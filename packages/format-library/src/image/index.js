@@ -6,6 +6,7 @@ import {
 	SVG,
 	Popover,
 	Button,
+	ExternalLink,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalNumberControl as NumberControl,
@@ -98,6 +99,24 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						onChange={ ( newAlt ) => {
 							setEditedAlt( newAlt );
 						} }
+						help={
+							<>
+								<ExternalLink
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
 					/>
 					<HStack justify="right">
 						<Button
