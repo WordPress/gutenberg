@@ -132,7 +132,7 @@ export class PropSignal {
 			this.getterSignal = signal( get );
 		} else if (
 			value !== this.valueSignal.peek() ||
-			get !== this.getterSignal?.peek()
+			get !== this.getterSignal!.peek()
 		) {
 			batch( () => {
 				this.valueSignal!.value = value;
