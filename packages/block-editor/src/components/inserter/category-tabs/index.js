@@ -1,14 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useReducedMotion } from '@wordpress/compose';
+import { usePrevious, useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
@@ -33,6 +32,9 @@ function CategoryTabs( {
 		duration: disableMotion ? 0 : ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
 	};
+
+	const previousSelectedCategory = usePrevious( selectedCategory );
+
 	return (
 		<Tabs
 			className="block-editor-inserter__category-tabs"
@@ -68,13 +70,18 @@ function CategoryTabs( {
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>
-			<AnimatePresence initial={ false }>
-				{ selectedCategory && (
+			{ categories.map( ( category ) => (
+				<Tabs.TabPanel
+					key={ category.name }
+					tabId={ category.name }
+					focusable={ false }
+				>
 					<motion.div
 						className="block-editor-inserter__category-panel"
-						initial="closed"
+						initial={
+							! previousSelectedCategory ? 'closed' : 'open'
+						}
 						animate="open"
-						exit="closed"
 						variants={ {
 							open: {
 								transform: 'translateX( 0 )',
@@ -89,18 +96,10 @@ function CategoryTabs( {
 						} }
 						transition={ defaultTransition }
 					>
-						{ categories.map( ( category ) => (
-							<Tabs.TabPanel
-								key={ category.name }
-								tabId={ category.name }
-								focusable={ false }
-							>
-								{ children }
-							</Tabs.TabPanel>
-						) ) }
+						{ children }
 					</motion.div>
-				) }
-			</AnimatePresence>
+				</Tabs.TabPanel>
+			) ) }
 		</Tabs>
 	);
 }
