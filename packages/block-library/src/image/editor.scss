@@ -80,6 +80,11 @@ figure.wp-block-image:not(.wp-block) {
 		background: $white;
 		opacity: 0.8;
 	}
+
+	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
