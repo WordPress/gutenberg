@@ -10,7 +10,7 @@ import {
 	ExternalLink,
 	Button,
 	__experimentalInputControl as InputControl,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -69,7 +69,7 @@ export default function PostURL( { onClose } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const [ forceEmptyField, setForceEmptyField ] = useState( false );
 	const copyButtonRef = useCopyToClipboard( permalink, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Copied Permalink to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
@@ -77,98 +77,86 @@ export default function PostURL( { onClose } ) {
 	return (
 		<div className="editor-post-url">
 			<InspectorPopoverHeader
-				title={ __( 'Link' ) }
+				title={ __( 'Permalink' ) }
 				onClose={ onClose }
 			/>
-			<VStack spacing={ 3 }>
+			<VStack spacing={ 4 }>
+				<HStack>
+					<ExternalLink
+						className="editor-post-url__link"
+						href={ postLink }
+						target="_blank"
+					>
+						{ isEditable ? (
+							<>
+								<span className="editor-post-url__link-prefix">
+									{ permalinkPrefix }
+								</span>
+								<span className="editor-post-url__link-slug">
+									{ postSlug }
+								</span>
+								<span className="editor-post-url__link-suffix">
+									{ permalinkSuffix }
+								</span>
+							</>
+						) : (
+							postLink
+						) }
+					</ExternalLink>
+					<Button
+						size="compact"
+						icon={ copySmall }
+						ref={ copyButtonRef }
+						label={ __( 'Copy' ) }
+					/>
+				</HStack>
 				{ isEditable && (
-					<div>
-						{ __( 'Customize the last part of the URL. ' ) }
-						<ExternalLink
-							href={ __(
-								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-							) }
-						>
-							{ __( 'Learn more.' ) }
-						</ExternalLink>
-					</div>
-				) }
-				<div>
-					{ isEditable && (
-						<InputControl
-							__next40pxDefaultSize
-							prefix={
-								<InputControlPrefixWrapper>
-									/
-								</InputControlPrefixWrapper>
+					<InputControl
+						__next40pxDefaultSize
+						label={ __( 'Slug' ) }
+						value={ forceEmptyField ? '' : postSlug }
+						autoComplete="off"
+						spellCheck="false"
+						type="text"
+						className="editor-post-url__input"
+						onChange={ ( newValue ) => {
+							editPost( { slug: newValue } );
+							// When we delete the field the permalink gets
+							// reverted to the original value.
+							// The forceEmptyField logic allows the user to have
+							// the field temporarily empty while typing.
+							if ( ! newValue ) {
+								if ( ! forceEmptyField ) {
+									setForceEmptyField( true );
+								}
+								return;
 							}
-							suffix={
-								<Button
-									icon={ copySmall }
-									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
-								/>
+							if ( forceEmptyField ) {
+								setForceEmptyField( false );
 							}
-							label={ __( 'Link' ) }
-							hideLabelFromVision
-							value={ forceEmptyField ? '' : postSlug }
-							autoComplete="off"
-							spellCheck="false"
-							type="text"
-							className="editor-post-url__input"
-							onChange={ ( newValue ) => {
-								editPost( { slug: newValue } );
-								// When we delete the field the permalink gets
-								// reverted to the original value.
-								// The forceEmptyField logic allows the user to have
-								// the field temporarily empty while typing.
-								if ( ! newValue ) {
-									if ( ! forceEmptyField ) {
-										setForceEmptyField( true );
-									}
-									return;
-								}
-								if ( forceEmptyField ) {
-									setForceEmptyField( false );
-								}
-							} }
-							onBlur={ ( event ) => {
-								editPost( {
-									slug: cleanForSlug( event.target.value ),
-								} );
-								if ( forceEmptyField ) {
-									setForceEmptyField( false );
-								}
-							} }
-							help={
+						} }
+						onBlur={ ( event ) => {
+							editPost( {
+								slug: cleanForSlug( event.target.value ),
+							} );
+							if ( forceEmptyField ) {
+								setForceEmptyField( false );
+							}
+						} }
+						help={
+							<>
+								{ __( 'The last part of the URL. ' ) }
 								<ExternalLink
-									className="editor-post-url__link"
-									href={ postLink }
-									target="_blank"
+									href={ __(
+										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+									) }
 								>
-									<span className="editor-post-url__link-prefix">
-										{ permalinkPrefix }
-									</span>
-									<span className="editor-post-url__link-slug">
-										{ postSlug }
-									</span>
-									<span className="editor-post-url__link-suffix">
-										{ permalinkSuffix }
-									</span>
+									{ __( 'Learn more.' ) }
 								</ExternalLink>
-							}
-						/>
-					) }
-					{ ! isEditable && (
-						<ExternalLink
-							className="editor-post-url__link"
-							href={ postLink }
-							target="_blank"
-						>
-							{ postLink }
-						</ExternalLink>
-					) }
-				</div>
+							</>
+						}
+					/>
+				) }
 			</VStack>
 		</div>
 	);

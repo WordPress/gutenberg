@@ -12,19 +12,11 @@
 .editor-post-url__link {
 	direction: ltr;
 	word-break: break-word;
-	margin-top: $grid-unit-05;
-	color: $gray-700;
 }
 /* rtl:end:ignore */
 
 .editor-post-url__link-slug {
 	font-weight: 600;
-}
-
-// TODO: This might indicate a need to update the InputControl itself, as
-// there is no way currently to control the padding when adding prefix/suffix.
-.editor-post-url__input input.components-input-control__input {
-	padding-inline-start: 0 !important;
 }
 
 .editor-post-url__panel-toggle {
