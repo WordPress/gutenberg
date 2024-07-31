@@ -42,10 +42,11 @@ export const image = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style, alt: _alt } = activeObjectAttributes;
-	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
-	const [ alt, setAlt ] = useState( _alt );
-	const [ hasChanged, setHasChanged ] = useState( false );
+	const { style, alt } = activeObjectAttributes;
+	const width = style?.replace( /\D/g, '' );
+	const [ editedWidth, setEditedWidth ] = useState( width );
+	const [ editedAlt, setEditedAlt ] = useState( alt );
+	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: image,
@@ -67,8 +68,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: width ? `width: ${ width }px;` : '',
-							alt,
+							style: width ? `width: ${ editedWidth }px;` : '',
+							alt: editedAlt,
 						},
 					};
 
@@ -77,29 +78,25 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						replacements: newReplacements,
 					} );
 
-					setHasChanged( false );
-
 					event.preventDefault();
 				} }
 			>
 				<VStack>
 					<NumberControl
 						label={ __( 'Width' ) }
-						value={ width }
+						value={ editedWidth }
 						min={ 1 }
 						onChange={ ( newWidth ) => {
-							setWidth( newWidth );
-							setHasChanged( true );
+							setEditedWidth( newWidth );
 						} }
 						size="compact"
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
 						__nextHasNoMarginBottom
-						value={ alt }
+						value={ editedAlt }
 						onChange={ ( newAlt ) => {
-							setAlt( newAlt );
-							setHasChanged( true );
+							setEditedAlt( newAlt );
 						} }
 					/>
 					<HStack justify="right">
