@@ -293,8 +293,8 @@ class Gutenberg_HTML_Processor_6_6 extends Gutenberg_HTML_Tag_Processor_6_6 {
 		$processor->state->insertion_mode = Gutenberg_HTML_Processor_State_6_6::INSERTION_MODE_IN_BODY;
 
 		// @todo Create "fake" bookmarks for non-existent but implied nodes.
-		$processor->bookmarks['root-node']    = new Gutenberg_HTML_Span_6_5( 0, 0 );
-		$processor->bookmarks['context-node'] = new Gutenberg_HTML_Span_6_5( 0, 0 );
+		$processor->bookmarks['root-node']    = new WP_HTML_Span( 0, 0 );
+		$processor->bookmarks['context-node'] = new WP_HTML_Span( 0, 0 );
 
 		$processor->state->stack_of_open_elements->push(
 			new WP_HTML_Token(
