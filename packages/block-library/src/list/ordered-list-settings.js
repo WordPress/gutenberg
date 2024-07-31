@@ -61,7 +61,7 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => (
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
-				label={ __( 'Reverse' ) }
+				label={ __( 'Reverse order' ) }
 				checked={ reversed || false }
 				onChange={ ( value ) => {
 					setAttributes( {
