@@ -45,16 +45,7 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 			),
-			// First/last child rules need to be after `> *` rule to take
-			// precedence when they have the same specificity.
 			'spacingStyles' => array(
-				array(
-					'selector' => ' > *',
-					'rules'    => array(
-						'margin-block-start' => null,
-						'margin-block-end'   => '0',
-					),
-				),
 				array(
 					'selector' => ' > :first-child',
 					'rules'    => array(
@@ -65,6 +56,13 @@ function gutenberg_get_layout_definitions() {
 					'selector' => ' > :last-child',
 					'rules'    => array(
 						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
 					),
 				),
 			),
@@ -112,16 +110,7 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 			),
-			// First/last child rules need to be after `> *` rule to take
-			// precedence when they have the same specificity.
 			'spacingStyles' => array(
-				array(
-					'selector' => ' > *',
-					'rules'    => array(
-						'margin-block-start' => null,
-						'margin-block-end'   => '0',
-					),
-				),
 				array(
 					'selector' => ' > :first-child',
 					'rules'    => array(
@@ -132,6 +121,13 @@ function gutenberg_get_layout_definitions() {
 					'selector' => ' > :last-child',
 					'rules'    => array(
 						'margin-block-end' => '0',
+					),
+				),
+				array(
+					'selector' => ' > *',
+					'rules'    => array(
+						'margin-block-start' => null,
+						'margin-block-end'   => '0',
 					),
 				),
 			),
