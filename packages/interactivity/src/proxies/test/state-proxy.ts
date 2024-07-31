@@ -114,10 +114,8 @@ describe( 'Interactivity API', () => {
 				const scope = { context: { test: { value: 'from context' } } };
 				try {
 					setScope( scope as any );
-					setNamespace( 'test' );
 					expect( state.y ).toBe( 'from context' );
 				} finally {
-					resetNamespace();
 					resetScope();
 				}
 			} );
@@ -152,10 +150,8 @@ describe( 'Interactivity API', () => {
 				const scope = { context: { test: { value: 1 } } };
 				try {
 					setScope( scope as any );
-					setNamespace( 'test' );
 					expect( state.sumContextValue( 2 ) ).toBe( 3 );
 				} finally {
-					resetNamespace();
 					resetScope();
 				}
 			} );
