@@ -14,6 +14,9 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	MenuGroup,
+	MenuItem,
+	ToolbarDropdownMenu,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -33,6 +36,12 @@ import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import {
+	link as linkIcon,
+	customLink,
+	image as imageIcon,
+	linkOff,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,11 +66,23 @@ import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
-	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
 	{
-		value: LINK_DESTINATION_NONE,
+		icon: customLink,
+		label: __( 'Link images to attachment pages' ),
+		value: LINK_DESTINATION_ATTACHMENT,
+		noticeText: __( 'Attachment Pages' ),
+	},
+	{
+		icon: imageIcon,
+		label: __( 'Link images to media files' ),
+		value: LINK_DESTINATION_MEDIA,
+		noticeText: __( 'Media Files' ),
+	},
+	{
+		icon: linkOff,
 		label: _x( 'None', 'Media item link option' ),
+		value: LINK_DESTINATION_NONE,
+		noticeText: __( 'None' ),
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -359,7 +380,7 @@ function GalleryEdit( props ) {
 			sprintf(
 				/* translators: %s: image size settings */
 				__( 'All gallery image links updated to: %s' ),
-				linkToText.label
+				linkToText.noticeText
 			),
 			{
 				id: 'gallery-attributes-linkTo',
@@ -552,15 +573,17 @@ function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 					) }
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton
-						size="__unstable-large"
-					/>
+					{ Platform.isNative ? (
+						<SelectControl
+							__nextHasNoMarginBottom
+							label={ __( 'Link' ) }
+							value={ linkTo }
+							onChange={ setLinkTo }
+							options={ linkOptions }
+							hideCancelButton
+							size="__unstable-large"
+						/>
+					) : null }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Crop images to fit' ) }
@@ -594,6 +617,45 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			{ Platform.isWeb ? (
+				<BlockControls group="block">
+					<ToolbarDropdownMenu
+						icon={ linkIcon }
+						label={ __( 'Link' ) }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ linkOptions.map( ( linkItem ) => {
+									const isOptionSelected =
+										linkTo === linkItem.value;
+									return (
+										<MenuItem
+											key={ linkItem.value }
+											isSelected={ isOptionSelected }
+											className={ clsx(
+												'components-dropdown-menu__menu-item',
+												{
+													'is-active':
+														isOptionSelected,
+												}
+											) }
+											iconPosition="left"
+											icon={ linkItem.icon }
+											onClick={ () => {
+												setLinkTo( linkItem.value );
+												onClose();
+											} }
+											role="menuitemradio"
+										>
+											{ linkItem.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</ToolbarDropdownMenu>
+				</BlockControls>
+			) : null }
 			{ Platform.isWeb && (
 				<>
 					{ ! multiGallerySelection && (

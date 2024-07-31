@@ -38,6 +38,12 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 import { setThemeFileUris } from './theme-file-uri-utils';
 
+// Elements that rely on class names in their selectors.
+const ELEMENT_CLASS_NAMES = {
+	button: 'wp-element-button',
+	caption: 'wp-element-caption',
+};
+
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
 const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
@@ -643,6 +649,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
+			// Root selector (body) styles should not be wrapped in `:root where()` to keep
+			// specificity at (0,0,1) and maintain backwards compatibility.
+			skipSelectorWrapper: true,
 		} );
 	}
 
@@ -651,6 +660,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
+				// Top level elements that don't use a class name should not receive the
+				// `:root :where()` wrapper to maintain backwards compatibility.
+				skipSelectorWrapper: ! ELEMENT_CLASS_NAMES[ name ],
 			} );
 		}
 	} );
@@ -957,6 +969,7 @@ export const toStyles = (
 				hasLayoutSupport,
 				featureSelectors,
 				styleVariationSelectors,
+				skipSelectorWrapper,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
@@ -1015,7 +1028,10 @@ export const toStyles = (
 					disableRootPadding
 				);
 				if ( styleDeclarations?.length ) {
-					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
+					const generalSelector = skipSelectorWrapper
+						? selector
+						: `:root :where(${ selector })`;
+					ruleset += `${ generalSelector }{${ styleDeclarations.join(
 						';'
 					) };}`;
 				}
@@ -1109,7 +1125,11 @@ export const toStyles = (
 								.map( ( sel ) => sel + pseudoKey )
 								.join( ',' );
 
-							const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+							// As pseudo classes such as :hover, :focus etc. have class-level
+							// specificity, they must use the `:root :where()` wrapper. This.
+							// caps the specificity at `0-1-0` to allow proper nesting of variations
+							// and block type element styles.
+							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
 								';'
 							) };}`;
 
@@ -1307,9 +1327,17 @@ function updateConfigWithSeparator( config ) {
 export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
+	if ( ! css || css.trim() === '' ) {
+		return processedCSS;
+	}
+
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
+		if ( ! part || part.trim() === '' ) {
+			return;
+		}
+
 		const isRootCss = ! part.includes( '{' );
 		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
@@ -1322,11 +1350,32 @@ export function processCSSNesting( css, blockSelector ) {
 			}
 
 			const [ nestedSelector, cssValue ] = splittedPart;
-			const combinedSelector = nestedSelector.startsWith( ' ' )
-				? scopeSelector( blockSelector, nestedSelector )
-				: appendToSelector( blockSelector, nestedSelector );
 
-			processedCSS += `:root :where(${ combinedSelector }){${ cssValue.trim() }}`;
+			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
+			// capture any leading combinator such as >, +, or ~, as well as spaces.
+			// This allows pseudo elements as descendants e.g. `.parent ::before`.
+			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
+			const pseudoPart = matches ? matches[ 1 ] : '';
+			const withoutPseudoElement = matches
+				? nestedSelector.replace( pseudoPart, '' ).trim()
+				: nestedSelector.trim();
+
+			let combinedSelector;
+			if ( withoutPseudoElement === '' ) {
+				// Only contained a pseudo element to use the block selector to form
+				// the final `:root :where()` selector.
+				combinedSelector = blockSelector;
+			} else {
+				// If the nested selector is a descendant of the block scope it with the
+				// block selector. Otherwise append it to the block selector.
+				combinedSelector = nestedSelector.startsWith( ' ' )
+					? scopeSelector( blockSelector, withoutPseudoElement )
+					: appendToSelector( blockSelector, withoutPseudoElement );
+			}
+
+			// Build final rule, re-adding any pseudo element outside the `:where()`
+			// to maintain valid CSS selector.
+			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
 		}
 	} );
 	return processedCSS;

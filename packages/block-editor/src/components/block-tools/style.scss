@@ -285,3 +285,11 @@
 		border: none;
 	}
 }
+
+.block-editor-block-tools__zoom-out-mode-inserter-button {
+	visibility: hidden;
+
+	&.is-visible {
+		visibility: visible;
+	}
+}

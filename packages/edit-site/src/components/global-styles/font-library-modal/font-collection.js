@@ -25,6 +25,7 @@ import {
 	DropdownMenu,
 	SearchControl,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
@@ -173,6 +174,25 @@ function FontCollection( { slug } ) {
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
+	};
+
+	const selectFontCount =
+		fontsToInstall.length > 0 ? fontsToInstall[ 0 ]?.fontFace?.length : 0;
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		selectFontCount > 0 &&
+		selectFontCount !== selectedFont?.fontFace?.length;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked =
+		selectFontCount === selectedFont?.fontFace?.length;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const newFonts = isSelectAllChecked ? [] : [ selectedFont ];
+
+		setFontsToInstall( newFonts );
 	};
 
 	const handleInstall = async () => {
@@ -400,6 +420,14 @@ function FontCollection( { slug } ) {
 								{ __( 'Select font variants to install.' ) }
 							</Text>
 							<Spacer margin={ 4 } />
+							<CheckboxControl
+								className="font-library-modal__select-all"
+								label={ __( 'Select all' ) }
+								checked={ isSelectAllChecked }
+								onChange={ toggleSelectAll }
+								indeterminate={ isIndeterminate }
+								__nextHasNoMarginBottom
+							/>
 							<VStack spacing={ 0 }>
 								<Spacer margin={ 8 } />
 								{ getSortedFontFaces( selectedFont ).map(

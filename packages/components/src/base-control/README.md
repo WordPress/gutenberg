@@ -53,7 +53,7 @@ If true, the label will only be visible to screen readers.
 
 ### help
 
-Additional description for the control. The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+Additional description for the control. Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
 -   Type: `ReactNode`
 -   Required: No

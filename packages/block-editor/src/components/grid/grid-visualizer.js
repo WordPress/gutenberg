@@ -13,7 +13,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -89,7 +89,7 @@ const GridVisualizerGrid = forwardRef(
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
-				__unstablePopoverSlot="block-toolbar"
+				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }

@@ -26,7 +26,7 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
+import { PatternCategoryPreviews } from './block-patterns-tab/pattern-category-previews';
 import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
@@ -147,7 +147,7 @@ function InserterMenu(
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
 	const showZoomOut =
-		showPatternPanel && window.__experimentalEnableZoomedOutPatternsTab;
+		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
 
 	useZoomOut( showZoomOut );
 
@@ -246,7 +246,7 @@ function InserterMenu(
 				selectedCategory={ selectedPatternCategory }
 			>
 				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
+					<PatternCategoryPreviews
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertPattern }
 						onHover={ onHoverPattern }

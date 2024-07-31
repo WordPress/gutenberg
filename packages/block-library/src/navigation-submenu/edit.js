@@ -29,7 +29,6 @@ import {
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import { useResourcePermissions } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
@@ -134,7 +133,7 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, type, url, description, rel, title } = attributes;
+	const { label, url, description, rel, title } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -153,9 +152,6 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
-
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
 		parentCount,
@@ -262,13 +258,6 @@ export default function NavigationSubmenuEdit( {
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
 		selection.addRange( range );
-	}
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
 	}
 
 	const {
@@ -499,7 +488,6 @@ export default function NavigationSubmenuEdit( {
 								}
 							} }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ () => {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );

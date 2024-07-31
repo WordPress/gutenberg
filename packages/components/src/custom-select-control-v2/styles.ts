@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 /**
  * Internal dependencies
@@ -12,6 +12,13 @@ import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import { fontSizeStyles } from '../input-control/styles/input-control-styles';
 import type { CustomSelectButtonSize } from './types';
+
+// TODO: extract to common utils and apply to relevant components
+const ANIMATION_PARAMS = {
+	SLIDE_AMOUNT: '2px',
+	DURATION: '400ms',
+	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+};
 
 const INLINE_PADDING = {
 	compact: 8, // space(2)
@@ -98,6 +105,14 @@ export const Select = styled( Ariakit.Select, {
 	`
 );
 
+const slideDownAndFade = keyframes( {
+	'0%': {
+		opacity: 0,
+		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+	},
+	'100%': { opacity: 1, transform: 'translateY(0)' },
+} );
+
 export const SelectPopover = styled( Ariakit.SelectPopover )`
 	display: flex;
 	flex-direction: column;
@@ -113,11 +128,21 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	overflow: auto;
 	overscroll-behavior: contain;
 
-	// The smallest size without overflowing the container.
+	/* The smallest size without overflowing the container. */
 	min-width: min-content;
 
+	/* Animation */
+	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+	animation-name: ${ slideDownAndFade };
+	will-change: transform, opacity;
+	@media ( prefers-reduced-motion ) {
+		animation-duration: 0s;
+	}
+
 	&[data-focus-visible] {
-		outline: none; // outline will be on the trigger, rather than the popover
+		/* The outline will be on the trigger, rather than the popover. */
+		outline: none;
 	}
 `;
 

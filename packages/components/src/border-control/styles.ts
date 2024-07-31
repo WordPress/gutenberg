@@ -16,10 +16,6 @@ import {
 
 import type { Border } from './types';
 
-const labelStyles = css`
-	font-weight: 500;
-`;
-
 const focusBoxShadow = css`
 	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
 `;
@@ -140,7 +136,6 @@ export const borderControlPopoverControls = css`
 
 	> div:first-of-type > ${ StyledLabel } {
 		margin-bottom: 0;
-		${ labelStyles }
 	}
 
 	&& ${ StyledLabel } + button:not( .has-text ) {

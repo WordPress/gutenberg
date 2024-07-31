@@ -33,7 +33,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -132,6 +132,11 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
+.emotion-12[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .emotion-12:active {
   background: #fff;
 }
@@ -213,6 +218,11 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
+.emotion-18[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .emotion-18:active {
   background: #fff;
 }
@@ -238,7 +248,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-10"
+        id="toggle-group-control-as-radio-group-11"
         role="radiogroup"
       >
         <div
@@ -252,7 +262,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-10-24"
+            id="toggle-group-control-as-radio-group-11-30"
             role="radio"
             type="button"
             value="uppercase"
@@ -291,7 +301,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             data-value="lowercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-10-25"
+            id="toggle-group-control-as-radio-group-11-31"
             role="radio"
             type="button"
             value="lowercase"
@@ -359,7 +369,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -452,6 +462,11 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   border: 0;
 }
 
+.emotion-12[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .emotion-12:active {
   background: #fff;
 }
@@ -486,7 +501,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
         class="components-toggle-group-control emotion-8 emotion-9"
         data-wp-c16t="true"
         data-wp-component="ToggleGroupControl"
-        id="toggle-group-control-as-radio-group-9"
+        id="toggle-group-control-as-radio-group-10"
         role="radiogroup"
       >
         <div
@@ -499,7 +514,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="rigas"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-9-22"
+            id="toggle-group-control-as-radio-group-10-28"
             role="radio"
             type="button"
             value="rigas"
@@ -521,7 +536,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
             data-value="jack"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
-            id="toggle-group-control-as-radio-group-9-23"
+            id="toggle-group-control-as-radio-group-10-29"
             role="radio"
             type="button"
             value="jack"
@@ -578,7 +593,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -677,6 +692,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   border: 0;
 }
 
+.emotion-12[disabled] {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .emotion-12:active {
   background: #fff;
 }
@@ -756,6 +776,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-18::-moz-focus-inner {
   border: 0;
+}
+
+.emotion-18[disabled] {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .emotion-18:active {
@@ -898,7 +923,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -989,6 +1014,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 
 .emotion-12::-moz-focus-inner {
   border: 0;
+}
+
+.emotion-12[disabled] {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .emotion-12:active {

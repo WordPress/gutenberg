@@ -89,11 +89,11 @@ test.describe( 'Templates', () => {
 		await page.getByRole( 'button', { name: 'Layout' } ).click();
 		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-		await page.getByRole( 'button', { name: 'Description' } ).click();
+		await page.getByRole( 'button', { name: 'Author' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
 		await expect(
-			page.getByRole( 'button', { name: 'Description' } )
+			page.getByRole( 'button', { name: 'Author' } )
 		).toBeHidden();
 	} );
 } );
