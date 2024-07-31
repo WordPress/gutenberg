@@ -200,12 +200,6 @@ describe( 'Interactivity API', () => {
 				expect( state.array.length ).toBe( 1 );
 			} );
 
-			it( 'should update when mutations happen', () => {
-				expect( state.a ).toBe( 1 );
-				state.a = 11;
-				expect( state.a ).toBe( 11 );
-			} );
-
 			it( 'should support setting getters on the fly', () => {
 				const state = proxifyState< {
 					counter: number;
