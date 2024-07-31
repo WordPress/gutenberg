@@ -39,7 +39,7 @@ GroupLabel.displayName = 'Composite.GroupLabel';
 export const Item = Ariakit.CompositeItem;
 Item.displayName = 'Composite.Item';
 
-export const Row = Ariakit.Composite.Row;
+export const Row = Ariakit.CompositeRow;
 Row.displayName = 'Composite.Row';
 
 /**
