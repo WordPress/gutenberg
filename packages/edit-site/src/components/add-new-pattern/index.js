@@ -173,9 +173,15 @@ export default function AddNewPattern() {
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
 						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
-							const currentCategory = categoryMap
-								.values()
-								.find( ( term ) => term.name === categoryId );
+							/*
+							 * categoryMap.values() returns an iterator, not an array.
+							 * Iterator.find() is not yet widely supported.
+							 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/find
+							 * Convert to array to use the find method.
+							 */
+							const currentCategory = Array.from(
+								categoryMap.values()
+							).find( ( term ) => term.name === categoryId );
 							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
