@@ -624,10 +624,7 @@ export default function LogoEdit( {
 				className={ placeholderClassName }
 				preview={ logoImage }
 				withIllustration
-				style={
-					( width,
-					isSelected === false ? borderProps.style : undefined )
-				}
+				style={ ( width, borderProps.style ) }
 			>
 				{ content }
 			</Placeholder>
