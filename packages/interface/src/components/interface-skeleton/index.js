@@ -121,6 +121,19 @@ function InterfaceSkeleton(
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
+	const navigableRegionVariants = {
+		open: {
+			width: secondarySidebarSize.width,
+		},
+		closed: { width: 0 },
+		mobileOpen: { width: '100vw' },
+	};
+	const secondarySidebarVariants = {
+		open: { x: 0 },
+		closed: { x: -100 },
+		mobileOpen: { x: 0 },
+	};
+
 	return (
 		<div
 			{ ...( enableRegionNavigation ? navigateRegionsProps : {} ) }
@@ -187,13 +200,7 @@ function InterfaceSkeleton(
 									isMobileViewport ? 'mobileOpen' : 'open'
 								}
 								exit="closed"
-								variants={ {
-									open: {
-										width: secondarySidebarSize.width,
-									},
-									closed: { width: 0 },
-									mobileOpen: { width: '100vw' },
-								} }
+								variants={ navigableRegionVariants }
 								transition={ defaultTransition }
 							>
 								<motion.div
@@ -205,17 +212,7 @@ function InterfaceSkeleton(
 										height: '100%',
 										left: 0,
 									} }
-									initial="closed"
-									animate="open"
-									exit="closed"
-									variants={ {
-										open: {
-											transform: 'translateX( 0 )',
-										},
-										closed: {
-											transform: 'translateX( -100% )',
-										},
-									} }
+									variants={ secondarySidebarVariants }
 									transition={ defaultTransition }
 								>
 									{ secondarySidebarResizeListener }
