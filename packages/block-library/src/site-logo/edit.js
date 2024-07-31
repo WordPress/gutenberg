@@ -56,14 +56,14 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
 // If the logo is linked, wrap in an <a /> tag to trigger any inherited link element styles.
-const ImageWrapper = ( { isLink, href, title, classes, children } ) => {
+const ImageWrapper = ( { isLink, href, title, children } ) => {
 	if ( ! isLink ) {
 		return children;
 	}
 	return (
 		<a
 			href={ href }
-			className={ classes }
+			className="custom-logo-link"
 			title={ title }
 			rel="home"
 			onClick={ ( event ) => event.preventDefault() }
@@ -105,7 +105,6 @@ const SiteLogo = ( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const borderProps = useBorderProps( attributes );
-	const classes = clsx( 'custom-logo-link' );
 
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
@@ -168,7 +167,6 @@ const SiteLogo = ( {
 					isLink={ isLink }
 					href={ siteUrl }
 					title={ title }
-					classes={ classes }
 				>
 					{ img }
 				</ImageWrapper>
@@ -233,12 +231,7 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageWrapper
-				isLink={ isLink }
-				href={ siteUrl }
-				title={ title }
-				classes={ classes }
-			>
+			<ImageWrapper isLink={ isLink } href={ siteUrl } title={ title }>
 				<ImageEditor
 					id={ logoId }
 					url={ logoUrl }
@@ -286,7 +279,6 @@ const SiteLogo = ( {
 					isLink={ isLink }
 					href={ siteUrl }
 					title={ title }
-					classes={ classes }
 				>
 					{ img }
 				</ImageWrapper>
