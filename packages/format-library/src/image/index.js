@@ -82,7 +82,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<VStack>
+				<VStack spacing={ 4 }>
 					<NumberControl
 						label={ __( 'Width' ) }
 						value={ editedWidth }
