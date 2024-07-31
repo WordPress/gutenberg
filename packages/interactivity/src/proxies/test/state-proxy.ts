@@ -120,6 +120,31 @@ describe( 'Interactivity API', () => {
 				}
 			} );
 
+			it( 'should use its namespace by default inside getters', () => {
+				const state = proxifyState( 'test/right', {
+					get value() {
+						const ctx = getContext< { value: string } >();
+						return ctx.value;
+					},
+				} );
+
+				const scope = {
+					context: {
+						'test/right': { value: 'OK' },
+						'test/other': { value: 'Wrong' },
+					},
+				};
+
+				try {
+					setScope( scope as any );
+					setNamespace( 'test/other' );
+					expect( state.value ).toBe( 'OK' );
+				} finally {
+					resetNamespace();
+					resetScope();
+				}
+			} );
+
 			it( 'should work with normal functions', () => {
 				const state = proxifyState( 'test', {
 					value: 1,
