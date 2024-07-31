@@ -96,7 +96,7 @@ describe( 'transformStyles', () => {
 			expect( output ).toMatchSnapshot();
 		} );
 
-		it( 'should ignore selectors', () => {
+		it( 'should ignore ignored selectors', () => {
 			const input = `h1, body { color: red; }`;
 			const output = transformStyles(
 				[
@@ -111,7 +111,7 @@ describe( 'transformStyles', () => {
 			expect( output ).toMatchSnapshot();
 		} );
 
-		it( 'should replace root tags', () => {
+		it( 'should replace root selectors', () => {
 			const input = `body, h1 { color: red; }`;
 			const output = transformStyles(
 				[

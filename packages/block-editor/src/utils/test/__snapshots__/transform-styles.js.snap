@@ -40,6 +40,12 @@ exports[`transformStyles selector wrap should ignore font-face selectors 1`] = `
 ]
 `;
 
+exports[`transformStyles selector wrap should ignore ignored selectors 1`] = `
+[
+  ".my-namespace h1, body { color: red; }",
+]
+`;
+
 exports[`transformStyles selector wrap should ignore keyframes 1`] = `
 [
   "
@@ -48,12 +54,6 @@ exports[`transformStyles selector wrap should ignore keyframes 1`] = `
 					opacity: 0;
 				}
 			}",
-]
-`;
-
-exports[`transformStyles selector wrap should ignore selectors 1`] = `
-[
-  ".my-namespace h1, body { color: red; }",
 ]
 `;
 
@@ -66,7 +66,7 @@ exports[`transformStyles selector wrap should replace :root selectors 1`] = `
 ]
 `;
 
-exports[`transformStyles selector wrap should replace root tags 1`] = `
+exports[`transformStyles selector wrap should replace root selectors 1`] = `
 [
   ".my-namespace, .my-namespace h1 { color: red; }",
 ]
