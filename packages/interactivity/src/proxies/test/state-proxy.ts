@@ -217,6 +217,38 @@ describe( 'Interactivity API', () => {
 				expect( state.double ).toBe( 4 );
 			} );
 
+			it( 'should support getter modification', () => {
+				const state = proxifyState< {
+					counter: number;
+					double: number;
+				} >( 'test', {
+					counter: 1,
+					get double() {
+						return state.counter * 2;
+					},
+				} );
+
+				const scope = {
+					context: { test: { counter: 2 } },
+				};
+
+				expect( state.double ).toBe( 2 );
+
+				Object.defineProperty( state, 'double', {
+					get() {
+						const ctx = getContext< { counter: number } >();
+						return ctx.counter * 2;
+					},
+				} );
+
+				try {
+					setScope( scope as any );
+					expect( state.double ).toBe( 4 );
+				} finally {
+					resetScope();
+				}
+			} );
+
 			it( 'should copy object like plain JavaScript', () => {
 				const state = proxifyState< {
 					a?: { id: number; nested: { id: number } };
@@ -739,6 +771,41 @@ describe( 'Interactivity API', () => {
 					configurable: true,
 				} );
 				expect( number ).toBe( 3 );
+			} );
+
+			it( 'should keep subscribed to modified getters', () => {
+				const state = proxifyState< {
+					counter: number;
+					double: number;
+				} >( 'test', {
+					counter: 1,
+					get double() {
+						return state.counter * 2;
+					},
+				} );
+
+				const scope = {
+					context: { test: { counter: 2 } },
+				};
+
+				let double = 0;
+
+				effect(
+					withScopeAndNs( scope, 'test', () => {
+						double = state.double;
+					} )
+				);
+
+				expect( double ).toBe( 2 );
+
+				Object.defineProperty( state, 'double', {
+					get() {
+						const ctx = getContext< { counter: number } >();
+						return ctx.counter * 2;
+					},
+				} );
+
+				expect( double ).toBe( 4 );
 			} );
 
 			it( 'should react to changes in props inside getters', () => {
