@@ -4,7 +4,7 @@ WordPress exposes several APIs that allow you to modify the behavior of existing
 
 ## Registration
 
-The following filters are available to extend block settings during their registration.
+Blocks in WordPress are typically registered on both the server and client side using `block.json`` metadata. You can use the following filters to modify or extend block settings during their registration on the server with PHP and on the client with JavaScript. To learn more, refer to the [block registration](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) guide.
 
 ### `block_type_metadata`
 
@@ -135,9 +135,9 @@ wp.hooks.addFilter(
 
 ## Front end
 
-The following filters are available to change the output of a block on the front end.
+The following PHP filters are available to change the output of a block on the front end.
 
-## `render_block`
+### `render_block`
 
 Filters the font-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
 
@@ -170,7 +170,7 @@ function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
 add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 2 );
 ```
 
-## `render_block_{namespace/block}`
+### `render_block_{namespace/block}`
 
 Filters the font-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
 
@@ -199,7 +199,7 @@ add_filter( 'render_block_core/paragraph', 'example_add_custom_class_to_paragrap
 
 ## Editor
 
-The following filters are available to change the behavior of blocks while editing in the Editor.
+The following JavaScript filters are available to change the behavior of blocks while editing in the Editor.
 
 ### `blocks.getSaveElement`
 
