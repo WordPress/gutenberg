@@ -866,7 +866,7 @@ describe( 'Interactivity API', () => {
 				expect( resultNoScope ).toBe( 'No scope: 2' );
 			} );
 
-			it( 'should throw an error in getters that require an scope', () => {
+			it( 'should throw an error in getters that require a scope', () => {
 				const state = proxifyState( 'test', {
 					number: 1,
 					get sumValueFromContext() {
