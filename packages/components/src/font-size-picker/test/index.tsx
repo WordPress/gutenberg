@@ -3,6 +3,7 @@
  */
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -13,7 +14,6 @@ import type { FontSize } from '../types';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { render } from '../../utils/tmp-ariakit-test-render-replacement';
 
 const ControlledFontSizePicker = ( {
 	onChange,

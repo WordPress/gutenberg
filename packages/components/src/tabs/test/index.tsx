@@ -3,6 +3,7 @@
  */
 import { screen, waitFor } from '@testing-library/react';
 import { press, click, sleep } from '@ariakit/test';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -14,7 +15,6 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import Tabs from '..';
 import type { TabsProps } from '../types';
-import { render } from '../../utils/tmp-ariakit-test-render-replacement';
 
 type Tab = {
 	tabId: string;
