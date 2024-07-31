@@ -60,7 +60,7 @@ function TypesetButton() {
 			return activeVariation.title;
 		}
 		return allFontFamilies.map( ( font ) => font?.name ).join( ', ' );
-	}, [ userTypographyConfig, variations ] );
+	}, [ allFontFamilies, userTypographyConfig, variations ] );
 
 	return (
 		hasFonts && (
