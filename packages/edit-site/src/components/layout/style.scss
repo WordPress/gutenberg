@@ -148,6 +148,14 @@
 html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	animation-delay: 255ms;
 }
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
 /* stylelint-enable  */
 
 .edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
@@ -175,8 +183,11 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		color: $white;
 	}
 
+	&:focus-visible,
 	&:focus {
-		box-shadow: none;
+		box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 6px var(--wp-admin-theme-color);
+		outline: 4px solid #0000;
+		outline-offset: 4px;
 	}
 
 	&::before {
@@ -191,13 +202,6 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		left: 9px;
 		border-radius: $radius-block-ui + $border-width + $border-width;
 		box-shadow: none;
-	}
-
-	// Lightened spot color focus.
-	&:focus::before {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
-			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {
@@ -254,4 +258,26 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	bottom: 16px;
 	padding-left: 16px;
 	padding-right: 16px;
+}
+
+.edit-site-layout.is-full-canvas {
+	.edit-site-layout__view-mode-toggle.components-button {
+		&:focus-visible,
+		&:focus {
+
+			box-shadow: none;
+			outline: none;
+			outline-offset: 0;
+
+			.edit-site-site-icon svg {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
+				outline: 3px solid #0000;
+				height: 40px;
+				width: 40px;
+				padding: 2px;
+				border-radius: 2px;
+			}
+
+		}
+	}
 }

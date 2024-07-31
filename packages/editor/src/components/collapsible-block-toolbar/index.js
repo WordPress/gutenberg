@@ -24,7 +24,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
-function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
+export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
 		return {
 			blockSelectionStart:
@@ -73,5 +73,3 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 		</>
 	);
 }
-
-export default CollapsableBlockToolbar;

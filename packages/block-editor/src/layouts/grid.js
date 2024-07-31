@@ -23,7 +23,6 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -101,15 +100,8 @@ export default {
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
-		return (
-			<>
-				{ window.__experimentalEnableGridInteractivity && (
-					<GridLayoutSync clientId={ clientId } />
-				) }
-				<GridVisualizer clientId={ clientId } />
-			</>
-		);
+	toolBarControls: function GridLayoutToolbarControls() {
+		return null;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -163,7 +155,7 @@ export default {
 			);
 			if ( rowCount ) {
 				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(8px, auto))`
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 				);
 			}
 		} else if ( columnCount ) {
@@ -172,7 +164,7 @@ export default {
 			);
 			if ( rowCount ) {
 				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(8px, auto))`
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 				);
 			}
 		} else {
@@ -272,6 +264,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
+						__nextHasNoMarginBottom
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -375,6 +368,7 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
+								__nextHasNoMarginBottom
 								value={ columnCount ?? 0 }
 								onChange={ ( value ) =>
 									onChange( {
@@ -478,8 +472,4 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			/>
 		</ToggleGroupControl>
 	);
-}
-
-function GridLayoutSync( props ) {
-	useGridLayoutSync( props );
 }

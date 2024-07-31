@@ -34,6 +34,8 @@ import {
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from '../time-input';
 
+const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
+
 /**
  * TimePicker is a React component that renders a clock for time selection.
  *
@@ -58,6 +60,7 @@ export function TimePicker( {
 	is12Hour,
 	currentTime,
 	onChange,
+	dateOrder: dateOrderProp,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -116,6 +119,7 @@ export function TimePicker( {
 
 	const dayField = (
 		<DayInput
+			key="day"
 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
@@ -134,7 +138,7 @@ export function TimePicker( {
 	);
 
 	const monthField = (
-		<MonthSelectWrapper>
+		<MonthSelectWrapper key="month">
 			<SelectControl
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
@@ -164,6 +168,46 @@ export function TimePicker( {
 			/>
 		</MonthSelectWrapper>
 	);
+
+	const yearField = (
+		<YearInput
+			key="year"
+			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+			label={ __( 'Year' ) }
+			hideLabelFromVision
+			__next40pxDefaultSize
+			value={ year }
+			step={ 1 }
+			min={ 1 }
+			max={ 9999 }
+			required
+			spinControls="none"
+			isPressEnterToChange
+			isDragEnabled={ false }
+			isShiftStepEnabled={ false }
+			onChange={ buildNumberControlChangeCallback( 'year' ) }
+			__unstableStateReducer={ buildPadInputStateReducer( 4 ) }
+		/>
+	);
+
+	const defaultDateOrder = is12Hour ? 'mdy' : 'dmy';
+	const dateOrder =
+		dateOrderProp && VALID_DATE_ORDERS.includes( dateOrderProp )
+			? dateOrderProp
+			: defaultDateOrder;
+
+	const fields = dateOrder.split( '' ).map( ( field ) => {
+		switch ( field ) {
+			case 'd':
+				return dayField;
+			case 'm':
+				return monthField;
+			case 'y':
+				return yearField;
+			default:
+				return null;
+		}
+	} );
 
 	return (
 		<Wrapper
@@ -201,36 +245,7 @@ export function TimePicker( {
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
-					{ is12Hour ? (
-						<>
-							{ monthField }
-							{ dayField }
-						</>
-					) : (
-						<>
-							{ dayField }
-							{ monthField }
-						</>
-					) }
-					<YearInput
-						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
-						label={ __( 'Year' ) }
-						hideLabelFromVision
-						__next40pxDefaultSize
-						value={ year }
-						step={ 1 }
-						min={ 1 }
-						max={ 9999 }
-						required
-						spinControls="none"
-						isPressEnterToChange
-						isDragEnabled={ false }
-						isShiftStepEnabled={ false }
-						onChange={ buildNumberControlChangeCallback( 'year' ) }
-						__unstableStateReducer={ buildPadInputStateReducer(
-							4
-						) }
-					/>
+					{ fields }
 				</HStack>
 			</Fieldset>
 		</Wrapper>

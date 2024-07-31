@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -53,15 +53,21 @@ export function getInstalledBlockTypes( state ) {
  *
  * @return {Array} Block type items.
  */
-export const getNewBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( blockEditorStore ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+export const getNewBlockTypes = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const usedBlockTree = select( blockEditorStore ).getBlocks();
+			const installedBlockTypes = getInstalledBlockTypes( state );
 
-		return installedBlockTypes.filter( ( blockType ) =>
-			hasBlockType( blockType, usedBlockTree )
-		);
-	}
+			return installedBlockTypes.filter( ( blockType ) =>
+				hasBlockType( blockType, usedBlockTree )
+			);
+		},
+		( state ) => [
+			getInstalledBlockTypes( state ),
+			select( blockEditorStore ).getBlocks(),
+		]
+	)
 );
 
 /**
@@ -72,15 +78,21 @@ export const getNewBlockTypes = createRegistrySelector(
  *
  * @return {Array} Block type items.
  */
-export const getUnusedBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( blockEditorStore ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+export const getUnusedBlockTypes = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const usedBlockTree = select( blockEditorStore ).getBlocks();
+			const installedBlockTypes = getInstalledBlockTypes( state );
 
-		return installedBlockTypes.filter(
-			( blockType ) => ! hasBlockType( blockType, usedBlockTree )
-		);
-	}
+			return installedBlockTypes.filter(
+				( blockType ) => ! hasBlockType( blockType, usedBlockTree )
+			);
+		},
+		( state ) => [
+			getInstalledBlockTypes( state ),
+			select( blockEditorStore ).getBlocks(),
+		]
+	)
 );
 
 /**

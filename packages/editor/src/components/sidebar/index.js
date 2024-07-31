@@ -51,7 +51,6 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
-	renderingMode,
 	onActionPerformed,
 	extraPanels,
 } ) => {
@@ -112,7 +111,7 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					<PostSummary onActionPerformed={ onActionPerformed } />
 					<PluginDocumentSettingPanel.Slot />
-					<TemplateContentPanel renderingMode={ renderingMode } />
+					<TemplateContentPanel />
 					<TemplatePartContentPanel />
 					<PostTransformPanel />
 					<PostTaxonomiesPanel />
@@ -129,7 +128,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary, renderingMode } = useSelect(
+	const { tabName, keyboardShortcut, showSummary } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
@@ -158,7 +157,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
 				].includes( select( editorStore ).getCurrentPostType() ),
-				renderingMode: select( editorStore ).getRenderingMode(),
 			};
 		},
 		[]
@@ -185,7 +183,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				showSummary={ showSummary }
-				renderingMode={ renderingMode }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 			/>

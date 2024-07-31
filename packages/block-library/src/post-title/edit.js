@@ -22,7 +22,7 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export default function PostTitleEdit( {
-	attributes: { level, textAlign, isLink, rel, linkTarget },
+	attributes: { level, levelOptions, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
@@ -42,11 +42,11 @@ export default function PostTitleEdit( {
 			if ( isDescendentOfQueryLoop ) {
 				return false;
 			}
-			return select( coreStore ).canUserEditEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
+			return select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: postType,
+				id: postId,
+			} );
 		},
 		[ isDescendentOfQueryLoop, postType, postId ]
 	);
@@ -125,6 +125,7 @@ export default function PostTitleEdit( {
 					<BlockControls group="block">
 						<HeadingLevelDropdown
 							value={ level }
+							options={ levelOptions }
 							onChange={ ( newLevel ) =>
 								setAttributes( { level: newLevel } )
 							}

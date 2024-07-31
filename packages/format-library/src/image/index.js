@@ -76,19 +76,19 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<HStack alignment="bottom" spacing="0">
+				<HStack alignment="bottom">
 					<NumberControl
-						className="block-editor-format-toolbar__image-container-value"
 						label={ __( 'Width' ) }
 						value={ width }
 						min={ 1 }
 						onChange={ ( newWidth ) => setWidth( newWidth ) }
+						size="__unstable-large"
 					/>
 					<Button
-						className="block-editor-format-toolbar__image-container-button"
 						icon={ keyboardReturn }
 						label={ __( 'Apply' ) }
 						type="submit"
+						__next40pxDefaultSize
 					/>
 				</HStack>
 			</form>

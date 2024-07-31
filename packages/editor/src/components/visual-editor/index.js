@@ -34,7 +34,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
-import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_POST_TYPE,
@@ -142,7 +142,10 @@ function VisualEditor( {
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
-		const canEditTemplate = canUser( 'create', 'templates' );
+		const canEditTemplate = canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_template',
+		} );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
 			? getEditedEntityRecord(

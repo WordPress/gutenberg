@@ -23,13 +23,18 @@ export interface TemplateOrTemplatePart extends BasePost {
 export interface Pattern extends BasePost {
 	slug: string;
 	title: { raw: string };
-	content: {
-		raw: string;
-	};
+	content: { raw: string } | string;
 	wp_pattern_sync_status: string;
 }
 
 export type Post = TemplateOrTemplatePart | Pattern | BasePost;
+
+export type PostWithPermissions = Post & {
+	permissions: {
+		delete: boolean;
+		update: boolean;
+	};
+};
 
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };

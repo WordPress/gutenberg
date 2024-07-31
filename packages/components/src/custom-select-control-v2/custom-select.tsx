@@ -145,6 +145,8 @@ function _CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
+					// Match legacy behavior
+					flip={ ! isLegacy }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }

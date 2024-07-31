@@ -3,13 +3,13 @@
  */
 import {
 	Button,
-	CustomSelectControl,
 	Icon,
 	RangeControl,
 	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -31,6 +31,11 @@ import {
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from '../utils';
+import { unlock } from '../../../lock-unlock';
+
+const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+	componentsPrivateApis
+);
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
@@ -261,6 +266,8 @@ export default function SpacingInputControl( {
 						onChange={ handleCustomValueSliderChange }
 						className="spacing-sizes-control__custom-value-range"
 						__nextHasNoMarginBottom
+						label={ ariaLabel }
+						hideLabelFromVision
 					/>
 				</>
 			) }
@@ -298,9 +305,11 @@ export default function SpacingInputControl( {
 				<CustomSelectControl
 					className="spacing-sizes-control__custom-select-control"
 					value={
+						// passing empty string as a fallback to continue using the
+						// component in controlled mode
 						options.find(
 							( option ) => option.key === currentValue
-						) || '' // passing undefined here causes a downshift controlled/uncontrolled warning
+						) || ''
 					}
 					onChange={ ( selection ) => {
 						onChange(

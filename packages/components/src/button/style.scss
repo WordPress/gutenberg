@@ -1,3 +1,10 @@
+/**
+ * For easier testing of potential regressions, you can use a Button variant matrix
+ * available in a special Storybook instance by running `npm run storybook:e2e:dev`.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/trunk/test/storybook-playwright/README.md
+ */
+
 .components-button {
 	display: inline-flex;
 	text-decoration: none;

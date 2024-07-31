@@ -43,9 +43,9 @@ type BaseButtonProps = {
 	 */
 	children?: ReactNode;
 	/**
-	 * An accessible description for the button.
+	 * A visually hidden accessible description for the button.
 	 */
-	describedBy?: string;
+	description?: string;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -199,6 +199,13 @@ export type DeprecatedButtonProps = {
 	 * @ignore
 	 */
 	isSmall?: boolean;
+	/**
+	 * A visually hidden accessible description for the button.
+	 *
+	 * @deprecated Use the `description` prop instead.
+	 * @ignore
+	 */
+	describedBy?: string;
 };
 
 export type DeprecatedIconButtonProps = {

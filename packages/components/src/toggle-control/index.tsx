@@ -3,6 +3,7 @@
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -22,27 +23,7 @@ import { HStack } from '../h-stack';
 import { useCx } from '../utils';
 import { space } from '../utils/space';
 
-/**
- * ToggleControl is used to generate a toggle user interface.
- *
- * ```jsx
- * import { ToggleControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const MyToggleControl = () => {
- *   const [ value, setValue ] = useState( false );
- *
- *   return (
- *     <ToggleControl
- *       label="Fixed Background"
- *       checked={ value }
- *       onChange={ () => setValue( ( state ) => ! state ) }
- *     />
- *   );
- * };
- * ```
- */
-export function ToggleControl(
+function UnforwardedToggleControl(
 	{
 		__nextHasNoMarginBottom,
 		label,
@@ -87,11 +68,17 @@ export function ToggleControl(
 	return (
 		<BaseControl
 			id={ id }
-			help={ helpLabel }
+			help={
+				helpLabel && (
+					<span className="components-toggle-control__help">
+						{ helpLabel }
+					</span>
+				)
+			}
 			className={ classes }
 			__nextHasNoMarginBottom
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
 					id={ id }
 					checked={ checked }
@@ -103,7 +90,9 @@ export function ToggleControl(
 				<FlexBlock
 					as="label"
 					htmlFor={ id }
-					className="components-toggle-control__label"
+					className={ clsx( 'components-toggle-control__label', {
+						'is-disabled': disabled,
+					} ) }
 				>
 					{ label }
 				</FlexBlock>
@@ -112,4 +101,26 @@ export function ToggleControl(
 	);
 }
 
-export default forwardRef( ToggleControl );
+/**
+ * ToggleControl is used to generate a toggle user interface.
+ *
+ * ```jsx
+ * import { ToggleControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyToggleControl = () => {
+ *   const [ value, setValue ] = useState( false );
+ *
+ *   return (
+ *     <ToggleControl
+ *       label="Fixed Background"
+ *       checked={ value }
+ *       onChange={ () => setValue( ( state ) => ! state ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const ToggleControl = forwardRef( UnforwardedToggleControl );
+
+export default ToggleControl;
