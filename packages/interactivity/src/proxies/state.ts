@@ -156,7 +156,7 @@ const stateHandlers: ProxyHandler< object > = {
 			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
-				prop.setGetter( desc.get! );
+				prop.setGetter( get );
 			} else {
 				const ns = getNamespaceFromProxy( receiver );
 				prop.setValue(
