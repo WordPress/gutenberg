@@ -196,7 +196,10 @@ const stateHandlers: ProxyHandler< object > = {
 		if ( ! objToIterable.has( target ) ) {
 			objToIterable.set( target, signal( 0 ) );
 		}
-		// This subscribes to the signal while preventing the minifier from deleting this line in production. 
+		/*
+		 *This subscribes to the signal while preventing the minifier from
+		 * deleting this line in production.
+		 */
 		( objToIterable as any )._ = objToIterable.get( target )!.value;
 		return Reflect.ownKeys( target );
 	},
