@@ -26,8 +26,6 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-tabbed-sidebar {
-		background-color: $white;
-
 		@include break-medium() {
 			width: $secondary-sidebar-width;
 		}

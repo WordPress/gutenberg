@@ -68,8 +68,8 @@ function CategoryTabs( {
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>
-			{ selectedCategory && (
-				<AnimatePresence initial={ false }>
+			<AnimatePresence initial={ false }>
+				{ selectedCategory && (
 					<motion.div
 						className="block-editor-inserter__category-panel"
 						initial="closed"
@@ -95,8 +95,8 @@ function CategoryTabs( {
 							</Tabs.TabPanel>
 						) ) }
 					</motion.div>
-				</AnimatePresence>
-			) }
+				) }
+			</AnimatePresence>
 		</Tabs>
 	);
 }
