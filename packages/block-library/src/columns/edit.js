@@ -192,6 +192,18 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
+	// eslint-disable-next-line no-unused-vars
+	const isAllColumnsEmpty = useSelect(
+		( select ) => {
+			const { getBlocks, getBlockCount } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+			return innerBlocks.every(
+				( block ) => getBlockCount( block.clientId ) === 0
+			);
+		},
+		[ clientId ]
+	);
+
 	const classes = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
