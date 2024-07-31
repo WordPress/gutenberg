@@ -86,6 +86,7 @@
 			border-top-left-radius: $radius-block-ui;
 			border-top-right-radius: $radius-block-ui;
 			border-top: 1px solid $gray-300;
+			border-bottom: 0;
 		}
 
 		// Identify the last visible instance as placeholder items will not have this class.
