@@ -174,10 +174,9 @@ export default function AddNewPattern() {
 						// add or create the proper pattern category.
 						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 							/*
-							 * categoryMap.values() returns an iterator, not an array.
-							 * Iterator.find() is not yet widely supported.
-							 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/find
-							 * Convert to array to use the find method.
+							 * categoryMap.values() returns an iterator.
+							 * Iterator.prototype.find() is not yet widely supported.
+							 * Convert to array to use the Array.prototype.find method.
 							 */
 							const currentCategory = Array.from(
 								categoryMap.values()
