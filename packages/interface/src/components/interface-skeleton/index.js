@@ -199,9 +199,6 @@ function InterfaceSkeleton(
 										height: '100%',
 										left: 0,
 									} }
-									initial="closed"
-									animate="open"
-									exit="closed"
 									variants={ {
 										open: { x: 0 },
 										closed: { x: '-100%' },
