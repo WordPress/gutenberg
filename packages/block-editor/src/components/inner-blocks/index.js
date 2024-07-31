@@ -210,7 +210,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			// The inner blocks belonging to the section drop zone is
 			// already disabled by the blocks themselves being disabled.
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings() );
+				const { sectionRootClientId } = getSettings();
 				_isDropZoneDisabled = clientId !== sectionRootClientId;
 			}
 			if ( ! clientId ) {

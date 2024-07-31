@@ -2858,7 +2858,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
 	if ( editorMode === 'zoom-out' ) {
-		const { sectionRootClientId } = unlock( getSettings( state ) );
+		const { sectionRootClientId } = getSettings( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
 				state,
@@ -2951,7 +2951,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings( state ) );
+				const { sectionRootClientId } = getSettings( state );
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 					return sectionRootClientId ? 'disabled' : 'contentOnly';
 				}
