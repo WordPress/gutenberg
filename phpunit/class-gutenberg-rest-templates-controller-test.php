@@ -37,27 +37,27 @@ class Gutenberg_REST_Templates_Controller_6_7_Test extends WP_Test_REST_Controll
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/test-plugin//test-template' );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertNotWPError( $response );
+		$this->assertNotWPError( $response, "Fetching a registered template shouldn't cause an error." );
 
 		$data = $response->get_data();
 
-		$this->assertEquals( 'default//test-template', $data['id'] );
-		$this->assertEquals( 'default', $data['theme'] );
-		$this->assertEquals( 'Template content', $data['content']['raw'] );
-		$this->assertEquals( 'test-template', $data['slug'] );
-		$this->assertEquals( 'plugin', $data['source'] );
-		$this->assertEquals( 'plugin', $data['origin'] );
-		$this->assertEquals( 'Description of test template', $data['description'] );
-		$this->assertEquals( 'Test Template', $data['title']['rendered'] );
-		$this->assertEquals( 'test-plugin', $data['plugin'] );
+		$this->assertSame( 'default//test-template', $data['id'], 'Template ID mismatch.' );
+		$this->assertSame( 'default', $data['theme'], 'Template theme mismatch.' );
+		$this->assertSame( 'Template content', $data['content']['raw'], 'Template content mismatch.' );
+		$this->assertSame( 'test-template', $data['slug'], 'Template slug mismatch.' );
+		$this->assertSame( 'plugin', $data['source'], "Template source should be 'plugin'." );
+		$this->assertSame( 'plugin', $data['origin'], "Template origin should be 'plugin'." );
+		$this->assertSame( 'Description of test template', $data['description'], 'Template description mismatch.' );
+		$this->assertSame( 'Test Template', $data['title']['rendered'], 'Template title mismatch.' );
+		$this->assertSame( 'test-plugin', $data['plugin'], 'Plugin name mismatch.' );
 
 		wp_unregister_template( $template_name );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/test-plugin//test-template' );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertNotWPError( $response );
-		$this->assertEquals( 404, $response->get_status() );
+		$this->assertNotWPError( $response, "Fetching an unregistered template shouldn't cause an error." );
+		$this->assertSame( 404, $response->get_status(), 'Fetching an unregistered template should return 404.' );
 	}
 
 	/**

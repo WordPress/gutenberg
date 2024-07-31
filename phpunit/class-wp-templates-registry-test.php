@@ -22,7 +22,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		$template_name = 'test-plugin//test-template';
 		$template      = self::$registry->register( $template_name );
 
-		$this->assertEquals( $template->slug, 'test-template' );
+		$this->assertSame( $template->slug, 'test-template' );
 
 		self::$registry->unregister( $template_name );
 	}
@@ -35,8 +35,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );
-		$this->assertEquals( 'template_name_no_string', $result->get_error_code() );
-		$this->assertEquals( 'Template names must be a string.', $result->get_error_message() );
+		$this->assertSame( 'template_name_no_string', $result->get_error_code(), 'Error code mismatch.' );
+		$this->assertSame( 'Template names must be a string.', $result->get_error_message(), 'Error message mismatch.' );
 	}
 
 	public function test_register_template_invalid_name_uppercase() {
@@ -47,8 +47,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );
-		$this->assertEquals( 'template_name_no_uppercase', $result->get_error_code() );
-		$this->assertEquals( 'Template names must not contain uppercase characters.', $result->get_error_message() );
+		$this->assertSame( 'template_name_no_uppercase', $result->get_error_code(), 'Error code mismatch.' );
+		$this->assertSame( 'Template names must not contain uppercase characters.', $result->get_error_message(), 'Error message mismatch.' );
 	}
 
 	public function test_register_template_no_prefix() {
@@ -57,8 +57,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		$result = self::$registry->register( 'template-no-plugin', array() );
 
 		$this->assertWPError( $result );
-		$this->assertEquals( 'template_no_prefix', $result->get_error_code() );
-		$this->assertEquals( 'Template names must contain a namespace prefix. Example: my-plugin//my-custom-template', $result->get_error_message() );
+		$this->assertSame( 'template_no_prefix', $result->get_error_code(), 'Error code mismatch.' );
+		$this->assertSame( 'Template names must contain a namespace prefix. Example: my-plugin//my-custom-template', $result->get_error_message(), 'Error message mismatch.' );
 	}
 
 	public function test_register_template_already_exists() {
@@ -71,8 +71,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );
-		$this->assertEquals( 'template_already_registered', $result->get_error_code() );
-		$this->assertStringContainsString( 'Template "test-plugin//duplicate-template" is already registered.', $result->get_error_message() );
+		$this->assertSame( 'template_already_registered', $result->get_error_code(), 'Error code mismatch.' );
+		$this->assertStringContainsString( 'Template "test-plugin//duplicate-template" is already registered.', $result->get_error_message(), 'Error message mismatch.' );
 
 		self::$registry->unregister( $template_name );
 	}
@@ -85,10 +85,10 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$all_templates = self::$registry->get_all_registered();
 
-		$this->assertIsArray( $all_templates );
-		$this->assertCount( 2, $all_templates );
-		$this->assertArrayHasKey( 'test-plugin//template-1', $all_templates );
-		$this->assertArrayHasKey( 'test-plugin//template-2', $all_templates );
+		$this->assertIsArray( $all_templates, 'Registered templates should be an array.' );
+		$this->assertCount( 2, $all_templates, 'Registered templates should contain 2 items.' );
+		$this->assertArrayHasKey( 'test-plugin//template-1', $all_templates, 'Registered templates should contain "test-plugin//template-1".' );
+		$this->assertArrayHasKey( 'test-plugin//template-2', $all_templates, 'Registered templates should contain "test-plugin//template-2".' );
 
 		self::$registry->unregister( $template_name_1 );
 		self::$registry->unregister( $template_name_2 );
@@ -106,16 +106,16 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$registered_template = self::$registry->get_registered( $template_name );
 
-		$this->assertEquals( 'default', $registered_template->theme );
-		$this->assertEquals( 'registered-template', $registered_template->slug );
-		$this->assertEquals( 'default//registered-template', $registered_template->id );
-		$this->assertEquals( 'Registered Template', $registered_template->title );
-		$this->assertEquals( 'Template content', $registered_template->content );
-		$this->assertEquals( 'Description of registered template', $registered_template->description );
-		$this->assertEquals( 'plugin', $registered_template->source );
-		$this->assertEquals( 'plugin', $registered_template->origin );
-		$this->assertEquals( array( 'post', 'page' ), $registered_template->post_types );
-		$this->assertEquals( 'test-plugin', $registered_template->plugin );
+		$this->assertSame( 'default', $registered_template->theme, 'Template theme mismatch.' );
+		$this->assertSame( 'registered-template', $registered_template->slug, 'Template slug mismatch.' );
+		$this->assertSame( 'default//registered-template', $registered_template->id, 'Template ID mismatch.' );
+		$this->assertSame( 'Registered Template', $registered_template->title, 'Template title mismatch.' );
+		$this->assertSame( 'Template content', $registered_template->content, 'Template content mismatch.' );
+		$this->assertSame( 'Description of registered template', $registered_template->description, 'Template description mismatch.' );
+		$this->assertSame( 'plugin', $registered_template->source, "Template source should be 'plugin'." );
+		$this->assertSame( 'plugin', $registered_template->origin, "Template origin should be 'plugin'." );
+		$this->assertEquals( array( 'post', 'page' ), $registered_template->post_types, 'Template post types mismatch.' );
+		$this->assertSame( 'test-plugin', $registered_template->plugin, 'Plugin name mismatch.' );
 
 		self::$registry->unregister( $template_name );
 	}
@@ -131,8 +131,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$registered_template = self::$registry->get_by_slug( $slug );
 
-		$this->assertNotNull( $registered_template );
-		$this->assertEquals( $slug, $registered_template->slug );
+		$this->assertNotNull( $registered_template, 'Registered template should not be null.' );
+		$this->assertSame( $slug, $registered_template->slug, 'Template slug mismatch.' );
 
 		self::$registry->unregister( $template_name );
 	}
@@ -156,8 +156,8 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		);
 		$results = self::$registry->get_by_query( $query );
 
-		$this->assertCount( 1, $results );
-		$this->assertArrayHasKey( $template_name_1, $results );
+		$this->assertCount( 1, $results, 'Query result should contain 1 item.' );
+		$this->assertArrayHasKey( $template_name_1, $results, 'Query result should contain "test-plugin//query-template-1".' );
 
 		self::$registry->unregister( $template_name_1 );
 		self::$registry->unregister( $template_name_2 );
@@ -186,7 +186,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$unregistered_template = self::$registry->unregister( $template_name );
 
-		$this->assertEquals( $template, $unregistered_template );
-		$this->assertFalse( self::$registry->is_registered( $template_name ) );
+		$this->assertEquals( $template, $unregistered_template, 'Unregistered template should be the same as the registered one.' );
+		$this->assertFalse( self::$registry->is_registered( $template_name ), 'Template should not be registered after unregistering.' );
 	}
 }
