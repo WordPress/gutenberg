@@ -7,12 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Notice,
-	PanelBody,
-	RangeControl,
-	ToggleControl,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 
 import {
 	InspectorControls,
@@ -25,166 +20,13 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
-	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import {
-	hasExplicitPercentColumnWidths,
-	getMappedColumnWidths,
-	getRedistributedColumnWidths,
-	toWidthPrecision,
-} from './utils';
-
 const DEFAULT_BLOCK = {
 	name: 'core/column',
 };
-
-function ColumnInspectorControls( {
-	clientId,
-	setAttributes,
-	isStackedOnMobile,
-} ) {
-	const { count, canInsertColumnBlock, minCount } = useSelect(
-		( select ) => {
-			const {
-				canInsertBlockType,
-				canRemoveBlock,
-				getBlocks,
-				getBlockCount,
-			} = select( blockEditorStore );
-			const innerBlocks = getBlocks( clientId );
-
-			// Get the indexes of columns for which removal is prevented.
-			// The highest index will be used to determine the minimum column count.
-			const preventRemovalBlockIndexes = innerBlocks.reduce(
-				( acc, block, index ) => {
-					if ( ! canRemoveBlock( block.clientId ) ) {
-						acc.push( index );
-					}
-					return acc;
-				},
-				[]
-			);
-
-			return {
-				count: getBlockCount( clientId ),
-				canInsertColumnBlock: canInsertBlockType(
-					'core/column',
-					clientId
-				),
-				minCount: Math.max( ...preventRemovalBlockIndexes ) + 1,
-			};
-		},
-		[ clientId ]
-	);
-	const { getBlocks } = useSelect( blockEditorStore );
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-
-	/**
-	 * Updates the column count, including necessary revisions to child Column
-	 * blocks to grant required or redistribute available space.
-	 *
-	 * @param {number} previousColumns Previous column count.
-	 * @param {number} newColumns      New column count.
-	 */
-	function updateColumns( previousColumns, newColumns ) {
-		let innerBlocks = getBlocks( clientId );
-		const hasExplicitWidths = hasExplicitPercentColumnWidths( innerBlocks );
-
-		// Redistribute available width for existing inner blocks.
-		const isAddingColumn = newColumns > previousColumns;
-
-		if ( isAddingColumn && hasExplicitWidths ) {
-			// If adding a new column, assign width to the new column equal to
-			// as if it were `1 / columns` of the total available space.
-			const newColumnWidth = toWidthPrecision( 100 / newColumns );
-			const newlyAddedColumns = newColumns - previousColumns;
-
-			// Redistribute in consideration of pending block insertion as
-			// constraining the available working width.
-			const widths = getRedistributedColumnWidths(
-				innerBlocks,
-				100 - newColumnWidth * newlyAddedColumns
-			);
-
-			innerBlocks = [
-				...getMappedColumnWidths( innerBlocks, widths ),
-				...Array.from( {
-					length: newlyAddedColumns,
-				} ).map( () => {
-					return createBlock( 'core/column', {
-						width: `${ newColumnWidth }%`,
-					} );
-				} ),
-			];
-		} else if ( isAddingColumn ) {
-			innerBlocks = [
-				...innerBlocks,
-				...Array.from( {
-					length: newColumns - previousColumns,
-				} ).map( () => {
-					return createBlock( 'core/column' );
-				} ),
-			];
-		} else if ( newColumns < previousColumns ) {
-			// The removed column will be the last of the inner blocks.
-			innerBlocks = innerBlocks.slice(
-				0,
-				-( previousColumns - newColumns )
-			);
-			if ( hasExplicitWidths ) {
-				// Redistribute as if block is already removed.
-				const widths = getRedistributedColumnWidths( innerBlocks, 100 );
-
-				innerBlocks = getMappedColumnWidths( innerBlocks, widths );
-			}
-		}
-
-		replaceInnerBlocks( clientId, innerBlocks );
-	}
-
-	return (
-		<PanelBody title={ __( 'Settings' ) }>
-			{ canInsertColumnBlock && (
-				<>
-					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Columns' ) }
-						value={ count }
-						onChange={ ( value ) =>
-							updateColumns( count, Math.max( minCount, value ) )
-						}
-						min={ Math.max( 1, minCount ) }
-						max={ Math.max( 6, count ) }
-					/>
-					{ count > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
-							) }
-						</Notice>
-					) }
-				</>
-			) }
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Stack on mobile' ) }
-				checked={ isStackedOnMobile }
-				onChange={ () =>
-					setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
-					} )
-				}
-			/>
-		</PanelBody>
-	);
-}
 
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
@@ -237,11 +79,18 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<ColumnInspectorControls
-					clientId={ clientId }
-					setAttributes={ setAttributes }
-					isStackedOnMobile={ isStackedOnMobile }
-				/>
+				<PanelBody title={ __( 'Settings' ) }>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Stack on mobile' ) }
+						checked={ isStackedOnMobile }
+						onChange={ () =>
+							setAttributes( {
+								isStackedOnMobile: ! isStackedOnMobile,
+							} )
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>

@@ -9,7 +9,6 @@ import { View, Dimensions } from 'react-native';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	PanelBody,
-	RangeControl,
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
@@ -36,7 +35,6 @@ import {
 } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
-import { columns } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -214,28 +212,12 @@ function ColumnsEditContainer( {
 		} );
 	}, [ editorSidebarOpened, isSelected, innerWidths ] );
 
-	const onChangeColumnsNum = useCallback(
-		( value ) => {
-			updateColumns( columnCount, value );
-		},
-		[ columnCount ]
-	);
-
 	return (
 		<>
 			{ isSelected && (
 				<>
 					<InspectorControls>
 						<PanelBody title={ __( 'Columns Settings' ) }>
-							<RangeControl
-								label={ __( 'Number of columns' ) }
-								icon={ columns }
-								value={ columnCount }
-								onChange={ onChangeColumnsNum }
-								min={ MIN_COLUMNS_NUM }
-								max={ columnCount + 1 }
-								type="stepper"
-							/>
 							{ getColumnsSliders }
 						</PanelBody>
 						<PanelBody>
