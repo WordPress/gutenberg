@@ -11,6 +11,15 @@ const cacheByWrapperSelector = new Map();
 const ROOT_SELECTOR_REGEX =
 	/^(:root :where\(body\)|:where\(body\)|:root|html|body)/;
 
+function replaceDoublePrefix( selector, prefix ) {
+	// Avoid prefixing an already prefixed selector.
+	const doublePrefix = `${ prefix } ${ prefix }`;
+	if ( selector.startsWith( doublePrefix ) ) {
+		return selector.replace( doublePrefix, prefix );
+	}
+	return selector;
+}
+
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
 	wrapperSelector = ''
@@ -30,29 +39,25 @@ function transformStyle(
 						prefix: wrapperSelector,
 						exclude: [ ...ignoredSelectors, wrapperSelector ],
 						transform( prefix, selector, prefixedSelector ) {
-							// Avoid prefixing an already prefixed selector.
-							if (
-								prefixedSelector.startsWith(
-									`${ prefix } ${ prefix }`
-								)
-							) {
-								prefixedSelector = prefixedSelector.replace(
-									`${ prefix } ${ prefix }`,
-									prefix
-								);
-							}
-
 							// `html`, `body` and `:root` need some special handling since they
-							// generally cannot be prefixed with a classname and produce a valid
+							// generally cannot be prefixed with a class name and produce a valid
 							// selector. Instead we replace the whole root part of the selector.
 							if ( ROOT_SELECTOR_REGEX.test( selector ) ) {
-								return selector.replace(
+								const updatedRootSelector = selector.replace(
 									ROOT_SELECTOR_REGEX,
 									prefix
 								);
+
+								return replaceDoublePrefix(
+									updatedRootSelector,
+									prefix
+								);
 							}
 
-							return prefixedSelector;
+							return replaceDoublePrefix(
+								prefixedSelector,
+								prefix
+							);
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
