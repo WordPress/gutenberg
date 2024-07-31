@@ -26,7 +26,7 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { baseCustomFonts, modalTabOpen, setModalTabOpen, setNotice } =
+	const { baseCustomFonts, modalTabOpen, setModalTabOpen } =
 		useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 	const [ baseFontFamilies ] = useGlobalSetting(
@@ -112,8 +112,6 @@ function FontFamilies() {
 					variant="secondary"
 					__next40pxDefaultSize
 					onClick={ () => {
-						// Reset notice when opening the modal.
-						setNotice( null );
 						setModalTabOpen(
 							hasInstalledFonts
 								? 'installed-fonts'
