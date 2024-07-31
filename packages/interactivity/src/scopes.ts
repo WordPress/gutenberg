@@ -64,10 +64,12 @@ const deepImmutable = < T extends object = {} >( target: T ): T => {
  */
 export const getContext = < T extends object >( namespace?: string ): T => {
 	const scope = getScope();
-	if ( ! scope ) {
-		throw Error(
-			'Cannot call `getContext()` outside getters and actions used by directives.'
-		);
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if ( ! scope ) {
+			throw Error(
+				'Cannot call `getContext()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
+			);
+		}
 	}
 	return scope.context[ namespace || getNamespace() ];
 };
@@ -80,12 +82,15 @@ export const getContext = < T extends object >( namespace?: string ): T => {
  * @return Element representation.
  */
 export const getElement = () => {
-	if ( ! getScope() ) {
-		throw Error(
-			'Cannot call `getElement()` outside getters and actions used by directives.'
-		);
+	const scope = getScope();
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if ( ! scope ) {
+			throw Error(
+				'Cannot call `getElement()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
+			);
+		}
 	}
-	const { ref, attributes } = getScope();
+	const { ref, attributes } = scope;
 	return Object.freeze( {
 		ref: ref.current,
 		attributes: deepImmutable( attributes ),
