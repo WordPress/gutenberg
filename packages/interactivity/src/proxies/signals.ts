@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getProxyNs } from './registry';
+import { getNamespaceFromProxy } from './registry';
 import { getScope } from '../scopes';
 import { setNamespace, resetNamespace } from '../namespaces';
 import { withScope } from '../utils';
@@ -107,7 +107,7 @@ export class PropSignal {
 					: this.valueSignal?.value;
 			};
 
-			setNamespace( getProxyNs( this.owner ) );
+			setNamespace( getNamespaceFromProxy( this.owner ) );
 			this.computedsByScope.set(
 				scope,
 				computed( withScope( callback ) )

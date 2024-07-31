@@ -50,7 +50,7 @@ export const createProxy = < T extends object >(
  * @param obj Object from which to know the proxy.
  * @return Associated proxy or `undefined`.
  */
-export const getProxy = < T extends object >( obj: T ): T =>
+export const getProxyFromObject = < T extends object >( obj: T ): T =>
 	objToProxy.get( obj ) as T;
 
 /**
@@ -61,7 +61,8 @@ export const getProxy = < T extends object >( obj: T ): T =>
  * @param proxy Proxy.
  * @return Namespace.
  */
-export const getProxyNs = ( proxy: object ): string => proxyToNs.get( proxy )!;
+export const getNamespaceFromProxy = ( proxy: object ): string =>
+	proxyToNs.get( proxy )!;
 
 /**
  * Checks if a given object can be proxied.

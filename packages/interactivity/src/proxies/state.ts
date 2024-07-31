@@ -6,7 +6,12 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { createProxy, getProxy, getProxyNs, shouldProxy } from './registry';
+import {
+	createProxy,
+	getProxyFromObject,
+	getNamespaceFromProxy,
+	shouldProxy,
+} from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
 
@@ -51,7 +56,7 @@ const getPropSignal = (
 	key = typeof key === 'number' ? `${ key }` : key;
 	const props = proxyToProps.get( proxy )!;
 	if ( ! props.has( key ) ) {
-		const ns = getProxyNs( proxy );
+		const ns = getNamespaceFromProxy( proxy );
 		const prop = new PropSignal( proxy );
 		props.set( key, prop );
 		if ( initial ) {
@@ -110,7 +115,7 @@ const stateHandlers: ProxyHandler< object > = {
 		 * which is set by the Directives component.
 		 */
 		if ( typeof result === 'function' ) {
-			const ns = getProxyNs( receiver );
+			const ns = getNamespaceFromProxy( receiver );
 			return ( ...args: unknown[] ) => {
 				setNamespace( ns );
 				try {
@@ -130,7 +135,7 @@ const stateHandlers: ProxyHandler< object > = {
 		value: unknown,
 		receiver: object
 	): boolean {
-		setNamespace( getProxyNs( receiver ) );
+		setNamespace( getNamespaceFromProxy( receiver ) );
 		try {
 			return Reflect.set( target, key, value, receiver );
 		} finally {
@@ -147,13 +152,13 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const receiver = getProxy( target );
+			const receiver = getProxyFromObject( target );
 			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
 				prop.setGetter( desc.get! );
 			} else {
-				const ns = getProxyNs( receiver );
+				const ns = getNamespaceFromProxy( receiver );
 				prop.setValue(
 					shouldProxy( value ) ? proxifyState( ns, value ) : value
 				);
@@ -176,7 +181,7 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getPropSignal( getProxy( target ), key );
+			const prop = getPropSignal( getProxyFromObject( target ), key );
 			prop.setValue( undefined );
 
 			if ( objToIterable.has( target ) ) {

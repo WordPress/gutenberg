@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createProxy, getProxyNs, shouldProxy } from './registry';
+import { createProxy, getNamespaceFromProxy, shouldProxy } from './registry';
 /**
  * External dependencies
  */
@@ -19,7 +19,7 @@ const storeRoots = new WeakSet();
 const storeHandlers: ProxyHandler< object > = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
 		const result = Reflect.get( target, key );
-		const ns = getProxyNs( receiver );
+		const ns = getNamespaceFromProxy( receiver );
 
 		/*
 		 * Check if the proxy is the store root and no key with that name exist. In
