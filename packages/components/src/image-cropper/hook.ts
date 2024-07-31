@@ -61,6 +61,7 @@ export const useImageCropper = ( {
 						x,
 						y,
 					} = imageRef.current.getBoundingClientRect();
+					// Save the initial position and distances from the origin.
 					memo = {
 						initial: { x: state.image.x, y: state.image.y },
 						distances: {
@@ -72,6 +73,7 @@ export const useImageCropper = ( {
 				dispatch( {
 					type: 'ZOOM',
 					scale,
+					// Calculate the new position based on the scale from the origin.
 					position: {
 						x:
 							memo.initial.x -

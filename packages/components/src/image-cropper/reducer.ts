@@ -180,6 +180,18 @@ function imageCropperReducer( state: State, action: Action ) {
 			const nextRadian = degreeToRadian( action.angle + rotations * 90 );
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
+
+			// Calculate the translation of the image center after the rotation.
+			// This is needed to rotate from the center of the cropper rather than the
+			// center of the image.
+			const deltaRadians = nextRadian - radian;
+			const rotatedPosition = rotatePoint(
+				{ x: image.x, y: image.y },
+				deltaRadians
+			);
+
+			// Calculate the minimum scale to fit the image within the cropper.
+			// TODO: Optimize the performance?
 			const minScale =
 				getMinScale(
 					nextRadian,
@@ -187,13 +199,17 @@ function imageCropperReducer( state: State, action: Action ) {
 					scaledHeight,
 					cropper.width,
 					cropper.height,
-					image.x,
-					image.y
+					rotatedPosition.x,
+					rotatedPosition.y
 				) * absScale;
 			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
 
 			return {
 				...state,
+				image: {
+					...state.image,
+					...rotatedPosition,
+				},
 				transforms: {
 					...state.transforms,
 					angle: action.angle,
