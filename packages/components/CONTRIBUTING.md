@@ -241,14 +241,27 @@ Dedicated React context should also use the dot notation, while hooks should not
 ```tsx
 // Component.tsx
 //=======================
-/** The top-level component's JSDoc. */
-export const Component = Object.assign( TopLevelComponent, {
-	/** The sub-component's JSDoc. */
-	SubComponent,
-	/** The sub-component's JSDoc. */
-	Content,
-} );
+import { forwardRef, createContext } from '@wordpress/element';
 
+function TopLevelComponent = forwardRef( function TopLevel( props, ref ) { /* ... */ });
+
+function SubComponent = forwardRef( function Sub( props, ref ) { /* ... */ });
+SubComponent.displayName = 'Component.SubComponent';
+
+const Context = createContext();
+
+/** The top-level component's JSDoc. */
+export const Component = Object.assign(
+	TopLevelComponent,
+	{
+		/** The sub-component's JSDoc. */
+		SubComponent,
+		/** The sub-component's JSDoc. */
+		Context,
+	}
+);
+
+/** The hook's JSDoc. */
 export function useComponent() {
 	/* ... */
 }
