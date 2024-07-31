@@ -436,4 +436,14 @@ describe.each( [
 			} )
 		).toBeVisible();
 	} );
+
+	it( 'Should label the component correctly even when the label is not visible', () => {
+		render( <Component { ...defaultProps } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: defaultProps.label,
+			} )
+		).toBeVisible();
+	} );
 } );

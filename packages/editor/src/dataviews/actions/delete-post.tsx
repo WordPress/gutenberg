@@ -78,6 +78,7 @@ const deletePostAction: Action< Post > = {
 						onClick={ closeModal }
 						disabled={ isBusy }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -95,6 +96,7 @@ const deletePostAction: Action< Post > = {
 						isBusy={ isBusy }
 						disabled={ isBusy }
 						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ __( 'Delete' ) }
 					</Button>

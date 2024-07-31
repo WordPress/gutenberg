@@ -25,10 +25,11 @@ import {
 	DropdownMenu,
 	SearchControl,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { moreVertical, chevronLeft } from '@wordpress/icons';
+import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -173,6 +174,25 @@ function FontCollection( { slug } ) {
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
+	};
+
+	const selectFontCount =
+		fontsToInstall.length > 0 ? fontsToInstall[ 0 ]?.fontFace?.length : 0;
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		selectFontCount > 0 &&
+		selectFontCount !== selectedFont?.fontFace?.length;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked =
+		selectFontCount === selectedFont?.fontFace?.length;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const newFonts = isSelectAllChecked ? [] : [ selectedFont ];
+
+		setFontsToInstall( newFonts );
 	};
 
 	const handleInstall = async () => {
@@ -400,6 +420,14 @@ function FontCollection( { slug } ) {
 								{ __( 'Select font variants to install.' ) }
 							</Text>
 							<Spacer margin={ 4 } />
+							<CheckboxControl
+								className="font-library-modal__select-all"
+								label={ __( 'Select all' ) }
+								checked={ isSelectAllChecked }
+								onChange={ toggleSelectAll }
+								indeterminate={ isIndeterminate }
+								__nextHasNoMarginBottom
+							/>
 							<VStack spacing={ 0 }>
 								<Spacer margin={ 8 } />
 								{ getSortedFontFaces( selectedFont ).map(
@@ -429,7 +457,7 @@ function FontCollection( { slug } ) {
 					{ selectedFont && (
 						<Flex
 							justify="flex-end"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
 							<Button
 								variant="primary"
@@ -446,32 +474,26 @@ function FontCollection( { slug } ) {
 					) }
 
 					{ ! selectedFont && (
-						<Flex
+						<HStack
+							spacing={ 4 }
 							justify="center"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
-							<Button
-								label={ __( 'First page' ) }
-								size="compact"
-								onClick={ () => setPage( 1 ) }
-								disabled={ page === 1 }
-								accessibleWhenDisabled
-							>
-								<span>«</span>
-							</Button>
 							<Button
 								label={ __( 'Previous page' ) }
 								size="compact"
 								onClick={ () => setPage( page - 1 ) }
 								disabled={ page === 1 }
+								showTooltip
 								accessibleWhenDisabled
-							>
-								<span>‹</span>
-							</Button>
+								icon={ chevronLeft }
+								tooltipPosition="top"
+							/>
 							<HStack
 								justify="flex-start"
 								expanded={ false }
 								spacing={ 2 }
+								className="font-library-modal__page-selection"
 							>
 								{ createInterpolateElement(
 									sprintf(
@@ -515,19 +537,10 @@ function FontCollection( { slug } ) {
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
 								accessibleWhenDisabled
-							>
-								<span>›</span>
-							</Button>
-							<Button
-								label={ __( 'Last page' ) }
-								size="compact"
-								onClick={ () => setPage( totalPages ) }
-								disabled={ page === totalPages }
-								accessibleWhenDisabled
-							>
-								<span>»</span>
-							</Button>
-						</Flex>
+								icon={ chevronRight }
+								tooltipPosition="top"
+							/>
+						</HStack>
 					) }
 				</>
 			) }

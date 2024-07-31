@@ -213,6 +213,7 @@ export const getTransformedBlocksFromPattern = (
 ) => {
 	const {
 		query: { postType, inherit },
+		namespace,
 	} = queryBlockAttributes;
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 	const queryClientIds = [];
@@ -225,6 +226,9 @@ export const getTransformedBlocksFromPattern = (
 				postType,
 				inherit,
 			};
+			if ( namespace ) {
+				block.attributes.namespace = namespace;
+			}
 			queryClientIds.push( block.clientId );
 		}
 		block.innerBlocks?.forEach( ( innerBlock ) => {

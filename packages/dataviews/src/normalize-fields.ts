@@ -19,7 +19,7 @@ export function normalizeFields< Item >(
 
 		return {
 			...field,
-			header: field.header || field.id,
+			label: field.label || field.id,
 			getValue,
 			render: field.render || getValue,
 		};

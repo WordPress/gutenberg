@@ -61,7 +61,7 @@ export function filterSortAndPaginate< Item >(
 		} );
 	}
 
-	if ( view.filters?.length > 0 ) {
+	if ( view.filters && view.filters?.length > 0 ) {
 		view.filters.forEach( ( filter ) => {
 			const field = _fields.find(
 				( _field ) => _field.id === filter.field

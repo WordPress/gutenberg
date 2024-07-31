@@ -22,7 +22,10 @@ function getJsonFromItem( item: Pattern ) {
 		{
 			__file: item.type,
 			title: getItemTitle( item ),
-			content: item.content.raw,
+			content:
+				typeof item.content === 'string'
+					? item.content
+					: item.content?.raw,
 			syncStatus: item.wp_pattern_sync_status,
 		},
 		null,
@@ -34,6 +37,7 @@ const exportPattern: Action< Pattern > = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	supportsBulk: true,
+	isEligible: ( item ) => item.type === 'wp_block',
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
 			return downloadBlob(

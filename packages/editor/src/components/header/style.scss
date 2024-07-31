@@ -1,8 +1,18 @@
 .editor-header {
 	height: $header-height;
 	background: $white;
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-auto-flow: row;
+	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	&:has(> .editor-header__center) {
+		grid-template: auto / $header-height min-content 1fr min-content $header-height;
+		@include break-medium {
+			grid-template: auto / $header-height minmax(min-content, 1fr) 2fr minmax(min-content, 1fr) $header-height;
+		}
+	}
+	@include break-mobile {
+		gap: $grid-unit-20;
+	}
 	align-items: center;
 	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
 	max-width: 100vw;
@@ -15,19 +25,32 @@
 }
 
 .editor-header__toolbar {
+	grid-column: 1 / 3;
+	// When there is no back button or the viewport is <= mobile the margin keeps the content off
+	// the starting edge.
+	> :first-child {
+		margin-inline: $grid-unit-20 0;
+	}
+
+	// This is the typical case, the back button takes up the first column.
+	.editor-header__back-button + & {
+		grid-column: 2 / 3;
+
+		@include break-mobile {
+			// Clears the margin; at this breakpoint the parent’s `gap` takes its place.
+			> :first-child {
+				margin-inline: 0;
+			}
+		}
+	}
 	display: flex;
-	// Allow this area to shrink to fit the toolbar buttons.
-	flex-shrink: 8;
-	// Take up the space of the toolbar so it can be justified to the left side of the toolbar.
-	flex-grow: 3;
-	// Hide the overflow so flex will limit its width. Block toolbar will allow scrolling on fixed toolbar.
-	overflow: hidden;
-	// Leave enough room for the focus ring to show.
-	padding: 2px 0;
+	// Make narrowing to less than content width possible. Block toolbar will hide overflow and allow scrolling on fixed toolbar.
+	min-width: 0;
 	align-items: center;
-	// Allow focus ring to be fully visible on furthest right button.
-	@include break-medium() {
-		padding-right: var(--wp-admin-border-width-focus);
+	// Clip the box while leaving room for focus rings.
+	clip-path: inset(-2px);
+	@include break-mobile {
+		clip-path: none;
 	}
 
 	.table-of-contents {
@@ -37,20 +60,35 @@
 			display: block;
 		}
 	}
+
+	// Add a gap before the block toolbar or its toggle button when collapsed.
+	.editor-collapsible-block-toolbar {
+		margin-inline: $grid-unit 0;
+
+		&.is-collapsed ~ .editor-collapsible-block-toolbar__toggle {
+			margin-inline: $grid-unit 0;
+		}
+	}
 }
 
 .editor-header__center {
-	flex-grow: 1;
+	grid-column: 3 / 4;
 	display: flex;
 	justify-content: center;
-	// Flex items will, by default, refuse to shrink below a minimum
-	// intrinsic width. In order to shrink this flexbox item, and
-	// subsequently truncate child text, we set an explicit min-width.
-	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	align-items: center;
+	// To enable shrinking and truncating of child text, apply an explicit min-width.
 	min-width: 0;
-
-	&.is-collapsed {
-		display: none;
+	// Clip the box while leaving room for focus rings.
+	clip-path: inset(-2px);
+	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
+	// gap around the center’s contents.
+	@media (max-width: #{$break-mobile - 1}) {
+		> :first-child {
+			margin-inline-start: $grid-unit;
+		}
+		> :last-child {
+			margin-inline-end: $grid-unit;
+		}
 	}
 }
 
@@ -59,6 +97,11 @@
  */
 
 .editor-header__settings {
+	grid-column: 3 / -1;
+	.editor-header:has(> .editor-header__center) & {
+		grid-column: 4 / -1;
+	}
+	justify-self: end;
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: nowrap;

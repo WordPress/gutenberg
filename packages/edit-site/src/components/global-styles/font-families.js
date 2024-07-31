@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
+	__experimentalText as Text,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	Button,
@@ -25,8 +26,14 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOpen, setModalTabOpen } = useContext( FontLibraryContext );
+	const { baseCustomFonts, modalTabOpen, setModalTabOpen, setNotice } =
+		useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const [ baseFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies',
+		undefined,
+		'base'
+	);
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
@@ -39,6 +46,11 @@ function FontFamilies() {
 		: [];
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
 
+	const hasInstalledFonts =
+		hasFonts ||
+		baseFontFamilies?.theme?.length > 0 ||
+		baseCustomFonts?.length > 0;
+
 	return (
 		<>
 			{ !! modalTabOpen && (
@@ -48,17 +60,16 @@ function FontFamilies() {
 				/>
 			) }
 
-			<VStack spacing={ 2 }>
-				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-				{ hasFonts ? (
-					<>
-						<ItemGroup isBordered isSeparated>
-							{ customFonts.map( ( font ) => (
-								<FontFamilyItem
-									key={ font.slug }
-									font={ font }
-								/>
-							) ) }
+			<VStack spacing={ 4 }>
+				{ themeFonts.length > 0 && (
+					<VStack>
+						<Subtitle level={ 3 }>
+							{
+								/* translators: Heading for a list of fonts provided by the theme. */
+								_x( 'Theme', 'font source' )
+							}
+						</Subtitle>
+						<ItemGroup size="large" isBordered isSeparated>
 							{ themeFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
@@ -66,30 +77,54 @@ function FontFamilies() {
 								/>
 							) ) }
 						</ItemGroup>
-						<Button
-							className="edit-site-global-styles-font-families__manage-fonts"
-							variant="secondary"
-							__next40pxDefaultSize
-							onClick={ () =>
-								setModalTabOpen( 'installed-fonts' )
-							}
-						>
-							{ __( 'Manage fonts' ) }
-						</Button>
-					</>
-				) : (
-					<>
-						{ __( 'No fonts installed.' ) }
-						<Button
-							className="edit-site-global-styles-font-families__add-fonts"
-							variant="secondary"
-							__next40pxDefaultSize
-							onClick={ () => setModalTabOpen( 'upload-fonts' ) }
-						>
-							{ __( 'Add fonts' ) }
-						</Button>
-					</>
+					</VStack>
 				) }
+				{ customFonts.length > 0 && (
+					<VStack>
+						<Subtitle level={ 3 }>
+							{
+								/* translators: Heading for a list of fonts installed by the user. */
+								_x( 'Custom', 'font source' )
+							}
+						</Subtitle>
+						<ItemGroup size="large" isBordered isSeparated>
+							{ customFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+						</ItemGroup>
+					</VStack>
+				) }
+				{ ! hasFonts && (
+					<VStack>
+						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
+						<Text as="p">
+							{ hasInstalledFonts
+								? __( 'No fonts activated.' )
+								: __( 'No fonts installed.' ) }
+						</Text>
+					</VStack>
+				) }
+				<Button
+					className="edit-site-global-styles-font-families__manage-fonts"
+					variant="secondary"
+					__next40pxDefaultSize
+					onClick={ () => {
+						// Reset notice when opening the modal.
+						setNotice( null );
+						setModalTabOpen(
+							hasInstalledFonts
+								? 'installed-fonts'
+								: 'upload-fonts'
+						);
+					} }
+				>
+					{ hasInstalledFonts
+						? __( 'Manage fonts' )
+						: __( 'Add fonts' ) }
+				</Button>
 			</VStack>
 		</>
 	);

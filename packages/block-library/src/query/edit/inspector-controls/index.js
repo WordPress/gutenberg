@@ -6,7 +6,8 @@ import {
 	TextControl,
 	SelectControl,
 	RangeControl,
-	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -101,6 +102,10 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
+	const postTypeControlLabel = __( 'Post type' );
+	const postTypeControlHelp = __(
+		'Select the type of content to display: posts, pages, or custom post types.'
+	);
 	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
@@ -140,34 +145,71 @@ export default function QueryInspectorControls( props ) {
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
-						<ToggleControl
+						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Inherit query from template' ) }
-							help={ __(
-								'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-							) }
-							checked={ !! inherit }
-							onChange={ ( value ) =>
-								setQuery( { inherit: !! value } )
+							label={ __( 'Query type' ) }
+							isBlock
+							onChange={ ( value ) => {
+								setQuery( { inherit: !! value } );
+							} }
+							help={
+								inherit
+									? __(
+											'Display a list of posts or custom post types based on the current template.'
+									  )
+									: __(
+											'Display a list of posts or custom post types based on specific criteria.'
+									  )
 							}
-						/>
+							value={ !! inherit }
+						>
+							<ToggleGroupControlOption
+								value
+								label={ __( 'Default' ) }
+							/>
+							<ToggleGroupControlOption
+								value={ false }
+								label={ __( 'Custom' ) }
+							/>
+						</ToggleGroupControl>
 					) }
-					{ showPostTypeControl && (
-						<SelectControl
-							__nextHasNoMarginBottom
-							options={ postTypesSelectOptions }
-							value={ postType }
-							label={ __( 'Post type' ) }
-							onChange={ onPostTypeChange }
-							help={ __(
-								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-							) }
-						/>
-					) }
+					{ showPostTypeControl &&
+						( postTypesSelectOptions.length > 2 ? (
+							<SelectControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								options={ postTypesSelectOptions }
+								value={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							/>
+						) : (
+							<ToggleGroupControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								isBlock
+								value={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							>
+								{ postTypesSelectOptions.map( ( option ) => (
+									<ToggleGroupControlOption
+										key={ option.value }
+										value={ option.value }
+										label={ option.label }
+									/>
+								) ) }
+							</ToggleGroupControl>
+						) ) }
+
 					{ showColumnsControl && (
 						<>
 							<RangeControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ displayLayout.columns }
 								onChange={ ( value ) =>
@@ -213,7 +255,7 @@ export default function QueryInspectorControls( props ) {
 			) }
 			{ ! inherit && showFiltersPanel && (
 				<ToolsPanel
-					className="block-library-query-toolspanel__filters"
+					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
 					label={ __( 'Filters' ) }
 					resetAll={ () => {
 						setQuery( {
@@ -262,6 +304,7 @@ export default function QueryInspectorControls( props ) {
 						>
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ setQuerySearch }

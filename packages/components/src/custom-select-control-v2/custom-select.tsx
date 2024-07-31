@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type * as Ariakit from '@ariakit/react';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -25,6 +24,7 @@ import type {
 } from './types';
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
+import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -113,13 +113,20 @@ function _CustomSelect(
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
-			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
-			) : (
-				<Styled.SelectLabel store={ store }>
-					{ label }
-				</Styled.SelectLabel>
-			) }
+			<Ariakit.SelectLabel
+				store={ store }
+				render={
+					hideLabelFromVision ? (
+						// @ts-expect-error `children` are passed via the render prop
+						<VisuallyHidden />
+					) : (
+						// @ts-expect-error `children` are passed via the render prop
+						<BaseControl.VisualLabel as="div" />
+					)
+				}
+			>
+				{ label }
+			</Ariakit.SelectLabel>
 			<InputBase
 				__next40pxDefaultSize
 				size={ size }
@@ -138,6 +145,8 @@ function _CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
+					// Match legacy behavior
+					flip={ ! isLegacy }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }

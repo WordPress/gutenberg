@@ -222,15 +222,11 @@ test.describe( 'Site Editor Performance', () => {
 				// If it's there, switch to the list layout before running the test.
 				// See https://github.com/WordPress/gutenberg/pull/59792
 				const isDataViewsUI = await page
-					.getByRole( 'button', { name: 'View options' } )
+					.getByRole( 'button', { name: 'Layout' } )
 					.isVisible();
 				if ( isDataViewsUI ) {
 					await page
-						.getByRole( 'button', { name: 'View options' } )
-						.click();
-					await page
-						.getByRole( 'menuitem' )
-						.filter( { has: page.getByText( 'Layout' ) } )
+						.getByRole( 'button', { name: 'Layout' } )
 						.click();
 					await page
 						.getByRole( 'menuitemradio' )

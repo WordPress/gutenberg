@@ -122,8 +122,15 @@
 }
 
 .block-editor-global-styles-background-panel__image-tools-panel-item {
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
+
+	// Ensure the dropzone is positioned to the size of the item.
+	position: relative;
+
 	// Since there is no option to skip rendering the drag'n'drop icon in drop
 	// zone, we hide it for now.
 	.components-drop-zone__content-icon {
@@ -207,12 +214,21 @@
 .block-editor-global-styles-background-panel__dropdown-content-wrapper {
 	min-width: 260px;
 	overflow-x: hidden;
-	.components-base-control__help,
-	.components-toggle-control {
-		margin-bottom: 0;
+
+	.components-focal-point-picker-wrapper {
+		background-color: $gray-100;
+		width: 100%;
+		border-radius: $radius-block-ui;
+		border: $border-width solid $gray-300;
 	}
+
 	.components-focal-point-picker__media--image {
-		max-height: clamp(120px, 9vh, 280px);
+		max-height: 180px;
+	}
+
+	// Override focal picker to avoid a double border.
+	.components-focal-point-picker::after {
+		content: none;
 	}
 }
 

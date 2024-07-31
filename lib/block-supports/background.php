@@ -52,12 +52,12 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$background_styles                       = array();
-	$background_styles['backgroundImage']    = $block_attributes['style']['background']['backgroundImage'] ?? null;
-	$background_styles['backgroundSize']     = $block_attributes['style']['background']['backgroundSize'] ?? null;
-	$background_styles['backgroundPosition'] = $block_attributes['style']['background']['backgroundPosition'] ?? null;
-	$background_styles['backgroundRepeat']   = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
-
+	$background_styles                         = array();
+	$background_styles['backgroundImage']      = $block_attributes['style']['background']['backgroundImage'] ?? null;
+	$background_styles['backgroundSize']       = $block_attributes['style']['background']['backgroundSize'] ?? null;
+	$background_styles['backgroundPosition']   = $block_attributes['style']['background']['backgroundPosition'] ?? null;
+	$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
+	$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
 	if ( ! empty( $background_styles['backgroundImage'] ) ) {
 		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
