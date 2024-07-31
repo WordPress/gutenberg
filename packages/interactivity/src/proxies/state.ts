@@ -168,7 +168,15 @@ const stateHandlers: ProxyHandler< object > = {
 				objToIterable.get( target )!.value++;
 			}
 
-			if ( Array.isArray( target ) ) {
+			/*
+			 * Modify the `length` property value only if the related
+			 * `PropSignal` exists, which means that there are subscriptions to
+			 * this property.
+			 */
+			if (
+				Array.isArray( target ) &&
+				proxyToProps.get( receiver )?.has( 'length' )
+			) {
 				const length = getPropSignal( receiver, 'length' );
 				length.setValue( target.length );
 			}
