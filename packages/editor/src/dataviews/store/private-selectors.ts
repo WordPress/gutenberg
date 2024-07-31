@@ -20,3 +20,7 @@ export const getEntityActions = createSelector(
 		state.actions[ kind ]?.[ '*' ],
 	]
 );
+
+export function isEntityReady( state: State, kind: string, name: string ) {
+	return state.isReady[ kind ]?.[ name ];
+}
