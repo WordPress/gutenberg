@@ -25,11 +25,11 @@ import {
  */
 import NavigableRegion from '../navigable-region';
 
-const ANIMATION_DURATION = 0.25;
+const ANIMATION_DURATION = 0.375;
 const commonTransition = {
 	type: 'tween',
 	duration: ANIMATION_DURATION,
-	ease: [ 0.6, 0, 0.4, 1 ],
+	ease: [ 0.65, 0, 0.33, 1 ],
 };
 
 function useHTMLClass( className ) {
@@ -54,8 +54,8 @@ const headerVariants = {
 		marginTop: 0,
 		transition: {
 			...commonTransition,
-			delay: 0.2,
-			delayChildren: 0.2,
+			delay: 0.1,
+			delayChildren: 0.1,
 		},
 	},
 	distractionFreeHidden: {
@@ -67,8 +67,8 @@ const headerVariants = {
 		marginTop: 0,
 		transition: {
 			...commonTransition,
-			delay: 0.8,
-			delayChildren: 0.8,
+			delay: 0.6,
+			delayChildren: 0.6,
 		},
 	},
 };

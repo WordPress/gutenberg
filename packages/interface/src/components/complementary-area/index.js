@@ -36,7 +36,7 @@ import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
 import { store as interfaceStore } from '../../store';
 
-const ANIMATION_DURATION = 0.3;
+const ANIMATION_DURATION = 0.375;
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
@@ -79,7 +79,7 @@ function ComplementaryAreaFill( {
 				activeArea !== previousActiveArea )
 				? 0
 				: ANIMATION_DURATION,
-		ease: [ 0.6, 0, 0.4, 1 ],
+		ease: [ 0.65, 0, 0.33, 1 ],
 	};
 
 	return (
