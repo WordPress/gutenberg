@@ -11,6 +11,7 @@ import exportPattern from './export-pattern';
 import resetPost from './reset-post';
 import trashPost from './trash-post';
 import permanentlyDeletePost from './permanently-delete-post';
+import restorePost from './restore-post';
 
 // @ts-ignore
 import { store as editorStore } from '../../store';
@@ -23,6 +24,7 @@ export default function registerDefaultActions() {
 
 	registerEntityAction( 'postType', 'wp_block', exportPattern );
 	registerEntityAction( 'postType', '*', resetPost );
+	registerEntityAction( 'postType', '*', restorePost );
 	registerEntityAction( 'postType', '*', deletePost );
 	registerEntityAction( 'postType', '*', trashPost );
 	registerEntityAction( 'postType', '*', permanentlyDeletePost );
