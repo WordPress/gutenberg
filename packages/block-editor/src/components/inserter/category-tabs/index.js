@@ -8,6 +8,7 @@ import {
 	FlexBlock,
 	privateApis as componentsPrivateApis,
 	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
@@ -68,31 +69,33 @@ function CategoryTabs( {
 				) ) }
 			</Tabs.TabList>
 			{ selectedCategory && (
-				<motion.div
-					className="block-editor-inserter__category-panel"
-					initial="closed"
-					animate="open"
-					exit="closed"
-					variants={ {
-						open: {
-							transform: 'translateX( 0 )',
-						},
-						closed: {
-							transform: 'translateX( -100% )',
-						},
-					} }
-					transition={ defaultTransition }
-				>
-					{ categories.map( ( category ) => (
-						<Tabs.TabPanel
-							key={ category.name }
-							tabId={ category.name }
-							focusable={ false }
-						>
-							{ children }
-						</Tabs.TabPanel>
-					) ) }
-				</motion.div>
+				<AnimatePresence initial={ false }>
+					<motion.div
+						className="block-editor-inserter__category-panel"
+						initial="closed"
+						animate="open"
+						exit="closed"
+						variants={ {
+							open: {
+								transform: 'translateX( 0 )',
+							},
+							closed: {
+								transform: 'translateX( -100% )',
+							},
+						} }
+						transition={ defaultTransition }
+					>
+						{ categories.map( ( category ) => (
+							<Tabs.TabPanel
+								key={ category.name }
+								tabId={ category.name }
+								focusable={ false }
+							>
+								{ children }
+							</Tabs.TabPanel>
+						) ) }
+					</motion.div>
+				</AnimatePresence>
 			) }
 		</Tabs>
 	);
