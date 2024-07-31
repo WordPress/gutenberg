@@ -78,9 +78,13 @@ function CategoryTabs( {
 						variants={ {
 							open: {
 								transform: 'translateX( 0 )',
+								transitionEnd: {
+									zIndex: '1',
+								},
 							},
 							closed: {
 								transform: 'translateX( -100% )',
+								zIndex: '-1',
 							},
 						} }
 						transition={ defaultTransition }
