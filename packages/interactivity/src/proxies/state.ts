@@ -102,11 +102,6 @@ const stateHandlers: ProxyHandler< object > = {
 		// At this point, the property should be reactive.
 		const desc = Object.getOwnPropertyDescriptor( target, key );
 		const prop = getPropSignal( receiver, key, desc );
-
-		if ( peeking ) {
-			return prop.getComputed().peek();
-		}
-
 		const result = prop.getComputed().value;
 
 		/*
