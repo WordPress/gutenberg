@@ -90,8 +90,21 @@ export default {
 				context?.postId
 			).meta;
 
+		const fields = registry
+			.select( coreDataStore )
+			.getEntityRecord( 'root', 'postType', 'post' );
+
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
-			return null;
+			if ( ! fields?.meta ) {
+				return null;
+			}
+			const metaDefaults = {};
+			for ( const key in fields.meta ) {
+				if ( fields.meta.hasOwnProperty( key ) ) {
+					metaDefaults[ key ] = fields.meta[ key ].default;
+				}
+			}
+			return metaDefaults;
 		}
 
 		// Remove footnotes or private keys from the list of fields.
