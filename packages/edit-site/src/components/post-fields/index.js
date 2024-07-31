@@ -242,7 +242,7 @@ function usePostFields( viewType ) {
 						label: name,
 					} ) ) || [],
 				render: PostAuthorField,
-				sort: ( { item: a }, { item: b }, direction ) => {
+				sort: ( a, b, direction ) => {
 					const nameA = a._embedded?.author?.[ 0 ]?.name || '';
 					const nameB = b._embedded?.author?.[ 0 ]?.name || '';
 

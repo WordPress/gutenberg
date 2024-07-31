@@ -145,14 +145,8 @@ export function filterSortAndPaginate< Item >(
 
 				if ( fieldToSort.type === 'integer' ) {
 					return fieldToSort.sort(
-						{
-							item: a,
-							value: valueA,
-						},
-						{
-							item: b,
-							value: valueB,
-						},
+						a,
+						b,
 						view.sort?.direction ?? 'desc'
 					);
 				}

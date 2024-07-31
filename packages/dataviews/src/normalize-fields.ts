@@ -20,7 +20,15 @@ export function normalizeFields< Item >(
 			field.getValue ||
 			( ( { item }: { item: ItemRecord } ) => item[ field.id ] );
 
-		const sort = field.sort || fieldTypeDefinition.sort;
+		const sort =
+			field.sort ??
+			function sort( a, b, direction ) {
+				return fieldTypeDefinition.sort(
+					getValue( { item: a } ),
+					getValue( { item: b } ),
+					direction
+				);
+			};
 
 		return {
 			...field,
