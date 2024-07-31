@@ -6,13 +6,18 @@ import type { Dispatch, SetStateAction } from 'react';
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
+import {
+	TextControl,
+	__experimentalNumberControl as NumberControl,
+	SelectControl,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { Form, Field, NormalizedField } from '../../types';
+import type { Form, Field, NormalizedField, FieldType } from '../../types';
 import { normalizeFields } from '../../normalize-fields';
 
 type DataFormProps< Item > = {
@@ -56,12 +61,63 @@ function DataFormTextControl< Item >( {
 	);
 }
 
+function DataFormNumberControl< Item >( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< Item > ) {
+	const { id, label, description } = field;
+	const value = field.getValue( { item: data } ) ?? '';
+	const onChangeControl = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( ( prevItem: Item ) => ( {
+				...prevItem,
+				[ id ]: newValue,
+			} ) ),
+		[ id, onChange ]
+	);
+
+	if ( field.elements ) {
+		const elements = [
+			/*
+			 * Value can be undefined when:
+			 *
+			 * - the field is not required
+			 * - in bulk editing
+			 *
+			 */
+			{ label: __( 'Select item' ), value: '' },
+			...field.elements,
+		];
+
+		return (
+			<SelectControl
+				label={ label }
+				value={ value }
+				options={ elements }
+				onChange={ onChangeControl }
+			/>
+		);
+	}
+
+	return (
+		<NumberControl
+			label={ label }
+			help={ description }
+			value={ value }
+			onChange={ onChangeControl }
+			__next40pxDefaultSize
+		/>
+	);
+}
+
 const controls: {
-	[ key: string ]: < Item >(
+	[ key in FieldType ]: < Item >(
 		props: DataFormControlProps< Item >
 	) => JSX.Element;
 } = {
 	text: DataFormTextControl,
+	integer: DataFormNumberControl,
 };
 
 function getControlForField< Item >( field: NormalizedField< Item > ) {

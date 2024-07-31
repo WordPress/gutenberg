@@ -6,11 +6,12 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	MenuItemsChoice,
 	VisuallyHidden,
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check, desktop, mobile, tablet, external } from '@wordpress/icons';
+import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -62,6 +63,45 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		desktop,
 	};
 
+	/**
+	 * The choices for the device type.
+	 *
+	 * @type {Array}
+	 */
+	const choices = [
+		{
+			value: 'Desktop',
+			label: __( 'Desktop' ),
+			icon: desktop,
+		},
+		{
+			value: 'Tablet',
+			label: __( 'Tablet' ),
+			icon: tablet,
+		},
+		{
+			value: 'Mobile',
+			label: __( 'Mobile' ),
+			icon: mobile,
+		},
+	];
+
+	/**
+	 * The selected choice.
+	 *
+	 * @type {Object}
+	 */
+	let selectedChoice = choices.find(
+		( choice ) => choice.value === deviceType
+	);
+
+	/**
+	 * If no selected choice is found, default to the first
+	 */
+	if ( ! selectedChoice ) {
+		selectedChoice = choices[ 0 ];
+	}
+
 	return (
 		<DropdownMenu
 			className="editor-preview-dropdown"
@@ -75,24 +115,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && check }
-						>
-							{ __( 'Desktop' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && check }
-						>
-							{ __( 'Tablet' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && check }
-						>
-							{ __( 'Mobile' ) }
-						</MenuItem>
+						<MenuItemsChoice
+							choices={ choices }
+							value={ selectedChoice.value }
+							onSelect={ setDeviceType }
+						/>
 					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
@@ -118,6 +145,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								className="editor-preview-dropdown__button-external"
 								role="menuitem"
 								forceIsAutosaveable={ forceIsAutosaveable }
+								aria-label={ __( 'Preview in new tab' ) }
 								textContent={
 									<>
 										{ __( 'Preview in new tab' ) }

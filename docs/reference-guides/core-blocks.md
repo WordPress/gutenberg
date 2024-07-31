@@ -360,7 +360,7 @@ Introduce new sections and organize content to help visitors (and search engines
 -	**Name:** core/heading
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
--	**Attributes:** content, level, placeholder, textAlign
+-	**Attributes:** content, level, levelOptions, placeholder, textAlign
 
 ## Home Link
 
@@ -435,7 +435,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 
 -	**Name:** core/loginout
 -	**Category:** theme
--	**Supports:** className, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
 ## Media & Text

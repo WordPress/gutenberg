@@ -29,5 +29,12 @@ export interface Pattern extends BasePost {
 
 export type Post = TemplateOrTemplatePart | Pattern | BasePost;
 
+export type PostWithPermissions = Post & {
+	permissions: {
+		delete: boolean;
+		update: boolean;
+	};
+};
+
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
