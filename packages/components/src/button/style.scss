@@ -333,19 +333,29 @@
 
 	// Toggled style.
 	&.is-pressed {
-		color: $components-color-foreground-inverted;
-		background: $components-color-foreground;
+		&,
+		&:hover {
+			color: $components-color-foreground-inverted;
+			&:not(:disabled, [aria-disabled="true"]) {
+				background: $components-color-foreground;
+			}
+		}
+
+		&:disabled,
+		&[aria-disabled="true"] {
+			color: $gray-500;
+
+			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
+				color: $components-color-foreground-inverted;
+				background: $gray-500;
+			}
+		}
 
 		&:focus:not(:disabled) {
 			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;
-		}
-
-		&:hover:not(:disabled) {
-			color: $components-color-foreground-inverted;
-			background: $components-color-foreground;
 		}
 	}
 
