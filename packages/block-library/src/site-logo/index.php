@@ -59,7 +59,7 @@ function render_block_core_site_logo( $attributes ) {
 		$processor = new WP_HTML_Tag_Processor( $custom_logo );
 		$processor->next_tag( 'img' );
 		if ( ! empty( $border_attributes['class'] ) ) {
-			$processor->set_attribute( 'class', $border_attributes['class'] );
+			$processor->add_class( $border_attributes['class'] );
 		}
 		if ( ! empty( $border_attributes['style'] ) ) {
 			$processor->set_attribute( 'style', $border_attributes['style'] );
@@ -80,7 +80,7 @@ function render_block_core_site_logo( $attributes ) {
  * Generates class names and styles to apply the border support styles for
  * the site logo block.
  *
- * @since 6.6.0
+ * @since 6.7.0
  *
  * @param array $attributes The block attributes.
  * @return array The border-related classnames and styles for the block.
