@@ -153,7 +153,7 @@ if ( ! class_exists( 'WP_Font_Utils' ) ) {
 				$slug_elements
 			);
 
-			return sanitize_text_field( join( ';', $slug_elements ) );
+			return sanitize_text_field( implode( ';', $slug_elements ) );
 		}
 
 		/**
