@@ -21,12 +21,6 @@
 		box-sizing: border-box;
 	}
 
-	// Inherit border radius from style variations.
-	a,
-	img {
-		border-radius: inherit;
-	}
-
 	&.aligncenter {
 		margin-left: auto;
 		margin-right: auto;

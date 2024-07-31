@@ -44,16 +44,20 @@
 // @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-site-logo.wp-block-site-logo {
 
+	/**
 	&.is-default-size .components-placeholder {
 		height: 60px;
 		width: 60px;
 	}
+	*/
 
+	/**
 	// Inherit radius.
 	> div, // A 60px width div shown only in the editor on mobile.
 	.components-resizable-box__container {
 		border-radius: inherit;
 	}
+	*/
 
 	// Style the placeholder.
 	.components-placeholder {
@@ -61,7 +65,6 @@
 		justify-content: center;
 		align-items: center;
 		padding: 0;
-		border-radius: inherit;
 
 		// Provide a minimum size for the placeholder, for when the logo is resized.
 		// @todo resizing is currently only possible by adding an image, resizing,
@@ -103,6 +106,12 @@
 			}
 		}
 	}
+}
+
+// Reduced specificity for the placeholder border radius,
+// so that border-radius from global styles can be applied.
+:root :where(.wp-block-site-logo .components-placeholder) {
+	border-radius: inherit;
 }
 
 .block-library-site-logo__inspector-upload-container {
