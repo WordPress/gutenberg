@@ -74,10 +74,10 @@ type Action =
 			direction: ResizeDirection;
 			delta: { width: number; height: number };
 	  }
+	// Resize the container and image to a new width.
+	| { type: 'RESIZE_CONTAINER'; width: number }
 	// Reset the state to the initial state.
-	| { type: 'RESET' }
-	// Resize the container and image to a new width and height.
-	| { type: 'RESIZE_CONTAINER'; width: number; height: number };
+	| { type: 'RESET' };
 
 function createInitialState( {
 	width,
@@ -382,19 +382,20 @@ function imageCropperReducer( state: State, action: Action ) {
 			};
 		}
 		case 'RESIZE_CONTAINER': {
-			if (
-				action.width === image.width &&
-				action.height === image.height
-			) {
+			const isAxisSwapped = rotations % 2 !== 0;
+			const imageInlineSize = isAxisSwapped ? image.height : image.width;
+			const ratio = action.width / imageInlineSize;
+
+			if ( ratio === 1 ) {
 				return state;
 			}
-			const ratio = action.width / image.width;
+
 			return {
 				...state,
 				image: {
 					...state.image,
-					width: action.width,
-					height: action.height,
+					width: image.width * ratio,
+					height: image.height * ratio,
 					x: image.x * ratio,
 					y: image.y * ratio,
 				},

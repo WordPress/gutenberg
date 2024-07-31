@@ -6,7 +6,13 @@ import { animate } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useContext, useRef, useEffect } from '@wordpress/element';
+import {
+	forwardRef,
+	useContext,
+	useRef,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -153,11 +159,14 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		originalWidth,
 		originalHeight,
 		refs: { imageRef },
-		getState,
 		dispatch,
 	} = useContext( ImageCropperContext );
 	const isAxisSwapped = rotations % 2 !== 0;
 	const degree = angle + rotations * 90;
+	const aspectRatio = useMemo(
+		() => originalWidth / originalHeight,
+		[ originalWidth, originalHeight ]
+	);
 
 	const squareImageHorizontalOffset = ( image.width - image.height ) / 2;
 	const paddingY = Math.max(
@@ -178,29 +187,20 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const containerRef = useRef< HTMLDivElement >( null! );
 	useEffect( () => {
 		const container = containerRef.current;
-		const aspectRatio = originalWidth / originalHeight;
 
 		const resizeObserver = new ResizeObserver( ( [ entry ] ) => {
-			const [ { inlineSize: width } ] = entry.contentBoxSize;
-			const _isAxisSwapped = getState().transforms.rotations % 2 !== 0;
-			const { width: imageWidth, height: imageHeight } = getState().image;
-			const imageDimensions = _isAxisSwapped
-				? {
-						width: imageHeight,
-						height: imageWidth,
-				  }
-				: {
-						width: imageWidth,
-						height: imageHeight,
-				  };
+			const [ { inlineSize } ] = entry.contentBoxSize;
+			const originalInlineSize = isAxisSwapped
+				? originalHeight
+				: originalWidth;
 
-			if ( width < imageDimensions.width ) {
-				dispatch( {
-					type: 'RESIZE_CONTAINER',
-					width: _isAxisSwapped ? width * aspectRatio : width,
-					height: _isAxisSwapped ? width : width / aspectRatio,
-				} );
-			}
+			dispatch( {
+				type: 'RESIZE_CONTAINER',
+				width:
+					inlineSize < originalInlineSize
+						? inlineSize
+						: originalInlineSize,
+			} );
 		} );
 
 		resizeObserver.observe( container );
@@ -208,7 +208,13 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		return () => {
 			resizeObserver.disconnect();
 		};
-	}, [ getState, dispatch, originalWidth, originalHeight ] );
+	}, [
+		dispatch,
+		originalWidth,
+		originalHeight,
+		aspectRatio,
+		isAxisSwapped,
+	] );
 
 	return (
 		<Container
@@ -230,12 +236,9 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			style={ {
 				width: `${
 					paddingInline * 2 +
-					( isAxisSwapped ? image.height : image.width )
+					( isAxisSwapped ? originalHeight : originalWidth )
 				}px`,
-				height: `${
-					paddingBlock * 2 +
-					( isAxisSwapped ? image.width : image.height )
-				}px`,
+				aspectRatio: '1 / 1',
 				'--wp-cropper-image-x': `${ image.x }px`,
 				'--wp-cropper-image-y': `${ image.y }px`,
 				'--wp-cropper-scale-x': scale.x,

@@ -10,13 +10,7 @@ import {
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useMemo,
-	useReducer,
-	useCallback,
-	useEffect,
-} from '@wordpress/element';
+import { useRef, useMemo, useReducer, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -146,12 +140,6 @@ export const useImageCropper = ( {
 		return blob;
 	}, [] );
 
-	const stateRef = useRef< State >( state );
-	useEffect( () => {
-		stateRef.current = state;
-	}, [ state ] );
-	const getState = useCallback( () => stateRef.current, [] );
-
 	return useMemo(
 		() => ( {
 			state,
@@ -162,10 +150,9 @@ export const useImageCropper = ( {
 				imageRef,
 				cropperWindowRef,
 			},
-			getState,
 			dispatch,
 			getImageBlob,
 		} ),
-		[ state, src, width, height, getImageBlob, getState ]
+		[ state, src, width, height, getImageBlob ]
 	);
 };
