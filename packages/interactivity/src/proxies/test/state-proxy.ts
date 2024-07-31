@@ -1164,7 +1164,7 @@ describe( 'Interactivity API', () => {
 				expect( state1 ).toBe( state2 );
 			} );
 
-			it( 'should return the same proxy when trying to re-proxify a state object', () => {
+			it( 'should throw when trying to re-proxify a state object', () => {
 				const state = proxifyState( 'test', {} );
 				expect( () => proxifyState( 'test', state ) ).toThrow();
 			} );
