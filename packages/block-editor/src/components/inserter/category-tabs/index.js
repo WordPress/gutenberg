@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useReducedMotion } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	FlexBlock,
 	privateApis as componentsPrivateApis,
+	__unstableMotion as motion,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
@@ -22,6 +24,14 @@ function CategoryTabs( {
 	onSelectCategory,
 	children,
 } ) {
+	// Copied from InterfaceSkeleton.
+	const ANIMATION_DURATION = 0.25;
+	const disableMotion = useReducedMotion();
+	const defaultTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
 	return (
 		<Tabs
 			className="block-editor-inserter__category-tabs"
@@ -57,16 +67,33 @@ function CategoryTabs( {
 					</Tabs.Tab>
 				) ) }
 			</Tabs.TabList>
-			{ categories.map( ( category ) => (
-				<Tabs.TabPanel
-					key={ category.name }
-					tabId={ category.name }
-					focusable={ false }
+			{ selectedCategory && (
+				<motion.div
 					className="block-editor-inserter__category-panel"
+					initial="closed"
+					animate="open"
+					exit="closed"
+					variants={ {
+						open: {
+							transform: 'translateX( 0 )',
+						},
+						closed: {
+							transform: 'translateX( -100% )',
+						},
+					} }
+					transition={ defaultTransition }
 				>
-					{ children }
-				</Tabs.TabPanel>
-			) ) }
+					{ categories.map( ( category ) => (
+						<Tabs.TabPanel
+							key={ category.name }
+							tabId={ category.name }
+							focusable={ false }
+						>
+							{ children }
+						</Tabs.TabPanel>
+					) ) }
+				</motion.div>
+			) }
 		</Tabs>
 	);
 }
