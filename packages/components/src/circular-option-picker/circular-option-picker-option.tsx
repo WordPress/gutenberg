@@ -16,7 +16,7 @@ import { Icon, check } from '@wordpress/icons';
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
-import * as Composite from '../composite';
+import { Composite } from '../composite';
 import Tooltip from '../tooltip';
 import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
 

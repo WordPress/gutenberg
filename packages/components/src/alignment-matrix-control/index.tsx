@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import * as Composite from '../composite';
+import { Composite, useCompositeStore } from '../composite';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
@@ -56,7 +56,7 @@ export function AlignmentMatrixControl( {
 		id
 	);
 
-	const compositeStore = Composite.useStore( {
+	const compositeStore = useCompositeStore( {
 		defaultActiveId: getItemId( baseId, defaultValue ),
 		activeId: getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
@@ -73,7 +73,7 @@ export function AlignmentMatrixControl( {
 	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
-		<Composite.Root
+		<Composite
 			store={ compositeStore }
 			render={
 				<Root
@@ -103,7 +103,7 @@ export function AlignmentMatrixControl( {
 					} ) }
 				</Composite.Row>
 			) ) }
-		</Composite.Root>
+		</Composite>
 	);
 }
 

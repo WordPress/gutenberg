@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import * as Composite from '../composite';
+import { Composite } from '../composite';
 import Tooltip from '../tooltip';
 import { VisuallyHidden } from '../visually-hidden';
 

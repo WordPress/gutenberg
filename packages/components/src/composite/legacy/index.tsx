@@ -5,10 +5,10 @@
  * tab stop for the whole Composite element. This means that it can behave as
  * a roving tabindex or aria-activedescendant container.
  *
- * This file aims at providing component that are as close as possible to the
+ * This file aims at providing components that are as close as possible to the
  * original `reakit`-based implementation (which was removed from the codebase),
  * although it is recommended that consumers of the package switch to the stable,
- * un-prefixed, ariakit-based version of `Composite`.
+ * un-prefixed, `ariakit`-based version of `Composite`.
  *
  * @see https://ariakit.org/components/composite
  */
@@ -21,7 +21,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as Current from '..';
+import { Composite as Current, useCompositeStore } from '..';
 import { useInstanceId } from '@wordpress/compose';
 
 type Orientation = 'horizontal' | 'vertical';
@@ -78,7 +78,7 @@ export interface LegacyStateOptions {
 
 type Component = React.FunctionComponent< any >;
 
-type CompositeStore = ReturnType< typeof Current.useStore >;
+type CompositeStore = ReturnType< typeof useCompositeStore >;
 type CompositeStoreState = { store: CompositeStore };
 export type CompositeState = CompositeStoreState &
 	Required< Pick< LegacyStateOptions, 'baseId' > >;
@@ -157,7 +157,7 @@ const unproxiedCompositeGroup = forwardRef<
 } );
 unproxiedCompositeGroup.displayName = 'CompositeGroup';
 
-export const Composite = proxyComposite( Current.Root, { baseId: 'id' } );
+export const Composite = proxyComposite( Current, { baseId: 'id' } );
 export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
 export const CompositeItem = proxyComposite( Current.Item, {
 	focusable: 'accessibleWhenDisabled',
@@ -180,7 +180,7 @@ export function useCompositeState(
 
 	return {
 		baseId: useInstanceId( Composite, 'composite', baseId ),
-		store: Current.useStore( {
+		store: useCompositeStore( {
 			defaultActiveId,
 			rtl,
 			orientation,

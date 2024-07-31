@@ -19,6 +19,7 @@ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
 	title: 'Components/Composite/Legacy',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
+		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
 		Composite,
 		CompositeGroup,
 		CompositeItem,
