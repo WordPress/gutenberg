@@ -147,16 +147,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const onSelect = ( value ) => {
 		setDeviceType( value );
 		let newEditorMode = originalEditingMode.current;
-		if ( value === 'Desktop' ) {
-			speak( __( 'Desktop selected' ), 'assertive' );
-		} else if ( value === 'Tablet' ) {
-			speak( __( 'Tablet selected' ), 'assertive' );
-		} else if ( value === 'Mobile' ) {
-			speak( __( 'Mobile selected' ), 'assertive' );
-		} else if ( value === 'ZoomIn' ) {
-			speak( __( 'Zoom to 100 percent selected' ), 'assertive' );
-		} else {
-			speak( __( 'Zoom to 50 percent selected' ), 'assertive' );
+		if ( value === 'ZoomOut' ) {
 			newEditorMode = 'zoom-out';
 		}
 
@@ -195,7 +186,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItemsChoice
 							choices={ choices }
 							value={ selectedChoice.value }
-							onSelect={ setDeviceType }
+							onSelect={ onSelect }
 						/>
 					</MenuGroup>
 					{ isTemplate && (
