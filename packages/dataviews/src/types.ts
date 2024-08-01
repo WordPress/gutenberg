@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ComponentType } from 'react';
+import type {
+	ReactElement,
+	ComponentType,
+	Dispatch,
+	SetStateAction,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -85,6 +90,11 @@ export type Field< Item > = {
 	render?: ComponentType< { item: Item } >;
 
 	/**
+	 * Callback used to render an edit control for the field.
+	 */
+	Edit?: ComponentType< DataFormControlProps< Item > >;
+
+	/**
 	 * Callback used to sort the field.
 	 */
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
@@ -138,6 +148,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
+	Edit: ComponentType< DataFormControlProps< Item > >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 };
@@ -154,6 +165,19 @@ export type Data< Item > = Item[];
  */
 export type Form = {
 	visibleFields?: string[];
+};
+
+export type DataFormProps< Item > = {
+	data: Item;
+	fields: Field< Item >[];
+	form: Form;
+	onChange: Dispatch< SetStateAction< Item > >;
+};
+
+export type DataFormControlProps< Item > = {
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: Dispatch< SetStateAction< Item > >;
 };
 
 /**

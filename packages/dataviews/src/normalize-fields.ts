@@ -39,6 +39,8 @@ export function normalizeFields< Item >(
 				);
 			};
 
+		const Edit = field.Edit || fieldTypeDefinition.Edit;
+
 		return {
 			...field,
 			label: field.label || field.id,
@@ -46,6 +48,7 @@ export function normalizeFields< Item >(
 			render: field.render || getValue,
 			sort,
 			isValid,
+			Edit,
 		};
 	} );
 }
