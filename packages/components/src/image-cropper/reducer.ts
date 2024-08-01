@@ -10,40 +10,40 @@ import {
 } from './math';
 
 export type State = {
-	// The image dimensions.
+	/** The image dimensions. */
 	image: {
-		// The x position of the image center.
+		/** The x position of the image center. */
 		x: number;
-		// The y position of the image center.
+		/** The y position of the image center. */
 		y: number;
-		// The width of the image.
+		/** The width of the image. */
 		width: number;
-		// The height of the image.
+		/** The height of the image. */
 		height: number;
 	};
-	// The image transforms.
+	/** The image transforms. */
 	transforms: {
-		// The angle of the image in degrees, from -45 to 45 degrees.
+		/** The angle of the image in degrees, from -45 to 45 degrees. */
 		angle: number;
-		// The number of 90-degree rotations clockwise.
+		/** The number of 90-degree rotations clockwise. */
 		rotations: number;
-		// The image scale.
+		/** The image scale. */
 		scale: { x: number; y: number };
 	};
-	// The cropper window dimensions.
+	/** The cropper window dimensions. */
 	cropper: {
-		// The width of the cropper window.
+		/** The width of the cropper window. */
 		width: number;
-		// The height of the cropper window
+		/** The height of the cropper window */
 		height: number;
-		// Whether the cropper window aspect ratio is locked.
+		/** Whether the cropper window aspect ratio is locked. */
 		lockAspectRatio: boolean;
 	};
-	// Whether the cropper window is resizing.
+	/** Whether the cropper window is resizing. */
 	isResizing: boolean;
-	// Whether the image is dragging/moving.
+	/** Whether the image is dragging/moving. */
 	isDragging: boolean;
-	// Whether the image is zooming/pinching.
+	/** Whether the image is zooming/pinching. */
 	isZooming: boolean;
 };
 
