@@ -15,7 +15,7 @@
  */
 add_filter(
 	'register_post_format_taxonomy_args',
-	function( $args ) {
+	function ( $args ) {
 		$args['show_in_rest'] = true;
 		return $args;
 	}
