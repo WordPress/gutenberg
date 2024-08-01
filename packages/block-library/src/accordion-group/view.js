@@ -1,46 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import { store, getContext } from '@wordpress/interactivity';
 
-/* eslint-disable-next-line no-unused-vars */
-const { state, actions } = store( 'core/accordion', {
+store( 'core/accordion', {
 	state: {
 		get isOpen() {
-			const { attributes } = getElement();
-			const id =
-				attributes.id ||
-				attributes[ 'aria-controls' ] ||
-				attributes[ 'aria-labelledby' ];
-			const context = getContext();
-			return context.isOpen.includes( id );
+			const { isOpen, id } = getContext();
+			return isOpen.includes( id );
 		},
 	},
 	actions: {
 		toggle: () => {
-			const { attributes } = getElement();
-			const id = attributes[ 'aria-controls' ];
 			const context = getContext();
-			if ( context.isOpen.includes( id ) ) {
-				if ( context.autoclose ) {
-					context.isOpen = [];
-				} else {
-					context.isOpen = context.isOpen.filter(
-						( item ) => item !== id
-					);
-				}
-			} else if ( context.autoclose ) {
-				context.isOpen = [ id ];
+			const { id, isOpen, autoclose } = context;
+			const itemIsOpen = isOpen.includes( id );
+			if ( autoclose ) {
+				context.isOpen = itemIsOpen ? [] : [ id ];
+			} else if ( itemIsOpen ) {
+				context.isOpen = isOpen.filter( ( item ) => item !== id );
 			} else {
-				context.isOpen = [ ...context.isOpen, id ];
+				context.isOpen = [ ...isOpen, id ];
 			}
 		},
 	},
 	callbacks: {
 		open: () => {
 			const context = getContext();
-			const { ref } = getElement();
-			context.isOpen.push( ref.id );
+			const { id } = context;
+			context.isOpen.push( id );
 		},
 	},
 } );

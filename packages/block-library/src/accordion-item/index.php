@@ -21,7 +21,7 @@ function block_core_accordion_item_render( $attributes, $content ) {
 
 	while ( $p->next_tag() ) {
 		if ( $p->has_class( 'wp-block-accordion-item' ) ) {
-			$p->set_attribute( 'id', $unique_id );
+            $p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '" }' );
 			$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
 			if ( $attributes['openByDefault'] ) {
 				$p->set_attribute( 'data-wp-init', 'callbacks.open' );
