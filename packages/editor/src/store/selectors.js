@@ -177,6 +177,12 @@ export const getCurrentPost = createRegistrySelector(
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ *
+ *```js
+ * const currentPostType = wp.data.select( 'core/editor' ).getCurrentPostType();
+ *
+ *```
  * @return {string} Post type.
  */
 export function getCurrentPostType( state ) {
@@ -315,6 +321,21 @@ const getNestedEditedPostProperty = createSelector(
  *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Post attribute name.
+ *
+ * @example
+ *
+ *```js
+ * const getFeaturedMediaUrl = useSelect( ( select ) => {
+ *     const getFeaturedMediaId =
+ *         select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+ *     const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+ *
+ *     // change sizes?.large for any registered size
+ *     return (
+ *         getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || ''
+ *     );
+ * }, [] );
+ *```
  *
  * @return {*} Post attribute value.
  */
