@@ -4,7 +4,7 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const send = (
-	<SVG viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 		<Path
 			fillRule="evenodd"
 			clipRule="evenodd"
