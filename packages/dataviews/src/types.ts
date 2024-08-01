@@ -167,13 +167,6 @@ export type Form = {
 	visibleFields?: string[];
 };
 
-export type DataFormProps< Item > = {
-	data: Item;
-	fields: Field< Item >[];
-	form: Form;
-	onChange: Dispatch< SetStateAction< Item > >;
-};
-
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;

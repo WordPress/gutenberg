@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Dispatch, SetStateAction } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -6,8 +11,15 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormProps } from '../../types';
 import { normalizeFields } from '../../normalize-fields';
+import type { Field, Form } from '../../types';
+
+type DataFormProps< Item > = {
+	data: Item;
+	fields: Field< Item >[];
+	form: Form;
+	onChange: Dispatch< SetStateAction< Item > >;
+};
 
 export default function DataForm< Item >( {
 	data,
