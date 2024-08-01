@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, click, sleep } from '@ariakit/test';
 
 /**

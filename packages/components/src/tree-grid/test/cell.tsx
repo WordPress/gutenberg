@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -22,23 +23,24 @@ const TestButton = forwardRef(
 );
 
 describe( 'TreeGridCell', () => {
-	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', () => {
-		expect( () =>
-			render(
-				<TreeGridCell>
-					{ ( props ) => (
-						<TestButton className="my-button" { ...props }>
-							Click Me!
-						</TestButton>
-					) }
-				</TreeGridCell>
-			)
+	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', async () => {
+		expect(
+			() =>
+				await render(
+					<TreeGridCell>
+						{ ( props ) => (
+							<TestButton className="my-button" { ...props }>
+								Click Me!
+							</TestButton>
+						) }
+					</TreeGridCell>
+				)
 		).toThrow();
 		expect( console ).toHaveErrored();
 	} );
 
-	it( 'uses a child render function to render children', () => {
-		const { container } = render(
+	it( 'uses a child render function to render children', async () => {
+		const { container } = await render(
 			<TreeGrid>
 				<tr>
 					<TreeGridCell>

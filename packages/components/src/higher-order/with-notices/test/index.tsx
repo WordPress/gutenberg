@@ -3,12 +3,12 @@
  */
 import {
 	act,
-	render,
 	fireEvent,
 	screen,
 	waitForElementToBeRemoved,
 	within,
 } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -89,9 +89,9 @@ describe( 'withNotices operations', () => {
 		return <TestNoticeOperations { ...props } ref={ handle } />;
 	};
 
-	it( 'should create notices with createNotice', () => {
+	it( 'should create notices with createNotice', async () => {
 		const message = 'Aló!';
-		const { container } = render( <Handle /> );
+		const { container } = await render( <Handle /> );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( { content: message } );
@@ -99,9 +99,9 @@ describe( 'withNotices operations', () => {
 		expect( getByText( message ) ).toBeInTheDocument();
 	} );
 
-	it( 'should create notices of error status with createErrorNotice', () => {
+	it( 'should create notices of error status with createErrorNotice', async () => {
 		const message = 'can’t touch this';
-		const { container } = render( <Handle /> );
+		const { container } = await render( <Handle /> );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createErrorNotice( message );
@@ -112,7 +112,7 @@ describe( 'withNotices operations', () => {
 
 	it( 'should remove a notice with removeNotice', async () => {
 		const notice = { id: 'so real', content: 'so why can’t I touch it?' };
-		const { container } = render( <Handle /> );
+		const { container } = await render( <Handle /> );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( notice );
@@ -129,7 +129,9 @@ describe( 'withNotices operations', () => {
 	it( 'should remove all notices with removeAllNotices', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container } = render( <Handle notifications={ notices } /> );
+		const { container } = await render(
+			<Handle notifications={ notices } />
+		);
 		const { getByText } = within( container );
 		expect(
 			await waitForElementToBeRemoved( () => {
@@ -144,15 +146,15 @@ describe( 'withNotices operations', () => {
 } );
 
 describe( 'withNotices rendering', () => {
-	it( 'should display the original component given no notices', () => {
-		const { container } = render( <TestComponent /> );
+	it( 'should display the original component given no notices', async () => {
+		const { container } = await render( <TestComponent /> );
 		expect( container.innerHTML ).toBe( `<div>${ content }</div>` );
 	} );
 
 	it( 'should display notices with functioning dismissal triggers', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container } = render(
+		const { container } = await render(
 			<TestComponent notifications={ notices } />
 		);
 		const [ buttonRemoveFirst ] =

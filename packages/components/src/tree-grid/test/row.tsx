@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,8 +10,8 @@ import { render } from '@testing-library/react';
 import TreeGridRow from '../row';
 
 describe( 'TreeGridRow', () => {
-	it( 'renders a tr with support for level, positionInSet and setSize props', () => {
-		const { container } = render(
+	it( 'renders a tr with support for level, positionInSet and setSize props', async () => {
+		const { container } = await render(
 			<table>
 				<tbody>
 					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
@@ -23,8 +24,8 @@ describe( 'TreeGridRow', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'forwards other props to the rendered tr element', () => {
-		const { container } = render(
+	it( 'forwards other props to the rendered tr element', async () => {
+		const { container } = await render(
 			<table>
 				<tbody>
 					<TreeGridRow

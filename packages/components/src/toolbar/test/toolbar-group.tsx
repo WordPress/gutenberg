@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -15,19 +16,21 @@ import { wordpress } from '@wordpress/icons';
 
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render an empty node, when controls are not passed', () => {
-			const { container } = render( <ToolbarGroup /> );
+		it( 'should render an empty node, when controls are not passed', async () => {
+			const { container } = await render( <ToolbarGroup /> );
 
 			expect( container ).toBeEmptyDOMElement();
 		} );
 
-		it( 'should render an empty node, when controls are empty', () => {
-			const { container } = render( <ToolbarGroup controls={ [] } /> );
+		it( 'should render an empty node, when controls are empty', async () => {
+			const { container } = await render(
+				<ToolbarGroup controls={ [] } />
+			);
 
 			expect( container ).toBeEmptyDOMElement();
 		} );
 
-		it( 'should render a list of controls with buttons', () => {
+		it( 'should render a list of controls with buttons', async () => {
 			const clickHandler = ( event?: React.MouseEvent ) => event;
 
 			const controls = [
@@ -39,14 +42,14 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 
-			render( <ToolbarGroup controls={ controls } /> );
+			await render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
 			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'false' );
 			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
-		it( 'should render a list of controls with buttons and active control', () => {
+		it( 'should render a list of controls with buttons and active control', async () => {
 			const clickHandler = ( event?: React.MouseEvent ) => event;
 			const controls = [
 				{
@@ -57,14 +60,14 @@ describe( 'ToolbarGroup', () => {
 				},
 			];
 
-			render( <ToolbarGroup controls={ controls } /> );
+			await render( <ToolbarGroup controls={ controls } /> );
 
 			const toolbarButton = screen.getByLabelText( 'WordPress' );
 			expect( toolbarButton ).toHaveAttribute( 'aria-pressed', 'true' );
 			expect( toolbarButton ).toHaveAttribute( 'type', 'button' );
 		} );
 
-		it( 'should render a nested list of controls with separator between', () => {
+		it( 'should render a nested list of controls with separator between', async () => {
 			const controls = [
 				[
 					// First set.
@@ -82,7 +85,7 @@ describe( 'ToolbarGroup', () => {
 				],
 			];
 
-			render( <ToolbarGroup controls={ controls } /> );
+			await render( <ToolbarGroup controls={ controls } /> );
 
 			const buttons = screen.getAllByRole( 'button' );
 
@@ -97,7 +100,7 @@ describe( 'ToolbarGroup', () => {
 			);
 		} );
 
-		it( 'should call the clickHandler on click.', () => {
+		it( 'should call the clickHandler on click.', async () => {
 			const clickHandler = jest.fn();
 			const controls = [
 				{
@@ -107,7 +110,7 @@ describe( 'ToolbarGroup', () => {
 					isActive: true,
 				},
 			];
-			render( <ToolbarGroup controls={ controls } /> );
+			await render( <ToolbarGroup controls={ controls } /> );
 
 			fireEvent.click( screen.getByLabelText( 'WordPress' ) );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );

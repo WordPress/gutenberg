@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -12,8 +13,8 @@ const noop = () => {};
 
 describe( 'TextControl', () => {
 	describe( 'When no ID prop is provided', () => {
-		it( 'should generate an ID', () => {
-			render( <TextControl onChange={ noop } value="" /> );
+		it( 'should generate an ID', async () => {
+			await render( <TextControl onChange={ noop } value="" /> );
 
 			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
 				'id',
@@ -21,9 +22,9 @@ describe( 'TextControl', () => {
 			);
 		} );
 
-		it( 'should be labelled correctly', () => {
+		it( 'should be labelled correctly', async () => {
 			const labelValue = 'Test Label';
-			render(
+			await render(
 				<TextControl label={ labelValue } onChange={ noop } value="" />
 			);
 
@@ -36,15 +37,17 @@ describe( 'TextControl', () => {
 	describe( 'When an ID prop is provided', () => {
 		const id = 'test-id';
 
-		it( 'should use the passed ID prop if provided', () => {
-			render( <TextControl id={ id } onChange={ noop } value="" /> );
+		it( 'should use the passed ID prop if provided', async () => {
+			await render(
+				<TextControl id={ id } onChange={ noop } value="" />
+			);
 
 			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'id', id );
 		} );
 
-		it( 'should be labelled correctly', () => {
+		it( 'should be labelled correctly', async () => {
 			const labelValue = 'Test Label';
-			render(
+			await render(
 				<TextControl
 					label={ labelValue }
 					id={ id }

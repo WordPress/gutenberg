@@ -2,7 +2,8 @@
  * External dependencies
  */
 import type { ComponentPropsWithoutRef } from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -408,38 +409,38 @@ describe( 'Navigator', () => {
 		window.Element.prototype.getClientRects = originalGetClientRects;
 	} );
 
-	it( 'should render', () => {
-		render( <MyNavigation /> );
+	it( 'should render', async () => {
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should show a different screen on the first render depending on the value of `initialPath`', () => {
-		render( <MyNavigation initialPath={ PATHS.CHILD } /> );
+	it( 'should show a different screen on the first render depending on the value of `initialPath`', async () => {
+		await render( <MyNavigation initialPath={ PATHS.CHILD } /> );
 
 		expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
 		expect( getScreen( 'child' ) ).toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should ignore changes to `initialPath` after the first render', () => {
-		const { rerender } = render( <MyNavigation /> );
+	it( 'should ignore changes to `initialPath` after the first render', async () => {
+		const { rerender } = await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 
-		rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
+		await rerender( <MyNavigation initialPath={ PATHS.CHILD } /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'nested' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should not rended anything if the `initialPath` does not match any available screen', () => {
-		render( <MyNavigation initialPath={ PATHS.NOT_FOUND } /> );
+	it( 'should not rended anything if the `initialPath` does not match any available screen', async () => {
+		await render( <MyNavigation initialPath={ PATHS.NOT_FOUND } /> );
 
 		expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
 		expect( queryScreen( 'child' ) ).not.toBeInTheDocument();
@@ -451,7 +452,7 @@ describe( 'Navigator', () => {
 
 		const user = userEvent.setup();
 
-		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+		await render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect( getNavigationButton( 'toChildScreen' ) ).toBeInTheDocument();
@@ -521,7 +522,7 @@ describe( 'Navigator', () => {
 
 		const user = userEvent.setup();
 
-		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+		await render( <MyNavigation onNavigatorButtonClick={ spy } /> );
 
 		expect(
 			getNavigationButton( 'toNonExistingScreen' )
@@ -543,7 +544,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should escape the value of the `path` prop', async () => {
-		render( <MyNavigation /> );
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 		expect(
@@ -564,7 +565,7 @@ describe( 'Navigator', () => {
 	it( 'should match correctly paths with named arguments', async () => {
 		const user = userEvent.setup();
 
-		render( <MyNavigation /> );
+		await render( <MyNavigation /> );
 
 		expect( getScreen( 'home' ) ).toBeInTheDocument();
 
@@ -594,7 +595,7 @@ describe( 'Navigator', () => {
 		it( 'should restore focus correctly', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
@@ -643,7 +644,7 @@ describe( 'Navigator', () => {
 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
@@ -665,7 +666,7 @@ describe( 'Navigator', () => {
 		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			// Navigate to child screen.
 			await user.click( getNavigationButton( 'toChildScreen' ) );
@@ -687,7 +688,7 @@ describe( 'Navigator', () => {
 		it( 'should restore focus correctly even when the `path` needs to be escaped', async () => {
 			const user = userEvent.setup();
 
-			render( <MyNavigation /> );
+			await render( <MyNavigation /> );
 
 			expect( getScreen( 'home' ) ).toBeInTheDocument();
 
@@ -711,7 +712,7 @@ describe( 'Navigator', () => {
 		it( 'should restore focus while using goTo and goToParent', async () => {
 			const user = userEvent.setup();
 
-			render( <MyHierarchicalNavigation /> );
+			await render( <MyHierarchicalNavigation /> );
 
 			expect( getScreen( 'home' ) ).toBeInTheDocument();
 
@@ -748,7 +749,7 @@ describe( 'Navigator', () => {
 
 		it( 'should skip focus based on location `skipFocus` option', async () => {
 			const user = userEvent.setup();
-			render( <MyHierarchicalNavigation /> );
+			await render( <MyHierarchicalNavigation /> );
 
 			// Navigate to child screen with skipFocus.
 			await user.click( getNavigationButton( 'goToWithSkipFocus' ) );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -10,22 +11,22 @@ import PanelHeader from '../header';
 
 describe( 'PanelHeader', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render PanelHeader with empty div inside', () => {
-			const { container } = render( <PanelHeader /> );
+		it( 'should render PanelHeader with empty div inside', async () => {
+			const { container } = await render( <PanelHeader /> );
 
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'should render a label matching the text provided in the prop', () => {
-			render( <PanelHeader label="Some Label" /> );
+		it( 'should render a label matching the text provided in the prop', async () => {
+			await render( <PanelHeader label="Some Label" /> );
 
 			const heading = screen.getByRole( 'heading' );
 			expect( heading ).toBeVisible();
 			expect( heading ).toHaveTextContent( 'Some Label' );
 		} );
 
-		it( 'should render child elements in the panel header body when provided', () => {
-			render(
+		it( 'should render child elements in the panel header body when provided', async () => {
+			await render(
 				<PanelHeader>
 					<dfn>Some text</dfn>
 				</PanelHeader>
@@ -36,8 +37,8 @@ describe( 'PanelHeader', () => {
 			expect( term ).toHaveTextContent( 'Some text' );
 		} );
 
-		it( 'should render both child elements and label when passed in', () => {
-			render(
+		it( 'should render both child elements and label when passed in', async () => {
+			await render(
 				<PanelHeader label="Some Label">
 					<dfn>Some text</dfn>
 				</PanelHeader>

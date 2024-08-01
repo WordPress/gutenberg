@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,13 +16,13 @@ const defaultProps = {
 };
 
 describe( 'Guide', () => {
-	it( 'renders nothing when there are no pages', () => {
-		render( <Guide { ...defaultProps } pages={ [] } /> );
+	it( 'renders nothing when there are no pages', async () => {
+		await render( <Guide { ...defaultProps } pages={ [] } /> );
 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders one page at a time', () => {
-		render(
+	it( 'renders one page at a time', async () => {
+		await render(
 			<Guide
 				{ ...defaultProps }
 				pages={ [
@@ -36,8 +37,8 @@ describe( 'Guide', () => {
 		expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'hides back button and shows forward button on the first page', () => {
-		render(
+	it( 'hides back button and shows forward button on the first page', async () => {
+		await render(
 			<Guide
 				{ ...defaultProps }
 				pages={ [
@@ -60,7 +61,7 @@ describe( 'Guide', () => {
 
 	it( 'shows back button and shows finish button on the last page', async () => {
 		const user = userEvent.setup();
-		render(
+		await render(
 			<Guide
 				{ ...defaultProps }
 				pages={ [
@@ -85,8 +86,8 @@ describe( 'Guide', () => {
 		).toBeVisible();
 	} );
 
-	it( "doesn't display the page control if there is only one page", () => {
-		render(
+	it( "doesn't display the page control if there is only one page", async () => {
+		await render(
 			<Guide
 				{ ...defaultProps }
 				pages={ [ { content: <p>Page 1</p> } ] }
@@ -100,7 +101,7 @@ describe( 'Guide', () => {
 	it( 'calls onFinish when the finish button is clicked', async () => {
 		const user = userEvent.setup();
 		const onFinish = jest.fn();
-		render(
+		await render(
 			<Guide
 				{ ...defaultProps }
 				onFinish={ onFinish }
@@ -115,7 +116,7 @@ describe( 'Guide', () => {
 	it( 'calls onFinish when the modal is closed', async () => {
 		const user = userEvent.setup();
 		const onFinish = jest.fn();
-		render(
+		await render(
 			<Guide
 				{ ...defaultProps }
 				onFinish={ onFinish }
@@ -129,8 +130,8 @@ describe( 'Guide', () => {
 	} );
 
 	describe( 'page navigation', () => {
-		it( 'renders an empty list when there are no pages', () => {
-			render( <Guide { ...defaultProps } pages={ [] } /> );
+		it( 'renders an empty list when there are no pages', async () => {
+			await render( <Guide { ...defaultProps } pages={ [] } /> );
 			expect(
 				screen.queryByRole( 'list', {
 					name: 'Guide controls',
@@ -143,8 +144,8 @@ describe( 'Guide', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders a button for each page', () => {
-			render(
+		it( 'renders a button for each page', async () => {
+			await render(
 				<Guide
 					{ ...defaultProps }
 					pages={ [
@@ -168,7 +169,7 @@ describe( 'Guide', () => {
 		it( 'sets the current page when a button is clicked', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<Guide
 					{ ...defaultProps }
 					pages={ [
@@ -211,7 +212,7 @@ describe( 'Guide', () => {
 		it( 'allows navigating through the pages with the left and right arrows', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<Guide
 					{ ...defaultProps }
 					pages={ [

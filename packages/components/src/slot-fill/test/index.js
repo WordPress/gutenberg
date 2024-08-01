@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, click, hover, sleep } from '@ariakit/test';
 
 /**
@@ -95,8 +96,8 @@ describe.each( [
 	const [ mode, Component ] = modeAndComponent;
 
 	describe( 'should render correctly', () => {
-		it( 'with text options', () => {
-			const { container } = render(
+		it( 'with text options', async () => {
+			const { container } = await render(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>
@@ -105,8 +106,8 @@ describe.each( [
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'with icons', () => {
-			const { container } = render(
+		it( 'with icons', async () => {
+			const { container } = await render(
 				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
@@ -124,8 +125,8 @@ describe.each( [
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
-	it( 'should render with the correct option initially selected when `value` is defined', () => {
-		render(
+	it( 'should render with the correct option initially selected when `value` is defined', async () => {
+		await render(
 			<Component value="jack" label="Test Toggle Group Control">
 				{ options }
 			</Component>
@@ -133,8 +134,8 @@ describe.each( [
 		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
 		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
 	} );
-	it( 'should render without a selected option when `value` is `undefined`', () => {
-		render(
+	it( 'should render without a selected option when `value` is `undefined`', async () => {
+		await render(
 			<Component label="Test Toggle Group Control">{ options }</Component>
 		);
 		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
@@ -143,7 +144,7 @@ describe.each( [
 	it( 'should call onChange with proper value', async () => {
 		const mockOnChange = jest.fn();
 
-		render(
+		await render(
 			<Component
 				value="jack"
 				onChange={ mockOnChange }
@@ -159,7 +160,7 @@ describe.each( [
 	} );
 
 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
-		render(
+		await render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</Component>
@@ -189,7 +190,7 @@ describe.each( [
 	} );
 
 	it( 'should not render tooltip', async () => {
-		render(
+		await render(
 			<Component label="Test Toggle Group Control">
 				{ optionsWithTooltip }
 			</Component>
@@ -217,7 +218,7 @@ describe.each( [
 
 	if ( mode === 'controlled' ) {
 		it( 'should reset values correctly when default value is undefined', async () => {
-			render(
+			await render(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>
@@ -238,7 +239,7 @@ describe.each( [
 		} );
 
 		it( 'should reset values correctly when default value is defined', async () => {
-			render(
+			await render(
 				<Component label="Test Toggle Group Control" value="rigas">
 					{ options }
 				</Component>
@@ -267,7 +268,7 @@ describe.each( [
 			'should update correctly when triggered by external updates',
 			( defaultValueType, defaultValue ) => {
 				it( `when default value is ${ defaultValueType }`, async () => {
-					render(
+					await render(
 						<Component
 							value={ defaultValue }
 							label="Test Toggle Group Control"
@@ -309,7 +310,7 @@ describe.each( [
 			it( 'should not be deselectable', async () => {
 				const mockOnChange = jest.fn();
 
-				render(
+				await render(
 					<Component
 						value="rigas"
 						label="Test"
@@ -328,7 +329,7 @@ describe.each( [
 			} );
 
 			it( 'should not tab to next radio option', async () => {
-				render(
+				await render(
 					<>
 						<Component value="rigas" label="Test">
 							{ options }
@@ -362,7 +363,7 @@ describe.each( [
 			it( 'should ignore disabled radio options', async () => {
 				const mockOnChange = jest.fn();
 
-				render(
+				await render(
 					<Component
 						value="pizza"
 						onChange={ mockOnChange }
@@ -411,7 +412,7 @@ describe.each( [
 			it( 'should be deselectable', async () => {
 				const mockOnChange = jest.fn();
 
-				render(
+				await render(
 					<Component
 						value="rigas"
 						label="Test"
@@ -442,7 +443,7 @@ describe.each( [
 			} );
 
 			it( 'should tab to the next option button', async () => {
-				render(
+				await render(
 					<Component isDeselectable value="rigas" label="Test">
 						{ options }
 					</Component>
@@ -479,7 +480,7 @@ describe.each( [
 			it( 'should ignore disabled options', async () => {
 				const mockOnChange = jest.fn();
 
-				render(
+				await render(
 					<Component
 						value="pizza"
 						isDeselectable

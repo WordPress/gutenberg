@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -84,16 +85,16 @@ describe.each( [
 ] )( 'ComboboxControl %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
-	it( 'should render with visible label', () => {
-		render(
+	it( 'should render with visible label', async () => {
+		await render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
 		const label = getLabel( defaultLabelText );
 		expect( label ).toBeVisible();
 	} );
 
-	it( 'should render with hidden label', () => {
-		render(
+	it( 'should render with hidden label', async () => {
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -111,7 +112,7 @@ describe.each( [
 
 	it( 'should render with the correct options', async () => {
 		const user = await userEvent.setup();
-		render(
+		await render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
 		const input = getInput( defaultLabelText );
@@ -134,7 +135,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 2 ];
 		const onChangeSpy = jest.fn();
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -159,7 +160,7 @@ describe.each( [
 		const targetIndex = 4;
 		const targetOption = timezones[ targetIndex ];
 		const onChangeSpy = jest.fn();
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -188,7 +189,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 		const onChangeSpy = jest.fn();
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -215,7 +216,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 9 ];
 		const onChangeSpy = jest.fn();
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -244,7 +245,7 @@ describe.each( [
 		const unmatchedString = 'Mordor';
 		const targetOption = timezones[ 6 ];
 		const onChangeSpy = jest.fn();
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -306,8 +307,8 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
-	it( 'should render with Reset button disabled', () => {
-		render(
+	it( 'should render with Reset button disabled', async () => {
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -325,7 +326,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -359,7 +360,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
@@ -398,7 +399,7 @@ describe.each( [
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 
-		render(
+		await render(
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }

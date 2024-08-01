@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -39,10 +40,10 @@ describe( 'TextHighlight', () => {
 			}
 		);
 
-		it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
+		it( 'should highlight multiple occurances of the string every time it exists in the text', async () => {
 			const highlight = 'edit';
 
-			const { container } = render(
+			const { container } = await render(
 				<TextHighlight text={ defaultText } highlight={ highlight } />
 			);
 
@@ -55,12 +56,12 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should highlight occurances of a string regardless of capitalisation', () => {
+		it( 'should highlight occurances of a string regardless of capitalisation', async () => {
 			// Note that `The` occurs twice in the default text, once in
 			// lowercase and once capitalized.
 			const highlight = 'The';
 
-			const { container } = render(
+			const { container } = await render(
 				<TextHighlight text={ defaultText } highlight={ highlight } />
 			);
 
@@ -77,10 +78,10 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should not highlight a string that is not in the text', () => {
+		it( 'should not highlight a string that is not in the text', async () => {
 			const highlight = 'Antidisestablishmentarianism';
 
-			const { container } = render(
+			const { container } = await render(
 				<TextHighlight text={ defaultText } highlight={ highlight } />
 			);
 

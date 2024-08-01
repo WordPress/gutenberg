@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -16,15 +17,15 @@ import DropdownMenu from '..';
 import MenuItem from '../../menu-item';
 
 describe( 'DropdownMenu', () => {
-	it( 'should not render when neither controls nor children are assigned', () => {
-		render( <DropdownMenu label="Open dropdown" /> );
+	it( 'should not render when neither controls nor children are assigned', async () => {
+		await render( <DropdownMenu label="Open dropdown" /> );
 
 		// The button toggle should not even be rendered
 		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should not render when controls are empty and children is not specified', () => {
-		render( <DropdownMenu label="Open dropdown" controls={ [] } /> );
+	it( 'should not render when controls are empty and children is not specified', async () => {
+		await render( <DropdownMenu label="Open dropdown" controls={ [] } /> );
 
 		// The button toggle should not even be rendered
 		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
@@ -56,7 +57,9 @@ describe( 'DropdownMenu', () => {
 			},
 		];
 
-		render( <DropdownMenu label="Open dropdown" controls={ controls } /> );
+		await render(
+			<DropdownMenu label="Open dropdown" controls={ controls } />
+		);
 
 		// Move focus on the toggle button
 		await user.tab();
@@ -76,7 +79,7 @@ describe( 'DropdownMenu', () => {
 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
 		const user = userEvent.setup();
 
-		render(
+		await render(
 			<DropdownMenu
 				label="Open dropdown"
 				children={ ( { onClose } ) => <MenuItem onClick={ onClose } /> }

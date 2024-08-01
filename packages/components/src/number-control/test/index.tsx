@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -30,13 +31,13 @@ function StatefulNumberControl( props: NumberControlProps ) {
 
 describe( 'NumberControl', () => {
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			render( <NumberControl /> );
+		it( 'should render', async () => {
+			await render( <NumberControl /> );
 			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
 		} );
 
-		it( 'should render custom className', () => {
-			render( <NumberControl className="hello" /> );
+		it( 'should render custom className', async () => {
+			await render( <NumberControl className="hello" /> );
 			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
 		} );
 	} );
@@ -46,7 +47,7 @@ describe( 'NumberControl', () => {
 			const user = userEvent.setup();
 			const spy = jest.fn();
 
-			render(
+			await render(
 				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
 			);
 
@@ -61,7 +62,7 @@ describe( 'NumberControl', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<NumberControl
 					value={ 5 }
 					min={ 4 }
@@ -104,7 +105,7 @@ describe( 'NumberControl', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<NumberControl
 					value={ 5 }
 					min={ 1 }
@@ -147,7 +148,7 @@ describe( 'NumberControl', () => {
 		it( 'should clamp value within range on ENTER keypress', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+			await render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 
@@ -165,7 +166,7 @@ describe( 'NumberControl', () => {
 		it( 'should clamp value within range on blur', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+			await render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -184,7 +185,7 @@ describe( 'NumberControl', () => {
 		it( 'should parse non-numeric values to a number on ENTER keypress when required', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } required /> );
+			await render( <NumberControl value={ 5 } required /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -197,7 +198,7 @@ describe( 'NumberControl', () => {
 		it( 'should parse non-numeric values to empty string on ENTER keypress when not required', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } required={ false } /> );
+			await render( <NumberControl value={ 5 } required={ false } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -216,7 +217,7 @@ describe( 'NumberControl', () => {
 		it( 'should not enforce numerical value for empty string when required is omitted', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } /> );
+			await render( <NumberControl value={ 5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -231,7 +232,7 @@ describe( 'NumberControl', () => {
 		it( 'should enforce numerical value for empty string when required', async () => {
 			const user = userEvent.setup();
 
-			render( <NumberControl value={ 5 } required /> );
+			await render( <NumberControl value={ 5 } required /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.clear( input );
@@ -247,7 +248,9 @@ describe( 'NumberControl', () => {
 
 			const spy = jest.fn();
 
-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } onKeyDown={ spy } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -259,7 +262,7 @@ describe( 'NumberControl', () => {
 		it( 'should increment by step on key UP press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } /> );
+			await render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -271,7 +274,7 @@ describe( 'NumberControl', () => {
 		it( 'should increment from a negative value', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ -5 } /> );
+			await render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -283,7 +286,9 @@ describe( 'NumberControl', () => {
 		it( 'should increment while preserving the decimal value when `step` is “any”', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
+			await render(
+				<StatefulNumberControl value={ 866.5309 } step="any" />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -295,7 +300,7 @@ describe( 'NumberControl', () => {
 		it( 'should increment by step multiplied by spinFactor when spinFactor is provided', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					step={ 0.01 }
 					spinFactor={ 10 }
@@ -313,7 +318,9 @@ describe( 'NumberControl', () => {
 		it( 'should increment by shiftStep on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } shiftStep={ 10 } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -325,7 +332,9 @@ describe( 'NumberControl', () => {
 		it( 'should increment by shiftStep multiplied by spinFactor on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } spinFactor={ 5 } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } spinFactor={ 5 } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -337,7 +346,9 @@ describe( 'NumberControl', () => {
 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
+			await render(
+				<StatefulNumberControl value={ 857.5309 } step="any" />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -349,7 +360,9 @@ describe( 'NumberControl', () => {
 		it( 'should increment by custom shiftStep on key UP + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } shiftStep={ 100 } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -361,7 +374,7 @@ describe( 'NumberControl', () => {
 		it( 'should increment but be limited by max on shiftStep', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					value={ 5 }
 					shiftStep={ 100 }
@@ -379,7 +392,7 @@ describe( 'NumberControl', () => {
 		it( 'should not increment by shiftStep if disabled', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					value={ 5 }
 					shiftStep={ 100 }
@@ -400,7 +413,9 @@ describe( 'NumberControl', () => {
 			const user = userEvent.setup();
 			const spy = jest.fn();
 
-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } onKeyDown={ spy } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -412,7 +427,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by step on key DOWN press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } /> );
+			await render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -424,7 +439,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement from a negative value', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ -5 } /> );
+			await render( <StatefulNumberControl value={ -5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -436,7 +451,9 @@ describe( 'NumberControl', () => {
 		it( 'should decrement while preserving the decimal value when `step` is “any”', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
+			await render(
+				<StatefulNumberControl value={ 868.5309 } step="any" />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -448,7 +465,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by step multiplied by spinFactor when spinFactor is provided', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					step={ 0.01 }
 					spinFactor={ 10 }
@@ -466,7 +483,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } /> );
+			await render( <StatefulNumberControl value={ 5 } /> );
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -478,7 +495,9 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by shiftStep multiplied by spinFactor on key DOWN + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 100 } spinFactor={ 5 } /> );
+			await render(
+				<StatefulNumberControl value={ 100 } spinFactor={ 5 } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -490,7 +509,9 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
+			await render(
+				<StatefulNumberControl value={ 877.5309 } step="any" />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -502,7 +523,9 @@ describe( 'NumberControl', () => {
 		it( 'should decrement by custom shiftStep on key DOWN + shift press', async () => {
 			const user = userEvent.setup();
 
-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+			await render(
+				<StatefulNumberControl value={ 5 } shiftStep={ 100 } />
+			);
 
 			const input = screen.getByRole( 'spinbutton' );
 			await user.click( input );
@@ -514,7 +537,7 @@ describe( 'NumberControl', () => {
 		it( 'should decrement but be limited by min on shiftStep', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					value={ 5 }
 					shiftStep={ 100 }
@@ -532,7 +555,7 @@ describe( 'NumberControl', () => {
 		it( 'should not decrement by shiftStep if disabled', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<StatefulNumberControl
 					value={ 5 }
 					shiftStep={ 100 }

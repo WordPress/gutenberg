@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, waitFor } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -25,15 +26,15 @@ describe( 'withFilters', () => {
 		removeAllFilters( hookName, 'test/enhanced-component-spy-2' );
 	} );
 
-	it( 'should display original component when no filters applied', () => {
+	it( 'should display original component when no filters applied', async () => {
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should display a component overridden by the filter', () => {
+	it( 'should display a component overridden by the filter', async () => {
 		const OverriddenComponent = () => <div>Overridden component</div>;
 		addFilter(
 			'EnhancedComponent',
@@ -42,12 +43,12 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should display two components composed by the filter', () => {
+	it( 'should display two components composed by the filter', async () => {
 		const ComposedComponent = () => <div>Composed component</div>;
 		addFilter(
 			hookName,
@@ -61,7 +62,7 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
@@ -79,7 +80,7 @@ describe( 'withFilters', () => {
 		);
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		await waitFor( () =>
 			expect( SpiedComponent ).toHaveBeenCalledTimes( 1 )
@@ -91,7 +92,7 @@ describe( 'withFilters', () => {
 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		SpiedComponent.mockClear();
 
@@ -115,7 +116,7 @@ describe( 'withFilters', () => {
 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		SpiedComponent.mockClear();
 
@@ -147,7 +148,7 @@ describe( 'withFilters', () => {
 	it( 'should re-render component twice when new filter added and removed in two different animation frames', async () => {
 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
-		const { container } = render( <EnhancedComponent /> );
+		const { container } = await render( <EnhancedComponent /> );
 
 		SpiedComponent.mockClear();
 
@@ -183,7 +184,7 @@ describe( 'withFilters', () => {
 				<EnhancedComponent />
 			</section>
 		);
-		const { container } = render( <CombinedComponents /> );
+		const { container } = await render( <CombinedComponents /> );
 
 		SpiedComponent.mockClear();
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -38,8 +39,8 @@ describe( 'SandBox', () => {
 		);
 	};
 
-	it( 'should rerender with new emdeded content if html prop changes', () => {
-		render( <TestWrapper /> );
+	it( 'should rerender with new emdeded content if html prop changes', async () => {
+		await render( <TestWrapper /> );
 
 		const iframe =
 			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );

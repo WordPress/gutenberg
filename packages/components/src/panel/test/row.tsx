@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,22 +10,22 @@ import { render, screen } from '@testing-library/react';
 import PanelRow from '../row';
 
 describe( 'PanelRow', () => {
-	it( 'should render with the default class name', () => {
-		const { container } = render( <PanelRow children={ null } /> );
+	it( 'should render with the default class name', async () => {
+		const { container } = await render( <PanelRow children={ null } /> );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should render with the custom class name', () => {
-		const { container } = render(
+	it( 'should render with the custom class name', async () => {
+		const { container } = await render(
 			<PanelRow className="custom" children={ null } />
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should render child components', () => {
-		render(
+	it( 'should render child components', async () => {
+		await render(
 			<PanelRow>
 				<dfn>Some text</dfn>
 			</PanelRow>

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,8 +10,8 @@ import { render } from '@testing-library/react';
 import ColorIndicator from '..';
 
 describe( 'ColorIndicator', () => {
-	it( 'matches the snapshot', () => {
-		const { container } = render(
+	it( 'matches the snapshot', async () => {
+		const { container } = await render(
 			<ColorIndicator aria-label="sample label" colorValue="#fff" />
 		);
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -216,8 +217,8 @@ describe( 'ToolsPanel', () => {
 			expect( nonToolsPanelItem ).toBeInTheDocument();
 		} );
 
-		it( 'should render panel item flagged as default control even without value', () => {
-			render(
+		it( 'should render panel item flagged as default control even without value', async () => {
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps }>
 						<div>Example control</div>
@@ -233,8 +234,8 @@ describe( 'ToolsPanel', () => {
 			expect( altControl ).toBeInTheDocument();
 		} );
 
-		it( 'should not render panel menu when there are no panel items', () => {
-			render(
+		it( 'should not render panel menu when there are no panel items', async () => {
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					{ false && (
 						<ToolsPanelItem
@@ -356,13 +357,15 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanel>
 				);
 			};
-			const { rerender } = render( <ToolsPanelOptional /> );
+			const { rerender } = await render( <ToolsPanelOptional /> );
 
 			const control = screen.queryByText( 'Optional control' );
 
 			expect( control ).not.toBeInTheDocument();
 
-			rerender( <ToolsPanelOptional toolsPanelItemValue={ 100 } /> );
+			await rerender(
+				<ToolsPanelOptional toolsPanelItemValue={ 100 } />
+			);
 
 			const controlRerendered = screen.getByText( 'Optional control' );
 
@@ -395,12 +398,12 @@ describe( 'ToolsPanel', () => {
 				);
 			};
 
-			const { rerender } = render( <ToolsPanelOptional /> );
+			const { rerender } = await render( <ToolsPanelOptional /> );
 			const control = screen.queryByText( 'Optional control' );
 
 			expect( control ).not.toBeInTheDocument();
 
-			rerender( <ToolsPanelOptional toolsPanelItemValue={ 99 } /> );
+			await rerender( <ToolsPanelOptional toolsPanelItemValue={ 99 } /> );
 
 			const controlRerendered = screen.getByText( 'Optional control' );
 
@@ -408,7 +411,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
-			render(
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
 						<div>Default control</div>
@@ -432,7 +435,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render appropriate menu groups', async () => {
-			render(
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...controlProps } isShownByDefault>
 						<div>Default control</div>
@@ -450,8 +453,8 @@ describe( 'ToolsPanel', () => {
 			expect( menuGroups.length ).toEqual( 2 );
 		} );
 
-		it( 'should not render contents of items when in placeholder state', () => {
-			render(
+		it( 'should not render contents of items when in placeholder state', async () => {
+			await render(
 				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
 					<ToolsPanelItem { ...altControlProps }>
 						<div>Optional control</div>
@@ -493,7 +496,7 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			const { rerender } = render( <TestPanel /> );
+			const { rerender } = await render( <TestPanel /> );
 
 			// The linked control should start out as an optional control and is
 			// not rendered because it does not have a value.
@@ -514,7 +517,7 @@ describe( 'ToolsPanel', () => {
 			// conditional `isShownByDefault` prop.
 			altControlValue = true;
 
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 
 			// The linked control should now be a default control and rendered
 			// despite not having a value.
@@ -567,7 +570,7 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanel>
 			);
 
-			const { rerender } = render( <TestPanel /> );
+			const { rerender } = await render( <TestPanel /> );
 
 			// The conditional control should not yet be rendered.
 			let conditionalItem = screen.queryByText( 'Conditional control' );
@@ -586,7 +589,7 @@ describe( 'ToolsPanel', () => {
 			// render the new default control into the ToolsPanel.
 			altControlValue = true;
 
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 
 			// The conditional control should now be rendered and included in
 			// the panel's menu.
@@ -609,7 +612,7 @@ describe( 'ToolsPanel', () => {
 			jest.clearAllMocks();
 		} );
 
-		it( 'should register and deregister items when panelId changes', () => {
+		it( 'should register and deregister items when panelId changes', async () => {
 			// This test simulates switching block selection, which causes the
 			// `ToolsPanel` to rerender with a new panelId, necessitating the
 			// registration and deregistration of appropriate `ToolsPanelItem`
@@ -630,7 +633,7 @@ describe( 'ToolsPanel', () => {
 
 			// On the initial render of the panel, the ToolsPanelItem should
 			// be registered.
-			const { rerender } = render( <TestPanel /> );
+			const { rerender } = await render( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -647,7 +650,7 @@ describe( 'ToolsPanel', () => {
 			// Rerender the panel item. Because we have a new panelId, this
 			// panelItem should NOT be registered, but it SHOULD be
 			// deregistered.
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 
 			// registerPanelItem has still only been called once.
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
@@ -663,7 +666,7 @@ describe( 'ToolsPanel', () => {
 
 			// Rerender the panel and ensure that the panelItem is registered
 			// again, and it is not de-registered.
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -676,7 +679,7 @@ describe( 'ToolsPanel', () => {
 			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should register items when ToolsPanel panelId is null', () => {
+		it( 'should register items when ToolsPanel panelId is null', async () => {
 			// This test simulates when a panel spans multiple block selections.
 			// Multi-selection means a panel can't have a single id to match
 			// against the item's. Instead the panel gets an id of `null` and
@@ -697,7 +700,7 @@ describe( 'ToolsPanel', () => {
 
 			// On the initial render of the panel, the ToolsPanelItem should
 			// be registered.
-			const { rerender, unmount } = render( <TestPanel /> );
+			const { rerender, unmount } = await render( <TestPanel /> );
 
 			expect( context.registerPanelItem ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -709,14 +712,14 @@ describe( 'ToolsPanel', () => {
 
 			// Simulate a further block selection being added to the
 			// multi-selection. The panelId will remain `null` in this case.
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
 			// Simulate a change in panel back to single block selection for
 			// which the item matches panelId.
 			context.panelId = '1234';
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 1 );
 			expect( context.deregisterPanelItem ).not.toHaveBeenCalled();
 
@@ -724,14 +727,14 @@ describe( 'ToolsPanel', () => {
 			// Item should re-register itself after it deregistered as the
 			// multi-selection occurred.
 			context.panelId = null;
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 			expect( context.registerPanelItem ).toHaveBeenCalledTimes( 2 );
 			expect( context.deregisterPanelItem ).toHaveBeenCalledTimes( 1 );
 
 			// Simulate a change in panel e.g. back to a single block selection
 			// Where the item's panelId is not a match.
 			context.panelId = '4321';
-			rerender( <TestPanel /> );
+			await rerender( <TestPanel /> );
 
 			// As the item no longer matches the panelId it should not have
 			// registered again but instead deregistered.
@@ -877,7 +880,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should maintain visual order of controls when toggled on and off', async () => {
 			// Multiple fills are added to better simulate panel items being
 			// injected from different locations.
-			render(
+			await render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>
@@ -948,7 +951,7 @@ describe( 'ToolsPanel', () => {
 				</ToolsPanelItems>
 			);
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<SlotFillProvider>
 					<InconsistentItems key="order-test-step-1" />
 					<ToolsPanelItems>
@@ -983,7 +986,7 @@ describe( 'ToolsPanel', () => {
 			// Close the dropdown menu.
 			await user.click( menuButton );
 
-			rerender(
+			await rerender(
 				<SlotFillProvider>
 					<InconsistentItems key="order-test-step-2" />
 					<ToolsPanelItems>
@@ -1014,7 +1017,7 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 2 ] ).toHaveTextContent( 'Item 3' );
 		} );
 
-		it( 'should not trigger callback when fill has not updated yet when panel has', () => {
+		it( 'should not trigger callback when fill has not updated yet when panel has', async () => {
 			// Fill provided controls can update independently to the panel.
 			// A `panelId` prop was added to both panels and items
 			// so it could prevent erroneous registrations and calls to
@@ -1046,7 +1049,7 @@ describe( 'ToolsPanel', () => {
 			// set its internal state to reflect it was previously selected.
 			// This later forms part of the condition used to determine if an
 			// item is being deselected and thus call the onDeselect callback.
-			const { rerender } = render(
+			const { rerender } = await render(
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
 						<div>Item</div>
@@ -1061,7 +1064,7 @@ describe( 'ToolsPanel', () => {
 
 			// Rerender the panel item and ensure that it skips any check
 			// for deselection given it still belongs to a different panelId.
-			rerender(
+			await rerender(
 				<ToolsPanelContext.Provider value={ context }>
 					<ToolsPanelItem { ...altControlProps } panelId="1234">
 						<div>Item</div>
@@ -1100,7 +1103,9 @@ describe( 'ToolsPanel', () => {
 				</SlotFillProvider>
 			);
 
-			const { rerender } = render( <TestSlotFillPanel panelId="1234" /> );
+			const { rerender } = await render(
+				<TestSlotFillPanel panelId="1234" />
+			);
 			await openDropdownMenu();
 
 			// Only the item matching the panelId should have been registered
@@ -1118,7 +1123,7 @@ describe( 'ToolsPanel', () => {
 
 			// Re-render the panel with different panelID simulating a block
 			// selection change.
-			rerender( <TestSlotFillPanel panelId="9999" /> );
+			await rerender( <TestSlotFillPanel panelId="9999" /> );
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
 					name: 'Show Alt',
@@ -1156,7 +1161,7 @@ describe( 'ToolsPanel', () => {
 		};
 
 		it( 'should render appropriate labels and descriptions for the dropdown menu where there are default controls', async () => {
-			render(
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...defaultControls }>
 						<div>Default control</div>
@@ -1180,7 +1185,7 @@ describe( 'ToolsPanel', () => {
 
 		it( 'should render appropriate labels and descriptions for the dropdown menu where there are no default controls', async () => {
 			// All options are inactive.
-			render(
+			await render(
 				<ToolsPanel { ...defaultProps }>
 					<ToolsPanelItem { ...optionalControls }>
 						<div>Optional control</div>
@@ -1241,7 +1246,7 @@ describe( 'ToolsPanel', () => {
 				filters: ResetAllFilter[] | undefined
 			) => filters?.forEach( ( f ) => f() );
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<ToolsPanel
 					{ ...defaultProps }
 					panelId="a"
@@ -1258,7 +1263,7 @@ describe( 'ToolsPanel', () => {
 
 			resetItem.mockClear();
 
-			rerender(
+			await rerender(
 				<ToolsPanel
 					{ ...defaultProps }
 					panelId="b"
@@ -1303,8 +1308,8 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'first and last panel items', () => {
-		it( 'should apply first/last classes to appropriate items', () => {
-			render(
+		it( 'should apply first/last classes to appropriate items', async () => {
+			await render(
 				<SlotFillProvider>
 					<ToolsPanelItems>
 						<ToolsPanelItem { ...altControlProps }>

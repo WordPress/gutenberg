@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -29,7 +30,7 @@ describe( 'FocalPointPicker', () => {
 
 			const mockOnChange = jest.fn();
 
-			render( <Picker { ...props } onChange={ mockOnChange } /> );
+			await render( <Picker { ...props } onChange={ mockOnChange } /> );
 
 			const draggableArea = screen.getByRole( 'button' );
 
@@ -38,12 +39,12 @@ describe( 'FocalPointPicker', () => {
 			expect( draggableArea ).toHaveFocus();
 		} );
 
-		it( 'should stop a drag operation when focus is lost', () => {
+		it( 'should stop a drag operation when focus is lost', async () => {
 			const mockOnDrag = jest.fn();
 			const mockOnDragEnd = jest.fn();
 			const mockOnChange = jest.fn();
 
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					onChange={ mockOnChange }
@@ -70,7 +71,7 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'drag gestures', () => {
-		it( 'should call onDragStart, onDrag, onDragEnd and onChange in that order', () => {
+		it( 'should call onDragStart, onDrag, onDragEnd and onChange in that order', async () => {
 			const logs: Log[] = [];
 			const eventLogger: EventLogger = ( name, args ) =>
 				logs.push( { name, args } );
@@ -80,7 +81,7 @@ describe( 'FocalPointPicker', () => {
 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
 			} );
 
-			render( <Picker { ...props } { ...handlers } /> );
+			await render( <Picker { ...props } { ...handlers } /> );
 
 			const dragArea = screen.getByRole( 'button' );
 
@@ -105,7 +106,7 @@ describe( 'FocalPointPicker', () => {
 			const spyChange = jest.fn();
 			const spy = jest.fn();
 
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ { x: 0.25, y: 0.25 } }
@@ -132,21 +133,23 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'controllability', () => {
-		it( 'should update value from props', () => {
-			const { rerender } = render(
+		it( 'should update value from props', async () => {
+			const { rerender } = await render(
 				<Picker { ...props } value={ { x: 0.25, y: 0.5 } } />
 			);
 			const xInput = screen.getByRole( 'spinbutton', {
 				name: 'Focal point left position',
 			} ) as HTMLButtonElement;
-			rerender( <Picker { ...props } value={ { x: 0.93, y: 0.5 } } /> );
+			await rerender(
+				<Picker { ...props } value={ { x: 0.93, y: 0.5 } } />
+			);
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
 			const user = userEvent.setup();
 
 			const spyChange = jest.fn();
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ { x: 0.14, y: 0.62 } }
@@ -167,9 +170,9 @@ describe( 'FocalPointPicker', () => {
 	} );
 
 	describe( 'value handling', () => {
-		it( 'should handle legacy string values', () => {
+		it( 'should handle legacy string values', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Picker
 					{ ...props }
 					value={ {

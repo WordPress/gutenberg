@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -38,46 +39,46 @@ const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
 
 describe( 'CheckboxControl', () => {
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			render( <CheckboxControl /> );
+		it( 'should render', async () => {
+			await render( <CheckboxControl /> );
 			expect( getInput() ).not.toBeNull();
 		} );
 
-		it( 'should render an unchecked `checkbox` by default', () => {
-			render( <CheckboxControl /> );
+		it( 'should render an unchecked `checkbox` by default', async () => {
+			await render( <CheckboxControl /> );
 			expect( getInput() ).toHaveProperty( 'checked', false );
 		} );
 
-		it( 'should render an checked `checkbox` when `checked={ true }`', () => {
-			render( <CheckboxControl checked /> );
+		it( 'should render an checked `checkbox` when `checked={ true }`', async () => {
+			await render( <CheckboxControl checked /> );
 			expect( getInput() ).toHaveProperty( 'checked', true );
 		} );
 
-		it( 'should render label', () => {
-			render( <CheckboxControl label="Hello" /> );
+		it( 'should render label', async () => {
+			await render( <CheckboxControl label="Hello" /> );
 
 			const label = screen.getByText( 'Hello' );
 			expect( label ).toBeInTheDocument();
 		} );
 
-		it( 'should not render label element if label is not set', () => {
-			render( <CheckboxControl /> );
+		it( 'should not render label element if label is not set', async () => {
+			await render( <CheckboxControl /> );
 
 			const label = screen.queryByRole( 'label' );
 			expect( label ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render a checkbox in an indeterminate state', () => {
-			render( <CheckboxControl indeterminate /> );
+		it( 'should render a checkbox in an indeterminate state', async () => {
+			await render( <CheckboxControl indeterminate /> );
 			expect( getInput() ).toHaveProperty( 'indeterminate', true );
 		} );
 
-		it( 'should render the indeterminate icon when in the indeterminate state', () => {
-			const { container: containerDefault } = render(
+		it( 'should render the indeterminate icon when in the indeterminate state', async () => {
+			const { container: containerDefault } = await render(
 				<CheckboxControl />
 			);
 
-			const { container: containerIndeterminate } = render(
+			const { container: containerIndeterminate } = await render(
 				<CheckboxControl indeterminate />
 			);
 
@@ -87,8 +88,8 @@ describe( 'CheckboxControl', () => {
 			);
 		} );
 
-		it( 'should associate the `help` text accessibly', () => {
-			render( <CheckboxControl help="Help text" /> );
+		it( 'should associate the `help` text accessibly', async () => {
+			await render( <CheckboxControl help="Help text" /> );
 			expect( getInput() ).toHaveAccessibleDescription( 'Help text' );
 		} );
 	} );
@@ -102,7 +103,7 @@ describe( 'CheckboxControl', () => {
 				( nextState: boolean ) => ( state = nextState )
 			);
 
-			render( <ControlledCheckboxControl onChange={ setState } /> );
+			await render( <ControlledCheckboxControl onChange={ setState } /> );
 
 			const input = getInput();
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -82,7 +83,7 @@ describe( 'AutocompleterUI', () => {
 				);
 			};
 
-			render( <Container /> );
+			await render( <Container /> );
 
 			// Click on autocompleter.
 			await user.click( screen.getByText( 'Apple' ) );

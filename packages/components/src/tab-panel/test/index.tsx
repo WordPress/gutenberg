@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, hover, click, sleep } from '@ariakit/test';
 
 /**
@@ -64,7 +65,7 @@ describe.each( [
 		it( 'should use the correct aria attributes', async () => {
 			const panelRenderFunction = jest.fn();
 
-			render(
+			await render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
 			);
 
@@ -102,7 +103,7 @@ describe.each( [
 				{ ...TABS[ 2 ], icon: media },
 			];
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS_WITH_ICON }
 					children={ panelRenderFunction }
@@ -139,7 +140,7 @@ describe.each( [
 				{ ...TABS[ 2 ], icon: media },
 			];
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS_WITH_ICON }
 					children={ panelRenderFunction }
@@ -194,7 +195,7 @@ describe.each( [
 		it( 'should render first tab', async () => {
 			const panelRenderFunction = jest.fn();
 
-			render(
+			await render(
 				<Component tabs={ TABS } children={ panelRenderFunction } />
 			);
 
@@ -206,7 +207,7 @@ describe.each( [
 
 		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
 			const mockOnSelect = jest.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -214,7 +215,7 @@ describe.each( [
 				/>
 			);
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS.slice( 1 ) /* remove alpha */ }
 					children={ () => undefined }
@@ -227,7 +228,7 @@ describe.each( [
 
 	describe( 'With `initialTabName`', () => {
 		it( 'should render the tab set by initialTabName prop', async () => {
-			render(
+			await render(
 				<Component
 					initialTabName="beta"
 					tabs={ TABS }
@@ -238,8 +239,8 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 		} );
 
-		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
-			render(
+		it( 'should not select a tab when `initialTabName` does not match any known tab', async () => {
+			await render(
 				<Component
 					initialTabName="does-not-exist"
 					tabs={ TABS }
@@ -256,7 +257,7 @@ describe.each( [
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 		it( 'should not change tabs when initialTabName is changed', async () => {
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="beta"
 					tabs={ TABS }
@@ -264,7 +265,7 @@ describe.each( [
 				/>
 			);
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="alpha"
 					tabs={ TABS }
@@ -278,7 +279,7 @@ describe.each( [
 		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -294,7 +295,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS.slice( 1 ) } // Remove alpha
@@ -310,7 +311,7 @@ describe.each( [
 		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -323,7 +324,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS.slice( 0, 2 ) } // Remove gamma
@@ -341,7 +342,7 @@ describe.each( [
 
 		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', async () => {
 			const mockOnSelect = jest.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="delta"
 					tabs={ TABS }
@@ -355,7 +356,7 @@ describe.each( [
 				screen.queryByRole( 'tab', { selected: true } )
 			).not.toBeInTheDocument();
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="delta"
 					tabs={ [
@@ -380,7 +381,7 @@ describe.each( [
 		it( 'should disable the tab when `disabled` is `true`', async () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ [
 						...TABS,
@@ -412,7 +413,7 @@ describe.each( [
 		it( 'should select first enabled tab when the initial tab is disabled', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					// Disable alpha
 					tabs={ TABS.map( ( tab ) => {
@@ -431,7 +432,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 			// Re-enable all tabs
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -447,7 +448,7 @@ describe.each( [
 		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS.map( ( tab ) => {
 						if ( tab.name === 'gamma' ) {
@@ -466,7 +467,7 @@ describe.each( [
 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 			// Re-enable all tabs
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					initialTabName="beta"
@@ -482,7 +483,7 @@ describe.each( [
 
 		it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
 			const mockOnSelect = jest.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -494,7 +495,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS.map( ( tab ) => {
 						if ( tab.name === 'alpha' ) {
@@ -511,7 +512,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -527,7 +528,7 @@ describe.each( [
 		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -540,7 +541,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ [
@@ -557,7 +558,7 @@ describe.each( [
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-			rerender(
+			await rerender(
 				<Component
 					initialTabName="gamma"
 					tabs={ TABS }
@@ -576,7 +577,7 @@ describe.each( [
 			const panelRenderFunction = jest.fn();
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ panelRenderFunction }
@@ -613,7 +614,7 @@ describe.each( [
 		it( 'defaults to automatic tab activation (arrow keys)', async () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -651,7 +652,7 @@ describe.each( [
 		it( 'wraps around the last/first tab when using arrow keys', async () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -689,7 +690,7 @@ describe.each( [
 		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
 			const mockOnSelect = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -723,7 +724,7 @@ describe.each( [
 
 			// Change orientation to `vertical`. When the orientation is vertical,
 			// left/right arrow keys are replaced by up/down arrow keys.
-			rerender(
+			await rerender(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -777,7 +778,7 @@ describe.each( [
 		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ [
 						...TABS,
@@ -837,7 +838,9 @@ describe.each( [
 		} );
 
 		it( 'should not focus the next tab when the Tab key is pressed', async () => {
-			render( <Component tabs={ TABS } children={ () => undefined } /> );
+			await render(
+				<Component tabs={ TABS } children={ () => undefined } />
+			);
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
@@ -859,7 +862,7 @@ describe.each( [
 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
 			const mockOnSelect = jest.fn();
 
-			render(
+			await render(
 				<Component
 					tabs={ TABS }
 					children={ () => undefined }
@@ -908,7 +911,9 @@ describe.each( [
 
 	describe( 'Tab Attributes', () => {
 		it( "should apply the tab's `className` to the tab button", async () => {
-			render( <Component tabs={ TABS } children={ () => undefined } /> );
+			await render(
+				<Component tabs={ TABS } children={ () => undefined } />
+			);
 
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -924,7 +929,7 @@ describe.each( [
 		it( 'should apply the `activeClass` to the selected tab', async () => {
 			const activeClass = 'my-active-tab';
 
-			render(
+			await render(
 				<Component
 					activeClass={ activeClass }
 					tabs={ TABS }

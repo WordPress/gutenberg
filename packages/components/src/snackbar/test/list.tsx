@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { click } from '@ariakit/test';
 
 /**
@@ -17,7 +18,7 @@ describe( 'SnackbarList', () => {
 	} );
 
 	it( 'should get focus after a snackbar is dismissed', async () => {
-		render(
+		await render(
 			<SnackbarList
 				notices={ [
 					{

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -32,25 +33,27 @@ const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
 
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render a span element with an unchecked checkbox', () => {
-			const { container } = render( <FormToggle onChange={ noop } /> );
+		it( 'should render a span element with an unchecked checkbox', async () => {
+			const { container } = await render(
+				<FormToggle onChange={ noop } />
+			);
 
 			expect( getInput() ).not.toBeChecked();
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'should render a checked checkbox when providing checked prop', () => {
-			render( <FormToggle onChange={ noop } checked /> );
+		it( 'should render a checked checkbox when providing checked prop', async () => {
+			await render( <FormToggle onChange={ noop } checked /> );
 
 			expect( getInput() ).toBeChecked();
 		} );
 
-		it( 'should render with an additional className', () => {
-			const { container: containerDefault } = render(
+		it( 'should render with an additional className', async () => {
+			const { container: containerDefault } = await render(
 				<FormToggle onChange={ noop } />
 			);
 
-			const { container: containerWithClassName } = render(
+			const { container: containerWithClassName } = await render(
 				<FormToggle onChange={ noop } className="testing" />
 			);
 
@@ -60,12 +63,12 @@ describe( 'FormToggle', () => {
 			);
 		} );
 
-		it( 'should render an id prop for the input checkbox', () => {
-			const { container: containerDefault } = render(
+		it( 'should render an id prop for the input checkbox', async () => {
+			const { container: containerDefault } = await render(
 				<FormToggle onChange={ noop } />
 			);
 
-			const { container: containerWithID } = render(
+			const { container: containerWithID } = await render(
 				// Disabled because of our rule restricting literal IDs, preferring
 				// `withInstanceId`. In this case, it's fine to use literal IDs.
 				// eslint-disable-next-line no-restricted-syntax
@@ -82,7 +85,7 @@ describe( 'FormToggle', () => {
 			const user = userEvent.setup();
 
 			const onChange = jest.fn();
-			render( <ControlledFormToggle onChange={ onChange } /> );
+			await render( <ControlledFormToggle onChange={ onChange } /> );
 
 			const input = getInput();
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -58,7 +59,7 @@ describe( 'withFocusOutside', () => {
 	} );
 
 	it( 'should not call handler if focus shifts to element within component', async () => {
-		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+		await render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
 		const button = screen.getByRole( 'button' );
@@ -72,7 +73,7 @@ describe( 'withFocusOutside', () => {
 
 	it( 'should not call handler if focus transitions via click to button', async () => {
 		const user = userEvent.setup();
-		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+		await render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
 		const button = screen.getByRole( 'button' );
@@ -84,7 +85,7 @@ describe( 'withFocusOutside', () => {
 	} );
 
 	it( 'should call handler if focus doesn’t shift to element within component', async () => {
-		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+		await render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		const input = screen.getByRole( 'textbox' );
 		input.focus();
@@ -94,7 +95,7 @@ describe( 'withFocusOutside', () => {
 	} );
 
 	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
-		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+		await render( <TestComponent onFocusOutside={ onFocusOutside } /> );
 
 		// Force document.hasFocus() to return false to simulate the window/document losing focus
 		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
@@ -108,7 +109,7 @@ describe( 'withFocusOutside', () => {
 	} );
 
 	it( 'should cancel check when unmounting while queued', async () => {
-		const { rerender } = render(
+		const { rerender } = await render(
 			<TestComponent onFocusOutside={ onFocusOutside } />
 		);
 
@@ -116,7 +117,7 @@ describe( 'withFocusOutside', () => {
 		input.focus();
 		input.blur();
 
-		rerender( <div /> );
+		await rerender( <div /> );
 
 		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
 	} );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -16,14 +17,14 @@ import MenuItem from '../';
 const noop = () => {};
 
 describe( 'MenuItem', () => {
-	it( 'should match snapshot when only label provided', () => {
-		render( <MenuItem>My item</MenuItem> );
+	it( 'should match snapshot when only label provided', async () => {
+		await render( <MenuItem>My item</MenuItem> );
 
 		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
-	it( 'should match snapshot when all props provided', () => {
-		render(
+	it( 'should match snapshot when all props provided', async () => {
+		await render(
 			<MenuItem
 				className="my-class"
 				icon={ more }
@@ -39,8 +40,8 @@ describe( 'MenuItem', () => {
 		expect( screen.getByRole( 'menuitemcheckbox' ) ).toMatchSnapshot();
 	} );
 
-	it( 'should match snapshot when isSelected and role are optionally provided', () => {
-		render(
+	it( 'should match snapshot when isSelected and role are optionally provided', async () => {
+		await render(
 			<MenuItem
 				className="my-class"
 				icon={ more }
@@ -54,16 +55,16 @@ describe( 'MenuItem', () => {
 		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
-	it( 'should match snapshot when info is provided', () => {
-		render(
+	it( 'should match snapshot when info is provided', async () => {
+		await render(
 			<MenuItem info="Extended description of My Item">My item</MenuItem>
 		);
 
 		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
 	} );
 
-	it( 'should avoid using aria-label if only has non-string children', () => {
-		render(
+	it( 'should avoid using aria-label if only has non-string children', async () => {
+		await render(
 			<MenuItem>
 				<div />
 			</MenuItem>
@@ -74,8 +75,8 @@ describe( 'MenuItem', () => {
 		);
 	} );
 
-	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
-		render(
+	it( 'should avoid using aria-checked if only menuitem is set as aria-role', async () => {
+		await render(
 			<MenuItem role="menuitem" isSelected>
 				<div />
 			</MenuItem>
@@ -85,8 +86,8 @@ describe( 'MenuItem', () => {
 		expect( menuItem ).not.toBeChecked();
 	} );
 
-	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
-		const { rerender } = render(
+	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', async () => {
+		const { rerender } = await render(
 			<MenuItem role="menuitemradio" isSelected>
 				<div />
 			</MenuItem>
@@ -95,7 +96,7 @@ describe( 'MenuItem', () => {
 		const radioMenuItem = screen.getByRole( 'menuitemradio' );
 		expect( radioMenuItem ).toBeChecked();
 
-		rerender(
+		await rerender(
 			<MenuItem role="menuitemcheckbox" isSelected>
 				<div />
 			</MenuItem>
@@ -105,8 +106,8 @@ describe( 'MenuItem', () => {
 		expect( checkboxMenuItem ).toBeChecked();
 	} );
 
-	it( 'should not render shortcut or right icon if suffix provided', () => {
-		render(
+	it( 'should not render shortcut or right icon if suffix provided', async () => {
+		await render(
 			<MenuItem
 				icon={ <span>Icon</span> }
 				iconPosition="right"
@@ -123,8 +124,8 @@ describe( 'MenuItem', () => {
 		expect( screen.queryByText( 'Icon' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should render left icon despite suffix being provided', () => {
-		render(
+	it( 'should render left icon despite suffix being provided', async () => {
+		await render(
 			<MenuItem
 				icon={ <span>Icon</span> }
 				iconPosition="left"

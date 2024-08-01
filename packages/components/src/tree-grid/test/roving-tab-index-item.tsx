@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -22,15 +23,15 @@ const TestButton = forwardRef(
 );
 
 describe( 'RovingTabIndexItem', () => {
-	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
-		expect( () =>
-			render( <RovingTabIndexItem as={ TestButton } /> )
+	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', async () => {
+		expect(
+			() => await render( <RovingTabIndexItem as={ TestButton } /> )
 		).toThrow();
 		expect( console ).toHaveErrored();
 	} );
 
-	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {
-		const { container } = render(
+	it( 'allows another component to be specified as the rendered component using the `as` prop', async () => {
+		const { container } = await render(
 			<RovingTabIndex>
 				<RovingTabIndexItem as={ TestButton } />
 			</RovingTabIndex>
@@ -39,8 +40,8 @@ describe( 'RovingTabIndexItem', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'forwards props to the `as` component', () => {
-		const { container } = render(
+	it( 'forwards props to the `as` component', async () => {
+		const { container } = await render(
 			<RovingTabIndex>
 				<RovingTabIndexItem as={ TestButton } className="my-button">
 					Click Me!
@@ -51,8 +52,8 @@ describe( 'RovingTabIndexItem', () => {
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'allows children to be declared using a child render function as an alternative to `as`', () => {
-		const { container } = render(
+	it( 'allows children to be declared using a child render function as an alternative to `as`', async () => {
+		const { container } = await render(
 			<RovingTabIndex>
 				<RovingTabIndexItem>
 					{ ( props: React.ComponentProps< typeof TestButton > ) => (

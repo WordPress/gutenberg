@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { queryByAttribute, render, screen } from '@testing-library/react';
+import { queryByAttribute, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, sleep, waitFor } from '@ariakit/test';
 
 /**

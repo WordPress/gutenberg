@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor, getByText } from '@testing-library/react';
+import { screen, waitFor, getByText } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 import type { CSSProperties } from 'react';
 
@@ -121,7 +122,7 @@ describe( 'Popover', () => {
 	describe( 'Component', () => {
 		describe( 'basic behavior', () => {
 			it( 'should render content', async () => {
-				render( <Popover>Hello</Popover> );
+				await render( <Popover>Hello</Popover> );
 
 				await waitFor( () =>
 					expect( screen.getByText( 'Hello' ) ).toBeVisible()
@@ -129,7 +130,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should forward additional props to portaled element', async () => {
-				render( <Popover role="tooltip">Hello</Popover> );
+				await render( <Popover role="tooltip">Hello</Popover> );
 
 				await waitFor( () =>
 					expect( screen.getByRole( 'tooltip' ) ).toBeVisible()
@@ -137,7 +138,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should render inline regardless of slot name', async () => {
-				const { container } = render(
+				const { container } = await render(
 					<Popover inline __unstableSlotName="Popover">
 						Hello
 					</Popover>
@@ -167,7 +168,7 @@ describe( 'Popover', () => {
 					);
 				};
 
-				render(
+				await render(
 					<PopoverWithAnchor>Popover content</PopoverWithAnchor>
 				);
 
@@ -181,7 +182,7 @@ describe( 'Popover', () => {
 
 		describe( 'focus behavior', () => {
 			it( 'should focus the popover container when opened', async () => {
-				render(
+				await render(
 					<Popover focusOnMount data-testid="popover-element">
 						Popover content
 					</Popover>
@@ -195,7 +196,7 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should allow focus-on-open behavior to be disabled', async () => {
-				render(
+				await render(
 					<Popover focusOnMount={ false }>Popover content</Popover>
 				);
 
@@ -439,7 +440,7 @@ describe( 'Popover', () => {
 
 	describe( 'Slot outside iframe', () => {
 		it( 'should support cross-document rendering', async () => {
-			render(
+			await render(
 				<PopoverInsideIframeRenderedInExternalSlot>
 					<span>content</span>
 				</PopoverInsideIframeRenderedInExternalSlot>

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -172,7 +173,7 @@ const TestNavigationControlled = () => {
 
 describe( 'Navigation', () => {
 	it( 'should render the panes and active item', async () => {
-		render( <TestNavigation activeItem="item-2" /> );
+		await render( <TestNavigation activeItem="item-2" /> );
 
 		const menuItems = screen.getAllByRole( 'listitem' );
 
@@ -187,8 +188,8 @@ describe( 'Navigation', () => {
 		).toHaveTextContent( 'Item 2' );
 	} );
 
-	it( 'should render anchor links when menu item supplies an href', () => {
-		render( <TestNavigation /> );
+	it( 'should render anchor links when menu item supplies an href', async () => {
+		await render( <TestNavigation /> );
 
 		const linkItem = screen.getByRole( 'link', { name: 'Item 2' } );
 
@@ -196,8 +197,8 @@ describe( 'Navigation', () => {
 		expect( linkItem ).toHaveAttribute( 'target', '_blank' );
 	} );
 
-	it( 'should render a custom component when menu item supplies one', () => {
-		render( <TestNavigation /> );
+	it( 'should render a custom component when menu item supplies one', async () => {
+		await render( <TestNavigation /> );
 
 		expect( screen.getByText( 'customize me' ) ).toBeInTheDocument();
 	} );
@@ -205,7 +206,7 @@ describe( 'Navigation', () => {
 	it( 'should set an active category on click', async () => {
 		const user = userEvent.setup();
 
-		render( <TestNavigation /> );
+		await render( <TestNavigation /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'Category' } ) );
 
@@ -216,30 +217,30 @@ describe( 'Navigation', () => {
 		expect( menuItems[ 1 ] ).toHaveTextContent( 'Child 2' );
 	} );
 
-	it( 'should render the root title', () => {
-		const { rerender } = render( <TestNavigation /> );
+	it( 'should render the root title', async () => {
+		const { rerender } = await render( <TestNavigation /> );
 
 		expect( screen.queryByRole( 'heading' ) ).not.toBeInTheDocument();
 
-		rerender( <TestNavigation rootTitle="Home" /> );
+		await rerender( <TestNavigation rootTitle="Home" /> );
 
 		expect( screen.getByRole( 'heading' ) ).toBeInTheDocument();
 		expect( screen.getByRole( 'heading' ) ).toHaveTextContent( 'Home' );
 	} );
 
-	it( 'should render badges', () => {
-		render( <TestNavigation showBadge /> );
+	it( 'should render badges', async () => {
+		await render( <TestNavigation showBadge /> );
 
 		const menuItem = screen.getAllByRole( 'listitem' );
 		expect( menuItem[ 0 ] ).toHaveTextContent( 'Item 1' + '21' );
 	} );
 
-	it( 'should render menu titles when items exist', () => {
-		const { rerender } = render( <Navigation></Navigation> );
+	it( 'should render menu titles when items exist', async () => {
+		const { rerender } = await render( <Navigation></Navigation> );
 
 		expect( screen.queryByText( 'Menu title' ) ).not.toBeInTheDocument();
 
-		rerender( <TestNavigation rootTitle="Menu title" /> );
+		await rerender( <TestNavigation rootTitle="Menu title" /> );
 
 		expect( screen.getByText( 'Menu title' ) ).toBeInTheDocument();
 	} );
@@ -247,7 +248,7 @@ describe( 'Navigation', () => {
 	it( 'should navigate up a level when clicking the back button', async () => {
 		const user = userEvent.setup();
 
-		render( <TestNavigation rootTitle="Home" /> );
+		await render( <TestNavigation rootTitle="Home" /> );
 
 		await user.click( screen.getByRole( 'button', { name: 'Category' } ) );
 
@@ -261,7 +262,7 @@ describe( 'Navigation', () => {
 	it( 'should navigate correctly when controlled', async () => {
 		const user = userEvent.setup();
 
-		render( <TestNavigationControlled /> );
+		await render( <TestNavigationControlled /> );
 
 		// check root menu is shown and item 1 is selected
 		expect(
