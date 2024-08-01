@@ -9,7 +9,7 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
-type SelectControlBaseProps< T extends string > = Pick<
+type SelectControlBaseProps< V extends string > = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
 	| '__next40pxDefaultSize'
@@ -33,7 +33,7 @@ type SelectControlBaseProps< T extends string > = Pick<
 			 * The internal value used to choose the selected value.
 			 * This is also the value passed to `onChange` when the option is selected.
 			 */
-			value: T;
+			value: V;
 			id?: string;
 			/**
 			 * Whether or not the option should have the disabled attribute.
@@ -61,8 +61,8 @@ type SelectControlBaseProps< T extends string > = Pick<
 		variant?: 'default' | 'minimal';
 	};
 
-export type SelectControlSingleSelectionProps< T extends string = string > =
-	SelectControlBaseProps< T > & {
+export type SelectControlSingleSelectionProps< V extends string = string > =
+	SelectControlBaseProps< V > & {
 		/**
 		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
 		 *
@@ -71,7 +71,7 @@ export type SelectControlSingleSelectionProps< T extends string = string > =
 		 * @default false
 		 */
 		multiple?: false;
-		value?: NoInfer< T >;
+		value?: NoInfer< V >;
 		/**
 		 * A function that receives the value of the new option that is being selected as input.
 		 *
@@ -79,13 +79,13 @@ export type SelectControlSingleSelectionProps< T extends string = string > =
 		 * Otherwise, the value received is a single value with the new selected value.
 		 */
 		onChange?: (
-			value: NoInfer< T >,
+			value: NoInfer< V >,
 			extra?: { event?: ChangeEvent< HTMLSelectElement > }
 		) => void;
 	};
 
-export type SelectControlMultipleSelectionProps< T extends string > =
-	SelectControlBaseProps< T > & {
+export type SelectControlMultipleSelectionProps< V extends string > =
+	SelectControlBaseProps< V > & {
 		/**
 		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
 		 *
@@ -94,7 +94,7 @@ export type SelectControlMultipleSelectionProps< T extends string > =
 		 * @default false
 		 */
 		multiple: true;
-		value?: NoInfer< T >[];
+		value?: NoInfer< V >[];
 		/**
 		 * A function that receives the value of the new option that is being selected as input.
 		 *
@@ -102,11 +102,11 @@ export type SelectControlMultipleSelectionProps< T extends string > =
 		 * Otherwise, the value received is a single value with the new selected value.
 		 */
 		onChange?: (
-			value: NoInfer< T >[],
+			value: NoInfer< V >[],
 			extra?: { event?: ChangeEvent< HTMLSelectElement > }
 		) => void;
 	};
 
-export type SelectControlProps< T extends string = string > =
-	| SelectControlSingleSelectionProps< T >
-	| SelectControlMultipleSelectionProps< T >;
+export type SelectControlProps< V extends string = string > =
+	| SelectControlSingleSelectionProps< V >
+	| SelectControlMultipleSelectionProps< V >;
