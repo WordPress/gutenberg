@@ -730,10 +730,6 @@ _Returns_
 
 -   `JSX.Element`: A React element.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -1032,6 +1028,16 @@ _Parameters_
 _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
+
+### useStyleOverride
+
+Override a block editor settings style. Leave the ID blank to create a new style.
+
+_Parameters_
+
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
 
 ### useZoomOut
 

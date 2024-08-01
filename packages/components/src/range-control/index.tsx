@@ -353,6 +353,7 @@ function UnforwardedRangeControl(
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <RangeControl
+ *       __nextHasNoMarginBottom
  *       help="Please select how transparent you would like this."
  *       initialPosition={50}
  *       label="Opacity"

@@ -117,6 +117,7 @@ export { default as helpFilled } from './library/help-filled';
 export { default as inbox } from './library/inbox';
 export { default as institution } from './library/institution';
 export { default as home } from './library/home';
+export { default as homeButton } from './library/home-button';
 export { default as html } from './library/html';
 export { default as image } from './library/image';
 export { default as info } from './library/info';

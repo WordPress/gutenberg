@@ -15,7 +15,13 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	getUserPermissionCacheKey,
+	getUserPermissionsFromResponse,
+	ALLOWED_RESOURCE_ACTIONS,
+} from './utils';
 import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
@@ -58,7 +64,7 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -165,8 +171,29 @@ export const getEntityRecord =
 					}
 				}
 
-				const record = await apiFetch( { path } );
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				const response = await apiFetch( { path, parse: false } );
+				const record = await response.json();
+				const permissions = getUserPermissionsFromResponse( response );
+
+				registry.batch( () => {
+					dispatch.receiveEntityRecords( kind, name, record, query );
+
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						const permissionKey = getUserPermissionCacheKey(
+							action,
+							{ kind, name, id: key }
+						);
+
+						dispatch.receiveUserPermission(
+							permissionKey,
+							permissions[ action ]
+						);
+						dispatch.finishResolution( 'canUser', [
+							action,
+							{ kind, name, id: key },
+						] );
+					}
+				} );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -355,9 +382,7 @@ export const getEmbedPreview =
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
-
-		if ( ! retrievedActions.includes( requestedAction ) ) {
+		if ( ! ALLOWED_RESOURCE_ACTIONS.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
@@ -382,14 +407,13 @@ export const canUser =
 			resourcePath =
 				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
 		} else {
-			// @todo: Maybe warn when detecting a legacy usage.
 			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
 		}
 
 		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		// Prevent resolving the same resource twice.
-		for ( const relatedAction of retrievedActions ) {
+		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
 			if ( relatedAction === requestedAction ) {
 				continue;
 			}
@@ -416,31 +440,10 @@ export const canUser =
 			return;
 		}
 
-		// Optional chaining operator is used here because the API requests don't
-		// return the expected result in the native version. Instead, API requests
-		// only return the result, without including response properties like the headers.
-		const allowedMethods = response.headers?.get( 'allow' ) || '';
-
-		const permissions = {};
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
-		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-			permissions[ actionName ] = allowedMethods.includes( methodName );
-		}
-
+		const permissions = getUserPermissionsFromResponse( response );
 		registry.batch( () => {
-			for ( const action of retrievedActions ) {
-				const key = (
-					typeof resource === 'object'
-						? [ action, resource.kind, resource.name, resource.id ]
-						: [ action, resource, id ]
-				)
-					.filter( Boolean )
-					.join( '/' );
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				const key = getUserPermissionCacheKey( action, resource, id );
 
 				dispatch.receiveUserPermission( key, permissions[ action ] );
 

@@ -29,6 +29,7 @@ const {
 	BackButton: __experimentalMainDashboardButton,
 	registerDefaultActions,
 	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
 } = unlock( editorPrivateApis );
 
 /**
@@ -87,6 +88,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

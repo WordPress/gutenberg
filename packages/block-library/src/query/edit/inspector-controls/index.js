@@ -6,7 +6,6 @@ import {
 	TextControl,
 	SelectControl,
 	RangeControl,
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
@@ -103,9 +102,9 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const postTypeControlLabel = __( 'Content type' );
+	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
-		'WordPress contains different types of content you can filter by. Posts and pages are the default types, but plugins could add more.'
+		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
@@ -146,17 +145,34 @@ export default function QueryInspectorControls( props ) {
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
-						<ToggleControl
+						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Inherit query from template' ) }
-							help={ __(
-								'Enable to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-							) }
-							checked={ !! inherit }
-							onChange={ ( value ) =>
-								setQuery( { inherit: !! value } )
+							label={ __( 'Query type' ) }
+							isBlock
+							onChange={ ( value ) => {
+								setQuery( { inherit: !! value } );
+							} }
+							help={
+								inherit
+									? __(
+											'Display a list of posts or custom post types based on the current template.'
+									  )
+									: __(
+											'Display a list of posts or custom post types based on specific criteria.'
+									  )
 							}
-						/>
+							value={ !! inherit }
+						>
+							<ToggleGroupControlOption
+								value
+								label={ __( 'Default' ) }
+							/>
+							<ToggleGroupControlOption
+								value={ false }
+								label={ __( 'Custom' ) }
+							/>
+						</ToggleGroupControl>
 					) }
 					{ showPostTypeControl &&
 						( postTypesSelectOptions.length > 2 ? (
