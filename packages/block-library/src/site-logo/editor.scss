@@ -112,6 +112,12 @@
 	border-radius: inherit;
 }
 
+// Reset the box-sizing for the placeholder to prevent the border
+// from covering the logo upload button.
+.wp-block-site-logo .components-placeholder.components-placeholder {
+	box-sizing: initial;
+}
+
 .block-library-site-logo__inspector-upload-container {
 	position: relative;
 	// Since there is no option to skip rendering the drag'n'drop icon in drop
