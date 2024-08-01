@@ -197,7 +197,7 @@ export const savePost =
 		};
 
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
-		let error;
+		let error = false;
 		try {
 			edits = await applyFilters(
 				'editor.__unstablePreSavePost',
@@ -208,7 +208,7 @@ export const savePost =
 			error = err;
 		}
 
-		if ( ! error ) {
+		if ( false !== error ) {
 			try {
 				error = await registry
 					.dispatch( coreStore )
@@ -226,7 +226,7 @@ export const savePost =
 			}
 		}
 
-		if ( ! error ) {
+		if ( false !== error ) {
 			error = registry
 				.select( coreStore )
 				.getLastEntitySaveError(
@@ -236,7 +236,7 @@ export const savePost =
 				);
 		}
 
-		if ( ! error ) {
+		if ( false !== error ) {
 			await applyFilters(
 				'editor.__unstableSavePost',
 				Promise.resolve(),
