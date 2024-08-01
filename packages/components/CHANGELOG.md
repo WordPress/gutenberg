@@ -15,6 +15,7 @@
 
 ### Internal
 
+-   Upgraded `@ariakit/react` (v0.4.7) and `@ariakit/test` (v0.4.0) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
 -   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
 
@@ -88,7 +89,7 @@
 
 ### Internal
 
--   `Allow ariakit and framer motion imports in the components package. ([#63123](https://github.com/WordPress/gutenberg/pull/63123))
+-   Allow ariakit and framer motion imports in the components package. ([#63123](https://github.com/WordPress/gutenberg/pull/63123))
 -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
 -   `CustomSelectControlV2`: expose legacy wrapper through private APIs. ([#62936](https://github.com/WordPress/gutenberg/pull/62936))
 -   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
