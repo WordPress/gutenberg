@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -11,7 +16,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { mobile, tablet, external, chevronDown } from '@wordpress/icons';
+import { mobile, tablet, external, chevronDownSmall } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -171,11 +176,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 
 	return (
 		<DropdownMenu
-			className="editor-preview-dropdown"
+			className={ clsx(
+				'editor-preview-dropdown',
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ chevronDown }
+			icon={ chevronDownSmall }
 			text={ getText() }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
