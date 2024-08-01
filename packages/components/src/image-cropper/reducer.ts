@@ -47,42 +47,119 @@ export type State = {
 	isZooming: boolean;
 };
 
+/** Zoom in/out to a scale. */
+type ZoomAction = {
+	/** Zoom type action. */
+	type: 'ZOOM';
+	/** Zoom scale. */
+	scale: number;
+	/** Zoom position. */
+	position: Position;
+};
+
+/** End zooming. */
+type ZoomEndAction = {
+	/** Zoom end type action. */
+	type: 'ZOOM_END';
+};
+
+/** Flip the image horizontally. */
+type FlipAction = {
+	/** Flip type action. */
+	type: 'FLIP';
+};
+
+/** Rotate the image to an angle. */
+type RotateAction = {
+	/** Rotate type action. */
+	type: 'ROTATE';
+	/** Rotate angle in degrees. */
+	angle: number;
+};
+
+/** Rotate the image 90-degree clockwise or counter-clockwise. */
+type Rotate90DegAction = {
+	/** Rotate clockwise type action. */
+	type: 'ROTATE_90_DEG';
+	/** Whether to rotate counter-clockwise instead. */
+	isCounterClockwise?: boolean;
+};
+
+/** Move the image to a position. */
+type MoveAction = {
+	/** Move type action. */
+	type: 'MOVE';
+	/** Move x position. */
+	x: number;
+	/** Move y position. */
+	y: number;
+};
+
+/** End moving the image. */
+type MoveEndAction = {
+	/** Move end type action. */
+	type: 'MOVE_END';
+};
+
+/** Start resizing the cropper window. */
+type ResizeStartAction = {
+	/** Resize start type action. */
+	type: 'RESIZE_START';
+};
+
+/** Resize the cropper window by a delta size in a direction. */
+type MoveWindowAction = {
+	/** Move window type action. */
+	type: 'MOVE_WINDOW';
+	/** Move x position. */
+	x: number;
+	/** Move y position. */
+	y: number;
+};
+
+/** Resize the cropper window by a delta size in a direction. */
+type ResizeWindowAction = {
+	/** Resize window type action. */
+	type: 'RESIZE_WINDOW';
+	/** Resize direction. */
+	direction: ResizeDirection;
+	/** Change in size. */
+	delta: {
+		/** Change in width. */
+		width: number;
+		/** Change in height. */
+		height: number;
+	};
+};
+
+/** Resize the container and image to a new width. */
+type ResizeContainerAction = {
+	/** Resize container type action. */
+	type: 'RESIZE_CONTAINER';
+	/** New width of the container. */
+	width: number;
+};
+
+/** Reset the state to the initial state. */
+type ResetAction = {
+	/** Reset type action. */
+	type: 'RESET';
+};
+
+/** All possible actions. */
 type Action =
-	// Zoom in/out to a scale.
-	| { type: 'ZOOM'; scale: number; position: Position }
-	// End zooming.
-	| { type: 'ZOOM_END' }
-	// Flip the image horizontally.
-	| { type: 'FLIP' }
-	// Rotate the image to an angle.
-	| { type: 'ROTATE'; angle: number }
-	// Rotate the image 90-degree clockwise or counter-clockwise.
-	| { type: 'ROTATE_90_DEG'; isCounterClockwise?: boolean }
-	// Move the image to a position.
-	| { type: 'MOVE'; x: number; y: number }
-	// End moving the image.
-	| { type: 'MOVE_END' }
-	// Start resizing the cropper window.
-	| { type: 'RESIZE_START' }
-	// Resize the cropper window by a delta size in a direction.
-	| { type: 'MOVE_WINDOW'; x: number; y: number }
-	// Resize the cropper window by a delta size in a direction.
-	| {
-			type: 'RESIZE_WINDOW';
-			direction: ResizeDirection;
-			delta: { width: number; height: number };
-	  }
-	// Lock the aspect ratio of the cropper window.
-	| {
-			type: 'LOCK_ASPECT_RATIO';
-			aspectRatio: number;
-	  }
-	// Unlock the aspect ratio of the cropper window.
-	| { type: 'UNLOCK_ASPECT_RATIO' }
-	// Resize the container and image to a new width.
-	| { type: 'RESIZE_CONTAINER'; width: number }
-	// Reset the state to the initial state.
-	| { type: 'RESET' };
+	| ZoomAction
+	| ZoomEndAction
+	| FlipAction
+	| RotateAction
+	| Rotate90DegAction
+	| MoveAction
+	| MoveEndAction
+	| ResizeStartAction
+	| MoveWindowAction
+	| ResizeWindowAction
+	| ResizeContainerAction
+	| ResetAction;
 
 function createInitialState( {
 	width,
