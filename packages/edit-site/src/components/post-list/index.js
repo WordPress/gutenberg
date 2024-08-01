@@ -2,11 +2,14 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { DataViews } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -33,6 +36,7 @@ import usePostFields from '../post-fields';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
 function useView( postType ) {
@@ -157,6 +161,8 @@ export default function PostList( { postType } ) {
 		[ history ]
 	);
 
+	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
+
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
@@ -196,12 +202,25 @@ export default function PostList( { postType } ) {
 	}, [ view ] );
 	const {
 		records,
-		isResolving: isLoadingMainEntities,
+		isResolving: isLoadingData,
 		totalItems,
 		totalPages,
-	} = useEntityRecords( 'postType', postType, queryArgs );
+	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
-	const ids = records?.map( ( record ) => getItemId( record ) ) ?? [];
+	// The REST API sort the authors by ID, but we want to sort them by name.
+	const data = useMemo( () => {
+		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
+			return filterSortAndPaginate(
+				records,
+				{ sort: { ...view.sort } },
+				fields
+			).data;
+		}
+
+		return records;
+	}, [ records, fields, isLoadingFields, view?.sort ] );
+
+	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
 	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
 	const postIdWasDeleted = deletedIds.includes( postId );
@@ -259,7 +278,6 @@ export default function PostList( { postType } ) {
 		} );
 		closeModal();
 	};
-	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
 
 	return (
 		<Page
@@ -290,8 +308,8 @@ export default function PostList( { postType } ) {
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
-				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoadingMainEntities || isLoadingFields }
+				data={ data || EMPTY_ARRAY }
+				isLoading={ isLoadingData || isLoadingFields }
 				view={ view }
 				onChangeView={ setView }
 				selection={ selection }
