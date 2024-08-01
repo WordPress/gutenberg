@@ -61,7 +61,7 @@ function gutenberg_register_wp_rest_templates_controller_plugin_field() {
 		array(
 			'get_callback'    => function ( $template_object ) {
 				if ( $template_object ) {
-					$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $template_object['slug'] );
+					$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $template_object['slug'] );
 					if ( $registered_template ) {
 						return $registered_template->plugin;
 					}

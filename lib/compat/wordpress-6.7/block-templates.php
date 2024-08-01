@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_register_template' ) ) {
+if ( ! function_exists( 'wp_register_block_template' ) ) {
 	/**
 	 * Register a template.
 	 *
@@ -23,19 +23,19 @@ if ( ! function_exists( 'wp_register_template' ) ) {
 	 * }
 	 * @return WP_Block_Template|WP_Error The registered template object on success, WP_Error object on failure.
 	 */
-	function wp_register_template( $template_name, $args = array() ) {
-		return WP_Templates_Registry::get_instance()->register( $template_name, $args );
+	function wp_register_block_template( $template_name, $args = array() ) {
+		return WP_Block_Templates_Registry::get_instance()->register( $template_name, $args );
 	}
 }
 
-if ( ! function_exists( 'wp_unregister_template' ) ) {
+if ( ! function_exists( 'wp_unregister_block_template' ) ) {
 	/**
 	 * Unregister a template.
 	 *
 	 * @param string $template_name Template name in the form of `plugin_uri//template_name`.
 	 * @return true|WP_Error True on success, WP_Error on failure or if the template doesn't exist.
 	 */
-	function wp_unregister_template( $template_name ) {
-		return WP_Templates_Registry::get_instance()->unregister( $template_name );
+	function wp_unregister_block_template( $template_name ) {
+		return WP_Block_Templates_Registry::get_instance()->unregister( $template_name );
 	}
 }

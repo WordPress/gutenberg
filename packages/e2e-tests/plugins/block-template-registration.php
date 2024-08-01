@@ -1,17 +1,17 @@
 <?php
 /**
- * Plugin Name: Gutenberg Test Template Registration
+ * Plugin Name: Gutenberg Test Block Template Registration
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Author: Gutenberg Team
  *
- * @package gutenberg-test-template-registration
+ * @package gutenberg-test-block-template-registration
  */
 
 add_action(
 	'init',
 	function () {
 		// Custom template used by most tests.
-		wp_register_template(
+		wp_register_block_template(
 			'gutenberg//plugin-template',
 			array(
 				'title'       => 'Plugin Template',
@@ -28,7 +28,7 @@ add_action(
 		);
 
 		// Custom template overridden by the theme.
-		wp_register_template(
+		wp_register_block_template(
 			'gutenberg//custom-template',
 			array(
 				'title'       => 'Custom Template (overridden by the theme)',
@@ -39,7 +39,7 @@ add_action(
 		);
 
 		// Custom template used to test unregistration.
-		wp_register_template(
+		wp_register_block_template(
 			'gutenberg//plugin-unregistered-template',
 			array(
 				'title'       => 'Plugin Unregistered Template',
@@ -47,10 +47,10 @@ add_action(
 				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template that is also unregistered.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
-		wp_unregister_template( 'gutenberg//plugin-unregistered-template' );
+		wp_unregister_block_template( 'gutenberg//plugin-unregistered-template' );
 
 		// Custom template used to test overriding default WP templates.
-		wp_register_template(
+		wp_register_block_template(
 			'gutenberg//page',
 			array(
 				'title'       => 'Plugin Page Template',
@@ -60,7 +60,7 @@ add_action(
 		);
 
 		// Custom template used to test overriding default WP templates which can be created by the user.
-		wp_register_template(
+		wp_register_block_template(
 			'gutenberg//author-admin',
 			array(
 				'title'       => 'Plugin Author Template',

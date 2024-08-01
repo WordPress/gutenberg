@@ -1,20 +1,20 @@
 <?php
 /**
- * Test WP_Templates_Registry class.
+ * Test WP_Block_Templates_Registry class.
  *
- * @covers WP_Templates_Registry
+ * @covers WP_Block_Templates_Registry
  */
-class WP_Templates_Registry_Test extends WP_UnitTestCase {
+class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {
 
 	/**
-	 * @var WP_Templates_Registry
+	 * @var WP_Block_Templates_Registry
 	 */
 	protected static $registry;
 
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		self::$registry = WP_Templates_Registry::get_instance();
+		self::$registry = WP_Block_Templates_Registry::get_instance();
 	}
 
 	public function test_register_template() {
@@ -31,7 +31,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		// Try to register a template with invalid name (non-string).
 		$template_name = array( 'invalid-template-name' );
 
-		$this->setExpectedIncorrectUsage( 'WP_Templates_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Block_Templates_Registry::register' );
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );
@@ -43,7 +43,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		// Try to register a template with uppercase characters in the name.
 		$template_name = 'test-plugin//Invalid-Template-Name';
 
-		$this->setExpectedIncorrectUsage( 'WP_Templates_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Block_Templates_Registry::register' );
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );
@@ -53,7 +53,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 
 	public function test_register_template_no_prefix() {
 		// Try to register a template without a namespace.
-		$this->setExpectedIncorrectUsage( 'WP_Templates_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Block_Templates_Registry::register' );
 		$result = self::$registry->register( 'template-no-plugin', array() );
 
 		$this->assertWPError( $result );
@@ -67,7 +67,7 @@ class WP_Templates_Registry_Test extends WP_UnitTestCase {
 		self::$registry->register( $template_name );
 
 		// Try to register the same template again.
-		$this->setExpectedIncorrectUsage( 'WP_Templates_Registry::register' );
+		$this->setExpectedIncorrectUsage( 'WP_Block_Templates_Registry::register' );
 		$result = self::$registry->register( $template_name );
 
 		$this->assertWPError( $result );

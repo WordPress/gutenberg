@@ -57,7 +57,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 		}
 
 		if ( rest_is_field_included( 'plugin', $fields ) ) {
-			$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $cloned_item->slug );
+			$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $cloned_item->slug );
 			if ( $registered_template ) {
 				$data['plugin'] = $registered_template->plugin;
 			}

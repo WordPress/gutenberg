@@ -4,21 +4,21 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	templateRegistrationUtils: async ( { editor, page }, use ) => {
-		await use( new TemplateRegistrationUtils( { editor, page } ) );
+	blockTemplateRegistrationUtils: async ( { editor, page }, use ) => {
+		await use( new BlockTemplateRegistrationUtils( { editor, page } ) );
 	},
 } );
 
-test.describe( 'Template registration', () => {
+test.describe( 'Block template registration', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.activatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 	} );
 	test.afterEach( async ( { requestUtils } ) => {
@@ -30,7 +30,7 @@ test.describe( 'Template registration', () => {
 		admin,
 		editor,
 		page,
-		templateRegistrationUtils,
+		blockTemplateRegistrationUtils,
 	} ) => {
 		// Verify template is applied to the frontend.
 		await page.goto( '/?cat=1' );
@@ -42,7 +42,9 @@ test.describe( 'Template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Plugin Template' );
+		await blockTemplateRegistrationUtils.searchForTemplate(
+			'Plugin Template'
+		);
 		await expect( page.getByText( 'Plugin Template' ) ).toBeVisible();
 		await expect(
 			page.getByText( 'A template registered by a plugin.' )
@@ -76,7 +78,9 @@ test.describe( 'Template registration', () => {
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Plugin Template' );
+		await blockTemplateRegistrationUtils.searchForTemplate(
+			'Plugin Template'
+		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
@@ -121,7 +125,7 @@ test.describe( 'Template registration', () => {
 		admin,
 		editor,
 		page,
-		templateRegistrationUtils,
+		blockTemplateRegistrationUtils,
 	} ) => {
 		// Create a post.
 		await admin.visitAdminPage( '/post-new.php' );
@@ -152,7 +156,7 @@ test.describe( 'Template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Custom' );
+		await blockTemplateRegistrationUtils.searchForTemplate( 'Custom' );
 		await expect(
 			page.getByText( 'Custom Template (overridden by the theme)' )
 		).toBeHidden();
@@ -165,13 +169,15 @@ test.describe( 'Template registration', () => {
 		editor,
 		page,
 		requestUtils,
-		templateRegistrationUtils,
+		blockTemplateRegistrationUtils,
 	} ) => {
 		// Make an edit to the template.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Plugin Template' );
+		await blockTemplateRegistrationUtils.searchForTemplate(
+			'Plugin Template'
+		);
 		await page.getByText( 'Plugin Template' ).click();
 		await expect(
 			editor.canvas.getByText( 'This is a plugin-registered template.' )
@@ -186,7 +192,7 @@ test.describe( 'Template registration', () => {
 
 		// Deactivate plugin.
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 
 		// Verify template can be deleted.
@@ -199,7 +205,9 @@ test.describe( 'Template registration', () => {
 		const savedButton = page.getByRole( 'button', {
 			name: 'Saved',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Plugin Template' );
+		await blockTemplateRegistrationUtils.searchForTemplate(
+			'Plugin Template'
+		);
 		const searchResults = page.getByLabel( 'Actions' );
 		await searchResults.first().click();
 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
@@ -213,19 +221,19 @@ test.describe( 'Template registration', () => {
 
 		// Reactivate plugin.
 		await requestUtils.activatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 	} );
 
 	test( 'registered templates can be unregistered', async ( {
 		admin,
 		page,
-		templateRegistrationUtils,
+		blockTemplateRegistrationUtils,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate(
+		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Unregistered Template'
 		);
 		await expect(
@@ -247,10 +255,10 @@ test.describe( 'Template registration', () => {
 		editor,
 		page,
 		requestUtils,
-		templateRegistrationUtils,
+		blockTemplateRegistrationUtils,
 	} ) => {
 		await requestUtils.deactivatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 
 		// Create an author template.
@@ -274,7 +282,7 @@ test.describe( 'Template registration', () => {
 		} );
 
 		await requestUtils.activatePlugin(
-			'gutenberg-test-template-registration'
+			'gutenberg-test-block-template-registration'
 		);
 
 		// Verify the template edited by the user has priority over the one registered by the theme.
@@ -290,7 +298,7 @@ test.describe( 'Template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate(
+		await blockTemplateRegistrationUtils.searchForTemplate(
 			'Plugin Author Template'
 		);
 		await expect( page.getByText( 'Plugin Author Template' ) ).toBeHidden();
@@ -329,7 +337,7 @@ test.describe( 'Template registration', () => {
 	} );
 } );
 
-class TemplateRegistrationUtils {
+class BlockTemplateRegistrationUtils {
 	constructor( { page } ) {
 		this.page = page;
 	}
