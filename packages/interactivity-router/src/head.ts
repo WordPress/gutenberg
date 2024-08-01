@@ -90,7 +90,10 @@ export const fetchHeadAssets = async (
 				element.textContent = headElement.text;
 
 				for ( const attr of headElement.tag.attributes ) {
-					element.setAttribute( attr.name, attr.value );
+					// don't copy the src or href attribute
+					if ( attr.name !== 'src' && attr.name !== 'href' ) {
+						element.setAttribute( attr.name, attr.value );
+					}
 				}
 				headTags.push( element );
 			} )
