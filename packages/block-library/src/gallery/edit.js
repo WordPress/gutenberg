@@ -27,6 +27,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	MediaReplaceFlow,
+	useSettings,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -67,7 +68,7 @@ import useGetMedia from './use-get-media';
 import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
-const linkOptions = [
+let linkOptions = [
 	{
 		icon: customLink,
 		label: __( 'Link images to attachment pages' ),
@@ -118,6 +119,23 @@ function GalleryEdit( props ) {
 		isContentLocked,
 		onFocus,
 	} = props;
+
+	const [ blockSetting ] = useSettings( 'blocks' );
+
+	const lightboxSetting = blockSetting.hasOwnProperty( 'core/image' )
+		? blockSetting[ 'core/image' ]?.lightbox
+		: false;
+	const isLightBoxEditingEnabled = lightboxSetting
+		? lightboxSetting?.allowEditing
+		: true;
+
+	useEffect( () => {
+		if ( ! isLightBoxEditingEnabled ) {
+			linkOptions = linkOptions.filter(
+				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
+			);
+		}
+	}, [] );
 
 	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
 		attributes;
