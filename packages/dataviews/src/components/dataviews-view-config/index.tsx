@@ -1,150 +1,195 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
 	Button,
-	privateApis as componentsPrivateApis,
+	Popover,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	SelectControl,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalGrid as Grid,
+	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { memo, useContext } from '@wordpress/element';
-import { cog } from '@wordpress/icons';
+import { memo, useContext, useState, useMemo } from '@wordpress/element';
+import { cog, seen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { SORTING_DIRECTIONS, sortLabels } from '../../constants';
+import { SORTING_DIRECTIONS, sortLabelsShort } from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
-import type { NormalizedField, View, SupportedLayouts } from '../../types';
+import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
-
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
-
-interface ViewTypeMenuProps {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	defaultLayouts?: SupportedLayouts;
-}
-
-interface PageSizeMenuProps {
-	view: View;
-	onChangeView: ( view: View ) => void;
-}
-
-interface FieldsVisibilityMenuProps< Item > {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	fields: NormalizedField< Item >[];
-}
-
-interface SortMenuProps< Item > {
-	fields: NormalizedField< Item >[];
-	view: View;
-	onChangeView: ( view: View ) => void;
-}
 
 interface ViewActionsProps {
 	defaultLayouts?: SupportedLayouts;
 }
 
-function ViewTypeMenu( {
-	view,
-	onChangeView,
+function LayoutPicker( {
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewTypeMenuProps ) {
+}: ViewActionsProps ) {
+	const { view, onChangeView } = useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
-	if ( availableLayouts.length <= 1 ) {
-		return null;
-	}
-	return availableLayouts.map( ( layout ) => {
-		const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
-		if ( ! config ) {
-			return null;
-		}
-		return (
-			<DropdownMenuRadioItem
-				key={ layout }
-				value={ layout }
-				name="view-actions-available-view"
-				checked={ layout === view.type }
-				hideOnClick
-				onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
-					switch ( e.target.value ) {
-						case 'list':
-						case 'grid':
-						case 'table':
-							return onChangeView( {
-								...view,
-								type: e.target.value,
-								...defaultLayouts[ e.target.value ],
-							} );
-					}
-					throw new Error( 'Invalid dataview' );
-				} }
-			>
-				<DropdownMenuItemLabel>{ config.label }</DropdownMenuItemLabel>
-			</DropdownMenuRadioItem>
-		);
-	} );
-}
-
-const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
-function PageSizeMenu( { view, onChangeView }: PageSizeMenuProps ) {
 	return (
-		<DropdownMenu
-			trigger={
-				<DropdownMenuItem
-					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
-				>
-					<DropdownMenuItemLabel>
-						{ __( 'Items per page' ) }
-					</DropdownMenuItemLabel>
-				</DropdownMenuItem>
-			}
+		<ToggleGroupControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Layout' ) }
+			value={ view.type }
+			onChange={ ( newLayout ) => {
+				switch ( newLayout ) {
+					case 'list':
+					case 'grid':
+					case 'table':
+						return onChangeView( {
+							...view,
+							type: newLayout,
+							...defaultLayouts[ newLayout ],
+						} );
+				}
+				throw new Error( 'Invalid dataview' );
+			} }
 		>
-			{ PAGE_SIZE_VALUES.map( ( size ) => {
+			{ availableLayouts.map( ( layout ) => {
+				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
+				if ( ! config ) {
+					return null;
+				}
 				return (
-					<DropdownMenuRadioItem
-						key={ size }
-						value={ size }
-						name="view-actions-page-size"
-						checked={ view.perPage === size }
-						onChange={ () => {
-							onChangeView( {
-								...view,
-								// `e.target.value` holds the same value as `size` but as a string,
-								// so we use `size` directly to avoid parsing to int.
-								perPage: size,
-								page: 1,
-							} );
-						} }
-					>
-						<DropdownMenuItemLabel>{ size }</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+					<ToggleGroupControlOption
+						key={ layout }
+						value={ layout }
+						label={ config.label }
+					/>
 				);
 			} ) }
-		</DropdownMenu>
+		</ToggleGroupControl>
 	);
 }
 
-function FieldsVisibilityMenu< Item >( {
-	view,
-	onChangeView,
-	fields,
-}: FieldsVisibilityMenuProps< Item > ) {
+function SortFieldControl() {
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
+	const orderOptions = useMemo( () => {
+		const sortableFields = fields.filter(
+			( field ) => field.enableSorting !== false
+		);
+		return sortableFields.map( ( field ) => {
+			return {
+				label: field.label,
+				value: field.id,
+			};
+		} );
+	}, [ fields ] );
+
+	return (
+		<SelectControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			label={ __( 'Sort by' ) }
+			value={ view.sort?.field }
+			options={ orderOptions }
+			onChange={ ( value: string ) => {
+				onChangeView( {
+					...view,
+					sort: {
+						direction: view?.sort?.direction || 'desc',
+						field: value,
+					},
+				} );
+			} }
+		/>
+	);
+}
+
+function SortDirectionControl() {
+	const { view, onChangeView } = useContext( DataViewsContext );
+	return (
+		<ToggleGroupControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Order' ) }
+			value={ view.sort?.direction || 'desc' }
+			disabled={ ! view?.sort?.field }
+			onChange={ ( newDirection ) => {
+				if ( ! view?.sort?.field ) {
+					return;
+				}
+				if ( newDirection === 'asc' || newDirection === 'desc' ) {
+					onChangeView( {
+						...view,
+						sort: {
+							direction: newDirection,
+							field: view.sort.field,
+						},
+					} );
+					return;
+				}
+				throw new Error( 'Invalid direction' );
+			} }
+		>
+			{ SORTING_DIRECTIONS.map( ( direction ) => {
+				return (
+					<ToggleGroupControlOption
+						key={ direction }
+						value={ direction }
+						label={ sortLabelsShort[ direction ] }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
+	);
+}
+
+const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
+function ItemsPerPageControl() {
+	const { view, onChangeView } = useContext( DataViewsContext );
+	return (
+		<ToggleGroupControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Items per page' ) }
+			value={ view.perPage || 10 }
+			disabled={ ! view?.sort?.field }
+			onChange={ ( newItemsPerPage ) => {
+				const newItemsPerPageNumber =
+					typeof newItemsPerPage === 'number' ||
+					newItemsPerPage === undefined
+						? newItemsPerPage
+						: parseInt( newItemsPerPage, 10 );
+				onChangeView( {
+					...view,
+					perPage: newItemsPerPageNumber,
+					page: 1,
+				} );
+			} }
+		>
+			{ PAGE_SIZE_VALUES.map( ( value ) => {
+				return (
+					<ToggleGroupControlOption
+						key={ value }
+						value={ value }
+						label={ value.toString() }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
+	);
+}
+
+function FieldControl() {
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const mandatoryFields = getMandatoryFields( view );
 	const hidableFields = fields.filter(
 		( field ) =>
@@ -156,186 +201,122 @@ function FieldsVisibilityMenu< Item >( {
 		return null;
 	}
 	return (
-		<DropdownMenu
-			trigger={
-				<DropdownMenuItem>
-					<DropdownMenuItemLabel>
-						{ __( 'Fields' ) }
-					</DropdownMenuItemLabel>
-				</DropdownMenuItem>
-			}
-		>
+		<ItemGroup isBordered isSeparated>
 			{ hidableFields?.map( ( field ) => {
+				const isVisible = viewFields.includes( field.id );
 				return (
-					<DropdownMenuCheckboxItem
-						key={ field.id }
-						value={ field.id }
-						checked={ viewFields.includes( field.id ) }
-						onChange={ () => {
-							onChangeView( {
-								...view,
-								fields: viewFields.includes( field.id )
-									? viewFields.filter(
-											( id ) => id !== field.id
-									  )
-									: [ ...viewFields, field.id ],
-							} );
-						} }
-					>
-						<DropdownMenuItemLabel>
-							{ field.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuCheckboxItem>
+					<Item key={ field.id }>
+						<HStack expanded>
+							<span>{ field.label }</span>
+							<Button
+								className={ clsx(
+									'dataviews-view-config__field-control-button',
+									{
+										'is-hidden': ! isVisible,
+									}
+								) }
+								size="compact"
+								onClick={ () =>
+									onChangeView( {
+										...view,
+										fields: isVisible
+											? viewFields.filter(
+													( id ) => id !== field.id
+											  )
+											: [ ...viewFields, field.id ],
+									} )
+								}
+								icon={ seen }
+								label={
+									isVisible
+										? __( 'Hide field' )
+										: __( 'Show field' )
+								}
+							/>
+						</HStack>
+					</Item>
 				);
 			} ) }
-		</DropdownMenu>
+		</ItemGroup>
 	);
 }
 
-function SortMenu< Item >( {
-	fields,
-	view,
-	onChangeView,
-}: SortMenuProps< Item > ) {
-	const sortableFields = fields.filter(
-		( field ) => field.enableSorting !== false
-	);
-	if ( ! sortableFields?.length ) {
-		return null;
-	}
-	const currentSortedField = fields.find(
-		( field ) => field.id === view.sort?.field
-	);
+function SettingsSection( {
+	title,
+	description,
+	children,
+}: {
+	title: string;
+	description: string;
+	children: React.ReactNode;
+} ) {
 	return (
-		<DropdownMenu
-			trigger={
-				<DropdownMenuItem
-					suffix={
-						<span aria-hidden="true">
-							{ currentSortedField?.label }
-						</span>
-					}
-				>
-					<DropdownMenuItemLabel>
-						{ __( 'Sort by' ) }
-					</DropdownMenuItemLabel>
-				</DropdownMenuItem>
-			}
-		>
-			{ sortableFields?.map( ( field ) => {
-				const sortedDirection = view.sort?.direction;
-				return (
-					<DropdownMenu
-						key={ field.id }
-						trigger={
-							<DropdownMenuItem>
-								<DropdownMenuItemLabel>
-									{ field.label }
-								</DropdownMenuItemLabel>
-							</DropdownMenuItem>
-						}
-						style={ {
-							minWidth: '220px',
-						} }
-					>
-						{ SORTING_DIRECTIONS.map( ( direction ) => {
-							const isChecked =
-								currentSortedField !== undefined &&
-								sortedDirection === direction &&
-								field.id === currentSortedField.id;
-
-							const value = `${ field.id }-${ direction }`;
-
-							return (
-								<DropdownMenuRadioItem
-									key={ value }
-									// All sorting radio items share the same name, so that
-									// selecting a sorting option automatically deselects the
-									// previously selected one, even if it is displayed in
-									// another submenu. The field and direction are passed via
-									// the `value` prop.
-									name="view-actions-sorting"
-									value={ value }
-									checked={ isChecked }
-									onChange={ () => {
-										onChangeView( {
-											...view,
-											sort: {
-												field: field.id,
-												direction,
-											},
-										} );
-									} }
-								>
-									<DropdownMenuItemLabel>
-										{ sortLabels[ direction ] }
-									</DropdownMenuItemLabel>
-								</DropdownMenuRadioItem>
-							);
-						} ) }
-					</DropdownMenu>
-				);
-			} ) }
-		</DropdownMenu>
+		<Grid columns={ 2 } className="dataviews-settings-section">
+			<VStack>
+				<h2 className="dataviews-settings-section__title">{ title }</h2>
+				<span className="dataviews-settings-section__description">
+					{ description }
+				</span>
+			</VStack>
+			<VStack spacing={ 4 }>{ children }</VStack>
+		</Grid>
 	);
 }
 
-function _DataViewsViewConfig( { defaultLayouts }: ViewActionsProps ) {
-	const { view, fields, onChangeView } = useContext( DataViewsContext );
-	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
+function DataviewsViewConfigContent( {
+	defaultLayouts = { list: {}, grid: {}, table: {} },
+}: ViewActionsProps ) {
 	return (
-		<>
-			<HStack
-				spacing={ 1 }
-				expanded={ false }
-				style={ { flexShrink: 0 } }
+		<VStack className="dataviews-view-config" spacing={ 6 }>
+			<SettingsSection
+				title={ __( 'Appearance' ) }
+				description={ __( 'Customise the display of data' ) }
 			>
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ activeView?.icon }
-							label={ __( 'Layout' ) }
-						/>
-					}
+				<LayoutPicker defaultLayouts={ defaultLayouts } />
+				<HStack expanded className="is-divided-in-two">
+					<SortFieldControl />
+					<SortDirectionControl />
+				</HStack>
+				<ItemsPerPageControl />
+			</SettingsSection>
+			<SettingsSection
+				title={ __( 'Properties' ) }
+				description={ __( 'Manage property order and display' ) }
+			>
+				<FieldControl />
+			</SettingsSection>
+		</VStack>
+	);
+}
+
+function _DataViewsViewConfig( {
+	defaultLayouts = { list: {}, grid: {}, table: {} },
+}: ViewActionsProps ) {
+	const [ isShowingViewPopover, setIsShowingViewPopover ] =
+		useState< boolean >( false );
+
+	return (
+		<div>
+			<Button
+				size="compact"
+				icon={ cog }
+				label={ _x( 'View options', 'View is used as a noun' ) }
+				onClick={ () => setIsShowingViewPopover( true ) }
+			/>
+			{ isShowingViewPopover && (
+				<Popover
+					placement="bottom-end"
+					onClose={ () => {
+						setIsShowingViewPopover( false );
+					} }
+					focusOnMount
 				>
-					<ViewTypeMenu
-						view={ view }
-						onChangeView={ onChangeView }
+					<DataviewsViewConfigContent
 						defaultLayouts={ defaultLayouts }
 					/>
-				</DropdownMenu>
-				<DropdownMenu
-					trigger={
-						<Button
-							size="compact"
-							icon={ cog }
-							label={ _x(
-								'View options',
-								'View is used as a noun'
-							) }
-						/>
-					}
-				>
-					<DropdownMenuGroup>
-						<SortMenu
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-						<FieldsVisibilityMenu
-							fields={ fields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-						<PageSizeMenu
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					</DropdownMenuGroup>
-				</DropdownMenu>
-			</HStack>
-		</>
+				</Popover>
+			) }
+		</div>
 	);
 }
 

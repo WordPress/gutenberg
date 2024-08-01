@@ -1,0 +1,39 @@
+.dataviews-view-config {
+    width: 363px;
+    container-type: inline-size;
+    padding: $grid-unit-20;
+}
+
+.dataviews-settings-section__title {
+    font-size: 13px;
+	font-weight: 600;
+	margin-top: 0;
+    margin-bottom: $grid-unit-05;
+}
+
+.dataviews-settings-section.dataviews-settings-section {
+    align-items: start;
+    grid-template-columns: 1fr;
+}
+
+.dataviews-settings-section__description {
+	margin: -$grid-unit-10 0 $grid-unit-10 0;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (min-width: 500px) {
+    .dataviews-settings-section.dataviews-settings-section {
+        grid-template-columns: 4fr 8fr;
+    }
+}
+
+.dataviews-view-config .is-divided-in-two > * {
+    width: calc(50% - #{ ($grid-unit-10) });
+}
+
+.dataviews-view-config__field-control-button.is-hidden {
+    opacity: 0.3;
+}
