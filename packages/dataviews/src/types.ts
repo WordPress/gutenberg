@@ -86,6 +86,11 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
+	 * Callback used to validate the field.
+	 */
+	isValid?: ( item: Item, elements?: Option[] ) => boolean;
+
+	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
@@ -130,6 +135,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: ( item: Item, elements?: Option[] ) => boolean;
 };
 
 /**
