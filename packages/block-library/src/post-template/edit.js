@@ -138,7 +138,19 @@ export default function PostTemplateEdit( {
 							( { slug } ) => slug === taxonomySlug
 						);
 						if ( taxonomy?.rest_base ) {
-							accumulator[ taxonomy?.rest_base ] = terms;
+							// Convert post format term ID's to a comma separated string,
+							// otherwise the Rest API will return a "rest_invalid_param" error
+							// and there will be a PHP fatal error from _post_format_request.
+							if (
+								taxonomy.rest_base === 'post_format' &&
+								Array.isArray( terms ) &&
+								terms.length > 0
+							) {
+								accumulator[ taxonomy.rest_base ] =
+									terms.join( ',' );
+							} else {
+								accumulator[ taxonomy.rest_base ] = terms;
+							}
 						}
 						return accumulator;
 					},
