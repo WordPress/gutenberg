@@ -49,5 +49,5 @@ export function useZoomOut( zoomOut = true ) {
 		) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
-	}, [ __unstableSetEditorMode, zoomOut, mode ] );
+	}, [ __unstableSetEditorMode, zoomOut ] );
 }
