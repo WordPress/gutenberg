@@ -81,6 +81,11 @@ export type Field< Item > = {
 	render?: ComponentType< { item: Item } >;
 
 	/**
+	 * Callback used to sort the field.
+	 */
+	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
@@ -124,6 +129,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 };
 
 /**
