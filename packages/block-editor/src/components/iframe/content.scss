@@ -21,9 +21,13 @@
 	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
 }
 
+$beizer: cubic-bezier(0.65, 0, 0.45, 1);
+$duration: 0.5s;
+
 .block-editor-iframe__html {
+	border: 0 solid $gray-300;
 	transform-origin: top center;
-	transition: transform 0.3s;
+	transition: transform $duration $beizer, background $duration $beizer, border $duration $beizer, margin $duration $beizer;
 	@include reduce-motion("transition");
 }
 
@@ -53,6 +57,7 @@
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
 		display: flex;
 		flex-direction: column;
+
 
 		> .is-root-container:not(.wp-block-post-content) {
 			flex: 1;
