@@ -1800,6 +1800,15 @@ export function editorMode( state = 'edit', action ) {
 		return 'edit';
 	}
 
+	// Let inserting a single block always trigger Edit mode.
+	if (
+		action.type === 'INSERT_BLOCKS' &&
+		action.blocks.length === 1 &&
+		action.blocks[ 0 ].innerBlocks.length === 0
+	) {
+		return 'edit';
+	}
+
 	if ( action.type === 'SET_EDITOR_MODE' ) {
 		return action.mode;
 	}
