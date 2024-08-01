@@ -467,11 +467,11 @@ module.exports = {
 										'framer-motion',
 									].includes( name )
 							),
-							{
-								name: '@testing-library/user-event',
-								message:
-									'Please use event triggers (`click`, `press`, etc) from `@ariakit/test` instead.',
-							},
+							// {
+							// 	name: '@testing-library/user-event',
+							// 	message:
+							// 		'Please use event triggers (`click`, `press`, etc) from `@ariakit/test` instead.',
+							// },
 							{
 								name: '@testing-library/react',
 								importNames: [ 'render' ],
