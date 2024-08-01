@@ -305,7 +305,7 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		const maxWidth = 800;
+		const maxWidth = 750;
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
