@@ -78,6 +78,23 @@ describe( 'validation', () => {
 		expect( result ).toBe( false );
 	} );
 
+	it( 'text field is invalid if value is not one of the elements', () => {
+		const item = { id: 1, author: 'not-in-elements' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'author',
+				type: 'text',
+				elements: [
+					{ value: 'jane', label: 'Jane' },
+					{ value: 'john', label: 'John' },
+				],
+			},
+		];
+		const form = { visibleFields: [ 'author' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
 	it( 'untyped field is invalid if value is not one of the elements', () => {
 		const item = { id: 1, author: 'not-in-elements' };
 		const fields: Field< {} >[] = [
