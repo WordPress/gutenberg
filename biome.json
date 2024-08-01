@@ -1,0 +1,37 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.8.3/schema.json",
+	"formatter": {
+		"indentStyle": "tab",
+		"indentWidth": 4,
+		"lineWidth": 80
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "es5",
+			"bracketSameLine": false,
+			"bracketSpacing": true,
+			"semicolons": "always",
+			"arrowParentheses": "always"
+		}
+	},
+	"json": {
+		"formatter": {
+			"enabled": false
+		}
+	},
+	"files": {
+		"ignore": [
+			".cache",
+			"build",
+			"build-module",
+			"build-types",
+			"node_modules",
+			"packages/block-serialization-spec-parser/parser.js",
+			"packages/edit-site/lib",
+			"packages/react-native-editor/bundle",
+			"packages/url/src/test/fixtures",
+			"vendor"
+		]
+	}
+}
