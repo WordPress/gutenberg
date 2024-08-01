@@ -79,7 +79,7 @@ export type SelectControlSingleSelectionProps< T extends string = string > =
 		 * Otherwise, the value received is a single value with the new selected value.
 		 */
 		onChange?: (
-			value: T,
+			value: NoInfer< T >,
 			extra?: { event?: ChangeEvent< HTMLSelectElement > }
 		) => void;
 	};
@@ -102,7 +102,7 @@ export type SelectControlMultipleSelectionProps< T extends string > =
 		 * Otherwise, the value received is a single value with the new selected value.
 		 */
 		onChange?: (
-			value: T[],
+			value: NoInfer< T >[],
 			extra?: { event?: ChangeEvent< HTMLSelectElement > }
 		) => void;
 	};
