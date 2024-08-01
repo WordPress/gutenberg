@@ -184,7 +184,7 @@ export const savePost =
 		}
 
 		const previousRecord = select.getCurrentPost();
-		let edits = {
+		const edits = {
 			id: previousRecord.id,
 			...registry
 				.select( coreStore )
@@ -197,25 +197,26 @@ export const savePost =
 		};
 
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
+
 		let error = false;
 		try {
-			edits = await applyFilters(
+			error = await applyFilters(
 				'editor.__unstablePreSavePost',
-				edits,
+				Promise.resolve( false ),
 				options
 			);
 		} catch ( err ) {
 			error = err;
 		}
 
-		if ( false !== error ) {
+		if ( ! error ) {
 			try {
-				error = await registry
+				await registry
 					.dispatch( coreStore )
 					.saveEntityRecord(
 						'postType',
 						previousRecord.type,
-						Promise.resolve( edits ),
+						edits,
 						options
 					);
 			} catch ( err ) {
@@ -226,7 +227,7 @@ export const savePost =
 			}
 		}
 
-		if ( false !== error ) {
+		if ( ! error ) {
 			error = registry
 				.select( coreStore )
 				.getLastEntitySaveError(
@@ -236,7 +237,7 @@ export const savePost =
 				);
 		}
 
-		if ( false !== error ) {
+		if ( ! error ) {
 			await applyFilters(
 				'editor.__unstableSavePost',
 				Promise.resolve(),
