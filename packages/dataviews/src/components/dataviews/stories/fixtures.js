@@ -23,7 +23,6 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'Space', 'NASA' ],
 		satellites: 0,
-		satellites_no_type: 0,
 	},
 	{
 		id: 2,
@@ -33,7 +32,6 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'Space' ],
 		satellites: 0,
-		satellites_no_type: 0,
 	},
 	{
 		id: 3,
@@ -43,7 +41,6 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'NASA' ],
 		satellites: 0,
-		satellites_no_type: 0,
 	},
 	{
 		id: 4,
@@ -53,7 +50,6 @@ export const data = [
 		type: 'Ice giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 14,
-		satellites_no_type: 14,
 	},
 	{
 		id: 5,
@@ -63,7 +59,6 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 0,
-		satellites_no_type: 0,
 	},
 	{
 		id: 6,
@@ -73,7 +68,6 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 0,
-		satellites_no_type: 0,
 	},
 	{
 		id: 7,
@@ -83,7 +77,6 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 1,
-		satellites_no_type: 1,
 	},
 	{
 		id: 8,
@@ -93,7 +86,6 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 2,
-		satellites_no_type: 2,
 	},
 	{
 		id: 9,
@@ -103,7 +95,6 @@ export const data = [
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 95,
-		satellites_no_type: 95,
 	},
 	{
 		id: 10,
@@ -113,7 +104,6 @@ export const data = [
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 146,
-		satellites_no_type: 146,
 	},
 	{
 		id: 11,
@@ -123,7 +113,6 @@ export const data = [
 		type: 'Ice giant',
 		categories: [ 'Space', 'Ice giant', 'Solar system' ],
 		satellites: 28,
-		satellites_no_type: 28,
 	},
 ];
 
@@ -201,11 +190,6 @@ export const fields = [
 		label: 'Satellites',
 		id: 'satellites',
 		type: 'integer',
-		enableSorting: true,
-	},
-	{
-		label: 'Satellites (no type)',
-		id: 'satellites_no_type',
 		enableSorting: true,
 	},
 	{
