@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import type { SortDirection, Option } from '../types';
+import type { SortDirection, ValidationContext } from '../types';
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	return direction === 'asc' ? a - b : b - a;
 }
 
-function isValid( value: any, elements?: Option[] ) {
+function isValid( value: any, context?: ValidationContext ) {
 	// TODO: this implicitely means the value is required.
 	if ( value === '' ) {
 		return false;
@@ -17,8 +17,8 @@ function isValid( value: any, elements?: Option[] ) {
 		return false;
 	}
 
-	if ( elements ) {
-		const validValues = elements.map( ( f ) => f.value );
+	if ( context?.elements ) {
+		const validValues = context?.elements.map( ( f ) => f.value );
 		if ( ! validValues.includes( Number( value ) ) ) {
 			return false;
 		}

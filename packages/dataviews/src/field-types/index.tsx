@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { default as integer } from './integer';
-import type { FieldType, Option } from '../types';
+import type { FieldType, ValidationContext } from '../types';
 
 /**
  *
@@ -17,9 +17,9 @@ export default function getFieldTypeDefinition( type?: FieldType ) {
 
 	return {
 		sort: () => 0,
-		isValid: ( value: any, elements?: Option[] ) => {
-			if ( elements ) {
-				const validValues = elements.map( ( f ) => f.value );
+		isValid: ( value: any, context?: ValidationContext ) => {
+			if ( context?.elements ) {
+				const validValues = context?.elements?.map( ( f ) => f.value );
 				if ( ! validValues.includes( value ) ) {
 					return false;
 				}

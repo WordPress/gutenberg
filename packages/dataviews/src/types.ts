@@ -46,6 +46,10 @@ export type ItemRecord = Record< string, unknown >;
 
 export type FieldType = 'text' | 'integer';
 
+export type ValidationContext = {
+	elements?: Option[];
+};
+
 /**
  * A dataview field for a specific property of a data type.
  */
@@ -88,7 +92,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to validate the field.
 	 */
-	isValid?: ( item: Item, elements?: Option[] ) => boolean;
+	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
 	 * Whether the field is sortable.
@@ -135,7 +139,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
-	isValid: ( item: Item, elements?: Option[] ) => boolean;
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 };
 
 /**

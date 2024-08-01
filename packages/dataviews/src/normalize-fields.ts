@@ -32,10 +32,10 @@ export function normalizeFields< Item >(
 
 		const isValid =
 			field.isValid ??
-			function isValid( item, elements ) {
+			function isValid( item, context ) {
 				return fieldTypeDefinition.isValid(
 					getValue( { item } ),
-					elements
+					context
 				);
 			};
 

@@ -13,6 +13,6 @@ export function isItemValid< Item >(
 		fields.filter( ( { id } ) => !! form.visibleFields?.includes( id ) )
 	);
 	return _fields.every( ( field ) => {
-		return field.isValid( item, field.elements );
+		return field.isValid( item, { elements: field.elements } );
 	} );
 }
