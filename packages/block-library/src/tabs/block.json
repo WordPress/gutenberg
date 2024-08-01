@@ -41,6 +41,5 @@
 		}
 	},
 	"editorStyle": "wp-block-tabs-editor",
-	"style": "wp-block-tabs",
-	"viewScriptModule": "file:./view.min.js"
+	"style": "wp-block-tabs"
 }
