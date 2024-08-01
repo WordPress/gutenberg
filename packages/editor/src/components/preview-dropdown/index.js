@@ -11,7 +11,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { mobile, tablet, external } from '@wordpress/icons';
+import { mobile, tablet, external, chevronDown } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -80,6 +80,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 	const toggleProps = {
 		className: 'editor-preview-dropdown__toggle',
+		iconPosition: 'right',
 		size: 'compact',
 		showTooltip: ! showIconLabels,
 		disabled,
@@ -154,20 +155,19 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		__unstableSetEditorMode( newEditorMode );
 	};
 
-	const getIcon = () => {
+	const getText = () => {
 		if (
 			deviceType === 'ZoomOut' ||
 			editorMode === 'zoom-out' // This can happen if zoom out is enabled from by other means - like the patterns tab.
 		) {
-			return <>{ __( '50%' ) }</>;
+			return __( '50%' );
 		}
 
-		switch ( deviceType ) {
-			case 'Desktop':
-				return <>{ __( '100%' ) }</>;
-			default:
-				return deviceIcons[ deviceType.toLowerCase() ];
+		if ( deviceType === 'Desktop' ) {
+			return __( '100%' );
 		}
+
+		return <Icon icon={ deviceIcons[ deviceType.toLowerCase() ] } />;
 	};
 
 	return (
@@ -176,7 +176,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ getIcon() }
+			icon={ chevronDown }
+			text={ getText() }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>
