@@ -71,6 +71,10 @@
 			align-items: flex-start;
 			min-height: $grid-unit-30;
 
+			&:not(:has(.dataviews-view-grid__field-value:not(:empty))) {
+				display: none;
+			}
+
 			&:not(.is-column) {
 				align-items: center;
 

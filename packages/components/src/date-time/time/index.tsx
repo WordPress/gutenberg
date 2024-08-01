@@ -32,7 +32,7 @@ import {
 	validateInputElementTarget,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
-import { TimeInput } from '../time-input';
+import { TimeInput } from './time-input';
 
 const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
@@ -256,5 +256,30 @@ export function TimePicker( {
 		</Wrapper>
 	);
 }
+
+/**
+ * A component to input a time.
+ *
+ * Values are passed as an object in 24-hour format (`{ hours: number, minutes: number }`).
+ *
+ * ```jsx
+ * import { TimePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTimeInput = () => {
+ * 	const [ time, setTime ] = useState( { hours: 13, minutes: 30 } );
+ *
+ * 	return (
+ * 		<TimePicker.TimeInput
+ * 			value={ time }
+ * 			onChange={ setTime }
+ * 			label="Time"
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+TimePicker.TimeInput = TimeInput;
+Object.assign( TimePicker.TimeInput, { displayName: 'TimePicker.TimeInput' } );
 
 export default TimePicker;

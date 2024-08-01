@@ -54,8 +54,7 @@ const defaultLayouts = {
 					minWidth: 320,
 				},
 				preview: {
-					minWidth: 120,
-					maxWidth: 120,
+					width: '1%',
 				},
 				author: {
 					width: '1%',

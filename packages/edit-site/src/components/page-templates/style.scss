@@ -37,6 +37,8 @@
 	.dataviews-view-table & {
 		border-radius: $radius-block-ui;
 		position: relative;
+		width: 120px;
+		max-height: 160px;
 
 		&::after {
 			content: "";
