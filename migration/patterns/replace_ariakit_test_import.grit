@@ -1,0 +1,14 @@
+engine marzano(0.1)
+language js
+
+pattern replace_ariakit_test_import() {
+    `import { $imports } from '@testing-library/react'` as $import where {
+        $imports <: contains `render` as $render,
+        $render => .,
+        $import =>
+`$import;
+import {render} from "@ariakit/test/react";`
+    }
+}
+
+replace_ariakit_test_import()

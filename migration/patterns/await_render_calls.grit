@@ -1,0 +1,21 @@
+engine marzano(0.1)
+language js
+
+pattern await_render_calls() {
+    `it($description, $test_fn)` where {
+        $test_fn <: contains bubble `$render_method($render_args)` where {
+            !$render_method <: within `await $_`,
+            $render_method <: or {
+            `render` => `await render`,
+            `rerender` => `await rerender`
+            },
+        },
+        $test_fn <: maybe $test_fn where {
+            !$test_fn <: arrow_function(async = "async"),
+            !$test_fn <: function(async = "async"),
+            $test_fn => `async $test_fn`
+        }
+    }
+}
+
+await_render_calls()
