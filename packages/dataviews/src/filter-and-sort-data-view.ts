@@ -143,6 +143,15 @@ export function filterSortAndPaginate< Item >(
 				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
 				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
 
+				if ( fieldToSort.type === 'integer' ) {
+					return fieldToSort.sort(
+						a,
+						b,
+						view.sort?.direction ?? 'desc'
+					);
+				}
+
+				// When/if types become required, we can remove the following logic.
 				if (
 					typeof valueA === 'number' &&
 					typeof valueB === 'number'

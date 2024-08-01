@@ -401,6 +401,7 @@ export function blockBindingsSources( state = {}, action ) {
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
 					canUserEditValue: action.canUserEditValue,
+					getFieldsList: action.getFieldsList,
 				},
 			};
 		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':

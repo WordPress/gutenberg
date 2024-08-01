@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
@@ -15,7 +15,6 @@ import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
-	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -81,365 +80,6 @@ function isTemplateRemovable( template ) {
 		! template?.has_theme_file
 	);
 }
-
-const trashPostAction = {
-	id: 'move-to-trash',
-	label: __( 'Move to Trash' ),
-	isPrimary: true,
-	icon: trash,
-	isEligible( item ) {
-		return (
-			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
-			item.permissions?.delete
-		);
-	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const { deleteEntityRecord } = useDispatch( coreStore );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ items.length === 1
-						? sprintf(
-								// translators: %s: The item's title.
-								__(
-									'Are you sure you want to move to trash "%s"?'
-								),
-								getItemTitle( items[ 0 ] )
-						  )
-						: sprintf(
-								// translators: %d: The number of items (2 or more).
-								_n(
-									'Are you sure you want to move to trash %d item?',
-									'Are you sure you want to move to trash %d items?',
-									items.length
-								),
-								items.length
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							const promiseResult = await Promise.allSettled(
-								items.map( ( item ) =>
-									deleteEntityRecord(
-										'postType',
-										item.type,
-										item.id,
-										{},
-										{ throwOnError: true }
-									)
-								)
-							);
-							// If all the promises were fulfilled with success.
-							if (
-								promiseResult.every(
-									( { status } ) => status === 'fulfilled'
-								)
-							) {
-								let successMessage;
-								if ( promiseResult.length === 1 ) {
-									successMessage = sprintf(
-										/* translators: The item's title. */
-										__( '"%s" moved to trash.' ),
-										getItemTitle( items[ 0 ] )
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of items. */
-										_n(
-											'%s item moved to trash.',
-											'%s items moved to trash.',
-											items.length
-										),
-										items.length
-									);
-								}
-								createSuccessNotice( successMessage, {
-									type: 'snackbar',
-									id: 'move-to-trash-action',
-								} );
-							} else {
-								// If there was at least one failure.
-								let errorMessage;
-								// If we were trying to delete a single item.
-								if ( promiseResult.length === 1 ) {
-									if ( promiseResult[ 0 ].reason?.message ) {
-										errorMessage =
-											promiseResult[ 0 ].reason.message;
-									} else {
-										errorMessage = __(
-											'An error occurred while moving to trash the item.'
-										);
-									}
-									// If we were trying to delete multiple items.
-								} else {
-									const errorMessages = new Set();
-									const failedPromises = promiseResult.filter(
-										( { status } ) => status === 'rejected'
-									);
-									for ( const failedPromise of failedPromises ) {
-										if ( failedPromise.reason?.message ) {
-											errorMessages.add(
-												failedPromise.reason.message
-											);
-										}
-									}
-									if ( errorMessages.size === 0 ) {
-										errorMessage = __(
-											'An error occurred while moving to trash the items.'
-										);
-									} else if ( errorMessages.size === 1 ) {
-										errorMessage = sprintf(
-											/* translators: %s: an error message */
-											__(
-												'An error occurred while moving to trash the item: %s'
-											),
-											[ ...errorMessages ][ 0 ]
-										);
-									} else {
-										errorMessage = sprintf(
-											/* translators: %s: a list of comma separated error messages */
-											__(
-												'Some errors occurred while moving to trash the items: %s'
-											),
-											[ ...errorMessages ].join( ',' )
-										);
-									}
-								}
-								createErrorNotice( errorMessage, {
-									type: 'snackbar',
-								} );
-							}
-							if ( onActionPerformed ) {
-								onActionPerformed( items );
-							}
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Trash' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
-const permanentlyDeletePostAction = {
-	id: 'permanently-delete',
-	label: __( 'Permanently delete' ),
-	supportsBulk: true,
-	isEligible( { status, permissions } ) {
-		return status === 'trash' && permissions?.delete;
-	},
-	async callback( posts, { registry, onActionPerformed } ) {
-		const { createSuccessNotice, createErrorNotice } =
-			registry.dispatch( noticesStore );
-		const { deleteEntityRecord } = registry.dispatch( coreStore );
-		const promiseResult = await Promise.allSettled(
-			posts.map( ( post ) => {
-				return deleteEntityRecord(
-					'postType',
-					post.type,
-					post.id,
-					{ force: true },
-					{ throwOnError: true }
-				);
-			} )
-		);
-		// If all the promises were fulfilled with success.
-		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
-			let successMessage;
-			if ( promiseResult.length === 1 ) {
-				successMessage = sprintf(
-					/* translators: The posts's title. */
-					__( '"%s" permanently deleted.' ),
-					getItemTitle( posts[ 0 ] )
-				);
-			} else {
-				successMessage = __( 'The posts were permanently deleted.' );
-			}
-			createSuccessNotice( successMessage, {
-				type: 'snackbar',
-				id: 'permanently-delete-post-action',
-			} );
-			onActionPerformed?.( posts );
-		} else {
-			// If there was at lease one failure.
-			let errorMessage;
-			// If we were trying to permanently delete a single post.
-			if ( promiseResult.length === 1 ) {
-				if ( promiseResult[ 0 ].reason?.message ) {
-					errorMessage = promiseResult[ 0 ].reason.message;
-				} else {
-					errorMessage = __(
-						'An error occurred while permanently deleting the post.'
-					);
-				}
-				// If we were trying to permanently delete multiple posts
-			} else {
-				const errorMessages = new Set();
-				const failedPromises = promiseResult.filter(
-					( { status } ) => status === 'rejected'
-				);
-				for ( const failedPromise of failedPromises ) {
-					if ( failedPromise.reason?.message ) {
-						errorMessages.add( failedPromise.reason.message );
-					}
-				}
-				if ( errorMessages.size === 0 ) {
-					errorMessage = __(
-						'An error occurred while permanently deleting the posts.'
-					);
-				} else if ( errorMessages.size === 1 ) {
-					errorMessage = sprintf(
-						/* translators: %s: an error message */
-						__(
-							'An error occurred while permanently deleting the posts: %s'
-						),
-						[ ...errorMessages ][ 0 ]
-					);
-				} else {
-					errorMessage = sprintf(
-						/* translators: %s: a list of comma separated error messages */
-						__(
-							'Some errors occurred while permanently deleting the posts: %s'
-						),
-						[ ...errorMessages ].join( ',' )
-					);
-				}
-			}
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
-	},
-};
-
-const restorePostAction = {
-	id: 'restore',
-	label: __( 'Restore' ),
-	isPrimary: true,
-	icon: backup,
-	supportsBulk: true,
-	isEligible( { status, permissions } ) {
-		return status === 'trash' && permissions?.update;
-	},
-	async callback( posts, { registry, onActionPerformed } ) {
-		const { createSuccessNotice, createErrorNotice } =
-			registry.dispatch( noticesStore );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			registry.dispatch( coreStore );
-		await Promise.allSettled(
-			posts.map( ( post ) => {
-				return editEntityRecord( 'postType', post.type, post.id, {
-					status: 'draft',
-				} );
-			} )
-		);
-		const promiseResult = await Promise.allSettled(
-			posts.map( ( post ) => {
-				return saveEditedEntityRecord( 'postType', post.type, post.id, {
-					throwOnError: true,
-				} );
-			} )
-		);
-
-		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
-			let successMessage;
-			if ( posts.length === 1 ) {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '"%s" has been restored.' ),
-					getItemTitle( posts[ 0 ] )
-				);
-			} else if ( posts[ 0 ].type === 'page' ) {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '%d pages have been restored.' ),
-					posts.length
-				);
-			} else {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '%d posts have been restored.' ),
-					posts.length
-				);
-			}
-			createSuccessNotice( successMessage, {
-				type: 'snackbar',
-				id: 'restore-post-action',
-			} );
-			if ( onActionPerformed ) {
-				onActionPerformed( posts );
-			}
-		} else {
-			// If there was at lease one failure.
-			let errorMessage;
-			// If we were trying to move a single post to the trash.
-			if ( promiseResult.length === 1 ) {
-				if ( promiseResult[ 0 ].reason?.message ) {
-					errorMessage = promiseResult[ 0 ].reason.message;
-				} else {
-					errorMessage = __(
-						'An error occurred while restoring the post.'
-					);
-				}
-				// If we were trying to move multiple posts to the trash
-			} else {
-				const errorMessages = new Set();
-				const failedPromises = promiseResult.filter(
-					( { status } ) => status === 'rejected'
-				);
-				for ( const failedPromise of failedPromises ) {
-					if ( failedPromise.reason?.message ) {
-						errorMessages.add( failedPromise.reason.message );
-					}
-				}
-				if ( errorMessages.size === 0 ) {
-					errorMessage = __(
-						'An error occurred while restoring the posts.'
-					);
-				} else if ( errorMessages.size === 1 ) {
-					errorMessage = sprintf(
-						/* translators: %s: an error message */
-						__( 'An error occurred while restoring the posts: %s' ),
-						[ ...errorMessages ][ 0 ]
-					);
-				} else {
-					errorMessage = sprintf(
-						/* translators: %s: a list of comma separated error messages */
-						__(
-							'Some errors occurred while restoring the posts: %s'
-						),
-						[ ...errorMessages ].join( ',' )
-					);
-				}
-			}
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
-	},
-};
 
 const viewPostAction = {
 	id: 'view-post',
@@ -934,25 +574,17 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const {
-		defaultActions,
-		postTypeObject,
-		userCanCreatePostType,
-		cachedCanUserResolvers,
-	} = useSelect(
+	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
 		( select ) => {
-			const { getPostType, canUser, getCachedResolvers } =
-				select( coreStore );
+			const { getPostType, canUser } = select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
-			const _postTypeObject = getPostType( postType );
 			return {
-				postTypeObject: _postTypeObject,
+				postTypeObject: getPostType( postType ),
 				defaultActions: getEntityActions( 'postType', postType ),
 				userCanCreatePostType: canUser( 'create', {
 					kind: 'postType',
 					name: postType,
 				} ),
-				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
 		[ postType ]
@@ -987,11 +619,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostAction,
 			reorderPagesAction,
-			! isTemplateOrTemplatePart && ! isPattern && restorePostAction,
-			! isTemplateOrTemplatePart && ! isPattern && trashPostAction,
-			! isTemplateOrTemplatePart &&
-				! isPattern &&
-				permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -1055,9 +682,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
-		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
-		// when user capabilities are resolved. This makes sure the isEligible functions of actions dependent on capabilities are re-evaluated.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		defaultActions,
 		userCanCreatePostType,
@@ -1071,6 +695,5 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		supportsRevisions,
 		supportsTitle,
 		context,
-		cachedCanUserResolvers,
 	] );
 }

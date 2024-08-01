@@ -1327,9 +1327,17 @@ function updateConfigWithSeparator( config ) {
 export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
+	if ( ! css || css.trim() === '' ) {
+		return processedCSS;
+	}
+
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
+		if ( ! part || part.trim() === '' ) {
+			return;
+		}
+
 		const isRootCss = ! part.includes( '{' );
 		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
@@ -1342,11 +1350,32 @@ export function processCSSNesting( css, blockSelector ) {
 			}
 
 			const [ nestedSelector, cssValue ] = splittedPart;
-			const combinedSelector = nestedSelector.startsWith( ' ' )
-				? scopeSelector( blockSelector, nestedSelector )
-				: appendToSelector( blockSelector, nestedSelector );
 
-			processedCSS += `:root :where(${ combinedSelector }){${ cssValue.trim() }}`;
+			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
+			// capture any leading combinator such as >, +, or ~, as well as spaces.
+			// This allows pseudo elements as descendants e.g. `.parent ::before`.
+			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
+			const pseudoPart = matches ? matches[ 1 ] : '';
+			const withoutPseudoElement = matches
+				? nestedSelector.replace( pseudoPart, '' ).trim()
+				: nestedSelector.trim();
+
+			let combinedSelector;
+			if ( withoutPseudoElement === '' ) {
+				// Only contained a pseudo element to use the block selector to form
+				// the final `:root :where()` selector.
+				combinedSelector = blockSelector;
+			} else {
+				// If the nested selector is a descendant of the block scope it with the
+				// block selector. Otherwise append it to the block selector.
+				combinedSelector = nestedSelector.startsWith( ' ' )
+					? scopeSelector( blockSelector, withoutPseudoElement )
+					: appendToSelector( blockSelector, withoutPseudoElement );
+			}
+
+			// Build final rule, re-adding any pseudo element outside the `:where()`
+			// to maintain valid CSS selector.
+			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
 		}
 	} );
 	return processedCSS;

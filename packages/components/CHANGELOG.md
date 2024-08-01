@@ -6,6 +6,12 @@
 
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
+-   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
+
+### Enhancements
+
+-   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+-   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
 
 ### Internal
 
@@ -47,6 +53,7 @@
 -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 -   `ColorPicker`: Use `minimal` variant for `SelectControl` ([#63676](https://github.com/WordPress/gutenberg/pull/63676)).
 -   `Tabs`: keep full opacity of focus ring and remove hover styles on disabled tabs ([#63754](https://github.com/WordPress/gutenberg/pull/63754)).
+-   `Placeholder`: Remove unnecssary `placeholder-style` Sass mixin ([#63885](https://github.com/WordPress/gutenberg/pull/63885)).
 
 ### Documentation
 
