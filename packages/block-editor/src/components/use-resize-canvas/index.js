@@ -62,8 +62,6 @@ export default function useResizeCanvas( deviceType ) {
 					marginLeft: marginHorizontal,
 					marginRight: marginHorizontal,
 					height,
-					borderRadius: '2px 2px 2px 2px',
-					border: '1px solid #ddd',
 					overflowY: 'auto',
 				};
 			default:
