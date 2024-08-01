@@ -54,7 +54,7 @@ export const defaultLayouts = {
 	},
 };
 
-export const DEFAULT_POST_BASE = {
+const DEFAULT_POST_BASE = {
 	type: LAYOUT_LIST,
 	search: '',
 	filters: [],
