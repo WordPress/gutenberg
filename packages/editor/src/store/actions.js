@@ -195,7 +195,6 @@ export const savePost =
 				),
 			content,
 		};
-
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 
 		let error = false;
