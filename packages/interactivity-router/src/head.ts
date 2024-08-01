@@ -95,7 +95,14 @@ export const fetchHeadAssets = async (
 						element.setAttribute( attr.name, attr.value );
 					}
 				}
+
 				headTags.push( element );
+
+				// wait for the `load` event to fire before appending the element
+				return new Promise( ( resolve, reject ) => {
+					element.onload = resolve;
+					element.onerror = reject;
+				} );
 			} )
 		);
 	}
