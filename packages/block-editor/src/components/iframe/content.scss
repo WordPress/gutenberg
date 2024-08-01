@@ -21,10 +21,9 @@
 	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
 }
 
-$beizer: cubic-bezier(0.65, 0, 0.45, 1);
-$duration: 0.5s;
-
 .block-editor-iframe__html {
+	$beizer: cubic-bezier(0.65, 0, 0.45, 1);
+	$duration: 0.5s;
 	border: 0 solid $gray-300;
 	transform-origin: top center;
 	transition: transform $duration $beizer, background $duration $beizer, border $duration $beizer, margin $duration $beizer;
