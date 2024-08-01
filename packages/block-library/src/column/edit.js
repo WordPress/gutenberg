@@ -56,23 +56,37 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const { columnsIds, hasChildBlocks, rootClientId, isParentSelected } =
-		useSelect(
-			( select ) => {
-				const { getBlockOrder, getBlockRootClientId, isBlockSelected } =
-					select( blockEditorStore );
+	const {
+		columnsIds,
+		hasChildBlocks,
+		rootClientId,
+		isParentSelected,
+		// Use this condition.
+		// areAllColumnsEmpty,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				getBlockOrder,
+				getBlockRootClientId,
+				isBlockSelected,
+			} = select( blockEditorStore );
 
-				const rootId = getBlockRootClientId( clientId );
+			const rootId = getBlockRootClientId( clientId );
+			const _columnsIds = getBlockOrder( rootId );
 
-				return {
-					hasChildBlocks: getBlockOrder( clientId ).length > 0,
-					rootClientId: rootId,
-					columnsIds: getBlockOrder( rootId ),
-					isParentSelected: isBlockSelected( rootId ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				hasChildBlocks: getBlockCount( clientId ) > 0,
+				rootClientId: rootId,
+				columnsIds: _columnsIds,
+				isParentSelected: isBlockSelected( rootId ),
+				areAllColumnsEmpty: _columnsIds.every(
+					( id ) => getBlockCount( id ) === 0
+				),
+			};
+		},
+		[ clientId ]
+	);
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
