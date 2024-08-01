@@ -218,12 +218,18 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ ! isReady && ! editedPostType && (
-				<Warning className="editor-error-boundary">
-					{ __( 'The template can not be previewed.' ) }
-				</Warning>
-			) }
-			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
+			{ ! isReady ? (
+				<>
+					{ ! editedPostType && (
+						<Warning className="editor-error-boundary">
+							{ __(
+								'The template you are currently using is not compatible with the Site Editor.'
+							) }
+						</Warning>
+					) }
+					<CanvasLoader id={ loadingProgressId } />
+				</>
+			) : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
 				<Editor
