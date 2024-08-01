@@ -87,7 +87,8 @@ export const fetchHeadAssets = async (
 
 				const headElement = headElements.get( attributeValue );
 				const element = doc.createElement( tagName );
-				element.innerText = headElement.text;
+				element.textContent = headElement.text;
+
 				for ( const attr of headElement.tag.attributes ) {
 					element.setAttribute( attr.name, attr.value );
 				}
