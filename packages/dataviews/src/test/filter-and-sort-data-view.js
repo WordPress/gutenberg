@@ -248,26 +248,6 @@ describe( 'sorting', () => {
 		expect( result[ 2 ].title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should sort untyped fields if the value is a number', () => {
-		const { data: result } = filterSortAndPaginate(
-			data,
-			{
-				sort: { field: 'satellites', direction: 'desc' },
-			},
-			// Remove type information for satellites field to test sorting untyped fields.
-			fields.map( ( field ) =>
-				field.id === 'satellites'
-					? { ...field, type: undefined }
-					: field
-			)
-		);
-
-		expect( result ).toHaveLength( 11 );
-		expect( result[ 0 ].title ).toBe( 'Saturn' );
-		expect( result[ 1 ].title ).toBe( 'Jupiter' );
-		expect( result[ 2 ].title ).toBe( 'Uranus' );
-	} );
-
 	it( 'should sort text field types', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
@@ -286,6 +266,26 @@ describe( 'sorting', () => {
 		expect( result ).toHaveLength( 2 );
 		expect( result[ 0 ].title ).toBe( 'Uranus' );
 		expect( result[ 1 ].title ).toBe( 'Neptune' );
+	} );
+
+	it( 'should sort untyped fields if the value is a number', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'satellites', direction: 'desc' },
+			},
+			// Remove type information for satellites field to test sorting untyped fields.
+			fields.map( ( field ) =>
+				field.id === 'satellites'
+					? { ...field, type: undefined }
+					: field
+			)
+		);
+
+		expect( result ).toHaveLength( 11 );
+		expect( result[ 0 ].title ).toBe( 'Saturn' );
+		expect( result[ 1 ].title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].title ).toBe( 'Uranus' );
 	} );
 
 	it( 'should sort untyped fields if the value is string', () => {
