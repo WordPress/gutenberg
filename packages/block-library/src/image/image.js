@@ -983,12 +983,20 @@ export default function Image( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+
+					let resizedWidth = `${ elt.offsetWidth }px`;
+					// Set width to 'auto' if the resized width is close to the max-content width.
+					if ( Math.abs( elt.offsetWidth - maxContentWidth ) < 10 ) {
+						resizedWidth = 'auto';
+						elt.style.width = 'auto';
+					}
+
 					// Since the aspect ratio is locked when resizing, we can
 					// use the width of the resized element to calculate the
 					// height in CSS to prevent stretching when the max-width
 					// is reached.
 					setAttributes( {
-						width: `${ elt.offsetWidth }px`,
+						width: resizedWidth,
 						height: 'auto',
 						aspectRatio:
 							ratio === naturalRatio
