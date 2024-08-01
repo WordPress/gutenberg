@@ -35,6 +35,7 @@ import {
 	privateRemoveBlocks,
 } from './private-actions';
 import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1673,9 +1674,9 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			const { sectionRootClientId } = registry
-				.select( STORE_NAME )
-				.getSettings();
+			const { sectionRootClientId } = unlock(
+				registry.select( STORE_NAME ).getSettings()
+			);
 			if ( firstSelectedClientId ) {
 				let sectionClientId;
 
