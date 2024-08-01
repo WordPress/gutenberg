@@ -60,7 +60,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		}
 
 		return () => {
-			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
 			if (
 				editorMode === 'zoom-out' &&
 				editorMode !== originalEditingMode.current
