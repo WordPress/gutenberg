@@ -35,7 +35,8 @@ function render_block_core_tabs( $attributes, $content, $block ) {
 	wp_enqueue_script_module( '@wordpress/block-library/tabs' );
 
 	// Modify markup to include interactivity API attributes.
-	$p = new WP_HTML_Tag_Processor( $content );
+	$p        = new WP_HTML_Tag_Processor( $content );
+	$title_id = wp_unique_id( 'tablist-label-' );
 
 	while ( $p->next_tag() ) {
 		if ( $p->has_class( 'wp-block-tabs' ) ) {
@@ -45,7 +46,9 @@ function render_block_core_tabs( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-init', 'callbacks.init' );
 		}
 
-		if ( $p->has_class( 'wp-block-tabs__list' ) ) {
+		// Set a unique ID for the title, so it can be used by aria-labelledby.
+		if ( $p->has_class( 'wp-block-tabs__title' ) ) {
+			$p->set_attribute( 'id', $title_id );
 		}
 	}
 

@@ -17,8 +17,11 @@ export default function save( { attributes } ) {
 
 	return (
 		<div { ...blockProps }>
-			{ /* translators: Title for a list of content sections linked below. */ }
-			<h3 className="wp-block-tabs__title">{ __( 'Contents' ) }</h3>
+			<h3 className="wp-block-tabs__title">
+				{ /* translators: Title for a list of content sections linked below. */ }
+				{ __( 'Contents' ) }
+			</h3>
+
 			<ul className="wp-block-tabs__list">
 				{ innerTabs.map( ( tab, index ) => {
 					const tabId = tab.href.replace( '#', '' ) + '--tab';
