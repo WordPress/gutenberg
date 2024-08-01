@@ -186,7 +186,7 @@ function InspectorImagePreviewItem( {
 				as="span"
 				className="block-editor-global-styles-background-panel__inspector-preview-inner"
 			>
-				{ imgUrl && (
+				{ imgUrl ? (
 					<span
 						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
 						aria-hidden
@@ -197,6 +197,13 @@ function InspectorImagePreviewItem( {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
 						/>
+					</span>
+				) : (
+					<span
+						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
+						aria-hidden
+					>
+						<span className="component-color-indicator" />
 					</span>
 				) }
 				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
@@ -233,8 +240,7 @@ function BackgroundControlsPanel( {
 		return;
 	}
 
-	const imgLabel =
-		label || getFilename( imgUrl ) || __( 'Add background image' );
+	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
 
 	return (
 		<Dropdown
@@ -380,8 +386,7 @@ function BackgroundImageControls( {
 			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel =
-		title || getFilename( url ) || __( 'Add background image' );
+	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
 		<div
