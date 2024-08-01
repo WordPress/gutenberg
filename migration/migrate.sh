@@ -12,4 +12,5 @@ function apply() {
 
 apply await_render_calls
 apply replace_ariakit_test_import
+git checkout '*.native.*'
 npm run lint:js:fix -- packages/components
