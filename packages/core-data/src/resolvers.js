@@ -605,6 +605,10 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 		const variations = await apiFetch( {
 			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
 		} );
+		const variations2 = await apiFetch( {
+			path: `/wp/v2/global-styles/themes/twentytwentythree/variations`,
+		} );
+
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 			currentTheme.stylesheet,
 			variations
