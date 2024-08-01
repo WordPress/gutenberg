@@ -1,3 +1,8 @@
-:root :where(.wp-block-site-title a) {
-	color: inherit;
+.wp-block-site-title {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	:where(a) {
+		color: inherit;
+	}
 }

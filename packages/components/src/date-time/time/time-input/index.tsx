@@ -18,20 +18,20 @@ import {
 	HoursInput,
 	MinutesInput,
 	Fieldset,
-} from '../time/styles';
-import { HStack } from '../../h-stack';
-import Button from '../../button';
-import ButtonGroup from '../../button-group';
+} from '../styles';
+import { HStack } from '../../../h-stack';
+import Button from '../../../button';
+import ButtonGroup from '../../../button-group';
 import {
 	from12hTo24h,
 	from24hTo12h,
 	buildPadInputStateReducer,
 	validateInputElementTarget,
-} from '../utils';
-import type { TimeInputProps } from '../types';
-import type { InputChangeCallback } from '../../input-control/types';
-import { useControlledValue } from '../../utils';
-import BaseControl from '../../base-control';
+} from '../../utils';
+import type { TimeInputProps } from '../../types';
+import type { InputChangeCallback } from '../../../input-control/types';
+import { useControlledValue } from '../../../utils';
+import BaseControl from '../../../base-control';
 
 export function TimeInput( {
 	value: valueProp,

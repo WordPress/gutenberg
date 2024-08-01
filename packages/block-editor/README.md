@@ -1029,6 +1029,16 @@ _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
 
+### useStyleOverride
+
+Override a block editor settings style. Leave the ID blank to create a new style.
+
+_Parameters_
+
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
+
 ### useZoomOut
 
 A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
