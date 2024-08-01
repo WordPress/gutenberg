@@ -32,6 +32,7 @@
 	}
 
 	.components-range-control__mark {
+		transform: translateX(-50%);
 		height: $grid-unit-05;
 		width: math.div($grid-unit-05, 2);
 		background-color: $white;
