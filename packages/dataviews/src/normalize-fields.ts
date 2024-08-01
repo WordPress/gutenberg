@@ -30,12 +30,22 @@ export function normalizeFields< Item >(
 				);
 			};
 
+		const isValid =
+			field.isValid ??
+			function isValid( item, context ) {
+				return fieldTypeDefinition.isValid(
+					getValue( { item } ),
+					context
+				);
+			};
+
 		return {
 			...field,
 			label: field.label || field.id,
 			getValue,
 			render: field.render || getValue,
 			sort,
+			isValid,
 		};
 	} );
 }
