@@ -538,10 +538,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `.${ className }${
+										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
