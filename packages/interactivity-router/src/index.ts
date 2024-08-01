@@ -111,6 +111,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 const renderRegions = ( page: Page ) => {
 	batch( () => {
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			populateInitialData( page.initialData );
 			if ( navigationMode === 'fullPage' ) {
 				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
 				updateHead( page.head );
