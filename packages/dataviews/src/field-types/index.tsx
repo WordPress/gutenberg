@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { default as integer } from './integer';
 import type { FieldType, ValidationContext } from '../types';
+import { default as integer } from './integer';
 
 /**
  *
