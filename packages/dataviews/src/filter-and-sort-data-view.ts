@@ -140,10 +140,9 @@ export function filterSortAndPaginate< Item >(
 		} );
 		if ( fieldToSort ) {
 			filteredData.sort( ( a, b ) => {
-				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-
-				if ( fieldToSort.type === 'integer' ) {
+				if (
+					[ 'integer', 'text' ].includes( fieldToSort.type ?? '' )
+				) {
 					return fieldToSort.sort(
 						a,
 						b,
@@ -152,6 +151,8 @@ export function filterSortAndPaginate< Item >(
 				}
 
 				// When/if types become required, we can remove the following logic.
+				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
 				if (
 					typeof valueA === 'number' &&
 					typeof valueB === 'number'

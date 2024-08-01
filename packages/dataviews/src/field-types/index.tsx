@@ -3,6 +3,7 @@
  */
 import type { FieldType, ValidationContext } from '../types';
 import { default as integer } from './integer';
+import { default as text } from './text';
 
 /**
  *
@@ -13,6 +14,10 @@ import { default as integer } from './integer';
 export default function getFieldTypeDefinition( type?: FieldType ) {
 	if ( 'integer' === type ) {
 		return integer;
+	}
+
+	if ( 'text' === type ) {
+		return text;
 	}
 
 	return {
