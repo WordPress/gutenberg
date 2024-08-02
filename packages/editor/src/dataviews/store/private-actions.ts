@@ -94,5 +94,5 @@ export const registerPostTypeActions =
 			} );
 		} );
 
-		doAction( 'core.registerPostTypeActions', Promise.resolve(), postType );
+		doAction( 'core.registerPostTypeActions', postType );
 	};
