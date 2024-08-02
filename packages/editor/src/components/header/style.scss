@@ -24,24 +24,26 @@
 	}
 }
 
+// When there is no back button keeps the first child off the starting edge.
+.editor-header > :first-child:not(.editor-header__back-button) {
+	margin-inline-start: $grid-unit-20;
+}
+
+// At less than mobile the header’s `gap` is zero and whatever element follows the back button
+// needs a margin to keep the space between it and the back button. The margin is applied to a
+// child to allow the parent to collapse completely i.e. occupy no space.
+@media (max-width: #{$break-mobile - 1}) {
+	.editor-header__back-button + * > :first-child {
+		margin-inline-start: $grid-unit-20;
+	}
+}
+
 .editor-header__toolbar {
 	grid-column: 1 / 3;
-	// When there is no back button or the viewport is <= mobile the margin keeps the content off
-	// the starting edge.
-	> :first-child {
-		margin-inline: $grid-unit-20 0;
-	}
 
 	// This is the typical case, the back button takes up the first column.
 	.editor-header__back-button + & {
 		grid-column: 2 / 3;
-
-		@include break-mobile {
-			// Clears the margin; at this breakpoint the parent’s `gap` takes its place.
-			> :first-child {
-				margin-inline: 0;
-			}
-		}
 	}
 	display: flex;
 	// Make narrowing to less than content width possible. Block toolbar will hide overflow and allow scrolling on fixed toolbar.
@@ -73,6 +75,15 @@
 
 .editor-header__center {
 	grid-column: 3 / 4;
+	.editor-header__back-button + & {
+		grid-column-start: 2;
+	}
+	// This is the first child when in Distraction Free mode, without a back button and at less
+	// than medium breakpoint. Currently its applicable in the Post editor.
+	&:first-child {
+		grid-column-start: 1;
+		justify-content: start;
+	}
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -80,10 +91,13 @@
 	min-width: 0;
 	// Clip the box while leaving room for focus rings.
 	clip-path: inset(-2px);
-	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
-	// gap around the center’s contents.
+	// At less than mobile the header’s `gap` is zero so margins are added to keep a smaller
+	// space around __center’s contents. Applying the margin on children instead of the __center
+	// itself allows __center to collapse completely, i.e. to occupy no space.
 	@media (max-width: #{$break-mobile - 1}) {
-		> :first-child {
+		// The start side should only apply when the __center follows __toolbar. A case where it
+		// doesn’t is in the Post Editor with Distraction Free mode on at less than medium breakpoint.
+		.editor-header__toolbar + & > :first-child {
 			margin-inline-start: $grid-unit;
 		}
 		> :last-child {

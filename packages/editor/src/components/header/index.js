@@ -58,6 +58,7 @@ function Header( {
 		hasFixedToolbar,
 		isNestedEntity,
 		isZoomedOutView,
+		isDistractionFree,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -75,12 +76,15 @@ function Header( {
 			isNestedEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
 			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			isDistractionFree: getPreference( 'core', 'distractionFree' ),
 		};
 	}, [] );
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
+	const hasDocumentOrCollapsedBlockToolbars =
+		! isDistractionFree || isLargeViewport;
 	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 
@@ -97,21 +101,25 @@ function Header( {
 					<BackButton.Slot />
 				</motion.div>
 			) }
-			<motion.div
-				variants={ toolbarVariations }
-				className="editor-header__toolbar"
-				transition={ { type: 'tween' } }
-			>
-				<DocumentTools
-					disableBlockTools={ forceDisableBlockTools || isTextEditor }
-				/>
-				{ hasFixedToolbar && isLargeViewport && (
-					<CollapsibleBlockToolbar
-						isCollapsed={ isBlockToolsCollapsed }
-						onToggle={ setIsBlockToolsCollapsed }
+			{ hasDocumentOrCollapsedBlockToolbars && (
+				<motion.div
+					variants={ toolbarVariations }
+					className="editor-header__toolbar"
+					transition={ { type: 'tween' } }
+				>
+					<DocumentTools
+						disableBlockTools={
+							forceDisableBlockTools || isTextEditor
+						}
 					/>
-				) }
-			</motion.div>
+					{ hasFixedToolbar && isLargeViewport && (
+						<CollapsibleBlockToolbar
+							isCollapsed={ isBlockToolsCollapsed }
+							onToggle={ setIsBlockToolsCollapsed }
+						/>
+					) }
+				</motion.div>
+			) }
 			{ hasCenter && (
 				<motion.div
 					className="editor-header__center"
