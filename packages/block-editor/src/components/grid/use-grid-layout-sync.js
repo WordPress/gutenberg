@@ -11,6 +11,10 @@ import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
+const UNSET_GRID_ATTRIBUTES = {
+	style: { layout: { rowStart: undefined, columnStart: undefined } },
+};
+
 export function useGridLayoutSync( { clientId: gridClientId } ) {
 	const { gridLayout, blockOrder, selectedBlockLayout } = useSelect(
 		( select ) => {
@@ -40,6 +44,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	const previousIsManualPlacement = usePrevious(
 		gridLayout.isManualPlacement
 	);
+	const previousBlockOrder = usePrevious( blockOrder );
 
 	useEffect( () => {
 		const updates = {};
@@ -123,6 +128,14 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					},
 				};
 			}
+
+			// Unset the columnStart/rowStart attributes for blocks removed
+			// from the grid.
+			previousBlockOrder?.forEach( ( clientId ) => {
+				if ( ! blockOrder.includes( clientId ) ) {
+					updates[ clientId ] = UNSET_GRID_ATTRIBUTES;
+				}
+			} );
 		} else {
 			// Remove all of the columnStart and rowStart values
 			// when switching from manual to auto mode,
@@ -166,6 +179,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		// Actual deps to sync:
 		gridClientId,
 		gridLayout,
+		previousBlockOrder,
 		blockOrder,
 		previouslySelectedBlockRect,
 		previousIsManualPlacement,
