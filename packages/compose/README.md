@@ -450,6 +450,20 @@ _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
+### useNetworkConnectivity
+
+Returns the current network connectivity status provided by `window.navigator`.
+
+_Usage_
+
+```jsx
+const { isConnected } = useNetworkConnectivity();
+```
+
+_Returns_
+
+-   `NetworkInformation`: Network information.
+
 ### useObservableValue
 
 React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.

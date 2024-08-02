@@ -100,6 +100,7 @@ export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
 export { default as TimeToRead } from './time-to-read';
 export { default as CharacterCount } from './character-count';
+export { default as OfflineStatus } from './offline-status';
 
 // State Related Components.
 export { default as EditorProvider } from './provider';
