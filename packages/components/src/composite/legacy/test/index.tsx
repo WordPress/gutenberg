@@ -47,7 +47,7 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
 		const activeButton = queryByAttribute(
 			'data-active-item',
 			view.baseElement,
-			''
+			'true'
 		);
 		expect( activeButton ).not.toBeNull();
 	} );

@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { click, press, sleep, type, waitFor } from '@ariakit/test';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -85,7 +86,7 @@ const ControlledCustomSelectControl = ( {
 
 it( 'Should apply external controlled updates', async () => {
 	const mockOnChange = jest.fn();
-	const { rerender } = render(
+	const { rerender } = await render(
 		<UncontrolledCustomSelectControl
 			{ ...props }
 			value={ props.options[ 0 ] }
@@ -101,7 +102,7 @@ it( 'Should apply external controlled updates', async () => {
 
 	expect( mockOnChange ).not.toHaveBeenCalled();
 
-	rerender(
+	await rerender(
 		<UncontrolledCustomSelectControl
 			{ ...props }
 			value={ props.options[ 1 ] }
@@ -124,7 +125,7 @@ describe.each( [
 
 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
 		const mockOnChange = jest.fn();
-		render( <Component { ...props } onChange={ mockOnChange } /> );
+		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		expect(
 			screen.getByRole( 'combobox', {
@@ -140,7 +141,7 @@ describe.each( [
 
 	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
 		const mockOnChange = jest.fn();
-		render(
+		await render(
 			<Component
 				{ ...props }
 				onChange={ mockOnChange }
@@ -161,7 +162,7 @@ describe.each( [
 	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
-		render( <Component { ...props } /> );
+		await render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -189,7 +190,7 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-		render( <Component { ...props } /> );
+		await render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -217,7 +218,7 @@ describe.each( [
 	} );
 
 	it( 'Should apply class only to options that have a className defined', async () => {
-		render( <Component { ...props } /> );
+		await render( <Component { ...props } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -251,7 +252,7 @@ describe.each( [
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
-		render( <Component { ...props } /> );
+		await render( <Component { ...props } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -285,7 +286,7 @@ describe.each( [
 	} );
 
 	it( 'does not show selected hint by default', async () => {
-		render(
+		await render(
 			<Component
 				{ ...props }
 				label="Custom select"
@@ -306,7 +307,7 @@ describe.each( [
 	} );
 
 	it( 'shows selected hint when showSelectedHint is set', async () => {
-		render(
+		await render(
 			<Component
 				{ ...props }
 				label="Custom select"
@@ -331,7 +332,7 @@ describe.each( [
 	} );
 
 	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
-		render(
+		await render(
 			<Component
 				{ ...props }
 				label="Custom select"
@@ -355,7 +356,7 @@ describe.each( [
 	it( 'Should return object onChange', async () => {
 		const mockOnChange = jest.fn();
 
-		render( <Component { ...props } onChange={ mockOnChange } /> );
+		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -385,7 +386,7 @@ describe.each( [
 	it( 'Should return selectedItem object when specified onChange', async () => {
 		const mockOnChange = jest.fn();
 
-		render( <Component { ...props } onChange={ mockOnChange } /> );
+		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await sleep();
 		await press.Tab();
@@ -412,7 +413,7 @@ describe.each( [
 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
 		const onChangeMock = jest.fn();
 
-		render( <Component { ...props } onChange={ onChangeMock } /> );
+		await render( <Component { ...props } onChange={ onChangeMock } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -449,8 +450,8 @@ describe.each( [
 		);
 	} );
 
-	it( 'Should label the component correctly even when the label is not visible', () => {
-		render( <Component { ...props } hideLabelFromVision /> );
+	it( 'Should label the component correctly even when the label is not visible', async () => {
+		await render( <Component { ...props } hideLabelFromVision /> );
 
 		expect(
 			screen.getByRole( 'combobox', {
@@ -463,7 +464,7 @@ describe.each( [
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const onKeyDown = jest.fn();
 
-			render(
+			await render(
 				<div
 					// This role="none" is required to prevent an eslint warning about accessibility.
 					role="none"
@@ -487,7 +488,7 @@ describe.each( [
 		} );
 
 		it( 'Should be able to change selection using keyboard', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -513,7 +514,7 @@ describe.each( [
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -534,7 +535,7 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -564,7 +565,7 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -591,7 +592,7 @@ describe.each( [
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -646,7 +647,7 @@ describe.each( [
 			const onFocusMock = jest.fn();
 			const onBlurMock = jest.fn();
 
-			render(
+			await render(
 				<>
 					<Component
 						{ ...props }
@@ -674,7 +675,7 @@ describe.each( [
 		it( 'should render the describedBy text when specified', async () => {
 			const describedByText = 'My description.';
 
-			render(
+			await render(
 				<Component { ...props } describedBy={ describedByText } />
 			);
 
@@ -684,7 +685,7 @@ describe.each( [
 		} );
 
 		it( 'should render the default ARIA description when describedBy is not specified', async () => {
-			render( <Component { ...props } /> );
+			await render( <Component { ...props } /> );
 
 			expect(
 				screen.getByRole( 'combobox' )

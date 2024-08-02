@@ -1,8 +1,9 @@
 /**
  * Internal dependencies
  */
+import type { FieldType, SortDirection, ValidationContext } from '../types';
 import { default as integer } from './integer';
-import type { FieldType } from '../types';
+import { default as text } from './text';
 
 /**
  *
@@ -15,8 +16,30 @@ export default function getFieldTypeDefinition( type?: FieldType ) {
 		return integer;
 	}
 
-	// If no type found, the sort function doesn't do anything.
+	if ( 'text' === type ) {
+		return text;
+	}
+
 	return {
-		sort: () => 0,
+		sort: ( a: any, b: any, direction: SortDirection ) => {
+			if ( typeof a === 'number' && typeof b === 'number' ) {
+				return direction === 'asc' ? a - b : b - a;
+			}
+
+			return direction === 'asc'
+				? a.localeCompare( b )
+				: b.localeCompare( a );
+		},
+		isValid: ( value: any, context?: ValidationContext ) => {
+			if ( context?.elements ) {
+				const validValues = context?.elements?.map( ( f ) => f.value );
+				if ( ! validValues.includes( value ) ) {
+					return false;
+				}
+			}
+
+			return true;
+		},
+		Edit: () => null,
 	};
 }
