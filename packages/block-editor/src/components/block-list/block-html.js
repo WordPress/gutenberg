@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { TextareaControl } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -68,11 +64,12 @@ function BlockHTML( { clientId } ) {
 	}, [ block ] );
 
 	return (
-		<TextareaAutosize
+		<TextareaControl
 			className="block-editor-block-list__block-html-textarea"
 			value={ html }
 			onBlur={ onChange }
-			onChange={ ( event ) => setHtml( event.target.value ) }
+			onChange={ setHtml }
+			__nextHasNoMarginBottom
 		/>
 	);
 }

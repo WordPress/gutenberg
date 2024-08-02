@@ -422,7 +422,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.block-editor-block-list__block .block-editor-block-list__block-html-textarea {
+.block-editor-block-list__block .block-editor-block-list__block-html-textarea textarea {
 	display: block;
 	margin: 0;
 	padding: $grid-unit-15;
@@ -432,6 +432,8 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	border-radius: 2px;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
+	/* stylelint-disable-next-line property-no-unknown -- TODO: Update stylelint to support a fresh list of https://github.com/known-css/known-css-properties */
+	field-sizing: content;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
