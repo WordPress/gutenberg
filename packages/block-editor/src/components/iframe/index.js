@@ -13,7 +13,6 @@ import {
 	useMemo,
 	useEffect,
 	useRef,
-	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -215,84 +214,13 @@ function Iframe( {
 	}, [] );
 
 	const isZoomedOut = scale !== 1;
-	const shouldScaleToDefault = scale === 'default';
-
-	const refZoomOutStatus = useRef( {
-		priorContainerWidth: null,
-		scale: null,
-		timerId: -1,
-		effect: null,
-	} );
-
-	const actualizeZoom = useCallback(
-		( nextScale, inset ) => {
-			if ( ! iframeDocument ) {
-				return;
-			}
-			const { documentElement, defaultView } = iframeDocument;
-			if ( nextScale < 1 ) {
-				documentElement.classList.add( 'is-zoomed-out' );
-				defaultView.frameElement.style.setProperty(
-					'--wp-block-editor-iframe-zoom-out-scale',
-					nextScale
-				);
-				defaultView.frameElement.style.setProperty(
-					'--wp-block-editor-iframe-zoom-out-inset',
-					inset
-				);
-			} else {
-				documentElement.classList.remove( 'is-zoomed-out' );
-				defaultView.frameElement.style.removeProperty(
-					'--wp-block-editor-iframe-zoom-out-scale'
-				);
-				defaultView.frameElement.style.removeProperty(
-					'--wp-block-editor-iframe-zoom-out-inset'
-				);
-			}
-		},
-		[ iframeDocument ]
-	);
-
-	useEffect(
-		() => {
-			if ( ! shouldScaleToDefault ) {
-				actualizeZoom( scale, frameSize );
-				return;
-			}
-			refZoomOutStatus.current.priorContainerWidth = containerWidth;
-			// Derives the scaling factor for 'default' scale as containerWidth changes
-			// yet leaves it constant after the container’s automated resize completes.
-			// This is so that container width changes caused by a user action like
-			// browser window resizing should not change the scale.
-			refZoomOutStatus.current.effect = ( isActive, nextWidth ) => {
-				if ( isActive ) {
-					const { priorContainerWidth } = refZoomOutStatus.current;
-					const frameInlineWidth = frameSize * 2;
-					nextWidth -= frameInlineWidth;
-					const maxWidth = ZOOM_OUT_MAX_WIDTH - frameInlineWidth;
-					const nextScale =
-						Math.min( maxWidth, nextWidth ) / priorContainerWidth;
-					actualizeZoom( nextScale, `${ frameSize }px` );
-					clearTimeout( refZoomOutStatus.current.timerId );
-					refZoomOutStatus.current.timerId = setTimeout( () => {
-						refZoomOutStatus.current.effect = null;
-					}, 250 );
-				} else {
-					clearTimeout( refZoomOutStatus.current.timerId );
-				}
-			};
-		},
-		// containerWidth is purposely omitted to memoize its value once
-		// "default" scaling begins.
-		[ actualizeZoom, frameSize, isZoomedOut, scale, shouldScaleToDefault ]
-	);
+	const priorContainerWidth = useRef();
 
 	useEffect( () => {
-		refZoomOutStatus.current.effect?.(
-			shouldScaleToDefault,
-			containerWidth
-		);
-	}, [ containerWidth, shouldScaleToDefault ] );
+		if ( ! isZoomedOut ) {
+			priorContainerWidth.current = containerWidth;
+		}
+	}, [ containerWidth, isZoomedOut ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
@@ -327,6 +255,38 @@ function Iframe( {
 	}, [ html ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
+
+	useEffect( () => {
+		if ( ! iframeDocument || ! isZoomedOut ) {
+			return;
+		}
+		const frameInlineWidth = frameSize * 2;
+		const nextWidth = containerWidth - frameInlineWidth;
+		const maxWidth = ZOOM_OUT_MAX_WIDTH - frameInlineWidth;
+		const nextScale =
+			Math.min( maxWidth, nextWidth ) / priorContainerWidth.current;
+		const { documentElement, defaultView } = iframeDocument;
+
+		documentElement.classList.add( 'is-zoomed-out' );
+		defaultView.frameElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			Math.min( nextScale, 1 )
+		);
+		defaultView.frameElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-inset',
+			`${ frameSize }px`
+		);
+
+		return () => {
+			documentElement.classList.remove( 'is-zoomed-out' );
+			defaultView.frameElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			defaultView.frameElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inset'
+			);
+		};
+	}, [ containerWidth, frameSize, iframeDocument, isZoomedOut ] );
 
 	const { marginLeft, marginRight, ...styleWithoutInlineMargins } =
 		props.style || {};
