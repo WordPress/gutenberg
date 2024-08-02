@@ -1684,7 +1684,7 @@ export const __unstableSetEditorMode =
 					const sectionClientIds =
 						select.getBlockOrder( sectionRootClientId );
 
-					// If the selected block is a section block, use it
+					// If the selected block is a section block, use it.
 					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
 						sectionClientId = firstSelectedClientId;
 					} else {
