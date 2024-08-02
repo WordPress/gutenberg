@@ -11,6 +11,18 @@ import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
+/**
+ * Returns an attributes 'update' object for unsetting columnStart and rowStart
+ * `styles.layout` attributes.
+ *
+ * Will return `undefined` when the attributes are already not set indicating
+ * there's nothing to do.
+ *
+ * @param {Object} attributes The current block attributes.
+ *
+ * @return {undefined|Object} The attribute updates or `undefined` when the
+ *                            attribute are already not set.
+ */
 function unsetGridPositionAttributes( attributes ) {
 	const { columnStart, rowStart, ...layout } = attributes.style?.layout ?? {};
 	// Only update attributes if columnStart or rowStart are set.
