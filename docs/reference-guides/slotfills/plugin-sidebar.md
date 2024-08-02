@@ -7,7 +7,7 @@ Using this slot will add an icon to the toolbar that, when clicked, opens a pane
 
 ```jsx
 import { __ } from '@wordpress/i18n';
-import { PluginSidebar } from '@wordpress/edit-post';
+import { PluginSidebar } from '@wordpress/editor';
 import {
 	PanelBody,
 	Button,
