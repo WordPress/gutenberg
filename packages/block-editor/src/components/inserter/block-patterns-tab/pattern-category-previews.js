@@ -16,9 +16,10 @@ import {
 	__experimentalText as Text,
 	FormToggle,
 	VisuallyHidden,
+	Tooltip,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Icon, fullscreen } from '@wordpress/icons';
+import { Icon, aspectRatio } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -139,6 +140,8 @@ export function PatternCategoryPreviews( {
 		[ setPatternSourceFilter, changePage ]
 	);
 
+	const zoomOutLabel = __( 'Zoom out' );
+
 	return (
 		<>
 			<VStack
@@ -146,21 +149,23 @@ export function PatternCategoryPreviews( {
 				className="block-editor-inserter__patterns-category-panel-header"
 			>
 				<HStack>
-					<HStack as="label" expanded={ false }>
-						<FormToggle
-							onChange={ () => {
-								if ( isZoomOut ) {
-									// TODO: We should set it back to what it was, not to edit.
-									__unstableSetEditorMode( 'edit' );
-								} else {
-									__unstableSetEditorMode( 'zoom-out' );
-								}
-							} }
-							checked={ isZoomOut }
-						/>
-						<VisuallyHidden>Full Screen View</VisuallyHidden>
-						<Icon icon={ fullscreen } size="24" />
-					</HStack>
+					<Tooltip text={ zoomOutLabel }>
+						<HStack as="label" expanded={ false }>
+							<FormToggle
+								onChange={ () => {
+									if ( isZoomOut ) {
+										// TODO: We should set it back to what it was, not to edit.
+										__unstableSetEditorMode( 'edit' );
+									} else {
+										__unstableSetEditorMode( 'zoom-out' );
+									}
+								} }
+								checked={ isZoomOut }
+							/>
+							<VisuallyHidden>{ zoomOutLabel }</VisuallyHidden>
+							<Icon icon={ aspectRatio } size="24" />
+						</HStack>
+					</Tooltip>
 					<PatternsFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
