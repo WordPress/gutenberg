@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
+import { CustomSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,21 +25,21 @@ export default function FontFamilyControl( {
 	}
 
 	const options = [
-		{ value: '', label: __( 'Default' ) },
+		{ key: '', name: __( 'Default' ) },
 		...fontFamilies.map( ( { fontFamily, name } ) => {
 			return {
-				value: fontFamily,
-				label: name || fontFamily,
+				key: fontFamily,
+				name: name || fontFamily,
 			};
 		} ),
 	];
+
 	return (
-		<SelectControl
+		<CustomSelectControl
 			label={ __( 'Font' ) }
 			options={ options }
-			value={ value }
-			onChange={ onChange }
-			labelPosition="top"
+			value={ options.find( ( { key } ) => key === value ) }
+			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }
 			{ ...props }
 		/>
 	);
