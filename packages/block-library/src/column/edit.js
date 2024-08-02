@@ -61,8 +61,7 @@ function ColumnEdit( {
 		hasChildBlocks,
 		rootClientId,
 		isParentSelected,
-		// Use this condition.
-		// areAllColumnsEmpty,
+		areAllColumnsEmpty,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -122,7 +121,8 @@ function ColumnEdit( {
 			templateLock,
 			allowedBlocks,
 			renderAppender:
-				hasChildBlocks || ! ( isParentSelected || isSelected )
+				( hasChildBlocks || ! ( isParentSelected || isSelected ) ) &&
+				! areAllColumnsEmpty
 					? undefined
 					: InnerBlocks.ButtonBlockAppender,
 		}
