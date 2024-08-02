@@ -127,22 +127,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		},
 	];
 
-	/**
-	 * The selected choice.
-	 *
-	 * @type {Object}
-	 */
 	const previewValue = editorMode === 'zoom-out' ? 'ZoomOut' : deviceType;
-	let selectedChoice = choices.find(
-		( choice ) => choice.value === previewValue
-	);
-
-	/**
-	 * If no selected choice is found, default to the first
-	 */
-	if ( ! selectedChoice ) {
-		selectedChoice = choices[ 0 ];
-	}
 
 	/**
 	 * Handles the selection of a device type.
@@ -150,20 +135,20 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 * @param {string} value The device type.
 	 */
 	const onSelect = ( value ) => {
-		setDeviceType( value );
 		let newEditorMode = originalEditingMode.current;
+
 		if ( value === 'ZoomOut' ) {
 			newEditorMode = 'zoom-out';
+			setDeviceType( 'Desktop' );
+		} else {
+			setDeviceType( value );
 		}
 
 		__unstableSetEditorMode( newEditorMode );
 	};
 
 	const getText = () => {
-		if (
-			deviceType === 'ZoomOut' ||
-			editorMode === 'zoom-out' // This can happen if zoom out is enabled from by other means - like the patterns tab.
-		) {
+		if ( editorMode === 'zoom-out' ) {
 			return __( '50%' );
 		}
 
@@ -193,7 +178,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 					<MenuGroup>
 						<MenuItemsChoice
 							choices={ choices }
-							value={ selectedChoice.value }
+							value={ previewValue }
 							onSelect={ onSelect }
 						/>
 					</MenuGroup>
