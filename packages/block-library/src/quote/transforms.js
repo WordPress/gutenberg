@@ -9,10 +9,18 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation, anchor, fontSize, style } ) => {
+			transform: ( {
+				value,
+				align,
+				citation,
+				anchor,
+				fontSize,
+				style,
+			} ) => {
 				return createBlock(
 					'core/quote',
 					{
+						align,
 						citation,
 						anchor,
 						fontSize,
