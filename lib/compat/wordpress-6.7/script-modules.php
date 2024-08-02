@@ -99,5 +99,6 @@ add_action(
 		if ( ! has_action( 'admin_print_footer_scripts', array( wp_script_modules(), 'print_script_module_data' ) ) ) {
 			add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_data' );
 		}
-	}
+	},
+	20
 );
