@@ -47,7 +47,7 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Record< string, unknown >;
+export type ItemRecord = Object;
 
 export type FieldType = 'text' | 'integer';
 
@@ -423,6 +423,12 @@ interface ActionBase< Item > {
 	supportsBulk?: boolean;
 }
 
+export interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
 export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
@@ -431,11 +437,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 		items,
 		closeModal,
 		onActionPerformed,
-	}: {
-		items: Item[];
-		closeModal?: () => void;
-		onActionPerformed?: ( items: Item[] ) => void;
-	} ) => ReactElement;
+	}: RenderModalProps< Item > ) => ReactElement;
 
 	/**
 	 * Whether to hide the modal header.

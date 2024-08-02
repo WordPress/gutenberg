@@ -27,6 +27,10 @@ export interface Pattern extends BasePost {
 	wp_pattern_sync_status: string;
 }
 
+export interface PostWithPageAttributesSupport extends BasePost {
+	menu_order: number;
+}
+
 export type Post = TemplateOrTemplatePart | Pattern | BasePost;
 
 export type PostWithPermissions = Post & {
@@ -38,6 +42,9 @@ export type PostWithPermissions = Post & {
 
 export interface PostType {
 	slug: string;
+	supports?: {
+		'page-attributes'?: boolean;
+	};
 }
 
 // Will be unnecessary after typescript 5.0 upgrade.
