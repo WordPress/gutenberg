@@ -61,9 +61,19 @@
 			padding: 0 0 $grid-unit-15;
 		}
 
+		.dataviews-view-grid__field-value:not(:empty) {
+			min-height: $grid-unit-30;
+			line-height: $grid-unit-05 * 5;
+			padding-top: math.div($grid-unit-05, 2);
+		}
+
 		.dataviews-view-grid__field {
 			align-items: flex-start;
 			min-height: $grid-unit-30;
+
+			&:not(:has(.dataviews-view-grid__field-value:not(:empty))) {
+				display: none;
+			}
 
 			&:not(.is-column) {
 				align-items: center;

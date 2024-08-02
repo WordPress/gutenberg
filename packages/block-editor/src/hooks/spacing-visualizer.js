@@ -14,7 +14,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * Internal dependencies
  */
 import BlockPopoverCover from '../components/block-popover/cover';
-import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 	const blockElement = useBlockElement( clientId );

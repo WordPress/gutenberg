@@ -235,13 +235,21 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Author' ),
 				id: 'author',
-				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				type: 'integer',
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
 						label: name,
 					} ) ) || [],
 				render: PostAuthorField,
+				sort: ( a, b, direction ) => {
+					const nameA = a._embedded?.author?.[ 0 ]?.name || '';
+					const nameB = b._embedded?.author?.[ 0 ]?.name || '';
+
+					return direction === 'asc'
+						? nameA.localeCompare( nameB )
+						: nameB.localeCompare( nameA );
+				},
 			},
 			{
 				label: __( 'Status' ),
@@ -292,7 +300,22 @@ function usePostFields( viewType ) {
 						);
 					}
 
-					// Pending & Published posts show the modified date if it's newer.
+					const isPublished = item.status === 'publish';
+					if ( isPublished ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation time */
+								__( '<span>Published: <time>%s</time></span>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					// Pending posts show the modified date if it's newer.
 					const dateToDisplay =
 						getDate( item.modified ) > getDate( item.date )
 							? item.modified
@@ -304,21 +327,6 @@ function usePostFields( viewType ) {
 							sprintf(
 								/* translators: %s: the newest of created or modified date for the page */
 								__( '<span>Modified: <time>%s</time></span>' ),
-								getFormattedDate( dateToDisplay )
-							),
-							{
-								span: <span />,
-								time: <time />,
-							}
-						);
-					}
-
-					const isPublished = item.status === 'publish';
-					if ( isPublished ) {
-						return createInterpolateElement(
-							sprintf(
-								/* translators: %s: the newest of created or modified date for the page */
-								__( '<span>Published: <time>%s</time></span>' ),
 								getFormattedDate( dateToDisplay )
 							),
 							{
