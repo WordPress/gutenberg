@@ -40,7 +40,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { link, linkOff } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import {
 	createBlock,
 	cloneBlock,
@@ -176,9 +176,6 @@ function ButtonEdit( props ) {
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
 			startEditing( event );
-		} else if ( isKeyboardEvent.primaryShift( event, 'k' ) ) {
-			unlink();
-			richTextRef.current?.focus();
 		}
 	}
 
@@ -243,7 +240,6 @@ function ButtonEdit( props ) {
 			const blockBindingsSource = unlock(
 				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
-
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
@@ -254,7 +250,7 @@ function ButtonEdit( props ) {
 					} ),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ clientId, isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -311,66 +307,53 @@ function ButtonEdit( props ) {
 						} }
 					/>
 				) }
-				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
+				{ isLinkTag && ! lockUrlControls && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ startEditing }
-					/>
-				) }
-				{ isURLSet && isLinkTag && ! lockUrlControls && (
-					<ToolbarButton
-						name="link"
-						icon={ linkOff }
-						title={ __( 'Unlink' ) }
-						shortcut={ displayShortcut.primaryShift( 'k' ) }
-						onClick={ unlink }
-						isActive
+						onClick={ () => setIsEditingURL( ! isEditingURL ) }
 					/>
 				) }
 			</BlockControls>
-			{ isLinkTag &&
-				isSelected &&
-				( isEditingURL || isURLSet ) &&
-				! lockUrlControls && (
-					<Popover
-						placement="bottom"
-						onClose={ () => {
-							setIsEditingURL( false );
+			{ isLinkTag && isSelected && isEditingURL && ! lockUrlControls && (
+				<Popover
+					placement="bottom"
+					onClose={ () => {
+						setIsEditingURL( false );
+						richTextRef.current?.focus();
+					} }
+					anchor={ popoverAnchor }
+					focusOnMount={ isEditingURL ? 'firstElement' : false }
+					__unstableSlotName="__unstable-block-tools-after"
+					shift
+				>
+					<LinkControl
+						value={ linkValue }
+						onChange={ ( {
+							url: newURL,
+							opensInNewTab: newOpensInNewTab,
+							nofollow: newNofollow,
+						} ) =>
+							setAttributes(
+								getUpdatedLinkAttributes( {
+									rel,
+									url: newURL,
+									opensInNewTab: newOpensInNewTab,
+									nofollow: newNofollow,
+								} )
+							)
+						}
+						onRemove={ () => {
+							unlink();
 							richTextRef.current?.focus();
 						} }
-						anchor={ popoverAnchor }
-						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName="__unstable-block-tools-after"
-						shift
-					>
-						<LinkControl
-							value={ linkValue }
-							onChange={ ( {
-								url: newURL,
-								opensInNewTab: newOpensInNewTab,
-								nofollow: newNofollow,
-							} ) =>
-								setAttributes(
-									getUpdatedLinkAttributes( {
-										rel,
-										url: newURL,
-										opensInNewTab: newOpensInNewTab,
-										nofollow: newNofollow,
-									} )
-								)
-							}
-							onRemove={ () => {
-								unlink();
-								richTextRef.current?.focus();
-							} }
-							forceIsEditingLink={ isEditingURL }
-							settings={ LINK_SETTINGS }
-						/>
-					</Popover>
-				) }
+						forceIsEditingLink={ ! isURLSet }
+						settings={ LINK_SETTINGS }
+					/>
+				</Popover>
+			) }
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }
