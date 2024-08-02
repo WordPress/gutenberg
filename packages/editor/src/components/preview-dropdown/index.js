@@ -16,7 +16,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { mobile, tablet, external, chevronDownSmall } from '@wordpress/icons';
+import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -95,6 +95,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const deviceIcons = {
+		desktop,
 		mobile,
 		tablet,
 	};
@@ -107,13 +108,13 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const choices = [
 		{
 			value: 'Desktop',
-			label: __( 'Zoom to 100%' ),
-			icon: <>{ __( '100%' ) }</>,
+			label: __( 'Desktop' ),
+			icon: desktop,
 		},
 		{
 			value: 'ZoomOut',
-			label: __( 'Zoom to 50%' ),
-			icon: <>{ __( '50%' ) }</>,
+			label: __( 'Desktop (50%)' ),
+			icon: desktop,
 		},
 		{
 			value: 'Tablet',
@@ -147,18 +148,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		__unstableSetEditorMode( newEditorMode );
 	};
 
-	const getText = () => {
-		if ( editorMode === 'zoom-out' ) {
-			return __( '50%' );
-		}
-
-		if ( deviceType === 'Desktop' ) {
-			return __( '100%' );
-		}
-
-		return <Icon icon={ deviceIcons[ deviceType.toLowerCase() ] } />;
-	};
-
 	return (
 		<DropdownMenu
 			className={ clsx(
@@ -168,8 +157,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
-			icon={ chevronDownSmall }
-			text={ getText() }
+			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			text={ editorMode === 'zoom-out' ? __( '50%' ) : undefined }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>

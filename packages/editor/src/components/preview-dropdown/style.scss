@@ -1,14 +1,6 @@
 .editor-preview-dropdown .editor-preview-dropdown__toggle.has-icon.has-text {
-	padding-right: $grid-unit-05 * 0.5;
-	gap: 0;
-}
-
-.editor-preview-dropdown--mobile,
-.editor-preview-dropdown--tablet {
-	.editor-preview-dropdown__toggle.has-icon.has-text {
-		gap: 0;
-		padding-left: $grid-unit-05;
-	}
+	padding-right: 4px;
+	padding-left: 6px;
 }
 
 .editor-preview-dropdown__button-external {
