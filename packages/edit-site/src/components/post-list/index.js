@@ -26,7 +26,6 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 	LAYOUT_LIST,
-	LAYOUT_TABLE,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
@@ -97,13 +96,13 @@ function useView( postType ) {
 		if ( isCustom === 'true' ) {
 			return (
 				getCustomView( editedEntityRecord ) ?? {
-					type: layout ?? LAYOUT_TABLE,
+					type: layout ?? LAYOUT_LIST,
 				}
 			);
 		}
 		return (
 			getDefaultView( defaultViews, activeView ) ?? {
-				type: layout ?? LAYOUT_TABLE,
+				type: layout ?? LAYOUT_LIST,
 			}
 		);
 	} );
@@ -132,13 +131,16 @@ function useView( postType ) {
 				);
 			}
 		},
-		[ history, isCustom, editedEntityRecord?.id ]
+		[ history, isCustom, editEntityRecord, editedEntityRecord?.id ]
 	);
 
 	// When layout URL param changes, update the view type
 	// without affecting any other config.
 	useEffect( () => {
-		setView( ( prevView ) => ( { ...prevView, type: layout } ) );
+		setView( ( prevView ) => ( {
+			...prevView,
+			type: layout ?? LAYOUT_LIST,
+		} ) );
 	}, [ layout ] );
 
 	// When activeView or isCustom URL parameters change,
@@ -156,7 +158,7 @@ function useView( postType ) {
 		}
 	}, [ activeView, isCustom, defaultViews, editedEntityRecord ] );
 
-	return [ view, setViewWithUrlUpdate ];
+	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
 }
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
