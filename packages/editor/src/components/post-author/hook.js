@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -58,7 +59,7 @@ export function useAuthorsQuery( search ) {
 			currentAuthor = [
 				{
 					value: 0,
-					label: '',
+					label: __( '(No author)' ),
 				},
 			];
 		}
