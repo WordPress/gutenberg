@@ -124,8 +124,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 			}
 		} else {
-			// When in switching from manual to auto mode,
-			// remove all of the columnStart and rowStart values.
+			// Remove all of the columnStart and rowStart values
+			// when switching from manual to auto mode,
 			if ( previousIsManualPlacement === true ) {
 				for ( const clientId of blockOrder ) {
 					const attributes = getBlockAttributes( clientId );
