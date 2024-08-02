@@ -125,7 +125,9 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_meta_fields' ) ) 
 			'meta',
 			array(
 				'get_callback' => function ( $item ) {
-					return get_registered_meta_keys( $item['slug'] );
+					$default_fields = get_registered_meta_keys( 'post' );
+					$post_type_fields = get_registered_meta_keys( 'post', $item['slug'] );
+					return array_merge( $default_fields, $post_type_fields );
 				},
 				'schema'       => array(
 					'type'        => 'array',
