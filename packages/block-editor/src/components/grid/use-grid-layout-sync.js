@@ -11,9 +11,18 @@ import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
-const UNSET_GRID_ATTRIBUTES = {
-	style: { layout: { rowStart: undefined, columnStart: undefined } },
-};
+function unsetGridPositionAttributes( attributes ) {
+	const { columnStart, rowStart, ...layout } = attributes.style?.layout ?? {};
+	// Only update attributes if columnStart or rowStart are set.
+	if ( columnStart || rowStart ) {
+		return {
+			style: {
+				...attributes.style,
+				layout,
+			},
+		};
+	}
+}
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
 	const { gridLayout, blockOrder, selectedBlockLayout } = useSelect(
@@ -133,7 +142,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			// from the grid.
 			previousBlockOrder?.forEach( ( clientId ) => {
 				if ( ! blockOrder.includes( clientId ) ) {
-					updates[ clientId ] = UNSET_GRID_ATTRIBUTES;
+					const attributes = getBlockAttributes( clientId );
+					const update = unsetGridPositionAttributes( attributes );
+					if ( update ) {
+						updates[ clientId ] = update;
+					}
 				}
 			} );
 		} else {
@@ -142,16 +155,9 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			if ( previousIsManualPlacement === true ) {
 				for ( const clientId of blockOrder ) {
 					const attributes = getBlockAttributes( clientId );
-					const { columnStart, rowStart, ...layout } =
-						attributes.style?.layout ?? {};
-					// Only update attributes if columnStart or rowStart are set.
-					if ( columnStart || rowStart ) {
-						updates[ clientId ] = {
-							style: {
-								...attributes.style,
-								layout,
-							},
-						};
+					const update = unsetGridPositionAttributes( attributes );
+					if ( update ) {
+						updates[ clientId ] = update;
 					}
 				}
 			}
