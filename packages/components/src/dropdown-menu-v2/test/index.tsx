@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { screen, waitFor } from '@testing-library/react';
+// eslint-disable-next-line no-restricted-imports
+import { screen, waitFor, render as renderSync } from '@testing-library/react';
 import { render } from '@ariakit/test/react';
 import { press, click, hover, type } from '@ariakit/test';
 
@@ -326,7 +327,9 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
-			await render(
+			// TODO: temporarily using the sync version of render until we figure out why it fails when async
+			// see: https://github.com/WordPress/gutenberg/pull/64180
+			renderSync(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -352,7 +355,9 @@ describe( 'DropdownMenu', () => {
 			);
 
 			// The menu is focused automatically when `defaultOpen` is set.
-			expect( await screen.findByRole( 'menu' ) ).toHaveFocus();
+			await waitFor( () =>
+				expect( screen.getByRole( 'menu' ) ).toHaveFocus()
+			);
 
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa

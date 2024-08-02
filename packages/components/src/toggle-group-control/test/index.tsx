@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { screen, waitFor } from '@testing-library/react';
+// eslint-disable-next-line no-restricted-imports
+import { screen, waitFor, render as renderSync } from '@testing-library/react';
 import { render } from '@ariakit/test/react';
 import { press, click, hover, sleep } from '@ariakit/test';
 
@@ -104,7 +105,9 @@ describe.each( [
 	describe( 'should render correctly', () => {
 		it( 'with text options', async () => {
 			const container = createContainer();
-			await render(
+			// TODO: temporarily using the sync version of render until we figure what to do with these snapshots
+			// see: https://github.com/WordPress/gutenberg/pull/64180
+			renderSync(
 				<Component label="Test Toggle Group Control">
 					{ options }
 				</Component>,
@@ -116,7 +119,9 @@ describe.each( [
 
 		it( 'with icons', async () => {
 			const container = createContainer();
-			await render(
+			// TODO: temporarily using the sync version of render until we figure what to do with these snapshots
+			// see: https://github.com/WordPress/gutenberg/pull/64180
+			renderSync(
 				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
