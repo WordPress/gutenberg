@@ -3,7 +3,7 @@
  */
 import { screen, waitFor } from '@testing-library/react';
 import { render } from '@ariakit/test/react';
-import { press, hover, click, sleep } from '@ariakit/test';
+import { press, hover, click } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -156,7 +156,6 @@ describe.each( [
 			// Tab to focus the tablist. Make sure alpha is focused, and that the
 			// corresponding tooltip is shown.
 			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
-			await sleep();
 			await press.Tab();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
@@ -628,7 +627,6 @@ describe.each( [
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -666,7 +664,6 @@ describe.each( [
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -704,7 +701,6 @@ describe.each( [
 			// Tab to focus the tablist. Make sure alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 
@@ -800,7 +796,6 @@ describe.each( [
 			// Tab to focus the tablist. Make sure Alpha is focused.
 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 			expect( await getSelectedTab() ).not.toHaveFocus();
-			await sleep();
 			await press.Tab();
 			expect( await getSelectedTab() ).toHaveFocus();
 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
@@ -844,7 +839,6 @@ describe.each( [
 
 			// Tab should initially focus the first tab in the tablist, which
 			// is Alpha.
-			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Alpha' } )
@@ -852,7 +846,6 @@ describe.each( [
 
 			// Because all other tabs should have `tabindex=-1`, pressing Tab
 			// should NOT move the focus to the next tab, which is Beta.
-			await sleep();
 			await press.Tab();
 			expect(
 				await screen.findByRole( 'tab', { name: 'Beta' } )

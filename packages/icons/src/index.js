@@ -225,6 +225,7 @@ export { default as search } from './library/search';
 export { default as seen } from './library/seen';
 export { default as unseen } from './library/unseen';
 export { default as scheduled } from './library/scheduled';
+export { default as send } from './library/send';
 export { default as separator } from './library/separator';
 export { default as settings } from './library/settings';
 export { default as shadow } from './library/shadow';

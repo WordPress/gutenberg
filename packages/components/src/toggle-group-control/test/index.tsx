@@ -352,11 +352,9 @@ describe.each( [
 					name: 'R',
 				} );
 
-				await sleep();
 				await press.Tab();
 				expect( rigas ).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 
 				// When in controlled mode, there is an additional "Reset" button.
@@ -383,7 +381,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(
@@ -459,7 +456,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -468,7 +464,6 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
-				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -501,7 +496,6 @@ describe.each( [
 					</Component>
 				);
 
-				await sleep();
 				await press.Tab();
 
 				expect(
