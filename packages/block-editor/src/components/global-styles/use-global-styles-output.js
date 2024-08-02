@@ -381,21 +381,40 @@ export function getStylesDeclarations(
 	);
 
 	/*
-	 * Set background defaults.
-	 * Applies to all background styles except the top-level site background.
+	 * Preprocess background image values.
+	 *
+	 * Note: As we absorb more and more styles into the engine, we could simplify this function.
+	 * A refactor is for the style engine to handle ref resolution (and possibly defaults)
+	 * via a public util used internally and externally. Theme.json tree and defaults could be passed
+	 * as options.
 	 */
-	if ( ! isRoot && !! blockStyles.background ) {
-		blockStyles = {
-			...blockStyles,
-			background: {
-				...blockStyles.background,
-				...setBackgroundStyleDefaults( blockStyles.background ),
-			},
-		};
+	if ( !! blockStyles.background ) {
+		/*
+		 * Resolve dynamic values before they are compiled by the style engine,
+		 * which doesn't (yet) resolve dynamic values.
+		 */
+		if ( blockStyles.background?.backgroundImage ) {
+			blockStyles.background.backgroundImage = getResolvedValue(
+				blockStyles.background.backgroundImage,
+				tree
+			);
+		}
+
+		/*
+		 * Set default values for block background styles.
+		 * Top-level styles are an exception as they are applied to the body.
+		 */
+		if ( ! isRoot ) {
+			blockStyles = {
+				...blockStyles,
+				background: {
+					...blockStyles.background,
+					...setBackgroundStyleDefaults( blockStyles.background ),
+				},
+			};
+		}
 	}
 
-	// The goal is to move everything to server side generated engine styles
-	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
