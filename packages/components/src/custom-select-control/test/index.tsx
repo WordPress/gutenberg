@@ -196,7 +196,6 @@ describe.each( [
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		await press.Enter();
 		expect(
@@ -388,7 +387,6 @@ describe.each( [
 
 		await render( <Component { ...props } onChange={ mockOnChange } /> );
 
-		await sleep();
 		await press.Tab();
 		expect(
 			screen.getByRole( 'combobox', {
@@ -494,7 +492,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
@@ -520,7 +517,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -541,7 +537,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
@@ -571,7 +566,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
