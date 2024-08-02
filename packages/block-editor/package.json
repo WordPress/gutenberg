@@ -75,7 +75,6 @@
 		"postcss": "^8.4.21",
 		"postcss-prefixwrap": "^1.41.0",
 		"postcss-urlrebase": "^1.4.0",
-		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^5.0.6",
 		"remove-accents": "^0.5.0"
 	},
