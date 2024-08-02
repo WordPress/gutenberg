@@ -54,8 +54,8 @@ function useView( postType ) {
 		if ( isCustom === 'false' && layout ) {
 			return {
 				...defaultView,
+				...defaultLayouts[ layout ],
 				type: layout,
-				layout: defaultLayouts[ layout ]?.layout,
 			};
 		}
 		return defaultView;
@@ -94,7 +94,7 @@ function useView( postType ) {
 
 		return {
 			...storedView,
-			layout: defaultLayouts[ storedView?.type ]?.layout,
+			...defaultLayouts[ layout ],
 		};
 	}, [ editedViewRecord?.content ] );
 

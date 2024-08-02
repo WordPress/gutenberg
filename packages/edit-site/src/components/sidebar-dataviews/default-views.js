@@ -30,27 +30,38 @@ export const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
 		layout: {
 			primaryField: 'title',
+			combinedFields: [
+				{
+					id: 'post',
+					header: __( 'Title' ),
+					children: [ 'featured-image', 'title' ],
+					direction: 'horizontal',
+				},
+			],
 			styles: {
 				'featured-image': {
 					width: '1%',
 				},
-				title: {
+				post: {
 					maxWidth: 300,
 				},
 			},
 		},
+		fields: [ 'post', 'author', 'status' ],
 	},
 	[ LAYOUT_GRID ]: {
 		layout: {
 			mediaField: 'featured-image',
 			primaryField: 'title',
 		},
+		fields: [ 'title', 'author', 'status' ],
 	},
 	[ LAYOUT_LIST ]: {
 		layout: {
 			primaryField: 'title',
 			mediaField: 'featured-image',
 		},
+		fields: [ 'title', 'author', 'status' ],
 	},
 };
 
@@ -64,8 +75,8 @@ const DEFAULT_POST_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	fields: [ 'title', 'author', 'status' ],
 	layout: defaultLayouts[ LAYOUT_LIST ].layout,
+	fields: defaultLayouts[ LAYOUT_LIST ].fields,
 };
 
 export function useDefaultViews( { postType } ) {
