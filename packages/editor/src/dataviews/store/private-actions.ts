@@ -14,6 +14,7 @@ import resetPost from '../actions/reset-post';
 import trashPost from '../actions/trash-post';
 import permanentlyDeletePost from '../actions/permanently-delete-post';
 import restorePost from '../actions/restore-post';
+import reorderPage from '../actions/reorder-page';
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -73,6 +74,9 @@ export const registerPostTypeActions =
 			.getPostType( postType ) ) as PostType;
 
 		const actions = [
+			postTypeConfig?.supports?.[ 'page-attributes' ]
+				? reorderPage
+				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
 			resetPost,
 			restorePost,

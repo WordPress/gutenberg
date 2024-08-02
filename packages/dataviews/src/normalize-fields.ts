@@ -18,7 +18,9 @@ export function normalizeFields< Item >(
 
 		const getValue =
 			field.getValue ||
-			( ( { item }: { item: ItemRecord } ) => item[ field.id ] );
+			( ( { item }: { item: ItemRecord } ) =>
+				// @ts-ignore
+				item[ field.id ] );
 
 		const sort =
 			field.sort ??
