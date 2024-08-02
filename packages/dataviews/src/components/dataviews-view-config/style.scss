@@ -5,10 +5,10 @@
 }
 
 .dataviews-settings-section__title {
-    font-size: 13px;
+    font-size: 15px;
+    line-height: $grid-unit-30;
 	font-weight: 600;
-	margin-top: 0;
-    margin-bottom: $grid-unit-05;
+	margin: 0;
 }
 
 .dataviews-settings-section.dataviews-settings-section {
@@ -17,10 +17,11 @@
 }
 
 .dataviews-settings-section__description {
-	margin: -$grid-unit-10 0 $grid-unit-10 0;
-	font-size: $helptext-font-size;
+	margin: 0;
 	font-style: normal;
 	color: $gray-700;
+    text-wrap: balance; // Fallback for Safari
+	text-wrap: pretty;
 }
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
