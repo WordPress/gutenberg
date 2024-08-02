@@ -24,9 +24,9 @@ import { GridRect } from './utils';
  *                            attribute are already not set.
  */
 function unsetGridPositionAttributes( attributes ) {
-	const { columnStart, rowStart, ...layout } = attributes.style?.layout ?? {};
-	// Only update attributes if columnStart or rowStart are set.
-	if ( columnStart || rowStart ) {
+	const { columnStart, rowStart, columnSpan, rowSpan, ...layout } =
+		attributes.style?.layout ?? {};
+	if ( columnStart || rowStart || columnSpan || rowSpan ) {
 		if ( ! Object.keys( layout ).length ) {
 			return { style: { ...attributes.style, layout: undefined } };
 		}
