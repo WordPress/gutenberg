@@ -184,7 +184,7 @@ export const savePost =
 		}
 
 		const previousRecord = select.getCurrentPost();
-		const edits = {
+		let edits = {
 			id: previousRecord.id,
 			...registry
 				.select( coreStore )
@@ -199,9 +199,9 @@ export const savePost =
 
 		let error = false;
 		try {
-			error = await applyFilters(
-				'editor.__unstablePreSavePost',
-				Promise.resolve( false ),
+			edits = await applyFilters(
+				'editor.PreSavePost',
+				Promise.resolve( edits ),
 				options
 			);
 		} catch ( err ) {
@@ -236,14 +236,29 @@ export const savePost =
 				);
 		}
 
+		// Run the hook with legacy unstable name for backward compatibility
 		if ( ! error ) {
-			await applyFilters(
-				'editor.__unstableSavePost',
-				Promise.resolve(),
-				options
-			).catch( ( err ) => {
+			try {
+				await applyFilters(
+					'editor.__unstableSavePost',
+					Promise.resolve(),
+					options
+				);
+			} catch ( err ) {
 				error = err;
-			} );
+			}
+		}
+
+		if ( ! error ) {
+			try {
+				await applyFilters(
+					'editor.SavePost',
+					Promise.resolve(),
+					options
+				);
+			} catch ( err ) {
+				error = err;
+			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
