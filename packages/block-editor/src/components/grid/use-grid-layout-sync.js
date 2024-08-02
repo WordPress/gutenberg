@@ -18,15 +18,33 @@ import { GridRect } from './utils';
  * Will return `undefined` when the attributes are already not set indicating
  * there's nothing to do.
  *
- * @param {Object} attributes The current block attributes.
+ * @param {Object}  attributes          The current block attributes.
+ * @param {boolean} unsetSpanAttributes Whether rowSpan and columnSpans should
+ *                                      also be unset.
  *
  * @return {undefined|Object} The attribute updates or `undefined` when the
  *                            attribute are already not set.
  */
-function unsetGridPositionAttributes( attributes ) {
-	const { columnStart, rowStart, columnSpan, rowSpan, ...layout } =
-		attributes.style?.layout ?? {};
-	if ( columnStart || rowStart || columnSpan || rowSpan ) {
+function unsetGridPositionAttributes(
+	attributes,
+	unsetSpanAttributes = false
+) {
+	let layout;
+	let hasUpdate;
+
+	if ( unsetSpanAttributes ) {
+		const { columnStart, rowStart, columnSpan, rowSpan, ...restLayout } =
+			attributes.style?.layout ?? {};
+		layout = restLayout;
+		hasUpdate = !! columnStart || rowStart || columnSpan || rowSpan;
+	} else {
+		const { columnStart, rowStart, ...restLayout } =
+			attributes.style?.layout ?? {};
+		layout = restLayout;
+		hasUpdate = !! columnStart || rowStart;
+	}
+
+	if ( hasUpdate ) {
 		if ( ! Object.keys( layout ).length ) {
 			return { style: { ...attributes.style, layout: undefined } };
 		}
@@ -155,7 +173,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			previousBlockOrder?.forEach( ( clientId ) => {
 				if ( ! blockOrder.includes( clientId ) ) {
 					const attributes = getBlockAttributes( clientId );
-					const update = unsetGridPositionAttributes( attributes );
+					const unsetSpanAttributes = true;
+					const update = unsetGridPositionAttributes(
+						attributes,
+						unsetSpanAttributes
+					);
 					if ( update ) {
 						updates[ clientId ] = update;
 					}
