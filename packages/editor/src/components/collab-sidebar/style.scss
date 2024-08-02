@@ -157,6 +157,11 @@
 	padding: 9px 11px;
 	line-height: 20px !important;
 	display: block;
+	// Auto-grow with the content, capped at ~20 rows (matching the previous
+	// `maxRows` behavior): 20 rows * 20px line-height + vertical padding/border.
+	/* stylelint-disable-next-line property-no-unknown -- TODO: Update stylelint to support a fresh list of https://github.com/known-css/known-css-properties */
+	field-sizing: content;
+	max-height: 420px;
 }
 
 // Visually hidden until focused (skip link pattern)
