@@ -110,6 +110,7 @@ function Iframe( {
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
+	withLoadingEffects,
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
@@ -191,6 +192,10 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
+
+			if ( withLoadingEffects ) {
+				documentElement.style.setProperty( 'opacity', 1 );
+			}
 		}
 
 		node.addEventListener( 'load', onLoad );

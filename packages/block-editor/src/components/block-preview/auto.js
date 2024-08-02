@@ -108,6 +108,7 @@ function ScaledBlockPreview( {
 							? minHeight / scale
 							: minHeight,
 				} }
+				withLoadingEffects
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
