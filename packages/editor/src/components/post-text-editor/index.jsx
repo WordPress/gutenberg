@@ -1,9 +1,9 @@
-import Textarea from 'react-autosize-textarea';
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
+import { TextareaControl } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { adjustPosition, getDiff } from './utils';
@@ -71,9 +71,8 @@ export default function PostTextEditor() {
 		};
 	}, [ value ] );
 
-	const updateSelection = ( event ) => {
-		const { selectionStart, selectionEnd, selectionDirection } =
-			event.target;
+	const updateSelection = ( textarea ) => {
+		const { selectionStart, selectionEnd, selectionDirection } = textarea;
 		selectionRef.current = {
 			selectionStart,
 			selectionEnd,
@@ -89,25 +88,27 @@ export default function PostTextEditor() {
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
-			<Textarea
+			<TextareaControl
 				autoComplete="off"
 				dir="auto"
 				ref={ textareaRef }
 				value={ value }
-				onChange={ ( event ) => {
-					updateSelection( event );
-					previousValueRef.current = event.target.value;
+				onChange={ ( newContent ) => {
+					if ( textareaRef.current ) {
+						updateSelection( textareaRef.current );
+					}
+					previousValueRef.current = newContent;
 					editEntityRecord( 'postType', type, id, {
-						content: event.target.value,
+						content: newContent,
 						blocks: undefined,
 						selection: undefined,
 					} );
 				} }
-				onFocus={ updateSelection }
+				onFocus={ ( event ) => updateSelection( event.target ) }
 				// A click or arrow-key caret move does not fire `select` (only
 				// range selections do), so track those moves via mouseup/keyup.
-				onMouseUp={ updateSelection }
-				onKeyUp={ updateSelection }
+				onMouseUp={ ( event ) => updateSelection( event.target ) }
+				onKeyUp={ ( event ) => updateSelection( event.target ) }
 				className="editor-post-text-editor"
 				id={ `post-content-${ instanceId }` }
 				placeholder={ __( 'Start writing with text or HTML' ) }

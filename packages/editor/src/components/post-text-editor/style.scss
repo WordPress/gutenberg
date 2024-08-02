@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-textarea.editor-post-text-editor {
+.editor-post-text-editor textarea {
 	border: $border-width solid $gray-600;
 	border-radius: 0;
 	display: block;
@@ -10,6 +10,8 @@ textarea.editor-post-text-editor {
 	width: 100%;
 	box-shadow: none;
 	resize: none;
+	/* stylelint-disable-next-line property-no-unknown -- TODO: Update stylelint to support a fresh list of https://github.com/known-css/known-css-properties */
+	field-sizing: content;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	line-height: 2.4;
