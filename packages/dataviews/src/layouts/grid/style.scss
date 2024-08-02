@@ -9,6 +9,7 @@
 	.dataviews-view-grid__card {
 		height: 100%;
 		justify-content: flex-start;
+		position: relative;
 
 		.dataviews-view-grid__title-actions {
 			padding: $grid-unit-10 0 $grid-unit-05;
@@ -147,4 +148,17 @@
 .dataviews-view-grid__field-value:empty,
 .dataviews-view-grid__field:empty {
 	display: none;
+}
+
+.dataviews-view-grid__card .dataviews-selection-checkbox {
+	position: absolute;
+	top: -9999em;
+	left: $grid-unit-10;
+	z-index: z-index(".dataviews-view-grid__card .dataviews-selection-checkbox");
+}
+
+.dataviews-view-grid__card:hover .dataviews-selection-checkbox,
+.dataviews-view-grid__card:focus-within .dataviews-selection-checkbox,
+.dataviews-view-grid__card.is-selected .dataviews-selection-checkbox {
+	top: $grid-unit-10;
 }
