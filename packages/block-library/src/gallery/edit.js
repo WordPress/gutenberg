@@ -254,13 +254,38 @@ function GalleryEdit( props ) {
 			);
 		}
 
+		let hrefAndDestination = getHrefAndDestination(
+			image,
+			linkTo,
+			imageAttributes?.linkDestination
+		);
+
+		if (
+			linkTo === LINK_DESTINATION_LIGHTBOX &&
+			! lightboxSetting?.enabled
+		) {
+			hrefAndDestination = {
+				...hrefAndDestination,
+				lightbox: { enabled: true },
+			};
+		} else if (
+			linkTo !== LINK_DESTINATION_LIGHTBOX &&
+			lightboxSetting?.enabled
+		) {
+			hrefAndDestination = {
+				...hrefAndDestination,
+				lightbox: { enabled: false },
+			};
+		} else {
+			hrefAndDestination = {
+				...hrefAndDestination,
+				lightbox: undefined,
+			};
+		}
+
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
-			...getHrefAndDestination(
-				image,
-				linkTo,
-				imageAttributes?.linkDestination
-			),
+			...hrefAndDestination,
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,

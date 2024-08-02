@@ -37,14 +37,12 @@ export function getHrefAndDestination(
 			return {
 				href: image?.source_url || image?.url, // eslint-disable-line camelcase
 				linkDestination: IMAGE_LINK_DESTINATION_MEDIA,
-				lightbox: { enabled: false },
 			};
 		case LINK_DESTINATION_ATTACHMENT_WP_CORE:
 		case LINK_DESTINATION_ATTACHMENT:
 			return {
 				href: image?.link,
 				linkDestination: IMAGE_LINK_DESTINATION_ATTACHMENT,
-				lightbox: { enabled: false },
 			};
 		case LINK_DESTINATION_LIGHTBOX:
 			return {
@@ -56,7 +54,7 @@ export function getHrefAndDestination(
 			return {
 				href: undefined,
 				linkDestination: IMAGE_LINK_DESTINATION_NONE,
-				lightbox: { enabled: false },
+				lightbox: { enabled: undefined },
 			};
 	}
 
