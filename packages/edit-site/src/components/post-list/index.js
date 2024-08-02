@@ -111,7 +111,10 @@ function useView( postType ) {
 		( newView ) => {
 			const { params } = history.getLocationWithParams();
 
-			if ( newView.type !== params?.layout ) {
+			if ( newView.type === LAYOUT_LIST && ! params?.layout ) {
+				// Skip updating the layout URL param if
+				// it is not present and the newView.type is LAYOUT_LIST.
+			} else if ( newView.type !== params?.layout ) {
 				history.push( {
 					...params,
 					layout: newView.type,
