@@ -3,24 +3,25 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-store( 'core/accordion', {
+const { state } = store( 'core/accordion', {
 	state: {
 		get isOpen() {
-			const { isOpen, id } = getContext();
-			return isOpen.includes( id );
+			const { id } = getContext();
+			return state.open.includes( id );
 		},
 	},
 	actions: {
 		toggle: () => {
 			const context = getContext();
-			const { id, isOpen, autoclose } = context;
-			const itemIsOpen = isOpen.includes( id );
+			const { id, autoclose } = context;
+			const itemIsOpen = state.open.includes( id );
+
 			if ( autoclose ) {
-				context.isOpen = itemIsOpen ? [] : [ id ];
+				state.open = itemIsOpen ? [] : [ id ];
 			} else if ( itemIsOpen ) {
-				context.isOpen = isOpen.filter( ( item ) => item !== id );
+				state.open = state.open.filter( ( item ) => item !== id );
 			} else {
-				context.isOpen = [ ...isOpen, id ];
+				state.open.push( id );
 			}
 		},
 	},

@@ -16,41 +16,41 @@ function block_core_accordion_item_render( $attributes, $content ) {
 		return $content;
 	}
 
-	$p         = new WP_HTML_Tag_Processor( $content );
-	$unique_id = wp_unique_id( 'accordion-item-' );
+	$p               = new WP_HTML_Tag_Processor( $content );
+	$unique_id       = wp_unique_id( 'accordion-item-' );
+	$open_by_default = (bool) $attributes['openByDefault'];
 
-	while ( $p->next_tag() ) {
-		if ( $p->has_class( 'wp-block-accordion-item' ) ) {
-            $p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '" }' );
-			$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
-			if ( $attributes['openByDefault'] ) {
-				$p->set_attribute( 'data-wp-init', 'callbacks.open' );
-			}
-		}
-	}
+	$state = wp_interactivity_state( 'core/accordion' );
+	wp_interactivity_state(
+		'core/accordion',
+		array(
+			'open' => array_merge(
+				isset( $state['open'] ) ? $state['open'] : array(),
+				$open_by_default ? array( $unique_id ) : array()
+			),
+		)
+	);
 
-	$content = $p->get_updated_html();
-	$p       = new WP_HTML_Tag_Processor( $content );
+	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-item' ) ) ) {
+		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '" }' );
+		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
 
-	while ( $p->next_tag() ) {
-		if ( $p->has_class( 'accordion-item__toggle' ) ) {
+		if ( $p->next_tag( array( 'class_name' => 'accordion-item__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
 			$p->set_attribute( 'aria-controls', $unique_id );
 			$p->set_attribute( 'data-wp-bind--aria-expanded', 'state.isOpen' );
 		}
-	}
 
-	$content = $p->get_updated_html();
-	$p       = new WP_HTML_Tag_Processor( $content );
-
-	while ( $p->next_tag() ) {
-		if ( $p->has_class( 'wp-block-accordion-content' ) ) {
+		if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-content' ) ) ) {
 			$p->set_attribute( 'aria-labelledby', $unique_id );
 			$p->set_attribute( 'data-wp-bind--aria-hidden', '!state.isOpen' );
+
+			// Only modify content if all directives have been set.
+			$content = $p->get_updated_html();
 		}
 	}
 
-	return $p->get_updated_html();
+	return $content;
 }
 
 /**

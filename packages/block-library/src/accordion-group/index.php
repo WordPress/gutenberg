@@ -31,16 +31,17 @@ function render_block_core_accordion_group( $attributes, $content ) {
 	}
 
 	$p         = new WP_HTML_Tag_Processor( $content );
-	$autoclose = $attributes['autoclose'];
+	$autoclose = (bool) $attributes['autoclose'];
 
-	while ( $p->next_tag() ) {
-		if ( $p->has_class( 'wp-block-accordion-group' ) ) {
-			$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
-			$p->set_attribute( 'data-wp-context', '{"isOpen":[],"autoclose":"' . $autoclose . '"}' );
-		}
+	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-group' ) ) ) {
+		$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
+		$p->set_attribute( 'data-wp-context', '{ "autoclose": "' . $autoclose . '" }' );
+
+		// Only modify content if directives have been set.
+		$content = $p->get_updated_html();
 	}
 
-	return $p->get_updated_html();
+	return $content;
 }
 
 /**
