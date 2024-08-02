@@ -1689,7 +1689,7 @@ export const __unstableSetEditorMode =
 						sectionClientId = firstSelectedClientId;
 					} else {
 						// If the selected block is not a section block, find
-						// the parent section that contains the selected block
+						// the parent section that contains the selected block.
 						sectionClientId = select
 							.getBlockParents( firstSelectedClientId )
 							.find( ( parent ) =>
