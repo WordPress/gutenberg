@@ -24,8 +24,7 @@
 .block-editor-iframe__html {
 	border: 0 solid $gray-300;
 	transform-origin: top center;
-	transition: all  0.5s cubic-bezier(0.65, 0, 0.45, 1);
-	@include reduce-motion("transition");
+	@include editor-canvas-resize-animation;
 }
 
 .block-editor-iframe__html.is-zoomed-out {

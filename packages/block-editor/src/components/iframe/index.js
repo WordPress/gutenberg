@@ -380,7 +380,6 @@ function Iframe( {
 				style={ {
 					...props.style,
 					height: props.style?.height,
-					transition: 'all 0.5s cubic-bezier(0.65, 0, 0.45, 1)', // Maps to the .block-editor-iframe__html transition.
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
