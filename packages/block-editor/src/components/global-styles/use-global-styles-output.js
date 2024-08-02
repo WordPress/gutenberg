@@ -24,6 +24,8 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
+	compileStyleValue,
+	getResolvedValue,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -36,7 +38,6 @@ import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { setThemeFileUris } from './theme-file-uri-utils';
 
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
@@ -53,21 +54,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 const { kebabCase } = unlock( componentsPrivateApis );
-
-function compileStyleValue( uncompiledValue ) {
-	const VARIABLE_REFERENCE_PREFIX = 'var:';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
 
 /**
  * Transform given preset tree into a set of style declarations.
@@ -424,18 +410,7 @@ export function getStylesDeclarations(
 			? rule.key
 			: kebabCase( rule.key );
 
-		let ruleValue = rule.value;
-		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
-			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = compileStyleValue(
-				getValueFromObjectPath( tree, refPath )
-			);
-			// Presence of another ref indicates a reference to another dynamic value.
-			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || ruleValue?.ref ) {
-				return;
-			}
-		}
+		let ruleValue = getResolvedValue( rule.value, tree, null );
 
 		// Calculate fluid typography rules where available.
 		if ( cssProperty === 'font-size' ) {
@@ -1398,10 +1373,6 @@ export function useGlobalStylesOutputWithConfig(
 	disableRootPadding
 ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
-	mergedConfig = setThemeFileUris(
-		mergedConfig,
-		mergedConfig?._links?.[ 'wp:theme-file' ]
-	);
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {
