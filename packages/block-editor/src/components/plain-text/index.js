@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
 import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { TextareaControl } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -22,13 +22,13 @@ const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
 		return <EditableText ref={ ref } { ...props } />;
 	}
 
-	const { className, onChange, ...remainingProps } = props;
+	const { className, ...remainingProps } = props;
 
 	return (
-		<TextareaAutosize
+		<TextareaControl
 			ref={ ref }
 			className={ clsx( 'block-editor-plain-text', className ) }
-			onChange={ ( event ) => onChange( event.target.value ) }
+			__nextHasNoMarginBottom
 			{ ...remainingProps }
 		/>
 	);
