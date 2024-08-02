@@ -203,8 +203,8 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'basic rendering', () => {
-		it( 'should render panel', () => {
-			renderPanel();
+		it( 'should render panel', async () => {
+			await renderPanel();
 
 			const menuButton = getMenuButton();
 			const label = screen.getByText( defaultProps.label );
@@ -262,14 +262,14 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render panel menu when at least one panel item', async () => {
-			renderPanel();
+			await renderPanel();
 
 			const menuButton = await openDropdownMenu();
 			expect( menuButton ).toBeInTheDocument();
 		} );
 
 		it( 'should render reset all item in menu', async () => {
-			renderPanel();
+			await renderPanel();
 			await openDropdownMenu();
 
 			const resetAllItem = await screen.findByRole( 'menuitem' );
@@ -278,7 +278,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render panel menu items correctly', async () => {
-			renderPanel();
+			await renderPanel();
 			await openDropdownMenu();
 
 			const menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
@@ -288,8 +288,8 @@ describe( 'ToolsPanel', () => {
 			expect( menuItems[ 1 ] ).not.toBeChecked();
 		} );
 
-		it( 'should render panel label as header text', () => {
-			renderPanel();
+		it( 'should render panel label as header text', async () => {
+			await renderPanel();
 			const header = screen.getByText( defaultProps.label );
 
 			expect( header ).toBeInTheDocument();
@@ -297,8 +297,8 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'conditional rendering of panel items', () => {
-		it( 'should render panel item when it has a value', () => {
-			renderPanel();
+		it( 'should render panel item when it has a value', async () => {
+			await renderPanel();
 
 			const exampleControl = screen.getByText( 'Example control' );
 			const altControl = screen.queryByText( 'Alt control' );
@@ -308,7 +308,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render panel item when corresponding menu item is selected', async () => {
-			renderPanel();
+			await renderPanel();
 			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
 			const control = await screen.findByText( 'Alt control' );
@@ -321,7 +321,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
-			renderPanel();
+			await renderPanel();
 			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
 			const control = screen.queryByText( 'Example control' );
@@ -750,7 +750,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
-			renderPanel();
+			await renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( controlProps.label );
@@ -760,7 +760,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should call onSelect callback when menu item is toggled on', async () => {
-			renderPanel();
+			await renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( altControlProps.label );
@@ -770,7 +770,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should call resetAll callback when its menu item is selected', async () => {
-			renderPanel();
+			await renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' );
@@ -786,7 +786,7 @@ describe( 'ToolsPanel', () => {
 		// controls does not prevent subsequent individual reset requests.
 		// i.e. onDeselect callbacks are called correctly after a resetAll.
 		it( 'should call onDeselect after previous reset all', async () => {
-			renderPanel();
+			await renderPanel();
 
 			await openDropdownMenu();
 			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
@@ -801,8 +801,8 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'grouped panel items within custom components', () => {
-		it( 'should render grouped items correctly', () => {
-			renderGroupedItemsInPanel();
+		it( 'should render grouped items correctly', async () => {
+			await renderGroupedItemsInPanel();
 
 			const defaultItem = screen.getByText( 'Grouped control' );
 			const altItem = screen.queryByText( 'Alt grouped control' );
@@ -812,7 +812,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render grouped items within the menu', async () => {
-			renderGroupedItemsInPanel();
+			await renderGroupedItemsInPanel();
 			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );
@@ -835,8 +835,8 @@ describe( 'ToolsPanel', () => {
 	} );
 
 	describe( 'wrapped panel items within custom components', () => {
-		it( 'should render wrapped items correctly', () => {
-			renderWrappedItemInPanel();
+		it( 'should render wrapped items correctly', async () => {
+			await renderWrappedItemInPanel();
 
 			const wrappers = screen.getAllByText( 'Wrapper' );
 			const defaultItem = screen.getByText( 'Wrapped 1' );
@@ -850,7 +850,7 @@ describe( 'ToolsPanel', () => {
 		} );
 
 		it( 'should render wrapped items within the menu', async () => {
-			renderWrappedItemInPanel();
+			await renderWrappedItemInPanel();
 			await openDropdownMenu();
 
 			const defaultItem = screen.getByText( 'Nested Control 1' );

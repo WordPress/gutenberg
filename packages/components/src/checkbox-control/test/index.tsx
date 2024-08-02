@@ -16,6 +16,12 @@ import { useState } from '@wordpress/element';
 import BaseCheckboxControl from '..';
 import type { CheckboxControlProps } from '../types';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const noop = () => {};
 
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
@@ -74,13 +80,15 @@ describe( 'CheckboxControl', () => {
 		} );
 
 		it( 'should render the indeterminate icon when in the indeterminate state', async () => {
-			const { container: containerDefault } = await render(
-				<CheckboxControl />
-			);
+			const containerDefault = createContainer();
+			await render( <CheckboxControl />, {
+				container: containerDefault,
+			} );
 
-			const { container: containerIndeterminate } = await render(
-				<CheckboxControl indeterminate />
-			);
+			const containerIndeterminate = createContainer();
+			await render( <CheckboxControl indeterminate />, {
+				container: containerIndeterminate,
+			} );
 
 			// Expect the diff snapshot to be mostly about the indeterminate icon
 			expect( containerDefault ).toMatchDiffSnapshot(

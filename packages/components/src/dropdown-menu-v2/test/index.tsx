@@ -354,9 +354,7 @@ describe( 'DropdownMenu', () => {
 			);
 
 			// The menu is focused automatically when `defaultOpen` is set.
-			await waitFor( () =>
-				expect( screen.getByRole( 'menu' ) ).toHaveFocus()
-			);
+			expect( await screen.findByRole( 'menu' ) ).toHaveFocus();
 
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa

@@ -15,6 +15,11 @@ import { Slot, Fill, Provider } from '../';
  */
 import { Component } from '@wordpress/element';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
 class Filler extends Component {
 	constructor() {
 		super( ...arguments );
@@ -39,33 +44,38 @@ class Filler extends Component {
 
 describe( 'Slot', () => {
 	it( 'should render empty Fills', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
 				</div>
 				<Fill name="chicken" />
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a string Fill', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
 				</div>
 				<Fill name="chicken">content</Fill>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a Fill containing an element', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
@@ -73,14 +83,16 @@ describe( 'Slot', () => {
 				<Fill name="chicken">
 					<span />
 				</Fill>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a Fill containing an array', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
@@ -88,7 +100,8 @@ describe( 'Slot', () => {
 				<Fill name="chicken">
 					{ [ <span key="1" />, <div key="2" />, 'text' ] }
 				</Fill>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
@@ -116,7 +129,8 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render empty Fills without HTML wrapper when render props used', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken">
@@ -128,14 +142,16 @@ describe( 'Slot', () => {
 					</Slot>
 				</div>
 				<Fill name="chicken" />
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="chicken">
@@ -145,7 +161,8 @@ describe( 'Slot', () => {
 					</Slot>
 				</div>
 				<Fill name="chicken">content</Fill>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
@@ -153,13 +170,15 @@ describe( 'Slot', () => {
 
 	it( 'should re-render Slot when not bubbling virtually', async () => {
 		const user = userEvent.setup();
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Provider>
 				<div>
 					<Slot name="egg" />
 				</div>
 				<Filler name="egg" />
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
@@ -170,12 +189,14 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render in expected order when fills always mounted', async () => {
-		const { container, rerender } = await render(
+		const container = createContainer();
+		const { rerender } = await render(
 			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
 				</div>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		await rerender(
@@ -231,12 +252,14 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render in expected order when fills unmounted', async () => {
-		const { container, rerender } = await render(
+		const container = createContainer();
+		const { rerender } = await render(
 			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
 				</div>
-			</Provider>
+			</Provider>,
+			{ container }
 		);
 
 		await rerender(
@@ -275,13 +298,15 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should warn without a Provider', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<>
 				<div>
 					<Slot name="chicken" bubblesVirtually />
 				</div>
 				<Fill name="chicken" />
-			</>
+			</>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
@@ -292,7 +317,8 @@ describe( 'Slot', () => {
 		'bubblesVirtually %p',
 		( bubblesVirtually ) => {
 			it( 'should subsume another slot by the same name', async () => {
-				const { container, rerender } = await render(
+				const container = createContainer();
+				const { rerender } = await render(
 					<Provider>
 						<div data-position="first">
 							<Slot
@@ -302,7 +328,8 @@ describe( 'Slot', () => {
 						</div>
 						<div data-position="second"></div>
 						<Fill name="egg">Content</Fill>
-					</Provider>
+					</Provider>,
+					{ container }
 				);
 
 				await rerender(
@@ -342,7 +369,8 @@ describe( 'Slot', () => {
 			} );
 
 			it( 'should unmount two slots with the same name', async () => {
-				const { rerender, container } = await render(
+				const container = createContainer();
+				const { rerender } = await render(
 					<Provider>
 						<div data-position="first">
 							<Slot
@@ -357,7 +385,8 @@ describe( 'Slot', () => {
 							/>
 						</div>
 						<Fill name="egg">Content</Fill>
-					</Provider>
+					</Provider>,
+					{ container }
 				);
 				await rerender(
 					<Provider>

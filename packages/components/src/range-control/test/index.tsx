@@ -37,11 +37,14 @@ describe( 'RangeControl', () => {
 		} );
 
 		it( 'should render with icons', async () => {
-			const { container } = await render(
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render(
 				<RangeControl
 					beforeIcon="format-image"
 					afterIcon="format-video"
-				/>
+				/>,
+				{ container }
 			);
 
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access

@@ -24,23 +24,24 @@ const TestButton = forwardRef(
 
 describe( 'TreeGridCell', () => {
 	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', async () => {
-		expect(
-			() =>
-				await render(
-					<TreeGridCell>
-						{ ( props ) => (
-							<TestButton className="my-button" { ...props }>
-								Click Me!
-							</TestButton>
-						) }
-					</TreeGridCell>
-				)
-		).toThrow();
+		await expect( () =>
+			render(
+				<TreeGridCell>
+					{ ( props ) => (
+						<TestButton className="my-button" { ...props }>
+							Click Me!
+						</TestButton>
+					) }
+				</TreeGridCell>
+			)
+		).rejects.toThrow();
 		expect( console ).toHaveErrored();
 	} );
 
 	it( 'uses a child render function to render children', async () => {
-		const { container } = await render(
+		const container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		await render(
 			<TreeGrid>
 				<tr>
 					<TreeGridCell>
@@ -51,7 +52,8 @@ describe( 'TreeGridCell', () => {
 						) }
 					</TreeGridCell>
 				</tr>
-			</TreeGrid>
+			</TreeGrid>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();

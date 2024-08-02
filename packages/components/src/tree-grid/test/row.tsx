@@ -9,23 +9,32 @@ import { render } from '@ariakit/test/react';
  */
 import TreeGridRow from '../row';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'TreeGridRow', () => {
 	it( 'renders a tr with support for level, positionInSet and setSize props', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<table>
 				<tbody>
 					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
 						<td>Test</td>
 					</TreeGridRow>
 				</tbody>
-			</table>
+			</table>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'forwards other props to the rendered tr element', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<table>
 				<tbody>
 					<TreeGridRow
@@ -37,7 +46,8 @@ describe( 'TreeGridRow', () => {
 						<td>Test</td>
 					</TreeGridRow>
 				</tbody>
-			</table>
+			</table>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();

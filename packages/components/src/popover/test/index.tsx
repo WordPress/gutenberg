@@ -23,6 +23,12 @@ import Popover from '..';
 import type { PopoverProps } from '../types';
 import { PopoverInsideIframeRenderedInExternalSlot } from './utils';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 type PositionToPlacementTuple = [
 	NonNullable< PopoverProps[ 'position' ] >,
 	NonNullable< PopoverProps[ 'placement' ] >,
@@ -138,10 +144,12 @@ describe( 'Popover', () => {
 			} );
 
 			it( 'should render inline regardless of slot name', async () => {
-				const { container } = await render(
+				const container = createContainer();
+				await render(
 					<Popover inline __unstableSlotName="Popover">
 						Hello
-					</Popover>
+					</Popover>,
+					{ container }
 				);
 
 				await waitFor( () =>
@@ -219,7 +227,7 @@ describe( 'Popover', () => {
 				props?: Partial< React.ComponentProps< typeof Popover > >
 			) => {
 				const user = await userEvent.setup();
-				const view = render(
+				await render(
 					<Popover data-testid="popover-element" { ...props }>
 						<button>Button 1</button>
 						<button>Button 2</button>
@@ -234,7 +242,6 @@ describe( 'Popover', () => {
 					screen.getAllByRole( 'button' );
 
 				return {
-					...view,
 					popover,
 					firstButton,
 					secondButton,
@@ -306,18 +313,13 @@ describe( 'Popover', () => {
 				} );
 
 				test( 'when `focusOnMount` is false if `constrainTabbing` is true', async () => {
-					const {
-						user,
-						baseElement,
-						firstButton,
-						secondButton,
-						thirdButton,
-					} = await setup( {
-						focusOnMount: false,
-						constrainTabbing: true,
-					} );
+					const { user, firstButton, secondButton, thirdButton } =
+						await setup( {
+							focusOnMount: false,
+							constrainTabbing: true,
+						} );
 
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab();
@@ -337,13 +339,8 @@ describe( 'Popover', () => {
 					// which means the default value for `constrainTabbing` is
 					// 'true', but the provided value should override this.
 
-					const {
-						user,
-						baseElement,
-						firstButton,
-						secondButton,
-						thirdButton,
-					} = await setup( { constrainTabbing: false } );
+					const { user, firstButton, secondButton, thirdButton } =
+						await setup( { constrainTabbing: false } );
 
 					await waitFor( () => expect( firstButton ).toHaveFocus() );
 					await user.tab();
@@ -351,23 +348,18 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is false', async () => {
-					const {
-						user,
-						baseElement,
-						firstButton,
-						secondButton,
-						thirdButton,
-					} = await setup( { focusOnMount: false } );
+					const { user, firstButton, secondButton, thirdButton } =
+						await setup( { focusOnMount: false } );
 
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab();
@@ -375,17 +367,16 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is true if `constrainTabbing` is false', async () => {
 					const {
 						user,
-						baseElement,
 						popover,
 						firstButton,
 						secondButton,
@@ -403,24 +394,19 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 				} );
 
 				test( 'when `focusOnMount` is "firstElement" if `constrainTabbing` is false', async () => {
-					const {
-						user,
-						baseElement,
-						firstButton,
-						secondButton,
-						thirdButton,
-					} = await setup( {
-						focusOnMount: 'firstElement',
-						constrainTabbing: false,
-					} );
+					const { user, firstButton, secondButton, thirdButton } =
+						await setup( {
+							focusOnMount: 'firstElement',
+							constrainTabbing: false,
+						} );
 
 					await waitFor( () => expect( firstButton ).toHaveFocus() );
 					await user.tab();
@@ -428,11 +414,11 @@ describe( 'Popover', () => {
 					await user.tab();
 					expect( thirdButton ).toHaveFocus();
 					await user.tab();
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 					await user.tab();
 					expect( firstButton ).toHaveFocus();
 					await user.tab( { shift: true } );
-					expect( baseElement ).toHaveFocus();
+					expect( document.body ).toHaveFocus();
 				} );
 			} );
 		} );

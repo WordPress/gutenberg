@@ -26,6 +26,12 @@ import {
 import withNotices from '..';
 import type { WithNoticeProps } from '../types';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 // Implementation detail of Notice component used to query the dismissal button.
 const stockDismissText = 'Close';
 
@@ -91,7 +97,8 @@ describe( 'withNotices operations', () => {
 
 	it( 'should create notices with createNotice', async () => {
 		const message = 'Aló!';
-		const { container } = await render( <Handle /> );
+		const container = createContainer();
+		await render( <Handle />, { container } );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( { content: message } );
@@ -101,7 +108,8 @@ describe( 'withNotices operations', () => {
 
 	it( 'should create notices of error status with createErrorNotice', async () => {
 		const message = 'can’t touch this';
-		const { container } = await render( <Handle /> );
+		const container = createContainer();
+		await render( <Handle />, { container } );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createErrorNotice( message );
@@ -112,7 +120,8 @@ describe( 'withNotices operations', () => {
 
 	it( 'should remove a notice with removeNotice', async () => {
 		const notice = { id: 'so real', content: 'so why can’t I touch it?' };
-		const { container } = await render( <Handle /> );
+		const container = createContainer();
+		await render( <Handle />, { container } );
 		const { getByText } = within( container );
 		act( () => {
 			handle.current.createNotice( notice );
@@ -129,9 +138,8 @@ describe( 'withNotices operations', () => {
 	it( 'should remove all notices with removeAllNotices', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container } = await render(
-			<Handle notifications={ notices } />
-		);
+		const container = createContainer();
+		await render( <Handle notifications={ notices } />, { container } );
 		const { getByText } = within( container );
 		expect(
 			await waitForElementToBeRemoved( () => {
@@ -147,16 +155,18 @@ describe( 'withNotices operations', () => {
 
 describe( 'withNotices rendering', () => {
 	it( 'should display the original component given no notices', async () => {
-		const { container } = await render( <TestComponent /> );
+		const container = createContainer();
+		await render( <TestComponent />, { container } );
 		expect( container.innerHTML ).toBe( `<div>${ content }</div>` );
 	} );
 
 	it( 'should display notices with functioning dismissal triggers', async () => {
 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
 		const notices = noticesFrom( messages );
-		const { container } = await render(
-			<TestComponent notifications={ notices } />
-		);
+		const container = createContainer();
+		await render( <TestComponent notifications={ notices } />, {
+			container,
+		} );
 		const [ buttonRemoveFirst ] =
 			screen.getAllByLabelText( stockDismissText );
 		const getRemovalTarget = () =>

@@ -13,7 +13,9 @@ import { PanelBody } from '../body';
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div with the matching className', async () => {
-			const { container } = await render( <PanelBody /> );
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render( <PanelBody />, { container } );
 
 			expect( container ).toMatchSnapshot();
 		} );

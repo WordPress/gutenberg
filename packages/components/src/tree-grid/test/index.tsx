@@ -50,12 +50,15 @@ describe( 'TreeGrid', () => {
 
 	describe( 'simple rendering', () => {
 		it( 'renders a table, tbody and any child elements', async () => {
-			const { container } = await render(
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render(
 				<TreeGrid>
 					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
 						<TreeGridCell withoutGridItem>Test</TreeGridCell>
 					</TreeGridRow>
-				</TreeGrid>
+				</TreeGrid>,
+				{ container }
 			);
 
 			expect( container.innerHTML ).toMatchSnapshot();

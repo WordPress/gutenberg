@@ -10,29 +10,41 @@ import userEvent from '@testing-library/user-event';
  */
 import { Item, ItemGroup } from '..';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'ItemGroup', () => {
 	describe( 'ItemGroup component', () => {
 		it( 'should render correctly', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'should show borders when the isBordered prop is true', async () => {
 			// By default, `isBordered` is `false`
-			const { container: noBorders } = await render(
+			const noBorders = createContainer();
+			await render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: noBorders }
 			);
 
-			const { container: withBorders } = await render(
+			const withBorders = createContainer();
+			await render(
 				<ItemGroup isBordered>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: withBorders }
 			);
 
 			expect( noBorders ).toMatchDiffSnapshot( withBorders );
@@ -40,16 +52,20 @@ describe( 'ItemGroup', () => {
 
 		it( 'should show rounded corners when the isRounded prop is true', async () => {
 			// By default, `isRounded` is `true`
-			const { container: roundCorners } = await render(
+			const roundCorners = createContainer();
+			await render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: roundCorners }
 			);
 
-			const { container: squaredCorners } = await render(
+			const squaredCorners = createContainer();
+			await render(
 				<ItemGroup isRounded={ false }>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: squaredCorners }
 			);
 
 			expect( roundCorners ).toMatchDiffSnapshot( squaredCorners );
@@ -57,16 +73,20 @@ describe( 'ItemGroup', () => {
 
 		it( 'should render items individually when the isSeparated prop is true', async () => {
 			// By default, `isSeparated` is `false`
-			const { container: groupedItems } = await render(
+			const groupedItems = createContainer();
+			await render(
 				<ItemGroup>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: groupedItems }
 			);
 
-			const { container: separatedItems } = await render(
+			const separatedItems = createContainer();
+			await render(
 				<ItemGroup isSeparated>
 					<Item>Code is poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: separatedItems }
 			);
 
 			expect( groupedItems ).toMatchDiffSnapshot( separatedItems );
@@ -109,13 +129,15 @@ describe( 'ItemGroup', () => {
 
 		it( 'should use different amounts of padding depending on the value of the size prop', async () => {
 			// By default, `size` is `medium`
-			const { container: mediumSize } = await render(
-				<Item>Code is poetry</Item>
-			);
+			const mediumSize = createContainer();
+			await render( <Item>Code is poetry</Item>, {
+				container: mediumSize,
+			} );
 
-			const { container: largeSize } = await render(
-				<Item size="large">Code is poetry</Item>
-			);
+			const largeSize = createContainer();
+			await render( <Item size="large">Code is poetry</Item>, {
+				container: largeSize,
+			} );
 
 			expect( mediumSize ).toMatchDiffSnapshot( largeSize );
 		} );
@@ -124,20 +146,24 @@ describe( 'ItemGroup', () => {
 			// By default, `size` is `medium`.
 			// The instances of `Item` that don't specify a `size` prop, should
 			// fallback to the value defined on `ItemGroup` via the context.
-			const { container: mediumSize } = await render(
+			const mediumSize = createContainer();
+			await render(
 				<ItemGroup>
 					<Item>Code</Item>
 					<Item>Is</Item>
 					<Item size="small">Poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: mediumSize }
 			);
 
-			const { container: largeSize } = await render(
+			const largeSize = createContainer();
+			await render(
 				<ItemGroup size="large">
 					<Item>Code</Item>
 					<Item>Is</Item>
 					<Item size="small">Poetry</Item>
-				</ItemGroup>
+				</ItemGroup>,
+				{ container: largeSize }
 			);
 
 			expect( mediumSize ).toMatchDiffSnapshot( largeSize );

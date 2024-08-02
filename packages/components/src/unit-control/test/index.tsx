@@ -16,6 +16,12 @@ import { useState } from '@wordpress/element';
 import UnitControl from '..';
 import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const getInput = ( {
 	isInputTypeText = false,
 }: {
@@ -96,13 +102,15 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should render custom className', async () => {
-			const { container: withoutClassName } = await render(
-				<UnitControl />
-			);
+			const withoutClassName = createContainer();
+			await render( <UnitControl />, {
+				container: withoutClassName,
+			} );
 
-			const { container: withClassName } = await render(
-				<UnitControl className="hello" />
-			);
+			const withClassName = createContainer();
+			await render( <UnitControl className="hello" />, {
+				container: withClassName,
+			} );
 
 			expect(
 				// eslint-disable-next-line testing-library/no-node-access

@@ -11,8 +11,11 @@ import ColorIndicator from '..';
 
 describe( 'ColorIndicator', () => {
 	it( 'matches the snapshot', async () => {
-		const { container } = await render(
-			<ColorIndicator aria-label="sample label" colorValue="#fff" />
+		const container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		await render(
+			<ColorIndicator aria-label="sample label" colorValue="#fff" />,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();

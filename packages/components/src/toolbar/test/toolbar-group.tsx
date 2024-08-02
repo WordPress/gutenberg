@@ -14,18 +14,24 @@ import { ToolbarGroup } from '..';
  */
 import { wordpress } from '@wordpress/icons';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty node, when controls are not passed', async () => {
-			const { container } = await render( <ToolbarGroup /> );
+			const container = createContainer();
+			await render( <ToolbarGroup />, { container } );
 
 			expect( container ).toBeEmptyDOMElement();
 		} );
 
 		it( 'should render an empty node, when controls are empty', async () => {
-			const { container } = await render(
-				<ToolbarGroup controls={ [] } />
-			);
+			const container = createContainer();
+			await render( <ToolbarGroup controls={ [] } />, { container } );
 
 			expect( container ).toBeEmptyDOMElement();
 		} );

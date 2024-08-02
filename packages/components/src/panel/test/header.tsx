@@ -12,7 +12,9 @@ import PanelHeader from '../header';
 describe( 'PanelHeader', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render PanelHeader with empty div inside', async () => {
-			const { container } = await render( <PanelHeader /> );
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render( <PanelHeader />, { container } );
 
 			expect( container ).toMatchSnapshot();
 		} );

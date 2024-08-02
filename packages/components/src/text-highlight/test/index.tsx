@@ -9,6 +9,12 @@ import { render } from '@ariakit/test/react';
  */
 import TextHighlight from '..';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const getMarks = ( container: Element ) =>
 	// Use querySelectorAll because the `mark` role is not officially supported
 	// yet. This should be changed to `getByRole` when it is.
@@ -23,11 +29,13 @@ describe( 'TextHighlight', () => {
 		it.each( [ [ 'Gutenberg' ], [ 'media' ] ] )(
 			'should highlight the singular occurance of the text "%s" in the text if it exists',
 			( highlight ) => {
-				const { container } = render(
+				const container = createContainer();
+				render(
 					<TextHighlight
 						text={ defaultText }
 						highlight={ highlight }
-					/>
+					/>,
+					{ container }
 				);
 
 				const highlightedEls = getMarks( container );
@@ -43,8 +51,10 @@ describe( 'TextHighlight', () => {
 		it( 'should highlight multiple occurances of the string every time it exists in the text', async () => {
 			const highlight = 'edit';
 
-			const { container } = await render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );
@@ -61,8 +71,10 @@ describe( 'TextHighlight', () => {
 			// lowercase and once capitalized.
 			const highlight = 'The';
 
-			const { container } = await render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );
@@ -81,8 +93,10 @@ describe( 'TextHighlight', () => {
 		it( 'should not highlight a string that is not in the text', async () => {
 			const highlight = 'Antidisestablishmentarianism';
 
-			const { container } = await render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );

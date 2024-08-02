@@ -11,7 +11,9 @@ import Shortcut from '..';
 
 describe( 'Shortcut', () => {
 	it( 'does not render anything if no shortcut prop is provided', async () => {
-		const { container } = await render( <Shortcut /> );
+		const container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		await render( <Shortcut />, { container } );
 		expect( container ).toBeEmptyDOMElement();
 	} );
 

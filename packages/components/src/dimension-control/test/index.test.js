@@ -15,6 +15,12 @@ import { plus } from '@wordpress/icons';
  */
 import { DimensionControl } from '../';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
 	const instanceId = 1;
@@ -25,31 +31,37 @@ describe( 'DimensionControl', () => {
 
 	describe( 'rendering', () => {
 		it( 'renders with defaults', async () => {
-			const { container } = await render(
-				<DimensionControl instanceId={ instanceId } label="Padding" />
+			const container = createContainer();
+			await render(
+				<DimensionControl instanceId={ instanceId } label="Padding" />,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and default icon label', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Margin"
 					icon={ plus }
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'renders with icon and custom icon label', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Margin"
 					icon={ plus }
 					iconLabel="Tablet Devices"
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
@@ -73,12 +85,14 @@ describe( 'DimensionControl', () => {
 				},
 			];
 
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Custom Dimension"
 					sizes={ customSizes }
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );

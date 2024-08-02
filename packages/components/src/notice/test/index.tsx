@@ -14,6 +14,12 @@ import { speak } from '@wordpress/a11y';
  */
 import Notice from '../index';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 const mockedSpeak = jest.mocked( speak );
 
@@ -27,7 +33,8 @@ describe( 'Notice', () => {
 	} );
 
 	it( 'should match snapshot', async () => {
-		const { container } = await render(
+		const container = createContainer();
+		await render(
 			<Notice
 				status="success"
 				actions={ [
@@ -37,15 +44,18 @@ describe( 'Notice', () => {
 				] }
 			>
 				Example
-			</Notice>
+			</Notice>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should not have is-dismissible class when isDismissible prop is false', async () => {
-		const { container } = await render(
-			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
+		const container = createContainer();
+		await render(
+			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>,
+			{ container }
 		);
 		const wrapper = getNoticeWrapper( container );
 
@@ -54,7 +64,8 @@ describe( 'Notice', () => {
 	} );
 
 	it( 'should default to info status', async () => {
-		const { container } = await render( <Notice>FYI</Notice> );
+		const container = createContainer();
+		await render( <Notice>FYI</Notice>, { container } );
 
 		expect( getNoticeWrapper( container ) ).toHaveClass( 'is-info' );
 	} );

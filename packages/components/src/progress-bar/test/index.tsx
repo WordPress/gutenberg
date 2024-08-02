@@ -10,6 +10,12 @@ import { render } from '@ariakit/test/react';
 import { ProgressBar } from '..';
 import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', async () => {
 		await render( <ProgressBar /> );
@@ -32,7 +38,8 @@ describe( 'ProgressBar', () => {
 	} );
 
 	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', async () => {
-		const { container } = await render( <ProgressBar /> );
+		const container = createContainer();
+		await render( <ProgressBar />, { container } );
 
 		/**
 		 * We're intentionally not using an accessible selector, because
@@ -50,7 +57,8 @@ describe( 'ProgressBar', () => {
 	} );
 
 	it( 'should use `value`% as width for determinate progress bar', async () => {
-		const { container } = await render( <ProgressBar value={ 55 } /> );
+		const container = createContainer();
+		await render( <ProgressBar value={ 55 } />, { container } );
 
 		/**
 		 * We're intentionally not using an accessible selector, because

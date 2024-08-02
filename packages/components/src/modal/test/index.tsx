@@ -231,7 +231,9 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-		const { container } = await render( <AriaDemo /> );
+		const container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		await render( <AriaDemo />, { container } );
 
 		// Opens outer modal > hides container.
 		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
@@ -462,29 +464,29 @@ describe( 'Modal', () => {
 		it( 'is added and removed when modal opens and closes including when closed due to another modal opening', async () => {
 			const user = userEvent.setup();
 
-			const { baseElement } = await render( <BodyClassDemo /> );
+			await render( <BodyClassDemo /> );
 
 			await user.keyboard( 'a' ); // Opens modal A.
-			expect( baseElement ).toHaveClass( 'is-A-open' );
+			expect( document.body ).toHaveClass( 'is-A-open' );
 
 			await user.keyboard( 'b' ); // Opens modal B > closes modal A.
-			expect( baseElement ).toHaveClass( 'is-B-open' );
-			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+			expect( document.body ).toHaveClass( 'is-B-open' );
+			expect( document.body ).not.toHaveClass( 'is-A-open' );
 
 			await user.keyboard( 'b' ); // Closes modal B.
-			expect( baseElement ).not.toHaveClass( 'is-B-open' );
+			expect( document.body ).not.toHaveClass( 'is-B-open' );
 		} );
 
 		it( 'is removed even when prop changes while nested modal is open', async () => {
 			const user = userEvent.setup();
 
-			const { baseElement } = await render( <BodyClassDemo /> );
+			await render( <BodyClassDemo /> );
 
 			await user.keyboard( 'a' ); // Opens modal A.
 			await user.keyboard( '{Meta>}a{/Meta}' ); // Opens nested modal.
 			await user.keyboard( 'c' ); // Changes `bodyOpenClassName`.
 			await user.keyboard( 'a' ); // Closes modal A.
-			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+			expect( document.body ).not.toHaveClass( 'is-A-open' );
 		} );
 	} );
 } );

@@ -9,10 +9,17 @@ import { render } from '@ariakit/test/react';
  */
 import Panel from '..';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'Panel', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty div without any provided props', async () => {
-			const { container } = await render( <Panel children={ null } /> );
+			const container = createContainer();
+			await render( <Panel children={ null } />, { container } );
 
 			expect( container ).toMatchSnapshot();
 		} );
@@ -26,9 +33,10 @@ describe( 'Panel', () => {
 		} );
 
 		it( 'should render an additional className', async () => {
-			const { container } = await render(
-				<Panel className="the-panel" children={ null } />
-			);
+			const container = createContainer();
+			await render( <Panel className="the-panel" children={ null } />, {
+				container,
+			} );
 
 			expect( container ).toMatchSnapshot();
 		} );

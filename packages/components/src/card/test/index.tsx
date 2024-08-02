@@ -16,10 +16,17 @@ import {
 	CardMedia,
 } from '../';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'Card', () => {
 	describe( 'Card component', () => {
 		it( 'should render correctly', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<Card>
 					<CardHeader>Card Header</CardHeader>
 					<CardBody>Card Body 1</CardBody>
@@ -33,7 +40,8 @@ describe( 'Card', () => {
 						/>
 					</CardMedia>
 					<CardFooter>Card Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
@@ -75,30 +83,36 @@ describe( 'Card', () => {
 		} );
 
 		it( 'should show a box shadow when the elevation prop is greater than 0', async () => {
-			const { container: withElevation } = await render(
-				<Card elevation={ 2 }>Code is Poetry</Card>
-			);
+			const withElevation = createContainer();
+			await render( <Card elevation={ 2 }>Code is Poetry</Card>, {
+				container: withElevation,
+			} );
 			// The `elevation` prop has a default value of "0"
-			const { container: withoutElevation } = await render(
-				<Card>Code is Poetry</Card>
-			);
+			const withoutElevation = createContainer();
+			await render( <Card>Code is Poetry</Card>, {
+				container: withoutElevation,
+			} );
 
 			expect( withElevation ).toMatchDiffSnapshot( withoutElevation );
 		} );
 
 		it( 'should add different amounts of white space when using the size prop', async () => {
 			// The `size` prop has a default value of "medium"
-			const { container: withSizeDefault } = await render(
+			const withSizeDefault = createContainer();
+			await render(
 				<Card>
 					<CardHeader>Header</CardHeader>
 					<CardBody>Code is Poetry</CardBody>
-				</Card>
+				</Card>,
+				{ container: withSizeDefault }
 			);
-			const { container: withSizeLarge } = await render(
+			const withSizeLarge = createContainer();
+			await render(
 				<Card size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Code is Poetry</CardBody>
-				</Card>
+				</Card>,
+				{ container: withSizeLarge }
 			);
 
 			expect( withSizeDefault ).toMatchDiffSnapshot( withSizeLarge );
@@ -106,41 +120,49 @@ describe( 'Card', () => {
 
 		it( 'should warn when the isElevated prop is passed', async () => {
 			// `isElevated` is automatically converted to `elevation="2"`
-			const { container } = await render(
-				<Card isElevated>Code is Poetry</Card>
-			);
+			const container = createContainer();
+			await render( <Card isElevated>Code is Poetry</Card>, {
+				container,
+			} );
 			expect( container ).toMatchSnapshot();
 
 			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should pass the isBorderless and isSize props from its context to its sub-components', async () => {
-			const { container: withoutBorderLarge } = await render(
+			const withoutBorderLarge = createContainer();
+			await render(
 				<Card isBorderless size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container: withoutBorderLarge }
 			);
-			const { container: withBorderSmall } = await render(
+			const withBorderSmall = createContainer();
+			await render(
 				<Card isBorderless={ false } size="small">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container: withBorderSmall }
 			);
 			expect( withoutBorderLarge ).toMatchDiffSnapshot( withBorderSmall );
 		} );
 
 		it( 'should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component', async () => {
-			const { container: withoutBorder } = await render(
+			const withoutBorder = createContainer();
+			await render(
 				<Card isBorderless size="large">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container: withoutBorder }
 			);
-			const { container: withBorder } = await render(
+			const withBorder = createContainer();
+			await render(
 				<Card isBorderless size="large">
 					<CardHeader isBorderless={ false } size="small">
 						Header
@@ -149,25 +171,30 @@ describe( 'Card', () => {
 					<CardFooter isBorderless={ false } size="xSmall">
 						Footer
 					</CardFooter>
-				</Card>
+				</Card>,
+				{ container: withBorder }
 			);
 			expect( withoutBorder ).toMatchDiffSnapshot( withBorder );
 		} );
 
 		it( 'should support the legacy extraSmall value for the size prop as an alias for the xSmall value', async () => {
-			const { container: containerXSmall } = await render(
+			const containerXSmall = createContainer();
+			await render(
 				<Card size="xSmall">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container: containerXSmall }
 			);
-			const { container: containerExtraSmall } = await render(
+			const containerExtraSmall = createContainer();
+			await render(
 				<Card size="extraSmall">
 					<CardHeader>Header</CardHeader>
 					<CardBody>Body</CardBody>
 					<CardFooter>Footer</CardFooter>
-				</Card>
+				</Card>,
+				{ container: containerExtraSmall }
 			);
 			expect( containerXSmall ).toMatchDiffSnapshot(
 				containerExtraSmall
@@ -176,33 +203,34 @@ describe( 'Card', () => {
 
 		describe( 'CardHeader', () => {
 			it( 'should render with a darker background color when isShady is true', async () => {
-				const { container } = await render(
-					<CardHeader>Header</CardHeader>
-				);
-				const { container: containerShady } = await render(
-					<CardHeader isShady>Header</CardHeader>
-				);
+				const container = createContainer();
+				await render( <CardHeader>Header</CardHeader>, { container } );
+				const containerShady = createContainer();
+				await render( <CardHeader isShady>Header</CardHeader>, {
+					container: containerShady,
+				} );
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
 		} );
 
 		describe( 'CardFooter', () => {
 			it( 'should render with a darker background color when isShady is true', async () => {
-				const { container } = await render(
-					<CardFooter>Footer</CardFooter>
-				);
-				const { container: containerShady } = await render(
-					<CardFooter isShady>Footer</CardFooter>
-				);
+				const container = createContainer();
+				await render( <CardFooter>Footer</CardFooter>, { container } );
+				const containerShady = createContainer();
+				await render( <CardFooter isShady>Footer</CardFooter>, {
+					container: containerShady,
+				} );
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
 
 			it( 'should use the justify prop to align its content, like a Flex container', async () => {
-				const { container } = await render(
-					<CardFooter>Footer</CardFooter>
-				);
-				const { container: containerWithFlexEnd } = await render(
-					<CardFooter justify="flex-end">Footer</CardFooter>
+				const container = createContainer();
+				await render( <CardFooter>Footer</CardFooter>, { container } );
+				const containerWithFlexEnd = createContainer();
+				await render(
+					<CardFooter justify="flex-end">Footer</CardFooter>,
+					{ container: containerWithFlexEnd }
 				);
 				expect( container ).toMatchDiffSnapshot( containerWithFlexEnd );
 			} );
@@ -210,18 +238,22 @@ describe( 'Card', () => {
 
 		describe( 'CardBody', () => {
 			it( 'should render with a darker background color when isShady is true', async () => {
-				const { container } = await render( <CardBody>Body</CardBody> );
-				const { container: containerShady } = await render(
-					<CardBody isShady>Body</CardBody>
-				);
+				const container = createContainer();
+				await render( <CardBody>Body</CardBody>, { container } );
+				const containerShady = createContainer();
+				await render( <CardBody isShady>Body</CardBody>, {
+					container: containerShady,
+				} );
 				expect( container ).toMatchDiffSnapshot( containerShady );
 			} );
 
 			it( 'should allow scrolling content with the scrollable prop is true', async () => {
-				const { container: containerScrollable } = await render(
-					<CardBody isScrollable>Body</CardBody>
-				);
-				const { container } = await render( <CardBody>Body</CardBody> );
+				const containerScrollable = createContainer();
+				await render( <CardBody isScrollable>Body</CardBody>, {
+					container: containerScrollable,
+				} );
+				const container = createContainer();
+				await render( <CardBody>Body</CardBody>, { container } );
 				expect( container ).toMatchDiffSnapshot( containerScrollable );
 			} );
 		} );

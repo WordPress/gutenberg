@@ -23,6 +23,12 @@ import {
 import { TOOLTIP_DELAY } from '../../tooltip';
 import type { ToggleGroupControlProps } from '../types';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
@@ -97,17 +103,20 @@ describe.each( [
 
 	describe( 'should render correctly', () => {
 		it( 'with text options', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<Component label="Test Toggle Group Control">
 					{ options }
-				</Component>
+				</Component>,
+				{ container }
 			);
 
 			expect( container ).toMatchSnapshot();
 		} );
 
 		it( 'with icons', async () => {
-			const { container } = await render(
+			const container = createContainer();
+			await render(
 				<Component value="uppercase" label="Test Toggle Group Control">
 					<ToggleGroupControlOptionIcon
 						value="uppercase"
@@ -119,7 +128,8 @@ describe.each( [
 						icon={ formatLowercase }
 						label="Lowercase"
 					/>
-				</Component>
+				</Component>,
+				{ container }
 			);
 
 			expect( container ).toMatchSnapshot();

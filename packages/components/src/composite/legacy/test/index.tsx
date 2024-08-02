@@ -43,16 +43,16 @@ type CompositeState = ReturnType< typeof useCompositeState >;
 type CompositeStateProps = CompositeState | { state: CompositeState };
 
 async function renderAndValidate( ...args: Parameters< typeof render > ) {
-	const view = render( ...args );
+	// TODO: this function can potentially be removed after @ariakit/test migration
+	await render( ...args );
 	await waitFor( () => {
 		const activeButton = queryByAttribute(
 			'data-active-item',
-			view.baseElement,
+			document.body,
 			'true'
 		);
 		expect( activeButton ).not.toBeNull();
 	} );
-	return view;
 }
 
 function getKeys( rtl: boolean ) {

@@ -9,17 +9,25 @@ import { render } from '@ariakit/test/react';
  */
 import PanelRow from '../row';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'PanelRow', () => {
 	it( 'should render with the default class name', async () => {
-		const { container } = await render( <PanelRow children={ null } /> );
+		const container = createContainer();
+		await render( <PanelRow children={ null } />, { container } );
 
 		expect( container ).toMatchSnapshot();
 	} );
 
 	it( 'should render with the custom class name', async () => {
-		const { container } = await render(
-			<PanelRow className="custom" children={ null } />
-		);
+		const container = createContainer();
+		await render( <PanelRow className="custom" children={ null } />, {
+			container,
+		} );
 
 		expect( container ).toMatchSnapshot();
 	} );

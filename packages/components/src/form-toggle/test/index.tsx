@@ -16,6 +16,12 @@ import { useState } from '@wordpress/element';
 import FormToggle, { noop } from '..';
 import type { FormToggleProps } from '../types';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
@@ -34,9 +40,8 @@ const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a span element with an unchecked checkbox', async () => {
-			const { container } = await render(
-				<FormToggle onChange={ noop } />
-			);
+			const container = createContainer();
+			await render( <FormToggle onChange={ noop } />, { container } );
 
 			expect( getInput() ).not.toBeChecked();
 			expect( container ).toMatchSnapshot();
@@ -49,12 +54,15 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render with an additional className', async () => {
-			const { container: containerDefault } = await render(
-				<FormToggle onChange={ noop } />
-			);
+			const containerDefault = createContainer();
+			await render( <FormToggle onChange={ noop } />, {
+				container: containerDefault,
+			} );
 
-			const { container: containerWithClassName } = await render(
-				<FormToggle onChange={ noop } className="testing" />
+			const containerWithClassName = createContainer();
+			await render(
+				<FormToggle onChange={ noop } className="testing" />,
+				{ container: containerWithClassName }
 			);
 
 			// Expect the diff snapshot to be mostly about the className.
@@ -64,15 +72,18 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render an id prop for the input checkbox', async () => {
-			const { container: containerDefault } = await render(
-				<FormToggle onChange={ noop } />
-			);
+			const containerDefault = createContainer();
+			await render( <FormToggle onChange={ noop } />, {
+				container: containerDefault,
+			} );
 
-			const { container: containerWithID } = await render(
+			const containerWithID = createContainer();
+			await render(
 				// Disabled because of our rule restricting literal IDs, preferring
 				// `withInstanceId`. In this case, it's fine to use literal IDs.
 				// eslint-disable-next-line no-restricted-syntax
-				<FormToggle onChange={ noop } id="test" />
+				<FormToggle onChange={ noop } id="test" />,
+				{ container: containerWithID }
 			);
 
 			// Expect the diff snapshot to be mostly about the ID.
