@@ -19,9 +19,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from '../../item-actions';
-import SingleSelectionCheckbox from '../../single-selection-checkbox';
-import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import ItemActions from '../../components/dataviews-item-actions';
+import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from '../../types';
 import type { SetSelection } from '../../private-types';
 
@@ -145,7 +145,7 @@ function GridItem< Item >( {
 							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
-										{ field.header }
+										{ field.label }
 									</FlexItem>
 									<FlexItem
 										className="dataviews-view-grid__field-value"
@@ -172,6 +172,7 @@ export default function ViewGrid< Item >( {
 	onChangeSelection,
 	selection,
 	view,
+	density,
 }: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout?.mediaField
@@ -202,6 +203,9 @@ export default function ViewGrid< Item >( {
 		{ visibleFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
+	const gridStyle = density
+		? { gridTemplateColumns: `repeat(${ density }, minmax(0, 1fr))` }
+		: {};
 	return (
 		<>
 			{ hasData && (
@@ -210,6 +214,7 @@ export default function ViewGrid< Item >( {
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"
+					style={ gridStyle }
 					aria-busy={ isLoading }
 				>
 					{ data.map( ( item ) => {

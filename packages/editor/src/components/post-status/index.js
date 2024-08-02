@@ -5,7 +5,6 @@ import {
 	Button,
 	CheckboxControl,
 	Dropdown,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
@@ -16,6 +15,13 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import {
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,70 +37,40 @@ import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
-const labels = {
-	'auto-draft': __( 'Draft' ),
-	draft: __( 'Draft' ),
-	pending: __( 'Pending' ),
-	private: __( 'Private' ),
-	future: __( 'Scheduled' ),
-	publish: __( 'Published' ),
+const postStatusesInfo = {
+	'auto-draft': { label: __( 'Draft' ), icon: drafts },
+	draft: { label: __( 'Draft' ), icon: drafts },
+	pending: { label: __( 'Pending' ), icon: pending },
+	private: { label: __( 'Private' ), icon: notAllowed },
+	future: { label: __( 'Scheduled' ), icon: scheduled },
+	publish: { label: __( 'Published' ), icon: published },
 };
 
 export const STATUS_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Draft' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Not ready to publish.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Draft' ),
 		value: 'draft',
+		description: __( 'Not ready to publish.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Pending' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Waiting for review before publishing.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Pending' ),
 		value: 'pending',
+		description: __( 'Waiting for review before publishing.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Private' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Only visible to site admins and editors.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Private' ),
 		value: 'private',
+		description: __( 'Only visible to site admins and editors.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Scheduled' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Publish automatically on a chosen date.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Scheduled' ),
 		value: 'future',
+		description: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Published' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visible to everyone.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Published' ),
 		value: 'publish',
+		description: __( 'Visible to everyone.' ),
 	},
 ];
 
@@ -200,13 +176,14 @@ export default function PostStatus() {
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
+							icon={ postStatusesInfo[ status ]?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
 								__( 'Change post status: %s' ),
-								labels[ status ]
+								postStatusesInfo[ status ]?.label
 							) }
 						>
-							{ labels[ status ] }
+							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -277,6 +254,7 @@ export default function PostStatus() {
 														id={ passwordInputId }
 														__next40pxDefaultSize
 														__nextHasNoMarginBottom
+														maxLength={ 255 }
 													/>
 												</div>
 											) }
@@ -290,7 +268,7 @@ export default function PostStatus() {
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">
-					{ labels[ status ] }
+					{ postStatusesInfo[ status ]?.label }
 				</div>
 			) }
 		</PostPanelRow>

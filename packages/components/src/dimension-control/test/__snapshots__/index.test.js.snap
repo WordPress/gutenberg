@@ -120,6 +120,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
+  color: currentColor;
   cursor: inherit;
   display: block;
   font-family: inherit;
@@ -405,6 +406,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
+  color: currentColor;
   cursor: inherit;
   display: block;
   font-family: inherit;
@@ -700,6 +702,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
+  color: currentColor;
   cursor: inherit;
   display: block;
   font-family: inherit;
@@ -1007,6 +1010,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
+  color: currentColor;
   cursor: inherit;
   display: block;
   font-family: inherit;

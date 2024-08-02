@@ -5,11 +5,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	useEntityBlockEditor,
-	store as coreStore,
-	useResourcePermissions,
-} from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -37,9 +33,9 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const mediaPermissions = useResourcePermissions( 'media' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
+		hasUploadPermissions,
 		reusableBlocks,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
@@ -55,8 +51,11 @@ export default function WidgetAreasBlockEditorProvider( {
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		return {
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
+			hasUploadPermissions:
+				canUser( 'create', {
+					kind: 'root',
+					name: 'media',
+				} ) ?? true,
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )
 				: EMPTY_ARRAY,
@@ -76,7 +75,7 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
-		if ( mediaPermissions.canCreate ) {
+		if ( hasUploadPermissions ) {
 			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
 				uploadMedia( {
 					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
@@ -97,11 +96,11 @@ export default function WidgetAreasBlockEditorProvider( {
 			pageForPosts,
 		};
 	}, [
+		hasUploadPermissions,
 		blockEditorSettings,
 		isFixedToolbarActive,
 		isLargeViewport,
 		keepCaretInsideBlock,
-		mediaPermissions.canCreate,
 		reusableBlocks,
 		setIsInserterOpened,
 		pageOnFront,

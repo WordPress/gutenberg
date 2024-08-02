@@ -293,8 +293,10 @@ module.exports = {
 						'CheckboxControl',
 						'ComboboxControl',
 						'FocalPointPicker',
+						'RangeControl',
 						'SearchControl',
 						'TextareaControl',
+						'ToggleGroupControl',
 						'TreeSelect',
 					].map( ( componentName ) => ( {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,

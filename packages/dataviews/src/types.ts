@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ComponentType } from 'react';
+import type {
+	ReactElement,
+	ComponentType,
+	Dispatch,
+	SetStateAction,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -44,7 +49,11 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
-export type FieldType = 'text';
+export type FieldType = 'text' | 'integer';
+
+export type ValidationContext = {
+	elements?: Option[];
+};
 
 /**
  * A dataview field for a specific property of a data type.
@@ -63,7 +72,12 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
+
+	/**
+	 * A description of the field.
+	 */
+	description?: string;
 
 	/**
 	 * Placeholder for the field.
@@ -74,6 +88,21 @@ export type Field< Item > = {
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
 	render?: ComponentType< { item: Item } >;
+
+	/**
+	 * Callback used to render an edit control for the field.
+	 */
+	Edit?: ComponentType< DataFormControlProps< Item > >;
+
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
 	 * Whether the field is sortable.
@@ -116,9 +145,12 @@ export type Field< Item > = {
 	  } );
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
+	Edit: ComponentType< DataFormControlProps< Item > >;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 };
 
 /**
@@ -133,6 +165,12 @@ export type Data< Item > = Item[];
  */
 export type Form = {
 	visibleFields?: string[];
+};
+
+export type DataFormControlProps< Item > = {
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: Dispatch< SetStateAction< Item > >;
 };
 
 /**
@@ -242,7 +280,7 @@ interface ViewBase {
 export interface CombinedField {
 	id: string;
 
-	header: string;
+	label: string;
 
 	/**
 	 * The fields to use as columns.
@@ -434,6 +472,7 @@ export interface ViewBaseProps< Item > {
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

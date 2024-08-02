@@ -22,21 +22,23 @@
 		}
 	}
 
-	&.is-viewtype-list {
+	.dataviews-view-list & {
 		.block-editor-block-preview__container {
 			height: 120px;
 		}
 	}
 
-	&.is-viewtype-grid {
+	.dataviews-view-grid & {
 		.block-editor-block-preview__container {
 			height: 100%;
 		}
 	}
 
-	&.is-viewtype-table {
+	.dataviews-view-table & {
 		border-radius: $radius-block-ui;
 		position: relative;
+		width: 120px;
+		max-height: 160px;
 
 		&::after {
 			content: "";
@@ -52,7 +54,13 @@
 }
 
 .page-templates-description {
-	white-space: normal;
+	max-width: 50em;
+	text-wrap: balance; // Fallback for Safari
+	text-wrap: pretty;
+
+	.dataviews-view-table & {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .edit-site-page-templates {
