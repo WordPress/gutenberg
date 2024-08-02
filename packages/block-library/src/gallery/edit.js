@@ -125,12 +125,9 @@ function GalleryEdit( props ) {
 	const lightboxSetting = blockSetting.hasOwnProperty( 'core/image' )
 		? blockSetting[ 'core/image' ]?.lightbox
 		: false;
-	const isLightBoxEditingEnabled = lightboxSetting
-		? lightboxSetting?.allowEditing
-		: true;
 
 	useEffect( () => {
-		if ( ! isLightBoxEditingEnabled ) {
+		if ( ! lightboxSetting?.allowEditing ) {
 			linkOptions = linkOptions.filter(
 				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
 			);
