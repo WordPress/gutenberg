@@ -86,7 +86,7 @@ describe( 'editor utils', () => {
 				{
 					name: 'file:./assets/other/image.jpg',
 					href: 'https://wordpress.org/assets/other/image.jpg',
-					target: "styles.blocks.['core/group].background.backgroundImage.url",
+					target: "styles.blocks.['core/group'].background.backgroundImage.url",
 				},
 			],
 		},
