@@ -30,11 +30,13 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 		viewRef.current = view;
 	}, [ onChangeView, view ] );
 	useEffect( () => {
-		onChangeViewRef.current( {
-			...viewRef.current,
-			page: 1,
-			search: debouncedSearch,
-		} );
+		if ( debouncedSearch !== viewRef.current?.search ) {
+			onChangeViewRef.current( {
+				...viewRef.current,
+				page: 1,
+				search: debouncedSearch,
+			} );
+		}
 	}, [ debouncedSearch ] );
 	const searchLabel = label || __( 'Search' );
 	return (
