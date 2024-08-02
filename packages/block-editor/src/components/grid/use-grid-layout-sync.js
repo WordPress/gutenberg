@@ -27,11 +27,11 @@ function unsetGridPositionAttributes( attributes ) {
 	const { columnStart, rowStart, ...layout } = attributes.style?.layout ?? {};
 	// Only update attributes if columnStart or rowStart are set.
 	if ( columnStart || rowStart ) {
+		if ( ! Object.keys( layout ).length ) {
+			return { style: { ...attributes.style, layout: undefined } };
+		}
 		return {
-			style: {
-				...attributes.style,
-				layout,
-			},
+			style: { ...attributes.style, layout },
 		};
 	}
 }
