@@ -24,7 +24,7 @@ type SelectControlBaseProps = Pick<
 	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
 		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
 		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-		options?: {
+		options?: ( {
 			/**
 			 * The label to be shown to the user.
 			 */
@@ -34,20 +34,7 @@ type SelectControlBaseProps = Pick<
 			 * This is also the value passed to `onChange` when the option is selected.
 			 */
 			value: string;
-			id?: string;
-			/**
-			 * Whether or not the option should have the disabled attribute.
-			 *
-			 * @default false
-			 */
-			disabled?: boolean;
-			/**
-			 * Whether or not the option should be hidden.
-			 *
-			 * @default false
-			 */
-			hidden?: boolean;
-		}[];
+		} & Omit< React.ComponentProps< 'option' >, 'label' | 'value' > )[];
 		/**
 		 * As an alternative to the `options` prop, `optgroup`s and `options` can be
 		 * passed in as `children` for more customizability.
