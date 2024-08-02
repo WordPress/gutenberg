@@ -33,7 +33,6 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 		<PanelBody title={ __( 'Settings' ) }>
 			<UnitControl
 				label={ __( 'Width' ) }
-				labelPosition="edge"
 				__unstableInputWidth="calc(50% - 8px)"
 				__next40pxDefaultSize
 				value={ width || '' }
