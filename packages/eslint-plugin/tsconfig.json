@@ -2,13 +2,16 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"isolatedDeclarations": false,
+
 		"module": "CommonJS",
-		"rootDir": "rules",
-		"declarationDir": "build-types"
+		"rootDir": "."
 	},
 	"references": [ { "path": "../prettier-config" } ],
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
+	// the future, this can be simplified to a broader `includes`.
 	"files": [ "rules/dependency-group.js", "rules/no-unsafe-wp-apis.js" ]
 }

@@ -51,10 +51,8 @@ const afterNextFrame = ( callback: () => void ) => {
 
 /**
  * Returns a promise that resolves after yielding to main.
- *
- * @return Promise
  */
-export const splitTask = () => {
+export const splitTask: () => Promise< void > = () => {
 	return new Promise( ( resolve ) => {
 		// TODO: Use scheduler.yield() when available.
 		setTimeout( resolve, 0 );
@@ -92,7 +90,7 @@ function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
  *
  * @param callback The callback function to be executed.
  */
-export function useSignalEffect( callback: () => unknown ) {
+export function useSignalEffect( callback: () => unknown ): void {
 	_useEffect( () => {
 		let eff: Flusher | null = null;
 		let isExecuting = false;
@@ -182,7 +180,7 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
  *
  * @param callback The hook callback.
  */
-export function useWatch( callback: () => unknown ) {
+export function useWatch( callback: () => unknown ): void {
 	useSignalEffect( withScope( callback ) );
 }
 
@@ -195,7 +193,7 @@ export function useWatch( callback: () => unknown ) {
  *
  * @param callback The hook callback.
  */
-export function useInit( callback: EffectCallback ) {
+export function useInit( callback: EffectCallback ): void {
 	_useEffect( withScope( callback ), [] );
 }
 
@@ -212,7 +210,7 @@ export function useInit( callback: EffectCallback ) {
  * @param inputs   If present, effect will only activate if the
  *                 values in the list change (using `===`).
  */
-export function useEffect( callback: EffectCallback, inputs: Inputs ) {
+export function useEffect( callback: EffectCallback, inputs: Inputs ): void {
 	_useEffect( withScope( callback ), inputs );
 }
 
@@ -229,7 +227,10 @@ export function useEffect( callback: EffectCallback, inputs: Inputs ) {
  * @param inputs   If present, effect will only activate if the
  *                 values in the list change (using `===`).
  */
-export function useLayoutEffect( callback: EffectCallback, inputs: Inputs ) {
+export function useLayoutEffect(
+	callback: EffectCallback,
+	inputs: Inputs
+): void {
 	_useLayoutEffect( withScope( callback ), inputs );
 }
 
@@ -284,7 +285,15 @@ export function useMemo< T >( factory: () => T, inputs: Inputs ): T {
 export const createRootFragment = (
 	parent: Element,
 	replaceNode: Node | Node[]
-) => {
+): {
+	nodeType: number;
+	parentNode: Element;
+	firstChild: Node;
+	childNodes: Node[];
+	insertBefore: ( child: any, root: any ) => void;
+	appendChild: ( child: any, root: any ) => void;
+	removeChild: ( c: Node ) => void;
+} => {
 	replaceNode = ( [] as Node[] ).concat( replaceNode );
 	const sibling = replaceNode[ replaceNode.length - 1 ].nextSibling;
 	function insert( child: any, root: any ) {

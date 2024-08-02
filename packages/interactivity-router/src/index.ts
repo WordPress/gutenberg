@@ -170,12 +170,15 @@ window.addEventListener( 'popstate', async () => {
 if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Cache the scripts. Has to be called before fetching the assets.
-		[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-			headElements.set( script.getAttribute( 'src' ), {
-				tag: script,
-				text: script.textContent,
-			} );
-		} );
+		[].map.call(
+			document.querySelectorAll( 'script[src]' ),
+			( script: HTMLScriptElement ) => {
+				headElements.set( script.getAttribute( 'src' ), {
+					tag: script,
+					text: script.textContent,
+				} );
+			}
+		);
 		await fetchHeadAssets( document, headElements );
 	}
 }
@@ -209,7 +212,26 @@ const isValidEvent = ( event: MouseEvent ) =>
 // Variable to store the current navigation.
 let navigatingTo = '';
 
-export const { state, actions } = store( 'core/router', {
+interface Store {
+	state: {
+		url: string;
+		navigation: {
+			hasStarted: boolean;
+			hasFinished: boolean;
+			texts: {
+				loading: string;
+				loaded: string;
+			};
+			message: string;
+		};
+	};
+	actions: {
+		navigate: ( href: string, options?: NavigateOptions ) => void;
+		prefetch: ( url: string, options?: PrefetchOptions ) => void;
+	};
+}
+
+const interactivityRouterStore = store( 'core/router', {
 	state: {
 		url: window.location.href,
 		navigation: {
@@ -393,3 +415,6 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		);
 	}
 }
+
+export const state: Store[ 'state' ] = interactivityRouterStore.state;
+export const actions: Store[ 'actions' ] = interactivityRouterStore.actions;

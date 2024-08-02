@@ -10,6 +10,7 @@ import {
 	createContext,
 	cloneElement,
 	type ComponentChildren,
+	type JSX,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
@@ -73,7 +74,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: object;
 	ref: RefObject< HTMLElement >;
-	attributes: createElement.JSX.HTMLAttributes;
+	attributes: JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -149,7 +150,10 @@ export const getContext = < T extends object >( namespace?: string ): T =>
  *
  * @return Element representation.
  */
-export const getElement = () => {
+export const getElement = (): {
+	readonly ref: HTMLElement | null;
+	readonly attributes: JSX.HTMLAttributes;
+} => {
 	if ( ! getScope() ) {
 		throw Error(
 			'Cannot call `getElement()` outside getters and actions used by directives.'
@@ -162,21 +166,21 @@ export const getElement = () => {
 	} );
 };
 
-export const getScope = () => scopeStack.slice( -1 )[ 0 ];
+export const getScope = (): Scope => scopeStack.slice( -1 )[ 0 ];
 
-export const setScope = ( scope: Scope ) => {
+export const setScope = ( scope: Scope ): void => {
 	scopeStack.push( scope );
 };
-export const resetScope = () => {
+export const resetScope = (): void => {
 	scopeStack.pop();
 };
 
-export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
+export const getNamespace = (): string => namespaceStack.slice( -1 )[ 0 ];
 
-export const setNamespace = ( namespace: string ) => {
+export const setNamespace = ( namespace: string ): void => {
 	namespaceStack.push( namespace );
 };
-export const resetNamespace = () => {
+export const resetNamespace = (): void => {
 	namespaceStack.pop();
 };
 
@@ -260,13 +264,13 @@ export const directive = (
 	name: string,
 	callback: DirectiveCallback,
 	{ priority = 10 }: DirectiveOptions = {}
-) => {
+): void => {
 	directiveCallbacks[ name ] = callback;
 	directivePriorities[ name ] = priority;
 };
 
 // Resolve the path to some property of the store object.
-const resolve = ( path: string, namespace: string ) => {
+const resolve = ( path: string, namespace: string ): unknown => {
 	if ( ! namespace ) {
 		warn(
 			`Namespace missing for "${ path }". The value for that path won't be resolved.`
@@ -286,7 +290,11 @@ const resolve = ( path: string, namespace: string ) => {
 	try {
 		// TODO: Support lazy/dynamically initialized stores
 		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {}
+	} catch {}
+
+	// Return something from each code-path, let TypeScript know we expect to return `undefined`.
+	// eslint-disable-next-line no-useless-return
+	return;
 };
 
 // Generate the evaluate function.

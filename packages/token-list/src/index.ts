@@ -18,19 +18,27 @@ export default class TokenList {
 		this.value = initialValue;
 	}
 
-	entries( ...args: Parameters< Array< string >[ 'entries' ] > ) {
+	entries(
+		...args: Parameters< Array< string >[ 'entries' ] >
+	): ReturnType< Array< string >[ 'entries' ] > {
 		return this._valueAsArray.entries( ...args );
 	}
 
-	forEach( ...args: Parameters< Array< string >[ 'forEach' ] > ) {
+	forEach(
+		...args: Parameters< Array< string >[ 'forEach' ] >
+	): ReturnType< Array< string >[ 'forEach' ] > {
 		return this._valueAsArray.forEach( ...args );
 	}
 
-	keys( ...args: Parameters< Array< string >[ 'keys' ] > ) {
+	keys(
+		...args: Parameters< Array< string >[ 'keys' ] >
+	): ReturnType< Array< string >[ 'keys' ] > {
 		return this._valueAsArray.keys( ...args );
 	}
 
-	values( ...args: Parameters< Array< string >[ 'values' ] > ) {
+	values(
+		...args: Parameters< Array< string >[ 'values' ] >
+	): ReturnType< Array< string >[ 'values' ] > {
 		return this._valueAsArray.values( ...args );
 	}
 

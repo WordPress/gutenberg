@@ -6,7 +6,7 @@
  *
  * @param string The ansi string.
  */
-function stripAnsi( string: string ) {
+function stripAnsi( string: string ): string {
 	return string.replace(
 		new RegExp(
 			[

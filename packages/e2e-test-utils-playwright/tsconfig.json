@@ -2,21 +2,19 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": false,
+		"isolatedDeclarations": false,
+
 		"incremental": false,
 		"composite": false,
 		"module": "Node16",
 		"moduleResolution": "node16",
 		"types": [ "node" ],
-		"rootDir": "src",
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"declarationDir": "build-types",
-		"emitDeclarationOnly": false,
-		"allowJs": true,
-		"checkJs": false
+		"emitDeclarationOnly": false
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src" ]
 }

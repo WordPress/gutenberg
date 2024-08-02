@@ -21,7 +21,7 @@ import {
 } from './markdown';
 import type { ReportedIssue } from './types';
 
-async function run() {
+async function run(): Promise< void > {
 	const token = core.getInput( 'repo-token', { required: true } );
 	const artifactPath = core.getInput( 'artifact-path', {
 		required: true,

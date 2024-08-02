@@ -4,7 +4,9 @@
  * @async
  * @param newHead The head elements of the new page.
  */
-export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
+export const updateHead = async (
+	newHead: HTMLHeadElement[]
+): Promise< void > => {
 	// Helper to get the tag id store in the cache.
 	const getTagId = ( tag: Element ) => tag.id || tag.outerHTML;
 

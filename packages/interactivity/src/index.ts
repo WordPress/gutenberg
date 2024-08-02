@@ -33,7 +33,7 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
-export const privateApis = ( lock ): any => {
+export const privateApis = ( lock: unknown ): any => {
 	if ( lock === requiredConsent ) {
 		return {
 			directivePrefix,

@@ -2,10 +2,11 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types"
+		"allowJs": true,
+		"checkJs": true,
+		"isolatedDeclarations": false
 	},
 	"references": [ { "path": "../i18n" }, { "path": "../url" } ],
-	"include": [ "src/**/*" ],
+	"include": [ "src" ],
 	"exclude": [ "**/test/**/*" ]
 }
