@@ -26,6 +26,7 @@ function InbetweenInsertionPointPopover( {
 	__unstableContentRef,
 	operation = 'insert',
 	nearestSide = 'right',
+	isVisible,
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -177,6 +178,7 @@ function InbetweenInsertionPointPopover( {
 				onFocus={ onFocus }
 				className={ clsx( className, {
 					'is-with-inserter': isInserterShown,
+					'is-visible': isVisible,
 				} ) }
 				onHoverEnd={ maybeHideInserterPoint }
 			>
@@ -231,7 +233,6 @@ export default function InsertionPoint( props ) {
 	);
 
 	if (
-		! isVisible ||
 		// Don't render the insertion point if the block list is empty.
 		// The insertion point will be represented by the appender instead.
 		isBlockListEmpty
@@ -243,7 +244,7 @@ export default function InsertionPoint( props ) {
 	 * Render a popover that overlays the block when the desired operation is to replace it.
 	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
 	 */
-	return insertionPoint.operation === 'replace' ? (
+	return isVisible && insertionPoint.operation === 'replace' ? (
 		<BlockDropZonePopover
 			// Force remount to trigger the animation.
 			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
@@ -253,6 +254,7 @@ export default function InsertionPoint( props ) {
 		<InbetweenInsertionPointPopover
 			operation={ insertionPoint.operation }
 			nearestSide={ insertionPoint.nearestSide }
+			isVisible={ isVisible }
 			{ ...props }
 		/>
 	);

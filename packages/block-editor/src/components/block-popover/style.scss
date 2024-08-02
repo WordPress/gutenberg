@@ -45,6 +45,16 @@
 	}
 }
 
+.block-editor-block-list__insertion-point {
+	opacity: 0;
+	pointer-events: none;
+
+	&:focus-within,
+	.is-visible {
+		opacity: 1;
+		pointer-events: all;
+	}
+}
 
 .components-popover.block-editor-block-popover__drop-zone {
 	// Disable pointer events for dragging and dropping.
