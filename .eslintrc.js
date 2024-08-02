@@ -467,6 +467,7 @@ module.exports = {
 										'framer-motion',
 									].includes( name )
 							),
+							// TODO: enable this rule in the future.
 							// {
 							// 	name: '@testing-library/user-event',
 							// 	message:
