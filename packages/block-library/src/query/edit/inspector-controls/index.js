@@ -24,6 +24,7 @@ import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
+import PostFormatControls from './post-format-controls';
 import StickyControl from './sticky-control';
 import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
@@ -52,6 +53,7 @@ export default function QueryInspectorControls( props ) {
 		inherit,
 		taxQuery,
 		parents,
+		postFormat,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -127,12 +129,15 @@ export default function QueryInspectorControls( props ) {
 	const showParentControl =
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
+	const showPostFormatControl =
+		taxonomies && taxonomies.some( ( { slug } ) => slug === 'post_format' );
 
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
 		showSearchControl ||
-		showParentControl;
+		showParentControl ||
+		showPostFormatControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
@@ -263,6 +268,7 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
+							postFormat: [],
 						} );
 						setQuerySearch( '' );
 					} }
@@ -321,6 +327,18 @@ export default function QueryInspectorControls( props ) {
 								parents={ parents }
 								postType={ postType }
 								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showPostFormatControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! postFormat?.length }
+							label={ __( 'Formats' ) }
+							onDeselect={ () => setQuery( { postFormat: [] } ) }
+						>
+							<PostFormatControls
+								onChange={ setQuery }
+								query={ query }
 							/>
 						</ToolsPanelItem>
 					) }

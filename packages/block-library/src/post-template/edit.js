@@ -90,6 +90,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			pages,
+			postFormat,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -138,17 +139,8 @@ export default function PostTemplateEdit( {
 							( { slug } ) => slug === taxonomySlug
 						);
 						if ( taxonomy?.rest_base ) {
-							// Convert post format term ID's to a comma separated string,
-							// otherwise the Rest API will return a "rest_invalid_param" error
-							// and there will be a PHP fatal error from _post_format_request.
-							if (
-								taxonomy.rest_base === 'post_format' &&
-								Array.isArray( terms ) &&
-								terms.length > 0
-							) {
-								accumulator[ taxonomy.rest_base ] =
-									terms.join( ',' );
-							} else {
+							// Skip post formats, as they are handled separately.
+							if ( ! taxonomy.rest_base === 'post_format' ) {
 								accumulator[ taxonomy.rest_base ] = terms;
 							}
 						}
@@ -175,6 +167,10 @@ export default function PostTemplateEdit( {
 			if ( parents?.length ) {
 				query.parent = parents;
 			}
+			if ( postFormat?.length ) {
+				query.post_format = postFormat;
+			}
+
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
@@ -217,6 +213,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			postFormat,
 			restQueryArgs,
 			previewPostType,
 		]

@@ -50,10 +50,15 @@ const getTermIdByTermValue = ( terms, termValue ) => {
 export function TaxonomyControls( { onChange, query } ) {
 	const { postType, taxQuery } = query;
 
-	const taxonomies = useTaxonomies( postType );
+	let taxonomies = useTaxonomies( postType );
 	if ( ! taxonomies || taxonomies.length === 0 ) {
 		return null;
 	}
+
+	// Remove post formats, as they are handled separately.
+	taxonomies = taxonomies.filter(
+		( taxonomy ) => taxonomy.slug !== 'post_format'
+	);
 
 	return (
 		<VStack spacing={ 4 }>

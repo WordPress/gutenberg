@@ -25,7 +25,8 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
-				"parents": []
+				"parents": [],
+				"postFormat": []
 			}
 		},
 		"tagName": {
