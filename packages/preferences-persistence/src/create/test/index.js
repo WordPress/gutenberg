@@ -10,6 +10,14 @@ import create from '..';
 
 jest.mock( '@wordpress/api-fetch' );
 
+// See https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function.
+// Jest fake timers and async functions don't mix too well, since queued up
+// promises can prevent jest from calling timeouts.
+// This function flushes promises in the queue.
+function flushPromises() {
+	return new Promise( jest.requireActual( 'timers' ).setImmediate );
+}
+
 describe( 'create', () => {
 	afterEach( () => {
 		apiFetch.mockReset();
@@ -39,13 +47,19 @@ describe( 'create', () => {
 			);
 		} );
 
-		it( 'sends data to the `users/me` endpoint', () => {
+		it( 'sends data to the `users/me` endpoint', async () => {
+			// Take control of time, since `set` implements a debounce.
+			jest.useFakeTimers();
+
 			apiFetch.mockResolvedValueOnce();
 
 			const { set } = create();
 
 			const data = { test: 1 };
 			set( data );
+
+			await flushPromises();
+			jest.runAllTimers();
 
 			expect( apiFetch ).toHaveBeenCalledWith( {
 				path: '/wp/v2/users/me',
@@ -57,6 +71,9 @@ describe( 'create', () => {
 					},
 				},
 			} );
+
+			jest.runOnlyPendingTimers();
+			jest.useRealTimers();
 		} );
 	} );
 
@@ -75,6 +92,8 @@ describe( 'create', () => {
 		} );
 
 		it( 'returns from a local cache once `set` has been called', async () => {
+			// Take control of time, since `set` implements a debounce.
+			jest.useFakeTimers();
 			const getItemSpy = jest.spyOn(
 				global.Storage.prototype,
 				'getItem'
@@ -86,6 +105,10 @@ describe( 'create', () => {
 
 			// apiFetch was called as a result of calling `set`.
 			set( data );
+
+			await flushPromises();
+			jest.runAllTimers();
+
 			expect( apiFetch ).toHaveBeenCalled();
 			apiFetch.mockClear();
 
@@ -94,6 +117,9 @@ describe( 'create', () => {
 			expect( await get() ).toEqual( expect.objectContaining( data ) );
 			expect( getItemSpy ).not.toHaveBeenCalled();
 			expect( apiFetch ).not.toHaveBeenCalled();
+
+			jest.runOnlyPendingTimers();
+			jest.useRealTimers();
 		} );
 
 		it( 'returns data from the users/me endpoint if there is no data in localStorage', async () => {

@@ -388,11 +388,11 @@ export const replaceBlocks =
 				type: 'REPLACE_BLOCKS',
 				clientIds,
 				blocks,
-				time: Date.now(),
 				indexToSelect,
 				initialPosition,
 				meta,
 			} );
+			dispatch.updateInsertUsage( blocks );
 			// To avoid a focus loss when removing the last block, assure there is
 			// always a default block if the last of the blocks have been removed.
 			dispatch.ensureDefaultBlock();
@@ -592,11 +592,11 @@ export const insertBlocks =
 				blocks: allowedBlocks,
 				index,
 				rootClientId,
-				time: Date.now(),
 				updateSelection,
 				initialPosition: updateSelection ? initialPosition : null,
 				meta,
 			} );
+			dispatch.updateInsertUsage( allowedBlocks );
 		}
 	};
 
@@ -1409,7 +1409,6 @@ export function replaceInnerBlocks(
 		blocks,
 		updateSelection,
 		initialPosition: updateSelection ? initialPosition : null,
-		time: Date.now(),
 	};
 }
 

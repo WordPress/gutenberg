@@ -219,6 +219,7 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 			const registry = createRegistry();
 
 			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
@@ -227,7 +228,6 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
-				time: expect.any( Number ),
 				initialPosition: 0,
 			} );
 		} );
@@ -260,6 +260,8 @@ describe( 'actions', () => {
 				},
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 
 			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
@@ -286,6 +288,7 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 			const registry = createRegistry();
 
 			replaceBlocks(
@@ -297,7 +300,6 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks,
-				time: expect.any( Number ),
 				initialPosition: 0,
 			} );
 		} );
@@ -324,6 +326,7 @@ describe( 'actions', () => {
 			};
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 			const registry = createRegistry();
 
 			replaceBlocks(
@@ -338,11 +341,44 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks,
-				time: expect.any( Number ),
 				indexToSelect: null,
 				initialPosition: null,
 				meta: { patternName: 'core/chicken-ribs-pattern' },
 			} );
+		} );
+
+		it( 'should set insertUsage in the preferences store', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/test-chicken',
+				},
+			];
+
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: () => true,
+				getBlockCount: () => 1,
+			};
+
+			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
+			const registry = createRegistry();
+
+			replaceBlocks(
+				[ 'pineapple' ],
+				blocks,
+				null,
+				null
+			)( { select, dispatch, registry } );
+
+			expect( dispatch.updateInsertUsage ).toHaveBeenCalledWith( blocks );
 		} );
 	} );
 
@@ -358,7 +394,9 @@ describe( 'actions', () => {
 				getSettings: () => null,
 				canInsertBlockType: () => true,
 			};
-			const dispatch = jest.fn();
+			const dispatch = Object.assign( jest.fn(), {
+				updateInsertUsage: () => {},
+			} );
 
 			insertBlock(
 				block,
@@ -372,7 +410,6 @@ describe( 'actions', () => {
 				blocks: [ block ],
 				index,
 				rootClientId: 'testclientid',
-				time: expect.any( Number ),
 				updateSelection: true,
 				initialPosition: 0,
 			} );
@@ -411,6 +448,8 @@ describe( 'actions', () => {
 				},
 			};
 			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 
 			insertBlocks(
 				blocks,
@@ -424,7 +463,6 @@ describe( 'actions', () => {
 				blocks: [ ribsBlock, chickenRibsBlock ],
 				index: 5,
 				rootClientId: 'testrootid',
-				time: expect.any( Number ),
 				updateSelection: false,
 				initialPosition: null,
 			} );
@@ -446,6 +484,7 @@ describe( 'actions', () => {
 				canInsertBlockType: () => false,
 			};
 			const dispatch = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 
 			insertBlocks(
 				blocks,
@@ -489,6 +528,7 @@ describe( 'actions', () => {
 				},
 			};
 			const dispatch = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
 
 			insertBlocks(
 				blocks,
@@ -504,11 +544,40 @@ describe( 'actions', () => {
 				blocks: [ ribsBlock, chickenRibsBlock ],
 				index: 5,
 				rootClientId: 'testrootid',
-				time: expect.any( Number ),
 				updateSelection: false,
 				initialPosition: null,
 				meta: { patternName: 'core/chicken-ribs-pattern' },
 			} );
+		} );
+
+		it( 'should update insertUsage', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/test-chicken',
+				},
+			];
+
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+			dispatch.updateInsertUsage = jest.fn();
+
+			insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false,
+				0
+			)( { select, dispatch } );
+
+			expect( dispatch.updateInsertUsage ).toHaveBeenCalledWith( blocks );
 		} );
 	} );
 
@@ -783,7 +852,6 @@ describe( 'actions', () => {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ block ],
 				rootClientId: 'root',
-				time: expect.any( Number ),
 				updateSelection: false,
 				initialPosition: null,
 			} );
@@ -794,7 +862,6 @@ describe( 'actions', () => {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ block ],
 				rootClientId: 'root',
-				time: expect.any( Number ),
 				updateSelection: true,
 				initialPosition: 0,
 			} );

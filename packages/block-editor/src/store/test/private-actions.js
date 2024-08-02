@@ -5,11 +5,14 @@ import {
 	hideBlockInterface,
 	showBlockInterface,
 	expandBlock,
+	updateInsertUsage,
 	__experimentalUpdateSettings,
 	setOpenedBlockSettingsMenu,
 	startDragging,
 	stopDragging,
 } from '../private-actions';
+
+import { lock } from '../../lock-unlock';
 
 describe( 'private actions', () => {
 	describe( 'hideBlockInterface', () => {
@@ -24,6 +27,165 @@ describe( 'private actions', () => {
 		it( 'should return the SHOW_BLOCK_INTERFACE action', () => {
 			expect( showBlockInterface() ).toEqual( {
 				type: 'SHOW_BLOCK_INTERFACE',
+			} );
+		} );
+	} );
+
+	describe( 'updateInsertUsage', () => {
+		it( 'should record recently used blocks', () => {
+			const actions = { set: jest.fn() };
+			const privateActions = { markNextChangeAsExpensive: jest.fn() };
+			lock( actions, privateActions );
+			const registry = {
+				dispatch: () => actions,
+				select: () => ( {
+					get: () => {},
+					getActiveBlockVariation: () => {},
+				} ),
+			};
+
+			updateInsertUsage( [
+				{
+					clientId: 'bacon',
+					name: 'core/embed',
+				},
+			] )( { registry } );
+
+			expect(
+				privateActions.markNextChangeAsExpensive
+			).toHaveBeenCalled();
+			expect( actions.set ).toHaveBeenCalledWith( 'core', 'insertUsage', {
+				'core/embed': {
+					time: expect.any( Number ),
+					count: 1,
+				},
+			} );
+		} );
+
+		it( 'merges insert usage if more blocks are added of the same type', () => {
+			const actions = { set: jest.fn() };
+			const privateActions = { markNextChangeAsExpensive: jest.fn() };
+			lock( actions, privateActions );
+			const registry = {
+				dispatch: () => actions,
+				select: () => ( {
+					// simulate an existing embed block.
+					get: () => ( {
+						'core/embed': {
+							time: 123456,
+							count: 1,
+						},
+					} ),
+					getActiveBlockVariation: () => {},
+				} ),
+			};
+
+			updateInsertUsage( [
+				{
+					clientId: 'eggs',
+					name: 'core/embed',
+				},
+				{
+					clientId: 'bacon',
+					name: 'core/block',
+					attributes: { ref: 123 },
+				},
+			] )( { registry } );
+
+			expect(
+				privateActions.markNextChangeAsExpensive
+			).toHaveBeenCalled();
+			expect( actions.set ).toHaveBeenCalledWith( 'core', 'insertUsage', {
+				// The reusable block has a special case where each ref is
+				// stored as though an individual block, and the ref is
+				// also recorded in the `insert` object.
+				'core/block/123': {
+					time: expect.any( Number ),
+					count: 1,
+				},
+				'core/embed': {
+					time: expect.any( Number ),
+					count: 2,
+				},
+			} );
+		} );
+
+		describe( 'block variations handling', () => {
+			const blockWithVariations = 'core/test-block-with-variations';
+
+			it( 'should return proper results with both found or not found block variation matches', () => {
+				const actions = { set: jest.fn() };
+				const privateActions = { markNextChangeAsExpensive: jest.fn() };
+				lock( actions, privateActions );
+				const registry = {
+					dispatch: () => actions,
+					select: () => ( {
+						get: () => {},
+						// simulate an active block variation:
+						// - 'apple' when the fruit attribute is 'apple'.
+						// - 'orange' when the fruit attribute is 'orange'.
+						getActiveBlockVariation: (
+							blockName,
+							{ fruit } = {}
+						) => {
+							if ( blockName === blockWithVariations ) {
+								if ( fruit === 'orange' ) {
+									return { name: 'orange' };
+								}
+								if ( fruit === 'apple' ) {
+									return { name: 'apple' };
+								}
+							}
+						},
+					} ),
+				};
+
+				updateInsertUsage( [
+					{
+						clientId: 'no match',
+						name: blockWithVariations,
+					},
+					{
+						clientId: 'not a variation match',
+						name: blockWithVariations,
+						attributes: { fruit: 'not in a variation' },
+					},
+					{
+						clientId: 'orange',
+						name: blockWithVariations,
+						attributes: { fruit: 'orange' },
+					},
+					{
+						clientId: 'apple',
+						name: blockWithVariations,
+						attributes: { fruit: 'apple' },
+					},
+				] )( { registry } );
+
+				const orangeVariationName = `${ blockWithVariations }/orange`;
+				const appleVariationName = `${ blockWithVariations }/apple`;
+
+				expect(
+					privateActions.markNextChangeAsExpensive
+				).toHaveBeenCalled();
+				expect( actions.set ).toHaveBeenCalledWith(
+					'core',
+					'insertUsage',
+					{
+						[ orangeVariationName ]: {
+							time: expect.any( Number ),
+							count: 1,
+						},
+						[ appleVariationName ]: {
+							time: expect.any( Number ),
+							count: 1,
+						},
+						[ blockWithVariations ]: {
+							time: expect.any( Number ),
+							count: 2,
+						},
+					}
+				);
 			} );
 		} );
 	} );

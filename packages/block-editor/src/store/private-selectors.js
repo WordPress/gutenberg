@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -30,6 +31,8 @@ import {
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
+
+const EMPTY_OBJECT = {};
 
 /**
  * Returns true if the block interface is hidden, or false otherwise.
@@ -511,3 +514,19 @@ export function getTemporarilyEditingAsBlocks( state ) {
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
+
+/**
+ * Return all insert usage stats.
+ *
+ * This is only exported since registry selectors need to be exported. It's marked
+ * as unstable so that it's not considered part of the public API.
+ *
+ * @return {Object<string,Object>} An object with an `id` key representing the type
+ *                                 of block and an object value that contains
+ *                                 block insertion statistics.
+ */
+export const getInsertUsage = createRegistrySelector(
+	( registrySelect ) => () =>
+		registrySelect( preferencesStore ).get( 'core', 'insertUsage' ) ??
+		EMPTY_OBJECT
+);

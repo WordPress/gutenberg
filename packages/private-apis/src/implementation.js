@@ -31,6 +31,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/reusable-blocks',
 	'@wordpress/router',
 	'@wordpress/dataviews',
+	'@wordpress/preferences',
 ];
 
 /**

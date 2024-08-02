@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import debounceAsync from './debounce-async';
+import createAsyncDebouncer from './create-async-debouncer';
 
 const EMPTY_OBJECT = {};
 const localStorage = window.localStorage;
@@ -16,25 +16,31 @@ const localStorage = window.localStorage;
  * REST API.
  *
  * @param {Object}  options
- * @param {?Object} options.preloadedData          Any persisted preferences data that should be preloaded.
- *                                                 When set, the persistence layer will avoid fetching data
- *                                                 from the REST API.
- * @param {?string} options.localStorageRestoreKey The key to use for restoring the localStorage backup, used
- *                                                 when the persistence layer calls `localStorage.getItem` or
- *                                                 `localStorage.setItem`.
- * @param {?number} options.requestDebounceMS      Debounce requests to the API so that they only occur at
- *                                                 minimum every `requestDebounceMS` milliseconds, and don't
- *                                                 swamp the server. Defaults to 2500ms.
+ * @param {?Object} options.preloadedData              Any persisted preferences data that should be preloaded.
+ *                                                     When set, the persistence layer will avoid fetching data
+ *                                                     from the REST API.
+ * @param {?string} options.localStorageRestoreKey     The key to use for restoring the localStorage backup, used
+ *                                                     when the persistence layer calls `localStorage.getItem` or
+ *                                                     `localStorage.setItem`.
+ * @param {?number} options.requestDebounceMS          Debounce requests to the API so that they only occur at
+ *                                                     minimum every `requestDebounceMS` milliseconds, and don't
+ *                                                     swamp the server. Defaults to 1000ms.
+ * @param {?number} options.expensiveRequestDebounceMS A longer debounce that can be defined for updates that have
+ *                                                     `isExpensive=true` defined. defaults to 5000ms.
+ * @param {?number} options.maxWaitMS                  The maximum wait, if the debouncing exceeds the wait, the callback
+ *                                                     will be invoked.
  *
  * @return {Object} A persistence layer for WordPress user meta.
  */
 export default function create( {
 	preloadedData,
 	localStorageRestoreKey = 'WP_PREFERENCES_RESTORE_DATA',
-	requestDebounceMS = 2500,
+	requestDebounceMS = 1000,
+	expensiveRequestDebounceMS = 5000,
+	maxWaitMS = 10000,
 } = {} ) {
 	let cache = preloadedData;
-	const debouncedApiFetch = debounceAsync( apiFetch, requestDebounceMS );
+	const debounce = createAsyncDebouncer( { maxWaitMS } );
 
 	async function get() {
 		if ( cache ) {
@@ -68,7 +74,7 @@ export default function create( {
 		return cache;
 	}
 
-	function set( newData ) {
+	function set( newData, { isExpensive = false } = {} ) {
 		const dataWithTimestamp = {
 			...newData,
 			_modified: new Date().toISOString(),
@@ -83,26 +89,29 @@ export default function create( {
 			JSON.stringify( dataWithTimestamp )
 		);
 
-		// The user meta endpoint seems susceptible to errors when consecutive
-		// requests are made in quick succession. Ensure there's a gap between
-		// any consecutive requests.
-		//
-		// Catch and do nothing with errors from the REST API.
-		debouncedApiFetch( {
-			path: '/wp/v2/users/me',
-			method: 'PUT',
-			// `keepalive` will still send the request in the background,
-			// even when a browser unload event might interrupt it.
-			// This should hopefully make things more resilient.
-			// This does have a size limit of 64kb, but the data is usually
-			// much less.
-			keepalive: true,
-			data: {
-				meta: {
-					persisted_preferences: dataWithTimestamp,
-				},
-			},
-		} ).catch( () => {} );
+		debounce(
+			() =>
+				apiFetch( {
+					path: '/wp/v2/users/me',
+					method: 'PUT',
+					// `keepalive` will still send the request in the background,
+					// even when a browser unload event might interrupt it.
+					// This should hopefully make things more resilient.
+					// This does have a size limit of 64kb, but the data is usually
+					// much less.
+					keepalive: true,
+					data: {
+						meta: {
+							persisted_preferences: dataWithTimestamp,
+						},
+					},
+				} ).catch( () => {} ),
+			{
+				delayMS: isExpensive
+					? expensiveRequestDebounceMS
+					: requestDebounceMS,
+			}
+		);
 	}
 
 	return {
