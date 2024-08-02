@@ -1,4 +1,4 @@
-import TextareaAutosize from 'react-autosize-textarea';
+import { TextareaControl } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -69,11 +69,11 @@ function BlockHTML( { clientId } ) {
 	}, [ blockContent ] );
 
 	return (
-		<TextareaAutosize
+		<TextareaControl
 			className="block-editor-block-list__block-html-textarea"
 			value={ html }
 			onBlur={ onChange }
-			onChange={ ( event ) => setHtml( event.target.value ) }
+			onChange={ setHtml }
 			// The edits are local state until committed on blur, so undo
 			// and redo must remain the browser's own within the field.
 			ref={ nativeUndoRef }
