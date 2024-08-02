@@ -54,6 +54,7 @@ function Edit< Item >( {
 			value={ value ?? '' }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
+			__nextHasNoMarginBottom
 		/>
 	);
 }
