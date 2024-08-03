@@ -4,5 +4,6 @@ iframe[name="editor-canvas"] {
 	height: 100%;
 	display: block;
 	background-color: transparent;
-	@include editor-canvas-resize-animation;
+	transition: all 0.5s cubic-bezier(0.65, 0, 0.45, 1);
+	@include reduce-motion("transition");
 }
