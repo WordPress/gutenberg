@@ -216,29 +216,28 @@ function Iframe( {
 	const isZoomedOut = scale !== 1;
 	const priorContainerWidth = useRef();
 	const isScaleFinal = useRef( false );
-	useEffect( () => {
-		if ( isZoomedOut ) {
-			return () => {
-				isScaleFinal.current = false;
-				if ( iframeDocument && iframeDocument.defaultView ) {
-					const { documentElement, defaultView } = iframeDocument;
-					documentElement.classList.remove( 'is-zoomed-out' );
-					defaultView.frameElement.style.removeProperty(
-						'--wp-block-editor-iframe-zoom-out-scale'
-					);
-					defaultView.frameElement.style.removeProperty(
-						'--wp-block-editor-iframe-zoom-out-inset'
-					);
-				}
-			};
-		}
-	}, [ isZoomedOut, iframeDocument ] );
-
-	useEffect( () => {
-		if ( ! isZoomedOut ) {
-			priorContainerWidth.current = containerWidth;
-		}
-	}, [ containerWidth, isZoomedOut ] );
+	useEffect(
+		() => {
+			if ( isZoomedOut ) {
+				priorContainerWidth.current = containerWidth;
+				return () => {
+					isScaleFinal.current = false;
+					if ( iframeDocument && iframeDocument.defaultView ) {
+						const { documentElement, defaultView } = iframeDocument;
+						documentElement.classList.remove( 'is-zoomed-out' );
+						defaultView.frameElement.style.removeProperty(
+							'--wp-block-editor-iframe-zoom-out-scale'
+						);
+						defaultView.frameElement.style.removeProperty(
+							'--wp-block-editor-iframe-zoom-out-inset'
+						);
+					}
+				};
+			}
+		},
+		// containerWidth omitted so that its value is read once when zoom out engages.
+		[ isZoomedOut, iframeDocument ]
+	);
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
