@@ -15,7 +15,19 @@
  * @return string The block content.
  */
 function render_block_core_tab( $attributes, $content, $block ) {
-	return $content;
+	if ( ! $content ) {
+		return '';
+	}
+
+	// Modify markup to include interactivity API attributes.
+	$p = new WP_HTML_Tag_Processor( $content );
+	while ( $p->next_tag( array( 'class_name' => 'wp-block-tab' ) ) ) {
+		$p->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
+		$p->set_attribute( 'data-wp-bind--tabindex', 'state.tabindexPanelAttribute' );
+		$p->set_attribute( 'data-tab-index', $attributes['tabIndex'] );
+	}
+
+	return $p->get_updated_html();
 }
 
 /**

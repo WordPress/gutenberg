@@ -38,17 +38,27 @@ function render_block_core_tabs( $attributes, $content, $block ) {
 	$p        = new WP_HTML_Tag_Processor( $content );
 	$title_id = wp_unique_id( 'tablist-label-' );
 
+	$tab_label_index = 0;
 	while ( $p->next_tag() ) {
 		if ( $p->has_class( 'wp-block-tabs' ) ) {
 			// Mark block as interactive to trigger tab styles.
 			$p->set_attribute( 'data-wp-interactive', 'core/tabs' );
-			$p->set_attribute( 'data-wp-context', '{ "activeTab": 0 }' );
+			$p->set_attribute( 'data-wp-context', '{ "activeTabIndex": 0 }' );
 			$p->set_attribute( 'data-wp-init', 'callbacks.init' );
 		}
 
 		// Set a unique ID for the title, so it can be used by aria-labelledby.
 		if ( $p->has_class( 'wp-block-tabs__title' ) ) {
 			$p->set_attribute( 'id', $title_id );
+		}
+
+		if ( $p->has_class( 'wp-block-tabs__tab-label' ) ) {
+			$p->set_attribute( 'data-wp-bind--aria-selected', 'state.isActiveTab' );
+			$p->set_attribute( 'data-wp-bind--tabindex', 'state.tabindexLabelAttribute' );
+			$p->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );
+			$p->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
+			$p->set_attribute( 'data-tab-index', $tab_label_index );
+			++$tab_label_index;
 		}
 	}
 

@@ -3,6 +3,30 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
+// Helper function to check for focusable elements
+function isFocusable( element ) {
+	return element.tabIndex >= 0;
+}
+
+function getFirstFocusableChild( element ) {
+	const treeWalker = document.createTreeWalker(
+		element,
+		window.NodeFilter.SHOW_ELEMENT,
+		{
+			acceptNode: ( node ) =>
+				isFocusable( node )
+					? window.NodeFilter.FILTER_ACCEPT
+					: window.NodeFilter.FILTER_SKIP,
+		}
+	);
+
+	return treeWalker.nextNode();
+}
+
+function isNumeric( value ) {
+	return ! isNaN( parseFloat( value ) );
+}
+
 function getTabPanelToLabelIdMap( tabLabels ) {
 	if ( ! tabLabels ) {
 		return new Map();
@@ -63,11 +87,91 @@ function initTabs( ref ) {
 	} );
 }
 
-store( 'core/tabs', {
-	actions: {
-		setActiveTab: ( index ) => {
+const { state, actions } = store( 'core/tabs', {
+	state: {
+		get isActiveTab() {
 			const context = getContext();
-			context.activeTab = index;
+			const { attributes } = getElement();
+			const tabIndexValue = attributes?.[ 'data-tab-index' ];
+			const tabIndex = isNumeric( tabIndexValue )
+				? parseInt( tabIndexValue, 10 )
+				: 0;
+
+			return context.activeTabIndex === tabIndex;
+		},
+		get tabindexLabelAttribute() {
+			return state.isActiveTab ? false : '-1';
+		},
+		get tabindexPanelAttribute() {
+			const { attributes } = getElement();
+			const panel = attributes?.id
+				? document.getElementById( attributes.id )
+				: null;
+			const hasFocusable = panel
+				? !! getFirstFocusableChild( panel )
+				: false;
+			return state.isActiveTab && ! hasFocusable ? '0' : false;
+		},
+	},
+	actions: {
+		handleTabKeyDown: ( event ) => {
+			const { key } = event;
+			const context = getContext();
+			const { ref } = getElement();
+			const container = ref?.closest( '.wp-block-tabs' );
+			const tabs = Array.from(
+				container.querySelectorAll( '.wp-block-tabs__tab-label' ) || []
+			);
+			const currentIndex = tabs.indexOf( event.target );
+
+			let nextIndex = currentIndex;
+
+			switch ( key ) {
+				case 'ArrowRight':
+					nextIndex = ( currentIndex + 1 ) % tabs.length;
+					actions.setActiveTab( nextIndex );
+					break;
+				case 'ArrowLeft':
+					nextIndex =
+						( currentIndex - 1 + tabs.length ) % tabs.length;
+					actions.setActiveTab( nextIndex );
+					break;
+				case 'ArrowDown':
+					event.preventDefault();
+					const panels = Array.from(
+						container?.querySelectorAll( '.wp-block-tab' ) || []
+					);
+					const currentPanel = panels[ context.activeTabIndex ];
+					const focusableChild =
+						getFirstFocusableChild( currentPanel );
+					if ( focusableChild ) {
+						focusableChild.focus();
+					} else {
+						currentPanel?.focus();
+					}
+					return;
+				default:
+					return;
+			}
+
+			tabs[ nextIndex ]?.focus();
+		},
+		handleTabClick: ( event ) => {
+			event.preventDefault();
+
+			const tabIndexValue =
+				event.target?.getAttribute( 'data-tab-index' );
+			const tabIndex = isNumeric( tabIndexValue )
+				? parseInt( tabIndexValue, 10 )
+				: null;
+
+			if ( tabIndex !== null ) {
+				actions.setActiveTab( tabIndex );
+			}
+		},
+		setActiveTab: ( tabIndex ) => {
+			const context = getContext();
+			context.activeTabIndex = tabIndex;
 		},
 	},
 	callbacks: {
