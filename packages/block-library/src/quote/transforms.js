@@ -103,7 +103,7 @@ const transforms = {
 				);
 			},
 			transform: (
-				{ citation, anchor, fontSize, style },
+				{ align, citation, anchor, fontSize, style },
 				innerBlocks
 			) => {
 				const value = innerBlocks
@@ -111,6 +111,7 @@ const transforms = {
 					.join( '<br>' );
 				return createBlock( 'core/pullquote', {
 					value,
+					align,
 					citation,
 					anchor,
 					fontSize,
