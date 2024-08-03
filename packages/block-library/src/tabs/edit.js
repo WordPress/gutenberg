@@ -145,13 +145,18 @@ export default function Edit( { clientId, setAttributes } ) {
 							className="wp-block-tabs__list-item"
 							role="presentation"
 						>
-							<a
+							<a // eslint-disable-line jsx-a11y/anchor-is-valid -- remove href attribute in editor so inner text can be selected for editing
 								aria-controls={ tabPanelId }
 								aria-selected={ isActive }
 								className="wp-block-tabs__tab-label"
-								href={ '#' + tabPanelId }
 								id={ tabLabelId }
 								onClick={ () => setActiveTab( block.clientId ) }
+								onFocus={ () => setActiveTab( block.clientId ) }
+								onKeyDown={ ( event ) => {
+									if ( event.key === 'Enter' ) {
+										setActiveTab( block.clientId );
+									}
+								} }
 								role="tab"
 								tabIndex={ tabIndexAttr }
 							>

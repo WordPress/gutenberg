@@ -116,11 +116,10 @@ const { state, actions } = store( 'core/tabs', {
 	actions: {
 		handleTabKeyDown: ( event ) => {
 			const { key } = event;
-			const context = getContext();
 			const { ref } = getElement();
 			const container = ref?.closest( '.wp-block-tabs' );
 			const tabs = Array.from(
-				container.querySelectorAll( '.wp-block-tabs__tab-label' ) || []
+				container?.querySelectorAll( '.wp-block-tabs__tab-label' ) || []
 			);
 			const currentIndex = tabs.indexOf( event.target );
 
@@ -130,14 +129,17 @@ const { state, actions } = store( 'core/tabs', {
 				case 'ArrowRight':
 					nextIndex = ( currentIndex + 1 ) % tabs.length;
 					actions.setActiveTab( nextIndex );
-					break;
+					tabs[ nextIndex ]?.focus();
+					return;
 				case 'ArrowLeft':
 					nextIndex =
 						( currentIndex - 1 + tabs.length ) % tabs.length;
 					actions.setActiveTab( nextIndex );
-					break;
+					tabs[ nextIndex ]?.focus();
+					return;
 				case 'ArrowDown':
 					event.preventDefault();
+					const context = getContext();
 					const panels = Array.from(
 						container?.querySelectorAll( '.wp-block-tab' ) || []
 					);
@@ -149,12 +151,8 @@ const { state, actions } = store( 'core/tabs', {
 					} else {
 						currentPanel?.focus();
 					}
-					return;
-				default:
-					return;
+					return; // eslint-disable-line no-useless-return -- explicit return for switch statement
 			}
-
-			tabs[ nextIndex ]?.focus();
 		},
 		handleTabClick: ( event ) => {
 			event.preventDefault();
