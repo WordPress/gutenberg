@@ -7,7 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -80,9 +84,14 @@ const SiteHub = memo(
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
 							>
 								{ decodeEntities( siteTitle ) }
+								<VisuallyHidden as="span">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</VisuallyHidden>
 							</Button>
 						</div>
 						<HStack
