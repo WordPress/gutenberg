@@ -27,9 +27,11 @@ export const extractColorNameFromCurrentValue = (
 	}
 
 	const currentValueIsCssVariable = /^var\(/.test( currentValue );
-	const normalizedCurrentValue = currentValueIsCssVariable
-		? currentValue
-		: colord( currentValue ).toHex();
+	const currentValueIsColorMix = /^color-mix\(.*\)$/.test( currentValue );
+	const normalizedCurrentValue =
+		currentValueIsCssVariable || currentValueIsColorMix
+			? currentValue
+			: colord( currentValue ).toHex();
 
 	// Normalize format of `colors` to simplify the following loop
 	type normalizedPaletteObject = { colors: ColorObject[] };
@@ -38,9 +40,10 @@ export const extractColorNameFromCurrentValue = (
 		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			const normalizedColorValue = currentValueIsCssVariable
-				? colorValue
-				: colord( colorValue ).toHex();
+			const normalizedColorValue =
+				currentValueIsCssVariable || currentValueIsColorMix
+					? colorValue
+					: colord( colorValue ).toHex();
 
 			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
