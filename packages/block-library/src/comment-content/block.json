@@ -35,12 +35,25 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
 		"spacing": {
 			"padding": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
 				"padding": true
 			}
 		},
-		"html": false
+		"html": false,
+		"style": "wp-block-comment-content"
 	}
 }
