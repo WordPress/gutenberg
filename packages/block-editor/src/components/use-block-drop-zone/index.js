@@ -275,6 +275,27 @@ export function isDropTargetValid(
 }
 
 /**
+ * Check if the Row or the Gallery can be created with the dragged
+ * blocks and the target block.
+ * @param {boolean} areAllImages
+ * @param {boolean} canInsertGalleryBlock
+ * @param {boolean} areGroupableBlocks
+ * @param {boolean} canInsertRow
+ * @return {boolean} Whether Row block or Gallery can be created.
+ */
+function canCreateRowOrGallery(
+	areAllImages,
+	canInsertGalleryBlock,
+	areGroupableBlocks,
+	canInsertRow
+) {
+	if ( areAllImages ) {
+		return canInsertGalleryBlock || ( areGroupableBlocks && canInsertRow );
+	}
+	return areGroupableBlocks && canInsertRow;
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -301,8 +322,10 @@ export default function useBlockDropZone( {
 		operation: 'insert',
 	} );
 
-	const { getBlockType } = useSelect( blocksStore );
+	const { getBlockType, getBlockVariations, getGroupingBlockName } =
+		useSelect( blocksStore );
 	const {
+		canInsertBlockType,
 		getBlockListSettings,
 		getBlocks,
 		getBlockIndex,
@@ -310,6 +333,7 @@ export default function useBlockDropZone( {
 		getBlockNamesByClientId,
 		getAllowedBlocks,
 		isDragging,
+		isGroupable,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -385,21 +409,57 @@ export default function useBlockDropZone( {
 					};
 				} );
 
+				const dropTargetPosition = getDropTargetPosition(
+					blocksData,
+					{ x: event.clientX, y: event.clientY },
+					getBlockListSettings( targetRootClientId )?.orientation,
+					{
+						dropZoneElement,
+						parentBlockClientId,
+						parentBlockOrientation: parentBlockClientId
+							? getBlockListSettings( parentBlockClientId )
+									?.orientation
+							: undefined,
+						rootBlockIndex: getBlockIndex( targetRootClientId ),
+					}
+				);
+
 				const [ targetIndex, operation, nearestSide ] =
-					getDropTargetPosition(
-						blocksData,
-						{ x: event.clientX, y: event.clientY },
-						getBlockListSettings( targetRootClientId )?.orientation,
-						{
-							dropZoneElement,
-							parentBlockClientId,
-							parentBlockOrientation: parentBlockClientId
-								? getBlockListSettings( parentBlockClientId )
-										?.orientation
-								: undefined,
-							rootBlockIndex: getBlockIndex( targetRootClientId ),
-						}
+					dropTargetPosition;
+
+				if ( operation === 'group' ) {
+					const targetBlock = blocks[ targetIndex ];
+					const areAllImages = [
+						targetBlock.name,
+						...draggedBlockNames,
+					].every( ( name ) => name === 'core/image' );
+					const canInsertGalleryBlock = canInsertBlockType(
+						'core/gallery',
+						targetRootClientId
 					);
+					const areGroupableBlocks = isGroupable( [
+						targetBlock.clientId,
+						getDraggedBlockClientIds(),
+					] );
+					const groupBlockVariations = getBlockVariations(
+						getGroupingBlockName(),
+						'block'
+					);
+					const canInsertRow =
+						groupBlockVariations &&
+						groupBlockVariations.find(
+							( { name } ) => name === 'group-row'
+						);
+					const _canCreateRowOrGallery = canCreateRowOrGallery(
+						areAllImages,
+						canInsertGalleryBlock,
+						areGroupableBlocks,
+						canInsertRow
+					);
+					if ( ! _canCreateRowOrGallery ) {
+						return;
+					}
+				}
 
 				registry.batch( () => {
 					setDropTarget( {
@@ -436,6 +496,10 @@ export default function useBlockDropZone( {
 				showInsertionPoint,
 				isDragging,
 				startDragging,
+				canInsertBlockType,
+				getBlockVariations,
+				getGroupingBlockName,
+				isGroupable,
 			]
 		),
 		200
