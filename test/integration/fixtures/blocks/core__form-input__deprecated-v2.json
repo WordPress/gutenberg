@@ -1,0 +1,16 @@
+[
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "checkbox",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all",
+			"className": "wp-block-form-input"
+		},
+		"innerBlocks": []
+	}
+]
