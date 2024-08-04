@@ -138,7 +138,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/comment-content
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** color (background, gradients, link, text), spacing (padding), style, typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
 ## Comment Date
