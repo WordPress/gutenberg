@@ -9,6 +9,10 @@ function isFocusable( element ) {
 }
 
 function getFirstFocusableChild( element ) {
+	if ( ! element ) {
+		return null;
+	}
+
 	const treeWalker = document.createTreeWalker(
 		element,
 		window.NodeFilter.SHOW_ELEMENT,
@@ -34,7 +38,7 @@ function getTabPanelToLabelIdMap( tabLabels ) {
 
 	return new Map(
 		[ ...tabLabels ].map( ( tabLabel ) => {
-			const tabPanelId = tabLabel.getAttribute( 'href' ).substring( 1 );
+			const tabPanelId = tabLabel.getAttribute( 'href' )?.substring( 1 );
 			const tabLabelId = tabLabel.getAttribute( 'id' );
 			return [ tabPanelId, tabLabelId ];
 		} )
@@ -127,18 +131,26 @@ const { state, actions } = store( 'core/tabs', {
 
 			switch ( key ) {
 				case 'ArrowRight':
+					event.stopPropagation();
+					event.preventDefault();
+
 					nextIndex = ( currentIndex + 1 ) % tabs.length;
 					actions.setActiveTab( nextIndex );
 					tabs[ nextIndex ]?.focus();
-					return;
+					break;
 				case 'ArrowLeft':
+					event.stopPropagation();
+					event.preventDefault();
+
 					nextIndex =
 						( currentIndex - 1 + tabs.length ) % tabs.length;
 					actions.setActiveTab( nextIndex );
 					tabs[ nextIndex ]?.focus();
-					return;
+					break;
 				case 'ArrowDown':
+					event.stopPropagation();
 					event.preventDefault();
+
 					const context = getContext();
 					const panels = Array.from(
 						container?.querySelectorAll( '.wp-block-tab' ) || []
@@ -146,12 +158,15 @@ const { state, actions } = store( 'core/tabs', {
 					const currentPanel = panels[ context.activeTabIndex ];
 					const focusableChild =
 						getFirstFocusableChild( currentPanel );
+
 					if ( focusableChild ) {
 						focusableChild.focus();
 					} else {
 						currentPanel?.focus();
 					}
-					return; // eslint-disable-line no-useless-return -- explicit return for switch statement
+					break;
+				default:
+					break;
 			}
 		},
 		handleTabClick: ( event ) => {
