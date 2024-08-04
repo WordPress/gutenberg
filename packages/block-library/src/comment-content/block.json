@@ -53,7 +53,7 @@
 				"padding": true
 			}
 		},
-		"html": false,
-		"style": "wp-block-comment-content"
-	}
+		"html": false
+	},
+	"style": "wp-block-comment-content"
 }
