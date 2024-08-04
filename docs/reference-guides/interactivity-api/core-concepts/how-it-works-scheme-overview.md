@@ -70,8 +70,26 @@ assets used on the page, WP will automatically add the `@wordpress/interactivity
 the `/wp-includes/js/dist/interactivity.min.js` script. This happens only on pages that have used at least one
 interactive block.
 
-The alias doesn't mean including the asset, so the script will be loaded in the browser during the import command in the
-block JS:
+#### 3.2) WP automatically enqueues the block script (only for Gutenberg blocks).
+
+The Interactivity API blocks have their own JavaScript, which defines actions, and this JavaScript is automatically
+enqueued by WordPress. In the case of the accordion block, the JS code defines only a single client-side state variable:
+
+```js
+import {store, getContext, getElement} from '@wordpress/interactivity';
+
+const {state} = store('accordion', {
+	state: {
+		isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+	}
+});
+```
+
+Pay attention, that automatic enqueueing happens only within Gutenberg blocks. Otherwise, the script should be enqueued
+manually.
+
+Note: the fact that the API script alias was added, doesn't mean loading the asset in browser. The API script will
+be loaded (once) during the import command processing in the block JS:
 
 ```javascript
 import {store, getContext, getElement} from '@wordpress/interactivity';
@@ -91,7 +109,7 @@ State variables of all the blocks, appeared on the page, are added as JSON insid
  ```html
 
 <script type="application/json" id="wp-interactivity-data">
-    {"state":{"accordion":{"isClosed":true}}}
+	{"state":{"accordion":{"isClosed":true}}}
 </script>
    ```
 
@@ -122,9 +140,9 @@ use, the class will be added:
    import {store, getContext, getElement} from '@wordpress/interactivity';
 
 const {state} = store('accordion', {
-    state: {
-        isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
-    }
+	state: {
+		isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+	}
 });
    ```
 
@@ -178,19 +196,24 @@ In a straightforward way, it can be done as follows:
    echo wp_interactivity_process_directives($html);
    ```
 
-#### 2.2) Use of the full path to `interactivity.min.js`.
+#### 2.2) Enqueueing the block's JS and using the full path to `interactivity.min.js`.
 
 Since no Gutenberg block with the Interactivity API is present, WordPress won't create the `@wordpress/interactivity`
-alias. It means that in the block JS snippet, the full path should be used:
+alias, and won't enqueue the block's JavaScript code automatically.
+
+This means that the block's JS code should be added to the theme's JavaScript file and enqueued manually.
+Additionally, in the block's JS snippet, the full path should be used:
 
 ```javascript
 import {store, getContext, getElement} from '/wp-includes/js/dist/interactivity.min.js';
 
 const {state} = store('accordion', {
-    state: {
-        isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
-    }
+	state: {
+		isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
+	}
 });
+
+// the other theme's JS code
 ```
 
 That's allow to apply the Interactivity API to any HTML, even if it has no relation to Gutenberg blocks.
