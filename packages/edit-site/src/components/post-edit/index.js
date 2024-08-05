@@ -47,7 +47,7 @@ function PostEditForm( { postType, postId } ) {
 	const { fields } = usePostFields();
 	const form = {
 		type: 'panel',
-		fields: [ 'title', 'author' ],
+		visibleFields: [ 'title', 'author', 'date' ],
 	};
 	const [ edits, setEdits ] = useState( {} );
 	const itemWithEdits = useMemo( () => {
