@@ -30,6 +30,9 @@ export default function useSelectAll() {
 			if (
 				selectionRoot &&
 				selectedClientIds.length < 2 &&
+				selectionRoot.closest(
+					`[data-block="${ selectedClientIds[ 0 ] }"]`
+				) &&
 				! isEntirelySelected( selectionRoot )
 			) {
 				if ( node === node.ownerDocument.activeElement ) {
