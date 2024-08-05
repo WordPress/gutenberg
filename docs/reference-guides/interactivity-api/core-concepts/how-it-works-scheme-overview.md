@@ -69,6 +69,7 @@ Besides adding the `<script>` tags for all the
 assets used on the page, WP will automatically add the `@wordpress/interactivity` alias, pointing to
 the `/wp-includes/js/dist/interactivity.min.js` script. This happens only on pages that have used at least one
 interactive block.
+[how-it-works-scheme-overview.md](how-it-works-scheme-overview.md)
 
 #### 3.2) WP automatically enqueues the block script (only for Gutenberg blocks).
 
@@ -99,8 +100,7 @@ If the block has no JS code, the interactivity JS won't be enqueued. It may look
 it becomes clear that no block JS means no actions and no client-side states, so the server will deliver the final
 markup, which won't have any changes down the line.
 
-As soon as some client changes are necessary, we add JS, and the
-script is enqueued.
+As soon as some client changes are necessary, JS code is added, and the script is enqueued.
 
 #### 3.2) State variables are added as JSON:
 
@@ -136,15 +136,15 @@ It was omitted on the server side due to the
 missing state variable. Now, on the client side, the related directive will be processed, and if the dark theme is in
 use, the class will be added:
 
-   ```javascript
-   import {store, getContext, getElement} from '@wordpress/interactivity';
+```javascript
+import {store, getContext, getElement} from '@wordpress/interactivity';
 
 const {state} = store('accordion', {
 	state: {
 		isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
 	}
 });
-   ```
+```
 
 The client-side-only approach for state variables should only be used when there are specific requirements, cause unlike
 server-processed directives, it isn't SEO-friendly.
@@ -181,20 +181,20 @@ above-mentioned snippet, it'll require a couple of things to be done manually:
 
 In a straightforward way, it can be done as follows:
 
-   ```php
-   echo wp_interactivity_state('maccordion', ['isOpen' => false]);
+```php
+wp_interactivity_state('maccordion', ['isOpen' => false]);
 
-   ob_start();
-   ?>
+ob_start();
+ ?>
 
-   <div class="accordion" data-wp-interactive="accordion">
-     <!-- inner HTML elements here -->
-   </div>
+<div class="accordion" data-wp-interactive="accordion">
+	<!-- inner HTML elements here -->
+</div>
 
-   <?php
-   $html = (string) ob_get_clean();
-   echo wp_interactivity_process_directives($html);
-   ```
+<?php
+$html = (string) ob_get_clean();
+echo wp_interactivity_process_directives($html);
+```
 
 #### 2.2) Enqueueing the block's JS and using the full path to `interactivity.min.js`.
 
