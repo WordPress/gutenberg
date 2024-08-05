@@ -7,6 +7,7 @@ import {
 	ToolbarGroup,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { _n, sprintf, __ } from '@wordpress/i18n';
@@ -17,7 +18,10 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useSomeItemHasAPossibleBulkAction } from '../dataviews-bulk-actions';
+import {
+	useSomeItemHasAPossibleBulkAction,
+	BulkSelectionCheckbox,
+} from '../dataviews-bulk-actions';
 import DataViewsContext from '../dataviews-context';
 import { ActionWithModal } from '../dataviews-item-actions';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
@@ -34,29 +38,11 @@ interface ActionButtonProps< Item > {
 
 interface ToolbarContentProps< Item > {
 	selection: string[];
-	actionsToShow: Action< Item >[];
-	selectedItems: Item[];
 	onChangeSelection: SetSelection;
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
 }
-
-const SNACKBAR_VARIANTS = {
-	init: {
-		bottom: -48,
-	},
-	open: {
-		bottom: 24,
-		transition: {
-			bottom: { type: 'tween', duration: 0.2, ease: [ 0, 0, 0.2, 1 ] },
-		},
-	},
-	exit: {
-		opacity: 0,
-		bottom: 24,
-		transition: {
-			opacity: { type: 'tween', duration: 0.2, ease: [ 0, 0, 0.2, 1 ] },
-		},
-	},
-};
 
 function ActionTrigger< Item >( {
 	action,
@@ -120,96 +106,57 @@ function ActionButton< Item >( {
 	);
 }
 
-function renderToolbarContent< Item >(
-	selection: string[],
-	actionsToShow: Action< Item >[],
-	selectedItems: Item[],
-	actionInProgress: string | null,
-	setActionInProgress: ( actionId: string | null ) => void,
-	onChangeSelection: SetSelection
-) {
-	return (
-		<>
-			<ToolbarGroup>
-				<div className="dataviews-bulk-actions-toolbar__selection-count">
-					{ selection.length === 1
-						? __( '1 item selected' )
-						: sprintf(
-								// translators: %s: Total number of selected items.
-								_n(
-									'%s item selected',
-									'%s items selected',
-									selection.length
-								),
-								selection.length
-						  ) }
-				</div>
-			</ToolbarGroup>
-			<ToolbarGroup>
-				{ actionsToShow.map( ( action ) => {
-					return (
-						<ActionButton
-							key={ action.id }
-							action={ action }
-							selectedItems={ selectedItems }
-							actionInProgress={ actionInProgress }
-							setActionInProgress={ setActionInProgress }
-						/>
-					);
-				} ) }
-			</ToolbarGroup>
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ closeSmall }
-					showTooltip
-					tooltipPosition="top"
-					label={ __( 'Cancel' ) }
-					disabled={ !! actionInProgress }
-					onClick={ () => {
-						onChangeSelection( EMPTY_ARRAY );
-					} }
-				/>
-			</ToolbarGroup>
-		</>
-	);
-}
-
 function ToolbarContent< Item >( {
 	selection,
-	actionsToShow,
-	selectedItems,
+	actions,
 	onChangeSelection,
+	data,
+	getItemId,
 }: ToolbarContentProps< Item > ) {
-	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
-		null
+	const bulkActions = useMemo(
+		() => actions.filter( ( action ) => action.supportsBulk ),
+		[ actions ]
 	);
-	const buttonsRef = useRef< JSX.Element | null >( null );
-	if ( ! actionInProgress ) {
-		if ( buttonsRef.current ) {
-			buttonsRef.current = null;
-		}
-		return renderToolbarContent(
-			selection,
-			actionsToShow,
-			selectedItems,
-			actionInProgress,
-			setActionInProgress,
-			onChangeSelection
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return bulkActions.some(
+				( action ) => ! action.isEligible || action.isEligible( item )
+			);
+		} );
+	}, [ data, bulkActions ] );
+
+	const selectedItems = useMemo( () => {
+		return data.filter(
+			( item ) =>
+				selection.includes( getItemId( item ) ) &&
+				selectableItems.includes( item )
 		);
-	} else if ( ! buttonsRef.current ) {
-		buttonsRef.current = renderToolbarContent(
-			selection,
-			actionsToShow,
-			selectedItems,
-			actionInProgress,
-			setActionInProgress,
-			onChangeSelection
-		);
-	}
-	return buttonsRef.current;
+	}, [ selection, data, getItemId, selectableItems ] );
+	const countToShow =
+		selectedItems.length > 0
+			? selectedItems.length
+			: selectableItems.length;
+	return (
+		<HStack>
+			<BulkSelectionCheckbox
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				data={ data }
+				actions={ actions }
+				getItemId={ getItemId }
+			/>
+			<span>
+				{ sprintf(
+					/* translators: %d: number of items. */
+					_n( '%d item', '%d items', countToShow ),
+					countToShow
+				) }
+			</span>
+		</HStack>
+	);
 }
 
-function _BulkActionsToolbar() {
+export default function BulkActionsToolbar() {
 	const {
 		data,
 		selection,
@@ -217,7 +164,6 @@ function _BulkActionsToolbar() {
 		onChangeSelection,
 		getItemId,
 	} = useContext( DataViewsContext );
-	const isReducedMotion = useReducedMotion();
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
@@ -239,50 +185,13 @@ function _BulkActionsToolbar() {
 		[ actions, selectedItems ]
 	);
 
-	if (
-		( selection && selection.length === 0 ) ||
-		actionsToShow.length === 0
-	) {
-		return null;
-	}
-
 	return (
-		<AnimatePresence>
-			<motion.div
-				layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-				initial="init"
-				animate="open"
-				exit="exit"
-				variants={ isReducedMotion ? undefined : SNACKBAR_VARIANTS }
-				className="dataviews-bulk-actions-toolbar"
-			>
-				<Toolbar label={ __( 'Bulk actions' ) }>
-					<div className="dataviews-bulk-actions-toolbar__wrapper">
-						<ToolbarContent
-							selection={ selection }
-							actionsToShow={ actionsToShow }
-							selectedItems={ selectedItems }
-							onChangeSelection={ onChangeSelection }
-						/>
-					</div>
-				</Toolbar>
-			</motion.div>
-		</AnimatePresence>
+		<ToolbarContent
+			selection={ selection }
+			onChangeSelection={ onChangeSelection }
+			data={ data }
+			actions={ actions }
+			getItemId={ getItemId }
+		/>
 	);
-}
-
-export default function BulkActionsToolbar() {
-	const { data, actions = [], view } = useContext( DataViewsContext );
-	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
-		actions,
-		data
-	);
-	if (
-		! [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) ||
-		! hasPossibleBulkAction
-	) {
-		return null;
-	}
-
-	return <_BulkActionsToolbar />;
 }

@@ -5,6 +5,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Button,
 	Modal,
+	CheckboxControl,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback, useContext } from '@wordpress/element';
@@ -17,6 +18,7 @@ import DataViewsContext from '../dataviews-context';
 import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal } from '../../types';
+import type { SetSelection } from '../../private-types';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
@@ -67,6 +69,58 @@ export function useSomeItemHasAPossibleBulkAction< Item >(
 			} );
 		} );
 	}, [ actions, data ] );
+}
+
+interface BulkSelectionCheckboxProps< Item > {
+	selection: string[];
+	onChangeSelection: SetSelection;
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
+}
+
+export function BulkSelectionCheckbox< Item >( {
+	selection,
+	onChangeSelection,
+	data,
+	actions,
+	getItemId,
+}: BulkSelectionCheckboxProps< Item > ) {
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return actions.some(
+				( action ) =>
+					action.supportsBulk &&
+					( ! action.isEligible || action.isEligible( item ) )
+			);
+		} );
+	}, [ data, actions ] );
+	const selectedItems = data.filter(
+		( item ) =>
+			selection.includes( getItemId( item ) ) &&
+			selectableItems.includes( item )
+	);
+	const areAllSelected = selectedItems.length === selectableItems.length;
+	return (
+		<CheckboxControl
+			className="dataviews-view-table-selection-checkbox"
+			__nextHasNoMarginBottom
+			checked={ areAllSelected }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
+			onChange={ () => {
+				if ( areAllSelected ) {
+					onChangeSelection( [] );
+				} else {
+					onChangeSelection(
+						selectableItems.map( ( item ) => getItemId( item ) )
+					);
+				}
+			} }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
+		/>
+	);
 }
 
 function ActionWithModal< Item >( {
