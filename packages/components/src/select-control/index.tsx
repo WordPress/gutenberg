@@ -26,6 +26,22 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
+function SelectOptions( {
+	options,
+}: {
+	options: NonNullable< SelectControlProps[ 'options' ] >;
+} ) {
+	return options.map( ( { id, label, value, ...optionProps }, index ) => {
+		const key = id || `${ label }-${ value }-${ index }`;
+
+		return (
+			<option key={ key } value={ value } { ...optionProps }>
+				{ label }
+			</option>
+		);
+	} );
+}
+
 function UnforwardedSelectControl(
 	props: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
@@ -115,23 +131,7 @@ function UnforwardedSelectControl(
 					value={ valueProp }
 					variant={ variant }
 				>
-					{ children ||
-						options.map( ( option, index ) => {
-							const key =
-								option.id ||
-								`${ option.label }-${ option.value }-${ index }`;
-
-							return (
-								<option
-									key={ key }
-									value={ option.value }
-									disabled={ option.disabled }
-									hidden={ option.hidden }
-								>
-									{ option.label }
-								</option>
-							);
-						} ) }
+					{ children || <SelectOptions options={ options } /> }
 				</Select>
 			</StyledInputBase>
 		</BaseControl>
