@@ -39,7 +39,7 @@
 .block-editor-global-styles__shadow-indicator {
 	color: $gray-800;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	cursor: pointer;
 	padding: 0;
 
@@ -83,8 +83,8 @@
 		border-bottom: 1px solid $gray-300;
 
 		&:not(:only-child):nth-child(1 of &) {
-			border-top-left-radius: $radius-block-ui;
-			border-top-right-radius: $radius-block-ui;
+			border-top-left-radius: $radius-small;
+			border-top-right-radius: $radius-small;
 			border-top: 1px solid $gray-300;
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
@@ -92,8 +92,8 @@
 
 		// Identify the last visible instance as placeholder items will not have this class.
 		&:not(:only-child):nth-last-child(1 of &) {
-			border-bottom-left-radius: $radius-block-ui;
-			border-bottom-right-radius: $radius-block-ui;
+			border-bottom-left-radius: $radius-small;
+			border-bottom-right-radius: $radius-small;
 			border-top: 0;
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
@@ -101,7 +101,7 @@
 
 		&:only-child {
 			border-top: 1px solid $gray-300;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 		}
 
 		> div,
@@ -219,7 +219,7 @@
 	.components-focal-point-picker-wrapper {
 		background-color: $gray-100;
 		width: 100%;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		border: $border-width solid $gray-300;
 	}
 
