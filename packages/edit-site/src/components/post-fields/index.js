@@ -259,9 +259,6 @@ function usePostFields( viewType ) {
 				label: __( 'Status' ),
 				id: 'status',
 				type: 'text',
-				getValue: ( { item } ) =>
-					STATUSES.find( ( { value } ) => value === item.status )
-						?.label ?? item.status,
 				elements: STATUSES,
 				render: PostStatusField,
 				enableSorting: false,
