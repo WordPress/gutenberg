@@ -27,7 +27,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		[ gridClientId ]
 	);
 
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { getBlockAttributes, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -126,18 +127,34 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 			}
 
-			// Unset the columnStart/rowStart attributes for blocks removed
-			// from the grid.
+			// Unset grid layout attributes for blocks removed from the grid.
 			previousBlockOrder?.forEach( ( clientId ) => {
 				if ( ! blockOrder.includes( clientId ) ) {
+					const rootClientId = getBlockRootClientId( clientId );
+
+					// Block was removed from the editor, so nothing to do.
+					if ( rootClientId === null ) {
+						return;
+					}
+
+					const rootAttributes = getBlockAttributes( rootClientId );
+					const newLayoutIsGrid =
+						rootAttributes?.layout?.type === 'grid';
 					const attributes = getBlockAttributes( clientId );
-					const pathsToUnset = [
-						[ 'styles', 'layout', 'columnStart' ],
-						[ 'styles', 'layout', 'rowStart' ],
-						[ 'styles', 'layout', 'columnSpan' ],
-						[ 'styles', 'layout', 'rowSpan' ],
-					];
-					const updatedAttributes = pathsToUnset.reduce(
+					// If the block is moving from one grid layout to another,
+					// keep the span attributes for use in the target grid.
+					const attributesToUnset = newLayoutIsGrid
+						? [
+								[ 'style', 'layout', 'columnStart' ],
+								[ 'style', 'layout', 'rowStart' ],
+						  ]
+						: [
+								[ 'style', 'layout', 'columnStart' ],
+								[ 'style', 'layout', 'rowStart' ],
+								[ 'style', 'layout', 'columnSpan' ],
+								[ 'style', 'layout', 'rowSpan' ],
+						  ];
+					const updatedAttributes = attributesToUnset.reduce(
 						( attrs, path ) =>
 							setImmutably( attrs, path, undefined ),
 						attributes
@@ -151,11 +168,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			if ( previousIsManualPlacement === true ) {
 				for ( const clientId of blockOrder ) {
 					const attributes = getBlockAttributes( clientId );
-					const pathsToUnset = [
-						[ 'styles', 'layout', 'columnStart' ],
-						[ 'styles', 'layout', 'rowStart' ],
+					const attributesToUnset = [
+						[ 'style', 'layout', 'columnStart' ],
+						[ 'style', 'layout', 'rowStart' ],
 					];
-					const updatedAttributes = pathsToUnset.reduce(
+					const updatedAttributes = attributesToUnset.reduce(
 						( attrs, path ) =>
 							setImmutably( attrs, path, undefined ),
 						attributes
