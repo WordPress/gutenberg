@@ -2,44 +2,23 @@
  * WordPress dependencies
  */
 import {
-	privateApis as componentsPrivateApis,
 	Button,
-	Modal,
 	CheckboxControl,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback, useContext } from '@wordpress/element';
+import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
-import { unlock } from '../../lock-unlock';
-import type { Action, ActionModal } from '../../types';
+import { ActionWithModal } from '../dataviews-item-actions';
+import type { Action } from '../../types';
 import type { SetSelection } from '../../private-types';
-
-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
-
-interface ActionWithModalProps< Item > {
-	action: ActionModal< Item >;
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
-	onMenuOpenChange: ( isOpen: boolean ) => void;
-}
-
-interface BulkActionsItemProps< Item > {
-	action: Action< Item >;
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
-}
-
-interface ActionsMenuGroupProps< Item > {
-	actions: Action< Item >[];
-	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal< Item > ) => void;
-}
+import type { ActionTriggerProps } from '../dataviews-item-actions';
 
 export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
@@ -123,126 +102,164 @@ export function BulkSelectionCheckbox< Item >( {
 	);
 }
 
-function ActionWithModal< Item >( {
+interface ActionButtonProps< Item > {
+	action: Action< Item >;
+	selectedItems: Item[];
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
+}
+
+interface ToolbarContentProps< Item > {
+	selection: string[];
+	onChangeSelection: SetSelection;
+	data: Item[];
+	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
+}
+
+function ActionTrigger< Item >( {
 	action,
-	selectedItems,
-	setActionWithModal,
-	onMenuOpenChange,
-}: ActionWithModalProps< Item > ) {
-	const eligibleItems = useMemo( () => {
-		return selectedItems.filter(
-			( item ) => ! action.isEligible || action.isEligible( item )
-		);
-	}, [ action, selectedItems ] );
-	const { RenderModal, hideModalHeader } = action;
-	const onCloseModal = useCallback( () => {
-		setActionWithModal( undefined );
-	}, [ setActionWithModal ] );
-
-	if ( ! eligibleItems.length ) {
-		return null;
-	}
-
+	onClick,
+	isBusy,
+	items,
+}: ActionTriggerProps< Item > ) {
 	const label =
-		typeof action.label === 'string'
-			? action.label
-			: action.label( selectedItems );
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Modal
-			title={ ! hideModalHeader ? label : undefined }
-			__experimentalHideHeader={ !! hideModalHeader }
-			onRequestClose={ onCloseModal }
-			overlayClassName="dataviews-bulk-actions__modal"
-		>
-			<RenderModal
-				items={ eligibleItems }
-				closeModal={ onCloseModal }
-				onActionPerformed={ () => onMenuOpenChange( false ) }
-			/>
-		</Modal>
+		<Button
+			disabled={ isBusy }
+			accessibleWhenDisabled
+			label={ label }
+			icon={ action.icon }
+			isDestructive={ action.isDestructive }
+			size="compact"
+			onClick={ onClick }
+			isBusy={ isBusy }
+			tooltipPosition="top"
+		/>
 	);
 }
 
-function BulkActionItem< Item >( {
+const EMPTY_ARRAY: [] = [];
+
+function ActionButton< Item >( {
 	action,
 	selectedItems,
-	setActionWithModal,
-}: BulkActionsItemProps< Item > ) {
+	actionInProgress,
+	setActionInProgress,
+}: ActionButtonProps< Item > ) {
 	const registry = useRegistry();
-	const eligibleItems = useMemo( () => {
-		return selectedItems.filter(
-			( item ) => ! action.isEligible || action.isEligible( item )
-		);
+	const selectedEligibleItems = useMemo( () => {
+		return selectedItems.filter( ( item ) => {
+			return ! action.isEligible || action.isEligible( item );
+		} );
 	}, [ action, selectedItems ] );
-
-	const shouldShowModal = 'RenderModal' in action;
-
+	if ( 'RenderModal' in action ) {
+		return (
+			<ActionWithModal
+				key={ action.id }
+				action={ action }
+				items={ selectedEligibleItems }
+				ActionTrigger={ ActionTrigger }
+			/>
+		);
+	}
 	return (
-		<DropdownMenuV2.Item
+		<ActionTrigger
 			key={ action.id }
-			hideOnClick={ ! shouldShowModal }
-			onClick={ async () => {
-				if ( shouldShowModal ) {
-					setActionWithModal( action );
-				} else {
-					action.callback( eligibleItems, { registry } );
-				}
+			action={ action }
+			onClick={ () => {
+				setActionInProgress( action.id );
+				action.callback( selectedItems, {
+					registry,
+				} );
 			} }
-			suffix={ eligibleItems.length }
-		>
-			{ action.label }
-		</DropdownMenuV2.Item>
+			items={ selectedEligibleItems }
+			isBusy={ actionInProgress === action.id }
+		/>
 	);
 }
 
-function ActionsMenuGroup< Item >( {
-	actions,
-	selectedItems,
-	setActionWithModal,
-}: ActionsMenuGroupProps< Item > ) {
-	const elligibleActions = useMemo( () => {
-		return actions.filter( ( action ) => {
-			return selectedItems.some(
-				( item ) => ! action.isEligible || action.isEligible( item )
-			);
-		} );
-	}, [ actions, selectedItems ] );
-	if ( ! elligibleActions.length ) {
-		return null;
-	}
+function renderFooterContent< Item >(
+	data: Item[],
+	actions: Action< Item >[],
+	getItemId: ( item: Item ) => string,
+	selection: string[],
+	actionsToShow: Action< Item >[],
+	selectedItems: Item[],
+	actionInProgress: string | null,
+	setActionInProgress: ( actionId: string | null ) => void,
+	onChangeSelection: SetSelection,
+	selectableItems: Item[]
+) {
+	const countToShow =
+		selectedItems.length > 0
+			? selectedItems.length
+			: selectableItems.length;
 	return (
-		<>
-			<DropdownMenuV2.Group>
-				{ elligibleActions.map( ( action ) => (
-					<BulkActionItem
+		<HStack
+			justify="flex-start"
+			expanded={ false }
+			className="dataviews-bulk-actions-footer__container"
+		>
+			<BulkSelectionCheckbox
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				data={ data }
+				actions={ actions }
+				getItemId={ getItemId }
+			/>
+			<span className="dataviews-bulk-actions-footer__item-count">
+				{ sprintf(
+					/* translators: %d: number of items. */
+					_n( '%d Item', '%d Items', countToShow ),
+					countToShow
+				) }
+			</span>
+			{ actionsToShow.map( ( action ) => {
+				return (
+					<ActionButton
 						key={ action.id }
 						action={ action }
 						selectedItems={ selectedItems }
-						setActionWithModal={ setActionWithModal }
+						actionInProgress={ actionInProgress }
+						setActionInProgress={ setActionInProgress }
 					/>
-				) ) }
-			</DropdownMenuV2.Group>
-			<DropdownMenuV2.Separator />
-		</>
+				);
+			} ) }
+			{ selectedItems.length > 0 && (
+				<Button
+					icon={ closeSmall }
+					showTooltip
+					tooltipPosition="top"
+					label={ __( 'Cancel' ) }
+					disabled={ !! actionInProgress }
+					accessibleWhenDisabled={ false }
+					onClick={ () => {
+						onChangeSelection( EMPTY_ARRAY );
+					} }
+				/>
+			) }
+		</HStack>
 	);
 }
 
-function _BulkActions() {
-	const {
-		data,
-		actions = [],
-		selection,
-		onChangeSelection,
-		getItemId,
-	} = useContext( DataViewsContext );
+function FooterContent< Item >( {
+	selection,
+	actions,
+	onChangeSelection,
+	data,
+	getItemId,
+}: ToolbarContentProps< Item > ) {
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
+	const footerContent = useRef< JSX.Element | null >( null );
+
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
-	const [ actionWithModal, setActionWithModal ] = useState<
-		ActionModal< any > | undefined
-	>();
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return bulkActions.some(
@@ -250,8 +267,6 @@ function _BulkActions() {
 			);
 		} );
 	}, [ data, bulkActions ] );
-
-	const numberSelectableItems = selectableItems.length;
 
 	const selectedItems = useMemo( () => {
 		return data.filter(
@@ -261,94 +276,68 @@ function _BulkActions() {
 		);
 	}, [ selection, data, getItemId, selectableItems ] );
 
-	const areAllSelected = selectedItems.length === numberSelectableItems;
-
-	if ( bulkActions.length === 0 ) {
-		return null;
-	}
-	return (
-		<>
-			<DropdownMenuV2
-				open={ isMenuOpen }
-				onOpenChange={ onMenuOpenChange }
-				label={ __( 'Bulk actions' ) }
-				style={ { minWidth: '240px' } }
-				trigger={
-					<Button
-						className="dataviews-bulk-actions__edit-button"
-						__next40pxDefaultSize
-						variant="tertiary"
-						size="compact"
-					>
-						{ selectedItems.length
-							? sprintf(
-									/* translators: %d: Number of items. */
-									_n(
-										'Edit %d item',
-										'Edit %d items',
-										selectedItems.length
-									),
-									selectedItems.length
-							  )
-							: __( 'Bulk edit' ) }
-					</Button>
-				}
-			>
-				<ActionsMenuGroup
-					actions={ bulkActions }
-					setActionWithModal={ setActionWithModal }
-					selectedItems={ selectedItems }
-				/>
-				<DropdownMenuV2.Group>
-					<DropdownMenuV2.Item
-						disabled={ areAllSelected }
-						hideOnClick={ false }
-						onClick={ () => {
-							onChangeSelection(
-								selectableItems.map( ( item ) =>
-									getItemId( item )
-								)
-							);
-						} }
-						suffix={ numberSelectableItems }
-					>
-						{ __( 'Select all' ) }
-					</DropdownMenuV2.Item>
-					<DropdownMenuV2.Item
-						disabled={ selection.length === 0 }
-						hideOnClick={ false }
-						onClick={ () => {
-							onChangeSelection( [] );
-						} }
-					>
-						{ __( 'Deselect' ) }
-					</DropdownMenuV2.Item>
-				</DropdownMenuV2.Group>
-			</DropdownMenuV2>
-			{ actionWithModal && (
-				<ActionWithModal
-					action={ actionWithModal }
-					selectedItems={ selectedItems }
-					setActionWithModal={ setActionWithModal }
-					onMenuOpenChange={ onMenuOpenChange }
-				/>
-			) }
-		</>
+	const actionsToShow = useMemo(
+		() =>
+			actions.filter( ( action ) => {
+				return (
+					action.supportsBulk &&
+					action.icon &&
+					selectedItems.some(
+						( item ) =>
+							! action.isEligible || action.isEligible( item )
+					)
+				);
+			} ),
+		[ actions, selectedItems ]
 	);
+	if ( ! actionInProgress ) {
+		if ( footerContent.current ) {
+			footerContent.current = null;
+		}
+		return renderFooterContent(
+			data,
+			actions,
+			getItemId,
+			selection,
+			actionsToShow,
+			selectedItems,
+			actionInProgress,
+			setActionInProgress,
+			onChangeSelection,
+			selectableItems
+		);
+	} else if ( ! footerContent.current ) {
+		footerContent.current = renderFooterContent(
+			data,
+			actions,
+			getItemId,
+			selection,
+			actionsToShow,
+			selectedItems,
+			actionInProgress,
+			setActionInProgress,
+			onChangeSelection,
+			selectableItems
+		);
+	}
+	return footerContent.current;
 }
 
-export default function BulkActions() {
-	const { data, actions = [], view } = useContext( DataViewsContext );
-	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
-		actions,
-		data
+export function BulkActionsFooter() {
+	const {
+		data,
+		selection,
+		actions = EMPTY_ARRAY,
+		onChangeSelection,
+		getItemId,
+	} = useContext( DataViewsContext );
+	return (
+		<FooterContent
+			selection={ selection }
+			onChangeSelection={ onChangeSelection }
+			data={ data }
+			actions={ actions }
+			getItemId={ getItemId }
+		/>
 	);
-	if (
-		! [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) ||
-		! hasPossibleBulkAction
-	) {
-		return null;
-	}
-
-	return <_BulkActions />;
 }
