@@ -137,23 +137,21 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						return;
 					}
 
+					// Check if the block is being moved to another grid.
+					// If so, do nothing and let the new grid parent handle
+					// the attributes.
 					const rootAttributes = getBlockAttributes( rootClientId );
-					const newLayoutIsGrid =
-						rootAttributes?.layout?.type === 'grid';
+					if ( rootAttributes?.layout?.type === 'grid' ) {
+						return;
+					}
+
 					const attributes = getBlockAttributes( clientId );
-					// If the block is moving from one grid layout to another,
-					// keep the span attributes for use in the target grid.
-					const attributesToUnset = newLayoutIsGrid
-						? [
-								[ 'style', 'layout', 'columnStart' ],
-								[ 'style', 'layout', 'rowStart' ],
-						  ]
-						: [
-								[ 'style', 'layout', 'columnStart' ],
-								[ 'style', 'layout', 'rowStart' ],
-								[ 'style', 'layout', 'columnSpan' ],
-								[ 'style', 'layout', 'rowSpan' ],
-						  ];
+					const attributesToUnset = [
+						[ 'style', 'layout', 'columnStart' ],
+						[ 'style', 'layout', 'rowStart' ],
+						[ 'style', 'layout', 'columnSpan' ],
+						[ 'style', 'layout', 'rowSpan' ],
+					];
 					const updatedAttributes = attributesToUnset.reduce(
 						( attrs, path ) =>
 							setImmutably( attrs, path, undefined ),
