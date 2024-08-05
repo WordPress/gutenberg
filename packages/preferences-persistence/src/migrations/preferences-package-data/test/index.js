@@ -36,8 +36,9 @@ const input = {
 
 describe( 'convertPreferencesPackageData', () => {
 	it( 'converts data to the expected format', () => {
-		expect( convertPreferencesPackageData( input ) )
-			.toMatchInlineSnapshot( `
+		expect(
+			convertPreferencesPackageData( input )
+		).toMatchInlineSnapshot( `
 		{
 		  "core": {
 		    "editorMode": "visual",

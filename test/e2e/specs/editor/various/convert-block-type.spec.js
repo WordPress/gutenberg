@@ -30,8 +30,7 @@ test.describe( 'Code block', () => {
 		await editor.transformBlockTo( 'core/preformatted' );
 
 		// The content should now be a Preformatted block with no data loss.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:preformatted -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:preformatted -->
 <pre class="wp-block-preformatted">${ code }</pre>
 <!-- /wp:preformatted -->` );
 	} );

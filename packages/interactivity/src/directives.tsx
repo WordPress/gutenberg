@@ -484,11 +484,11 @@ export default () => {
 						if ( ! result ) {
 							(
 								element.ref as RefObject< HTMLElement >
-							 ).current!.classList.remove( className );
+							).current!.classList.remove( className );
 						} else {
 							(
 								element.ref as RefObject< HTMLElement >
-							 ).current!.classList.add( className );
+							).current!.classList.add( className );
 						}
 					} );
 				} );
@@ -523,11 +523,10 @@ export default () => {
 					if ( ! result ) {
 						(
 							element.ref as RefObject< HTMLElement >
-						 ).current!.style.removeProperty( styleProp );
+						).current!.style.removeProperty( styleProp );
 					} else {
-						(
-							element.ref as RefObject< HTMLElement >
-						 ).current!.style[ styleProp ] = result;
+						( element.ref as RefObject< HTMLElement > )
+							.current!.style[ styleProp ] = result;
 					}
 				} );
 			} );

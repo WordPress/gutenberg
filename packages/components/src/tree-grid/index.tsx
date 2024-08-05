@@ -307,7 +307,7 @@ function UnforwardedTreeGrid(
 				// Prevent browser mode from triggering in NVDA by wrapping List View
 				// in a role=application wrapper.
 				// see: https://github.com/WordPress/gutenberg/issues/43729
-			 }
+			}
 			<div role="application" aria-label={ applicationAriaLabel }>
 				<table
 					{ ...props }

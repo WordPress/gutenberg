@@ -102,8 +102,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.mouse.up();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Dummy text</p>
 <!-- /wp:paragraph -->
 

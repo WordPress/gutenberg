@@ -307,7 +307,7 @@ const UnforwardedPopover = (
 		?.top;
 	const anchorRefBottom = (
 		anchorRef as PopoverAnchorRefTopBottom | undefined
-	 )?.bottom;
+	)?.bottom;
 	const anchorRefStartContainer = ( anchorRef as Range | undefined )
 		?.startContainer;
 	const anchorRefCurrent = ( anchorRef as PopoverAnchorRefReference )

@@ -64,8 +64,7 @@ test.describe( 'Gallery', () => {
 		await expect( img ).toBeVisible();
 
 		const editedPostContent = await editor.getEditedPostContent();
-		expect( editedPostContent )
-			.toBe( `<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
+		expect( editedPostContent ).toBe( `<!-- wp:gallery {"columns":3,"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-3 is-cropped"><!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
 <!-- /wp:image --></figure>

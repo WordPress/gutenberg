@@ -71,7 +71,7 @@ export class Metrics {
 					performance.getEntriesByType(
 						'navigation'
 					) as PerformanceNavigationTiming[]
-				 )[ 0 ].serverTiming.reduce(
+				)[ 0 ].serverTiming.reduce(
 					( acc, entry ) => {
 						if ( f.length === 0 || f.includes( entry.name ) ) {
 							acc[ entry.name ] = entry.duration;
@@ -97,7 +97,7 @@ export class Metrics {
 				performance.getEntriesByType(
 					'navigation'
 				) as PerformanceNavigationTiming[]
-			 )[ 0 ];
+			)[ 0 ];
 			return responseStart - startTime;
 		} );
 	}

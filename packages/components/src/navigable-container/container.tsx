@@ -118,7 +118,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 			// for highlighting text.
 			const targetRole = (
 				event.target as HTMLDivElement | null
-			 )?.getAttribute( 'role' );
+			)?.getAttribute( 'role' );
 			const targetHasMenuItemRole =
 				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 

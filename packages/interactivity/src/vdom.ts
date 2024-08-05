@@ -112,8 +112,8 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 							typeof value === 'string'
 								? value
 								: typeof value?.namespace === 'string'
-								? value.namespace
-								: null;
+								  ? value.namespace
+								  : null;
 						namespaces.push( islandNamespace );
 					} else {
 						directives.push( [ attributeName, namespace, value ] );

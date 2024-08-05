@@ -184,14 +184,14 @@ describe( 'FocalPointPicker', () => {
 					screen.getByRole( 'spinbutton', {
 						name: 'Focal point left position',
 					} ) as HTMLButtonElement
-				 ).value
+				).value
 			).toBe( '10' );
 			expect(
 				(
 					screen.getByRole( 'spinbutton', {
 						name: 'Focal point top position',
 					} ) as HTMLButtonElement
-				 ).value
+				).value
 			).toBe( '20' );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );

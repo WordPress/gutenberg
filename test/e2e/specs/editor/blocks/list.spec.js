@@ -1323,8 +1323,7 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
 		// Add empty list block
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
-			.fill( `<!-- wp:list -->
+		await page.getByPlaceholder( 'Start writing with text or HTML' ).fill( `<!-- wp:list -->
 <ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
@@ -1424,8 +1423,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.getByRole( 'button', { name: 'List', exact: true } ).click();
 		await page.getByRole( 'menuitem', { name: 'Paragraph' } ).click();
 
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:paragraph -->
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 

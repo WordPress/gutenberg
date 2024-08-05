@@ -73,12 +73,11 @@ const Template: StoryFn< typeof BorderControl > = ( {
 	...props
 } ) => {
 	const [ border, setBorder ] = useState< Border >();
-	const onChangeMerged: ComponentProps<
-		typeof BorderControl
-	>[ 'onChange' ] = ( newBorder ) => {
-		setBorder( newBorder );
-		onChange( newBorder );
-	};
+	const onChangeMerged: ComponentProps< typeof BorderControl >[ 'onChange' ] =
+		( newBorder ) => {
+			setBorder( newBorder );
+			onChange( newBorder );
+		};
 
 	return (
 		<BorderControl

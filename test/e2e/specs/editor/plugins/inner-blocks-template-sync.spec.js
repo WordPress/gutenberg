@@ -30,9 +30,11 @@ test.describe( 'InnerBlocks Template Sync', () => {
 		} );
 		await pageUtils.pressKeys( 'secondary+M' );
 
-		await page.getByRole( 'textbox', {
-			name: 'Type text or HTML',
-		} ).fill( `<!-- wp:test/test-inner-blocks-no-locking -->
+		await page
+			.getByRole( 'textbox', {
+				name: 'Type text or HTML',
+			} )
+			.fill( `<!-- wp:test/test-inner-blocks-no-locking -->
 <!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Content…</p>
 <!-- /wp:paragraph -->
@@ -73,9 +75,11 @@ test.describe( 'InnerBlocks Template Sync', () => {
 		} );
 		await pageUtils.pressKeys( 'secondary+M' );
 
-		await page.getByRole( 'textbox', {
-			name: 'Type text or HTML',
-		} ).fill( `<!-- wp:test/test-inner-blocks-locking-all -->
+		await page
+			.getByRole( 'textbox', {
+				name: 'Type text or HTML',
+			} )
+			.fill( `<!-- wp:test/test-inner-blocks-locking-all -->
 <!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Content…</p>
 <!-- /wp:paragraph -->

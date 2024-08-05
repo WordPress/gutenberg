@@ -132,8 +132,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await pageUtils.pressKeys( 'secondary+M' );
 
 		// Change content.
-		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
-			.fill( `<!-- wp:paragraph -->
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } ).fill( `<!-- wp:paragraph -->
 <p>Hi world!</p>
 <!-- /wp:paragraph -->` );
 
@@ -165,8 +164,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await pageUtils.pressKeys( 'secondary+M' );
 
 		// Change the content.
-		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
-			.fill( `<!-- wp:paragraph -->
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } ).fill( `<!-- wp:paragraph -->
 <p>abc</p>
 <!-- /wp:paragraph -->` );
 

@@ -341,8 +341,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				).toBeVisible();
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( ' grapes.' );
-				await expect.poll( editor.getEditedPostContent )
-					.toBe( `<!-- wp:paragraph -->
+				await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Sorry, we are all out of ~g grapes.</p>
 <!-- /wp:paragraph -->` );
 			} );

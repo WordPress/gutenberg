@@ -76,7 +76,9 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 			: '/var/www/html',
 		// Remove spaces and single quotes from both ends of the path.
 		// This is needed because Windows treats single quotes as a literal character.
-		envCwd.trim().replace( /^'|'$/g, '' )
+		envCwd
+			.trim()
+			.replace( /^'|'$/g, '' )
 	);
 
 	const composeCommand = [

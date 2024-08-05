@@ -35,8 +35,7 @@ test.describe( 'Font Size Picker', () => {
 
 			await page.keyboard.type( '23' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"style":{"typography":{"fontSize":"23px"}}} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"style":{"typography":{"fontSize":"23px"}}} -->
 <p style="font-size:23px">Paragraph to be made "small"</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -57,14 +56,12 @@ test.describe( 'Font Size Picker', () => {
 			await page.click( 'role=spinbutton[name="Custom"i]' );
 			await page.keyboard.type( '23' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"style":{"typography":{"fontSize":"23px"}}} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"style":{"typography":{"fontSize":"23px"}}} -->
 <p style="font-size:23px">Paragraph reset - custom size</p>
 <!-- /wp:paragraph -->` );
 
 			await pageUtils.pressKeys( 'Backspace', { times: 2 } );
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Paragraph reset - custom size</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -149,8 +146,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"large"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Paragraph to be made "large"</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -173,8 +169,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"medium"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"medium"} -->
 <p class="has-medium-font-size">Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 
@@ -182,8 +177,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click( 'role=menuitem[name="Reset Size"i]' );
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -206,8 +200,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
 <p class="has-small-font-size">Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 
@@ -218,8 +211,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -239,8 +231,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Large"i]'
 			);
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"large"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"large"} -->
 <p class="has-large-font-size">Paragraph to be made "large"</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -260,8 +251,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Small"i]'
 			);
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
 <p class="has-small-font-size">Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 
@@ -269,8 +259,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.click( 'role=menuitem[name="Reset Size"i]' );
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Paragraph with font size reset using tools panel menu</p>
 <!-- /wp:paragraph -->` );
 		} );
@@ -291,8 +280,7 @@ test.describe( 'Font Size Picker', () => {
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Small"i]'
 			);
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph {"fontSize":"small"} -->
 <p class="has-small-font-size">Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 
@@ -303,8 +291,7 @@ test.describe( 'Font Size Picker', () => {
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:paragraph -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>Paragraph with font size reset using input field</p>
 <!-- /wp:paragraph -->` );
 		} );

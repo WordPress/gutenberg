@@ -18,20 +18,21 @@ const waitUntilButtonHighlightStable = async ( page ) => {
 	return handle;
 };
 
-test.describe.parallel( 'FontSizePicker', () => {
-	test.beforeEach( async ( { page } ) => {
-		await gotoStoryId( page, 'components-fontsizepicker--default' );
+test.describe
+	.parallel( 'FontSizePicker', () => {
+		test.beforeEach( async ( { page } ) => {
+			await gotoStoryId( page, 'components-fontsizepicker--default' );
+		} );
+
+		// This isn't a meaningful test, just some example code to demonstrate a way to
+		// wait until a certain element has finished animating.
+		// We can remove it once we have real tests.
+		test( 'with value', async ( { page } ) => {
+			const button = await page.locator( 'button[aria-label="Normal"]' );
+
+			await waitUntilButtonHighlightStable( page );
+
+			expect( button ).toHaveAttribute( 'aria-checked', 'true' );
+			expect( await page.screenshot() ).toMatchSnapshot();
+		} );
 	} );
-
-	// This isn't a meaningful test, just some example code to demonstrate a way to
-	// wait until a certain element has finished animating.
-	// We can remove it once we have real tests.
-	test( 'with value', async ( { page } ) => {
-		const button = await page.locator( 'button[aria-label="Normal"]' );
-
-		await waitUntilButtonHighlightStable( page );
-
-		expect( button ).toHaveAttribute( 'aria-checked', 'true' );
-		expect( await page.screenshot() ).toMatchSnapshot();
-	} );
-} );

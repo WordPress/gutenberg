@@ -298,8 +298,8 @@ const v13 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-					  ? mediaPosition(focalPoint)
-					  : undefined;
+				? mediaPosition( focalPoint )
+				: undefined;
 
 		const backgroundImage = url ? `url(${ url })` : undefined;
 
@@ -460,8 +460,8 @@ const v12 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-			  ? mediaPosition(focalPoint)
-			  : undefined;
+				? mediaPosition( focalPoint )
+				: undefined;
 
 		const backgroundImage = url ? `url(${ url })` : undefined;
 
@@ -609,8 +609,8 @@ const v11 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-				  ? mediaPosition(focalPoint)
-				  : undefined;
+				? mediaPosition( focalPoint )
+				: undefined;
 
 		const backgroundImage = url ? `url(${ url })` : undefined;
 
@@ -762,8 +762,8 @@ const v10 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-				 : undefined;
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				: undefined;
 
 		const classes = clsx(
 			{
@@ -897,8 +897,8 @@ const v9 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-				 : undefined;
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				: undefined;
 
 		const classes = clsx(
 			{
@@ -1029,8 +1029,8 @@ const v8 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-				 : undefined;
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				: undefined;
 
 		const classes = clsx(
 			{
@@ -1179,8 +1179,8 @@ const v7 = {
 		const objectPosition =
 			// prettier-ignore
 			focalPoint && isImgElement
-					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
-					: undefined;
+				? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
+				: undefined;
 
 		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),

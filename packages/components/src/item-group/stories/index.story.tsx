@@ -60,7 +60,7 @@ Default.args = {
 				href: 'https://wordpress.org',
 			},
 		] as ItemProps[]
-	 ).map( mapPropsToItem ),
+	).map( mapPropsToItem ),
 };
 
 export const NonClickableItems: StoryFn< typeof ItemGroup > = Template.bind(
@@ -78,7 +78,7 @@ NonClickableItems.args = {
 					"This <Item /> is also not click-able because it doesn't have an `onClick` prop",
 			},
 		] as ItemProps[]
-	 ).map( mapPropsToItem ),
+	).map( mapPropsToItem ),
 };
 
 export const CustomItemSize: StoryFn< typeof ItemGroup > = Template.bind( {} );
@@ -95,7 +95,7 @@ CustomItemSize.args = {
 				size: 'large',
 			},
 		] as ItemProps[]
-	 ).map( mapPropsToItem ),
+	).map( mapPropsToItem ),
 };
 
 export const WithBorder: StoryFn< typeof ItemGroup > = Template.bind( {} );

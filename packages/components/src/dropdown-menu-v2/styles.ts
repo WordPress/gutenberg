@@ -89,9 +89,11 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	background-color: ${ COLORS.ui.background };
 	border-radius: 4px;
 	${ ( props ) => css`
-		box-shadow: ${ props.variant === 'toolbar'
-			? TOOLBAR_VARIANT_BOX_SHADOW
-			: DEFAULT_BOX_SHADOW };
+		box-shadow: ${
+			props.variant === 'toolbar'
+				? TOOLBAR_VARIANT_BOX_SHADOW
+				: DEFAULT_BOX_SHADOW
+		};
 	` }
 
 	overscroll-behavior: contain;

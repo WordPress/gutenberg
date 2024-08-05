@@ -72,9 +72,7 @@ class PuppeteerEnvironment extends NodeEnvironment {
 				} );
 				// eslint-disable-next-line no-console
 				console.log(
-					chalk.blue(
-						'\n\n🕵️‍  Code is paused, press enter to resume'
-					)
+					chalk.blue( '\n\n🕵️‍  Code is paused, press enter to resume' )
 				);
 				// Run an infinite promise.
 				return new Promise( ( resolve ) => {

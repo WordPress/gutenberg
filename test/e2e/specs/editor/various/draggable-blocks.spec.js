@@ -33,8 +33,7 @@ test.describe( 'Draggable block', () => {
 		await page.keyboard.type( '2' );
 
 		// Confirm correct setup.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
@@ -85,8 +84,7 @@ test.describe( 'Draggable block', () => {
 		// Drop the paragraph block.
 		await page.mouse.up();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
 
@@ -105,8 +103,7 @@ test.describe( 'Draggable block', () => {
 		await page.keyboard.type( '2' );
 
 		// Confirm correct setup.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
@@ -162,8 +159,7 @@ test.describe( 'Draggable block', () => {
 		// Drop the paragraph block.
 		await page.mouse.up();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
 
@@ -241,8 +237,7 @@ test.describe( 'Draggable block', () => {
 		// Drop the paragraph block.
 		await page.mouse.up();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->
@@ -326,8 +321,7 @@ test.describe( 'Draggable block', () => {
 		// Drop the paragraph block.
 		await page.mouse.up();
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:group {"layout":{"type":"flex","flexWrap":"nowrap"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>2</p>
 <!-- /wp:paragraph -->

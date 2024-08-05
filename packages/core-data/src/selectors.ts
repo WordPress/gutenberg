@@ -662,7 +662,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 			Object.keys( records[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = (
 					Object.keys( records[ kind ][ name ].edits ) as string[]
-				 ).filter(
+				).filter(
 					( primaryKey ) =>
 						// The entity record must exist (not be deleted),
 						// and it must have edits.
@@ -719,7 +719,7 @@ export const __experimentalGetEntitiesBeingSaved = createSelector(
 			Object.keys( records[ kind ] ).forEach( ( name ) => {
 				const primaryKeys = (
 					Object.keys( records[ kind ][ name ].saving ) as string[]
-				 ).filter( ( primaryKey ) =>
+				).filter( ( primaryKey ) =>
 					isSavingEntityRecord( state, kind, name, primaryKey )
 				);
 

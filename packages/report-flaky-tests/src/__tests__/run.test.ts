@@ -155,8 +155,9 @@ describe( 'Report flaky tests', () => {
 
 		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
 		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
-		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ] )
-			.toMatchInlineSnapshot( `
+		expect(
+			mockAPI.createCommentOnPR.mock.calls[ 0 ][ 1 ]
+		).toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
 		**Flaky tests detected in headSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.
@@ -256,8 +257,9 @@ describe( 'Report flaky tests', () => {
 		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 0 ] ).toBe(
 			'commitSHA'
 		);
-		expect( mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 1 ] )
-			.toMatchInlineSnapshot( `
+		expect(
+			mockAPI.createCommentOnCommit.mock.calls[ 0 ][ 1 ]
+		).toMatchInlineSnapshot( `
 		"<!-- flaky-tests-report-comment -->
 		**Flaky tests detected in commitSHA.**
 		Some tests passed with failed attempts. The failures may not be related to this commit but are still reported for visibility. See [the documentation](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/testing-overview.md#flaky-tests) for more information.

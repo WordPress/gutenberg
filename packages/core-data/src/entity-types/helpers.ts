@@ -91,8 +91,8 @@ export type OmitNevers<
 		[ K in keyof T ]: Exclude< T[ K ], undefined > extends never
 			? never
 			: T[ K ] extends Record< string, unknown >
-			? OmitNevers< T[ K ] >
-			: T[ K ];
+			  ? OmitNevers< T[ K ] >
+			  : T[ K ];
 	},
 > = Pick<
 	Nevers,

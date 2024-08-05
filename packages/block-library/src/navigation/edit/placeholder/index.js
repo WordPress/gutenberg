@@ -50,7 +50,7 @@ export default function NavigationPlaceholder( {
 					// The <PlaceholderPreview> component is displayed conditionally via CSS depending on
 					// whether the block is selected or not. This is achieved via CSS to avoid
 					// component re-renders
-				 }
+				}
 				<PlaceholderPreview isVisible={ ! isSelected } />
 				<div
 					aria-hidden={ ! isSelected ? true : undefined }

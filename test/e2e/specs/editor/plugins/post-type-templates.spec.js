@@ -101,8 +101,7 @@ test.describe( 'Post type templates', () => {
 		} ) => {
 			await admin.createNewPost();
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:image -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:image -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->` );
 		} );

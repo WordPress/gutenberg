@@ -72,9 +72,7 @@ export default function save( { attributes } ) {
 
 	const objectPosition =
 		// prettier-ignore
-		focalPoint && isImgElement
-			  ? mediaPosition(focalPoint)
-			  : undefined;
+		focalPoint && isImgElement ? mediaPosition( focalPoint ) : undefined;
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 

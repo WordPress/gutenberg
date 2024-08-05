@@ -591,9 +591,8 @@ async function runPerformanceTests( branches, options ) {
 				const percentageChange = fixed(
 					( ( value1 - value2 ) / value2 ) * 100
 				);
-				printedResult[ metric ][
-					'% Change'
-				] = `${ percentageChange }%`;
+				printedResult[ metric ][ '% Change' ] =
+					`${ percentageChange }%`;
 			}
 		}
 

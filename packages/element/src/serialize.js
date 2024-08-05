@@ -698,7 +698,8 @@ export function renderComponent(
 		typeof (
 			// Ignore reason: Current prettier reformats parens and mangles type assertion
 			// prettier-ignore
-			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext
+			/** @type {{getChildContext?: () => unknown}} */ ( instance )
+				.getChildContext
 		) === 'function'
 	) {
 		Object.assign(

@@ -123,7 +123,8 @@ test.describe( 'Post-type locking', () => {
 			await pageUtils.pressKeys( 'secondary+M' );
 
 			// Modify template.
-			await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
+			await page
+				.getByRole( 'textbox', { name: 'Type text or HTML' } )
 				.fill( `<!-- wp:paragraph {"placeholder":"Add a description"} -->
 <p></p>
 <!-- /wp:paragraph -->` );

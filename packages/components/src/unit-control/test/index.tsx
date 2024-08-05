@@ -58,9 +58,8 @@ const ControlledSyncUnits = () => {
 				parseQuantityAndUnitFromRawValue( stateValue );
 
 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
-				nextState[
-					stateProp as 'valueA' | 'valueB'
-				] = `${ stateQuantity }${ newUnit }`;
+				nextState[ stateProp as 'valueA' | 'valueB' ] =
+					`${ stateQuantity }${ newUnit }`;
 			}
 		} );
 

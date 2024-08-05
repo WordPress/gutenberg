@@ -186,8 +186,10 @@ function LayoutPanelPure( {
 		...layoutBlockSupport,
 		...layout,
 	};
-	const { type, default: { type: defaultType = 'default' } = {} } =
-		blockSupportAndLayout;
+	const {
+		type,
+		default: { type: defaultType = 'default' } = {},
+	} = blockSupportAndLayout;
 	const blockLayoutType = type || defaultType;
 
 	// Only show the inherit toggle if it's supported,

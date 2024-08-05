@@ -82,8 +82,10 @@ function EditableContent( { context = {} } ) {
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
-		props;
+	const {
+		context: { queryId, postType, postId } = {},
+		layoutClassNames,
+	} = props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	if ( userCanEdit === undefined ) {
 		return null;

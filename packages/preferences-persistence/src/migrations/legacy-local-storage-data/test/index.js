@@ -180,8 +180,9 @@ describe( 'convertLegacyData', () => {
 	} );
 
 	it( 'retains already converted data', () => {
-		expect( convertLegacyData( alreadyConvertedData ) )
-			.toMatchInlineSnapshot( `
+		expect(
+			convertLegacyData( alreadyConvertedData )
+		).toMatchInlineSnapshot( `
 		{
 		  "core/edit-post": {
 		    "complementaryArea": "edit-post/block",

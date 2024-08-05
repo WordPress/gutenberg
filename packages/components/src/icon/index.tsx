@@ -44,8 +44,8 @@ interface BaseProps {
 type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U
 	: T extends DashiconIconKey
-	? SVGProps< SVGSVGElement >
-	: {};
+	  ? SVGProps< SVGSVGElement >
+	  : {};
 
 export type Props = BaseProps & AdditionalProps< IconType >;
 

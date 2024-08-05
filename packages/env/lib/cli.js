@@ -37,9 +37,7 @@ const withSpinner =
 			( message ) => {
 				time = process.hrtime( time );
 				spinner.succeed(
-					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-						time[ 1 ] / 1e6
-					).toFixed( 0 ) }ms)`
+					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ ( time[ 1 ] / 1e6 ).toFixed( 0 ) }ms)`
 				);
 				process.exit( 0 );
 			},

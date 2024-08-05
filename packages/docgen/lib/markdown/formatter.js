@@ -148,9 +148,7 @@ module.exports = (
 					const desc = tag.description.trim();
 
 					// prettier-ignore
-					return desc
-						? `- ${ name } ${ desc }`
-						: `- ${ name }`;
+					return desc ? `- ${ name } ${ desc }` : `- ${ name }`;
 				},
 				docs
 			);
@@ -165,9 +163,7 @@ module.exports = (
 					);
 
 					// prettier-ignore
-					return type
-						? `- ${ type }${ desc }`
-						: `- ${ desc }`;
+					return type ? `- ${ type }${ desc }` : `- ${ desc }`;
 				},
 				docs
 			);
@@ -195,9 +191,7 @@ module.exports = (
 					);
 
 					// prettier-ignore
-					return type
-						? `- ${ type }: ${ desc }`
-						: `- ${ desc }`;
+					return type ? `- ${ type }: ${ desc }` : `- ${ desc }`;
 				},
 				docs
 			);
@@ -225,7 +219,7 @@ module.exports = (
 					// prettier-ignore
 					return type
 						? `- *${ name }* ${ type }: ${ desc }`
-						: `- *${ name }* ${ desc }`
+						: `- *${ name }* ${ desc }`;
 				},
 				docs
 			);

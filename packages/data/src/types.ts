@@ -48,16 +48,16 @@ export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
 	F extends MapSelect
 		? ReturnType< F >
 		: F extends StoreDescriptor< any >
-		? CurriedSelectorsOf< F >
-		: never;
+		  ? CurriedSelectorsOf< F >
+		  : never;
 
 // Return type for the useDispatch() hook.
 export type UseDispatchReturn< StoreNameOrDescriptor > =
 	StoreNameOrDescriptor extends StoreDescriptor< any >
 		? ActionCreatorsOf< ConfigOf< StoreNameOrDescriptor > >
 		: StoreNameOrDescriptor extends undefined
-		? DispatchFunction
-		: any;
+		  ? DispatchFunction
+		  : any;
 
 export type DispatchFunction = < StoreNameOrDescriptor >(
 	store: StoreNameOrDescriptor
@@ -111,8 +111,8 @@ export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 type CurriedState< F > = F extends SelectorWithCustomCurrySignature
 	? F[ 'CurriedSignature' ]
 	: F extends ( state: any, ...args: infer P ) => infer R
-	? ( ...args: P ) => R
-	: F;
+	  ? ( ...args: P ) => R
+	  : F;
 
 /**
  * Utility to manually specify curried selector signatures.

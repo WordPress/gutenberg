@@ -245,8 +245,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'primary+i' );
 		await page.keyboard.press( 'ArrowLeft' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p><strong><em>1</em> <em>2</em></strong></p>
 <!-- /wp:paragraph -->` );
 
@@ -270,8 +269,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'j' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -284,8 +282,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'a' );
 		await pageUtils.pressKeys( 'shift+Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>a<br></p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -299,8 +296,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'b' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>a<br>b</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -314,8 +310,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'shift+Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>a<br>b</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -329,8 +324,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'shift+Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p><br>a</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -342,8 +336,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'shift+Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p><br></p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -404,15 +397,13 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await pageUtils.pressKeys( 'ArrowLeft', { times: ' 3'.length } );
 		await page.keyboard.press( 'Backspace' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1  3</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( '2' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1 2 3</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -430,15 +421,13 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			`${ process.platform === 'darwin' ? 'Alt' : 'primary' }+Backspace`
 		);
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>alpha  gamma</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( 'beta' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>alpha beta gamma</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -457,15 +446,13 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>alpha  gamma</p>
 <!-- /wp:paragraph -->` );
 
 		await page.keyboard.type( 'beta' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>alpha beta gamma</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -634,8 +621,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'Backspace' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>12</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -652,8 +638,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Delete' );
 		await page.keyboard.press( 'Enter' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>abc</p>
 <!-- /wp:paragraph -->
 
@@ -676,8 +661,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.up( 'Shift' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1<br>2</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -691,8 +675,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Delete' );
 		await page.keyboard.type( '2' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>123</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -710,8 +693,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( '3' );
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await pageUtils.pressKeys( 'Delete', { times: 2 } );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
@@ -721,8 +703,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Delete' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>13</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -741,8 +722,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.type( '1' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>abc</p>
 <!-- /wp:paragraph -->
 
@@ -765,8 +745,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( 'x' ); // Should be right after "1".
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1x</p>
 <!-- /wp:paragraph -->
 
@@ -861,8 +840,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.mouse.click( x, lowerInserterY );
 		await page.keyboard.type( '3' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
@@ -896,8 +874,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>1</p>
 <!-- /wp:paragraph -->
 
@@ -952,8 +929,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( '2' );
 		// Confirm correct setup.
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:table -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:table -->
 <figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->` );
 	} );
@@ -1035,8 +1011,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.up( 'Shift' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
+		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:paragraph -->
 <p>first</p>
 <!-- /wp:paragraph -->
 

@@ -16,8 +16,7 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
-			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+		await page.getByPlaceholder( 'Start writing with text or HTML' ).fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>Hello</p>
 <!-- /wp:paragraph --></div>
@@ -40,8 +39,7 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
-			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+		await page.getByPlaceholder( 'Start writing with text or HTML' ).fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
 <p>Hello</p>
@@ -85,8 +83,7 @@ test.describe( 'Content-only lock', () => {
 		// Add content only locked block in the code editor
 		await pageUtils.pressKeys( 'secondary+M' ); // Emulates CTRL+Shift+Alt + M => toggle code editor
 
-		await page.getByPlaceholder( 'Start writing with text or HTML' )
-			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+		await page.getByPlaceholder( 'Start writing with text or HTML' ).fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 			<div class="wp-block-group"><!-- wp:paragraph -->
 			<p>Locked block a</p>
 			<!-- /wp:paragraph -->

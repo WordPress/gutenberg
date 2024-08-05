@@ -40,9 +40,8 @@ export default ( ...fontSizeNames ) => {
 	 */
 	const fontSizeAttributeNames = fontSizeNames.reduce(
 		( fontSizeAttributeNamesAccumulator, fontSizeAttributeName ) => {
-			fontSizeAttributeNamesAccumulator[
-				fontSizeAttributeName
-			] = `custom${ upperFirst( fontSizeAttributeName ) }`;
+			fontSizeAttributeNamesAccumulator[ fontSizeAttributeName ] =
+				`custom${ upperFirst( fontSizeAttributeName ) }`;
 			return fontSizeAttributeNamesAccumulator;
 		},
 		{}

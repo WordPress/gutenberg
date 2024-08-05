@@ -125,8 +125,7 @@ test.describe( 'Paragraph', () => {
 
 			await page.mouse.up();
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:heading -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:heading -->
 <h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );
@@ -153,8 +152,7 @@ test.describe( 'Paragraph', () => {
 
 			await page.mouse.up();
 
-			await expect.poll( editor.getEditedPostContent )
-				.toBe( `<!-- wp:heading -->
+			await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:heading -->
 <h2 class="wp-block-heading">My Heading</h2>
 <!-- /wp:heading -->` );
 		} );

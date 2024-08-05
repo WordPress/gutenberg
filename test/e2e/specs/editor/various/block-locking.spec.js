@@ -61,8 +61,7 @@ test.describe( 'Block Locking', () => {
 		await page.click( 'role=checkbox[name="Lock all"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:paragraph {"lock":{"move":true,"remove":true}} -->
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph {"lock":{"move":true,"remove":true}} -->
 <p>Some paragraph</p>
 <!-- /wp:paragraph -->` );
 	} );
@@ -88,8 +87,7 @@ test.describe( 'Block Locking', () => {
 				.getByRole( 'button', { name: 'Lock' } )
 		).toBeFocused();
 
-		expect( await editor.getEditedPostContent() )
-			.toBe( `<!-- wp:paragraph {"lock":{"move":false,"remove":false}} -->
+		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:paragraph {"lock":{"move":false,"remove":false}} -->
 <p>Some paragraph</p>
 <!-- /wp:paragraph -->` );
 	} );
