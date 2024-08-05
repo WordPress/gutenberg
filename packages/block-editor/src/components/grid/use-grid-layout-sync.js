@@ -154,14 +154,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						...layout
 					} = attributes?.style?.layout;
 
-					const hasEmptyLayoutAttribute =
-						Object.keys( layout ).length === 0;
+					if ( columnStart || rowStart || columnSpan || rowSpan ) {
+						const hasEmptyLayoutAttribute =
+							Object.keys( layout ).length === 0;
 
-					updates[ clientId ] = setImmutably(
-						attributes,
-						[ 'style', 'layout' ],
-						hasEmptyLayoutAttribute ? undefined : layout
-					);
+						updates[ clientId ] = setImmutably(
+							attributes,
+							[ 'style', 'layout' ],
+							hasEmptyLayoutAttribute ? undefined : layout
+						);
+					}
 				}
 			} );
 		} else {
@@ -173,14 +175,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					const { columnStart, rowStart, ...layout } =
 						attributes?.style?.layout;
 
-					const hasEmptyLayoutAttribute =
-						Object.keys( layout ).length === 0;
+					if ( columnStart || rowStart ) {
+						const hasEmptyLayoutAttribute =
+							Object.keys( layout ).length === 0;
 
-					updates[ clientId ] = setImmutably(
-						attributes,
-						[ 'style', 'layout' ],
-						hasEmptyLayoutAttribute ? undefined : layout
-					);
+						updates[ clientId ] = setImmutably(
+							attributes,
+							[ 'style', 'layout' ],
+							hasEmptyLayoutAttribute ? undefined : layout
+						);
+					}
 				}
 			}
 
