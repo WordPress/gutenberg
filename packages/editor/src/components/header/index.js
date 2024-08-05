@@ -47,6 +47,7 @@ function Header( {
 	setEntitiesSavedStatesCallback,
 	title,
 	icon,
+	disableIframe = false,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -136,6 +137,7 @@ function Header( {
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
 					disabled={ isNestedEntity }
+					disableIframe={ disableIframe }
 				/>
 				<PostPreviewButton
 					className="editor-header__post-preview-button"

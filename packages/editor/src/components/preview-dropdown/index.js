@@ -29,7 +29,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 
-export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+export default function PreviewDropdown( {
+	forceIsAutosaveable,
+	disabled,
+	disableIframe = false,
+} ) {
 	const {
 		deviceType,
 		editorMode,
@@ -111,7 +115,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 		},
-		{
+		// The "Desktop (50%)" option only works in the iframe editor,
+		// so disable it in the non-iframe editor.
+		! disableIframe && {
 			value: 'ZoomOut',
 			label: __( 'Desktop (50%)' ),
 			icon: desktop,
@@ -126,7 +132,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Mobile' ),
 			icon: mobile,
 		},
-	];
+	].filter( Boolean );
 
 	const previewValue = editorMode === 'zoom-out' ? 'ZoomOut' : deviceType;
 

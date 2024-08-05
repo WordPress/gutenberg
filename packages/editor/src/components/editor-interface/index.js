@@ -143,6 +143,7 @@ export default function EditorInterface( {
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
 						icon={ icon }
+						disableIframe={ disableIframe }
 					/>
 				)
 			}
