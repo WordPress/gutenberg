@@ -182,7 +182,7 @@ above-mentioned snippet, it'll require a couple of things to be done manually:
 In a straightforward way, it can be done as follows:
 
 ```php
-wp_interactivity_state('maccordion', ['isOpen' => false]);
+wp_interactivity_state('accordion', ['isOpen' => false]);
 
 ob_start();
  ?>
