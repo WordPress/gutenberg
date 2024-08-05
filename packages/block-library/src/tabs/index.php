@@ -14,7 +14,7 @@
  *
  * @return string The block content.
  */
-function render_block_core_tabs( $attributes, $content, $block ) {
+function render_block_core_tabs( $attributes, $content ) {
 	if ( ! $content ) {
 		return '';
 	}
