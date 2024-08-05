@@ -172,61 +172,61 @@ export default function Layout( { route } ) {
 
 					<EditorSnackbars />
 
-					{ isMobileViewport && areas.mobile && (
-						<div className="edit-site-layout__mobile">
-							{ canvasMode !== 'edit' && (
-								<SidebarContent routeKey={ routeKey }>
-									<SiteHubMobile
-										ref={ toggleRef }
-										isTransparent={
-											isResizableFrameOversized
-										}
-									/>
-								</SidebarContent>
-							) }
-							{ areas.mobile }
-						</div>
-					) }
-
-					{ ! isMobileViewport &&
-						areas.content &&
-						canvasMode !== 'edit' && (
-							<div
-								className="edit-site-layout__area"
-								style={ {
-									maxWidth: widths?.content,
-								} }
-							>
-								{ areas.content }
+					<ErrorBoundary>
+						{ isMobileViewport && areas.mobile && (
+							<div className="edit-site-layout__mobile">
+								{ canvasMode !== 'edit' && (
+									<SidebarContent routeKey={ routeKey }>
+										<SiteHubMobile
+											ref={ toggleRef }
+											isTransparent={
+												isResizableFrameOversized
+											}
+										/>
+									</SidebarContent>
+								) }
+								{ areas.mobile }
 							</div>
 						) }
 
-					{ ! isMobileViewport && areas.edit && (
-						<div
-							className="edit-site-layout__area"
-							style={ {
-								maxWidth: widths?.edit,
-							} }
-						>
-							{ areas.edit }
-						</div>
-					) }
-
-					{ ! isMobileViewport && areas.preview && (
-						<div className="edit-site-layout__canvas-container">
-							{ canvasResizer }
-							{ !! canvasSize.width && (
+						{ ! isMobileViewport &&
+							areas.content &&
+							canvasMode !== 'edit' && (
 								<div
-									className={ clsx(
-										'edit-site-layout__canvas',
-										{
-											'is-right-aligned':
-												isResizableFrameOversized,
-										}
-									) }
-									ref={ animationRef }
+									className="edit-site-layout__area"
+									style={ {
+										maxWidth: widths?.content,
+									} }
 								>
-									<ErrorBoundary>
+									{ areas.content }
+								</div>
+							) }
+
+						{ ! isMobileViewport && areas.edit && (
+							<div
+								className="edit-site-layout__area"
+								style={ {
+									maxWidth: widths?.edit,
+								} }
+							>
+								{ areas.edit }
+							</div>
+						) }
+
+						{ ! isMobileViewport && areas.preview && (
+							<div className="edit-site-layout__canvas-container">
+								{ canvasResizer }
+								{ !! canvasSize.width && (
+									<div
+										className={ clsx(
+											'edit-site-layout__canvas',
+											{
+												'is-right-aligned':
+													isResizableFrameOversized,
+											}
+										) }
+										ref={ animationRef }
+									>
 										<ResizableFrame
 											isReady={ ! isEditorLoading }
 											isFullWidth={
@@ -252,11 +252,11 @@ export default function Layout( { route } ) {
 										>
 											{ areas.preview }
 										</ResizableFrame>
-									</ErrorBoundary>
-								</div>
-							) }
-						</div>
-					) }
+									</div>
+								) }
+							</div>
+						) }
+					</ErrorBoundary>
 				</div>
 			</div>
 		</>
