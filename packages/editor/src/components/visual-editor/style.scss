@@ -2,6 +2,7 @@
 	position: relative;
 	display: flex;
 	background-color: $gray-300;
+	isolation: isolate;
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;

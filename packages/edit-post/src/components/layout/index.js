@@ -157,6 +157,16 @@ function useEditorStyles() {
 }
 
 function MetaBoxesDetails() {
+	const hasMetaboxes = useSelect( ( select ) => {
+		const { getMetaBoxesPerLocation } = select( editPostStore );
+		return (
+			getMetaBoxesPerLocation( 'normal' ).length > 0 ||
+			getMetaBoxesPerLocation( 'advanced' ).length > 0
+		);
+	}, [] );
+	if ( ! hasMetaboxes ) {
+		return null;
+	}
 	return (
 		<details className="edit-post-layout__metaboxes-details">
 			<summary className="edit-post-layout__metaboxes-details-summary">
