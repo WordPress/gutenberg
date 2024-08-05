@@ -62,6 +62,7 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/style-engine": "file:../style-engine",
 		"@wordpress/token-list": "file:../token-list",
+		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",

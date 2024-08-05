@@ -33,6 +33,7 @@
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
+		{ "path": "../upload-media" },
 		{ "path": "../url" },
 		{ "path": "../wordcount" }
 	],

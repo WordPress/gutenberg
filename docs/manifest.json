@@ -1770,6 +1770,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/mime",
+		"slug": "packages-mime",
+		"markdown_source": "../packages/mime/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",
@@ -1944,6 +1950,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/upload-media",
+		"slug": "packages-upload-media",
+		"markdown_source": "../packages/upload-media/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
@@ -1953,6 +1965,12 @@
 		"title": "@wordpress/viewport",
 		"slug": "packages-viewport",
 		"markdown_source": "../packages/viewport/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/vips",
+		"slug": "packages-vips",
+		"markdown_source": "../packages/vips/README.md",
 		"parent": "packages"
 	},
 	{

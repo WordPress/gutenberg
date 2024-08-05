@@ -1,19 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { createBlobURL } from '@wordpress/blob';
-import apiFetch from '@wordpress/api-fetch';
-
-/**
  * Internal dependencies
  */
-import { uploadMedia, getMimeTypesArray } from '../upload-media';
+import { uploadMedia } from '../uploadMedia';
+import { UploadError } from '../uploadError';
+import { uploadToServer } from '../uploadToServer';
 
-jest.mock( '@wordpress/blob', () => ( {
-	createBlobURL: jest.fn(),
-	revokeBlobURL: jest.fn(),
+jest.mock( '../uploadToServer', () => ( {
+	uploadToServer: jest.fn(),
 } ) );
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', {
 	type: 'text/xml',
@@ -23,6 +17,10 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 } );
 
 describe( 'uploadMedia', () => {
+	afterEach( () => {
+		jest.clearAllMocks();
+	} );
+
 	it( 'should do nothing on no files', async () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
@@ -33,7 +31,7 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( onError ).not.toHaveBeenCalled();
-		expect( onFileChange ).not.toHaveBeenCalled();
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
@@ -47,11 +45,14 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message:
+					'test.xml: Sorry, this file type is not supported here.',
+				file: xmlFile,
 			} )
 		);
-		expect( onFileChange ).not.toHaveBeenCalled();
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should error if allowedTypes contains a complete mime type and the validation fails', async () => {
@@ -65,17 +66,17 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message:
+					'test.jpeg: Sorry, this file type is not supported here.',
+				file: xmlFile,
 			} )
 		);
-		expect( onFileChange ).not.toHaveBeenCalled();
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', async () => {
-		createBlobURL.mockReturnValue( 'blob:fake_blob' );
-		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
-
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		await uploadMedia( {
@@ -83,10 +84,11 @@ describe( 'uploadMedia', () => {
 			filesList: [ imageFile ],
 			onError,
 			onFileChange,
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
 		} );
 
 		expect( onError ).not.toHaveBeenCalled();
-		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+		expect( uploadToServer ).toHaveBeenCalled();
 	} );
 
 	it( 'should error if allowedTypes contains multiple types and the validation fails', async () => {
@@ -100,17 +102,17 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message:
+					'test.xml: Sorry, this file type is not supported here.',
+				file: xmlFile,
 			} )
 		);
-		expect( onFileChange ).not.toHaveBeenCalled();
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should work if allowedTypes contains multiple types and the validation succeeds', async () => {
-		createBlobURL.mockReturnValue( 'blob:fake_blob' );
-		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
-
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		await uploadMedia( {
@@ -118,16 +120,14 @@ describe( 'uploadMedia', () => {
 			filesList: [ imageFile ],
 			onError,
 			onFileChange,
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg', mp4: 'video/mp4' },
 		} );
 
 		expect( onError ).not.toHaveBeenCalled();
-		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+		expect( uploadToServer ).toHaveBeenCalled();
 	} );
 
 	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', async () => {
-		createBlobURL.mockReturnValue( 'blob:fake_blob' );
-		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
-
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		await uploadMedia( {
@@ -135,15 +135,18 @@ describe( 'uploadMedia', () => {
 			filesList: [ imageFile, xmlFile ],
 			onError,
 			onFileChange,
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message:
+					'test.xml: Sorry, you are not allowed to upload this file type.',
 				file: xmlFile,
 			} )
 		);
-		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+		expect( uploadToServer ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should error if the file size is greater than the maximum', async () => {
@@ -155,19 +158,22 @@ describe( 'uploadMedia', () => {
 			maxUploadFileSize: 1,
 			onError,
 			onFileChange,
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'SIZE_ABOVE_LIMIT',
+				message:
+					'test.jpeg: This file exceeds the maximum upload size for this site.',
+				file: imageFile,
 			} )
 		);
-		expect( onFileChange ).not.toHaveBeenCalled();
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should call error handler with the correct error object if file type is not allowed for user', async () => {
 		const onError = jest.fn();
-		const onFileChange = jest.fn();
 		await uploadMedia( {
 			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
@@ -176,53 +182,13 @@ describe( 'uploadMedia', () => {
 		} );
 
 		expect( onError ).toHaveBeenCalledWith(
-			expect.objectContaining( {
+			new UploadError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+				message:
+					'test.jpeg: Sorry, you are not allowed to upload this file type.',
+				file: imageFile,
 			} )
 		);
-		expect( onFileChange ).not.toHaveBeenCalled();
-	} );
-} );
-
-describe( 'getMimeTypesArray', () => {
-	it( 'should return the parameter passed if it is "falsy" e.g: undefined or null', () => {
-		expect( getMimeTypesArray( null ) ).toEqual( null );
-		expect( getMimeTypesArray( undefined ) ).toEqual( undefined );
-	} );
-
-	it( 'should return an empty array if an empty object is passed', () => {
-		expect( getMimeTypesArray( {} ) ).toEqual( [] );
-	} );
-
-	it( 'should return the type plus a new mime type with type and subtype with the extension if a type is passed', () => {
-		expect( getMimeTypesArray( { ext: 'chicken' } ) ).toEqual( [
-			'chicken',
-			'chicken/ext',
-		] );
-	} );
-
-	it( 'should return the mime type passed and a new mime type with type and the extension as subtype', () => {
-		expect( getMimeTypesArray( { ext: 'chicken/ribs' } ) ).toEqual( [
-			'chicken/ribs',
-			'chicken/ext',
-		] );
-	} );
-
-	it( 'should return the mime type passed and an additional mime type per extension supported', () => {
-		expect( getMimeTypesArray( { 'jpg|jpeg|jpe': 'image/jpeg' } ) ).toEqual(
-			[ 'image/jpeg', 'image/jpg', 'image/jpeg', 'image/jpe' ]
-		);
-	} );
-
-	it( 'should handle multiple mime types', () => {
-		expect(
-			getMimeTypesArray( { 'ext|aaa': 'chicken/ribs', aaa: 'bbb' } )
-		).toEqual( [
-			'chicken/ribs',
-			'chicken/ext',
-			'chicken/aaa',
-			'bbb',
-			'bbb/aaa',
-		] );
+		expect( uploadToServer ).not.toHaveBeenCalled();
 	} );
 } );

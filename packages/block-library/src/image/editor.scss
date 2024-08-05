@@ -197,3 +197,24 @@ figure.wp-block-image:not(.wp-block) {
 	// Corresponds to the size of the textarea in the block inspector.
 	width: 250px;
 }
+
+.compression-comparison-modal__labels {
+	display: flex;
+	justify-content: space-around;
+	margin: 0 0 1em;
+}
+
+.compression-comparison-modal__labels p {
+	margin: 0;
+}
+
+.compression-comparison-modal__slider {
+	width: 25em;
+	margin: 0 0 1em;
+}
+
+.compression-comparison-modal__buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 1em;
+}

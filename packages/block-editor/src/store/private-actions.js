@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -25,6 +26,8 @@ const privateSettings = [
 	'blockInspectorAnimation',
 ];
 
+const noop = () => {};
+
 /**
  * Action that updates the block editor settings and
  * conditionally preserves the experimental ones.
@@ -39,21 +42,115 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
-	// There are no plugins in the mobile apps, so there is no
-	// need to strip the experimental settings:
-	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
-		cleanSettings = {};
-		for ( const key in settings ) {
-			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+	return ( { dispatch, registry } ) => {
+		let cleanSettings = settings;
+		// There are no plugins in the mobile apps, so there is no
+		// need to strip the experimental settings:
+		if ( stripExperimentalSettings && Platform.OS === 'web' ) {
+			cleanSettings = {};
+			for ( const key in settings ) {
+				if ( ! privateSettings.includes( key ) ) {
+					cleanSettings[ key ] = settings[ key ];
+				}
 			}
 		}
-	}
-	return {
-		type: 'UPDATE_SETTINGS',
-		settings: cleanSettings,
-		reset,
+
+		if ( window.__experimentalMediaProcessing ) {
+			/*
+			 Make the upload queue aware of the functions for uploading to the server.
+			*/
+			const uploadSettings = {};
+			if ( '__experimentalAvailableImageSizes' in cleanSettings ) {
+				uploadSettings.imageSizes =
+					cleanSettings.__experimentalAvailableImageSizes;
+			}
+			if ( '__experimentalBigImageSizeThreshold' in cleanSettings ) {
+				uploadSettings.imageSizeThreshold =
+					cleanSettings.__experimentalBigImageSizeThreshold;
+			}
+			if ( '__experimentalMediaSideload' in cleanSettings ) {
+				uploadSettings.mediaSideload =
+					cleanSettings.__experimentalMediaSideload;
+			}
+
+			/**
+			 * Upload a media file when the file upload button is activated
+			 * or when adding a file to the editor via drag & drop.
+			 *
+			 * This function is intended to eventually live
+			 * in the `@wordpress/block-editor` package, allowing
+			 * to perform the client-side file processing before eventually
+			 * uploading the media to WordPress.
+			 *
+			 * @param {Object}      $0                Parameters object passed to the function.
+			 * @param {Array}       $0.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
+			 * @param {Object}      $0.additionalData Additional data to include in the request.
+			 * @param {Array<File>} $0.filesList      List of files.
+			 * @param {Function}    $0.onError        Function called when an error happens.
+			 * @param {Function}    $0.onFileChange   Function called each time a file or a temporary representation of the file is available.
+			 * @param {Function}    $0.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
+			 * @param {Function}    $0.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+			 */
+			function mediaUpload( {
+				allowedTypes,
+				additionalData = {},
+				filesList,
+				onError = noop,
+				onFileChange,
+				onSuccess,
+				onBatchSuccess,
+			} ) {
+				const validFiles = [];
+
+				for ( const mediaFile of filesList ) {
+					try {
+						cleanSettings.__experimentalValidateMimeType(
+							mediaFile,
+							allowedTypes
+						);
+					} catch ( error ) {
+						onError( error );
+						continue;
+					}
+
+					try {
+						cleanSettings.__experimentalValidateFileSize(
+							mediaFile
+						);
+					} catch ( error ) {
+						onError( error );
+						continue;
+					}
+
+					validFiles.push( mediaFile );
+				}
+
+				void registry.dispatch( uploadStore ).addItems( {
+					files: validFiles,
+					onChange: onFileChange,
+					onSuccess,
+					onBatchSuccess,
+					onError: ( { message } ) => onError( message ),
+					additionalData,
+				} );
+			}
+
+			if ( 'mediaUpload' in cleanSettings ) {
+				uploadSettings.mediaUpload = cleanSettings.mediaUpload;
+
+				cleanSettings.mediaUpload = mediaUpload;
+			}
+
+			void registry
+				.dispatch( uploadStore )
+				.updateSettings( uploadSettings );
+		}
+
+		dispatch( {
+			type: 'UPDATE_SETTINGS',
+			settings: cleanSettings,
+			reset,
+		} );
 	};
 }
 

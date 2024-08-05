@@ -776,6 +776,8 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
+-   _\_\_experimentalAvailableImageSizes_ `Array`: Array of available image sizes.
+-   _\_\_experimentalBigImageSizeThreshold_ `number`: Big image size threshold.
 
 ### SkipToSelectedBlock
 
