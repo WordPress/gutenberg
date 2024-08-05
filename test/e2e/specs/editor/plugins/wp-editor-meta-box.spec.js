@@ -24,6 +24,10 @@ test.describe( 'WP Editor Meta Boxes', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
+		await page.click(
+			'summary.edit-post-layout__metaboxes-details-summary'
+		);
+
 		// Switch tinymce to Text mode, first waiting for it to initialize
 		// because otherwise it will flip back to Visual mode once initialized.
 		await page.locator( '#test_tinymce_id_ifr' ).waitFor();
