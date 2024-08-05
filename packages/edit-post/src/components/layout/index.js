@@ -156,6 +156,18 @@ function useEditorStyles() {
 	] );
 }
 
+function MetaBoxesDetails() {
+	return (
+		<details className="edit-post-layout__metaboxes-details">
+			<summary className="edit-post-layout__metaboxes-details-summary">
+				{ __( 'Meta Boxes' ) }
+			</summary>
+			<MetaBoxes location="normal" />
+			<MetaBoxes location="advanced" />
+		</details>
+	);
+}
+
 function Layout( {
 	postId: initialPostId,
 	postType: initialPostType,
@@ -361,8 +373,7 @@ function Layout( {
 						! isDistractionFree &&
 						showMetaBoxes && (
 							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
+								<MetaBoxesDetails />
 							</div>
 						)
 					}

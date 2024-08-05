@@ -3,6 +3,29 @@
 	clear: both;
 }
 
+.edit-post-layout__metaboxes-details {
+	background: $white;
+	border-top: $border-width solid $gray-200;
+}
+
+.edit-post-layout__metaboxes-details[open] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.edit-post-layout__metaboxes-details summary {
+	cursor: pointer;
+	color: $gray-900;
+	height: 24px;
+	line-height: 24px;
+	font-size: 13px;
+	list-style-position: outside;
+	margin-left: 24px;
+}
+
 // Adjust the position of the notices
 .components-editor-notices__snackbar {
 	position: fixed;
