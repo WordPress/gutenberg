@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add `wrapContents` prop to `PluginSidebar` to wrap the inner contents in a `<PanelBody>` component ([#64273](https://github.com/WordPress/gutenberg/pull/64273))
+
 ## 14.4.0 (2024-07-24)
 
 ### Deprecations
