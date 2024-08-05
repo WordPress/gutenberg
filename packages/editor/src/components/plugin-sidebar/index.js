@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { ComplementaryArea } from '@wordpress/interface';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ import { store as editorStore } from '../../store';
  * @param {Object}                props                                 Element props.
  * @param {string}                props.name                            A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
  * @param {string}                [props.className]                     An optional class name added to the sidebar body.
+ * @param {string}                [props.wrapContents]                  Should the content of the panel be wrapped in a `PanelBody` component. Default is `false`.
  * @param {string}                props.title                           Title displayed at the top of the sidebar.
  * @param {boolean}               [props.isPinnable=true]               Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
@@ -76,7 +78,11 @@ import { store as editorStore } from '../../store';
  * );
  * ```
  */
-export default function PluginSidebar( { className, ...props } ) {
+export default function PluginSidebar( {
+	className,
+	wrapContents = false,
+	...props
+} ) {
 	const { postTitle, shortcut } = useSelect( ( select ) => {
 		return {
 			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
@@ -85,6 +91,7 @@ export default function PluginSidebar( { className, ...props } ) {
 			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 		};
 	}, [] );
+
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
@@ -93,6 +100,12 @@ export default function PluginSidebar( { className, ...props } ) {
 			scope="core"
 			toggleShortcut={ shortcut }
 			{ ...props }
-		/>
+		>
+			{ wrapContents ? (
+				<PanelBody>{ props.children }</PanelBody>
+			) : (
+				props.children
+			) }
+		</ComplementaryArea>
 	);
 }
