@@ -11,6 +11,14 @@ import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { cleanForSlug } from '@wordpress/url';
 
+/**
+ * Generates a slug from a tab's text label.
+ *
+ * @param {string} label    Tab label RichText value.
+ * @param {number} tabIndex Tab index value.
+ *
+ * @return {string} The generated slug with HTML stripped out.
+ */
 function slugFromLabel( label, tabIndex ) {
 	// Get just the text content, filtering out any HTML tags from the RichText value.
 	const htmlDocument = new window.DOMParser().parseFromString(
@@ -27,7 +35,7 @@ function slugFromLabel( label, tabIndex ) {
 
 export default function Edit( { attributes, clientId, setAttributes } ) {
 	const { anchor, isActive, label, slug, tabIndex } = attributes;
-	// Use a custom anchor, if possible. Otherwise fall back to the slug generated from the label.
+	// Use a custom anchor, if set. Otherwise fall back to the slug generated from the label text.
 	const tabPanelId = anchor || slug;
 	const tabLabelId = tabPanelId + '--tab';
 	const hasChildBlocks = useSelect(

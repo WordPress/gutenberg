@@ -41,7 +41,6 @@ function render_block_core_tabs( $attributes, $content ) {
 	$tab_label_index = 0;
 	while ( $p->next_tag() ) {
 		if ( $p->has_class( 'wp-block-tabs' ) ) {
-			// Mark block as interactive to trigger tab styles.
 			$p->set_attribute( 'data-wp-interactive', 'core/tabs' );
 			$p->set_attribute( 'data-wp-context', '{ "activeTabIndex": 0 }' );
 			$p->set_attribute( 'data-wp-init', 'callbacks.init' );

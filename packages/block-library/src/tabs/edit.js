@@ -74,7 +74,7 @@ export default function Edit( { clientId, setAttributes } ) {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps -- set first tab as active when the editor is loaded.
 
-	// Update active tab when selection or blocks change.
+	// Update active tab when selection or inner blocks change.
 	useEffect( () => {
 		const hasActiveTab =
 			innerTabBlocks &&
@@ -91,8 +91,8 @@ export default function Edit( { clientId, setAttributes } ) {
 
 	/**
 	 * Cache data needed for save functions:
-	 * - Labels for inner tabs to generate tab list
-	 * - tabIndex to save the first tab as active, independent of the editor view
+	 * - labels from inner tabs to generate tab list
+	 * - href values pointing to ids of inner tab blocks
 	 */
 	useEffect( () => {
 		__unstableMarkNextChangeAsNotPersistent();
