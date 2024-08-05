@@ -116,7 +116,9 @@ export default ( props ) => ( element ) => {
 
 		const { anchorNode, focusNode } = defaultView.getSelection();
 		const containsSelection =
-			element.contains( anchorNode ) && element.contains( focusNode );
+			element.contains( anchorNode ) &&
+			element.contains( focusNode ) &&
+			ownerDocument.activeElement.contains( element );
 
 		if ( ! containsSelection ) {
 			return;
