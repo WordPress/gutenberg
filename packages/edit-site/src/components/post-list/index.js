@@ -174,7 +174,12 @@ export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const location = useLocation();
-	const { postId, quickEdit = false } = location.params;
+	const {
+		postId,
+		quickEdit = false,
+		isCustom,
+		activeView = 'all',
+	} = location.params;
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -334,6 +339,7 @@ export default function PostList( { postType } ) {
 			}
 		>
 			<DataViews
+				key={ activeView + isCustom }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }

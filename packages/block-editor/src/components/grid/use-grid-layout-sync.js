@@ -37,6 +37,9 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	);
 
 	const previouslySelectedBlockRect = usePrevious( selectedBlockRect );
+	const previousIsManualPlacement = usePrevious(
+		gridLayout.isManualPlacement
+	);
 
 	useEffect( () => {
 		const updates = {};
@@ -121,19 +124,22 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 			}
 		} else {
-			// When in auto mode, remove all of the columnStart and rowStart values.
-			for ( const clientId of blockOrder ) {
-				const attributes = getBlockAttributes( clientId );
-				const { columnStart, rowStart, ...layout } =
-					attributes.style?.layout ?? {};
-				// Only update attributes if columnStart or rowStart are set.
-				if ( columnStart || rowStart ) {
-					updates[ clientId ] = {
-						style: {
-							...attributes.style,
-							layout,
-						},
-					};
+			// Remove all of the columnStart and rowStart values
+			// when switching from manual to auto mode,
+			if ( previousIsManualPlacement === true ) {
+				for ( const clientId of blockOrder ) {
+					const attributes = getBlockAttributes( clientId );
+					const { columnStart, rowStart, ...layout } =
+						attributes.style?.layout ?? {};
+					// Only update attributes if columnStart or rowStart are set.
+					if ( columnStart || rowStart ) {
+						updates[ clientId ] = {
+							style: {
+								...attributes.style,
+								layout,
+							},
+						};
+					}
 				}
 			}
 
@@ -162,6 +168,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		gridLayout,
 		blockOrder,
 		previouslySelectedBlockRect,
+		previousIsManualPlacement,
 		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
