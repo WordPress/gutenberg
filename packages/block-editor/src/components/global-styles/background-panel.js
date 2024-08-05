@@ -720,55 +720,56 @@ export default function BackgroundPanel( {
 					}
 				) }
 			>
-				{ shouldShowBackgroundImageControls ? (
-					<BackgroundControlsPanel
-						label={ title }
-						filename={ title }
-						url={ getResolvedThemeFilePath( url, themeFileURIs ) }
-						onToggle={ setIsDropDownOpen }
-						hasImageValue={ hasImageValue }
-					>
-						<VStack spacing={ 3 } className="single-column">
-							<BackgroundImageControls
-								onChange={ onChange }
-								style={ value }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-								displayInPanel
-								onRemoveImage={ () => {
-									setIsDropDownOpen( false );
-									resetBackground();
-								} }
-							/>
-							<BackgroundSizeControls
-								onChange={ onChange }
-								panelId={ panelId }
-								style={ value }
-								defaultValues={ defaultValues }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-							/>
-						</VStack>
-					</BackgroundControlsPanel>
-				) : (
-					<BackgroundImageControls
-						onChange={ onChange }
-						style={ value }
-						inheritedValue={ inheritedValue }
-						themeFileURIs={ themeFileURIs }
-					/>
-				) }
+				<ToolsPanelItem
+					hasValue={ () => hasImageValue }
+					label={ __( 'Image' ) }
+					onDeselect={ resetBackground }
+					isShownByDefault={ defaultControls.backgroundImage }
+					panelId={ panelId }
+				>
+					{ shouldShowBackgroundImageControls ? (
+						<BackgroundControlsPanel
+							label={ title }
+							filename={ title }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
+							onToggle={ setIsDropDownOpen }
+							hasImageValue={ hasImageValue }
+						>
+							<VStack spacing={ 3 } className="single-column">
+								<BackgroundImageControls
+									onChange={ onChange }
+									style={ value }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+									displayInPanel
+									onRemoveImage={ () => {
+										setIsDropDownOpen( false );
+										resetBackground();
+									} }
+								/>
+								<BackgroundSizeControls
+									onChange={ onChange }
+									panelId={ panelId }
+									style={ value }
+									defaultValues={ defaultValues }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+								/>
+							</VStack>
+						</BackgroundControlsPanel>
+					) : (
+						<BackgroundImageControls
+							onChange={ onChange }
+							style={ value }
+							inheritedValue={ inheritedValue }
+							themeFileURIs={ themeFileURIs }
+						/>
+					) }
+				</ToolsPanelItem>
 			</div>
-
-			{ /* Dummy ToolsPanel items, so we can control what's in the dropdown popover */ }
-			<ToolsPanelItem
-				hasValue={ () => hasImageValue }
-				label={ __( 'Image' ) }
-				onDeselect={ resetBackground }
-				isShownByDefault={ defaultControls.backgroundImage }
-				panelId={ panelId }
-				className="block-editor-global-styles-background-panel__hidden-tools-panel-item"
-			/>
 		</Wrapper>
 	);
 }
