@@ -146,18 +146,22 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					}
 
 					const attributes = getBlockAttributes( clientId );
-					const attributesToUnset = [
-						[ 'style', 'layout', 'columnStart' ],
-						[ 'style', 'layout', 'rowStart' ],
-						[ 'style', 'layout', 'columnSpan' ],
-						[ 'style', 'layout', 'rowSpan' ],
-					];
-					const updatedAttributes = attributesToUnset.reduce(
-						( attrs, path ) =>
-							setImmutably( attrs, path, undefined ),
-						attributes
+					const {
+						columnStart,
+						rowStart,
+						columnSpan,
+						rowSpan,
+						...layout
+					} = attributes?.style?.layout;
+
+					const hasEmptyLayoutAttribute =
+						Object.keys( layout ).length === 0;
+
+					updates[ clientId ] = setImmutably(
+						attributes,
+						[ 'style', 'layout' ],
+						hasEmptyLayoutAttribute ? undefined : layout
 					);
-					updates[ clientId ] = updatedAttributes;
 				}
 			} );
 		} else {
@@ -166,16 +170,17 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			if ( previousIsManualPlacement === true ) {
 				for ( const clientId of blockOrder ) {
 					const attributes = getBlockAttributes( clientId );
-					const attributesToUnset = [
-						[ 'style', 'layout', 'columnStart' ],
-						[ 'style', 'layout', 'rowStart' ],
-					];
-					const updatedAttributes = attributesToUnset.reduce(
-						( attrs, path ) =>
-							setImmutably( attrs, path, undefined ),
-						attributes
+					const { columnStart, rowStart, ...layout } =
+						attributes?.style?.layout;
+
+					const hasEmptyLayoutAttribute =
+						Object.keys( layout ).length === 0;
+
+					updates[ clientId ] = setImmutably(
+						attributes,
+						[ 'style', 'layout' ],
+						hasEmptyLayoutAttribute ? undefined : layout
 					);
-					updates[ clientId ] = updatedAttributes;
 				}
 			}
 
@@ -199,16 +204,15 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			);
 		}
 	}, [
-		// Actual deps to sync:
 		gridClientId,
 		gridLayout,
 		previousBlockOrder,
 		blockOrder,
 		previouslySelectedBlockRect,
 		previousIsManualPlacement,
-		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
+		getBlockRootClientId,
 		updateBlockAttributes,
 	] );
 }
