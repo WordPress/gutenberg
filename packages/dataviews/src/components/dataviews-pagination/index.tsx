@@ -32,7 +32,8 @@ function DataViewsPagination() {
 			const page = i + 1;
 			return {
 				value: page.toString(),
-				label:
+				label: page.toString(),
+				'aria-label':
 					currentPage === page
 						? sprintf(
 								// translators: Current page number in total number of pages
@@ -54,10 +55,15 @@ function DataViewsPagination() {
 				justify="end"
 				className="dataviews-pagination"
 			>
-				<HStack justify="flex-start" expanded={ false } spacing={ 0 }>
+				<HStack
+					justify="flex-start"
+					expanded={ false }
+					spacing={ 1 }
+					className="dataviews-pagination__page-select"
+				>
+					<div aria-hidden>Page</div>
 					<SelectControl
 						aria-label={ __( 'Current page' ) }
-						className="dataviews-pagination__page-select"
 						value={ currentPage.toString() }
 						options={ pageSelectOptions }
 						onChange={ ( newValue ) => {
@@ -70,6 +76,7 @@ function DataViewsPagination() {
 						__nextHasNoMarginBottom
 						variant="minimal"
 					/>
+					<div aria-hidden>/ { totalPages }</div>
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button

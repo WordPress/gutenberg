@@ -188,9 +188,5 @@
 
 	& + .dataviews-pagination {
 		justify-content: space-between;
-
-		.dataviews-pagination__page-selection {
-			margin-left: - $grid-unit-10; // Offset the padding applied to the SelectControl
-		}
 	}
 }

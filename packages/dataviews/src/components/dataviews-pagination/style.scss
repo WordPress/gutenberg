@@ -12,15 +12,8 @@
 }
 
 .dataviews-pagination__page-select {
-	font-size: 11px;
-	font-weight: 500;
-	text-transform: uppercase;
-
-	select {
-		font-size: 11px !important;
-		font-weight: 500;
-		text-transform: uppercase;
-	}
+	color: $gray-900;
+	font-size: 13px;
 }
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
