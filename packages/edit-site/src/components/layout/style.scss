@@ -148,6 +148,14 @@
 html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	animation-delay: 255ms;
 }
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
 /* stylelint-enable  */
 
 .edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {

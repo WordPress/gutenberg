@@ -4,7 +4,7 @@
 import { trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
 import {
@@ -185,7 +185,7 @@ const trashPost: Action< PostWithPermissions > = {
 						disabled={ isBusy }
 						accessibleWhenDisabled
 					>
-						{ __( 'Trash' ) }
+						{ _x( 'Trash', 'verb' ) }
 					</Button>
 				</HStack>
 			</VStack>

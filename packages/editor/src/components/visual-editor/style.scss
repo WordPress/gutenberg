@@ -1,6 +1,6 @@
 .editor-visual-editor {
 	position: relative;
-	display: block;
+	display: flex;
 	background-color: $gray-300;
 
 	// Centralize the editor horizontally (flex-direction is column).

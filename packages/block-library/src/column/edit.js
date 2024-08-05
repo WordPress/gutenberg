@@ -33,8 +33,8 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 		<PanelBody title={ __( 'Settings' ) }>
 			<UnitControl
 				label={ __( 'Width' ) }
-				labelPosition="edge"
-				__unstableInputWidth="80px"
+				__unstableInputWidth="calc(50% - 8px)"
+				__next40pxDefaultSize
 				value={ width || '' }
 				onChange={ ( nextWidth ) => {
 					nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;

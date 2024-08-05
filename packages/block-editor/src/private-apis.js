@@ -16,7 +16,7 @@ import {
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
+import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -68,7 +68,6 @@ lock( privateApis, {
 	BlockInfo,
 	useHasBlockToolbar,
 	cleanEmptyObject,
-	useStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,

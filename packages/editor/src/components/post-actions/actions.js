@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { external, backup } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
 import { DataForm, isItemValid } from '@wordpress/dataviews';
@@ -80,113 +80,6 @@ function isTemplateRemovable( template ) {
 		! template?.has_theme_file
 	);
 }
-
-const restorePostAction = {
-	id: 'restore',
-	label: __( 'Restore' ),
-	isPrimary: true,
-	icon: backup,
-	supportsBulk: true,
-	isEligible( { status, permissions } ) {
-		return status === 'trash' && permissions?.update;
-	},
-	async callback( posts, { registry, onActionPerformed } ) {
-		const { createSuccessNotice, createErrorNotice } =
-			registry.dispatch( noticesStore );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			registry.dispatch( coreStore );
-		await Promise.allSettled(
-			posts.map( ( post ) => {
-				return editEntityRecord( 'postType', post.type, post.id, {
-					status: 'draft',
-				} );
-			} )
-		);
-		const promiseResult = await Promise.allSettled(
-			posts.map( ( post ) => {
-				return saveEditedEntityRecord( 'postType', post.type, post.id, {
-					throwOnError: true,
-				} );
-			} )
-		);
-
-		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
-			let successMessage;
-			if ( posts.length === 1 ) {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '"%s" has been restored.' ),
-					getItemTitle( posts[ 0 ] )
-				);
-			} else if ( posts[ 0 ].type === 'page' ) {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '%d pages have been restored.' ),
-					posts.length
-				);
-			} else {
-				successMessage = sprintf(
-					/* translators: The number of posts. */
-					__( '%d posts have been restored.' ),
-					posts.length
-				);
-			}
-			createSuccessNotice( successMessage, {
-				type: 'snackbar',
-				id: 'restore-post-action',
-			} );
-			if ( onActionPerformed ) {
-				onActionPerformed( posts );
-			}
-		} else {
-			// If there was at lease one failure.
-			let errorMessage;
-			// If we were trying to move a single post to the trash.
-			if ( promiseResult.length === 1 ) {
-				if ( promiseResult[ 0 ].reason?.message ) {
-					errorMessage = promiseResult[ 0 ].reason.message;
-				} else {
-					errorMessage = __(
-						'An error occurred while restoring the post.'
-					);
-				}
-				// If we were trying to move multiple posts to the trash
-			} else {
-				const errorMessages = new Set();
-				const failedPromises = promiseResult.filter(
-					( { status } ) => status === 'rejected'
-				);
-				for ( const failedPromise of failedPromises ) {
-					if ( failedPromise.reason?.message ) {
-						errorMessages.add( failedPromise.reason.message );
-					}
-				}
-				if ( errorMessages.size === 0 ) {
-					errorMessage = __(
-						'An error occurred while restoring the posts.'
-					);
-				} else if ( errorMessages.size === 1 ) {
-					errorMessage = sprintf(
-						/* translators: %s: an error message */
-						__( 'An error occurred while restoring the posts: %s' ),
-						[ ...errorMessages ][ 0 ]
-					);
-				} else {
-					errorMessage = sprintf(
-						/* translators: %s: a list of comma separated error messages */
-						__(
-							'Some errors occurred while restoring the posts: %s'
-						),
-						[ ...errorMessages ].join( ',' )
-					);
-				}
-			}
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
-	},
-};
 
 const viewPostAction = {
 	id: 'view-post',
@@ -696,6 +589,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		},
 		[ postType ]
 	);
+	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		registerPostTypeActions( postType );
+	}, [ registerPostTypeActions, postType ] );
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
 	const reorderPagesAction = useReorderPagesAction( postType );
@@ -726,7 +623,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostAction,
 			reorderPagesAction,
-			! isTemplateOrTemplatePart && ! isPattern && restorePostAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
