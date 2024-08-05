@@ -217,6 +217,12 @@ function PostParentToggle( { isOpen, onClick } ) {
 }
 
 export function ParentRow() {
+	const { homeUrl } = useSelect( ( select ) => {
+		const { getUnstableBase } = select( coreStore );
+		return {
+			homeUrl: getUnstableBase()?.home,
+		};
+	}, [] );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -249,12 +255,15 @@ export function ParentRow() {
 							onClose={ onClose }
 						/>
 						<div>
-							{
-								/* translators: The domain name should be a reserved domain name to prevent linking to third party sites outside the WordPress project's control. You may also wish to use wordpress.org or a wordpress.org sub-domain. */
+							{ sprintf(
+								/* translators: %1$s The home URL of the WordPress installation without the scheme. */
 								__(
-									'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be example.org/services/pricing.'
-								)
-							}
+									'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s/services/pricing.'
+								),
+								homeUrl
+									.replace( /^https?:\/\//, '' )
+									.replace( /\/$/, '' )
+							) }
 							<p>
 								{ __(
 									'They also show up as sub-items in the default navigation menu. '
