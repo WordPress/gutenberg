@@ -2,19 +2,24 @@
  * Internal dependencies
  */
 import type { Style, StyleOptions } from '../../types';
-import { generateRule, safeDecodeURI } from '../utils';
+import { generateRule, safeDecodeURI, getCSSVarFromStyleValue } from '../utils';
 
 const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const _backgroundImage = style?.background?.backgroundImage;
+		const _backgroundGradient =
+			typeof style?.color?.gradient === 'string'
+				? `${ getCSSVarFromStyleValue( style.color.gradient ) }, `
+				: '';
+
 		if ( typeof _backgroundImage === 'object' && _backgroundImage?.url ) {
 			return [
 				{
-					selector: options.selector,
+					selector: options?.selector,
 					key: 'backgroundImage',
 					// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-					value: `url( '${ encodeURI(
+					value: `${ _backgroundGradient }url( '${ encodeURI(
 						safeDecodeURI( _backgroundImage.url )
 					) }' )`,
 				},
@@ -26,12 +31,13 @@ const backgroundImage = {
 		 * or have a linear-gradient value.
 		 */
 		if ( typeof _backgroundImage === 'string' ) {
-			return generateRule(
-				style,
-				options,
-				[ 'background', 'backgroundImage' ],
-				'backgroundImage'
-			);
+			return [
+				{
+					selector: options?.selector,
+					key: 'backgroundImage',
+					value: `${ _backgroundGradient }${ _backgroundImage }`,
+				},
+			];
 		}
 
 		return [];

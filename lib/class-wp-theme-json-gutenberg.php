@@ -2355,9 +2355,9 @@ class WP_Theme_JSON_Gutenberg {
 		if ( null === $properties ) {
 			$properties = static::PROPERTIES_METADATA;
 		}
-		$declarations             = array();
-		$root_variable_duplicates = array();
-		$root_style_length        = strlen( '--wp--style--root--' );
+		$declarations         = array();
+        $properties_to_remove = array();
+		$root_style_length    = strlen( '--wp--style--root--' );
 
 		foreach ( $properties as $css_property => $value_path ) {
 			if ( ! is_array( $value_path ) ) {
@@ -2378,18 +2378,32 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( $is_root_style && $use_root_padding ) {
-				$root_variable_duplicates[] = substr( $css_property, $root_style_length );
+				$properties_to_remove[] = substr( $css_property, $root_style_length );
 			}
 
-			// Processes background styles.
+			// Processes background styles and merges gradient with `background-image`.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
-				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
+				$background_styles       = gutenberg_style_engine_get_styles( $styles );
+				$background_image_styles = ! empty( $background_styles['declarations'][ $css_property ] ) ? $background_styles['declarations'][ $css_property ] : null;
+				if ( $background_image_styles ) {
+					$value                  = $background_image_styles;
+					$properties_to_remove[] = 'background';
+				}
 			}
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
+				continue;
+			}
+
+			// Look up protected properties, keyed by value path.
+			// Skip protected properties that are explicitly set to `null`.
+			$path_string = implode( '.', $value_path );
+			if (
+				isset( static::PROTECTED_PROPERTIES[ $path_string ] ) &&
+				_wp_array_get( $settings, static::PROTECTED_PROPERTIES[ $path_string ], null ) === null
+			) {
 				continue;
 			}
 
@@ -2432,7 +2446,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// If a variable value is added to the root, the corresponding property should be removed.
-		foreach ( $root_variable_duplicates as $duplicate ) {
+		foreach ( $properties_to_remove as $duplicate ) {
 			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
 			if ( is_numeric( $discard ) ) {
 				array_splice( $declarations, $discard, 1 );

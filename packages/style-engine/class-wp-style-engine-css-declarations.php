@@ -124,7 +124,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
-				return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
+				// @TODO safecss_filter_attr can't handle background-image with multiple values.
+				return "{$property}:{$spacer}{$filtered_value}";
+				//return safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 			}
 			return '';
 		}

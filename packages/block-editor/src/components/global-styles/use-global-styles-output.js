@@ -416,6 +416,16 @@ export function getStylesDeclarations(
 	}
 
 	const extraRules = getCSSRules( blockStyles );
+
+
+	/*
+		@TODO how to do this in the editor. Probably should match frontend.
+		Quick way might be to check extraRules['background-image] and extraRules['background']
+		and then combine.
+		Style engine should do it? How?
+		Some post-processing function that combines the two?
+	 */
+
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (

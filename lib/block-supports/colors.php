@@ -105,13 +105,13 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 	}
 
-	// Gradients.
+/*	// Gradients.
 
 	if ( $has_gradients_support && ! wp_should_skip_block_supports_serialization( $block_type, 'color', 'gradients' ) ) {
 		$preset_gradient_color          = array_key_exists( 'gradient', $block_attributes ) ? "var:preset|gradient|{$block_attributes['gradient']}" : null;
 		$custom_gradient_color          = $block_attributes['style']['color']['gradient'] ?? null;
 		$color_block_styles['gradient'] = $preset_gradient_color ? $preset_gradient_color : $custom_gradient_color;
-	}
+	}*/
 
 	$attributes = array();
 	$styles     = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );

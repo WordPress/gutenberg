@@ -429,6 +429,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				}
 			}
 
+			// Where necessary, merge background-image and background declarations.
+			// @TODO revisit this logic. Standardize it in some way.
+            // Also it should strip out the classnames for presets?
+			if ( ! empty( $parsed_styles['declarations'] ) ) {
+				if ( isset( $parsed_styles['declarations']['background-image'] ) && isset( $parsed_styles['declarations']['background'] ) ) {
+					// @TODO what about order here? It probably requires a better, incoming style structure. E.g., 'background' => [ a, b ].
+					$parsed_styles['declarations']['background-image'] = $parsed_styles['declarations']['background'] . ', ' . $parsed_styles['declarations']['background-image'];
+					unset( $parsed_styles['declarations']['background'] );
+				}
+			}
+
 			return $parsed_styles;
 		}
 
