@@ -109,7 +109,6 @@ export default function PostTemplateEdit( {
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -168,7 +167,51 @@ export default function PostTemplateEdit( {
 				query.parent = parents;
 			}
 			if ( postFormat?.length ) {
-				query.post_format = postFormat;
+				// Get the name and id of the registered post formats from the wp_terms table.
+				const postFormats = getEntityRecords(
+					'taxonomy',
+					'post_format',
+					{
+						order: 'asc',
+						_fields: 'id,name',
+						context: 'view',
+						per_page: -1,
+						post_type: postType,
+					}
+				);
+
+				// Return early if there are no post formats in the database,
+				// and show the "No results found" message.
+				if ( ! postFormats ) {
+					return { posts: [] };
+				}
+
+				// Helper function to compare the value of postFormat to the name in the postFormats object.
+				const isSameTermName = ( termA, termB ) =>
+					termA.toLowerCase() === termB.toLowerCase();
+
+				// Map the postFormat values to the corresponding IDs (term_taxonomy_id).
+				let formatIds = postFormat.map( ( name ) => {
+					const matchingFormat = Object.values( postFormats ).find(
+						( format ) => isSameTermName( format.name, name )
+					);
+					return matchingFormat ? matchingFormat.id : null;
+				} );
+
+				// Convert post format term ID's to a comma separated string,
+				// otherwise the Rest API will return a "rest_invalid_param" error
+				// and there will be a PHP fatal error from _post_format_request.
+				formatIds = formatIds
+					.filter( ( id ) => id !== null )
+					.join( ',' );
+
+				// Return early if there are no matching post formats in the database,
+				// and show the "No results found" message.
+				if ( ! formatIds ) {
+					return { posts: [] };
+				}
+
+				query.post_format = formatIds;
 			}
 
 			// If sticky is not set, it will return all posts in the results.
@@ -190,6 +233,7 @@ export default function PostTemplateEdit( {
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
+			const { getBlocks } = select( blockEditorStore );
 			return {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
