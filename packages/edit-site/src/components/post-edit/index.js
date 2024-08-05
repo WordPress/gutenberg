@@ -45,7 +45,7 @@ function PostEditForm( { postType, postId } ) {
 	const { fields } = usePostFields();
 	const form = {
 		type: 'panel',
-		fields: [ 'title', 'author', 'date', 'comment_status' ],
+		fields: [ 'title', 'author', 'date', 'comment_status', 'status' ],
 	};
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
