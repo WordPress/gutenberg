@@ -76,6 +76,8 @@ function Edit< Item >( {
 				value={ value }
 				options={ elements }
 				onChange={ onChangeControl }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
 			/>
 		);
 	}
