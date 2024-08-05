@@ -95,7 +95,6 @@ function InterfaceSkeleton(
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
 		useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
 		type: 'tween',
@@ -144,22 +143,22 @@ function InterfaceSkeleton(
 							className="interface-interface-skeleton__header"
 							aria-label={ mergedLabels.header }
 							initial={
-								isDistractionFree && isLargeViewport
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
 							whileHover={
-								isDistractionFree && isLargeViewport
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHover'
 									: 'visible'
 							}
 							animate={
-								isDistractionFree && isLargeViewport
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeDisabled'
 									: 'visible'
 							}
 							exit={
-								isDistractionFree && isLargeViewport
+								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'
 									: 'hidden'
 							}
