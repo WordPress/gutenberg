@@ -15,8 +15,9 @@
 	}
 
 	&.is-selected,
+	&.is-selected .has-colors,
 	&:not(:disabled,[aria-disabled="true"]):active {
 		background: $components-color-accent;
-		color: $white;
+		color: $white !important; // !important to override any plugin custom colors when selected.
 	}
 }
