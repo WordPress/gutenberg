@@ -47,7 +47,9 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Object;
+export type ItemRecord< Name extends string > = {
+	[ id in Name ]: unknown;
+};
 
 export type FieldType = 'text' | 'integer';
 
@@ -58,7 +60,7 @@ export type ValidationContext = {
 /**
  * A dataview field for a specific property of a data type.
  */
-export type Field< Item > = {
+export type Field< Item, Name extends string = string > = {
 	/**
 	 * Type of the fields.
 	 */
@@ -67,7 +69,7 @@ export type Field< Item > = {
 	/**
 	 * The unique identifier of the field.
 	 */
-	id: string;
+	id: Name;
 
 	/**
 	 * The label of the field. Defaults to the id.
@@ -128,7 +130,7 @@ export type Field< Item > = {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-} & ( Item extends ItemRecord
+} & ( Item extends ItemRecord< Name >
 	? {
 			/**
 			 * Callback used to retrieve the value of the field from the item.
@@ -144,13 +146,22 @@ export type Field< Item > = {
 			getValue: ( args: { item: Item } ) => any;
 	  } );
 
-export type NormalizedField< Item > = Field< Item > & {
+export type NormalizedField< Item > = {
+	type?: FieldType;
+	id: string;
 	label: string;
-	getValue: ( args: { item: Item } ) => any;
+	description?: string;
+	placeholder?: string;
 	render: ComponentType< { item: Item } >;
 	Edit: ComponentType< DataFormControlProps< Item > >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	enableSorting?: boolean;
+	enableGlobalSearch?: boolean;
+	enableHiding?: boolean;
+	elements?: Option[];
+	filterBy?: FilterByConfig | undefined;
+	getValue: ( args: { item: Item } ) => any;
 };
 
 /**
