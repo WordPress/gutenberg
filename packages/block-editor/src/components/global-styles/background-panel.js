@@ -186,26 +186,16 @@ function InspectorImagePreviewItem( {
 				as="span"
 				className="block-editor-global-styles-background-panel__inspector-preview-inner"
 			>
-				{ imgUrl ? (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
-						<span
-							className="block-editor-global-styles-background-panel__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					</span>
-				) : (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
-						<span className="component-color-indicator" />
-					</span>
-				) }
+				<ColorIndicator
+					aria-hidden
+					style={ {
+						'--image-url': imgUrl ? `url(${ imgUrl })` : undefined,
+					} }
+					className={ clsx(
+						'block-editor-global-styles-background-panel__inspector-image-indicator',
+						{ 'has-image': !! imgUrl }
+					) }
+				/>
 				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
 					<Truncate
 						numberOfLines={ 1 }
