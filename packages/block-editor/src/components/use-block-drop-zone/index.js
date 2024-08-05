@@ -427,6 +427,8 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
+				// Checks if it is creatable either a Row variation or a Gallery block from
+				// the dragged block and the target block.
 				if ( operation === 'group' ) {
 					const targetBlock = blocks[ targetIndex ];
 					const areAllImages = [
