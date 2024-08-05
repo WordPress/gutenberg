@@ -189,6 +189,7 @@ export const fields = [
 	{
 		label: 'Satellites',
 		id: 'satellites',
+		type: 'integer',
 		enableSorting: true,
 	},
 	{

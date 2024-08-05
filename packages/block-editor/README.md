@@ -547,7 +547,7 @@ _Returns_
 
 > **Deprecated**
 
-This function was accidentially exposed for mobile/native usage.
+This function was accidentally exposed for mobile/native usage.
 
 _Returns_
 
@@ -1028,6 +1028,16 @@ _Parameters_
 _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
+
+### useStyleOverride
+
+Override a block editor settings style. Leave the ID blank to create a new style.
+
+_Parameters_
+
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
 
 ### useZoomOut
 

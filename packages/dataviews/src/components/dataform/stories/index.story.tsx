@@ -25,16 +25,36 @@ const fields = [
 		label: 'Order',
 		type: 'integer' as const,
 	},
+	{
+		id: 'author',
+		label: 'Author',
+		type: 'integer' as const,
+		elements: [
+			{ value: 1, label: 'Jane' },
+			{ value: 2, label: 'John' },
+		],
+	},
+	{
+		id: 'status',
+		label: 'Status',
+		type: 'text' as const,
+		elements: [
+			{ value: 'draft', label: 'Draft' },
+			{ value: 'published', label: 'Published' },
+		],
+	},
 ];
 
 export const Default = () => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
 		order: 2,
+		author: 1,
+		status: 'draft',
 	} );
 
 	const form = {
-		visibleFields: [ 'title', 'order' ],
+		visibleFields: [ 'title', 'order', 'author', 'status' ],
 	};
 
 	return (

@@ -251,12 +251,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ window.__experimentalEnableZoomedOutPatternsTab &&
-					isZoomOutMode && (
-						<ZoomOutModeInserters
-							__unstableContentRef={ __unstableContentRef }
-						/>
-					) }
+				{ isZoomOutMode && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

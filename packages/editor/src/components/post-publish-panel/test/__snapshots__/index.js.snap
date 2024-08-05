@@ -22,7 +22,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -214,7 +214,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
