@@ -1,8 +1,21 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
-import { DateTimePicker } from '@wordpress/components';
+import {
+	Button,
+	DateTimePicker,
+	Dropdown,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -28,12 +41,44 @@ function isValid( value: any, context?: ValidationContext ) {
 	return true;
 }
 
+interface DateTimePickerControlProps {
+	title: string;
+	value: string;
+	onChange: ( newValue: string | null ) => void;
+	onClose: () => void;
+}
+
+const DateTimePickerForm: ComponentType< DateTimePickerControlProps > = ( {
+	title,
+	value,
+	onChange,
+	onClose,
+} ) => {
+	return (
+		<VStack>
+			<HStack>
+				<span>{ title }</span>
+				<Button
+					label={ __( 'Close' ) }
+					icon={ closeSmall }
+					onClick={ onClose }
+				/>
+			</HStack>
+			<DateTimePicker
+				currentDate={ value }
+				onChange={ onChange }
+				is12Hour
+			/>
+		</VStack>
+	);
+};
+
 function Edit< Item >( {
 	data,
 	field,
 	onChange,
 }: DataFormControlProps< Item > ) {
-	const { id } = field;
+	const { id, label, description } = field;
 	const value = field.getValue( { item: data } ) ?? '';
 	const onChangeControl = useCallback(
 		( newValue: string | null ) =>
@@ -45,10 +90,27 @@ function Edit< Item >( {
 	);
 
 	return (
-		<DateTimePicker
-			currentDate={ value }
-			onChange={ onChangeControl }
-			is12Hour
+		<Dropdown
+			renderToggle={ ( { onToggle, isOpen } ) => (
+				<Button
+					size="compact"
+					variant="tertiary"
+					onClick={ onToggle }
+					aria-expanded={ isOpen }
+					aria-label={ label }
+					label={ description }
+				>
+					{ value }
+				</Button>
+			) }
+			renderContent={ ( { onClose } ) => (
+				<DateTimePickerForm
+					onClose={ onClose }
+					title={ label }
+					value={ value }
+					onChange={ onChangeControl }
+				/>
+			) }
 		/>
 	);
 }
