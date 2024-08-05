@@ -56,7 +56,7 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
 		await page
-			.getByRole( 'button', { name: 'Reset', exact: true } )
+			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
 		await expect( titles ).toHaveCount( 6 );
 

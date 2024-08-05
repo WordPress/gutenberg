@@ -2,6 +2,10 @@
 	position: relative;
 }
 
+.dataviews-filters__container {
+	padding-top: 0;
+}
+
 .dataviews-filters__reset-button.dataviews-filters__reset-button[aria-disabled="true"] {
 	&,
 	&:hover {
@@ -249,4 +253,30 @@
 		justify-content: center;
 		width: $icon-size;
 	}
+}
+
+.dataviews-filters__container-visibility-toggle {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.dataviews-filters-toggle__count {
+	position: absolute;
+	top: 0;
+	right: 0;
+	transform: translate(50%, -50%);
+	background: var(--wp-admin-theme-color, #3858e9);
+	height: $grid-unit-20;
+	min-width: $grid-unit-20;
+	line-height: $grid-unit-20;
+	padding: 0 $grid-unit-05;
+	text-align: center;
+	border-radius: $grid-unit-10;
+	font-size: 11px;
+	outline: var(--wp-admin-border-width-focus) solid $white;
+	color: $white;
+}
+
+.dataviews-search {
+	width: fit-content;
 }
