@@ -23,6 +23,11 @@
 			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
 				color: $gray-900;
 			}
+
+			.dataviews-view-grid__media::after {
+				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+				box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+			}
 		}
 	}
 
@@ -33,6 +38,7 @@
 		background-color: $gray-100;
 		border-radius: $grid-unit-05;
 		position: relative;
+		overflow: hidden;
 
 		img {
 			object-fit: cover;
