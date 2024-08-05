@@ -296,6 +296,7 @@ module.exports = {
 						'RangeControl',
 						'SearchControl',
 						'TextareaControl',
+						'ToggleControl',
 						'ToggleGroupControl',
 						'TreeSelect',
 					].map( ( componentName ) => ( {
