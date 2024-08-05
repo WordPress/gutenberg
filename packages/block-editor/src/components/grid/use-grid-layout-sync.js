@@ -152,7 +152,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						columnSpan,
 						rowSpan,
 						...layout
-					} = attributes?.style?.layout;
+					} = attributes.style?.layout ?? {};
 
 					if ( columnStart || rowStart || columnSpan || rowSpan ) {
 						const hasEmptyLayoutAttribute =
@@ -173,8 +173,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				for ( const clientId of blockOrder ) {
 					const attributes = getBlockAttributes( clientId );
 					const { columnStart, rowStart, ...layout } =
-						attributes?.style?.layout;
-
+						attributes.style?.layout ?? {};
+					// Only update attributes if columnStart or rowStart are set.
 					if ( columnStart || rowStart ) {
 						const hasEmptyLayoutAttribute =
 							Object.keys( layout ).length === 0;
@@ -208,12 +208,14 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			);
 		}
 	}, [
+		// Actual deps to sync:
 		gridClientId,
 		gridLayout,
 		previousBlockOrder,
 		blockOrder,
 		previouslySelectedBlockRect,
 		previousIsManualPlacement,
+		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
 		getBlockRootClientId,
