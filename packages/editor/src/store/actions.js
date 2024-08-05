@@ -200,7 +200,7 @@ export const savePost =
 		let error = false;
 		try {
 			edits = await applyFilters(
-				'editor.PreSavePost',
+				'editor.preSavePost',
 				Promise.resolve( edits ),
 				options
 			);
@@ -252,7 +252,7 @@ export const savePost =
 		if ( ! error ) {
 			try {
 				await applyFilters(
-					'editor.SavePost',
+					'editor.savePost',
 					Promise.resolve(),
 					options
 				);
