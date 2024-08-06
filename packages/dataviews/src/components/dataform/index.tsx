@@ -6,6 +6,7 @@ import type { Dispatch, SetStateAction } from 'react';
 /**
  * WordPress dependencies
  */
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -37,14 +38,18 @@ export default function DataForm< Item >( {
 		[ fields, form.visibleFields ]
 	);
 
-	return visibleFields.map( ( field ) => {
-		return (
-			<field.Edit
-				key={ field.id }
-				data={ data }
-				field={ field }
-				onChange={ onChange }
-			/>
-		);
-	} );
+	return (
+		<VStack spacing={ 4 }>
+			{ visibleFields.map( ( field ) => {
+				return (
+					<field.Edit
+						key={ field.id }
+						data={ data }
+						field={ field }
+						onChange={ onChange }
+					/>
+				);
+			} ) }
+		</VStack>
+	);
 }

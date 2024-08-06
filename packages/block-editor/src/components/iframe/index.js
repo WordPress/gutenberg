@@ -242,10 +242,8 @@ function Iframe( {
 	const isZoomedOut = scale !== 1;
 
 	useEffect( () => {
-		if ( ! isZoomedOut ) {
-			prevContainerWidth.current = containerWidth;
-		}
-	}, [ containerWidth, isZoomedOut ] );
+		prevContainerWidth.current = containerWidth;
+	}, [ containerWidth ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [

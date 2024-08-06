@@ -34,6 +34,15 @@ const fields = [
 			{ value: 2, label: 'John' },
 		],
 	},
+	{
+		id: 'status',
+		label: 'Status',
+		type: 'text' as const,
+		elements: [
+			{ value: 'draft', label: 'Draft' },
+			{ value: 'published', label: 'Published' },
+		],
+	},
 ];
 
 export const Default = () => {
@@ -41,10 +50,11 @@ export const Default = () => {
 		title: 'Hello, World!',
 		order: 2,
 		author: 1,
+		status: 'draft',
 	} );
 
 	const form = {
-		visibleFields: [ 'title', 'order', 'author' ],
+		visibleFields: [ 'title', 'order', 'author', 'status' ],
 	};
 
 	return (
