@@ -32,26 +32,14 @@ const POST_FORMATS = [
 } );
 
 export default function PostFormatControls( { onChange, query } ) {
-	const { postType, postFormat } = query;
+	const { postFormat } = query;
 
-	// WIP/TODO: Only show formats supported by *both* the theme and the (custom) post type.
-	const { supportedFormats } = useSelect(
-		( select ) => {
-			const themeSupports = select( coreStore ).getThemeSupports();
-			const { getEntityRecords } = select( coreStore );
-			return {
-				supportedFormats: themeSupports.formats,
-				postFormats: getEntityRecords( 'taxonomy', 'post_format', {
-					order: 'asc',
-					_fields: 'id,name',
-					context: 'view',
-					per_page: -1,
-					post_type: postType,
-				} ),
-			};
-		},
-		[ postType ]
-	);
+	const { supportedFormats } = useSelect( ( select ) => {
+		const themeSupports = select( coreStore ).getThemeSupports();
+		return {
+			supportedFormats: themeSupports.formats,
+		};
+	}, [] );
 
 	// TODO: It seems that even when the theme does not support post formats,
 	// the 'standard' format is still returned, so the control shows.

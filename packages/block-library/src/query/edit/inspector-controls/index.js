@@ -129,6 +129,10 @@ export default function QueryInspectorControls( props ) {
 	const showParentControl =
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
+
+	// TODO: this condition does not work for custom post types,
+	// useTaxonomies util does not return the post format taxonomy
+	// for custom post types, only posts?
 	const showPostFormatControl =
 		taxonomies && taxonomies.some( ( { slug } ) => slug === 'post_format' );
 
