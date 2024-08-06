@@ -27,7 +27,10 @@ import type {
 } from '../types';
 
 function sort( a: any, b: any, direction: SortDirection ) {
-	return direction === 'asc' ? a - b : b - a;
+	const timeA = new Date( a ).getTime();
+	const timeB = new Date( b ).getTime();
+
+	return direction === 'asc' ? timeA - timeB : timeB - timeA;
 }
 
 function isValid( value: any, context?: ValidationContext ) {
