@@ -34,6 +34,11 @@ const fields = [
 		type: 'integer' as const,
 	},
 	{
+		id: 'date',
+		label: 'Date',
+		type: 'datetime' as const,
+	},
+	{
 		id: 'author',
 		label: 'Author',
 		type: 'integer' as const,
@@ -59,10 +64,11 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 		order: 2,
 		author: 1,
 		status: 'draft',
+		date: '2021-01-01T12:00:00',
 	} );
 
 	const form = {
-		fields: [ 'title', 'order', 'author', 'status' ],
+		fields: [ 'title', 'order', 'author', 'status', 'date' ],
 	};
 
 	return (
