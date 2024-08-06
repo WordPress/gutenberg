@@ -128,13 +128,13 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			}
 
 			// Unset grid layout attributes for blocks removed from the grid.
-			previousBlockOrder?.forEach( ( clientId ) => {
+			for ( const clientId of previousBlockOrder ?? [] ) {
 				if ( ! blockOrder.includes( clientId ) ) {
 					const rootClientId = getBlockRootClientId( clientId );
 
 					// Block was removed from the editor, so nothing to do.
 					if ( rootClientId === null ) {
-						return;
+						continue;
 					}
 
 					// Check if the block is being moved to another grid.
@@ -142,7 +142,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					// the attributes.
 					const rootAttributes = getBlockAttributes( rootClientId );
 					if ( rootAttributes?.layout?.type === 'grid' ) {
-						return;
+						continue;
 					}
 
 					const attributes = getBlockAttributes( clientId );
@@ -165,7 +165,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						);
 					}
 				}
-			} );
+			}
 		} else {
 			// Remove all of the columnStart and rowStart values
 			// when switching from manual to auto mode,
