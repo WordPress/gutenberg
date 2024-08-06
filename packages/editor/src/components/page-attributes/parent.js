@@ -14,7 +14,11 @@ import {
 	ExternalLink,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
@@ -256,12 +260,20 @@ export function ParentRow() {
 							onClose={ onClose }
 						/>
 						<div>
-							{ sprintf(
-								/* translators: %1$s The home URL of the WordPress installation without the scheme. */
-								__(
-									'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s/services/pricing.'
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %1$s The home URL of the WordPress installation without the scheme. */
+									__(
+										'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be <span>%1$s</span><wbr />/services<wbr />/pricing.'
+									),
+									filterURLForDisplay( homeUrl )
 								),
-								filterURLForDisplay( homeUrl )
+								{
+									span: (
+										<span className="editor-post-parent__panel-dialog_example-url" />
+									),
+									wbr: <wbr />,
+								}
 							) }
 							<p>
 								{ __(
