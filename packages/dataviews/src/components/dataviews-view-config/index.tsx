@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
+import type { ChangeEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -19,10 +19,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
-import { cog, seen } from '@wordpress/icons';
+import { cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 
 /**
@@ -32,36 +33,36 @@ import { SORTING_DIRECTIONS, sortLabelsShort } from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import { unlock } from '../../lock-unlock';
 
-interface ViewActionsProps {
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
+
+interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
 }
 
-function LayoutPicker( {
+function ViewTypeMenu( {
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+}: ViewTypeMenuProps ) {
 	const { view, onChangeView } = useContext( DataViewsContext );
 	const availableLayouts = Object.keys( defaultLayouts );
+	if ( availableLayouts.length <= 1 ) {
+		return null;
+	}
+	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<ToggleGroupControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			isBlock
+		<DropdownMenu
+			trigger={
+				<Button
+					size="compact"
+					icon={ activeView?.icon }
 			label={ __( 'Layout' ) }
-			value={ view.type }
-			onChange={ ( newLayout ) => {
-				switch ( newLayout ) {
-					case 'list':
-					case 'grid':
-					case 'table':
-						return onChangeView( {
-							...view,
-							type: newLayout,
-							...defaultLayouts[ newLayout ],
-						} );
+				/>
 				}
-				warning( 'Invalid dataview' );
-			} }
 		>
 			{ availableLayouts.map( ( layout ) => {
 				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
@@ -69,15 +70,38 @@ function LayoutPicker( {
 					return null;
 				}
 				return (
-					<ToggleGroupControlOption
+					<DropdownMenuRadioItem
 						key={ layout }
 						value={ layout }
-						label={ config.label }
-					/>
+						name="view-actions-available-view"
+						checked={ layout === view.type }
+						hideOnClick
+						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+							switch ( e.target.value ) {
+								case 'list':
+								case 'grid':
+								case 'table':
+									return onChangeView( {
+										...view,
+										type: e.target.value,
+										...defaultLayouts[ e.target.value ],
+									} );
+							}
+							warning( 'Invalid dataview' );
+						} }
+					>
+						<DropdownMenuItemLabel>
+							{ config.label }
+						</DropdownMenuItemLabel>
+					</DropdownMenuRadioItem>
 				);
 			} ) }
-		</ToggleGroupControl>
+		</DropdownMenu>
 	);
+}
+
+interface ViewActionsProps {
+	defaultLayouts?: SupportedLayouts;
 }
 
 function SortFieldControl() {
@@ -213,12 +237,7 @@ function FieldControl() {
 						<HStack expanded>
 							<span>{ field.label }</span>
 							<Button
-								className={ clsx(
-									'dataviews-view-config__field-control-button',
-									{
-										'is-hidden': ! isVisible,
-									}
-								) }
+								className="'dataviews-view-config__field-control-button"
 								size="compact"
 								onClick={ () =>
 									onChangeView( {
@@ -230,7 +249,7 @@ function FieldControl() {
 											: [ ...viewFields, field.id ],
 									} )
 								}
-								icon={ seen }
+								icon={ isVisible ? seen : unseen }
 								label={
 									isVisible
 										? __( 'Hide field' )
@@ -260,7 +279,6 @@ function SettingsSection( {
 				<Heading
 					level={ 2 }
 					className="dataviews-settings-section__title"
-					size={ 15 }
 				>
 					{ title }
 				</Heading>
@@ -282,16 +300,13 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent( {
-	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+function DataviewsViewConfigContent() {
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection
 				title={ __( 'Appearance' ) }
 				description={ __( 'Customize the display of data' ) }
 			>
-				<LayoutPicker defaultLayouts={ defaultLayouts } />
 				<HStack expanded className="is-divided-in-two">
 					<SortFieldControl />
 					<SortDirectionControl />
@@ -315,6 +330,8 @@ function _DataViewsViewConfig( {
 		useState< boolean >( false );
 
 	return (
+		<>
+			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
 		<div>
 			<Button
 				size="compact"
@@ -330,12 +347,11 @@ function _DataViewsViewConfig( {
 					} }
 					focusOnMount
 				>
-					<DataviewsViewConfigContent
-						defaultLayouts={ defaultLayouts }
-					/>
+						<DataviewsViewConfigContent />
 				</Popover>
 			) }
 		</div>
+		</>
 	);
 }
 
