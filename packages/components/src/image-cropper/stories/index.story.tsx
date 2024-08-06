@@ -76,7 +76,7 @@ function TemplateControls() {
 					variant="secondary"
 					onClick={ () => {
 						dispatch( {
-							type: 'ROTATE_CLOCKWISE',
+							type: 'ROTATE_90_DEG',
 							isCounterClockwise: true,
 						} );
 					} }
@@ -86,7 +86,7 @@ function TemplateControls() {
 				<Button
 					variant="secondary"
 					onClick={ () => {
-						dispatch( { type: 'ROTATE_CLOCKWISE' } );
+						dispatch( { type: 'ROTATE_90_DEG' } );
 					} }
 				>
 					Rotate 90°

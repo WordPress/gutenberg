@@ -59,7 +59,7 @@ type Action =
 	// Rotate the image to an angle.
 	| { type: 'ROTATE'; angle: number }
 	// Rotate the image 90-degree clockwise or counter-clockwise.
-	| { type: 'ROTATE_CLOCKWISE'; isCounterClockwise?: boolean }
+	| { type: 'ROTATE_90_DEG'; isCounterClockwise?: boolean }
 	// Move the image to a position.
 	| { type: 'MOVE'; x: number; y: number }
 	// End moving the image.
@@ -220,7 +220,7 @@ function imageCropperReducer( state: State, action: Action ) {
 				},
 			};
 		}
-		case 'ROTATE_CLOCKWISE': {
+		case 'ROTATE_90_DEG': {
 			const isCounterClockwise = action.isCounterClockwise;
 			const nextRotations = rotations + ( isCounterClockwise ? -1 : 1 );
 			const rotatedPosition = rotatePoint(
