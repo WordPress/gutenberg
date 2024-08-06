@@ -9,7 +9,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	privateApis as componentsPrivateApis,
+	CustomSelectControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -31,11 +31,6 @@ import {
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from '../utils';
-import { unlock } from '../../../lock-unlock';
-
-const { CustomSelectControlV2: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
@@ -309,11 +304,17 @@ export default function SpacingInputControl( {
 						// component in controlled mode
 						options.find(
 							( option ) => option.key === currentValue
-						)?.name || ''
+						) || ''
 					}
-					onChange={ ( newValue ) =>
-						onChange( getNewPresetValue( newValue, 'selectList' ) )
-					}
+					onChange={ ( selection ) => {
+						onChange(
+							getNewPresetValue(
+								selection.selectedItem.key,
+								'selectList'
+							)
+						);
+					} }
+					options={ options }
 					label={ ariaLabel }
 					hideLabelFromVision
 					size="__unstable-large"
@@ -321,13 +322,7 @@ export default function SpacingInputControl( {
 					onMouseOut={ onMouseOut }
 					onFocus={ onMouseOver }
 					onBlur={ onMouseOut }
-				>
-					{ options.map( ( { key, name } ) => (
-						<CustomSelectControl.Item key={ key } value={ key }>
-							{ name }
-						</CustomSelectControl.Item>
-					) ) }
-				</CustomSelectControl>
+				/>
 			) }
 			{ ! disableCustomSpacingSizes && (
 				<Button

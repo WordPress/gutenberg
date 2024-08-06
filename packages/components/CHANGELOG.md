@@ -4,7 +4,6 @@
 
 ### Bug Fixes
 
--   Spacing controls: using `CustomSelectControlV2` for >= 8 spacing sizes ([#64284](https://github.com/WordPress/gutenberg/pull/64284)
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
 -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
