@@ -19,6 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -260,9 +261,7 @@ export function ParentRow() {
 								__(
 									'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s/services/pricing.'
 								),
-								homeUrl
-									.replace( /^https?:\/\//, '' )
-									.replace( /\/$/, '' )
+								filterURLForDisplay( homeUrl )
 							) }
 							<p>
 								{ __(
