@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -59,8 +59,14 @@ export const sortLabels = {
 	desc: __( 'Sort descending' ),
 };
 export const sortLabelsShort = {
-	asc: __( 'Asc' ),
-	desc: __( 'Desc' ),
+	asc: _x(
+		'Asc',
+		'Short label for ascending sorting, should be at most 6 characters'
+	),
+	desc: _x(
+		'Desc',
+		'Short label for descending sorting, should be at most 6 characters'
+	),
 };
 
 // View layouts.
