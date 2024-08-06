@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   RichText: make readOnly prop work properly ([#64114](https://github.com/WordPress/gutenberg/pull/64114)).
+
 ## 13.4.0 (2024-07-24)
 
 ## 13.3.0 (2024-07-10)
