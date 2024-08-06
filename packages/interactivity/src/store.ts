@@ -350,6 +350,32 @@ export const populateInitialData = ( data?: {
 	}
 };
 
+// Get the parent state from the referent page.
+
 // Parse and populate the initial state and config.
 const data = parseInitialData();
 populateInitialData( data );
+
+const deepClone = ( source: any ) => {
+	const clone = {};
+	for ( const key in source ) {
+		const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
+		if ( typeof getter === 'function' ) {
+			continue;
+		} else if ( isObject( source[ key ] ) ) {
+			clone[ key ] = deepClone( source[ key ] );
+		} else {
+			clone[ key ] = source[ key ];
+		}
+	}
+	return clone;
+};
+
+// Serialize the current store.
+export const serializeStore = () => {
+	const stateData = { state: {} };
+	for ( const [ namespace, value ] of stores.entries() ) {
+		stateData.state[ namespace ] = deepClone( value.state );
+	}
+	return JSON.stringify( stateData );
+};

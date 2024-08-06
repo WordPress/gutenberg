@@ -13,7 +13,7 @@ import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive, getNamespace } from './hooks';
-import { parseInitialData, populateInitialData } from './store';
+import { parseInitialData, populateInitialData, serializeStore } from './store';
 
 export { store, getConfig } from './store';
 export { getContext, getElement } from './hooks';
@@ -59,3 +59,30 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	registerDirectives();
 	await init();
 } );
+
+function storeStore() {
+	window.sessionStorage.setItem(
+		'interactivity-api-store',
+		serializeStore()
+	);
+}
+
+if (
+	// @ts-ignore
+	document.prerendering
+) {
+	document.addEventListener( 'prerenderingchange', () => {
+		const store = window.sessionStorage.getItem(
+			'interactivity-api-store'
+		);
+		populateInitialData( JSON.parse( store ) );
+
+		// remove the store from session storage
+		window.sessionStorage.removeItem( 'interactivity-api-store' );
+
+		// add the listener for when the user leaves the page
+		window.addEventListener( 'beforeunload', storeStore );
+	} );
+} else {
+	window.addEventListener( 'beforeunload', storeStore );
+}
