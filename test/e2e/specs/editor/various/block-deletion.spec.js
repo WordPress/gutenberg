@@ -292,9 +292,11 @@ test.describe( 'Block deletion', () => {
 		// Ensure that the newly created empty block is focused.
 		await expect.poll( editor.getBlocks ).toHaveLength( 2 );
 		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.nth( 1 )
 		).toBeFocused();
 	} );
 

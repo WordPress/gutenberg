@@ -68,7 +68,7 @@ export function useWritingFlow() {
 			),
 			useRefEffect( ( node ) => {
 				function onInput( event ) {
-					if ( event.target !== node ) {
+					if ( event.target !== node || event.__isRedirected ) {
 						return;
 					}
 
@@ -92,6 +92,7 @@ export function useWritingFlow() {
 					init.bubbles = false;
 
 					const newEvent = new Constructor( event.type, init );
+					newEvent.__isRedirected = true;
 					const cancelled = ! root.dispatchEvent( newEvent );
 
 					if ( cancelled ) {
