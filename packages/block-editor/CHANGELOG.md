@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `URLInput`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64282](https://github.com/WordPress/gutenberg/pull/64282)).
 -   `LineHeightControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64281](https://github.com/WordPress/gutenberg/pull/64281)).
 
 ### Enhancements
