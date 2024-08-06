@@ -12,6 +12,10 @@
  */
 
 function render_block_core_accordion_group( $attributes, $content ) {
+	if ( ! $content ) {
+		return $content;
+	}
+
 	$suffix = wp_scripts_get_suffix();
 	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		$module_url = gutenberg_url( '/build/interactivity/accordionGroup.min.js' );
@@ -25,10 +29,6 @@ function render_block_core_accordion_group( $attributes, $content ) {
 	);
 
 	wp_enqueue_script_module( '@wordpress/block-library/accordion-group' );
-
-	if ( ! $content ) {
-		return $content;
-	}
 
 	$p         = new WP_HTML_Tag_Processor( $content );
 	$autoclose = (bool) $attributes['autoclose'];
