@@ -21,6 +21,7 @@
 -   Upgraded `@ariakit/react` (v0.4.7) and `@ariakit/test` (v0.4.0) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
 -   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
+-   `TextControl`: Support generic props type ([#64293](https://github.com/WordPress/gutenberg/pull/64293)).
 
 ## 28.4.0 (2024-07-24)
 
