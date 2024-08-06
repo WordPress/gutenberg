@@ -82,6 +82,12 @@ module.exports = ( api ) => {
 				},
 			],
 			maybeGetPluginTransformRuntime(),
+      [
+        require.resolve( '@babel/plugin-proposal-decorators' ),
+        {
+          legacy: true,
+        },
+      ]
 		].filter( Boolean ),
 	};
 };
