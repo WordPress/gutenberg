@@ -61,7 +61,7 @@ function DataViewsPagination() {
 					spacing={ 1 }
 					className="dataviews-pagination__page-select"
 				>
-					<div aria-hidden>Page</div>
+					<div aria-hidden>{ __( 'Page' ) }</div>
 					<SelectControl
 						aria-label={ __( 'Current page' ) }
 						value={ currentPage.toString() }
