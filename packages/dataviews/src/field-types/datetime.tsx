@@ -96,6 +96,7 @@ function Edit< Item >( {
 	let time;
 	if ( value ) {
 		const dateTime = getDate( value );
+		// TODO: WordPress uses UTC time, we should display the WordPress user time.
 		date = dateTime.toISOString().split( 'T' )[ 0 ];
 		time = dateTime.toISOString().split( 'T' )[ 1 ].split( '.' )[ 0 ];
 	}
