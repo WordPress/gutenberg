@@ -101,7 +101,7 @@ export default function PostCardPanel( { actions } ) {
 					as="h2"
 					lineHeight="20px"
 				>
-					{ title ? decodeEntities( title ) : __( 'No Title' ) }
+					{ title ? decodeEntities( title ) : __( 'No title' ) }
 					{ isFrontPage && (
 						<span className="editor-post-card-panel__title-badge">
 							{ __( 'Homepage' ) }

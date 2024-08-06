@@ -8,7 +8,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useState, useEffect } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
 import { DataForm, isItemValid } from '@wordpress/dataviews';
@@ -589,6 +589,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		},
 		[ postType ]
 	);
+	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		registerPostTypeActions( postType );
+	}, [ registerPostTypeActions, postType ] );
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
 	const reorderPagesAction = useReorderPagesAction( postType );
