@@ -70,7 +70,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 					! contextAssignedObjects.get( target )?.has( k ) &&
 					isPlainObject( currentProp )
 				) {
-					return proxifyContext( currentProp, fallback[ k ] );
+					return proxifyContext( currentProp );
 				}
 
 				// Return the stored proxy for `currentProp` when it exists.
@@ -144,7 +144,7 @@ const updateContext = ( target: any, source: any ) => {
 			isPlainObject( source[ k ] )
 		) {
 			updateContext( peek( target, k ) as object, source[ k ] );
-		} else {
+		} else if ( ! ( k in target ) ) {
 			target[ k ] = source[ k ];
 		}
 	}
@@ -291,8 +291,12 @@ export default () => {
 						currentValue.current[ namespace ],
 						deepClone( value ) as object
 					);
+					currentValue.current[ namespace ] = proxifyContext(
+						currentValue.current[ namespace ],
+						inheritedValue[ namespace ]
+					);
 				}
-				return proxifyContext( currentValue.current, inheritedValue );
+				return currentValue.current;
 			}, [ defaultEntry, inheritedValue ] );
 
 			return createElement( Provider, { value: contextStack }, children );
