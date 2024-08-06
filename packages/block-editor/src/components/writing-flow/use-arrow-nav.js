@@ -19,6 +19,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId, isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { getSelectionRoot } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -134,7 +135,11 @@ export function getClosestTabbable(
 		}
 
 		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		if (
+			node.isContentEditable &&
+			node.contentEditable !== 'true' &&
+			! node.getAttribute( 'tabindex' )
+		) {
 			return false;
 		}
 
@@ -190,8 +195,7 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -232,6 +236,8 @@ export default function useArrowNav() {
 
 				return;
 			}
+
+			const target = getSelectionRoot( ownerDocument ) || event.target;
 
 			// Abort if our current target is not a candidate for navigation
 			// (e.g. preserve native input behaviors).
@@ -282,6 +288,7 @@ export default function useArrowNav() {
 				);
 
 				if ( closestTabbable ) {
+					node.contentEditable = false;
 					placeCaretAtVerticalEdge(
 						closestTabbable,
 						// When Alt is pressed, place the caret at the furthest
@@ -302,6 +309,7 @@ export default function useArrowNav() {
 					isReverseDir,
 					node
 				);
+				node.contentEditable = false;
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 				event.preventDefault();
 			}
