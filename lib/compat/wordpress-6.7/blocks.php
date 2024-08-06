@@ -55,9 +55,12 @@ function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $bloc
 	if ( isset( $block->context['query']['postFormat'] ) &&
 		! empty( $block->context['query']['postFormat'] ) ) {
 		// Add the required "post-format-" prefix to each format.
-		$formats = array_map( function( $format ) {
-			return "post-format-" . $format;
-		}, $block->context['query']['postFormat'] );
+		$formats = array_map(
+			function ( $format ) {
+				return 'post-format-' . $format;
+			},
+			$block->context['query']['postFormat']
+		);
 
 		$query['tax_query'] = array(
 			array(
