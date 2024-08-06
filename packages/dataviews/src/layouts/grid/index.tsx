@@ -84,18 +84,18 @@ function GridItem< Item >( {
 			<div className="dataviews-view-grid__media">
 				{ renderedMediaField }
 			</div>
+			<SingleSelectionCheckbox
+				item={ item }
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				getItemId={ getItemId }
+				primaryField={ primaryField }
+				disabled={ ! hasBulkAction }
+			/>
 			<HStack
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
 			>
-				<SingleSelectionCheckbox
-					item={ item }
-					selection={ selection }
-					onChangeSelection={ onChangeSelection }
-					getItemId={ getItemId }
-					primaryField={ primaryField }
-					disabled={ ! hasBulkAction }
-				/>
 				<HStack className="dataviews-view-grid__primary-field">
 					{ renderedPrimaryField }
 				</HStack>

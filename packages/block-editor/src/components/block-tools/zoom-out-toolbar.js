@@ -100,7 +100,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 						<Button
 							icon={ dragHandle }
 							className="block-selection-button_drag-handle zoom-out-toolbar-button"
-							aria-hidden="true"
 							label={ __( 'Drag' ) }
 							iconSize={ 24 }
 							size="compact"

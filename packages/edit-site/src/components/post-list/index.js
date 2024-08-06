@@ -39,100 +39,129 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
+const getDefaultView = ( defaultViews, activeView ) => {
+	return defaultViews.find( ( { slug } ) => slug === activeView )?.view;
+};
+
+const getCustomView = ( editedEntityRecord ) => {
+	if ( ! editedEntityRecord?.content ) {
+		return undefined;
+	}
+
+	const content = JSON.parse( editedEntityRecord.content );
+	if ( ! content ) {
+		return undefined;
+	}
+
+	return {
+		...content,
+		layout: defaultLayouts[ content.type ]?.layout,
+	};
+};
+
+/**
+ * This function abstracts working with default & custom views by
+ * providing a [ state, setState ] tuple based on the URL parameters.
+ *
+ * Consumers use the provided tuple to work with state
+ * and don't have to deal with the specifics of default & custom views.
+ *
+ * @param {string} postType Post type to retrieve default views for.
+ * @return {Array} The [ state, setState ] tuple.
+ */
 function useView( postType ) {
 	const {
 		params: { activeView = 'all', isCustom = 'false', layout },
 	} = useLocation();
 	const history = useHistory();
-	const DEFAULT_VIEWS = useDefaultViews( { postType } );
-	const selectedDefaultView = useMemo( () => {
-		const defaultView =
-			isCustom === 'false' &&
-			DEFAULT_VIEWS[ postType ].find(
-				( { slug } ) => slug === activeView
-			)?.view;
-		if ( isCustom === 'false' && layout ) {
-			return {
-				...defaultView,
-				type: layout,
-				layout: defaultLayouts[ layout ]?.layout,
-			};
-		}
-		return defaultView;
-	}, [ isCustom, activeView, layout, postType, DEFAULT_VIEWS ] );
-	const [ view, setView ] = useState( selectedDefaultView );
 
-	useEffect( () => {
-		if ( selectedDefaultView ) {
-			setView( selectedDefaultView );
-		}
-	}, [ selectedDefaultView ] );
-	const editedViewRecord = useSelect(
+	const defaultViews = useDefaultViews( { postType } );
+	const { editEntityRecord } = useDispatch( coreStore );
+	const editedEntityRecord = useSelect(
 		( select ) => {
 			if ( isCustom !== 'true' ) {
-				return;
+				return undefined;
 			}
+
 			const { getEditedEntityRecord } = select( coreStore );
-			const dataviewRecord = getEditedEntityRecord(
+			return getEditedEntityRecord(
 				'postType',
 				'wp_dataviews',
 				Number( activeView )
 			);
-			return dataviewRecord;
 		},
 		[ activeView, isCustom ]
 	);
-	const { editEntityRecord } = useDispatch( coreStore );
-
-	const customView = useMemo( () => {
-		const storedView =
-			editedViewRecord?.content &&
-			JSON.parse( editedViewRecord?.content );
-		if ( ! storedView ) {
-			return storedView;
-		}
-
-		return {
-			...storedView,
-			layout: defaultLayouts[ storedView?.type ]?.layout,
-		};
-	}, [ editedViewRecord?.content ] );
-
-	const setCustomView = useCallback(
-		( viewToSet ) => {
-			editEntityRecord(
-				'postType',
-				'wp_dataviews',
-				editedViewRecord?.id,
-				{
-					content: JSON.stringify( viewToSet ),
+	const [ view, setView ] = useState( () => {
+		if ( isCustom === 'true' ) {
+			return (
+				getCustomView( editedEntityRecord ) ?? {
+					type: layout ?? LAYOUT_LIST,
 				}
 			);
-		},
-		[ editEntityRecord, editedViewRecord?.id ]
-	);
+		}
+		return (
+			getDefaultView( defaultViews, activeView ) ?? {
+				type: layout ?? LAYOUT_LIST,
+			}
+		);
+	} );
 
-	const setDefaultViewAndUpdateUrl = useCallback(
-		( viewToSet ) => {
-			if ( viewToSet.type !== view?.type ) {
-				const { params } = history.getLocationWithParams();
+	const setViewWithUrlUpdate = useCallback(
+		( newView ) => {
+			const { params } = history.getLocationWithParams();
+
+			if ( newView.type === LAYOUT_LIST && ! params?.layout ) {
+				// Skip updating the layout URL param if
+				// it is not present and the newView.type is LAYOUT_LIST.
+			} else if ( newView.type !== params?.layout ) {
 				history.push( {
 					...params,
-					layout: viewToSet.type,
+					layout: newView.type,
 				} );
 			}
-			setView( viewToSet );
+
+			setView( newView );
+
+			if ( isCustom === 'true' && editedEntityRecord?.id ) {
+				editEntityRecord(
+					'postType',
+					'wp_dataviews',
+					editedEntityRecord?.id,
+					{
+						content: JSON.stringify( newView ),
+					}
+				);
+			}
 		},
-		[ history, view?.type ]
+		[ history, isCustom, editEntityRecord, editedEntityRecord?.id ]
 	);
 
-	if ( isCustom === 'false' ) {
-		return [ view, setDefaultViewAndUpdateUrl ];
-	} else if ( isCustom === 'true' && customView ) {
-		return [ customView, setCustomView ];
-	}
-	// Loading state where no the view was not found on custom views or default views.
-	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
+	// When layout URL param changes, update the view type
+	// without affecting any other config.
+	useEffect( () => {
+		setView( ( prevView ) => ( {
+			...prevView,
+			type: layout ?? LAYOUT_LIST,
+		} ) );
+	}, [ layout ] );
+
+	// When activeView or isCustom URL parameters change,
+	// reset the view & update the layout URL param to match the view's type.
+	useEffect( () => {
+		let newView;
+		if ( isCustom === 'true' ) {
+			newView = getCustomView( editedEntityRecord );
+		} else {
+			newView = getDefaultView( defaultViews, activeView );
+		}
+
+		if ( newView ) {
+			setViewWithUrlUpdate( newView );
+		}
+	}, [ activeView, isCustom, defaultViews, editedEntityRecord ] );
+
+	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
 }
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
@@ -145,7 +174,12 @@ export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const location = useLocation();
-	const { postId, quickEdit = false } = location.params;
+	const {
+		postId,
+		quickEdit = false,
+		isCustom,
+		activeView = 'all',
+	} = location.params;
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -165,7 +199,7 @@ export default function PostList( { postType } ) {
 
 	const queryArgs = useMemo( () => {
 		const filters = {};
-		view.filters.forEach( ( filter ) => {
+		view.filters?.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
 				filter.operator === OPERATOR_IS_ANY
@@ -305,6 +339,7 @@ export default function PostList( { postType } ) {
 			}
 		>
 			<DataViews
+				key={ activeView + isCustom }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
