@@ -54,7 +54,6 @@ export function getHrefAndDestination(
 			return {
 				href: undefined,
 				linkDestination: IMAGE_LINK_DESTINATION_NONE,
-				lightbox: { enabled: undefined },
 			};
 	}
 

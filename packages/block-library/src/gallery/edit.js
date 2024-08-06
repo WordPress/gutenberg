@@ -254,38 +254,13 @@ function GalleryEdit( props ) {
 			);
 		}
 
-		let hrefAndDestination = getHrefAndDestination(
-			image,
-			linkTo,
-			imageAttributes?.linkDestination
-		);
-
-		if (
-			linkTo === LINK_DESTINATION_LIGHTBOX &&
-			! lightboxSetting?.enabled
-		) {
-			hrefAndDestination = {
-				...hrefAndDestination,
-				lightbox: { enabled: true },
-			};
-		} else if (
-			linkTo !== LINK_DESTINATION_LIGHTBOX &&
-			lightboxSetting?.enabled
-		) {
-			hrefAndDestination = {
-				...hrefAndDestination,
-				lightbox: { enabled: false },
-			};
-		} else {
-			hrefAndDestination = {
-				...hrefAndDestination,
-				lightbox: undefined,
-			};
-		}
-
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
-			...hrefAndDestination,
+			...getHrefAndDestination(
+				image,
+				linkTo,
+				imageAttributes?.linkDestination
+			),
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
@@ -415,10 +390,33 @@ function GalleryEdit( props ) {
 			const image = block.attributes.id
 				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
-			changedAttributes[ block.clientId ] = getHrefAndDestination(
-				image,
-				value
-			);
+
+			let hrefAndDestination = getHrefAndDestination( image, value );
+
+			if (
+				value === LINK_DESTINATION_LIGHTBOX &&
+				! lightboxSetting?.enabled
+			) {
+				hrefAndDestination = {
+					...hrefAndDestination,
+					lightbox: { enabled: true },
+				};
+			} else if (
+				value !== LINK_DESTINATION_LIGHTBOX &&
+				lightboxSetting?.enabled
+			) {
+				hrefAndDestination = {
+					...hrefAndDestination,
+					lightbox: { enabled: false },
+				};
+			} else {
+				hrefAndDestination = {
+					...hrefAndDestination,
+					lightbox: undefined,
+				};
+			}
+
+			changedAttributes[ block.clientId ] = hrefAndDestination;
 		} );
 		updateBlockAttributes( blocks, changedAttributes, true );
 		const linkToText = [ ...linkOptions ].find(
