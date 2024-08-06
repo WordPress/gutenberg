@@ -19,12 +19,15 @@ function block_core_accordion_item_render( $attributes, $content ) {
 	$p         = new WP_HTML_Tag_Processor( $content );
 	$unique_id = wp_unique_id( 'accordion-item-' );
 
-	// Adds the id to the current accordion group list.
+	// If the item is open by default,
+	// add its id to the accordion group's initial context.isOpen list.
 	if ( $attributes['openByDefault'] ) {
 		// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
 		gutenberg_block_core_accordion_group_item_ids( $unique_id );
 	}
 
+	// Initialize the state of the item on the server using a closure,
+	// since we need to get derived state based on the current context.
 	wp_interactivity_state(
 		'core/accordion',
 		array(
@@ -43,14 +46,14 @@ function block_core_accordion_item_render( $attributes, $content ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
 			$p->set_attribute( 'aria-controls', $unique_id );
 			$p->set_attribute( 'data-wp-bind--aria-expanded', 'state.isOpen' );
-		}
 
-		if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-content' ) ) ) {
-			$p->set_attribute( 'aria-labelledby', $unique_id );
-			$p->set_attribute( 'data-wp-bind--aria-hidden', '!state.isOpen' );
+			if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-content' ) ) ) {
+				$p->set_attribute( 'aria-labelledby', $unique_id );
+				$p->set_attribute( 'data-wp-bind--aria-hidden', '!state.isOpen' );
 
-			// Only modify content if all directives have been set.
-			$content = $p->get_updated_html();
+				// Only modify content if all directives have been set.
+				$content = $p->get_updated_html();
+			}
 		}
 	}
 

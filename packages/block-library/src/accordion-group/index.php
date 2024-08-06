@@ -10,7 +10,6 @@
  *
  * @return string Returns the updated markup.
  */
-
 function render_block_core_accordion_group( $attributes, $content ) {
 	if ( ! $content ) {
 		return $content;
@@ -45,10 +44,18 @@ function render_block_core_accordion_group( $attributes, $content ) {
 	return $content;
 }
 
+/**
+ * Returns the existing list of ids, or adds a new id to the list.
+ *
+ * @since 6.6.0
+ *
+ * @param string $id The id of the accordion item.
+ * @return array|void Returns the ids for the  or nothing.
+ */
 function block_core_accordion_group_item_ids( $id = null ) {
 	static $ids = array();
 	if ( null === $id ) {
-		// Returns the ids and reset them for the next accordion group.
+		// Returns the ids and resets them for the next accordion group.
 		$current_ids = $ids;
 		$ids         = array();
 		return $current_ids;
