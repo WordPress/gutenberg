@@ -12,10 +12,12 @@ import {
 	Dropdown,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	BaseControl,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -25,6 +27,14 @@ import type {
 	ValidationContext,
 	DataFormControlProps,
 } from '../types';
+
+function getFormattedDate( value: string | null ) {
+	return dateI18n(
+		getSettings().formats.datetimeAbbreviated,
+		getDate( value ),
+		undefined
+	);
+}
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	const timeA = new Date( a ).getTime();
@@ -95,16 +105,18 @@ function Edit< Item >( {
 	return (
 		<Dropdown
 			renderToggle={ ( { onToggle, isOpen } ) => (
-				<Button
-					size="compact"
-					variant="tertiary"
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-					aria-label={ label }
-					label={ description }
-				>
-					{ value }
-				</Button>
+				<BaseControl id={ id } label={ label }>
+					<Button
+						size="compact"
+						variant="tertiary"
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+						aria-label={ label }
+						label={ description }
+					>
+						{ getFormattedDate( value ) }
+					</Button>
+				</BaseControl>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<DateTimePickerForm
