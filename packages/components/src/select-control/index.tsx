@@ -26,6 +26,22 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
+function SelectOptions( {
+	options,
+}: {
+	options: NonNullable< SelectControlProps[ 'options' ] >;
+} ) {
+	return options.map( ( { id, label, value, ...optionProps }, index ) => {
+		const key = id || `${ label }-${ value }-${ index }`;
+
+		return (
+			<option key={ key } value={ value } { ...optionProps }>
+				{ label }
+			</option>
+		);
+	} );
+}
+
 function UnforwardedSelectControl(
 	props: WordPressComponentProps< SelectControlProps, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
@@ -46,6 +62,7 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		variant = 'default',
 		__next40pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
 		...restProps
@@ -86,6 +103,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
+				isBorderless={ variant === 'minimal' }
 				label={ label }
 				size={ size }
 				suffix={
@@ -93,6 +111,10 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__unstableInputWidth={
+					variant === 'minimal' ? 'auto' : undefined
+				}
+				variant={ variant }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
@@ -107,24 +129,9 @@ function UnforwardedSelectControl(
 					ref={ ref }
 					selectSize={ size }
 					value={ valueProp }
+					variant={ variant }
 				>
-					{ children ||
-						options.map( ( option, index ) => {
-							const key =
-								option.id ||
-								`${ option.label }-${ option.value }-${ index }`;
-
-							return (
-								<option
-									key={ key }
-									value={ option.value }
-									disabled={ option.disabled }
-									hidden={ option.hidden }
-								>
-									{ option.label }
-								</option>
-							);
-						} ) }
+					{ children || <SelectOptions options={ options } /> }
 				</Select>
 			</StyledInputBase>
 		</BaseControl>

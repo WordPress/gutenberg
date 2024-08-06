@@ -131,6 +131,7 @@ $z-layers: (
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
 	".edit-site-list__rename-modal": 1000001,
+	".dataviews-bulk-actions__modal": 1000001,
 	".dataviews-action-modal": 1000001,
 	".editor-action-modal": 1000001,
 	".editor-post-template__swap-template-modal": 1000001,
@@ -207,8 +208,11 @@ $z-layers: (
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
+	// Ensure selection checkbox stays above the preview field.
+	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
+
 	// Ensure quick actions toolbar appear above pagination
-	".dataviews-bulk-actions": 2,
+	".dataviews-bulk-actions-toolbar": 2,
 );
 
 @function z-index( $key ) {

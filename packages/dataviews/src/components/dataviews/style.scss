@@ -1,0 +1,100 @@
+.dataviews-wrapper {
+	height: 100%;
+	overflow: auto;
+	box-sizing: border-box;
+	scroll-padding-bottom: $grid-unit-80;
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: dataviews-wrapper / inline-size;
+	display: flex;
+	flex-direction: column;
+}
+
+.dataviews__view-actions,
+.dataviews-filters__container {
+	box-sizing: border-box;
+	padding: $grid-unit-20 $grid-unit-60;
+	flex-shrink: 0;
+	position: sticky;
+	left: 0;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
+
+	.components-search-control {
+		.components-base-control__field {
+			max-width: 240px;
+		}
+	}
+}
+
+.dataviews-view-list__primary-field,
+.dataviews-view-grid__primary-field,
+.dataviews-view-table__primary-field {
+	font-size: $default-font-size;
+	font-weight: 500;
+	color: $gray-700;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+
+	a {
+		text-decoration: none;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		flex-grow: 0;
+		color: $gray-900;
+
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+		@include link-reset();
+	}
+
+	button.components-button.is-link {
+		text-decoration: none;
+		font-weight: inherit;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+		display: block;
+		width: 100%;
+		color: $gray-900;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+.dataviews-no-results,
+.dataviews-loading {
+	padding: 0 $grid-unit-60;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.dataviews__view-actions,
+	.dataviews-filters__container {
+		padding: $grid-unit-15 $grid-unit-30;
+
+		.components-search-control {
+			.components-base-control__field {
+				max-width: 112px;
+			}
+		}
+	}
+
+	.dataviews-view-grid,
+	.dataviews-no-results,
+	.dataviews-loading {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
+}
+

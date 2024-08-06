@@ -13,7 +13,7 @@ import { throttle } from '@wordpress/compose';
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { isDropTargetValid } from '../use-block-drop-zone';
 
 const BlockDraggable = ( {
@@ -82,8 +82,8 @@ const BlockDraggable = ( {
 	}, [] );
 
 	// Find the root of the editor iframe.
-	const blockRef = useBlockRef( clientIds[ 0 ] );
-	const editorRoot = blockRef.current?.closest( 'body' );
+	const blockEl = useBlockElement( clientIds[ 0 ] );
+	const editorRoot = blockEl?.closest( 'body' );
 
 	/*
 	 * Add a dragover event listener to the editor root to track the blocks being dragged over.

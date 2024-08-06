@@ -2,13 +2,24 @@
 
 ## Unreleased
 
-## 3.0.0 (2024-07-10)
+## Internal
 
+-   Upgraded `@ariakit/react` (v0.4.7) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
+
+## 4.0.0 (2024-07-24)
 
 ### Breaking Changes
 
-- Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
-- Replace the `supportedLayouts` prop in the `DataViews` component with a `defaultLayouts` prop that accepts an object whose keys are the layout names and values are the default view objects for these layouts.
+-   `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
+-   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
+-   `header` field property has been renamed to `label`.
+
+## 3.0.0 (2024-07-10)
+
+### Breaking Changes
+
+-   Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
+-   Replace the `supportedLayouts` prop in the `DataViews` component with a `defaultLayouts` prop that accepts an object whose keys are the layout names and values are the default view objects for these layouts.
 
 ### New features
 

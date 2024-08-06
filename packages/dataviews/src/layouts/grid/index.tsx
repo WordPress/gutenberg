@@ -19,15 +19,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from '../../item-actions';
-import SingleSelectionCheckbox from '../../single-selection-checkbox';
-import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import ItemActions from '../../components/dataviews-item-actions';
+import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from '../../types';
 import type { SetSelection } from '../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	actions: Action< Item >[];
@@ -40,7 +40,7 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 	item,
 	actions,
@@ -73,7 +73,7 @@ function GridItem< Item >( {
 					if ( ! hasBulkAction ) {
 						return;
 					}
-					onSelectionChange(
+					onChangeSelection(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
 							: [ ...selection, id ]
@@ -84,18 +84,18 @@ function GridItem< Item >( {
 			<div className="dataviews-view-grid__media">
 				{ renderedMediaField }
 			</div>
+			<SingleSelectionCheckbox
+				item={ item }
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				getItemId={ getItemId }
+				primaryField={ primaryField }
+				disabled={ ! hasBulkAction }
+			/>
 			<HStack
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
 			>
-				<SingleSelectionCheckbox
-					item={ item }
-					selection={ selection }
-					onSelectionChange={ onSelectionChange }
-					getItemId={ getItemId }
-					primaryField={ primaryField }
-					disabled={ ! hasBulkAction }
-				/>
 				<HStack className="dataviews-view-grid__primary-field">
 					{ renderedPrimaryField }
 				</HStack>
@@ -145,7 +145,7 @@ function GridItem< Item >( {
 							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
-										{ field.header }
+										{ field.label }
 									</FlexItem>
 									<FlexItem
 										className="dataviews-view-grid__field-value"
@@ -169,9 +169,10 @@ export default function ViewGrid< Item >( {
 	fields,
 	getItemId,
 	isLoading,
-	onSelectionChange,
+	onChangeSelection,
 	selection,
 	view,
+	density,
 }: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout?.mediaField
@@ -202,6 +203,9 @@ export default function ViewGrid< Item >( {
 		{ visibleFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
+	const gridStyle = density
+		? { gridTemplateColumns: `repeat(${ density }, minmax(0, 1fr))` }
+		: {};
 	return (
 		<>
 			{ hasData && (
@@ -210,6 +214,7 @@ export default function ViewGrid< Item >( {
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"
+					style={ gridStyle }
 					aria-busy={ isLoading }
 				>
 					{ data.map( ( item ) => {
@@ -217,7 +222,7 @@ export default function ViewGrid< Item >( {
 							<GridItem
 								key={ getItemId( item ) }
 								selection={ selection }
-								onSelectionChange={ onSelectionChange }
+								onChangeSelection={ onChangeSelection }
 								getItemId={ getItemId }
 								item={ item }
 								actions={ actions }

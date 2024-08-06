@@ -319,6 +319,7 @@ export default function PageListEdit( {
 				{ pagesTree.length > 0 && (
 					<PanelBody>
 						<ComboboxControl
+							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							className="editor-page-attributes__parent"
 							label={ __( 'Parent' ) }

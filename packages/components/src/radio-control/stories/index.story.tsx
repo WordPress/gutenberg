@@ -68,3 +68,26 @@ Default.args = {
 		{ label: 'Password Protected', value: 'password' },
 	],
 };
+
+export const WithOptionDescriptions: StoryFn< typeof RadioControl > =
+	Template.bind( {} );
+WithOptionDescriptions.args = {
+	...Default.args,
+	options: [
+		{
+			label: 'Public',
+			value: 'public',
+			description: 'Visible to everyone',
+		},
+		{
+			label: 'Private',
+			value: 'private',
+			description: 'Only visible to you',
+		},
+		{
+			label: 'Password Protected',
+			value: 'password',
+			description: 'Protected by a password',
+		},
+	],
+};
