@@ -54,7 +54,7 @@ export const Default = () => {
 	} );
 
 	const form = {
-		visibleFields: [ 'title', 'order', 'author', 'status' ],
+		fields: [ 'title', 'order', 'author', 'status' ],
 	};
 
 	return (

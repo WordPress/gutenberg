@@ -55,11 +55,11 @@ const fields = [
 ];
 
 const formDuplicateAction = {
-	visibleFields: [ 'title' ],
+	fields: [ 'title' ],
 };
 
 const formOrderAction = {
-	visibleFields: [ 'menu_order' ],
+	fields: [ 'menu_order' ],
 };
 
 /**
