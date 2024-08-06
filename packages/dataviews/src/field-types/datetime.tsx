@@ -1,23 +1,9 @@
 /**
- * External dependencies
- */
-import type { ComponentType } from 'react';
-
-/**
  * WordPress dependencies
  */
-import {
-	Button,
-	DateTimePicker,
-	Dropdown,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	BaseControl,
-} from '@wordpress/components';
+import { BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { closeSmall } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -27,14 +13,6 @@ import type {
 	ValidationContext,
 	DataFormControlProps,
 } from '../types';
-
-function getFormattedDate( value: string | null ) {
-	return dateI18n(
-		getSettings().formats.datetimeAbbreviated,
-		getDate( value ),
-		undefined
-	);
-}
 
 function sort( a: any, b: any, direction: SortDirection ) {
 	const timeA = new Date( a ).getTime();
@@ -54,79 +32,79 @@ function isValid( value: any, context?: ValidationContext ) {
 	return true;
 }
 
-interface DateTimePickerControlProps {
-	title: string;
-	value: string;
-	onChange: ( newValue: string | null ) => void;
-	onClose: () => void;
-}
-
-const DateTimePickerForm: ComponentType< DateTimePickerControlProps > = ( {
-	title,
-	value,
-	onChange,
-	onClose,
-} ) => {
-	return (
-		<VStack>
-			<HStack>
-				<span>{ title }</span>
-				<Button
-					label={ __( 'Close' ) }
-					icon={ closeSmall }
-					onClick={ onClose }
-				/>
-			</HStack>
-			<DateTimePicker
-				currentDate={ value }
-				onChange={ onChange }
-				is12Hour
-			/>
-		</VStack>
-	);
-};
-
 function Edit< Item >( {
 	data,
 	field,
 	onChange,
 }: DataFormControlProps< Item > ) {
-	const { id, label, description } = field;
-	const value = field.getValue( { item: data } ) ?? '';
-	const onChangeControl = useCallback(
-		( newValue: string | null ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
-				[ id ]: newValue,
-			} ) ),
+	const { id, label } = field;
+	const value = field.getValue( { item: data } );
+
+	const onChangeDate = useCallback(
+		( event: any ) => {
+			const getNewValue = ( prevValue: string, newValue: string ) => {
+				const [ year, month, day ] = newValue.split( '-' );
+
+				const dateTime = getDate( prevValue );
+				dateTime.setFullYear( +year );
+				dateTime.setMonth( +month );
+				dateTime.setDate( +day );
+
+				// TODO: we should allow the consumer to declare the date format.
+				return dateTime.toISOString();
+			};
+
+			onChange( ( prevItem: Item ) => {
+				const prevValue = prevItem[
+					id as keyof Item
+				] as unknown as string;
+				return {
+					...prevItem,
+					[ id ]: getNewValue( prevValue, event.target.value ),
+				};
+			} );
+		},
+		[ id, onChange ]
+	);
+	const onChangeTime = useCallback(
+		( event: any ) => {
+			const getNewValue = ( prevValue: string, newValue: string ) => {
+				const [ hours, minutes ] = newValue.split( ':' );
+
+				const dateTime = getDate( prevValue );
+				dateTime.setHours( +hours );
+				dateTime.setMinutes( +minutes );
+
+				// TODO: we should allow the consumer to declare the date format.
+				return dateTime.toISOString();
+			};
+
+			onChange( ( prevItem: Item ) => {
+				const prevValue = prevItem[
+					id as keyof Item
+				] as unknown as string;
+				return {
+					...prevItem,
+					[ id ]: getNewValue( prevValue, event.target.value ),
+				};
+			} );
+		},
 		[ id, onChange ]
 	);
 
+	let date;
+	let time;
+	if ( value ) {
+		const dateTime = getDate( value );
+		date = dateTime.toISOString().split( 'T' )[ 0 ];
+		time = dateTime.toISOString().split( 'T' )[ 1 ].split( '.' )[ 0 ];
+	}
+
 	return (
-		<Dropdown
-			renderToggle={ ( { onToggle, isOpen } ) => (
-				<BaseControl id={ id } label={ label }>
-					<Button
-						size="compact"
-						variant="tertiary"
-						onClick={ onToggle }
-						aria-expanded={ isOpen }
-						aria-label={ label }
-						label={ description }
-					>
-						{ getFormattedDate( value ) }
-					</Button>
-				</BaseControl>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<DateTimePickerForm
-					onClose={ onClose }
-					title={ label }
-					value={ value }
-					onChange={ onChangeControl }
-				/>
-			) }
-		/>
+		<BaseControl id={ id } label={ label }>
+			<input type="date" value={ date } onChange={ onChangeDate } />
+			<input type="time" value={ time } onChange={ onChangeTime } />
+		</BaseControl>
 	);
 }
 
