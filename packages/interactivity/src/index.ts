@@ -13,7 +13,7 @@ import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
-import { parseInitialData, populateInitialData } from './store';
+import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 
 export { store, getConfig } from './store';
@@ -47,8 +47,8 @@ export const privateApis = ( lock ): any => {
 			cloneElement,
 			render,
 			proxifyState,
-			parseInitialData,
-			populateInitialData,
+			parseServerData,
+			populateServerData,
 			batch,
 		};
 	}

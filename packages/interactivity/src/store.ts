@@ -6,33 +6,7 @@ import { proxifyState, proxifyStore } from './proxies';
  * External dependencies
  */
 import { getNamespace } from './namespaces';
-import { isPlainObject } from './utils';
-
-const deepMerge = ( target: any, source: any ) => {
-	if ( isPlainObject( target ) && isPlainObject( source ) ) {
-		for ( const key in source ) {
-			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
-			if ( typeof getter === 'function' ) {
-				Object.defineProperty( target, key, {
-					get: getter,
-					configurable: true,
-				} );
-			} else if ( isPlainObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) {
-					target[ key ] = {};
-				}
-				deepMerge( target[ key ], source[ key ] );
-			} else {
-				try {
-					target[ key ] = source[ key ];
-				} catch ( e ) {
-					// Assignemnts fail for properties that are only getters.
-					// When that's the case, the assignment is simply ignored.
-				}
-			}
-		}
-	}
-};
+import { deepMerge, isPlainObject } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
@@ -189,7 +163,7 @@ export function store(
 	return stores.get( namespace );
 }
 
-export const parseInitialData = ( dom = document ) => {
+export const parseServerData = ( dom = document ) => {
 	const jsonDataScriptTag =
 		// Preferred Script Module data passing form
 		dom.getElementById(
@@ -205,13 +179,14 @@ export const parseInitialData = ( dom = document ) => {
 	return {};
 };
 
-export const populateInitialData = ( data?: {
+export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
 } ) => {
 	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
-			store( namespace, { state }, { lock: universalUnlock } );
+			const st = store< any >( namespace, {}, { lock: universalUnlock } );
+			deepMerge( st.state, state, false );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {
@@ -222,5 +197,5 @@ export const populateInitialData = ( data?: {
 };
 
 // Parse and populate the initial state and config.
-const data = parseInitialData();
-populateInitialData( data );
+const data = parseServerData();
+populateServerData( data );

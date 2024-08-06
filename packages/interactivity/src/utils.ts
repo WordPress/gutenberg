@@ -364,3 +364,34 @@ export const isPlainObject = (
 			typeof candidate === 'object' &&
 			candidate.constructor === Object
 	);
+
+export const deepMerge = (
+	target: any,
+	source: any,
+	override: boolean = true
+) => {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		for ( const key in source ) {
+			const desc = Object.getOwnPropertyDescriptor( source, key );
+			if (
+				typeof desc?.get === 'function' ||
+				typeof desc?.set === 'function'
+			) {
+				if ( override || ! ( key in target ) ) {
+					Object.defineProperty( target, key, {
+						...desc,
+						configurable: true,
+						enumerable: true,
+					} );
+				}
+			} else if ( isPlainObject( source[ key ] ) ) {
+				if ( ! target[ key ] ) {
+					target[ key ] = {};
+				}
+				deepMerge( target[ key ], source[ key ], override );
+			} else if ( override || ! ( key in target ) ) {
+				Object.defineProperty( target, key, desc! );
+			}
+		}
+	}
+};
