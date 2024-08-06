@@ -3,7 +3,7 @@
  */
 import type { BaseControlProps } from '../base-control/types';
 
-export type TextControlProps = Pick<
+export type TextControlProps< T extends string | number > = Pick<
 	BaseControlProps,
 	| 'className'
 	| 'hideLabelFromVision'
@@ -14,11 +14,11 @@ export type TextControlProps = Pick<
 	/**
 	 * A function that receives the value of the input.
 	 */
-	onChange: ( value: string ) => void;
+	onChange: ( value: T ) => void;
 	/**
 	 * The current value of the input.
 	 */
-	value: string | number;
+	value: T;
 	/**
 	 * Type of the input element to render. Defaults to "text".
 	 *

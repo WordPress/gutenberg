@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent, ForwardedRef } from 'react';
+import type { ChangeEvent, ForwardedRef, JSX, Ref } from 'react';
 import clsx from 'clsx';
 
 /**
@@ -17,8 +17,8 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { TextControlProps } from './types';
 
-function UnforwardedTextControl(
-	props: WordPressComponentProps< TextControlProps, 'input', false >,
+function UnforwardedTextControl< T extends string | number >(
+	props: WordPressComponentProps< TextControlProps< T >, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
@@ -36,7 +36,11 @@ function UnforwardedTextControl(
 	} = props;
 	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
-		onChange( event.target.value );
+		onChange(
+			( typeof value === 'number'
+				? event.target.valueAsNumber
+				: event.target.value ) as T
+		);
 
 	return (
 		<BaseControl
@@ -83,6 +87,12 @@ function UnforwardedTextControl(
  * };
  * ```
  */
-export const TextControl = forwardRef( UnforwardedTextControl );
+export const TextControl = forwardRef( UnforwardedTextControl ) as <
+	T extends string | number,
+>(
+	props: WordPressComponentProps< TextControlProps< T >, 'input', false > & {
+		ref?: Ref< HTMLInputElement >;
+	}
+) => JSX.Element;
 
 export default TextControl;
