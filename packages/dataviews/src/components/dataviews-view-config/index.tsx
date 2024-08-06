@@ -251,14 +251,20 @@ function SettingsSection( {
 	children: React.ReactNode;
 } ) {
 	return (
-		<Grid columns={ 2 } className="dataviews-settings-section" gap={ 4 }>
-			<VStack spacing={ 0 }>
+		<Grid columns={ 12 } className="dataviews-settings-section" gap={ 4 }>
+			<div className="dataviews-settings-section__sidebar">
 				<h2 className="dataviews-settings-section__title">{ title }</h2>
 				<span className="dataviews-settings-section__description">
 					{ description }
 				</span>
-			</VStack>
-			<VStack spacing={ 4 }>{ children }</VStack>
+			</div>
+			<Grid
+				columns={ 8 }
+				gap={ 4 }
+				className="dataviews-settings-section__content"
+			>
+				{ children }
+			</Grid>
 		</Grid>
 	);
 }
