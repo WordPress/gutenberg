@@ -10,7 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { DataForm, isItemValid } from '@wordpress/dataviews';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	FlexItem,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 
 /**
@@ -71,22 +75,25 @@ function PostEditForm( { postType, postId } ) {
 
 	const isUpdateDisabled = ! isItemValid( itemWithEdits, fields, form );
 	return (
-		<form onSubmit={ onSubmit }>
+		<VStack as="form" onSubmit={ onSubmit } spacing={ 4 }>
 			<DataForm
 				data={ itemWithEdits }
 				fields={ fields }
 				form={ form }
 				onChange={ setEdits }
 			/>
-			<Button
-				variant="primary"
-				type="submit"
-				accessibleWhenDisabled
-				disabled={ isUpdateDisabled }
-			>
-				{ __( 'Update' ) }
-			</Button>
-		</form>
+			<FlexItem>
+				<Button
+					variant="primary"
+					type="submit"
+					accessibleWhenDisabled
+					disabled={ isUpdateDisabled }
+					__next40pxDefaultSize
+				>
+					{ __( 'Update' ) }
+				</Button>
+			</FlexItem>
+		</VStack>
 	);
 }
 

@@ -90,6 +90,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				return undefined;
 			}
 
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
+				return undefined;
+			}
+
 			const {
 				getEditedEntityRecord,
 				getEntityRecords,

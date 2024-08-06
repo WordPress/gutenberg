@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { screen } from '@testing-library/react';
-import { click, press, sleep, type } from '@ariakit/test';
+import { click, press, type } from '@ariakit/test';
 import { render } from '@ariakit/test/react';
 
 /**
@@ -101,7 +101,6 @@ describe.each( [
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		await press.Enter();
 		expect(
@@ -128,7 +127,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
@@ -152,7 +150,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -173,7 +170,6 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
@@ -425,7 +421,6 @@ describe.each( [
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		expect( currentSelectedItem ).toHaveFocus();
 		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
