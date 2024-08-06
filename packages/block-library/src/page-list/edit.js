@@ -227,7 +227,7 @@ export default function PageListEdit( {
 							: __( '(no title)' ),
 					title:
 						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() === ''
+						page.title?.rendered?.trim() !== ''
 							? page.title?.rendered
 							: __( '(no title)' ),
 					link: page.url,
