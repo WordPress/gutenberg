@@ -908,7 +908,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 
 ## Tag Cloud
 
-A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
+A cloud of popular keywords, each sized by how often it appears. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
 
 -	**Name:** core/tag-cloud
 -	**Category:** widgets

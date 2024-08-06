@@ -4,7 +4,7 @@
 import { RangeControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { plus, lineSolid } from '@wordpress/icons';
+import { plus, reset } from '@wordpress/icons';
 import { useEffect } from '@wordpress/element';
 
 const viewportBreaks = {
@@ -90,7 +90,7 @@ export default function DensityPicker( {
 		<>
 			<Button
 				size="compact"
-				icon={ lineSolid }
+				icon={ reset }
 				disabled={ rangeValue <= 0 }
 				accessibleWhenDisabled
 				label={ __( 'Decrease size' ) }
