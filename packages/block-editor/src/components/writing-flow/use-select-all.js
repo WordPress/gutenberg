@@ -27,12 +27,19 @@ export default function useSelectAll() {
 			const selectionRoot = getSelectionRoot( node.ownerDocument );
 			const selectedClientIds = getSelectedBlockClientIds();
 
+			// Abort if there is selection, but it is not within a block.
+			if (
+				selectionRoot &&
+				! selectionRoot.closest(
+					`[data-block="${ selectedClientIds[ 0 ] }"]`
+				)
+			) {
+				return;
+			}
+
 			if (
 				selectionRoot &&
 				selectedClientIds.length < 2 &&
-				selectionRoot.closest(
-					`[data-block="${ selectedClientIds[ 0 ] }"]`
-				) &&
 				! isEntirelySelected( selectionRoot )
 			) {
 				if ( node === node.ownerDocument.activeElement ) {
