@@ -222,12 +222,10 @@ function PostParentToggle( { isOpen, onClick } ) {
 }
 
 export function ParentRow() {
-	const { homeUrl } = useSelect( ( select ) => {
-		const { getUnstableBase } = select( coreStore );
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
+	const homeUrl = useSelect(
+		( select ) => select( coreStore ).getUnstableBase()?.home,
+		[]
+	);
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
