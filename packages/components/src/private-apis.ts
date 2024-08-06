@@ -9,6 +9,7 @@ import {
 	useCompositeStore as useCompositeStoreV2,
 } from './composite/v2';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+import { default as CustomSelectControlV2 } from './custom-select-control-v2/';
 import { createPrivateSlotFill } from './slot-fill';
 import {
 	DropdownMenu as DropdownMenuV2,
@@ -32,6 +33,7 @@ lock( privateApis, {
 	CompositeGroupV2,
 	CompositeItemV2,
 	CompositeRowV2,
+	CustomSelectControlV2,
 	useCompositeStoreV2,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,

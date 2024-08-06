@@ -33,7 +33,7 @@ import {
 } from '../utils';
 import { unlock } from '../../../lock-unlock';
 
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+const { CustomSelectControlV2: CustomSelectControl } = unlock(
 	componentsPrivateApis
 );
 
@@ -309,17 +309,11 @@ export default function SpacingInputControl( {
 						// component in controlled mode
 						options.find(
 							( option ) => option.key === currentValue
-						) || ''
+						)?.name || ''
 					}
-					onChange={ ( selection ) => {
-						onChange(
-							getNewPresetValue(
-								selection.selectedItem.key,
-								'selectList'
-							)
-						);
-					} }
-					options={ options }
+					onChange={ ( newValue ) =>
+						onChange( getNewPresetValue( newValue, 'selectList' ) )
+					}
 					label={ ariaLabel }
 					hideLabelFromVision
 					size="__unstable-large"
@@ -327,7 +321,13 @@ export default function SpacingInputControl( {
 					onMouseOut={ onMouseOut }
 					onFocus={ onMouseOver }
 					onBlur={ onMouseOut }
-				/>
+				>
+					{ options.map( ( { key, name } ) => (
+						<CustomSelectControl.Item key={ key } value={ key }>
+							{ name }
+						</CustomSelectControl.Item>
+					) ) }
+				</CustomSelectControl>
 			) }
 			{ ! disableCustomSpacingSizes && (
 				<Button
