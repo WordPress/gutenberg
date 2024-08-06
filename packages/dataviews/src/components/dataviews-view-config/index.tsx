@@ -17,10 +17,13 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
 import { cog, seen } from '@wordpress/icons';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -57,7 +60,7 @@ function LayoutPicker( {
 							...defaultLayouts[ newLayout ],
 						} );
 				}
-				throw new Error( 'Invalid dataview' );
+				warning( 'Invalid dataview' );
 			} }
 		>
 			{ availableLayouts.map( ( layout ) => {
@@ -115,6 +118,7 @@ function SortDirectionControl() {
 	const { view, onChangeView } = useContext( DataViewsContext );
 	return (
 		<ToggleGroupControl
+			className="dataviews-view-config__sort-direction"
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
@@ -135,7 +139,7 @@ function SortDirectionControl() {
 					} );
 					return;
 				}
-				throw new Error( 'Invalid direction' );
+				warning( 'Invalid direction' );
 			} }
 		>
 			{ SORTING_DIRECTIONS.map( ( direction ) => {
@@ -253,10 +257,19 @@ function SettingsSection( {
 	return (
 		<Grid columns={ 12 } className="dataviews-settings-section" gap={ 4 }>
 			<div className="dataviews-settings-section__sidebar">
-				<h2 className="dataviews-settings-section__title">{ title }</h2>
-				<span className="dataviews-settings-section__description">
+				<Heading
+					level={ 2 }
+					className="dataviews-settings-section__title"
+					size={ 15 }
+				>
+					{ title }
+				</Heading>
+				<Text
+					variant="muted"
+					className="dataviews-settings-section__description"
+				>
 					{ description }
-				</span>
+				</Text>
 			</div>
 			<Grid
 				columns={ 8 }
@@ -276,7 +289,7 @@ function DataviewsViewConfigContent( {
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection
 				title={ __( 'Appearance' ) }
-				description={ __( 'Customise the display of data' ) }
+				description={ __( 'Customize the display of data' ) }
 			>
 				<LayoutPicker defaultLayouts={ defaultLayouts } />
 				<HStack expanded className="is-divided-in-two">

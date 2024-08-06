@@ -38,6 +38,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
 		"remove-accents": "^0.5.0"
 	},

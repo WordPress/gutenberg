@@ -59,8 +59,8 @@ export const sortLabels = {
 	desc: __( 'Sort descending' ),
 };
 export const sortLabelsShort = {
-	asc: __( 'ASC' ),
-	desc: __( 'DESC' ),
+	asc: __( 'Asc' ),
+	desc: __( 'Desc' ),
 };
 
 // View layouts.

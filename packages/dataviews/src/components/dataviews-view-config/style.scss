@@ -3,20 +3,12 @@
     container-type: inline-size;
     padding: $grid-unit-20;
 }
+.dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
+    text-transform: uppercase;
+}   
 
-.dataviews-settings-section__title {
-    font-size: 15px;
+.dataviews-settings-section__title.dataviews-settings-section__title {
     line-height: $grid-unit-30;
-	font-weight: 600;
-	margin: 0;
-}
-
-.dataviews-settings-section__description {
-	margin: 0;
-	font-style: normal;
-	color: $gray-700;
-    text-wrap: balance; // Fallback for Safari
-	text-wrap: pretty;
 }
 
 .dataviews-view-config__field-control-button.is-hidden {
