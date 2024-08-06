@@ -34,6 +34,7 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -116,6 +117,14 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
+
+#### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

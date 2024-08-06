@@ -7,8 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Icon, homeButton } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ import {
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
+import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
@@ -50,7 +52,32 @@ const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
+const toggleHomeIconVariants = {
+	edit: {
+		opacity: 0,
+		scale: 0.2,
+	},
+	hover: {
+		opacity: 1,
+		scale: 1,
+		clipPath: 'inset( 22% round 2px )',
+	},
+};
+
+const siteIconVariants = {
+	edit: {
+		clipPath: 'inset(0% round 0)',
+	},
+	hover: {
+		clipPath: 'inset( 22% round 2px )',
+	},
+	tap: {
+		clipPath: 'inset(0% round 0)',
+	},
+};
+
 export default function EditSiteEditor( { isPostsList = false } ) {
+	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
 	const isLoading = useIsSiteEditorLoading();
 	const {
@@ -64,6 +91,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		showIconLabels,
 		editorCanvasView,
 		currentPostIsTrashed,
+		hasSiteIcon,
 	} = useSelect( ( select ) => {
 		const {
 			getEditorCanvasContainerView,
@@ -74,8 +102,9 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			getEditedPostId,
 		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
-		const { getCurrentTheme } = select( coreDataStore );
+		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const _context = getEditedPostContext();
+		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
@@ -92,6 +121,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
+			hasSiteIcon: !! siteData?.site_icon_url,
 		};
 	}, [] );
 	useEditorTitle();
@@ -178,6 +208,9 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
 
 	const isReady = ! isLoading;
+	const transition = {
+		duration: disableMotion ? 0 : 0.2,
+	};
 
 	return (
 		<>
@@ -202,6 +235,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
+					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
 					title={ title }
 					icon={ icon }
@@ -215,26 +249,52 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<Button
-										label={ __( 'Open Navigation' ) }
-										className="edit-site-layout__view-mode-toggle"
-										onClick={ () => {
-											setCanvasMode( 'view' );
-											// TODO: this is a temporary solution to navigate to the posts list if we are
-											// come here through `posts list` and are in focus mode editing a template, template part etc..
-											if (
-												isPostsList &&
-												params?.focusMode
-											) {
-												history.push( {
-													page: 'gutenberg-posts-dashboard',
-													postType: 'post',
-												} );
-											}
-										} }
+									<motion.div
+										className="edit-site-editor__view-mode-toggle"
+										transition={ transition }
+										animate="edit"
+										initial="edit"
+										whileHover="hover"
+										whileTap="tap"
 									>
-										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-									</Button>
+										<Button
+											label={ __( 'Open Navigation' ) }
+											showTooltip
+											tooltipPosition="middle right"
+											onClick={ () => {
+												setCanvasMode( 'view' );
+												// TODO: this is a temporary solution to navigate to the posts list if we are
+												// come here through `posts list` and are in focus mode editing a template, template part etc..
+												if (
+													isPostsList &&
+													params?.focusMode
+												) {
+													history.push( {
+														page: 'gutenberg-posts-dashboard',
+														postType: 'post',
+													} );
+												}
+											} }
+										>
+											<motion.div
+												variants={ siteIconVariants }
+											>
+												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+											</motion.div>
+										</Button>
+										<motion.div
+											className={ clsx(
+												'edit-site-editor__back-icon',
+												{
+													'has-site-icon':
+														hasSiteIcon,
+												}
+											) }
+											variants={ toggleHomeIconVariants }
+										>
+											<Icon icon={ homeButton } />
+										</motion.div>
+									</motion.div>
 								)
 							}
 						</BackButton>

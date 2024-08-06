@@ -20,3 +20,6 @@ changelog.txt linguist-language=Markdown
 
 # Flag docs directory as documentation for GitHub stats.
 docs/** linguist-documentation
+
+# TSConfig files use jsonc.
+tsconfig*.json linguist-language=jsonc

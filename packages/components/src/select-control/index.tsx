@@ -13,8 +13,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import InputBase from '../input-control/input-base';
-import { Select } from './styles/select-control-styles';
+import { Select, StyledInputBase } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
@@ -25,6 +24,22 @@ function useUniqueId( idProp?: string ) {
 	const id = `inspector-select-control-${ instanceId }`;
 
 	return idProp || id;
+}
+
+function SelectOptions( {
+	options,
+}: {
+	options: NonNullable< SelectControlProps[ 'options' ] >;
+} ) {
+	return options.map( ( { id, label, value, ...optionProps }, index ) => {
+		const key = id || `${ label }-${ value }-${ index }`;
+
+		return (
+			<option key={ key } value={ value } { ...optionProps }>
+				{ label }
+			</option>
+		);
+	} );
 }
 
 function UnforwardedSelectControl(
@@ -47,6 +62,7 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		variant = 'default',
 		__next40pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
 		...restProps
@@ -82,11 +98,12 @@ function UnforwardedSelectControl(
 			id={ id }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 		>
-			<InputBase
+			<StyledInputBase
 				className={ classes }
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
+				isBorderless={ variant === 'minimal' }
 				label={ label }
 				size={ size }
 				suffix={
@@ -94,6 +111,10 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__unstableInputWidth={
+					variant === 'minimal' ? 'auto' : undefined
+				}
+				variant={ variant }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
@@ -108,26 +129,11 @@ function UnforwardedSelectControl(
 					ref={ ref }
 					selectSize={ size }
 					value={ valueProp }
+					variant={ variant }
 				>
-					{ children ||
-						options.map( ( option, index ) => {
-							const key =
-								option.id ||
-								`${ option.label }-${ option.value }-${ index }`;
-
-							return (
-								<option
-									key={ key }
-									value={ option.value }
-									disabled={ option.disabled }
-									hidden={ option.hidden }
-								>
-									{ option.label }
-								</option>
-							);
-						} ) }
+					{ children || <SelectOptions options={ options } /> }
 				</Select>
-			</InputBase>
+			</StyledInputBase>
 		</BaseControl>
 	);
 }

@@ -24,10 +24,14 @@ import { store as blockEditorStore } from '../../store';
 export const ZWNBSP = '\ufeff';
 
 export default function DefaultBlockAppender( { rootClientId } ) {
-	const { showPrompt, isLocked, placeholder } = useSelect(
+	const { showPrompt, isLocked, placeholder, isManualGrid } = useSelect(
 		( select ) => {
-			const { getBlockCount, getSettings, getTemplateLock } =
-				select( blockEditorStore );
+			const {
+				getBlockCount,
+				getSettings,
+				getTemplateLock,
+				getBlockAttributes,
+			} = select( blockEditorStore );
 
 			const isEmpty = ! getBlockCount( rootClientId );
 			const { bodyPlaceholder } = getSettings();
@@ -36,6 +40,9 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 				showPrompt: isEmpty,
 				isLocked: !! getTemplateLock( rootClientId ),
 				placeholder: bodyPlaceholder,
+				isManualGrid:
+					getBlockAttributes( rootClientId )?.layout
+						?.isManualPlacement,
 			};
 		},
 		[ rootClientId ]
@@ -43,7 +50,7 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 
 	const { insertDefaultBlock, startTyping } = useDispatch( blockEditorStore );
 
-	if ( isLocked ) {
+	if ( isLocked || isManualGrid ) {
 		return null;
 	}
 

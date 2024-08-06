@@ -26,12 +26,13 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
+import { PatternCategoryPreviews } from './block-patterns-tab/pattern-category-previews';
 import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
-import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import TabbedSidebar from '../tabbed-sidebar';
+import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -88,7 +89,7 @@ function InserterMenu(
 				shouldForceFocusBlock,
 				_rootClientId
 			);
-			onSelect();
+			onSelect( blocks );
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -144,6 +145,11 @@ function InserterMenu(
 		!! selectedPatternCategory;
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
+
+	const showZoomOut =
+		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
+
+	useZoomOut( showZoomOut );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
@@ -240,7 +246,7 @@ function InserterMenu(
 				selectedCategory={ selectedPatternCategory }
 			>
 				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
+					<PatternCategoryPreviews
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertPattern }
 						onHover={ onHoverPattern }
@@ -315,21 +321,49 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs
+				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
-				>
-					{ inserterSearch }
-					{ selectedTab === 'blocks' &&
-						! delayedFilterValue &&
-						blocksTab }
-					{ selectedTab === 'patterns' &&
-						! delayedFilterValue &&
-						patternsTab }
-					{ selectedTab === 'media' && mediaTab }
-				</InserterTabs>
+					closeButtonLabel={ __( 'Close block inserter' ) }
+					tabs={ [
+						{
+							name: 'blocks',
+							title: __( 'Blocks' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'blocks' &&
+										! delayedFilterValue &&
+										blocksTab }
+								</>
+							),
+						},
+						{
+							name: 'patterns',
+							title: __( 'Patterns' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'patterns' &&
+										! delayedFilterValue &&
+										patternsTab }
+								</>
+							),
+						},
+						{
+							name: 'media',
+							title: __( 'Media' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ mediaTab }
+								</>
+							),
+						},
+					] }
+				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover

@@ -49,17 +49,24 @@ $footer-height: 70px;
 		// It should be 120px (72px modal header height + 48px tab height)
 		padding-top: $header-height + $grid-unit-15 + $grid-unit-60;
 	}
+}
 
-	.font-library-modal__tabpanel-layout__footer {
-		border-top: 1px solid $gray-300;
-		margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
-		padding: $grid-unit-20 $grid-unit-40;
-		position: absolute;
-		bottom: $grid-unit-40;
-		width: 100%;
-		height: $footer-height;
-		background-color: $white;
-	}
+.font-library-modal__footer {
+	border-top: 1px solid $gray-300;
+	margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
+	padding: $grid-unit-20 $grid-unit-40;
+	position: absolute;
+	bottom: $grid-unit-40;
+	width: 100%;
+	height: $footer-height;
+	background-color: $white;
+}
+
+.font-library-modal__page-selection {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
 }
 
 .font-library-modal__tabpanel-layout .components-base-control__field {
@@ -177,5 +184,13 @@ button.font-library-modal__upload-area {
 	.components-button {
 		width: 100%;
 		justify-content: center;
+	}
+}
+
+.font-library-modal__select-all {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 + $border-width;
+
+	.components-checkbox-control__label {
+		padding-left: $grid-unit-20;
 	}
 }

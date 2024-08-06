@@ -9,16 +9,16 @@ import {
 // Keeping an old name for backward compatibility.
 const slotName = '__experimentalMainDashboardButton';
 
+export const useHasBackButton = () => {
+	const fills = useSlotFills( slotName );
+	return Boolean( fills && fills.length );
+};
+
 const { Fill, Slot } = createSlotFill( slotName );
 
 const BackButton = Fill;
-const BackButtonSlot = ( { children } ) => {
+const BackButtonSlot = () => {
 	const fills = useSlotFills( slotName );
-	const hasFills = Boolean( fills && fills.length );
-
-	if ( ! hasFills ) {
-		return children;
-	}
 
 	return (
 		<Slot

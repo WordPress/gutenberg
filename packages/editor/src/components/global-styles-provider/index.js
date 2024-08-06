@@ -33,17 +33,24 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
+			const { getEditedEntityRecord, hasFinishedResolution, canUser } =
 				select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+
+			const record =
+				_globalStylesId &&
+				canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: _globalStylesId,
+				} )
+					? getEditedEntityRecord(
+							'root',
+							'globalStyles',
+							_globalStylesId
+					  )
+					: undefined;
 
 			let hasResolved = false;
 			if (
@@ -126,9 +133,13 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
+		const { __experimentalGetCurrentThemeBaseGlobalStyles, canUser } =
+			select( coreStore );
+
+		return (
+			canUser( 'read', { kind: 'root', name: 'theme' } ) &&
+			__experimentalGetCurrentThemeBaseGlobalStyles()
+		);
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];

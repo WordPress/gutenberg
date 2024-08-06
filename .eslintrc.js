@@ -143,9 +143,9 @@ const restrictedSyntax = [
 const restrictedSyntaxComponents = [
 	{
 		selector:
-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="__experimentalIsFocusable"])) JSXAttribute[name.name="disabled"]',
+			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
 		message:
-			'`disabled` used without the `__experimentalIsFocusable` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
 	},
 ];
 
@@ -278,6 +278,37 @@ module.exports = {
 			},
 		},
 		{
+			// Temporary rules until we're ready to officially deprecate the bottom margins.
+			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'packages/components/src/**/@(test|stories)/**',
+				'**/*.@(native|ios|android).js',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
+					...[
+						'CheckboxControl',
+						'ComboboxControl',
+						'FocalPointPicker',
+						'RangeControl',
+						'SearchControl',
+						'TextControl',
+						'TextareaControl',
+						'ToggleGroupControl',
+						'TreeSelect',
+					].map( ( componentName ) => ( {
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+						message:
+							componentName +
+							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+					} ) ),
+				],
+			},
+		},
+		{
 			files: [
 				// Components package.
 				'packages/components/src/**/*.[tj]s?(x)',
@@ -397,6 +428,7 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
+					...restrictedSyntaxComponents,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
@@ -418,6 +450,26 @@ module.exports = {
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [ 'packages/components/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
+					// the `@wordpress/components` package, hence why importing those
+					// dependencies should be allowed in the components package.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [
+									'@ariakit/react',
+									'framer-motion',
+								].includes( name )
+						),
+					},
+				],
+			},
 		},
 		{
 			files: [ 'packages/block-editor/**' ],

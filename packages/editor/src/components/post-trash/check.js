@@ -21,13 +21,17 @@ export default function PostTrashCheck( { children } ) {
 	const { canTrashPost } = useSelect( ( select ) => {
 		const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
 			select( editorStore );
-		const { getPostType, canUser } = select( coreStore );
-		const postType = getPostType( getCurrentPostType() );
+		const { canUser } = select( coreStore );
+		const postType = getCurrentPostType();
 		const postId = getCurrentPostId();
 		const isNew = isEditedPostNew();
-		const resource = postType?.rest_base || ''; // eslint-disable-line camelcase
-		const canUserDelete =
-			postId && resource ? canUser( 'delete', resource, postId ) : false;
+		const canUserDelete = !! postId
+			? canUser( 'delete', {
+					kind: 'postType',
+					name: postType,
+					id: postId,
+			  } )
+			: false;
 
 		return {
 			canTrashPost: ( ! isNew || postId ) && canUserDelete,

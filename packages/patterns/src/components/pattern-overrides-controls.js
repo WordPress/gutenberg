@@ -111,7 +111,7 @@ function PatternOverridesControls( {
 						disabled={
 							! hasOverrides && hasUnsupportedImageAttributes
 						}
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ hasOverrides
 							? __( 'Disable overrides' )

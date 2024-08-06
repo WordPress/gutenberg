@@ -234,6 +234,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background-position'               => array( 'background', 'backgroundPosition' ),
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
+		'background-attachment'             => array( 'background', 'backgroundAttachment' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -503,10 +504,11 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_STYLES = array(
 		'background' => array(
-			'backgroundImage'    => 'top',
-			'backgroundPosition' => 'top',
-			'backgroundRepeat'   => 'top',
-			'backgroundSize'     => 'top',
+			'backgroundImage'      => null,
+			'backgroundAttachment' => null,
+			'backgroundPosition'   => null,
+			'backgroundRepeat'     => null,
+			'backgroundSize'       => null,
 		),
 		'border'     => array(
 			'color'  => null,
@@ -1441,9 +1443,16 @@ class WP_Theme_JSON_Gutenberg {
 	protected function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
+		if ( empty( $css ) ) {
+			return $processed_css;
+		}
+
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
+			if ( empty( $part ) ) {
+				continue;
+			}
 			$is_root_css = ( ! str_contains( $part, '{' ) );
 			if ( $is_root_css ) {
 				// If the part doesn't contain braces, it applies to the root level.
@@ -1456,11 +1465,24 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				$nested_selector = $part[0];
 				$css_value       = $part[1];
-				$part_selector   = str_starts_with( $nested_selector, ' ' )
+
+				/*
+				 * Handle pseudo elements such as ::before, ::after etc. Regex will also
+				 * capture any leading combinator such as >, +, or ~, as well as spaces.
+				 * This allows pseudo elements as descendants e.g. `.parent ::before`.
+				 */
+				$matches            = array();
+				$has_pseudo_element = preg_match( '/([>+~\s]*::[a-zA-Z-]+)/', $nested_selector, $matches );
+				$pseudo_part        = $has_pseudo_element ? $matches[1] : '';
+				$nested_selector    = $has_pseudo_element ? str_replace( $pseudo_part, '', $nested_selector ) : $nested_selector;
+
+				// Finalize selector and re-append pseudo element if required.
+				$part_selector  = str_starts_with( $nested_selector, ' ' )
 					? static::scope_selector( $selector, $nested_selector )
 					: static::append_to_selector( $selector, $nested_selector );
-				$final_selector  = ":root :where($part_selector)";
-				$processed_css  .= $final_selector . '{' . trim( $css_value ) . '}';
+				$final_selector = ":root :where($part_selector)$pseudo_part";
+
+				$processed_css .= $final_selector . '{' . trim( $css_value ) . '}';
 			}
 		}
 		return $processed_css;
@@ -2918,8 +2940,28 @@ class WP_Theme_JSON_Gutenberg {
 			$declarations = static::update_separator_declarations( $declarations );
 		}
 
+		/*
+		 * Root selector (body) styles should not be wrapped in `:root where()` to keep
+		 * specificity at (0,0,1) and maintain backwards compatibility.
+		 *
+		 * Top-level element styles using element-only specificity selectors should
+		 * not get wrapped in `:root :where()` to maintain backwards compatibility.
+		 *
+		 * Pseudo classes, e.g. :hover, :focus etc., are a class-level selector so
+		 * still need to be wrapped in `:root :where` to cap specificity for nested
+		 * variations etc. Pseudo selectors won't match the ELEMENTS selector exactly.
+		 */
+		$element_only_selector = $is_root_selector || (
+				$current_element &&
+				isset( static::ELEMENTS[ $current_element ] ) &&
+				// buttons, captions etc. still need `:root :where()` as they are class based selectors.
+				! isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $current_element ] ) &&
+				static::ELEMENTS[ $current_element ] === $selector
+			);
+
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( ":root :where($selector)", $declarations );
+		$general_selector = $element_only_selector ? $selector : ":root :where($selector)";
+		$block_rules     .= static::to_ruleset( $general_selector, $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -3000,10 +3042,10 @@ class WP_Theme_JSON_Gutenberg {
 			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
-			// Nested children of the container with left and right padding that are not wide or full aligned do not get padding, unless they are direct children of an alignfull flow container.
-			$css .= '.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }';
+			// Nested children of the container with left and right padding that are not full aligned do not get padding, unless they are direct children of an alignfull flow container.
+			$css .= '.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) { padding-right: 0; padding-left: 0; }';
 			// Alignfull direct children of the containers that are targeted by the rule above do not need negative margins.
-			$css .= '.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0; }';
+			$css .= '.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) > .alignfull { margin-left: 0; margin-right: 0; }';
 		}
 
 		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';

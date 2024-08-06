@@ -107,7 +107,7 @@
 }
 
 // Provide colors for a range of icons.
-.wp-block-social-links:not(.is-style-logos-only) {
+:where(.wp-block-social-links:not(.is-style-logos-only)) {
 	// Generic items such as mail, feed, etc.
 	@import "../social-link/socials-with-bg.scss";
 }
@@ -116,7 +116,7 @@
 // The specificity for this selector has not been reduced to 0-1-0 as per
 // global styles variation selectors as the lack of background should be
 // enforced for this block style.
-.wp-block-social-links.is-style-logos-only {
+:where(.wp-block-social-links.is-style-logos-only) {
 	.wp-social-link {
 		background: none;
 
