@@ -151,6 +151,7 @@ function UnforwardedSelectControl(
  *
  *   return (
  *     <SelectControl
+ *       __nextHasNoMarginBottom
  *       label="Size"
  *       value={ size }
  *       options={ [
