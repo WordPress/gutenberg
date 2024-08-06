@@ -3,11 +3,12 @@
  */
 import { toHTMLString } from '../../to-html-string';
 import { slice } from '../../slice';
+import { remove } from '../../remove';
 import { getTextContent } from '../../get-text-content';
 
 export default ( props ) => ( element ) => {
 	function onCopy( event ) {
-		const { record } = props.current;
+		const { record, createRecord, handleChange } = props.current;
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 		const { anchorNode, focusNode, isCollapsed } =
@@ -28,7 +29,7 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		if ( event.type === 'cut' ) {
-			ownerDocument.execCommand( 'delete' );
+			handleChange( remove( createRecord() ) );
 		}
 	}
 
