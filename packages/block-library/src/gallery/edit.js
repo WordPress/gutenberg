@@ -132,7 +132,7 @@ function GalleryEdit( props ) {
 				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
 			);
 		}
-	}, [] );
+	}, [ lightboxSetting?.allowEditing ] );
 
 	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
 		attributes;
@@ -669,6 +669,9 @@ function GalleryEdit( props ) {
 					<ToolbarDropdownMenu
 						icon={ linkIcon }
 						label={ __( 'Link' ) }
+						toggleProps={ {
+							isPressed: linkTo === LINK_DESTINATION_NONE,
+						} }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup className="blocks-gallery__link-to-control">
