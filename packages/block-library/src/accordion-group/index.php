@@ -31,11 +31,11 @@ function render_block_core_accordion_group( $attributes, $content ) {
 	wp_enqueue_script_module( '@wordpress/block-library/accordion-group' );
 
 	$p         = new WP_HTML_Tag_Processor( $content );
-	$autoclose = (bool) $attributes['autoclose'];
+	$autoclose = $attributes['autoclose'] ? 'true' : 'false';
 
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-group' ) ) ) {
 		$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
-		$p->set_attribute( 'data-wp-context', '{ "autoclose": "' . $autoclose . '" }' );
+		$p->set_attribute( 'data-wp-context', '{ "autoclose": ' . $autoclose . ' }' );
 
 		// Only modify content if directives have been set.
 		$content = $p->get_updated_html();
