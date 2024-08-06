@@ -76,7 +76,14 @@ function DataViewsPagination() {
 						__nextHasNoMarginBottom
 						variant="minimal"
 					/>
-					<div aria-hidden>/ { totalPages }</div>
+					<div aria-hidden>
+						{ sprintf(
+							/* translators: This is preceded by a pagination dropdown, and %s is the total number of pages
+							 * (e.g. Page 1 of 10). Use '/ %s' if language doesn't use this word order. */
+							__( 'of %s' ),
+							totalPages
+						) }
+					</div>
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
