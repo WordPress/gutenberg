@@ -275,27 +275,6 @@ export function isDropTargetValid(
 }
 
 /**
- * Check if the Row or the Gallery can be created with the dragged
- * blocks and the target block.
- * @param {boolean} areAllImages
- * @param {boolean} canInsertGalleryBlock
- * @param {boolean} areGroupableBlocks
- * @param {boolean} canInsertRow
- * @return {boolean} Whether Row block or Gallery can be created.
- */
-function canCreateRowOrGallery(
-	areAllImages,
-	canInsertGalleryBlock,
-	areGroupableBlocks,
-	canInsertRow
-) {
-	if ( areAllImages ) {
-		return canInsertGalleryBlock || ( areGroupableBlocks && canInsertRow );
-	}
-	return areGroupableBlocks && canInsertRow;
-}
-
-/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -427,8 +406,6 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
-				// Checks if it is creatable either a Row variation or a Gallery block from
-				// the dragged block and the target block.
 				if ( operation === 'group' ) {
 					const targetBlock = blocks[ targetIndex ];
 					const areAllImages = [
@@ -452,13 +429,22 @@ export default function useBlockDropZone( {
 						groupBlockVariations.find(
 							( { name } ) => name === 'group-row'
 						);
-					const _canCreateRowOrGallery = canCreateRowOrGallery(
-						areAllImages,
-						canInsertGalleryBlock,
-						areGroupableBlocks,
-						canInsertRow
-					);
-					if ( ! _canCreateRowOrGallery ) {
+
+					// If the dragged blocks and the target block are all images,
+					// check if it is creatable either a Row variation or a Gallery block.
+					if (
+						areAllImages &&
+						! canInsertGalleryBlock &&
+						( ! areGroupableBlocks || ! canInsertRow )
+					) {
+						return;
+					}
+					// If the dragged blocks and the target block are not all images,
+					// check if it is creatable a Row variation.
+					if (
+						! areAllImages &&
+						( ! areGroupableBlocks || ! canInsertRow )
+					) {
 						return;
 					}
 				}
