@@ -1,46 +1,46 @@
 .dataviews-view-config {
-    width: 363px;
-    container-type: inline-size;
-    padding: $grid-unit-20;
+	width: 363px;
+	container-type: inline-size;
+	padding: $grid-unit-20;
 }
 .dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
-    text-transform: uppercase;
+	text-transform: uppercase;
 }   
 
 .dataviews-settings-section__title.dataviews-settings-section__title {
-    line-height: $grid-unit-30;
+	line-height: $grid-unit-30;
 }
 
 .dataviews-view-config__field-control-button.is-hidden {
-    opacity: 0.3;
+	opacity: 0.3;
 }
 
 .dataviews-settings-section__sidebar {
-    grid-column: span 4;
+	grid-column: span 4;
 }
 
 .dataviews-settings-section__content, 
 .dataviews-settings-section__content > * {
-    grid-column: span 8;
+	grid-column: span 8;
 }
 
 .dataviews-settings-section__content .is-divided-in-two {
-    display: contents;
-    & > * {
-        grid-column: span 4;
-    }
+	display: contents;
+	& > * {
+		grid-column: span 4;
+	}
 }
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 500px) {
-    .dataviews-settings-section.dataviews-settings-section {
-        grid-template-columns: repeat( 2, 1fr );
-        .dataviews-settings-section__sidebar {
-            grid-column: span 2;
-        }
-        
-        .dataviews-settings-section__content {
-            grid-column: span 2;
-        }
-    }
+	.dataviews-settings-section.dataviews-settings-section {
+		grid-template-columns: repeat( 2, 1fr );
+		.dataviews-settings-section__sidebar {
+			grid-column: span 2;
+		}
+		
+		.dataviews-settings-section__content {
+			grid-column: span 2;
+		}
+	}
 }
