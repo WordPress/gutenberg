@@ -268,7 +268,7 @@ export function ParentRow() {
 								),
 								{
 									span: (
-										<span className="editor-post-parent__panel-dialog_example-url" />
+										<span className="editor-post-parent__panel-dialog__example-url" />
 									),
 									wbr: <wbr />,
 								}
