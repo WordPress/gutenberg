@@ -287,7 +287,6 @@ test.describe( 'Block deletion', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
-			{ name: 'core/paragraph', attributes: { content: '' } },
 		] );
 
 		// Ensure that the newly created empty block is focused.
