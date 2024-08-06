@@ -192,7 +192,15 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			$css_class .= ' menu-item-home';
 		}
 
-		$title      = wp_kses_post( $page['title'] );
+		$title = wp_kses_post( $page['title'] );
+		if ( '' === $title ) {
+			/* translators: %d: ID of a page. */
+			$title = sprintf(
+				__( '#%d (no title)' ),
+				$page['page_id']
+			);
+		}
+
 		$aria_label = sprintf(
 			/* translators: Accessibility text. %s: Parent page title. */
 			__( '%s submenu' ),
