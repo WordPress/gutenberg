@@ -16,18 +16,22 @@ function block_core_accordion_item_render( $attributes, $content ) {
 		return $content;
 	}
 
-	$p               = new WP_HTML_Tag_Processor( $content );
-	$unique_id       = wp_unique_id( 'accordion-item-' );
-	$open_by_default = (bool) $attributes['openByDefault'];
+	$p         = new WP_HTML_Tag_Processor( $content );
+	$unique_id = wp_unique_id( 'accordion-item-' );
 
-	$state = wp_interactivity_state( 'core/accordion' );
+	// Adds the id to the current accordion group list.
+	if ( $attributes['openByDefault'] ) {
+		// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
+		gutenberg_block_core_accordion_group_item_ids( $unique_id );
+	}
+
 	wp_interactivity_state(
 		'core/accordion',
 		array(
-			'open' => array_merge(
-				isset( $state['open'] ) ? $state['open'] : array(),
-				$open_by_default ? array( $unique_id ) : array()
-			),
+			'isOpen' => function () {
+				$context = wp_interactivity_get_context();
+				return in_array( $context['id'], $context['isOpen'], true );
+			},
 		)
 	);
 
