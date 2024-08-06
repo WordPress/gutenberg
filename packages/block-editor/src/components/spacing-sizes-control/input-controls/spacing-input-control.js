@@ -9,7 +9,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	privateApis as componentsPrivateApis,
+	CustomSelectControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -31,11 +31,6 @@ import {
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from '../utils';
-import { unlock } from '../../../lock-unlock';
-
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
