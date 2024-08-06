@@ -3,7 +3,6 @@
  */
 import { BaseControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -42,16 +41,14 @@ function Edit< Item >( {
 
 	const onChangeDate = useCallback(
 		( event: any ) => {
-			const getNewValue = ( prevValue: string, newValue: string ) => {
-				const [ year, month, day ] = newValue.split( '-' );
+			const getNewValue = ( prevValue: string, newDate: string ) => {
+				const prevTime =
+					prevValue?.split( 'T' )[ 1 ] ||
+					new Date().toISOString().split( 'T' )[ 1 ];
 
-				const dateTime = getDate( prevValue );
-				dateTime.setFullYear( +year );
-				dateTime.setMonth( +month );
-				dateTime.setDate( +day );
-
-				// TODO: we should allow the consumer to declare the date format.
-				return dateTime.toISOString();
+				// TODO: WordPress uses ISO8601,
+				// we should allow the consumer to declare the date format.
+				return `${ newDate }T${ prevTime }`;
 			};
 
 			onChange( ( prevItem: Item ) => {
@@ -68,15 +65,14 @@ function Edit< Item >( {
 	);
 	const onChangeTime = useCallback(
 		( event: any ) => {
-			const getNewValue = ( prevValue: string, newValue: string ) => {
-				const [ hours, minutes ] = newValue.split( ':' );
+			const getNewValue = ( prevValue: string, newTime: string ) => {
+				const prevDate =
+					prevValue?.split( 'T' )[ 0 ] ||
+					new Date().toISOString().split( 'T' )[ 0 ];
 
-				const dateTime = getDate( prevValue );
-				dateTime.setHours( +hours );
-				dateTime.setMinutes( +minutes );
-
-				// TODO: we should allow the consumer to declare the date format.
-				return dateTime.toISOString();
+				// TODO: WordPress uses ISO8601,
+				// we should allow the consumer to declare the date format.
+				return `${ prevDate }T${ newTime }`;
 			};
 
 			onChange( ( prevItem: Item ) => {
@@ -95,10 +91,10 @@ function Edit< Item >( {
 	let date;
 	let time;
 	if ( value ) {
-		const dateTime = getDate( value );
-		// TODO: WordPress uses UTC time, we should display the WordPress user time.
-		date = dateTime.toISOString().split( 'T' )[ 0 ];
-		time = dateTime.toISOString().split( 'T' )[ 1 ].split( '.' )[ 0 ];
+		// TODO: WordPress uses ISO8601 format,
+		// we should allow the consumer to use any format.
+		date = value.split( 'T' )[ 0 ];
+		time = value.split( 'T' )[ 1 ].split( '.' )[ 0 ];
 	}
 
 	return (
