@@ -15,6 +15,7 @@ const MyToggleControl = () => {
 
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label="Fixed Background"
 			help={
 				hasFixedBackground
