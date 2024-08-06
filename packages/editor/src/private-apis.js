@@ -23,7 +23,6 @@ import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
 } from './components/global-styles-provider';
-import registerDefaultActions from './dataviews/actions';
 import {
 	registerCoreBlockBindingsSources,
 	bootstrapBlockBindingsSourcesFromServer,
@@ -46,7 +45,6 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
-	registerDefaultActions,
 	registerCoreBlockBindingsSources,
 	bootstrapBlockBindingsSourcesFromServer,
 

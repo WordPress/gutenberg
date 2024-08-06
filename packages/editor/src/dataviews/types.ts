@@ -36,5 +36,9 @@ export type PostWithPermissions = Post & {
 	};
 };
 
+export interface PostType {
+	slug: string;
+}
+
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };

@@ -49,7 +49,7 @@ function TypesetButton() {
 		if ( Object.keys( userTypographyConfig ).length === 0 ) {
 			return __( 'Default' );
 		}
-		const activeVariation = variations.find( ( variation ) => {
+		const activeVariation = variations?.find( ( variation ) => {
 			return (
 				JSON.stringify(
 					filterObjectByProperties( variation, 'typography' )
@@ -60,7 +60,7 @@ function TypesetButton() {
 			return activeVariation.title;
 		}
 		return allFontFamilies.map( ( font ) => font?.name ).join( ', ' );
-	}, [ userTypographyConfig, variations ] );
+	}, [ allFontFamilies, userTypographyConfig, variations ] );
 
 	return (
 		hasFonts && (

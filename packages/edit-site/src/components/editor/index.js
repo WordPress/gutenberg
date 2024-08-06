@@ -23,7 +23,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Warning } from '@wordpress/block-editor';
-import { Icon, chevronLeft } from '@wordpress/icons';
+import { Icon, homeButton } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -304,7 +304,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											) }
 											variants={ toggleHomeIconVariants }
 										>
-											<Icon icon={ chevronLeft } />
+											<Icon icon={ homeButton } />
 										</motion.div>
 									</motion.div>
 								)
