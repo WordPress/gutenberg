@@ -21,6 +21,18 @@
 			"background": true,
 			"gradient": true
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],

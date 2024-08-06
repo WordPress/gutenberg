@@ -29,13 +29,17 @@ export default function Edit( { attributes: { autoclose }, setAttributes } ) {
 				<PanelBody title={ __( 'Settings' ) } initialOpen>
 					<ToggleControl
 						isBlock
-						label={ __( 'Autoclose' ) }
+						__nextHasNoMarginBottom
+						label={ __( 'Close automatically' ) }
 						onChange={ ( value ) => {
 							setAttributes( {
 								autoclose: value,
 							} );
 						} }
 						checked={ autoclose }
+						help={ __(
+							'Clicking one accordion section automatically closes all other open sections.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

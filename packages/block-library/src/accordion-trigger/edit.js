@@ -103,9 +103,8 @@ export default function Edit( { attributes, setAttributes } ) {
 							icon={ chevronRight }
 							value="chevronRight"
 						/>
-						<ToggleGroupControlOptionIcon
+						<ToggleGroupControlOption
 							label="None"
-							icon={ false }
 							value={ false }
 						/>
 					</ToggleGroupControl>

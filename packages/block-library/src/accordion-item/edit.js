@@ -86,6 +86,7 @@ export default function Edit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Open by default' ) }
+						__nextHasNoMarginBottom
 						onChange={ ( value ) => {
 							setAttributes( {
 								openByDefault: value,
@@ -97,6 +98,9 @@ export default function Edit( {
 							}
 						} }
 						checked={ openByDefault }
+						help={ __(
+							'Accordion content will be displayed by default.'
+						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

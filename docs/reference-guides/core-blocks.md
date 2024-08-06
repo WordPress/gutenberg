@@ -39,7 +39,7 @@ A single accordion that displays a header and expandable content. ([Source](http
 -	**Category:** design
 -	**Parent:** core/accordion-group
 -	**Allowed Blocks:** core/accordion-trigger, core/accordion-content
--	**Supports:** align (full, wide), border, color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin)
+-	**Supports:** align (full, wide), color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin)
 -	**Attributes:** openByDefault
 
 ## Trigger

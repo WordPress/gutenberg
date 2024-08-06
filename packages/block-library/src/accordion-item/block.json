@@ -16,7 +16,6 @@
 			"background": true,
 			"gradient": true
 		},
-		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
