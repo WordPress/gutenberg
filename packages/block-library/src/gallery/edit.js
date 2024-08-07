@@ -605,7 +605,10 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className="gallery-image-sizes">
+						<BaseControl
+							className="gallery-image-sizes"
+							__nextHasNoMarginBottom
+						>
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
