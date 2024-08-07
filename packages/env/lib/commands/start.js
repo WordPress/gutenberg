@@ -108,7 +108,12 @@ module.exports = async function start( {
 	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 	 */
 	if ( shouldConfigureWp ) {
-		await stop( { scripts, spinner, debug } );
+		await stop( {
+			// Since we're actually starting, we don't want to run the afterStop lifecycle scripts here.
+			scripts: false,
+			spinner,
+			debug,
+		} );
 		// Update the images before starting the services again.
 		spinner.text = 'Updating docker images.';
 
