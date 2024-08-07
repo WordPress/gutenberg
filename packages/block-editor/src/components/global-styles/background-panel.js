@@ -318,8 +318,12 @@ function BackgroundImageControls( {
 			return;
 		}
 
-		const sizeValue = style?.background?.backgroundSize;
-		const positionValue = style?.background?.backgroundPosition;
+		const sizeValue =
+			style?.background?.backgroundSize ||
+			inheritedValue?.background?.backgroundSize;
+		const positionValue =
+			style?.background?.backgroundPosition ||
+			inheritedValue?.background?.backgroundPosition;
 
 		onChange(
 			setImmutably( style, [ 'background' ], {
@@ -334,6 +338,7 @@ function BackgroundImageControls( {
 					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
 						: positionValue,
+				backgroundSize: sizeValue,
 			} )
 		);
 	};
@@ -448,6 +453,9 @@ function BackgroundSizeControls( {
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
+	const isUploadedImage =
+		style?.background?.backgroundImage?.id ||
+		inheritedValue?.background?.backgroundImage?.id;
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
@@ -456,19 +464,15 @@ function BackgroundSizeControls( {
 		inheritedValue?.background?.backgroundAttachment;
 
 	/*
-	 * An `undefined` value is replaced with any supplied
-	 * default control value for the toggle group control.
-	 * An empty string is treated as `auto` - this allows a user
-	 * to select "Size" and then enter a custom value, with an
-	 * empty value being treated as `auto`.
+	 * Set default values for uploaded images.
+	 * The default values are passed by the consumer.
+	 * Block-level controls may have different defaults to root-level controls.
+	 * A falsy value is treated by default as `auto` (Tile).
 	 */
 	const currentValueForToggle =
-		( sizeValue !== undefined &&
-			sizeValue !== 'cover' &&
-			sizeValue !== 'contain' ) ||
-		sizeValue === ''
-			? 'auto'
-			: sizeValue || defaultValues?.backgroundSize;
+		! sizeValue && isUploadedImage
+			? defaultValues?.backgroundSize
+			: sizeValue || 'auto';
 
 	/*
 	 * If the current value is `cover` and the repeat value is `undefined`, then
