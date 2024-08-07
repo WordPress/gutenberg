@@ -198,9 +198,9 @@ function renderFooterContent< Item >(
 			: selectableItems.length;
 	return (
 		<HStack
-			justify="flex-start"
 			expanded={ false }
 			className="dataviews-bulk-actions-footer__container"
+			spacing={ 3 }
 		>
 			<BulkSelectionCheckbox
 				selection={ selection }
@@ -212,34 +212,41 @@ function renderFooterContent< Item >(
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ sprintf(
 					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', countToShow ),
+					_n( '%d Item selected', '%d Items selected', countToShow ),
 					countToShow
 				) }
 			</span>
-			{ actionsToShow.map( ( action ) => {
-				return (
-					<ActionButton
-						key={ action.id }
-						action={ action }
-						selectedItems={ selectedItems }
-						actionInProgress={ actionInProgress }
-						setActionInProgress={ setActionInProgress }
+			<HStack
+				className="dataviews-bulk-actions-footer__action-buttons"
+				expanded={ false }
+				spacing={ 1 }
+			>
+				{ actionsToShow.map( ( action ) => {
+					return (
+						<ActionButton
+							key={ action.id }
+							action={ action }
+							selectedItems={ selectedItems }
+							actionInProgress={ actionInProgress }
+							setActionInProgress={ setActionInProgress }
+						/>
+					);
+				} ) }
+				{ selectedItems.length > 0 && (
+					<Button
+						icon={ closeSmall }
+						showTooltip
+						tooltipPosition="top"
+						size="compact"
+						label={ __( 'Cancel' ) }
+						disabled={ !! actionInProgress }
+						accessibleWhenDisabled={ false }
+						onClick={ () => {
+							onChangeSelection( EMPTY_ARRAY );
+						} }
 					/>
-				);
-			} ) }
-			{ selectedItems.length > 0 && (
-				<Button
-					icon={ closeSmall }
-					showTooltip
-					tooltipPosition="top"
-					label={ __( 'Cancel' ) }
-					disabled={ !! actionInProgress }
-					accessibleWhenDisabled={ false }
-					onClick={ () => {
-						onChangeSelection( EMPTY_ARRAY );
-					} }
-				/>
-			) }
+				) }
+			</HStack>
 		</HStack>
 	);
 }
