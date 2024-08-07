@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	BaseControl,
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -16,12 +15,13 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
@@ -303,21 +303,35 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								} )
 							}
 						/>
-						<BaseControl className="editor-latest-posts-image-alignment-control">
-							<BaseControl.VisualLabel>
-								{ __( 'Image alignment' ) }
-							</BaseControl.VisualLabel>
-							<BlockAlignmentToolbar
-								value={ featuredImageAlign }
-								onChange={ ( value ) =>
-									setAttributes( {
-										featuredImageAlign: value,
-									} )
-								}
-								controls={ [ 'left', 'center', 'right' ] }
-								isCollapsed={ false }
+						<ToggleGroupControl
+							className="editor-latest-posts-image-alignment-control"
+							__nextHasNoMarginBottom
+							label={ __( 'Image alignment' ) }
+							value={ featuredImageAlign }
+							onChange={ ( value ) =>
+								setAttributes( {
+									featuredImageAlign: value,
+								} )
+							}
+							isBlock
+						>
+							<ToggleGroupControlOption
+								value="none"
+								label={ __( 'None' ) }
 							/>
-						</BaseControl>
+							<ToggleGroupControlOption
+								value="left"
+								label={ __( 'Left' ) }
+							/>
+							<ToggleGroupControlOption
+								value="center"
+								label={ __( 'Center' ) }
+							/>
+							<ToggleGroupControlOption
+								value="right"
+								label={ __( 'Right' ) }
+							/>
+						</ToggleGroupControl>
 						<ToggleControl
 							__nextHasNoMarginBottom
 							label={ __( 'Add link to featured image' ) }

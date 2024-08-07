@@ -63,7 +63,7 @@
 		},
 		"featuredImageAlign": {
 			"type": "string",
-			"enum": [ "left", "center", "right" ]
+			"default": "none"
 		},
 		"featuredImageSizeSlug": {
 			"type": "string",
