@@ -100,4 +100,129 @@ describe( 'SelectControl', () => {
 			screen.getByRole( 'option', { name: 'Aria label' } )
 		).toBeInTheDocument();
 	} );
+
+	/* eslint-disable jest/expect-expect */
+	describe( 'static typing', () => {
+		describe( 'single', () => {
+			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
+				const onChange: ( value: 'foo' | 'bar' ) => void = () => {};
+
+				<SelectControl
+					value="narrow"
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							value: 'value',
+							label: 'Value',
+						},
+					] }
+					// @ts-expect-error onChange type is not compatible with inferred value type
+					onChange={ onChange }
+				/>;
+
+				<SelectControl
+					// @ts-expect-error "string" is not "narrow" or "value"
+					value="string"
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							value: 'value',
+							label: 'Value',
+						},
+					] }
+					// @ts-expect-error "string" is not "narrow" or "value"
+					onChange={ ( value ) => value === 'string' }
+				/>;
+			} );
+
+			it( 'should accept an explicit type argument', () => {
+				<SelectControl< 'narrow' | 'value' >
+					// @ts-expect-error "string" is not "narrow" or "value"
+					value="string"
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							// @ts-expect-error "string" is not "narrow" or "value"
+							value: 'string',
+							label: 'String',
+						},
+					] }
+				/>;
+			} );
+		} );
+
+		describe( 'multiple', () => {
+			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
+				const onChange: (
+					value: ( 'foo' | 'bar' )[]
+				) => void = () => {};
+
+				<SelectControl
+					multiple
+					value={ [ 'narrow' ] }
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							value: 'value',
+							label: 'Value',
+						},
+					] }
+					// @ts-expect-error onChange type is not compatible with inferred value type
+					onChange={ onChange }
+				/>;
+
+				<SelectControl
+					multiple
+					// @ts-expect-error "string" is not "narrow" or "value"
+					value={ [ 'string' ] }
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							value: 'value',
+							label: 'Value',
+						},
+					] }
+					onChange={ ( value ) =>
+						// @ts-expect-error "string" is not "narrow" or "value"
+						value.forEach( ( v ) => v === 'string' )
+					}
+				/>;
+			} );
+
+			it( 'should accept an explicit type argument', () => {
+				<SelectControl< 'narrow' | 'value' >
+					multiple
+					// @ts-expect-error "string" is not "narrow" or "value"
+					value={ [ 'string' ] }
+					options={ [
+						{
+							value: 'narrow',
+							label: 'Narrow',
+						},
+						{
+							// @ts-expect-error "string" is not "narrow" or "value"
+							value: 'string',
+							label: 'String',
+						},
+					] }
+				/>;
+			} );
+		} );
+	} );
+	/* eslint-enable jest/expect-expect */
 } );

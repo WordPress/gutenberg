@@ -2,7 +2,7 @@
 
 Namespace: `core`.
 
-### Dynamically generated selectors
+## Dynamically generated selectors
 
 There are a number of user-friendly selectors that are wrappers of the more generic `getEntityRecord` and `getEntityRecords` that can be used to retrieve information for the various entities.
 
