@@ -57,3 +57,4 @@ This list is not exhaustive, but here are several additional options to choose f
 - [XAMPP](https://www.apachefriends.org/)
 - [MAMP](https://www.mamp.info/en/mamp/mac/)
 - [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)
+- [WP Studio](https://developer.wordpress.com/studio/)
