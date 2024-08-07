@@ -62,7 +62,11 @@ function ListBox( {
 					disabled={ option.isDisabled }
 					className={ clsx(
 						'components-autocomplete__result',
-						className
+						className,
+						{
+							// Unused, for backwards compatibility.
+							'is-selected': index === selectedIndex,
+						}
 					) }
 					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
