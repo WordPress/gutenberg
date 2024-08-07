@@ -7,6 +7,7 @@
 	flex-wrap: wrap;
 	padding-left: $grid-unit-15 * 0.5; // 6px.
 	padding-right: $grid-unit-15 * 0.5;
+	border-radius: $radius-medium 0 0 $radius-medium;
 
 	// Unset for nested toolbar groups. Increase specificity.
 	& .components-toolbar-group.components-toolbar-group {

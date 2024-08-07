@@ -87,7 +87,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	padding: ${ CONTENT_WRAPPER_PADDING };
 
 	background-color: ${ COLORS.ui.background };
-	border-radius: 4px;
+	border-radius: ${ CONFIG.radiusMedium };
 	${ ( props ) => css`
 		box-shadow: ${ props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BOX_SHADOW
@@ -150,7 +150,7 @@ const baseItem = css`
 	line-height: 20px;
 
 	color: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusSmall };
 
 	padding-block: ${ ITEM_PADDING_BLOCK };
 	padding-inline: ${ ITEM_PADDING_INLINE };
