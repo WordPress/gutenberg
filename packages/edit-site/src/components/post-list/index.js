@@ -93,18 +93,22 @@ function useView( postType ) {
 		[ activeView, isCustom ]
 	);
 	const [ view, setView ] = useState( () => {
+		let initialView;
 		if ( isCustom === 'true' ) {
-			return (
-				getCustomView( editedEntityRecord ) ?? {
-					type: layout ?? LAYOUT_LIST,
-				}
-			);
-		}
-		return (
-			getDefaultView( defaultViews, activeView ) ?? {
+			initialView = getCustomView( editedEntityRecord ) ?? {
 				type: layout ?? LAYOUT_LIST,
-			}
-		);
+			};
+		} else {
+			initialView = getDefaultView( defaultViews, activeView ) ?? {
+				type: layout ?? LAYOUT_LIST,
+			};
+		}
+
+		const type = layout ?? initialView.type;
+		return {
+			...initialView,
+			type,
+		};
 	} );
 
 	const setViewWithUrlUpdate = useCallback(
@@ -146,8 +150,7 @@ function useView( postType ) {
 		} ) );
 	}, [ layout ] );
 
-	// When activeView or isCustom URL parameters change,
-	// reset the view & update the layout URL param to match the view's type.
+	// When activeView or isCustom URL parameters change, reset the view.
 	useEffect( () => {
 		let newView;
 		if ( isCustom === 'true' ) {
@@ -157,9 +160,13 @@ function useView( postType ) {
 		}
 
 		if ( newView ) {
-			setViewWithUrlUpdate( newView );
+			const type = layout ?? newView.type;
+			setView( {
+				...newView,
+				type,
+			} );
 		}
-	}, [ activeView, isCustom, defaultViews, editedEntityRecord ] );
+	}, [ activeView, isCustom, layout, defaultViews, editedEntityRecord ] );
 
 	return [ view, setViewWithUrlUpdate, setViewWithUrlUpdate ];
 }

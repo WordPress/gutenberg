@@ -8,11 +8,14 @@
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
 -   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
 -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
+-   `Autocompleter UI`: Fix text color when hovering selected item ([#64294](https://github.com/WordPress/gutenberg/pull/64294)).
+-   `Heading`: Add the missing `size` prop to the component's props type ([#64299](https://github.com/WordPress/gutenberg/pull/64299)).
 
 ### Enhancements
 
 -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
 -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
+-   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
 
