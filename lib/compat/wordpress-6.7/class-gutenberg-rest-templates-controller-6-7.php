@@ -186,7 +186,9 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
 					return $plugins[ $plugin_basename ]['Name'];
 				}
-				return $template_object->theme;
+				return isset( $template_object->plugin ) ?
+					$template_object->plugin :
+					$template_object->theme;
 				// @core-merge: End of changes to merge in core.
 			case 'site':
 				return get_bloginfo( 'name' );
