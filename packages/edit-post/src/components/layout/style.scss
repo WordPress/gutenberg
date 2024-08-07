@@ -1,6 +1,20 @@
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
 	clear: both;
+	overflow: auto;
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.;
+
+	&:has(.postbox:not(.closed)) {
+		flex: 1 1 50%;
+	}
+}
+
+.edit-post-meta-boxes-area:first-child .postbox-header {
+	border-top: none;
+}
+
+.has-metaboxes .editor-visual-editor {
+	flex: 1 1 50%;
 }
 
 // Adjust the position of the notices
