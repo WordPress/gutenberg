@@ -108,7 +108,7 @@ module.exports = async function start( {
 	 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 	 */
 	if ( shouldConfigureWp ) {
-		await stop( { spinner, debug } );
+		await stop( { scripts, spinner, debug } );
 		// Update the images before starting the services again.
 		spinner.text = 'Updating docker images.';
 
