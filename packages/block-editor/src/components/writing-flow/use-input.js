@@ -50,7 +50,20 @@ export default function useInput() {
 			// DOM. This will cause React errors (and the DOM should only be
 			// altered in a controlled fashion).
 			if ( node.contentEditable === 'true' ) {
-				// event.preventDefault();
+				const selection = node.ownerDocument.defaultView.getSelection();
+				const range = selection.rangeCount
+					? selection.getRangeAt( 0 )
+					: null;
+				const root = getSelectionRoot( node.ownerDocument );
+
+				node.contentEditable = false;
+				if ( root ) {
+					root.focus();
+					selection.removeAllRanges();
+					if ( range ) {
+						selection.addRange( range );
+					}
+				}
 			}
 		}
 
