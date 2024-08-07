@@ -237,7 +237,10 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const target = getSelectionRoot( ownerDocument ) || event.target;
+			const target =
+				ownerDocument.activeElement === node
+					? getSelectionRoot( ownerDocument )
+					: event.target;
 
 			// Abort if our current target is not a candidate for navigation
 			// (e.g. preserve native input behaviors).
