@@ -689,13 +689,14 @@ export default () => {
 			return list.map( ( item ) => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const itemContext = {
-					[ namespace ]: proxifyState( namespace, {} ),
-				};
-				const mergedContext = proxifyContext(
-					itemContext,
-					inheritedValue
+				const itemContext = proxifyContext(
+					proxifyState( namespace, {} ),
+					inheritedValue[ namespace ]
 				);
+				const mergedContext = {
+					...inheritedValue,
+					[ namespace ]: itemContext,
+				};
 
 				// Set the item after proxifying the context.
 				mergedContext[ namespace ][ itemProp ] = item;
