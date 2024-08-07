@@ -11,6 +11,14 @@ import DataForm from '../index';
 const meta = {
 	title: 'DataViews/DataForm',
 	component: DataForm,
+	argTypes: {
+		type: {
+			control: { type: 'select' },
+			description:
+				'Chooses the layout of the form. "regular" is the default layout.',
+			options: [ 'regular', 'panel' ],
+		},
+	},
 };
 export default meta;
 
@@ -45,7 +53,7 @@ const fields = [
 	},
 ];
 
-export const Default = () => {
+export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
 		order: 2,
@@ -61,7 +69,10 @@ export const Default = () => {
 		<DataForm
 			data={ post }
 			fields={ fields }
-			form={ form }
+			form={ {
+				...form,
+				type,
+			} }
 			onChange={ setPost }
 		/>
 	);
