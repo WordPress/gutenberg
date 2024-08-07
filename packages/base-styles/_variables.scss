@@ -115,8 +115,8 @@ $radio-input-size-sm: 24px; // Width & height for small viewports.
 // Deprecated, please avoid using these.
 $block-padding: 14px; // Used to define space between block footprint and surrouding borders.
 $radius-block-ui: $radius-small;
-$shadow-popover: $elevation-10;
-$shadow-modal: $elevation-40;
+$shadow-popover: $elevation-x-small;
+$shadow-modal: $elevation-large;
 
 
 /**
