@@ -25,15 +25,13 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Sorting', async ( { admin, page } ) => {
-		const user = userEvent.setup();
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		const sortBySelect = page.getByRole( 'combobox', { name: 'Sort by' } );
-		await sortBySelect.click();
-		await user.selectOptions( sortBySelect, 'title' );
-		await page.getByRole( 'option', { name: 'title' } ).click();
+		await page.getByRole( 'combobox', { name: 'Sort by' } ).click();
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Enter' );
 		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
 		const firstTitle = page
 			.getByRole( 'region', {
