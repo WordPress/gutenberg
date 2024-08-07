@@ -5,7 +5,7 @@
 		margin-right: $grid-unit-10;
 	}
 
-	&.is-selected .block-editor-block-icon {
+	&[aria-selected="true"] .block-editor-block-icon {
 		color: inherit !important;
 	}
 }
