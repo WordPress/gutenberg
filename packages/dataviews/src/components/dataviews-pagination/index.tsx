@@ -63,11 +63,12 @@ function DataViewsPagination() {
 				>
 					{ createInterpolateElement(
 						sprintf(
-							// translators: <CurrentPage /> is the current page number, %s is the total number of pages.
+							// translators: 1: Current page number, 2: Total number of pages.
 							_x(
-								'<div>Page</div><CurrentPage /><div>of %s</div>',
+								'<div>Page</div>%1$s<div>of %2$s</div>',
 								'paging'
 							),
+							'<CurrentPage />',
 							totalPages
 						),
 						{
