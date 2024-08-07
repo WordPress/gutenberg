@@ -58,6 +58,7 @@ const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
  * ```
  */
 export function TimePicker( {
+	id,
 	is12Hour,
 	currentTime,
 	onChange,
@@ -237,6 +238,7 @@ export function TimePicker( {
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
 					<TimeInput
+						id={ id }
 						value={ {
 							hours: Number( hours ),
 							minutes: Number( minutes ),

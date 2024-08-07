@@ -34,6 +34,7 @@ import { useControlledValue } from '../../../utils';
 import BaseControl from '../../../base-control';
 
 export function TimeInput( {
+	id,
 	value: valueProp,
 	defaultValue,
 	is12Hour,
@@ -108,6 +109,7 @@ export function TimeInput( {
 					className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
 				>
 					<HoursInput
+						id={ id }
 						className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
 						label={ __( 'Hours' ) }
 						hideLabelFromVision

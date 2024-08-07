@@ -4,6 +4,7 @@
 import { BaseControl, TimePicker, SelectControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -40,6 +41,8 @@ function Edit< Item >( {
 	const { id, label } = field;
 	const value = field.getValue( { item: data } );
 
+	const instanceId = useInstanceId( TimePicker, `datetime-field-${ id }` );
+
 	const onChangeControl = useCallback(
 		( newValue: string | null ) =>
 			onChange( ( prevItem: Item ) => ( {
@@ -75,8 +78,9 @@ function Edit< Item >( {
 	}
 
 	return (
-		<BaseControl id={ id } label={ label }>
+		<BaseControl id={ instanceId } label={ label }>
 			<TimePicker
+				id={ instanceId }
 				currentTime={ value }
 				onChange={ onChangeControl }
 				hideLabelFromVision
