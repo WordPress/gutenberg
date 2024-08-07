@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.1.0 (2024-08-07)
+
 ## Internal
 
 -   Upgraded `@ariakit/react` (v0.4.7) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
