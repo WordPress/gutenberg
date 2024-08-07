@@ -5,16 +5,17 @@ import { useContext } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { unlock } from '../../lock-unlock';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 import { getFontFamilies } from './utils';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 export default function PreviewTypography( { fontSize, variation } ) {
 	const { base } = useContext( GlobalStylesContext );

@@ -6,7 +6,7 @@
 	"category": "text",
 	"parent": [ "core/list" ],
 	"allowedBlocks": [ "core/list" ],
-	"description": "Create a list item.",
+	"description": "An individual item within a list.",
 	"textdomain": "default",
 	"attributes": {
 		"placeholder": {
@@ -20,9 +20,17 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"className": false,
 		"splitting": true,
-		"__experimentalSelector": "li",
+		"color": {
+			"gradients": true,
+			"link": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true
+			}
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -47,5 +55,8 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"root": ".wp-block-list > li"
 	}
 }

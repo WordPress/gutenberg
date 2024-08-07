@@ -16,6 +16,10 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 } from '../components/global-styles/background-panel';
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../store/private-keys';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -59,7 +63,7 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
+	if ( !! backgroundImage?.url ) {
 		if ( ! backgroundStyle?.backgroundSize ) {
 			backgroundStylesWithDefaults = {
 				backgroundSize: 'cover',
@@ -134,10 +138,25 @@ export function BackgroundImagePanel( {
 	setAttributes,
 	settings,
 } ) {
-	const style = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
-		[ clientId ]
+	const { style, inheritedValue, _links } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			const _settings = getSettings();
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				_links: _settings[ globalStylesLinksDataKey ],
+				/*
+				 * @TODO 1. Pass inherited value down to all block style controls,
+				 *   See: packages/block-editor/src/hooks/style.js
+				 * @TODO 2. Add support for block style variations,
+				 *   See implementation: packages/block-editor/src/hooks/block-style-variation.js
+				 */
+				inheritedValue:
+					_settings[ globalStylesDataKey ]?.blocks?.[ name ],
+			};
+		},
+		[ clientId, name ]
 	);
 
 	if (
@@ -146,11 +165,6 @@ export function BackgroundImagePanel( {
 	) {
 		return null;
 	}
-
-	const defaultControls = getBlockSupport( name, [
-		BACKGROUND_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
 
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -170,13 +184,14 @@ export function BackgroundImagePanel( {
 
 	return (
 		<StylesBackgroundPanel
+			inheritedValue={ inheritedValue }
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
-			defaultControls={ defaultControls }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }
+			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);
 }

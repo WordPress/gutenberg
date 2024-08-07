@@ -93,6 +93,7 @@
 		<button
 			data-testid="toggle value"
 			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>

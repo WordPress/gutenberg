@@ -10,21 +10,13 @@
 namespace GutenbergCS\Gutenberg\Tests\NamingConventions;
 
 use GutenbergCS\Gutenberg\Sniffs\NamingConventions\ValidBlockLibraryFunctionNameSniff;
-use PHP_CodeSniffer\Config;
-use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
-use PHP_CodeSniffer\Ruleset;
+use GutenbergCS\Gutenberg\Tests\AbstractSniffUnitTest;
+use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * Unit test class for the ValidBlockLibraryFunctionNameSniff sniff.
  */
 final class ValidBlockLibraryFunctionNameUnitTest extends AbstractSniffUnitTest {
-
-	/**
-	 * Holds the original Ruleset instance.
-	 *
-	 * @var Ruleset
-	 */
-	private static $original_ruleset;
 
 	/**
 	 * Returns the lines where errors should occur.
@@ -50,50 +42,22 @@ final class ValidBlockLibraryFunctionNameUnitTest extends AbstractSniffUnitTest 
 	}
 
 	/**
+	 * Returns the fully qualified class name (FQCN) of the sniff.
 	 *
-	 * This method resets the 'Gutenberg' ruleset in the $GLOBALS['PHP_CODESNIFFER_RULESETS']
-	 * to its original state.
+	 * @return string The fully qualified class name of the sniff.
 	 */
-	public static function tearDownAfterClass() {
-		parent::tearDownAfterClass();
-
-		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = self::$original_ruleset;
-		self::$original_ruleset                           = null;
+	protected function get_sniff_fqcn() {
+		return ValidBlockLibraryFunctionNameSniff::class;
 	}
 
-
 	/**
-	 * Prepares the environment before executing tests. Specifically, sets prefixes for the
-	 * ValidBlockLibraryFunctionName sniff.This is needed since AbstractSniffUnitTest class
-	 * doesn't apply sniff properties from the Gutenberg/ruleset.xml file.
+	 * Sets the parameters for the sniff.
 	 *
-	 * @param string $filename The name of the file being tested.
-	 * @param Config $config   The config data for the run.
+	 * @throws RuntimeException If unable to set the ruleset parameters required for the test.
 	 *
-	 * @return void
+	 * @param Sniff $sniff The sniff being tested.
 	 */
-	public function setCliValues( $filename, $config ) {
-		parent::setCliValues( $filename, $config );
-
-		if ( ! isset( $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] )
-			|| ( ! $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] instanceof Ruleset )
-		) {
-			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
-		}
-
-		// Backup the original Ruleset instance.
-		self::$original_ruleset = $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'];
-
-		$current_ruleset                                  = clone self::$original_ruleset;
-		$GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] = $current_ruleset;
-
-		if ( ! isset( $current_ruleset->sniffs[ ValidBlockLibraryFunctionNameSniff::class ] )
-			|| ( ! $current_ruleset->sniffs[ ValidBlockLibraryFunctionNameSniff::class ] instanceof ValidBlockLibraryFunctionNameSniff )
-		) {
-			throw new \RuntimeException( 'Cannot set ruleset parameters required for this test.' );
-		}
-
-		$sniff           = $current_ruleset->sniffs[ ValidBlockLibraryFunctionNameSniff::class ];
+	public function set_sniff_parameters( Sniff $sniff ) {
 		$sniff->prefixes = array(
 			'block_core_',
 			'render_block_core_',

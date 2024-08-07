@@ -302,6 +302,7 @@ function ComplementaryArea( {
 					smallScreenTitle={ smallScreenTitle }
 					toggleButtonProps={ {
 						label: closeLabel,
+						size: 'small',
 						shortcut: toggleShortcut,
 						scope,
 						identifier,
@@ -329,6 +330,7 @@ function ComplementaryArea( {
 									}
 									isPressed={ isPinned }
 									aria-expanded={ isPinned }
+									size="compact"
 								/>
 							) }
 						</>

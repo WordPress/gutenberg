@@ -5,6 +5,8 @@ import { selectBlockPatternsKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 
+export const withRootClientIdOptionKey = Symbol( 'withRootClientId' );
+
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
 		return list;

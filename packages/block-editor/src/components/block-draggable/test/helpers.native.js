@@ -108,11 +108,11 @@ export const initializeWithBlocksLayouts = async ( blocks ) => {
 /**
  * Fires long-press gesture event on a block.
  *
- * @param {HTMLElement} block                  Block test instance.
- * @param {string}      testID                 Id for querying the draggable trigger element.
- * @param {Object}      [options]              Configuration options for the gesture event.
- * @param {boolean}     [options.failed]       Determines if the gesture should fail.
- * @param {number}      [options.triggerIndex] In case there are multiple draggable triggers, this specifies the index to use.
+ * @param {import('react-test-renderer').ReactTestInstance} block                  Block test instance.
+ * @param {string}                                          testID                 Id for querying the draggable trigger element.
+ * @param {Object}                                          [options]              Configuration options for the gesture event.
+ * @param {boolean}                                         [options.failed]       Determines if the gesture should fail.
+ * @param {number}                                          [options.triggerIndex] In case there are multiple draggable triggers, this specifies the index to use.
  */
 export const fireLongPress = (
 	block,
@@ -140,8 +140,8 @@ export const fireLongPress = (
 /**
  * Fires pan gesture event on a BlockDraggable component.
  *
- * @param {HTMLElement} blockDraggable BlockDraggable test instance.
- * @param {Object}      [touchEvents]  Array of touch events to dispatch on the pan gesture.
+ * @param {import('react-test-renderer').ReactTestInstance} blockDraggable BlockDraggable test instance.
+ * @param {Object}                                          [touchEvents]  Array of touch events to dispatch on the pan gesture.
  */
 export const firePanGesture = (
 	blockDraggable,
@@ -169,7 +169,7 @@ export const firePanGesture = (
  *
  * @param {import('@testing-library/react-native').RenderAPI} screen The Testing Library screen.
  *
- * @return {HTMLElement} Draggable chip test instance.
+ * @return {import('react-test-renderer').ReactTestInstance} Draggable chip test instance.
  */
 export const getDraggableChip = ( { getByTestId } ) => {
 	let draggableChip;

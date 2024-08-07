@@ -1,29 +1,67 @@
 # PluginSidebar
 
-This slot allows for adding items into the Gutenberg Toolbar.
-Using this slot will add an icon to the bar that, when clicked, will open a sidebar with the content of the items wrapped in the `<PluginSidebar />` component.
+This slot allows adding items to the tool bar of either the Post or Site editor screens.
+Using this slot will add an icon to the toolbar that, when clicked, opens a panel with containing the items wrapped in the `<PluginSidebar />` component.
 
 ## Example
 
-```js
-import { registerPlugin } from '@wordpress/plugins';
+```jsx
+import { __ } from '@wordpress/i18n';
 import { PluginSidebar } from '@wordpress/editor';
-import { image } from '@wordpress/icons';
+import {
+	PanelBody,
+	Button,
+	TextControl,
+	SelectControl,
+} from '@wordpress/components';
+import { registerPlugin } from '@wordpress/plugins';
+import { useState } from '@wordpress/element';
 
-const PluginSidebarTest = () => (
-	<PluginSidebar name="plugin-sidebar-test" title="My Plugin" icon={ image }>
-		<p>Plugin Sidebar</p>
-	</PluginSidebar>
-);
+const PluginSidebarExample = () => {
+	const [ text, setText ] = useState( '' );
+	const [ select, setSelect ] = useState( 'a' );
 
-registerPlugin( 'plugin-sidebar-test', { render: PluginSidebarTest } );
+	return (
+		<PluginSidebar
+			name="plugin-sidebar-example"
+			title={ __( 'My PluginSidebar' ) }
+			icon={ 'smiley' }
+		>
+			<PanelBody>
+				<h2>
+					{ __( 'This is a heading for the PluginSidebar example.' ) }
+				</h2>
+				<p>
+					{ __(
+						'This is some example text for the PluginSidebar example.'
+					) }
+				</p>
+				<TextControl
+					label={ __( 'Text Control' ) }
+					value={ text }
+					onChange={ ( newText ) => setText( newText ) }
+				/>
+				<SelectControl
+					label={ __( 'Select Control' ) }
+					value={ select }
+					options={ [
+						{ value: 'a', label: 'Option A' },
+						{ value: 'b', label: 'Option B' },
+						{ value: 'c', label: 'Option C' },
+					] }
+					onChange={ ( newSelect ) => setSelect( newSelect ) }
+				/>
+				<Button variant="primary">{ __( 'Primary Button' ) } </Button>
+			</PanelBody>
+		</PluginSidebar>
+	);
+};
+
+// Register the plugin.
+registerPlugin( 'plugin-sidebar-example', { render: PluginSidebarExample } );
 ```
 
 ## Location
-
-### Closed State
-
-![Closed State](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-closed-state.png?raw=true)
 
 ### Open State
 

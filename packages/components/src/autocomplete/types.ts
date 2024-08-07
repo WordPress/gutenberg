@@ -200,9 +200,8 @@ export type AutocompleteProps = UseAutocompleteProps & {
 		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
 	) => React.ReactNode;
 	/**
-	 * Whether or not the Autocomplte componenet is selected, and if its
-	 * `Popover`
-	 * should be displayed.
+	 * Whether or not the Autocomplete component is selected, and if its
+	 * `Popover` should be displayed.
 	 */
 	isSelected: boolean;
 };

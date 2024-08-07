@@ -44,7 +44,8 @@ export default function QuickInserter( {
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
-		onInsertBlocks
+		onInsertBlocks,
+		true
 	);
 
 	const [ patterns ] = usePatternsState(
@@ -84,7 +85,12 @@ export default function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, insertionIndex, filterValue } );
+		setInserterIsOpened( {
+			rootClientId,
+			insertionIndex,
+			filterValue,
+			onSelect,
+		} );
 	};
 
 	let maxBlockPatterns = 0;
@@ -126,6 +132,7 @@ export default function QuickInserter( {
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					isQuick
 				/>
 			</div>
 

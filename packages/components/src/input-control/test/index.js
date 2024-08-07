@@ -53,7 +53,7 @@ describe( 'InputControl', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render help as aria-details when not plain text', () => {
+		it( 'should still render help as aria-describedby when not plain text', () => {
 			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
 
 			const input = screen.getByRole( 'textbox' );
@@ -61,7 +61,7 @@ describe( 'InputControl', () => {
 
 			expect(
 				// eslint-disable-next-line testing-library/no-node-access
-				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
+				help.closest( `#${ input.getAttribute( 'aria-describedby' ) }` )
 			).toBeVisible();
 		} );
 	} );

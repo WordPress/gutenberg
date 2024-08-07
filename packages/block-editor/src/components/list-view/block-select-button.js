@@ -10,12 +10,11 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,6 +25,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
+import { store as blockEditorStore } from '../../store';
 
 function ListViewBlockSelectButton(
 	{
@@ -51,16 +51,17 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { isContentOnly } = useSelect(
+		( select ) => ( {
+			isContentOnly:
+				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+				'contentOnly',
+		} ),
+		[ clientId ]
+	);
+	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-
-	const positionLabel = blockInformation?.positionLabel
-		? sprintf(
-				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
-				__( 'Position: %1$s' ),
-				blockInformation.positionLabel
-		  )
-		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -125,10 +126,10 @@ function ListViewBlockSelectButton(
 						</Truncate>
 					</span>
 				) }
-				{ positionLabel && isSticky && (
-					<Tooltip text={ positionLabel }>
+				{ isSticky && (
+					<span className="block-editor-list-view-block-select-button__sticky">
 						<Icon icon={ pinSmall } />
-					</Tooltip>
+					</span>
 				) }
 				{ images.length ? (
 					<span
@@ -147,7 +148,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ isLocked && (
+				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />
 					</span>

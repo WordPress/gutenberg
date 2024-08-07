@@ -32,15 +32,18 @@ import {
 } from './screen-block-list';
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
+import ScreenTypeset from './screen-typeset';
 import ScreenTypographyElement from './screen-typography-element';
+import FontSize from './font-sizes/font-size';
+import FontSizes from './font-sizes/font-sizes';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
-import ScreenBackground from './screen-background';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -76,7 +79,11 @@ function GlobalStylesActionMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More' ) }
+				toggleProps={ { size: 'compact' } }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
@@ -309,6 +316,18 @@ function GlobalStylesUI() {
 				<ScreenTypography />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/">
+				<FontSizes />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
+				<FontSize />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/typeset">
+				<ScreenTypeset />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path="/typography/text">
 				<ScreenTypographyElement element="text" />
 			</GlobalStylesNavigationScreen>
@@ -333,6 +352,14 @@ function GlobalStylesUI() {
 				<ScreenColors />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path="/shadows">
+				<ScreenShadows />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
+				<ScreenShadowsEdit />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path="/layout">
 				<ScreenLayout />
 			</GlobalStylesNavigationScreen>
@@ -341,12 +368,8 @@ function GlobalStylesUI() {
 				<ScreenCSS />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ '/revisions' }>
+			<GlobalStylesNavigationScreen path="/revisions">
 				<ScreenRevisions />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ '/background' }>
-				<ScreenBackground />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (

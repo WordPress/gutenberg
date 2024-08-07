@@ -3,9 +3,14 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { Dropdown, Button } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	__experimentalTruncate as Truncate,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -15,6 +20,11 @@ import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the `PostURLPanel` component.
+ *
+ * @return {JSX.Element} The rendered PostURLPanel component.
+ */
 export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -53,10 +63,22 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const slug = useSelect(
-		( select ) => select( editorStore ).getEditedPostSlug(),
-		[]
-	);
+	const { slug, isFrontPage, postLink } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPost } = select( editorStore );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
+		const _id = getCurrentPostId();
+		return {
+			slug: select( editorStore ).getEditedPostSlug(),
+			isFrontPage: siteSettings?.page_on_front === _id,
+			postLink: getCurrentPost()?.link,
+		};
+	}, [] );
 	const decodedSlug = safeDecodeURIComponent( slug );
 	return (
 		<Button
@@ -68,7 +90,9 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ decodedSlug }
+			<Truncate numberOfLines={ 1 }>
+				{ isFrontPage ? postLink : `/${ decodedSlug }` }
+			</Truncate>
 		</Button>
 	);
 }

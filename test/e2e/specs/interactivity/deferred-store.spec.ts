@@ -21,16 +21,20 @@ test.describe( 'deferred store', () => {
 	} ) => {
 		const resultInput = page.getByTestId( 'result' );
 		await expect( resultInput ).toHaveText( '' );
+		await page.evaluate( () => {
+			window.dispatchEvent( new Event( '_test_proceed_' ) );
+		} );
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
 
-	// There is a known issue for deferred getters right now.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'Ensure that a state getter can be subscribed to before it is initialized', async ( {
+	test( 'Ensure that a state getter can be subscribed to before it is initialized', async ( {
 		page,
 	} ) => {
 		const resultInput = page.getByTestId( 'result-getter' );
 		await expect( resultInput ).toHaveText( '' );
+		await page.evaluate( () => {
+			window.dispatchEvent( new Event( '_test_proceed_' ) );
+		} );
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
 } );

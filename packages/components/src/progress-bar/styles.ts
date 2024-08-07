@@ -5,18 +5,27 @@ import styled from '@emotion/styled';
 import { css, keyframes } from '@emotion/react';
 
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { COLORS, CONFIG } from '../utils';
 
-const animateProgressBar = keyframes( {
-	'0%': {
-		left: '-50%',
-	},
-	'100%': {
-		left: '100%',
-	},
-} );
+function animateProgressBar( isRtl = false ) {
+	const animationDirection = isRtl ? 'right' : 'left';
+
+	return keyframes( {
+		'0%': {
+			[ animationDirection ]: '-50%',
+		},
+		'100%': {
+			[ animationDirection ]: '100%',
+		},
+	} );
+}
 
 // Width of the indicator for the indeterminate progress bar
 export const INDETERMINATE_TRACK_WIDTH = 50;
@@ -24,8 +33,6 @@ export const INDETERMINATE_TRACK_WIDTH = 50;
 export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
-	width: 100%;
-	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	/* Text color at 10% opacity */
 	background-color: color-mix(
@@ -38,6 +45,10 @@ export const Track = styled.div`
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+
+	:where( & ) {
+		width: 160px;
+	}
 `;
 
 export const Indicator = styled.div< {
@@ -65,7 +76,7 @@ export const Indicator = styled.div< {
 					animationDuration: '1.5s',
 					animationTimingFunction: 'ease-in-out',
 					animationIterationCount: 'infinite',
-					animationName: animateProgressBar,
+					animationName: animateProgressBar( isRTL() ),
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 			  } )
 			: css( {

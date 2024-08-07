@@ -306,14 +306,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * They're added separately because padding might only be set on one side.
 			 */
 			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
+				// Add unit if 0.
+				if ( '0' === $padding_right ) {
+					$padding_right = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
 			}
 			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
+				// Add unit if 0.
+				if ( '0' === $padding_left ) {
+					$padding_left = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
@@ -466,29 +474,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['columnCount'] ) ) {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
-				);
-			}
-		} else {
-			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
-
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'container-type'        => 'inline-size',
-				),
-			);
-		}
-
+		// Deal with block gap first so it can be used for responsive computation.
+		$responsive_gap_value = '1.2rem';
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -506,14 +493,53 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value = trim( $combined_gap_value );
+			$gap_value            = trim( $combined_gap_value );
+			$responsive_gap_value = $gap_value;
+		}
 
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
+			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
 				);
 			}
+		} elseif ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
+				);
+			}
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+		}
+
+		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'gap' => $gap_value ),
+			);
 		}
 	}
 
@@ -573,112 +599,126 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$outer_class_names         = array();
-	$container_content_class   = wp_unique_id( 'wp-container-content-' );
-	$child_layout_declarations = array();
-	$child_layout_styles       = array();
+	$outer_class_names = array();
 
-	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
+	// Child layout specific logic.
+	if ( $child_layout ) {
+		$container_content_class   = wp_unique_prefixed_id( 'wp-container-content-' );
+		$child_layout_declarations = array();
+		$child_layout_styles       = array();
 
-	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
-		$child_layout_declarations['box-sizing'] = 'border-box';
-	} elseif ( 'fill' === $self_stretch ) {
-		$child_layout_declarations['flex-grow'] = '1';
-	}
+		$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
 
-	$column_start = isset( $block['attrs']['style']['layout']['columnStart'] ) ? $block['attrs']['style']['layout']['columnStart'] : null;
-	$column_span  = isset( $block['attrs']['style']['layout']['columnSpan'] ) ? $block['attrs']['style']['layout']['columnSpan'] : null;
-	if ( $column_start && $column_span ) {
-		$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
-	} elseif ( $column_start ) {
-		$child_layout_declarations['grid-column'] = "$column_start";
-	} elseif ( $column_span ) {
-		$child_layout_declarations['grid-column'] = "span $column_span";
-	}
+		if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
+			$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+			$child_layout_declarations['box-sizing'] = 'border-box';
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
 
-	$row_start = isset( $block['attrs']['style']['layout']['rowStart'] ) ? $block['attrs']['style']['layout']['rowStart'] : null;
-	$row_span  = isset( $block['attrs']['style']['layout']['rowSpan'] ) ? $block['attrs']['style']['layout']['rowSpan'] : null;
-	if ( $row_start && $row_span ) {
-		$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
-	} elseif ( $row_start ) {
-		$child_layout_declarations['grid-row'] = "$row_start";
-	} elseif ( $row_span ) {
-		$child_layout_declarations['grid-row'] = "span $row_span";
-	}
+		$column_start = isset( $block['attrs']['style']['layout']['columnStart'] ) ? $block['attrs']['style']['layout']['columnStart'] : null;
+		$column_span  = isset( $block['attrs']['style']['layout']['columnSpan'] ) ? $block['attrs']['style']['layout']['columnSpan'] : null;
+		if ( $column_start && $column_span ) {
+			$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
+		} elseif ( $column_start ) {
+			$child_layout_declarations['grid-column'] = "$column_start";
+		} elseif ( $column_span ) {
+			$child_layout_declarations['grid-column'] = "span $column_span";
+		}
 
-	$child_layout_styles[] = array(
-		'selector'     => ".$container_content_class",
-		'declarations' => $child_layout_declarations,
-	);
+		$row_start = isset( $block['attrs']['style']['layout']['rowStart'] ) ? $block['attrs']['style']['layout']['rowStart'] : null;
+		$row_span  = isset( $block['attrs']['style']['layout']['rowSpan'] ) ? $block['attrs']['style']['layout']['rowSpan'] : null;
+		if ( $row_start && $row_span ) {
+			$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
+		} elseif ( $row_start ) {
+			$child_layout_declarations['grid-row'] = "$row_start";
+		} elseif ( $row_span ) {
+			$child_layout_declarations['grid-row'] = "span $row_span";
+		}
 
-	$minimum_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : null;
-	$column_count         = isset( $block['parentLayout']['columnCount'] ) ? $block['parentLayout']['columnCount'] : null;
+		$child_layout_styles[] = array(
+			'selector'     => ".$container_content_class",
+			'declarations' => $child_layout_declarations,
+		);
 
-	/*
-	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
-	 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
-	 * once the grid has less columns than the start.
-	 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
-	 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
-	 */
-	if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
-		$column_span_number  = floatval( $column_span );
-		$column_start_number = floatval( $column_start );
-		$highest_number      = max( $column_span_number, $column_start_number );
-		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
-		$parent_column_value = floatval( $parent_column_width );
-		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+		$minimum_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : null;
+		$column_count         = isset( $block['parentLayout']['columnCount'] ) ? $block['parentLayout']['columnCount'] : null;
 
 		/*
-		 * If there is no unit, the width has somehow been mangled so we reset both unit and value
-		 * to defaults.
-		 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+		 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+		 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
+		 * once the grid has less columns than the start.
+		 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
+		 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
 		 */
-		if ( count( $parent_column_unit ) <= 1 ) {
-			$parent_column_unit  = 'rem';
-			$parent_column_value = 12;
-		} else {
-			$parent_column_unit = $parent_column_unit[1];
+		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
+			$column_span_number  = floatval( $column_span );
+			$column_start_number = floatval( $column_start );
+			$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
+			$parent_column_value = floatval( $parent_column_width );
+			$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
 
-			if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
-				$parent_column_unit = 'rem';
+			$num_cols_to_break_at = 2;
+			if ( $column_span_number && $column_start_number ) {
+				$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
+			} elseif ( $column_span_number ) {
+				$num_cols_to_break_at = $column_span_number;
+			} else {
+				$num_cols_to_break_at = $column_start_number;
 			}
+
+			/*
+			 * If there is no unit, the width has somehow been mangled so we reset both unit and value
+			 * to defaults.
+			 * Additionally, the unit should be one of px, rem or em, so that also needs to be checked.
+			 */
+			if ( count( $parent_column_unit ) <= 1 ) {
+				$parent_column_unit  = 'rem';
+				$parent_column_value = 12;
+			} else {
+				$parent_column_unit = $parent_column_unit[1];
+
+				if ( ! in_array( $parent_column_unit, array( 'px', 'rem', 'em' ), true ) ) {
+					$parent_column_unit = 'rem';
+				}
+			}
+
+			/*
+			 * A default gap value is used for this computation because custom gap values may not be
+			 * viable to use in the computation of the container query value.
+			 */
+			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
+			$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
+			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
+			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
+			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
+			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
+
+			$child_layout_styles[] = array(
+				'rules_group'  => "@container (max-width: $container_query_value )",
+				'selector'     => ".$container_content_class",
+				'declarations' => array(
+					'grid-column' => $grid_column_value,
+					'grid-row'    => 'auto',
+				),
+			);
 		}
 
 		/*
-		 * A default gap value is used for this computation because custom gap values may not be
-		 * viable to use in the computation of the container query value.
+		 * Add to the style engine store to enqueue and render layout styles.
+		 * Return styles here just to check if any exist.
 		 */
-		$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
-		$container_query_value = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
-		$container_query_value = $container_query_value . $parent_column_unit;
-		// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-		$grid_column_value = $column_span ? '1/-1' : 'auto';
-
-		$child_layout_styles[] = array(
-			'rules_group'  => "@container (max-width: $container_query_value )",
-			'selector'     => ".$container_content_class",
-			'declarations' => array(
-				'grid-column' => $grid_column_value,
-			),
+		$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
+			$child_layout_styles,
+			array(
+				'context'  => 'block-supports',
+				'prettify' => false,
+			)
 		);
-	}
 
-	/*
-	 * Add to the style engine store to enqueue and render layout styles.
-	 * Return styles here just to check if any exist.
-	 */
-	$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
-		$child_layout_styles,
-		array(
-			'context'  => 'block-supports',
-			'prettify' => false,
-		)
-	);
-
-	if ( $child_css ) {
-		$outer_class_names[] = $container_content_class;
+		if ( $child_css ) {
+			$outer_class_names[] = $container_content_class;
+		}
 	}
 
 	// Prep the processor for modifying the block output.
@@ -979,27 +1019,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
-		if ( method_exists( $processor, 'class_list' ) ) {
-			foreach ( $processor->class_list() as $class_name ) {
-				if ( str_contains( $class_name, 'layout' ) ) {
-					array_push( $layout_classes, $class_name );
-					$processor->remove_class( $class_name );
-				}
-			}
-		} else {
-			/*
-			* The class_list method was only added in 6.4 so this needs a temporary fallback.
-			* This fallback should be removed when the minimum supported version is 6.4.
-			*/
-			$classes = $processor->get_attribute( 'class' );
-			if ( $classes ) {
-				$classes = explode( ' ', $classes );
-				foreach ( $classes as $class_name ) {
-					if ( str_contains( $class_name, 'is-layout-' ) ) {
-						array_push( $layout_classes, $class_name );
-						$processor->remove_class( $class_name );
-					}
-				}
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_contains( $class_name, 'layout' ) ) {
+				array_push( $layout_classes, $class_name );
+				$processor->remove_class( $class_name );
 			}
 		}
 	}

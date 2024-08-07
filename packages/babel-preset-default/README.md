@@ -2,7 +2,7 @@
 
 Default [Babel](https://babeljs.io/) preset for WordPress development.
 
-The preset includes configuration which enable language features and syntax extensions targeted for support by WordPress. This includes [ECMAScript proposals](https://github.com/tc39/proposals) which have reached [Stage 4 ("Finished")](https://tc39.es/process-document/), as well as the [JSX syntax extension](https://reactjs.org/docs/introducing-jsx.html). For more information, refer to the [JavaScript Coding Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/coding-guidelines.md#javascript).
+The preset includes configuration which enable language features and syntax extensions targeted for support by WordPress. This includes [ECMAScript proposals](https://github.com/tc39/proposals) which have reached [Stage 4 ("Finished")](https://tc39.es/process-document/), as well as the [JSX syntax extension](https://react.dev/learn/writing-markup-with-jsx). For more information, refer to the [JavaScript Coding Guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/coding-guidelines.md#javascript).
 
 ## Installation
 
@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/babel-preset-default --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ### Usage
 

@@ -7,8 +7,7 @@ import { speak } from '@wordpress/a11y';
 /** @typedef {import('react').ComponentType} ComponentType */
 
 /**
- * A Higher Order Component used to be provide speak and debounced speak
- * functions.
+ * A Higher Order Component used to provide speak and debounced speak functions.
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak
  *

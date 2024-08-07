@@ -21,7 +21,7 @@ const apiFetchPromise = Promise.resolve( {} );
  * @param {Object}                                            [options]                Configuration options for the transformation.
  * @param {number}                                            [options.isMediaBlock]   True if the block transformation will result in a media block.
  * @param {number}                                            [options.hasInnerBlocks] True if the block transformation will result in a block that contains inner blocks.
- * @return {HTMLElement} Block instance after the block transformation result.
+ * @return {import('react-test-renderer').ReactTestInstance} Block instance after the block transformation result.
  */
 export const transformBlock = async (
 	screen,

@@ -12,7 +12,7 @@
  * `edit_theme_options` capability. In order to allow other roles to also view the templates,
  * we need to override the permissions check for the REST API endpoints.
  */
-class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_Controller_6_4 {
+class Gutenberg_REST_Templates_Controller_6_6 extends WP_REST_Templates_Controller {
 
 	/**
 	 * Checks if a given request has access to read templates.
@@ -113,8 +113,19 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 			array_shift( $hierarchy );
 		} while ( ! empty( $hierarchy ) && empty( $fallback_template->content ) );
 
-		$response = $this->prepare_item_for_response( $fallback_template, $request );
+		// To maintain original behavior, return an empty object rather than a 404 error when no template is found.
+		$response = $fallback_template ? $this->prepare_item_for_response( $fallback_template, $request ) : new stdClass();
 
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * See WP_REST_Templates_Controller::prepare_item_for_response
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$blocks        = parse_blocks( $item->content );
+		$blocks        = gutenberg_replace_pattern_blocks( $blocks );
+		$item->content = serialize_blocks( $blocks );
+		return parent::prepare_item_for_response( $item, $request );
 	}
 }

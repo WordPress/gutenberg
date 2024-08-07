@@ -2,51 +2,69 @@
 
 exports[`Buttons block color customization sets a background color 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"backgroundColor":"luminous-vivid-amber"} /--></div>
+<div class="wp-block-buttons"><!-- wp:button {"backgroundColor":"luminous-vivid-amber"} -->
+<div class="wp-block-button"><a class="wp-block-button__link has-luminous-vivid-amber-background-color has-background wp-element-button" href=""></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block color customization sets a custom gradient background color 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"style":{"color":{"gradient":"linear-gradient(200deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)"}}} /--></div>
+<div class="wp-block-buttons"><!-- wp:button {"style":{"color":{"gradient":"linear-gradient(200deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link has-background wp-element-button" href="" style="background:linear-gradient(200deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block color customization sets a gradient background color 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"gradient":"light-green-cyan-to-vivid-green-cyan"} /--></div>
+<div class="wp-block-buttons"><!-- wp:button {"gradient":"light-green-cyan-to-vivid-green-cyan"} -->
+<div class="wp-block-button"><a class="wp-block-button__link has-light-green-cyan-to-vivid-green-cyan-gradient-background has-background wp-element-button" href=""></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block color customization sets a text color 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"textColor":"pale-pink"} /--></div>
+<div class="wp-block-buttons"><!-- wp:button {"textColor":"pale-pink"} -->
+<div class="wp-block-button"><a class="wp-block-button__link has-pale-pink-color has-text-color wp-element-button" href=""></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block justify content sets Justify items center option 1`] = `
 "<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
-<div class="wp-block-buttons"><!-- wp:button /--></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block justify content sets Justify items left option 1`] = `
 "<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"left"}} -->
-<div class="wp-block-buttons"><!-- wp:button /--></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block justify content sets Justify items right option 1`] = `
 "<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"right"}} -->
-<div class="wp-block-buttons"><!-- wp:button /--></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;
 
 exports[`Buttons block when a button is shown adds another button using the inline appender 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button /-->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href=""></a></div>
+<!-- /wp:button -->
 
-<!-- wp:button /--></div>
+<!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href=""></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->
 
 <!-- wp:paragraph -->
@@ -56,7 +74,9 @@ exports[`Buttons block when a button is shown adds another button using the inli
 
 exports[`Buttons block when a button is shown adds another button using the inserter 1`] = `
 "<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button /-->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href=""></a></div>
+<!-- /wp:button -->
 
 <!-- wp:button -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Hello!</a></div>

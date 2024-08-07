@@ -162,22 +162,6 @@
 	}
 }
 
-@mixin placeholder-style() {
-	border-radius: $radius-block-ui;
-
-	&::before {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		pointer-events: none;
-		background: currentColor;
-		opacity: 0.1;
-	}
-}
-
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
@@ -284,9 +268,8 @@
 			display: inline-block;
 			vertical-align: middle;
 			width: 16px;
-			/* stylelint-disable */
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
 			font: normal 30px/1 dashicons;
-			/* stylelint-enable */
 			speak: none;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -317,17 +300,25 @@
 	border-radius: $radius-round;
 	width: $radio-input-size-sm;
 	height: $radio-input-size-sm;
+	min-width: $radio-input-size-sm;
+	max-width: $radio-input-size-sm;
+	position: relative;
 
 	@include break-small() {
 		height: $radio-input-size;
 		width: $radio-input-size;
+		min-width: $radio-input-size;
+		max-width: $radio-input-size;
 	}
 
 	&:checked::before {
 		box-sizing: inherit;
-		width: 8px;
-		height: 8px;
-		transform: translate(7px, 7px);
+		width: math.div($radio-input-size-sm, 2);
+		height: math.div($radio-input-size-sm, 2);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		margin: 0;
 		background-color: $white;
 
@@ -335,7 +326,8 @@
 		border: 4px solid $white;
 
 		@include break-small() {
-			transform: translate(5px, 5px);
+			width: math.div($radio-input-size, 2);
+			height: math.div($radio-input-size, 2);
 		}
 	}
 
@@ -348,7 +340,7 @@
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
+		border: none;
 	}
 }
 
@@ -518,12 +510,9 @@
 
 // Deprecated from UI, kept for back-compat.
 @mixin gradient-colors-deprecated() {
-	/*
-	 * Our classes uses the same values we set for gradient value attributes,
-	 * and we can not use spacing because of WP multi site kses rule.
-	 */
+	// Our classes uses the same values we set for gradient value attributes.
 
-	/* stylelint-disable function-comma-space-after */
+	/* stylelint-disable function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
 	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
 		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}
@@ -596,4 +585,22 @@
 			scrollbar-color: $handle-color-hover transparent;
 		}
 	}
+}
+
+@mixin selected-block-outline($widthRatio: 1) {
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+}
+
+@mixin selected-block-focus($widthRatio: 1) {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	@include selected-block-outline($widthRatio);
 }

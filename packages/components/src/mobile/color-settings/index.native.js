@@ -7,7 +7,6 @@ import { useRoute } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { memo, useEffect, useContext } from '@wordpress/element';
-import { BottomSheetContext, BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,6 +14,8 @@ import { BottomSheetContext, BottomSheet } from '@wordpress/components';
 import PickerScreen from './picker-screen';
 import GradientPickerScreen from './gradient-picker-screen';
 import PaletteScreen from './palette.screen';
+import BottomSheet from '../bottom-sheet';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
 import { colorsUtils } from './utils';
 

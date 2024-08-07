@@ -183,8 +183,9 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
-		const postStatusButton = page.locator( '.editor-post-status-trigger' );
-		await postStatusButton.click();
+		await page
+			.getByRole( 'button', { name: 'Change post status:' } )
+			.click();
 		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

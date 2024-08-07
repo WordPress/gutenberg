@@ -367,7 +367,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					label="Item for alternate panel"
 					onDeselect={ () => undefined }
 					resetAllFilter={ () => undefined }
-					panelId={ 'intended-for-another-panel-via-shared-slot' }
+					panelId="intended-for-another-panel-via-shared-slot"
 				>
 					<p>
 						This panel item will not be displayed in the demo as its

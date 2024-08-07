@@ -20,7 +20,6 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			background: {
 				backgroundImage: {
 					url: 'https://example.com/image.jpg',
-					source: 'file',
 				},
 				backgroundSize: 'contain',
 				backgroundPosition: '30% 30%',
@@ -96,7 +95,6 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			background: {
 				backgroundImage: {
 					url: 'https://example.com/image_new.jpg',
-					source: 'file',
 				},
 				backgroundSize: 'contain',
 				backgroundPosition: '40% 77%',

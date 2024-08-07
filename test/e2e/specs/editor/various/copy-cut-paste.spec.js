@@ -494,6 +494,32 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'should paste list in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<ul><li>x</li><li>y</li></ul>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste paragraphs in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<p>x</p><p>y</p>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'should link selection', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -636,6 +662,42 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'b]',
+				},
+			},
+		] );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/61900
+	test( 'should inherit heading attributes on paste split', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+
+		pageUtils.setClipboardData( {
+			html: '<p>a</p><p>b</p>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Aa',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'bB',
 				},
 			},
 		] );

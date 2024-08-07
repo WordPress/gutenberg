@@ -9,7 +9,6 @@ import namesPlugin from 'colord/plugins/names';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { Icon, check, close } from '@wordpress/icons';
 /**
@@ -17,6 +16,7 @@ import { Icon, check, close } from '@wordpress/icons';
  */
 import styles from './style.scss';
 import HsvColorPicker from './hsv-color-picker.native.js';
+import BottomSheet from '../mobile/bottom-sheet';
 
 extend( [ namesPlugin ] );
 

@@ -9,6 +9,14 @@ import { useSelect } from '@wordpress/data';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
+/**
+ * Wrapper component that renders its children if the post has more than one revision.
+ *
+ * @param {Object}  props          Props.
+ * @param {Element} props.children Children to be rendered.
+ *
+ * @return {Component|null} Rendered child components if post has more than one revision, otherwise null.
+ */
 function PostLastRevisionCheck( { children } ) {
 	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
 		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =

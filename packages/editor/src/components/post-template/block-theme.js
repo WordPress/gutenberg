@@ -53,7 +53,11 @@ export default function BlockThemeControl( { id } ) {
 
 	const canCreateTemplate = useSelect(
 		( select ) =>
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+			!! select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+		[]
 	);
 
 	if ( ! hasResolved ) {
@@ -78,6 +82,7 @@ export default function BlockThemeControl( { id } ) {
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
+				tooltipPosition: 'middle left',
 			} }
 			label={ __( 'Template options' ) }
 			text={ decodeEntities( template.title ) }

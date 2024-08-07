@@ -5,7 +5,7 @@ import postcss, { CssSyntaxError } from 'postcss';
 import wrap from 'postcss-prefixwrap';
 import rebaseUrl from 'postcss-urlrebase';
 
-const transformStylesCache = new WeakMap();
+const cacheByWrapperSelector = new Map();
 
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
@@ -18,8 +18,9 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
-
-	const postcssFriendlyCSS = css.replace( ':where(body)', 'body' );
+	const postcssFriendlyCSS = css
+		.replace( /:root :where\(body\)/g, 'body' )
+		.replace( /:where\(body\)/g, 'body' );
 	try {
 		return postcss(
 			[
@@ -65,14 +66,18 @@ function transformStyle(
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperSelector = '' ) => {
+	let cache = cacheByWrapperSelector.get( wrapperSelector );
+	if ( ! cache ) {
+		cache = new WeakMap();
+		cacheByWrapperSelector.set( wrapperSelector, cache );
+	}
 	return styles.map( ( style ) => {
-		if ( transformStylesCache.has( style ) ) {
-			return transformStylesCache.get( style );
+		let css = cache.get( style );
+		if ( ! css ) {
+			css = transformStyle( style, wrapperSelector );
+			cache.set( style, css );
 		}
-
-		const transformedStyle = transformStyle( style, wrapperSelector );
-		transformStylesCache.set( style, transformedStyle );
-		return transformedStyle;
+		return css;
 	} );
 };
 

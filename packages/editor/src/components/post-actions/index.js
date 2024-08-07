@@ -10,6 +10,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -17,11 +18,6 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-} from '../../store/constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,52 +27,41 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-let POST_ACTIONS_WHILE_EDITING = [
-	'view-post',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
-	POST_ACTIONS_WHILE_EDITING = [
-		'view-post',
-		'view-post-revisions',
-		'duplicate-post',
-		'rename-post',
-		'move-to-trash',
-	];
-}
-
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { postType, item } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPost } = select( editorStore );
+	const { item, permissions, postType } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		const { getEditedEntityRecord, getEntityRecordPermissions } = unlock(
+			select( coreStore )
+		);
+		const _postType = getCurrentPostType();
+		const _id = getCurrentPostId();
 		return {
-			postType: getCurrentPostType(),
-			item: getCurrentPost(),
+			item: getEditedEntityRecord( 'postType', _postType, _id ),
+			permissions: getEntityRecordPermissions(
+				'postType',
+				_postType,
+				_id
+			),
+			postType: _postType,
 		};
-	} );
-	const allActions = usePostActions(
-		onActionPerformed,
-		POST_ACTIONS_WHILE_EDITING
-	);
+	}, [] );
+	const itemWithPermissions = useMemo( () => {
+		return {
+			...item,
+			permissions,
+		};
+	}, [ item, permissions ] );
+	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
-			return ! action.isEligible || action.isEligible( item );
+			return (
+				! action.isEligible || action.isEligible( itemWithPermissions )
+			);
 		} );
-	}, [ allActions, item ] );
+	}, [ allActions, itemWithPermissions ] );
 
-	if (
-		[
-			TEMPLATE_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType )
-	) {
-		return null;
-	}
 	return (
 		<DropdownMenu
 			open={ isActionsMenuOpen }
@@ -86,6 +71,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={ ! actions.length }
+					accessibleWhenDisabled
 					className="editor-all-actions-button"
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
@@ -98,7 +84,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		>
 			<ActionsDropdownMenuGroup
 				actions={ actions }
-				item={ item }
+				item={ itemWithPermissions }
 				onClose={ () => {
 					setIsActionsMenuOpen( false );
 				} }
@@ -113,13 +99,15 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 // so duplicating the code here seems like the least bad option.
 
 // Copied as is from packages/dataviews/src/item-actions.js
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( { action, onClick, items } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! action.RenderModal }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -131,6 +119,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
+		items: [ item ],
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -146,6 +135,8 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenderModal
 						items={ [ item ] }
@@ -182,6 +173,7 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						items={ [ item ] }
 					/>
 				);
 			} ) }

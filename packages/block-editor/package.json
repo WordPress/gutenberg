@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "12.25.0",
+	"version": "13.4.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -73,7 +74,7 @@
 		"memize": "^2.1.0",
 		"postcss": "^8.4.21",
 		"postcss-prefixwrap": "^1.41.0",
-		"postcss-urlrebase": "^1.0.0",
+		"postcss-urlrebase": "^1.4.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^5.0.6",
 		"remove-accents": "^0.5.0"

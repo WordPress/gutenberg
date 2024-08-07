@@ -5,6 +5,15 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 
+/**
+ * Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
+ *
+ * @return {Object} An object containing the following properties:
+ *   - dirtyEntityRecords: An array of dirty entity records.
+ *   - isDirty: A boolean indicating if there are any dirty entity records.
+ *   - setUnselectedEntities: A function to set the unselected entities.
+ *   - unselectedEntities: An array of unselected entities.
+ */
 export const useIsDirty = () => {
 	const { editedEntities, siteEdits, siteEntityConfig } = useSelect(
 		( select ) => {

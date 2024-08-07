@@ -78,10 +78,12 @@ const getIndexOfMatchingSuggestion = (
  * 	{
  * 		value: 'normal',
  * 		label: 'Normal',
+ * 		disabled: true,
  * 	},
  * 	{
  * 		value: 'large',
  * 		label: 'Large',
+ * 		disabled: false,
  * 	},
  * ];
  *
@@ -90,6 +92,7 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
+ * 			__nextHasNoMarginBottom
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -125,6 +128,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			selected: __( 'Item selected.' ),
 		},
 		__experimentalRenderItem,
+		expandOnFocus = true,
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -165,6 +169,10 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const onSuggestionSelected = (
 		newSelectedSuggestion: ComboboxControlOption
 	) => {
+		if ( newSelectedSuggestion.disabled ) {
+			return;
+		}
+
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
@@ -230,9 +238,16 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	const onFocus = () => {
 		setInputHasFocus( true );
-		setIsExpanded( true );
+		if ( expandOnFocus ) {
+			setIsExpanded( true );
+		}
+
 		onFilterValueChange( '' );
 		setInputValue( '' );
+	};
+
+	const onClick = () => {
+		setIsExpanded( true );
 	};
 
 	const onFocusOutside = () => {
@@ -251,6 +266,15 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const handleOnReset = () => {
 		setValue( null );
 		inputContainer.current?.focus();
+	};
+
+	// Stop propagation of the keydown event when pressing Enter on the Reset
+	// button to prevent calling the onKeydown callback on the container div
+	// element which actually sets the selected suggestion.
+	const handleResetStopPropagation: React.KeyboardEventHandler<
+		HTMLButtonElement
+	> = ( event ) => {
+		event.stopPropagation();
 	};
 
 	// Update current selections when the filter input changes.
@@ -318,6 +342,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								value={ isExpanded ? inputValue : currentLabel }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
+								onClick={ onClick }
 								isExpanded={ isExpanded }
 								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
 									selectedSuggestion,
@@ -331,8 +356,11 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								<Button
 									className="components-combobox-control__reset"
 									icon={ closeSmall }
+									// Disable reason: Focus returns to input field when reset is clicked.
+									// eslint-disable-next-line no-restricted-syntax
 									disabled={ ! value }
 									onClick={ handleOnReset }
+									onKeyDown={ handleResetStopPropagation }
 									label={ __( 'Reset' ) }
 								/>
 							</FlexItem>

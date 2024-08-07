@@ -1,19 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, edit, backup } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState } from '@wordpress/element';
-
+import { useMemo, useState, useEffect } from '@wordpress/element';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { parse } from '@wordpress/blocks';
+import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
-	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -21,347 +22,62 @@ import {
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import isTemplateRevertable from '../../store/utils/is-template-revertable';
+import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
-function getItemTitle( item ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
-	}
-	return decodeEntities( item.title?.rendered || '' );
-}
+// Patterns.
+const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
+	unlock( patternsPrivateApis );
 
-const trashPostAction = {
-	id: 'move-to-trash',
-	label: __( 'Move to Trash' ),
-	isPrimary: true,
-	icon: trash,
-	isEligible( { status } ) {
-		return status !== 'trash';
+// TODO: this should be shared with other components (see post-fields in edit-site).
+const fields = [
+	{
+		type: 'text',
+		id: 'title',
+		label: __( 'Title' ),
+		placeholder: __( 'No title' ),
+		getValue: ( { item } ) => item.title,
 	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal, onActionPerformed } ) => {
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const { deleteEntityRecord } = useDispatch( coreStore );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ posts.length === 1
-						? sprintf(
-								// translators: %s: The page's title.
-								__( 'Are you sure you want to delete "%s"?' ),
-								getItemTitle( posts[ 0 ] )
-						  )
-						: sprintf(
-								// translators: %d: The number of pages (2 or more).
-								_n(
-									'Are you sure you want to delete %d page?',
-									'Are you sure you want to delete %d pages?',
-									posts.length
-								),
-								posts.length
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							const promiseResult = await Promise.allSettled(
-								posts.map( ( post ) => {
-									return deleteEntityRecord(
-										'postType',
-										post.type,
-										post.id,
-										{},
-										{ throwOnError: true }
-									);
-								} )
-							);
-							// If all the promises were fulfilled with success.
-							if (
-								promiseResult.every(
-									( { status } ) => status === 'fulfilled'
-								)
-							) {
-								let successMessage;
-								if ( promiseResult.length === 1 ) {
-									successMessage = sprintf(
-										/* translators: The posts's title. */
-										__( '"%s" moved to the Trash.' ),
-										getItemTitle( posts[ 0 ] )
-									);
-								} else {
-									successMessage = __(
-										'Pages moved to the Trash.'
-									);
-								}
-								createSuccessNotice( successMessage, {
-									type: 'snackbar',
-									id: 'trash-post-action',
-								} );
-							} else {
-								// If there was at lease one failure.
-								let errorMessage;
-								// If we were trying to move a single post to the trash.
-								if ( promiseResult.length === 1 ) {
-									if ( promiseResult[ 0 ].reason?.message ) {
-										errorMessage =
-											promiseResult[ 0 ].reason.message;
-									} else {
-										errorMessage = __(
-											'An error occurred while moving the post to the trash.'
-										);
-									}
-									// If we were trying to move multiple posts to the trash
-								} else {
-									const errorMessages = new Set();
-									const failedPromises = promiseResult.filter(
-										( { status } ) => status === 'rejected'
-									);
-									for ( const failedPromise of failedPromises ) {
-										if ( failedPromise.reason?.message ) {
-											errorMessages.add(
-												failedPromise.reason.message
-											);
-										}
-									}
-									if ( errorMessages.size === 0 ) {
-										errorMessage = __(
-											'An error occurred while moving the posts to the trash.'
-										);
-									} else if ( errorMessages.size === 1 ) {
-										errorMessage = sprintf(
-											/* translators: %s: an error message */
-											__(
-												'An error occurred while moving the posts to the trash: %s'
-											),
-											[ ...errorMessages ][ 0 ]
-										);
-									} else {
-										errorMessage = sprintf(
-											/* translators: %s: a list of comma separated error messages */
-											__(
-												'Some errors occurred while moving the pages to the trash: %s'
-											),
-											[ ...errorMessages ].join( ',' )
-										);
-									}
-								}
-								createErrorNotice( errorMessage, {
-									type: 'snackbar',
-								} );
-							}
-							if ( onActionPerformed ) {
-								onActionPerformed( posts );
-							}
-							closeModal();
-						} }
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
+	{
+		type: 'integer',
+		id: 'menu_order',
+		label: __( 'Order' ),
+		description: __( 'Determines the order of pages.' ),
 	},
+];
+
+const formDuplicateAction = {
+	visibleFields: [ 'title' ],
 };
 
-function usePermanentlyDeletePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { deleteEntityRecord } = useDispatch( coreStore );
+const formOrderAction = {
+	visibleFields: [ 'menu_order' ],
+};
 
-	return useMemo(
-		() => ( {
-			id: 'permanently-delete',
-			label: __( 'Permanently delete' ),
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				const promiseResult = await Promise.allSettled(
-					posts.map( ( post ) => {
-						return deleteEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ force: true },
-							{ throwOnError: true }
-						);
-					} )
-				);
-				// If all the promises were fulfilled with success.
-				if (
-					promiseResult.every(
-						( { status } ) => status === 'fulfilled'
-					)
-				) {
-					let successMessage;
-					if ( promiseResult.length === 1 ) {
-						successMessage = sprintf(
-							/* translators: The posts's title. */
-							__( '"%s" permanently deleted.' ),
-							getItemTitle( posts[ 0 ] )
-						);
-					} else {
-						successMessage = __(
-							'The posts were permanently deleted.'
-						);
-					}
-					createSuccessNotice( successMessage, {
-						type: 'snackbar',
-						id: 'permanently-delete-post-action',
-					} );
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
-				} else {
-					// If there was at lease one failure.
-					let errorMessage;
-					// If we were trying to permanently delete a single post.
-					if ( promiseResult.length === 1 ) {
-						if ( promiseResult[ 0 ].reason?.message ) {
-							errorMessage = promiseResult[ 0 ].reason.message;
-						} else {
-							errorMessage = __(
-								'An error occurred while permanently deleting the post.'
-							);
-						}
-						// If we were trying to permanently delete multiple posts
-					} else {
-						const errorMessages = new Set();
-						const failedPromises = promiseResult.filter(
-							( { status } ) => status === 'rejected'
-						);
-						for ( const failedPromise of failedPromises ) {
-							if ( failedPromise.reason?.message ) {
-								errorMessages.add(
-									failedPromise.reason.message
-								);
-							}
-						}
-						if ( errorMessages.size === 0 ) {
-							errorMessage = __(
-								'An error occurred while permanently deleting the posts.'
-							);
-						} else if ( errorMessages.size === 1 ) {
-							errorMessage = sprintf(
-								/* translators: %s: an error message */
-								__(
-									'An error occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ][ 0 ]
-							);
-						} else {
-							errorMessage = sprintf(
-								/* translators: %s: a list of comma separated error messages */
-								__(
-									'Some errors occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ].join( ',' )
-							);
-						}
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
-				}
-			},
-		} ),
-		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
-	);
-}
-
-function useRestorePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-
-	return useMemo(
-		() => ( {
-			id: 'restore',
-			label: __( 'Restore' ),
-			isPrimary: true,
-			icon: backup,
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				try {
-					for ( const post of posts ) {
-						await editEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{
-								status: 'draft',
-							}
-						);
-						await saveEditedEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ throwOnError: true }
-						);
-					}
-
-					createSuccessNotice(
-						posts.length > 1
-							? sprintf(
-									/* translators: The number of posts. */
-									__( '%d posts have been restored.' ),
-									posts.length
-							  )
-							: sprintf(
-									/* translators: The number of posts. */
-									__( '"%s" has been restored.' ),
-									getItemTitle( posts[ 0 ] )
-							  ),
-						{
-							type: 'snackbar',
-							id: 'restore-post-action',
-						}
-					);
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
-				} catch ( error ) {
-					let errorMessage;
-					if (
-						error.message &&
-						error.code !== 'unknown_error' &&
-						error.message
-					) {
-						errorMessage = error.message;
-					} else if ( posts.length > 1 ) {
-						errorMessage = __(
-							'An error occurred while restoring the posts.'
-						);
-					} else {
-						errorMessage = __(
-							'An error occurred while restoring the post.'
-						);
-					}
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
-				}
-			},
-		} ),
-		[
-			createSuccessNotice,
-			createErrorNotice,
-			editEntityRecord,
-			saveEditedEntityRecord,
-		]
+/**
+ * Check if a template is removable.
+ *
+ * @param {Object} template The template entity to check.
+ * @return {boolean} Whether the template is removable.
+ */
+function isTemplateRemovable( template ) {
+	if ( ! template ) {
+		return false;
+	}
+	// In patterns list page we map the templates parts to a different object
+	// than the one returned from the endpoint. This is why we need to check for
+	// two props whether is custom or has a theme file.
+	return (
+		template?.source === TEMPLATE_ORIGINS.custom &&
+		! template?.has_theme_file
 	);
 }
 
@@ -373,7 +89,7 @@ const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		window.open( post.link, '_blank' );
 		if ( onActionPerformed ) {
@@ -382,24 +98,18 @@ const viewPostAction = {
 	},
 };
 
-const editPostAction = {
-	id: 'edit-post',
-	label: __( 'Edit' ),
-	isPrimary: true,
-	icon: edit,
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	callback( posts, onActionPerformed ) {
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
-	},
-};
 const postRevisionsAction = {
 	id: 'view-post-revisions',
-	label: __( 'View revisions' ),
-	isPrimary: false,
+	context: 'list',
+	label( items ) {
+		const revisionsCount =
+			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
+		return sprintf(
+			/* translators: %s: number of revisions */
+			__( 'View revisions (%s)' ),
+			revisionsCount
+		);
+	},
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;
@@ -410,7 +120,7 @@ const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
@@ -426,14 +136,42 @@ const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
-		return post.status !== 'trash';
+		if ( post.status === 'trash' ) {
+			return false;
+		}
+		// Templates, template parts and patterns have special checks for renaming.
+		if (
+			! [
+				TEMPLATE_POST_TYPE,
+				TEMPLATE_PART_POST_TYPE,
+				...Object.values( PATTERN_TYPES ),
+			].includes( post.type )
+		) {
+			return post.permissions?.update;
+		}
+		// In the case of templates, we can only rename custom templates.
+		if ( post.type === TEMPLATE_POST_TYPE ) {
+			return (
+				isTemplateRemovable( post ) &&
+				post.is_custom &&
+				post.permissions?.update
+			);
+		}
+		// Make necessary checks for template parts and patterns.
+		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
+		const isUserPattern = post.type === PATTERN_TYPES.user;
+		// In patterns list page we map the templates parts to a different object
+		// than the one returned from the endpoint. This is why we need to check for
+		// two props whether is custom or has a theme file.
+		const isCustomPattern =
+			isUserPattern ||
+			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
+		const hasThemeFile = post?.has_theme_file;
+		return isCustomPattern && ! hasThemeFile && post.permissions?.update;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const originalTitle = decodeEntities(
-			typeof item.title === 'string' ? item.title : item.title.rendered
-		);
-		const [ title, setTitle ] = useState( () => originalTitle );
+		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -500,478 +238,466 @@ const renamePostAction = {
 	},
 };
 
-export const duplicatePostAction = {
-	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item ] = items;
-		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-		const [ title, setTitle ] = useState(
-			sprintf(
-				/* translators: %s: Existing item title */
-				__( '%s (Copy)' ),
-				getItemTitle( item )
-			)
-		);
+function ReorderModal( { items, closeModal, onActionPerformed } ) {
+	const [ item, setItem ] = useState( items[ 0 ] );
+	const orderInput = item.menu_order;
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
-		const { saveEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
+	async function onOrder( event ) {
+		event.preventDefault();
 
-		async function createPage( event ) {
-			event.preventDefault();
-
-			if ( isCreatingPage ) {
-				return;
-			}
-			setIsCreatingPage( true );
-			try {
-				const newItem = await saveEntityRecord(
-					'postType',
-					item.type,
-					{
-						status: 'draft',
-						title,
-						slug: title || __( 'No title' ),
-						author: item.author,
-						comment_status: item.comment_status,
-						content:
-							typeof item.content === 'string'
-								? item.content
-								: item.content.raw,
-						excerpt: item.excerpt.raw,
-						meta: item.meta,
-						parent: item.parent,
-						password: item.password,
-						template: item.template,
-						format: item.format,
-						featured_media: item.featured_media,
-						menu_order: item.menu_order,
-						ping_status: item.ping_status,
-						categories: item.categories,
-						tags: item.tags,
-					},
-					{ throwOnError: true }
-				);
-
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: Title of the created template e.g: "Category".
-						__( '"%s" successfully created.' ),
-						newItem.title?.rendered || title
-					),
-					{
-						id: 'duplicate-post-action',
-						type: 'snackbar',
-					}
-				);
-
-				if ( onActionPerformed ) {
-					onActionPerformed( [ newItem ] );
-				}
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while duplicating the page.' );
-
-				createErrorNotice( errorMessage, {
-					type: 'snackbar',
-				} );
-			} finally {
-				setIsCreatingPage( false );
-				closeModal();
-			}
+		if ( ! isItemValid( item, fields, formOrderAction ) ) {
+			return;
 		}
-		return (
-			<form onSubmit={ createPage }>
-				<VStack spacing={ 3 }>
-					<TextControl
-						label={ __( 'Title' ) }
-						onChange={ setTitle }
-						placeholder={ __( 'No title' ) }
-						value={ title }
-					/>
-					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							isBusy={ isCreatingPage }
-							aria-disabled={ isCreatingPage }
-						>
-							{ _x( 'Duplicate', 'action label' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
-};
 
-const resetTemplateAction = {
-	id: 'reset-template',
-	label: __( 'Reset' ),
-	isEligible: isTemplateRevertable,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const { revertTemplate } = unlock( useDispatch( editorStore ) );
-		const { saveEditedEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const onConfirm = async () => {
-			try {
-				for ( const template of items ) {
-					await revertTemplate( template, {
-						allowUndo: false,
-					} );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
-					);
-				}
-
-				createSuccessNotice(
-					items.length > 1
-						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
-								items.length
-						  )
-						: sprintf(
-								/* translators: The template/part's name. */
-								__( '"%s" reset.' ),
-								decodeEntities( items[ 0 ].title.rendered )
-						  ),
-					{
-						type: 'snackbar',
-						id: 'revert-template-action',
-					}
-				);
-			} catch ( error ) {
-				let fallbackErrorMessage;
-				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template.'
-							  )
-							: __(
-									'An error occurred while reverting the templates.'
-							  );
-				} else {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template part.'
-							  )
-							: __(
-									'An error occurred while reverting the template parts.'
-							  );
-				}
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		};
-		return (
+		try {
+			await editEntityRecord( 'postType', item.type, item.id, {
+				menu_order: orderInput,
+			} );
+			closeModal();
+			// Persist edited entity.
+			await saveEditedEntityRecord( 'postType', item.type, item.id, {
+				throwOnError: true,
+			} );
+			createSuccessNotice( __( 'Order updated' ), {
+				type: 'snackbar',
+			} );
+			onActionPerformed?.( items );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while updating the order' );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	}
+	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
+	return (
+		<form onSubmit={ onOrder }>
 			<VStack spacing="5">
-				<Text>
-					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
+				<div>
+					{ __(
+						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
+					) }
+				</div>
+				<DataForm
+					data={ item }
+					fields={ fields }
+					form={ formOrderAction }
+					onChange={ setItem }
+				/>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
-						{ __( 'Cancel' ) }
-					</Button>
 					<Button
-						variant="primary"
-						onClick={ async () => {
-							await onConfirm( items );
-							onActionPerformed?.( items );
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ () => {
 							closeModal();
 						} }
 					>
-						{ __( 'Reset' ) }
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						accessibleWhenDisabled
+						disabled={ isSaveDisabled }
+						__experimentalIsFocusable
+					>
+						{ __( 'Save' ) }
 					</Button>
 				</HStack>
 			</VStack>
-		);
-	},
-};
-
-/**
- * Check if a template is removable.
- * Copy from packages/edit-site/src/utils/is-template-removable.js.
- *
- * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is revertable.
- */
-function isTemplateRemovable( template ) {
-	if ( ! template ) {
-		return false;
-	}
-
-	return (
-		template.source === TEMPLATE_ORIGINS.custom && ! template.has_theme_file
+		</form>
 	);
 }
 
-const deleteTemplateAction = {
-	id: 'delete-template',
-	label: __( 'Delete' ),
-	isEligible: isTemplateRemovable,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ templates.length > 1
-						? sprintf(
-								// translators: %d: number of items to delete.
-								_n(
-									'Delete %d item?',
-									'Delete %d items?',
-									templates.length
-								),
-								templates.length
-						  )
-						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
-								decodeEntities(
-									templates?.[ 0 ]?.title?.rendered
-								)
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							await removeTemplates( templates, {
-								allowUndo: false,
-							} );
-							onActionPerformed?.( templates );
-							closeModal();
-						} }
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
+function useReorderPagesAction( postType ) {
+	const supportsPageAttributes = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			const postTypeObject = getPostType( postType );
 
-const renameTemplateAction = {
-	id: 'rename-template',
-	label: __( 'Rename' ),
-	isEligible: ( template ) => {
-		// We can only remove templates or template parts that can be removed.
-		// Additionally in the case of templates, we can only remove custom templates.
-		if (
-			! isTemplateRemovable( template ) ||
-			( template.type === TEMPLATE_POST_TYPE && ! template.is_custom )
-		) {
-			return false;
-		}
-		return true;
-	},
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
-		const template = templates[ 0 ];
-		const title = decodeEntities( template.title.rendered );
-		const [ editedTitle, setEditedTitle ] = useState( title );
-		const {
-			editEntityRecord,
-			__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-		} = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		async function onTemplateRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord(
-					'postType',
-					template.type,
-					template.id,
-					{
-						title: editedTitle,
-					}
-				);
-				// Update state before saving rerenders the list.
-				setEditedTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveSpecifiedEntityEdits(
-					'postType',
-					template.type,
-					template.id,
-					[ 'title' ], // Only save title to avoid persisting other edits.
-					{
-						throwOnError: true,
-					}
-				);
-				createSuccessNotice(
-					template.type === TEMPLATE_POST_TYPE
-						? __( 'Template renamed.' )
-						: __( 'Template part renamed.' ),
-					{
-						type: 'snackbar',
-					}
-				);
-				onActionPerformed?.( templates );
-			} catch ( error ) {
-				const fallbackErrorMessage =
-					template.type === TEMPLATE_POST_TYPE
-						? __( 'An error occurred while renaming the template.' )
-						: __(
-								'An error occurred while renaming the template part.'
-						  );
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
+			return !! postTypeObject?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
 
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-		return (
-			<form onSubmit={ onTemplateRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ editedTitle }
-						onChange={ setEditedTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							variant="tertiary"
-							onClick={ closeModal }
-							__next40pxDefaultSize
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							__next40pxDefaultSize
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
-};
-
-export function usePostActions( onActionPerformed, actionIds = null ) {
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
 	return useMemo(
-		() => {
-			// By default, return all actions...
-			const defaultActions = [
-				editPostAction,
-				resetTemplateAction,
-				viewPostAction,
-				restorePostAction,
-				deleteTemplateAction,
-				permanentlyDeletePostAction,
-				postRevisionsAction,
-				duplicatePostAction,
-				renamePostAction,
-				renameTemplateAction,
-				trashPostAction,
-			];
+		() =>
+			supportsPageAttributes && {
+				id: 'order-pages',
+				label: __( 'Order' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ReorderModal,
+			},
+		[ supportsPageAttributes ]
+	);
+}
 
-			// ... unless `actionIds` was specified, in which case we find the
-			// actions matching the given IDs.
-			const actions = actionIds
-				? actionIds.map( ( actionId ) =>
-						defaultActions.find( ( { id } ) => actionId === id )
-				  )
-				: defaultActions;
+const useDuplicatePostAction = ( postType ) => {
+	const userCanCreatePost = useSelect(
+		( select ) => {
+			return select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
+		},
+		[ postType ]
+	);
+	return useMemo(
+		() =>
+			userCanCreatePost && {
+				id: 'duplicate-post',
+				label: _x( 'Duplicate', 'action label' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+					const [ item, setItem ] = useState( {
+						...items[ 0 ],
+						title: sprintf(
+							/* translators: %s: Existing template title */
+							__( '%s (Copy)' ),
+							getItemTitle( items[ 0 ] )
+						),
+					} );
 
-			if ( onActionPerformed ) {
-				for ( let i = 0; i < actions.length; ++i ) {
-					if ( actions[ i ].callback ) {
-						const existingCallback = actions[ i ].callback;
-						actions[ i ] = {
-							...actions[ i ],
-							callback: ( items, _onActionPerformed ) => {
-								existingCallback( items, ( _items ) => {
-									if ( _onActionPerformed ) {
-										_onActionPerformed( _items );
+					const [ isCreatingPage, setIsCreatingPage ] =
+						useState( false );
+
+					const { saveEntityRecord } = useDispatch( coreStore );
+					const { createSuccessNotice, createErrorNotice } =
+						useDispatch( noticesStore );
+
+					async function createPage( event ) {
+						event.preventDefault();
+
+						if ( isCreatingPage ) {
+							return;
+						}
+
+						const newItemOject = {
+							status: 'draft',
+							title: item.title,
+							slug: item.title || __( 'No title' ),
+							comment_status: item.comment_status,
+							content:
+								typeof item.content === 'string'
+									? item.content
+									: item.content.raw,
+							excerpt: item.excerpt.raw,
+							meta: item.meta,
+							parent: item.parent,
+							password: item.password,
+							template: item.template,
+							format: item.format,
+							featured_media: item.featured_media,
+							menu_order: item.menu_order,
+							ping_status: item.ping_status,
+						};
+						const assignablePropertiesPrefix = 'wp:action-assign-';
+						// Get all the properties that the current user is able to assign normally author, categories, tags,
+						// and custom taxonomies.
+						const assignableProperties = Object.keys(
+							item?._links || {}
+						)
+							.filter( ( property ) =>
+								property.startsWith(
+									assignablePropertiesPrefix
+								)
+							)
+							.map( ( property ) =>
+								property.slice(
+									assignablePropertiesPrefix.length
+								)
+							);
+						assignableProperties.forEach( ( property ) => {
+							if ( item[ property ] ) {
+								newItemOject[ property ] = item[ property ];
+							}
+						} );
+						setIsCreatingPage( true );
+						try {
+							const newItem = await saveEntityRecord(
+								'postType',
+								item.type,
+								newItemOject,
+								{ throwOnError: true }
+							);
+
+							createSuccessNotice(
+								sprintf(
+									// translators: %s: Title of the created template e.g: "Category".
+									__( '"%s" successfully created.' ),
+									decodeEntities(
+										newItem.title?.rendered || item.title
+									)
+								),
+								{
+									id: 'duplicate-post-action',
+									type: 'snackbar',
+								}
+							);
+
+							if ( onActionPerformed ) {
+								onActionPerformed( [ newItem ] );
+							}
+						} catch ( error ) {
+							const errorMessage =
+								error.message && error.code !== 'unknown_error'
+									? error.message
+									: __(
+											'An error occurred while duplicating the page.'
+									  );
+
+							createErrorNotice( errorMessage, {
+								type: 'snackbar',
+							} );
+						} finally {
+							setIsCreatingPage( false );
+							closeModal();
+						}
+					}
+
+					return (
+						<form onSubmit={ createPage }>
+							<VStack spacing={ 3 }>
+								<DataForm
+									data={ item }
+									fields={ fields }
+									form={ formDuplicateAction }
+									onChange={ setItem }
+								/>
+								<HStack spacing={ 2 } justify="end">
+									<Button
+										variant="tertiary"
+										onClick={ closeModal }
+										__next40pxDefaultSize
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+									<Button
+										variant="primary"
+										type="submit"
+										isBusy={ isCreatingPage }
+										aria-disabled={ isCreatingPage }
+										__next40pxDefaultSize
+									>
+										{ _x( 'Duplicate', 'action label' ) }
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					);
+				},
+			},
+		[ userCanCreatePost ]
+	);
+};
+
+export const duplicatePatternAction = {
+	id: 'duplicate-pattern',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate pattern', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const duplicatedProps = useDuplicatePatternProps( {
+			pattern: item,
+			onSuccess: () => closeModal(),
+		} );
+		return (
+			<CreatePatternModalContents
+				onClose={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+				{ ...duplicatedProps }
+			/>
+		);
+	},
+};
+
+export const duplicateTemplatePartAction = {
+	id: 'duplicate-template-part',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate template part', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const blocks = useMemo( () => {
+			return (
+				item.blocks ??
+				parse(
+					typeof item.content === 'string'
+						? item.content
+						: item.content.raw,
+					{
+						__unstableSkipMigrationLogs: true,
+					}
+				)
+			);
+		}, [ item.content, item.blocks ] );
+		const { createSuccessNotice } = useDispatch( noticesStore );
+		function onTemplatePartSuccess() {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					getItemTitle( item )
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
+			closeModal();
+		}
+		return (
+			<CreateTemplatePartModalContents
+				blocks={ blocks }
+				defaultArea={ item.area }
+				defaultTitle={ sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					getItemTitle( item )
+				) }
+				onCreate={ onTemplatePartSuccess }
+				onError={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+			/>
+		);
+	},
+};
+
+export function usePostActions( { postType, onActionPerformed, context } ) {
+	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
+		( select ) => {
+			const { getPostType, canUser } = select( coreStore );
+			const { getEntityActions } = unlock( select( editorStore ) );
+			return {
+				postTypeObject: getPostType( postType ),
+				defaultActions: getEntityActions( 'postType', postType ),
+				userCanCreatePostType: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
+			};
+		},
+		[ postType ]
+	);
+	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		registerPostTypeActions( postType );
+	}, [ registerPostTypeActions, postType ] );
+
+	const duplicatePostAction = useDuplicatePostAction( postType );
+	const reorderPagesAction = useReorderPagesAction( postType );
+	const isTemplateOrTemplatePart = [
+		TEMPLATE_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+	].includes( postType );
+	const isPattern = postType === PATTERN_POST_TYPE;
+	const isLoaded = !! postTypeObject;
+	const supportsRevisions = !! postTypeObject?.supports?.revisions;
+	const supportsTitle = !! postTypeObject?.supports?.title;
+	return useMemo( () => {
+		if ( ! isLoaded ) {
+			return [];
+		}
+
+		let actions = [
+			postTypeObject?.viewable && viewPostAction,
+			supportsRevisions && postRevisionsAction,
+			globalThis.IS_GUTENBERG_PLUGIN
+				? ! isTemplateOrTemplatePart &&
+				  ! isPattern &&
+				  duplicatePostAction
+				: false,
+			isTemplateOrTemplatePart &&
+				userCanCreatePostType &&
+				duplicateTemplatePartAction,
+			isPattern && userCanCreatePostType && duplicatePatternAction,
+			supportsTitle && renamePostAction,
+			reorderPagesAction,
+			...defaultActions,
+		].filter( Boolean );
+		// Filter actions based on provided context. If not provided
+		// all actions are returned. We'll have a single entry for getting the actions
+		// and the consumer should provide the context to filter the actions, if needed.
+		// Actions should also provide the `context` they support, if it's specific, to
+		// compare with the provided context to get all the actions.
+		// Right now the only supported context is `list`.
+		actions = actions.filter( ( action ) => {
+			if ( ! action.context ) {
+				return true;
+			}
+			return action.context === context;
+		} );
+
+		if ( onActionPerformed ) {
+			for ( let i = 0; i < actions.length; ++i ) {
+				if ( actions[ i ].callback ) {
+					const existingCallback = actions[ i ].callback;
+					actions[ i ] = {
+						...actions[ i ],
+						callback: ( items, argsObject ) => {
+							existingCallback( items, {
+								...argsObject,
+								onActionPerformed: ( _items ) => {
+									if ( argsObject?.onActionPerformed ) {
+										argsObject.onActionPerformed( _items );
 									}
 									onActionPerformed(
 										actions[ i ].id,
 										_items
 									);
-								} );
-							},
-						};
-					}
-					if ( actions[ i ].RenderModal ) {
-						const ExistingRenderModal = actions[ i ].RenderModal;
-						actions[ i ] = {
-							...actions[ i ],
-							RenderModal: ( props ) => {
-								return (
-									<ExistingRenderModal
-										items={ props.items }
-										closeModal={ props.closeModal }
-										onActionPerformed={ ( _items ) => {
-											if ( props.onActionPerformed ) {
-												props.onActionPerformed(
-													_items
-												);
-											}
-											onActionPerformed(
-												actions[ i ].id,
-												_items
-											);
-										} }
-									/>
-								);
-							},
-						};
-					}
+								},
+							} );
+						},
+					};
+				}
+				if ( actions[ i ].RenderModal ) {
+					const ExistingRenderModal = actions[ i ].RenderModal;
+					actions[ i ] = {
+						...actions[ i ],
+						RenderModal: ( props ) => {
+							return (
+								<ExistingRenderModal
+									{ ...props }
+									onActionPerformed={ ( _items ) => {
+										if ( props.onActionPerformed ) {
+											props.onActionPerformed( _items );
+										}
+										onActionPerformed(
+											actions[ i ].id,
+											_items
+										);
+									} }
+								/>
+							);
+						},
+					};
 				}
 			}
-			return actions;
-		},
+		}
 
-		// Disable reason: if provided, `actionIds` is a shallow array of
-		// strings, and the strings themselves should be part of the useMemo
-		// dependencies. Two different disable statements are needed, as the
-		// first flags what it thinks are missing dependencies, and the second
-		// flags the array spread operation.
-		//
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			...( actionIds || [] ),
-			permanentlyDeletePostAction,
-			restorePostAction,
-			onActionPerformed,
-		]
-	);
+		return actions;
+	}, [
+		defaultActions,
+		userCanCreatePostType,
+		isTemplateOrTemplatePart,
+		isPattern,
+		postTypeObject?.viewable,
+		duplicatePostAction,
+		reorderPagesAction,
+		onActionPerformed,
+		isLoaded,
+		supportsRevisions,
+		supportsTitle,
+		context,
+	] );
 }

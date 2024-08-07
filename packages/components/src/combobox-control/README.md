@@ -34,6 +34,7 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -77,7 +78,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
+-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
 -   Required: Yes
 
 #### onFilterValueChange
@@ -101,12 +102,29 @@ The current value of the control.
 -   Type: `string | null`
 -   Required: No
 
+#### expandOnFocus
+
+Automatically expand the dropdown when the control is focused.
+If the control is clicked, the dropdown will expand regardless of this prop.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
+
+#### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

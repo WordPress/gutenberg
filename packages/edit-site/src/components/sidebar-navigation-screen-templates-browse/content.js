@@ -53,7 +53,7 @@ export default function DataviewsTemplatesSidebarContent( {
 	return (
 		<ItemGroup>
 			<DataViewItem
-				slug={ 'all' }
+				slug="all"
 				title={ title }
 				icon={ layout }
 				isActive={ activeView === 'all' }

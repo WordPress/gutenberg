@@ -17,7 +17,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -202,6 +202,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Post content' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Post content' ) }
 					checked={ displayPostContent }
 					onChange={ ( value ) =>
@@ -416,13 +417,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const layoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'list' } ),
 			isActive: postLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'grid' } ),
 			isActive: postLayout === 'grid',
 		},

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -13,6 +8,11 @@ import { useEffect } from '@wordpress/element';
  */
 import basicStyles from '../global-basic.lazy.scss';
 import wordPressStyles from '../global-wordpress.lazy.scss';
+
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
 
 /**
  * A Storybook decorator to inject global CSS.

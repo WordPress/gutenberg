@@ -31,11 +31,11 @@
 	}
 }
 
-.wp-block-social-links.is-style-pill-shape .wp-social-link button {
+:root :where(.wp-block-social-links.is-style-pill-shape .wp-social-link button) {
 	padding-left: calc((2/3) * 1em);
 	padding-right: calc((2/3) * 1em);
 }
 
-.wp-block-social-links.is-style-logos-only .wp-social-link button {
+:root :where(.wp-block-social-links.is-style-logos-only .wp-social-link button) {
 	padding: 0;
 }

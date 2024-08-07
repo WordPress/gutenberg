@@ -22,11 +22,19 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Dropdown,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	Platform,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -34,16 +42,23 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { getResolvedThemeFilePath } from './theme-file-uri-utils';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	backgroundSize: false,
 };
+const BACKGROUND_POPOVER_PROPS = {
+	placement: 'left-start',
+	offset: 36,
+	shift: true,
+	className: 'block-editor-global-styles-background-panel__popover',
+};
+const noop = () => {};
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -82,6 +97,8 @@ export function hasBackgroundSizeValue( style ) {
 export function hasBackgroundImageValue( style ) {
 	return (
 		!! style?.background?.backgroundImage?.id ||
+		// Supports url() string values in theme.json.
+		'string' === typeof style?.background?.backgroundImage ||
 		!! style?.background?.backgroundImage?.url
 	);
 }
@@ -99,7 +116,7 @@ function backgroundSizeHelpText( value ) {
 	if ( value === 'contain' ) {
 		return __( 'Image is contained without distortion.' );
 	}
-	return __( 'Specify a fixed width.' );
+	return __( 'Image has a fixed width.' );
 }
 
 /**
@@ -138,21 +155,30 @@ export const backgroundPositionToCoords = ( value ) => {
 	return { x, y };
 };
 
-function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel =
-		label || getFilename( imgUrl ) || __( 'Add background image' );
-
+function InspectorImagePreviewItem( {
+	as = 'span',
+	imgUrl,
+	toggleProps = {},
+	filename,
+	label,
+	className,
+	onToggleCallback = noop,
+} ) {
+	useEffect( () => {
+		if ( typeof toggleProps?.isOpen !== 'undefined' ) {
+			onToggleCallback( toggleProps?.isOpen );
+		}
+	}, [ toggleProps?.isOpen, onToggleCallback ] );
 	return (
-		<ItemGroup as="span">
-			<HStack justify={ imgUrl ? 'flex-start' : 'center' } as="span">
+		<ItemGroup as={ as } className={ className } { ...toggleProps }>
+			<HStack
+				justify="flex-start"
+				as="span"
+				className="block-editor-global-styles-background-panel__inspector-preview-inner"
+			>
 				{ imgUrl && (
 					<span
-						className={ clsx(
-							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
-							{
-								'has-image': imgUrl,
-							}
-						) }
+						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
 						aria-hidden
 					>
 						<span
@@ -163,21 +189,21 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 						/>
 					</span>
 				) }
-				<FlexItem as="span">
+				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
 					>
-						{ imgLabel }
+						{ label }
 					</Truncate>
 					<VisuallyHidden as="span">
-						{ filename
+						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
+									__( 'Background image: %s' ),
+									filename || label
 							  )
-							: __( 'No image selected' ) }
+							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
@@ -185,12 +211,65 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	);
 }
 
-function BackgroundImageToolsPanelItem( {
-	panelId,
-	isShownByDefault,
+function BackgroundControlsPanel( {
+	label,
+	filename,
+	url: imgUrl,
+	children,
+	onToggle: onToggleCallback = noop,
+	hasImageValue,
+} ) {
+	if ( ! hasImageValue ) {
+		return;
+	}
+
+	const imgLabel =
+		label || getFilename( imgUrl ) || __( 'Add background image' );
+
+	return (
+		<Dropdown
+			popoverProps={ BACKGROUND_POPOVER_PROPS }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const toggleProps = {
+					onClick: onToggle,
+					className:
+						'block-editor-global-styles-background-panel__dropdown-toggle',
+					'aria-expanded': isOpen,
+					'aria-label': __(
+						'Background size, position and repeat options.'
+					),
+					isOpen,
+				};
+				return (
+					<InspectorImagePreviewItem
+						imgUrl={ imgUrl }
+						filename={ filename }
+						label={ imgLabel }
+						toggleProps={ toggleProps }
+						as="button"
+						onToggleCallback={ onToggleCallback }
+					/>
+				);
+			} }
+			renderContent={ () => (
+				<DropdownContentWrapper
+					className="block-editor-global-styles-background-panel__dropdown-content-wrapper"
+					paddingSize="medium"
+				>
+					{ children }
+				</DropdownContentWrapper>
+			) }
+		/>
+	);
+}
+
+function BackgroundImageControls( {
 	onChange,
 	style,
 	inheritedValue,
+	onRemoveImage = noop,
+	displayInPanel,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -200,9 +279,7 @@ function BackgroundImageToolsPanelItem( {
 	const { id, title, url } = style?.background?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
 	};
-
 	const replaceContainerRef = useRef();
-
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -241,12 +318,27 @@ function BackgroundImageToolsPanelItem( {
 			return;
 		}
 
+		const sizeValue =
+			style?.background?.backgroundSize ||
+			inheritedValue?.background?.backgroundSize;
+		const positionValue =
+			style?.background?.backgroundPosition ||
+			inheritedValue?.background?.backgroundPosition;
+
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], {
-				url: media.url,
-				id: media.id,
-				source: 'file',
-				title: media.title || undefined,
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+					title: media.title || undefined,
+				},
+				backgroundPosition:
+					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
+						? '50% 0'
+						: positionValue,
+				backgroundSize: sizeValue,
 			} )
 		);
 	};
@@ -265,81 +357,92 @@ function BackgroundImageToolsPanelItem( {
 		} );
 	};
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			style: {
-				...previousValue.style,
-				background: undefined,
-			},
-		};
-	}, [] );
-
 	const hasValue = hasBackgroundImageValue( style );
 
+	const closeAndFocus = () => {
+		const [ toggleButton ] = focus.tabbable.find(
+			replaceContainerRef.current
+		);
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton?.focus();
+		toggleButton?.click();
+	};
+
+	const onRemove = () =>
+		onChange(
+			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+		);
+	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+	const imgLabel =
+		title || getFilename( url ) || __( 'Add background image' );
+
 	return (
-		<ToolsPanelItem
-			className="single-column"
-			hasValue={ () => hasValue }
-			label={ __( 'Background image' ) }
-			onDeselect={ resetBackgroundImage }
-			isShownByDefault={ isShownByDefault }
-			resetAllFilter={ resetAllFilter }
-			panelId={ panelId }
+		<div
+			ref={ replaceContainerRef }
+			className="block-editor-global-styles-background-panel__image-tools-panel-item"
 		>
-			<div
-				className="block-editor-global-styles-background-panel__inspector-media-replace-container"
-				ref={ replaceContainerRef }
+			<MediaReplaceFlow
+				mediaId={ id }
+				mediaURL={ url }
+				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+				accept="image/*"
+				onSelect={ onSelectMedia }
+				popoverProps={ {
+					className: clsx( {
+						'block-editor-global-styles-background-panel__media-replace-popover':
+							displayInPanel,
+					} ),
+				} }
+				name={
+					<InspectorImagePreviewItem
+						className="block-editor-global-styles-background-panel__image-preview"
+						imgUrl={ getResolvedThemeFilePath(
+							url,
+							themeFileURIs
+						) }
+						filename={ title }
+						label={ imgLabel }
+					/>
+				}
+				variant="secondary"
 			>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-					accept="image/*"
-					onSelect={ onSelectMedia }
-					name={
-						<InspectorImagePreview
-							label={ title }
-							filename={ title || __( 'Untitled' ) }
-							url={ url }
-						/>
-					}
-					variant="secondary"
-				>
-					{ hasValue && (
-						<MenuItem
-							onClick={ () => {
-								const [ toggleButton ] = focus.tabbable.find(
-									replaceContainerRef.current
-								);
-								// Focus the toggle button and close the dropdown menu.
-								// This ensures similar behaviour as to selecting an image, where the dropdown is
-								// closed and focus is redirected to the dropdown toggle button.
-								toggleButton?.focus();
-								toggleButton?.click();
-								resetBackgroundImage();
-							} }
-						>
-							{ __( 'Reset ' ) }
-						</MenuItem>
-					) }
-				</MediaReplaceFlow>
-				<DropZone
-					onFilesDrop={ onFilesDrop }
-					label={ __( 'Drop to upload' ) }
-				/>
-			</div>
-		</ToolsPanelItem>
+				{ canRemove && (
+					<MenuItem
+						onClick={ () => {
+							closeAndFocus();
+							onRemove();
+						} }
+					>
+						{ __( 'Remove' ) }
+					</MenuItem>
+				) }
+				{ hasValue && (
+					<MenuItem
+						onClick={ () => {
+							closeAndFocus();
+							onRemoveImage();
+						} }
+					>
+						{ __( 'Reset ' ) }
+					</MenuItem>
+				) }
+			</MediaReplaceFlow>
+			<DropZone
+				onFilesDrop={ onFilesDrop }
+				label={ __( 'Drop to upload' ) }
+			/>
+		</div>
 	);
 }
 
-function BackgroundSizeToolsPanelItem( {
-	panelId,
-	isShownByDefault,
+function BackgroundSizeControls( {
 	onChange,
 	style,
 	inheritedValue,
 	defaultValues,
+	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -350,24 +453,26 @@ function BackgroundSizeToolsPanelItem( {
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
+	const isUploadedImage =
+		style?.background?.backgroundImage?.id ||
+		inheritedValue?.background?.backgroundImage?.id;
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
+	const attachmentValue =
+		style?.background?.backgroundAttachment ||
+		inheritedValue?.background?.backgroundAttachment;
 
 	/*
-	 * An `undefined` value is replaced with any supplied
-	 * default control value for the toggle group control.
-	 * An empty string is treated as `auto` - this allows a user
-	 * to select "Size" and then enter a custom value, with an
-	 * empty value being treated as `auto`.
+	 * Set default values for uploaded images.
+	 * The default values are passed by the consumer.
+	 * Block-level controls may have different defaults to root-level controls.
+	 * A falsy value is treated by default as `auto` (Tile).
 	 */
 	const currentValueForToggle =
-		( sizeValue !== undefined &&
-			sizeValue !== 'cover' &&
-			sizeValue !== 'contain' ) ||
-		sizeValue === ''
-			? 'auto'
-			: sizeValue || defaultValues?.backgroundSize;
+		! sizeValue && isUploadedImage
+			? defaultValues?.backgroundSize
+			: sizeValue || 'auto';
 
 	/*
 	 * If the current value is `cover` and the repeat value is `undefined`, then
@@ -379,32 +484,19 @@ function BackgroundSizeToolsPanelItem( {
 		( currentValueForToggle === 'cover' && repeatValue === undefined )
 	);
 
-	const hasValue = hasBackgroundSizeValue( style );
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			style: {
-				...previousValue.style,
-				background: {
-					...previousValue.style?.background,
-					backgroundRepeat: undefined,
-					backgroundSize: undefined,
-				},
-			},
-		};
-	}, [] );
-
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
 			nextRepeat = undefined;
+			nextPosition = undefined;
 		}
 
 		if (
@@ -413,11 +505,29 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
+			/*
+			 * A background image uploaded and set in the editor (an image with a record id),
+			 * receives a default background position of '50% 0',
+			 * when the toggle switches to "Tile". This is to increase the chance that
+			 * the image's focus point is visible.
+			 */
+			if ( !! style?.background?.backgroundImage?.id ) {
+				nextPosition = '50% 0';
+			}
+		}
+
+		/*
+		 * Next will be null when the input is cleared,
+		 * in which case the value should be 'auto'.
+		 */
+		if ( ! next && currentValueForToggle === 'auto' ) {
+			next = 'auto';
 		}
 
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
+				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
@@ -439,79 +549,96 @@ function BackgroundSizeToolsPanelItem( {
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : undefined
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
 			)
 		);
 
-	const resetBackgroundSize = () =>
+	const toggleScrollWithPage = () =>
 		onChange(
-			setImmutably( style, [ 'background' ], {
-				...style?.background,
-				backgroundPosition: undefined,
-				backgroundRepeat: undefined,
-				backgroundSize: undefined,
-			} )
+			setImmutably(
+				style,
+				[ 'background', 'backgroundAttachment' ],
+				attachmentValue === 'fixed' ? 'scroll' : 'fixed'
+			)
 		);
 
 	return (
-		<VStack
-			as={ ToolsPanelItem }
-			spacing={ 2 }
-			className="single-column"
-			hasValue={ () => hasValue }
-			label={ __( 'Size' ) }
-			onDeselect={ resetBackgroundSize }
-			isShownByDefault={ isShownByDefault }
-			resetAllFilter={ resetAllFilter }
-			panelId={ panelId }
-		>
+		<VStack spacing={ 4 } className="single-column">
 			<FocalPointPicker
 				__next40pxDefaultSize
-				label={ __( 'Position' ) }
-				url={ imageValue }
+				__nextHasNoMarginBottom
+				label={ __( 'Focal point' ) }
+				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Fixed background' ) }
+				checked={ attachmentValue === 'fixed' }
+				onChange={ toggleScrollWithPage }
+				help={ __(
+					'Whether your image should scroll with the page or stay fixed in place.'
+				) }
+			/>
 			<ToggleGroupControl
-				size={ '__unstable-large' }
+				__nextHasNoMarginBottom
+				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
 				isBlock
-				help={ backgroundSizeHelpText( sizeValue ) }
+				help={ backgroundSizeHelpText(
+					sizeValue || defaultValues?.backgroundSize
+				) }
 			>
 				<ToggleGroupControlOption
-					key={ 'cover' }
-					value={ 'cover' }
-					label={ __( 'Cover' ) }
+					key="cover"
+					value="cover"
+					label={ _x(
+						'Cover',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'contain' }
-					value={ 'contain' }
-					label={ __( 'Contain' ) }
+					key="contain"
+					value="contain"
+					label={ _x(
+						'Contain',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'auto' }
-					label={ __( 'Fixed' ) }
+					key="tile"
+					value="auto"
+					label={ _x(
+						'Tile',
+						'Size option for background image control'
+					) }
 				/>
 			</ToggleGroupControl>
-			{ currentValueForToggle !== undefined &&
-			currentValueForToggle !== 'cover' &&
-			currentValueForToggle !== 'contain' ? (
+			<HStack justify="flex-start" spacing={ 2 } as="span">
 				<UnitControl
-					size={ '__unstable-large' }
+					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
+					size="__unstable-large"
+					__unstableInputWidth="100px"
+					min={ 0 }
+					placeholder={ __( 'Auto' ) }
+					disabled={
+						currentValueForToggle !== 'auto' ||
+						currentValueForToggle === undefined
+					}
 				/>
-			) : null }
-			{ currentValueForToggle !== 'cover' && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Repeat' ) }
 					checked={ repeatCheckedValue }
 					onChange={ toggleIsRepeated }
+					disabled={ currentValueForToggle === 'cover' }
 				/>
-			) }
+			</HStack>
 		</VStack>
 	);
 }
@@ -524,6 +651,7 @@ function BackgroundToolsPanel( {
 	children,
 	headerLabel,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -536,7 +664,7 @@ function BackgroundToolsPanel( {
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</VStack>
@@ -553,6 +681,7 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background image' ),
+	themeFileURIs,
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -560,8 +689,24 @@ export default function BackgroundPanel( {
 			background: {},
 		};
 	}, [] );
-	const shouldShowBackgroundSizeControls =
-		settings?.background?.backgroundSize;
+
+	const resetBackground = () =>
+		onChange( setImmutably( value, [ 'background' ], {} ) );
+
+	const { title, url } = value?.background?.backgroundImage || {
+		...inheritedValue?.background?.backgroundImage,
+	};
+	const hasImageValue =
+		hasBackgroundImageValue( value ) ||
+		hasBackgroundImageValue( inheritedValue );
+
+	const shouldShowBackgroundImageControls =
+		hasImageValue &&
+		( settings?.background?.backgroundSize ||
+			settings?.background?.backgroundPosition ||
+			settings?.background?.backgroundRepeat );
+
+	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
 
 	return (
 		<Wrapper
@@ -571,23 +716,64 @@ export default function BackgroundPanel( {
 			panelId={ panelId }
 			headerLabel={ headerLabel }
 		>
-			<BackgroundImageToolsPanelItem
-				onChange={ onChange }
-				panelId={ panelId }
-				isShownByDefault={ defaultControls.backgroundImage }
-				style={ value }
-				inheritedValue={ inheritedValue }
-			/>
-			{ shouldShowBackgroundSizeControls && (
-				<BackgroundSizeToolsPanelItem
-					onChange={ onChange }
+			<div
+				className={ clsx(
+					'block-editor-global-styles-background-panel__inspector-media-replace-container',
+					{
+						'is-open': isDropDownOpen,
+					}
+				) }
+			>
+				<ToolsPanelItem
+					hasValue={ () => hasImageValue }
+					label={ __( 'Image' ) }
+					onDeselect={ resetBackground }
+					isShownByDefault={ defaultControls.backgroundImage }
 					panelId={ panelId }
-					isShownByDefault={ defaultControls.backgroundSize }
-					style={ value }
-					inheritedValue={ inheritedValue }
-					defaultValues={ defaultValues }
-				/>
-			) }
+				>
+					{ shouldShowBackgroundImageControls ? (
+						<BackgroundControlsPanel
+							label={ title }
+							filename={ title }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
+							onToggle={ setIsDropDownOpen }
+							hasImageValue={ hasImageValue }
+						>
+							<VStack spacing={ 3 } className="single-column">
+								<BackgroundImageControls
+									onChange={ onChange }
+									style={ value }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+									displayInPanel
+									onRemoveImage={ () => {
+										setIsDropDownOpen( false );
+										resetBackground();
+									} }
+								/>
+								<BackgroundSizeControls
+									onChange={ onChange }
+									panelId={ panelId }
+									style={ value }
+									defaultValues={ defaultValues }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+								/>
+							</VStack>
+						</BackgroundControlsPanel>
+					) : (
+						<BackgroundImageControls
+							onChange={ onChange }
+							style={ value }
+							inheritedValue={ inheritedValue }
+							themeFileURIs={ themeFileURIs }
+						/>
+					) }
+				</ToolsPanelItem>
+			</div>
 		</Wrapper>
 	);
 }

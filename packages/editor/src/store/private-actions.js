@@ -15,7 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
-import { TEMPLATE_POST_TYPE } from './constants';
+export * from '../dataviews/store/private-actions';
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
@@ -363,14 +363,15 @@ export const revertTemplate =
 	};
 
 /**
- * Action that removes an array of templates.
+ * Action that removes an array of templates, template parts or patterns.
  *
- * @param {Array} items An array of template or template part objects to remove.
+ * @param {Array} items An array of template,template part or pattern objects to remove.
  */
 export const removeTemplates =
 	( items ) =>
 	async ( { registry } ) => {
-		const isTemplate = items[ 0 ].type === TEMPLATE_POST_TYPE;
+		const isResetting = items.every( ( item ) => item?.has_theme_file );
+
 		const promiseResult = await Promise.allSettled(
 			items.map( ( item ) => {
 				return registry
@@ -392,26 +393,36 @@ export const removeTemplates =
 			if ( items.length === 1 ) {
 				// Depending on how the entity was retrieved its title might be
 				// an object or simple string.
-				const title =
-					typeof items[ 0 ].title === 'string'
-						? items[ 0 ].title
-						: items[ 0 ].title?.rendered;
-				successMessage = sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" deleted.' ),
-					decodeEntities( title )
-				);
+				let title;
+				if ( typeof items[ 0 ].title === 'string' ) {
+					title = items[ 0 ].title;
+				} else if ( typeof items[ 0 ].title?.rendered === 'string' ) {
+					title = items[ 0 ].title?.rendered;
+				} else if ( typeof items[ 0 ].title?.raw === 'string' ) {
+					title = items[ 0 ].title?.raw;
+				}
+				successMessage = isResetting
+					? sprintf(
+							/* translators: The template/part's name. */
+							__( '"%s" reset.' ),
+							decodeEntities( title )
+					  )
+					: sprintf(
+							/* translators: The template/part's name. */
+							__( '"%s" deleted.' ),
+							decodeEntities( title )
+					  );
 			} else {
-				successMessage = isTemplate
-					? __( 'Templates deleted.' )
-					: __( 'Template parts deleted.' );
+				successMessage = isResetting
+					? __( 'Items reset.' )
+					: __( 'Items deleted.' );
 			}
 
 			registry
 				.dispatch( noticesStore )
 				.createSuccessNotice( successMessage, {
 					type: 'snackbar',
-					id: 'site-editor-template-deleted-success',
+					id: 'editor-template-deleted-success',
 				} );
 		} else {
 			// If there was at lease one failure.
@@ -421,11 +432,9 @@ export const removeTemplates =
 				if ( promiseResult[ 0 ].reason?.message ) {
 					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					errorMessage = isTemplate
-						? __( 'An error occurred while deleting the template.' )
-						: __(
-								'An error occurred while deleting the template part.'
-						  );
+					errorMessage = isResetting
+						? __( 'An error occurred while reverting the item.' )
+						: __( 'An error occurred while deleting the item.' );
 				}
 				// If we were trying to delete a multiple templates
 			} else {
@@ -439,42 +448,38 @@ export const removeTemplates =
 					}
 				}
 				if ( errorMessages.size === 0 ) {
-					errorMessage = isTemplate
-						? __(
-								'An error occurred while deleting the templates.'
-						  )
-						: __(
-								'An error occurred while deleting the template parts.'
-						  );
+					errorMessage = __(
+						'An error occurred while deleting the items.'
+					);
 				} else if ( errorMessages.size === 1 ) {
-					errorMessage = isTemplate
+					errorMessage = isResetting
 						? sprintf(
 								/* translators: %s: an error message */
 								__(
-									'An error occurred while deleting the templates: %s'
+									'An error occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
 						  )
 						: sprintf(
 								/* translators: %s: an error message */
 								__(
-									'An error occurred while deleting the template parts: %s'
+									'An error occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
 						  );
 				} else {
-					errorMessage = isTemplate
+					errorMessage = isResetting
 						? sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
-									'Some errors occurred while deleting the templates: %s'
+									'Some errors occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
 						  )
 						: sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
-									'Some errors occurred while deleting the template parts: %s'
+									'Some errors occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
 						  );

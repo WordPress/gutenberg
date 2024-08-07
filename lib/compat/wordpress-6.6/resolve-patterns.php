@@ -61,25 +61,6 @@ function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 	return $blocks;
 }
 
-function gutenberg_replace_pattern_blocks_get_block_templates( $templates ) {
-	foreach ( $templates as $template ) {
-		$blocks            = parse_blocks( $template->content );
-		$blocks            = gutenberg_replace_pattern_blocks( $blocks );
-		$template->content = serialize_blocks( $blocks );
-	}
-	return $templates;
-}
-
-function gutenberg_replace_pattern_blocks_get_block_template( $template ) {
-	if ( null === $template ) {
-		return $template;
-	}
-	$blocks            = parse_blocks( $template->content );
-	$blocks            = gutenberg_replace_pattern_blocks( $blocks );
-	$template->content = serialize_blocks( $blocks );
-	return $template;
-}
-
 function gutenberg_replace_pattern_blocks_patterns_endpoint( $result, $server, $request ) {
 	if ( $request->get_route() !== '/wp/v2/block-patterns/patterns' ) {
 		return $result;
@@ -98,10 +79,6 @@ function gutenberg_replace_pattern_blocks_patterns_endpoint( $result, $server, $
 	return $result;
 }
 
-// For core merge, we should avoid the double parse and replace the patterns in templates here:
-// https://github.com/WordPress/wordpress-develop/blob/02fb53498f1ce7e63d807b9bafc47a7dba19d169/src/wp-includes/block-template-utils.php#L558
-add_filter( 'get_block_templates', 'gutenberg_replace_pattern_blocks_get_block_templates' );
-add_filter( 'get_block_template', 'gutenberg_replace_pattern_blocks_get_block_template' );
 // Similarly, for patterns, we can avoid the double parse here:
 // https://github.com/WordPress/wordpress-develop/blob/02fb53498f1ce7e63d807b9bafc47a7dba19d169/src/wp-includes/class-wp-block-patterns-registry.php#L175
 add_filter( 'rest_post_dispatch', 'gutenberg_replace_pattern_blocks_patterns_endpoint', 10, 3 );

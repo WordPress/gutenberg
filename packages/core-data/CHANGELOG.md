@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.35.0 (2024-05-16)
+
 ## 6.34.0 (2024-05-02)
 
 ## 6.33.0 (2024-04-19)
@@ -30,7 +47,7 @@
 
 ## 6.21.0 (2023-10-18)
 
-## Enhancements
+### Enhancements
 
 -   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).
 -   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
@@ -95,7 +112,7 @@
 
 ### Breaking Changes
 
-–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
 ## 4.14.0 (2022-08-24)
 
@@ -130,6 +147,7 @@
 ## 4.3.0 (2022-03-23)
 
 ### New Features
+
 -   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
 -   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
 
@@ -149,7 +167,7 @@
 
 ## 4.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -172,13 +190,13 @@
 
 ## 2.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.21.0 (2020-09-03)
 
-### New Feature
+### New Features
 
 -   The `deleteEntityRecord` and `removeItems` actions have been added.
 -   The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
@@ -186,7 +204,7 @@
 
 ## 2.3.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
 -   The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
@@ -221,7 +239,7 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   `dispatch("core").receiveTerms` has been deprecated. Please use `dispatch("core").receiveEntityRecords` instead.
 -   `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.

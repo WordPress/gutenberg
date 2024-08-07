@@ -33,8 +33,8 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CompositeItem,
 	},
+	tags: [ 'status-private' ],
 	parameters: {
-		badges: [ 'private' ],
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { transform },

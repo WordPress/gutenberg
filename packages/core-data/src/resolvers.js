@@ -15,7 +15,13 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	getUserPermissionCacheKey,
+	getUserPermissionsFromResponse,
+	ALLOWED_RESOURCE_ACTIONS,
+} from './utils';
 import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
@@ -58,12 +64,12 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -81,7 +87,7 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					const objectId = entityConfig.getSyncObjectId( key );
 
 					// Loads the persisted document.
@@ -165,8 +171,29 @@ export const getEntityRecord =
 					}
 				}
 
-				const record = await apiFetch( { path } );
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				const response = await apiFetch( { path, parse: false } );
+				const record = await response.json();
+				const permissions = getUserPermissionsFromResponse( response );
+
+				registry.batch( () => {
+					dispatch.receiveEntityRecords( kind, name, record, query );
+
+					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+						const permissionKey = getUserPermissionCacheKey(
+							action,
+							{ kind, name, id: key }
+						);
+
+						dispatch.receiveUserPermission(
+							permissionKey,
+							permissions[ action ]
+						);
+						dispatch.finishResolution( 'canUser', [
+							action,
+							{ kind, name, id: key },
+						] );
+					}
+				} );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
@@ -198,7 +225,7 @@ export const getEntityRecords =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -278,19 +305,13 @@ export const getEntityRecords =
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
+						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-					dispatch( {
-						type: 'START_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
-					dispatch( {
-						type: 'FINISH_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						resolutionsArgs
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -352,25 +373,47 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                  'delete'.
- * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id              ID of the rest resource to check.
+ * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                        'delete'.
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                                        or REST base as a string - `media`.
+ * @param {?string}       id              ID of the rest resource to check.
  */
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		const resourcePath = id ? `${ resource }/${ id }` : resource;
-		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
-
-		if ( ! retrievedActions.includes( requestedAction ) ) {
+		if ( ! ALLOWED_RESOURCE_ACTIONS.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
 
+		let resourcePath = null;
+		if ( typeof resource === 'object' ) {
+			if ( ! resource.kind || ! resource.name ) {
+				throw new Error( 'The entity resource object is not valid.' );
+			}
+
+			const configs = await dispatch(
+				getOrLoadEntitiesConfig( resource.kind, resource.name )
+			);
+			const entityConfig = configs.find(
+				( config ) =>
+					config.name === resource.name &&
+					config.kind === resource.kind
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+
+			resourcePath =
+				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
+		} else {
+			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
+
 		// Prevent resolving the same resource twice.
-		for ( const relatedAction of retrievedActions ) {
+		for ( const relatedAction of ALLOWED_RESOURCE_ACTIONS ) {
 			if ( relatedAction === requestedAction ) {
 				continue;
 			}
@@ -387,7 +430,7 @@ export const canUser =
 		let response;
 		try {
 			response = await apiFetch( {
-				path: `/wp/v2/${ resourcePath }`,
+				path: resourcePath,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -397,29 +440,23 @@ export const canUser =
 			return;
 		}
 
-		// Optional chaining operator is used here because the API requests don't
-		// return the expected result in the native version. Instead, API requests
-		// only return the result, without including response properties like the headers.
-		const allowHeader = response.headers?.get( 'allow' );
-		const allowedMethods = allowHeader?.allow || allowHeader || '';
+		const permissions = getUserPermissionsFromResponse( response );
+		registry.batch( () => {
+			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+				const key = getUserPermissionCacheKey( action, resource, id );
 
-		const permissions = {};
-		const methods = {
-			create: 'POST',
-			read: 'GET',
-			update: 'PUT',
-			delete: 'DELETE',
-		};
-		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
-			permissions[ actionName ] = allowedMethods.includes( methodName );
-		}
+				dispatch.receiveUserPermission( key, permissions[ action ] );
 
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+				// Mark related action resolutions as finished.
+				if ( action !== requestedAction ) {
+					dispatch.finishResolution( 'canUser', [
+						action,
+						resource,
+						id,
+					] );
+				}
+			}
+		} );
 	};
 
 /**
@@ -433,16 +470,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-		if ( ! entityConfig ) {
-			return;
-		}
-
-		const resource = entityConfig.__unstable_rest_base;
-		await dispatch( canUser( 'update', resource, recordId ) );
+		await dispatch( canUser( 'update', { kind, name, id: recordId } ) );
 	};
 
 /**
@@ -543,13 +571,17 @@ export const __experimentalGetCurrentGlobalStylesId =
 		const globalStylesURL =
 			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
 				?.href;
-		if ( globalStylesURL ) {
-			const globalStylesObject = await apiFetch( {
-				url: globalStylesURL,
-			} );
-			dispatch.__experimentalReceiveCurrentGlobalStylesId(
-				globalStylesObject.id
-			);
+		if ( ! globalStylesURL ) {
+			return;
+		}
+
+		// Regex matches the ID at the end of a URL or immediately before
+		// the query string.
+		const matches = globalStylesURL.match( /\/(\d+)(?:\?|$)/ );
+		const id = matches ? Number( matches[ 1 ] ) : null;
+
+		if ( id ) {
+			dispatch.__experimentalReceiveCurrentGlobalStylesId( id );
 		}
 	};
 
@@ -712,7 +744,8 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		if ( template ) {
+		// Endpoint may return an empty object if no template is found.
+		if ( template?.id ) {
 			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
 	};
@@ -735,7 +768,7 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -819,16 +852,8 @@ export const getRevisions =
 						record[ key ],
 					] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
+				dispatch.startResolutions( 'getRevision', resolutionsArgs );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		}
 	};
@@ -860,7 +885,7 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 

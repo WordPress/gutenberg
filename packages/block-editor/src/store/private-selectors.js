@@ -401,6 +401,21 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	}, getAllPatternsDependants( select ) )
 );
 
+export const isResolvingPatterns = createRegistrySelector( ( select ) =>
+	createSelector( ( state ) => {
+		const blockPatternsSelect = state.settings[ selectBlockPatternsKey ];
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return (
+			( blockPatternsSelect
+				? blockPatternsSelect( select ) === undefined
+				: false ) ||
+			( reusableBlocksSelect
+				? reusableBlocksSelect( select ) === undefined
+				: false )
+		);
+	}, getAllPatternsDependants( select ) )
+);
+
 const EMPTY_ARRAY = [];
 
 export const getReusableBlocks = createRegistrySelector(

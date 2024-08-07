@@ -2,24 +2,18 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { press, sleep } from '@ariakit/test';
+import { press } from '@ariakit/test';
 
 /**
  * Internal dependencies
  */
 import CircularOptionPicker from '..';
 
-const SINGLE_OPTION = [ <CircularOptionPicker.Option key={ 'option' } /> ];
+const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
 
 const MULTIPLE_OPTIONS = [
-	<CircularOptionPicker.Option
-		key={ 'option-1' }
-		aria-label={ 'Option One' }
-	/>,
-	<CircularOptionPicker.Option
-		key={ 'option-2' }
-		aria-label={ 'Option Two' }
-	/>,
+	<CircularOptionPicker.Option key="option-1" aria-label="Option One" />,
+	<CircularOptionPicker.Option key="option-2" aria-label="Option Two" />,
 ];
 
 const DEFAULT_PROPS = {
@@ -76,7 +70,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -96,7 +89,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -116,7 +108,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();

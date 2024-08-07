@@ -44,3 +44,16 @@
 	justify-content: center;
 }
 
+
+.patterns-pattern-overrides-toolbar-indicator__popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
+}
+
+.patterns-pattern-overrides-toolbar-indicator .patterns-pattern-overrides-toolbar-indicator-icon.has-colors svg {
+	fill: var(--wp-block-synced-color);
+}
+
+.editor-collapsible-block-toolbar .patterns-pattern-overrides-toolbar-indicator {
+	height: 32px;
+}

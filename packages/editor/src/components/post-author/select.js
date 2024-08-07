@@ -29,6 +29,7 @@ export default function PostAuthorSelect() {
 			options={ authorOptions }
 			onChange={ setAuthorId }
 			value={ authorId }
+			hideLabelFromVision
 		/>
 	);
 }

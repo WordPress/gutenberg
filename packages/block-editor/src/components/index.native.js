@@ -71,6 +71,12 @@ export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';
 export { default as useMultipleOriginColorsAndGradients } from './colors-gradients/use-multiple-origin-colors-and-gradients';
 export { default as UnsupportedBlockDetails } from './unsupported-block-details';
+export {
+	useGlobalStyles,
+	getGlobalStyles,
+	getColorsAndGradients,
+	useMobileGlobalStylesColors,
+} from './global-styles/use-global-styles-context';
 
 export {
 	BottomSheetSettings,
@@ -78,6 +84,7 @@ export {
 	blockSettingsScreens,
 } from './block-settings';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
+export { default as AudioPlayer } from './audio-player';
 
 export {
 	getSpacingPresetCssVar,

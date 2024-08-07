@@ -188,7 +188,7 @@ When saving your block, you want to save the attributes in the same format speci
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together. For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together.
 
 ### Saving Attributes to Child Elements
 

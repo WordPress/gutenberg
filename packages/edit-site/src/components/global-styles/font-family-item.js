@@ -16,14 +16,14 @@ import { FontLibraryContext } from './font-library-modal/context';
 import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
 
 function FontFamilyItem( { font } ) {
-	const { handleSetLibraryFontSelected, toggleModal } =
+	const { handleSetLibraryFontSelected, setModalTabOpen } =
 		useContext( FontLibraryContext );
 
 	const variantsCount = font?.fontFace?.length || 1;
 
 	const handleClick = () => {
 		handleSetLibraryFontSelected( font );
-		toggleModal( 'installed-fonts' );
+		setModalTabOpen( 'installed-fonts' );
 	};
 
 	const previewStyle = getFamilyPreviewStyle( font );

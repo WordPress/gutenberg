@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "27.5.0",
+	"version": "28.4.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -30,7 +31,7 @@
 	],
 	"types": "build-types",
 	"dependencies": {
-		"@ariakit/react": "^0.3.12",
+		"@ariakit/react": "^0.4.7",
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
@@ -41,7 +42,7 @@
 		"@floating-ui/react-dom": "^2.0.8",
 		"@types/gradient-parser": "0.1.3",
 		"@types/highlight-words-core": "1.2.1",
-		"@use-gesture/react": "^10.2.24",
+		"@use-gesture/react": "^10.3.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/date": "file:../date",
@@ -64,9 +65,8 @@
 		"colord": "^2.7.0",
 		"date-fns": "^3.6.0",
 		"deepmerge": "^4.3.0",
-		"downshift": "^6.0.15",
 		"fast-deep-equal": "^3.1.3",
-		"framer-motion": "^10.13.0",
+		"framer-motion": "^11.1.9",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
 		"is-plain-object": "^5.0.0",
