@@ -43,10 +43,13 @@ export function normalizeFields< Item >(
 
 		const renderFromElements = ( { item }: { item: Item } ) => {
 			const value = getValue( { item } );
-			return (
-				field?.elements?.find( ( element ) => element.value === value )
-					?.label || getValue( { item } )
-			);
+			const label = field?.elements?.find( ( element ) => {
+				// Intentionally using == here to allow for type coercion.
+				// eslint-disable-next-line eqeqeq
+				return element.value == value;
+			} )?.label;
+
+			return label || value;
 		};
 
 		const render =
