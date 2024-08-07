@@ -10,6 +10,12 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
+export function getComputedCSS( element, property ) {
+	return element.ownerDocument.defaultView
+		.getComputedStyle( element )
+		.getPropertyValue( property );
+}
+
 /** @typedef {import('react').ReactNode} ReactNode */
 
 /**
@@ -49,7 +55,7 @@ export default function Underlay( { clientId, className, children } ) {
 				width: Math.floor( gridRect.width ),
 				height: Math.floor( gridRect.height ),
 				margin: 0,
-				padding: 0,
+				padding: getComputedCSS( gridElement, 'padding' ),
 				zIndex: 0,
 			} );
 		};
@@ -60,12 +66,10 @@ export default function Underlay( { clientId, className, children } ) {
 			: undefined;
 		resizeObserver?.observe( gridElement );
 		resizeObserver?.observe( rootElement );
-		// defaultView?.addEventListener( 'resize', update );
 		update();
 
 		return () => {
 			resizeObserver?.disconnect();
-			// defaultView?.removeEventListener( 'resize', update );
 		};
 	}, [ gridElement, rootElement ] );
 

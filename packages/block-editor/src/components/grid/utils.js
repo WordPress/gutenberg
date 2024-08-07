@@ -172,7 +172,6 @@ export function getGridInfo( gridElement ) {
 			gridTemplateColumns,
 			gridTemplateRows,
 			gap: getComputedCSS( gridElement, 'gap' ),
-			padding: getComputedCSS( gridElement, 'padding' ),
 			display: 'grid',
 		},
 	};
