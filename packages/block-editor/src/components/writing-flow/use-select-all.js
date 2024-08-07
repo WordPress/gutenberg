@@ -32,7 +32,8 @@ export default function useSelectAll() {
 				selectionRoot &&
 				! selectionRoot.closest(
 					`[data-block="${ selectedClientIds[ 0 ] }"]`
-				)
+				) &&
+				selectedClientIds.length < 2
 			) {
 				return;
 			}
