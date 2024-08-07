@@ -200,7 +200,7 @@ export default function DocumentBar( props ) {
 						>
 							{ title
 								? decodeEntities( title )
-								: __( 'No Title' ) }
+								: __( 'No title' ) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">

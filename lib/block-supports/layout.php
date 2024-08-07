@@ -1019,27 +1019,10 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 	$processor      = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $processor->next_tag( array( 'class_name' => 'wp-block-group' ) ) ) {
-		if ( method_exists( $processor, 'class_list' ) ) {
-			foreach ( $processor->class_list() as $class_name ) {
-				if ( str_contains( $class_name, 'layout' ) ) {
-					array_push( $layout_classes, $class_name );
-					$processor->remove_class( $class_name );
-				}
-			}
-		} else {
-			/*
-			* The class_list method was only added in 6.4 so this needs a temporary fallback.
-			* This fallback should be removed when the minimum supported version is 6.4.
-			*/
-			$classes = $processor->get_attribute( 'class' );
-			if ( $classes ) {
-				$classes = explode( ' ', $classes );
-				foreach ( $classes as $class_name ) {
-					if ( str_contains( $class_name, 'is-layout-' ) ) {
-						array_push( $layout_classes, $class_name );
-						$processor->remove_class( $class_name );
-					}
-				}
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_contains( $class_name, 'layout' ) ) {
+				array_push( $layout_classes, $class_name );
+				$processor->remove_class( $class_name );
 			}
 		}
 	}

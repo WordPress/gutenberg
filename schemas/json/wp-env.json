@@ -82,6 +82,7 @@
 			"$ref": "#/definitions/wpEnvProperties"
 		},
 		{
+			"type": "object",
 			"properties": {
 				"$schema": {
 					"type": "string"
@@ -91,10 +92,10 @@
 					"type": "object",
 					"patternProperties": {
 						"[a-zA-Z]": {
-							"type": "object",
 							"allOf": [
 								{ "$ref": "#/definitions/wpEnvProperties" },
 								{
+									"type": "object",
 									"propertyNames": {
 										"$ref": "#/definitions/wpEnvPropertyNames"
 									}
@@ -107,6 +108,7 @@
 			}
 		},
 		{
+			"type": "object",
 			"propertyNames": {
 				"anyOf": [
 					{

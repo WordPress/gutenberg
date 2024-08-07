@@ -5,6 +5,7 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -260,7 +261,7 @@ export const usePatterns = (
 	categoryId,
 	{ search = '', syncStatus } = {}
 ) => {
-	return useSelect(
+	const { patterns, ...rest } = useSelect(
 		( select ) => {
 			if ( postType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplateParts( select, categoryId, search );
@@ -283,6 +284,35 @@ export const usePatterns = (
 		},
 		[ categoryId, postType, search, syncStatus ]
 	);
+
+	const ids = useMemo(
+		() => patterns?.map( ( record ) => record.id ) ?? [],
+		[ patterns ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordsPermissions } = unlock(
+				select( coreStore )
+			);
+			return getEntityRecordsPermissions( 'postType', postType, ids );
+		},
+		[ ids, postType ]
+	);
+
+	const patternsWithPermissions = useMemo(
+		() =>
+			patterns?.map( ( record, index ) => ( {
+				...record,
+				permissions: permissions[ index ],
+			} ) ) ?? [],
+		[ patterns, permissions ]
+	);
+
+	return {
+		...rest,
+		patterns: patternsWithPermissions,
+	};
 };
 
 export default usePatterns;

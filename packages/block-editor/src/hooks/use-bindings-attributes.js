@@ -91,6 +91,10 @@ export function canBindAttribute( blockName, attributeName ) {
 	);
 }
 
+export function getBindableAttributes( blockName ) {
+	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+}
+
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
