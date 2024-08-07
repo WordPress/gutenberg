@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { RefObject, ReactNode, MouseEvent, TouchEvent } from 'react';
-import { animate } from 'framer-motion';
+import { useAnimate } from 'framer-motion';
 /**
  * WordPress dependencies
  */
@@ -36,20 +36,27 @@ function CropWindow() {
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const resizableElementRef = useRef< HTMLDivElement >( null! );
+	const [ resizableScope, animate ] = useAnimate();
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
 	const isAxisSwapped = rotations % 2 !== 0;
 
 	useEffect( () => {
-		if ( resizableElementRef.current ) {
-			animate( resizableElementRef.current, {
+		if ( resizableScope.current ) {
+			animate( [ resizableScope.current ], {
 				'--wp-cropper-window-x': `${ cropper.x }px`,
 				'--wp-cropper-window-y': `${ cropper.y }px`,
 				width: `${ cropper.width }px`,
 				height: `${ cropper.height }px`,
 			} );
 		}
-	}, [ cropper.x, cropper.y, cropper.width, cropper.height ] );
+	}, [
+		resizableScope,
+		animate,
+		cropper.x,
+		cropper.y,
+		cropper.width,
+		cropper.height,
+	] );
 
 	return (
 		<Resizable
@@ -65,7 +72,7 @@ function CropWindow() {
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
 			onResizeStart={ ( event ) => {
 				// Set the temporary offset on resizing.
-				animate( resizableElementRef.current, {
+				animate( [ resizableScope.current ], {
 					'--wp-cropper-window-x': `${ cropper.x }px`,
 					'--wp-cropper-window-y': `${ cropper.y }px`,
 				} ).complete();
@@ -127,7 +134,7 @@ function CropWindow() {
 					) {
 						y -= delta.height;
 					}
-					animate( resizableElementRef.current, {
+					animate( [ resizableScope.current ], {
 						'--wp-cropper-window-x': `${ x }px`,
 						'--wp-cropper-window-y': `${ y }px`,
 						width: `${ cropper.width + delta.width }px`,
@@ -138,7 +145,7 @@ function CropWindow() {
 			onResizeStop={ ( _event, direction, _element, delta ) => {
 				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
 			} }
-			ref={ resizableElementRef }
+			ref={ resizableScope }
 		>
 			<Draggable
 				ref={ cropperWindowRef as RefObject< HTMLDivElement > }
