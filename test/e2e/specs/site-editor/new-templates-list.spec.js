@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event';
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-
 test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
