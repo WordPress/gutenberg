@@ -3,7 +3,7 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,11 +11,8 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import {
-	GridVisualizer,
-	GridItemResizer,
-	GridItemMovers,
-} from '../components/grid';
+import { GridItemResizer, GridItemMovers } from '../components/grid';
+import { GridResizerBoundsContext } from './grid-visualizer';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -179,8 +176,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		[ clientId ]
 	);
 
-	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
-	const [ resizerBounds, setResizerBounds ] = useState();
+	const resizerBounds = useContext( GridResizerBoundsContext );
 
 	if ( parentLayoutType !== 'grid' ) {
 		return null;
@@ -200,11 +196,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 
 	return (
 		<>
-			<GridVisualizer
-				clientId={ rootClientId }
-				contentRef={ setResizerBounds }
-				parentLayout={ parentLayout }
-			/>
 			{ allowSizingOnChildren && (
 				<GridItemResizer
 					clientId={ clientId }
