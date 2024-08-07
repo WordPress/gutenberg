@@ -20,7 +20,7 @@ import { cog } from '@wordpress/icons';
  */
 import { unlock } from '../../lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from '../../constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from '../../layouts';
+import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { NormalizedField, View, SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
 

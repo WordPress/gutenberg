@@ -404,7 +404,7 @@ export function getStylesDeclarations(
 		 * Set default values for block background styles.
 		 * Top-level styles are an exception as they are applied to the body.
 		 */
-		if ( ! isRoot ) {
+		if ( ! isRoot && !! blockStyles.background?.backgroundImage?.id ) {
 			blockStyles = {
 				...blockStyles,
 				background: {

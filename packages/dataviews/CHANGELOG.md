@@ -13,6 +13,11 @@
 -   `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
 -   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
 -   `header` field property has been renamed to `label`.
+-   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
+
+### New features
+
+-   Support multiple layouts in `DataForm` component and introduce the `panel` layout.
 
 ## 3.0.0 (2024-07-10)
 
