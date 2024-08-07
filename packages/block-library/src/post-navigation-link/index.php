@@ -116,6 +116,11 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$content = $get_link_function( $format, $link );
 	}
 
+	// Return If the adjacent post is unavailable.
+	if ( empty( $content ) ) {
+		return '';
+	}
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
