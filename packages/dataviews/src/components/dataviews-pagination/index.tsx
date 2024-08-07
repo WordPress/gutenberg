@@ -6,8 +6,8 @@ import {
 	__experimentalHStack as HStack,
 	SelectControl,
 } from '@wordpress/components';
-import { memo, useContext } from '@wordpress/element';
-import { sprintf, __ } from '@wordpress/i18n';
+import { createInterpolateElement, memo, useContext } from '@wordpress/element';
+import { sprintf, __, _x } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 
 /**
@@ -61,29 +61,35 @@ function DataViewsPagination() {
 					spacing={ 1 }
 					className="dataviews-pagination__page-select"
 				>
-					<div aria-hidden>{ __( 'Page' ) }</div>
-					<SelectControl
-						aria-label={ __( 'Current page' ) }
-						value={ currentPage.toString() }
-						options={ pageSelectOptions }
-						onChange={ ( newValue ) => {
-							onChangeView( {
-								...view,
-								page: +newValue,
-							} );
-						} }
-						size="compact"
-						__nextHasNoMarginBottom
-						variant="minimal"
-					/>
-					<div aria-hidden>
-						{ sprintf(
-							/* translators: This is preceded by a pagination dropdown, and %s is the total number of pages
-							 * (e.g. Page 1 of 10). Use '/ %s' if language doesn't use this word order. */
-							__( 'of %s' ),
+					{ createInterpolateElement(
+						sprintf(
+							// translators: <CurrentPage /> is the current page number, %s is the total number of pages.
+							_x(
+								'<div>Page</div><CurrentPage /><div>of %s</div>',
+								'paging'
+							),
 							totalPages
-						) }
-					</div>
+						),
+						{
+							div: <div aria-hidden />,
+							CurrentPage: (
+								<SelectControl
+									aria-label={ __( 'Current page' ) }
+									value={ currentPage.toString() }
+									options={ pageSelectOptions }
+									onChange={ ( newValue ) => {
+										onChangeView( {
+											...view,
+											page: +newValue,
+										} );
+									} }
+									size="compact"
+									__nextHasNoMarginBottom
+									variant="minimal"
+								/>
+							),
+						}
+					) }
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
