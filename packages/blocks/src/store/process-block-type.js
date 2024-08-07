@@ -134,6 +134,10 @@ export const processBlockType =
 			null
 		);
 
+		// Re-stabilize any experimental supports after applying filters.
+		// This ensures that any supports updated by filters are also stabilized.
+		blockType.supports = stabilizeSupports( blockType.supports );
+
 		if (
 			settings.description &&
 			typeof settings.description !== 'string'
@@ -145,27 +149,33 @@ export const processBlockType =
 
 		if ( settings.deprecated ) {
 			settings.deprecated = settings.deprecated.map( ( deprecation ) => {
+				// Stabilize any experimental supports before applying filters.
 				deprecation.supports = stabilizeSupports(
 					deprecation.supports
 				);
+				const filteredDeprecation = // Only keep valid deprecation keys.
+					applyFilters(
+						'blocks.registerBlockType',
+						// Merge deprecation keys with pre-filter settings
+						// so that filters that depend on specific keys being
+						// present don't fail.
+						{
+							// Omit deprecation keys here so that deprecations
+							// can opt out of specific keys like "supports".
+							...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+							...deprecation,
+						},
+						blockType.name,
+						deprecation
+					);
+				// Re-stabilize any experimental supports after applying filters.
+				// This ensures that any supports updated by filters are also stabilized.
+				filteredDeprecation.supports = stabilizeSupports(
+					filteredDeprecation.supports
+				);
+
 				return Object.fromEntries(
-					Object.entries(
-						// Only keep valid deprecation keys.
-						applyFilters(
-							'blocks.registerBlockType',
-							// Merge deprecation keys with pre-filter settings
-							// so that filters that depend on specific keys being
-							// present don't fail.
-							{
-								// Omit deprecation keys here so that deprecations
-								// can opt out of specific keys like "supports".
-								...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-								...deprecation,
-							},
-							blockType.name,
-							deprecation
-						)
-					).filter( ( [ key ] ) =>
+					Object.entries( filteredDeprecation ).filter( ( [ key ] ) =>
 						DEPRECATED_ENTRY_KEYS.includes( key )
 					)
 				);
