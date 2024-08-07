@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.5.0 (2024-08-07)
+
 ### Bug Fixes
 
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
