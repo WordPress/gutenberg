@@ -71,37 +71,26 @@
 	direction: ltr;
 }
 
-
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	// Full width. ToolsPanel lays out children in a grid.
-	grid-column: 1 / -1;
 
 	& > div {
-		// Border styles.
-		border-left: 1px solid $gray-300;
-		border-right: 1px solid $gray-300;
-		border-bottom: 1px solid $gray-300;
+		width: 100%;
 
 		&:not(:only-child):nth-child(1 of &) {
-			border-top-left-radius: $radius-small;
-			border-top-right-radius: $radius-small;
-			border-top: 1px solid $gray-300;
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
 		}
 
 		// Identify the last visible instance as placeholder items will not have this class.
 		&:not(:only-child):nth-last-child(1 of &) {
-			border-bottom-left-radius: $radius-small;
-			border-bottom-right-radius: $radius-small;
-			border-top: 0;
 			border-top-left-radius: 0;
 			border-top-right-radius: 0;
 		}
 
 		&:only-child {
-			border-top: 1px solid $gray-300;
-			border-radius: $radius-small;
+			> div {
+				border-bottom: 0;
+			}
 		}
 
 		> div,
@@ -112,8 +101,23 @@
 		}
 	}
 
-	&.is-open {
-		.block-editor-global-styles-background-panel__dropdown-toggle {
+	.components-item {
+		padding: 0;
+
+		&.block-editor-global-styles-background-panel__dropdown-toggle {
+			&.is-open {
+				background-color: $gray-100;
+			}
+			padding: 6px 12px;
+		}
+	}
+
+	.block-editor-global-styles-background-panel__image-tools-panel-item {
+		border: 0;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown {
+		&.is-open {
 			background-color: $gray-100;
 		}
 	}
@@ -125,31 +129,14 @@
 			border-radius: inherit;
 		}
 	}
-
-	.block-editor-panel-color-gradient-settings__dropdown {
-		&.is-open {
-			background-color: $gray-100;
-		}
-	}
-
-	.block-editor-global-styles-background-panel__image-tools-panel-item {
-		flex-grow: 1;
-		.components-dropdown {
-			display: block;
-		}
-	}
-
-	.block-editor-global-styles-background-panel__inspector-preview-inner {
-		height: 100%;
-	}
-
-	.components-dropdown {
-		display: block;
-		height: 36px;
-	}
 }
 
 .block-editor-global-styles-background-panel__image-tools-panel-item {
+
+	.block-editor-global-styles-background-panel__image-preview {
+		padding: 0;
+	}
+
 	border: 1px solid $gray-300;
 	border-radius: 2px;
 
