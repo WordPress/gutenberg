@@ -262,14 +262,14 @@ export function ParentRow() {
 								sprintf(
 									/* translators: %1$s The home URL of the WordPress installation without the scheme. */
 									__(
-										'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be <span>%1$s</span><wbr />/services<wbr />/pricing.'
+										'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s<wbr />/services<wbr />/pricing.'
 									),
-									filterURLForDisplay( homeUrl )
+									filterURLForDisplay( homeUrl ).replace(
+										/([/.])/g,
+										'<wbr />$1'
+									)
 								),
 								{
-									span: (
-										<span className="editor-post-parent__panel-dialog__example-url" />
-									),
 									wbr: <wbr />,
 								}
 							) }
