@@ -295,6 +295,7 @@ module.exports = {
 						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
+						'SelectControl',
 						'TextControl',
 						'TextareaControl',
 						'ToggleControl',
