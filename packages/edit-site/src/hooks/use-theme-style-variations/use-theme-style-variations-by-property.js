@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import cloneDeep from '../../utils/clone-deep';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
@@ -91,7 +90,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 	const propertiesAsString = properties.toString();
 
 	return useMemo( () => {
-		const clonedUserVariation = cloneDeep( userVariation );
+		const clonedUserVariation = structuredClone( userVariation );
 
 		// Get user variation and remove the settings for the given property.
 		const userVariationWithoutProperties = removePropertiesFromObject(
@@ -167,7 +166,7 @@ export const filterObjectByProperties = ( object, properties ) => {
  */
 export function isVariationWithProperties( variation, properties ) {
 	const variationWithProperties = filterObjectByProperties(
-		cloneDeep( variation ),
+		structuredClone( variation ),
 		properties
 	);
 

@@ -27,7 +27,6 @@ import { unlock } from './lock-unlock';
 
 const {
 	BackButton: __experimentalMainDashboardButton,
-	registerDefaultActions,
 	registerCoreBlockBindingsSources,
 	bootstrapBlockBindingsSourcesFromServer,
 } = unlock( editorPrivateApis );
@@ -97,7 +96,6 @@ export function initializeEditor(
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
-	registerDefaultActions();
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

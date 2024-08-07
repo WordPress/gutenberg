@@ -202,6 +202,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Post content' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Post content' ) }
 					checked={ displayPostContent }
 					onChange={ ( value ) =>

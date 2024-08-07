@@ -474,7 +474,6 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<LineHeightControl
-						__nextHasNoMarginBottom
 						__unstableInputWidth="auto"
 						value={ lineHeight }
 						onChange={ setLineHeight }

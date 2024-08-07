@@ -295,7 +295,10 @@ module.exports = {
 						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
+						'TextControl',
 						'TextareaControl',
+						'ToggleControl',
+						'ToggleGroupControl',
 						'TreeSelect',
 					].map( ( componentName ) => ( {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
