@@ -402,6 +402,7 @@ function GalleryEdit( props ) {
 					lightbox: { enabled: true },
 				};
 			} else if (
+				value !== LINK_DESTINATION_NONE &&
 				value !== LINK_DESTINATION_LIGHTBOX &&
 				lightboxSetting?.enabled
 			) {
