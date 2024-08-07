@@ -215,6 +215,16 @@
 				color: $gray-600;
 			}
 		}
+
+		&.is-tertiary {
+			&:hover:not(:disabled, [aria-disabled="true"]) {
+				background: rgba($alert-red, 0.04);
+			}
+
+			&:active:not(:disabled, [aria-disabled="true"]) {
+				background: rgba($alert-red, 0.08);
+			}
+		}
 	}
 
 	/**
