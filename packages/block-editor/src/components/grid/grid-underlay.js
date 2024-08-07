@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,7 +36,7 @@ export default function Underlay( { clientId, className, children } ) {
 	const rootElement = useBlockElement( rootClientId );
 	const gridElement = useBlockElement( clientId );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! gridElement || ! rootElement ) {
 			return;
 		}
@@ -64,12 +64,21 @@ export default function Underlay( { clientId, className, children } ) {
 		const resizeObserver = defaultView.ResizeObserver
 			? new defaultView.ResizeObserver( update )
 			: undefined;
+		const mutationObserver = defaultView.MutationObserver
+			? new defaultView.MutationObserver( update )
+			: undefined;
+
+		// Monitor grid and parent block resizing.
 		resizeObserver?.observe( gridElement );
 		resizeObserver?.observe( rootElement );
+
+		// Monitor block moving.
+		mutationObserver?.observe( gridElement, { attributes: true } );
 		update();
 
 		return () => {
 			resizeObserver?.disconnect();
+			mutationObserver?.disconnect();
 		};
 	}, [ gridElement, rootElement ] );
 
