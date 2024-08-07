@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+import { arrowDown, arrowUp } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -58,15 +59,9 @@ export const sortLabels = {
 	asc: __( 'Sort ascending' ),
 	desc: __( 'Sort descending' ),
 };
-export const sortLabelsShort = {
-	asc: _x(
-		'Asc',
-		'Short label for ascending sorting, should be at most 6 characters'
-	),
-	desc: _x(
-		'Desc',
-		'Short label for descending sorting, should be at most 6 characters'
-	),
+export const sortIcons = {
+	asc: arrowUp,
+	desc: arrowDown,
 };
 
 // View layouts.

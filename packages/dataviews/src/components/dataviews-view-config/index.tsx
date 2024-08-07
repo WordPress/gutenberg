@@ -11,6 +11,7 @@ import {
 	Popover,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -29,7 +30,7 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortLabelsShort } from '../../constants';
+import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
@@ -60,9 +61,9 @@ function ViewTypeMenu( {
 				<Button
 					size="compact"
 					icon={ activeView?.icon }
-			label={ __( 'Layout' ) }
+					label={ __( 'Layout' ) }
 				/>
-				}
+			}
 		>
 			{ availableLayouts.map( ( layout ) => {
 				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
@@ -168,10 +169,11 @@ function SortDirectionControl() {
 		>
 			{ SORTING_DIRECTIONS.map( ( direction ) => {
 				return (
-					<ToggleGroupControlOption
+					<ToggleGroupControlOptionIcon
 						key={ direction }
 						value={ direction }
-						label={ sortLabelsShort[ direction ] }
+						icon={ sortIcons[ direction ] }
+						label={ sortLabels[ direction ] }
 					/>
 				);
 			} ) }
@@ -270,7 +272,7 @@ function SettingsSection( {
 	children,
 }: {
 	title: string;
-	description: string;
+	description?: string;
 	children: React.ReactNode;
 } ) {
 	return (
@@ -282,12 +284,14 @@ function SettingsSection( {
 				>
 					{ title }
 				</Heading>
-				<Text
-					variant="muted"
-					className="dataviews-settings-section__description"
-				>
-					{ description }
-				</Text>
+				{ description && (
+					<Text
+						variant="muted"
+						className="dataviews-settings-section__description"
+					>
+						{ description }
+					</Text>
+				) }
 			</div>
 			<Grid
 				columns={ 8 }
@@ -303,20 +307,14 @@ function SettingsSection( {
 function DataviewsViewConfigContent() {
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
-			<SettingsSection
-				title={ __( 'Appearance' ) }
-				description={ __( 'Customize the display of data' ) }
-			>
+			<SettingsSection title={ __( 'Appearance' ) }>
 				<HStack expanded className="is-divided-in-two">
 					<SortFieldControl />
 					<SortDirectionControl />
 				</HStack>
 				<ItemsPerPageControl />
 			</SettingsSection>
-			<SettingsSection
-				title={ __( 'Properties' ) }
-				description={ __( 'Manage property order and display' ) }
-			>
+			<SettingsSection title={ __( 'Properties' ) }>
 				<FieldControl />
 			</SettingsSection>
 		</VStack>
@@ -332,25 +330,25 @@ function _DataViewsViewConfig( {
 	return (
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-		<div>
-			<Button
-				size="compact"
-				icon={ cog }
-				label={ _x( 'View options', 'View is used as a noun' ) }
-				onClick={ () => setIsShowingViewPopover( true ) }
-			/>
-			{ isShowingViewPopover && (
-				<Popover
-					placement="bottom-end"
-					onClose={ () => {
-						setIsShowingViewPopover( false );
-					} }
-					focusOnMount
-				>
+			<div>
+				<Button
+					size="compact"
+					icon={ cog }
+					label={ _x( 'View options', 'View is used as a noun' ) }
+					onClick={ () => setIsShowingViewPopover( true ) }
+				/>
+				{ isShowingViewPopover && (
+					<Popover
+						placement="bottom-end"
+						onClose={ () => {
+							setIsShowingViewPopover( false );
+						} }
+						focusOnMount
+					>
 						<DataviewsViewConfigContent />
-				</Popover>
-			) }
-		</div>
+					</Popover>
+				) }
+			</div>
 		</>
 	);
 }
