@@ -42,8 +42,8 @@ function SelectOptions( {
 	} );
 }
 
-function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+function UnforwardedSelectControl< V extends string >(
+	props: WordPressComponentProps< SelectControlProps< V >, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
@@ -82,12 +82,14 @@ function UnforwardedSelectControl(
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
-			const newValues = selectedOptions.map( ( { value } ) => value );
+			const newValues = selectedOptions.map(
+				( { value } ) => value as V
+			);
 			props.onChange?.( newValues, { event } );
 			return;
 		}
 
-		props.onChange?.( event.target.value, { event } );
+		props.onChange?.( event.target.value as V, { event } );
 	};
 
 	const classes = clsx( 'components-select-control', className );
@@ -165,6 +167,14 @@ function UnforwardedSelectControl(
  * };
  * ```
  */
-export const SelectControl = forwardRef( UnforwardedSelectControl );
+export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
+	V extends string,
+>(
+	props: WordPressComponentProps<
+		SelectControlProps< V >,
+		'select',
+		false
+	> & { ref?: React.Ref< HTMLSelectElement > }
+) => React.JSX.Element | null;
 
 export default SelectControl;
