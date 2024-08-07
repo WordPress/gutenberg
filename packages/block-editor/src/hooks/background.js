@@ -55,7 +55,7 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 }
 
 export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if ( ! backgroundStyle ) {
+	if ( ! backgroundStyle || !! backgroundStyle?.backgroundImage?.id ) {
 		return;
 	}
 
@@ -75,7 +75,7 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 			! backgroundStyle?.backgroundPosition
 		) {
 			backgroundStylesWithDefaults = {
-				backgroundPosition: 'center',
+				backgroundPosition: '50% 50%',
 			};
 		}
 	}

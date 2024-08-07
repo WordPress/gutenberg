@@ -268,8 +268,10 @@ function BackgroundImageControls( {
 	style,
 	inheritedValue,
 	onRemoveImage = noop,
+	onResetImage = noop,
 	displayInPanel,
 	themeFileURIs,
+	defaultValues,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -318,9 +320,18 @@ function BackgroundImageControls( {
 			return;
 		}
 
+		/*
+		 * Only apply a default size value if
+		 * one doesn't exist on the block styles,
+		 * or in global styles. We should never
+		 * save an already-inherited style to the
+		 * block styles.
+		 */
 		const sizeValue =
 			style?.background?.backgroundSize ||
-			inheritedValue?.background?.backgroundSize;
+			( ! inheritedValue?.background?.backgroundSize
+				? defaultValues?.backgroundSize
+				: undefined );
 		const positionValue =
 			style?.background?.backgroundPosition ||
 			inheritedValue?.background?.backgroundPosition;
@@ -337,7 +348,7 @@ function BackgroundImageControls( {
 				backgroundPosition:
 					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
-						: positionValue,
+						: style?.background?.backgroundPosition,
 				backgroundSize: sizeValue,
 			} )
 		);
@@ -413,6 +424,7 @@ function BackgroundImageControls( {
 						onClick={ () => {
 							closeAndFocus();
 							onRemove();
+							onRemoveImage();
 						} }
 					>
 						{ __( 'Remove' ) }
@@ -422,7 +434,7 @@ function BackgroundImageControls( {
 					<MenuItem
 						onClick={ () => {
 							closeAndFocus();
-							onRemoveImage();
+							onResetImage();
 						} }
 					>
 						{ __( 'Reset ' ) }
@@ -469,11 +481,19 @@ function BackgroundSizeControls( {
 	 * Block-level controls may have different defaults to root-level controls.
 	 * A falsy value is treated by default as `auto` (Tile).
 	 */
-	const currentValueForToggle =
+	let currentValueForToggle =
 		! sizeValue && isUploadedImage
 			? defaultValues?.backgroundSize
 			: sizeValue || 'auto';
-
+	/*
+	 * The incoming value could be a value + unit, e.g. '20px'.
+	 * In this case set the value to 'tile'.
+	 */
+	currentValueForToggle = ! [ 'cover', 'contain', 'auto' ].includes(
+		currentValueForToggle
+	)
+		? 'auto'
+		: currentValueForToggle;
 	/*
 	 * If the current value is `cover` and the repeat value is `undefined`, then
 	 * the toggle should be unchecked as the default state. Otherwise, the toggle
@@ -569,7 +589,11 @@ function BackgroundSizeControls( {
 				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
-				value={ backgroundPositionToCoords( positionValue ) }
+				value={ backgroundPositionToCoords(
+					! positionValue && 'contain' === sizeValue
+						? '50% 50%'
+						: positionValue
+				) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
@@ -577,9 +601,6 @@ function BackgroundSizeControls( {
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
-				help={ __(
-					'Whether your image should scroll with the page or stay fixed in place.'
-				) }
 			/>
 			<ToggleGroupControl
 				__nextHasNoMarginBottom
@@ -700,8 +721,13 @@ export default function BackgroundPanel( {
 		hasBackgroundImageValue( value ) ||
 		hasBackgroundImageValue( inheritedValue );
 
+	const imageValue =
+		value?.background?.backgroundImage ||
+		inheritedValue?.background?.backgroundImage;
+
 	const shouldShowBackgroundImageControls =
 		hasImageValue &&
+		'none' !== imageValue &&
 		( settings?.background?.backgroundSize ||
 			settings?.background?.backgroundPosition ||
 			settings?.background?.backgroundRepeat );
@@ -725,7 +751,7 @@ export default function BackgroundPanel( {
 				) }
 			>
 				<ToolsPanelItem
-					hasValue={ () => hasImageValue }
+					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
@@ -749,10 +775,14 @@ export default function BackgroundPanel( {
 									inheritedValue={ inheritedValue }
 									themeFileURIs={ themeFileURIs }
 									displayInPanel
-									onRemoveImage={ () => {
+									onResetImage={ () => {
 										setIsDropDownOpen( false );
 										resetBackground();
 									} }
+									onRemoveImage={ () =>
+										setIsDropDownOpen( false )
+									}
+									defaultValues={ defaultValues }
 								/>
 								<BackgroundSizeControls
 									onChange={ onChange }
@@ -770,6 +800,12 @@ export default function BackgroundPanel( {
 							style={ value }
 							inheritedValue={ inheritedValue }
 							themeFileURIs={ themeFileURIs }
+							defaultValues={ defaultValues }
+							onResetImage={ () => {
+								setIsDropDownOpen( false );
+								resetBackground();
+							} }
+							onRemoveImage={ () => setIsDropDownOpen( false ) }
 						/>
 					) }
 				</ToolsPanelItem>
