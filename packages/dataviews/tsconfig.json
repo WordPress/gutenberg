@@ -14,7 +14,8 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis" },
+		{ "path": "../warning" }
 	],
 	"include": [ "src" ]
 }
