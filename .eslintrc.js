@@ -292,6 +292,7 @@ module.exports = {
 					...[
 						'CheckboxControl',
 						'ComboboxControl',
+						'DimensionControl',
 						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
