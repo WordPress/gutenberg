@@ -191,6 +191,8 @@ function GridVisualizerCell( { color, children, className } ) {
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
 				color,
+				background: 'cornflowerblue',
+				opacity: 0.1,
 			} }
 		>
 			{ children }
