@@ -11,13 +11,14 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockIcon,
-	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
+	MediaReplaceFlow,
+	BlockControls,
+	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -268,8 +269,6 @@ export function ImageEdit( {
 		onError: onUploadError,
 	} );
 
-	const isExternal = isExternalImage( id, url );
-	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -333,13 +332,6 @@ export function ImageEdit( {
 				} ) }
 				withIllustration
 				icon={ lockUrlControls ? pluginsIcon : icon }
-				label={ __( 'Image' ) }
-				instructions={
-					! lockUrlControls &&
-					__(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
-					)
-				}
 				style={ {
 					aspectRatio:
 						! ( width && height ) && aspectRatio
@@ -365,6 +357,34 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
+			{ ! ( temporaryURL || url ) && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						name={ __( 'Choose Image' ) }
+						onSelect={ onSelectImage }
+						onError={ onUploadError }
+					>
+						<form className="block-editor-media-flow__url-input has-siblings">
+							<span className="block-editor-media-replace-flow__image-url-label">
+								{ __( 'Insert from URL:' ) }
+							</span>
+
+							<LinkControl
+								value={ { url } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( value ) => {
+									onSelectURL( value.url );
+								} }
+							/>
+						</form>
+					</MediaReplaceFlow>
+				</BlockControls>
+			) }
 			<Image
 				temporaryURL={ temporaryURL }
 				attributes={ attributes }
@@ -380,18 +400,7 @@ export function ImageEdit( {
 				blockEditingMode={ blockEditingMode }
 				parentLayoutType={ parentLayout?.type }
 			/>
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
+			{ ! ( temporaryURL || url ) && placeholder( mediaPreview ) }
 		</figure>
 	);
 }
