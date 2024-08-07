@@ -14,11 +14,16 @@ import {
 	ExternalLink,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { useState, useMemo } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useMemo,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -217,6 +222,10 @@ function PostParentToggle( { isOpen, onClick } ) {
 }
 
 export function ParentRow() {
+	const homeUrl = useSelect(
+		( select ) => select( coreStore ).getUnstableBase()?.home,
+		[]
+	);
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -249,12 +258,21 @@ export function ParentRow() {
 							onClose={ onClose }
 						/>
 						<div>
-							{
-								/* translators: The domain name should be a reserved domain name to prevent linking to third party sites outside the WordPress project's control. You may also wish to use wordpress.org or a wordpress.org sub-domain. */
-								__(
-									"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services', its URL would be example.org/services/web-design."
-								)
-							}
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %1$s The home URL of the WordPress installation without the scheme. */
+									__(
+										'Child pages inherit characteristics from their parent, such as URL structure. For instance, if "Pricing" is a child of "Services", its URL would be %1$s<wbr />/services<wbr />/pricing.'
+									),
+									filterURLForDisplay( homeUrl ).replace(
+										/([/.])/g,
+										'<wbr />$1'
+									)
+								),
+								{
+									wbr: <wbr />,
+								}
+							) }
 							<p>
 								{ __(
 									'They also show up as sub-items in the default navigation menu. '
