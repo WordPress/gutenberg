@@ -1152,7 +1152,7 @@ store('mySliderPlugin', {
 
 ## Server functions
 
-The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
+The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
 
 ### wp_interactivity_config
 
@@ -1179,6 +1179,35 @@ This config can be retrieved on the client:
 // view.js
 
 const { showLikeButton } = getConfig();
+```
+
+### wp_interactivity_state
+
+`wp_interactivity_state` allows the initialization of state on the server, which will be merged with with any stores defined in `view.js`.
+
+Initializing state on the server allows you to use many critical WordPress APIs, including [AJAX](https://developer.wordpress.org/plugins/javascript/ajax/), or [nonces](https://developer.wordpress.org/plugins/javascript/enqueuing/#nonce).
+
+The `wp_interactivity_state` function receives two arguments, a string with the namespace that will be used as a reference and an associative array containing the values.
+
+Here is an example of passing the WP Admin AJAX endpoint with a nonce.
+
+```php
+// render.php
+
+wp_interactivity_state(
+	'myPlugin',
+	array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
+	),
+);
+```
+
+```js
+const { state } = store( 'myPlugin', {
+	console.log( state.ajaxUrl );
+	// Expected output: https://yoursite.com/wp-admin/admin-ajax.php
+}
 ```
 
 ### wp_interactivity_process_directives
