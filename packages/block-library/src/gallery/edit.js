@@ -670,7 +670,7 @@ function GalleryEdit( props ) {
 						icon={ linkIcon }
 						label={ __( 'Link' ) }
 						toggleProps={ {
-							isPressed: linkTo === LINK_DESTINATION_NONE,
+							isPressed: hasLinkTo,
 						} }
 					>
 						{ ( { onClose } ) => (
