@@ -79,7 +79,7 @@ function Edit< Item >( {
 			<TimePicker
 				currentTime={ value }
 				onChange={ onChangeControl }
-				withLabels={ false }
+				hideLabelFromVision
 			/>
 		</BaseControl>
 	);

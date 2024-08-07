@@ -31,9 +31,11 @@ export type TimePickerProps = {
 	onChange?: ( time: string ) => void;
 
 	/**
-	 * Whether to render the time picker with labels. True by default.
+	 * If true, the label will only be visible to screen readers.
+	 *
+	 * @default false
 	 */
-	withLabels?: boolean;
+	hideLabelFromVision?: boolean;
 };
 
 export type TimeInputValue = {
