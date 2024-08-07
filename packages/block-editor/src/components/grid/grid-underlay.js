@@ -42,10 +42,6 @@ export default function Underlay( { clientId, className, children } ) {
 			const rootRect = rootElement.getBoundingClientRect();
 			const gridRect = gridElement.getBoundingClientRect();
 
-			// The 'underlay' has the width and horizontal positioning of the root block list,
-			// and the height and vertical positioning of the edited block.
-			// Note: using the root block list is a naive implementation here, ideally the parent
-			// block that provides the layout should be used.
 			setUnderlayStyle( {
 				position: 'absolute',
 				left: Math.floor( gridRect.left - rootRect.left ),
@@ -64,10 +60,12 @@ export default function Underlay( { clientId, className, children } ) {
 			: undefined;
 		resizeObserver?.observe( gridElement );
 		resizeObserver?.observe( rootElement );
+		// defaultView?.addEventListener( 'resize', update );
 		update();
 
 		return () => {
 			resizeObserver?.disconnect();
+			// defaultView?.removeEventListener( 'resize', update );
 		};
 	}, [ gridElement, rootElement ] );
 
