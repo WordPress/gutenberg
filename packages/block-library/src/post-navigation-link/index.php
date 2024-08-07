@@ -116,7 +116,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
 		$content = $get_link_function( $format, $link );
 	}
 
-	// Return If the adjacent post is unavailable.
+	// Return empty if the adjacent post is unavailable.
 	if ( empty( $content ) ) {
 		return '';
 	}
