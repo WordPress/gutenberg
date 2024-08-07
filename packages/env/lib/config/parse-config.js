@@ -37,6 +37,7 @@ const mergeConfigs = require( './merge-configs' );
  * @property {number}                               testsPort                     The port to use in the tests environment.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
+ * @property {Object.<string, string|null>}         lifecycleScripts.afterStop    The script to run after the "stop" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterDestroy The script to run after the "destroy" command has completed.
  * @property {Object.<string, WPEnvironmentConfig>} env                           The environment-specific configuration options.
@@ -230,6 +231,7 @@ async function getDefaultConfig(
 		// on environment-specific configuration objects.
 		lifecycleScripts: {
 			afterStart: null,
+			afterStop: null,
 			afterClean: null,
 			afterDestroy: null,
 		},
