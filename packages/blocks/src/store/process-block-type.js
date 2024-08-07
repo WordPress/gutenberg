@@ -63,6 +63,34 @@ function mergeBlockVariations(
 }
 
 /**
+ * Function to stabilize border supports.
+ * This function needs to be merged once we have below PR merged.
+ *
+ *  Reference from - https://github.com/WordPress/gutenberg/pull/63401/
+ *
+ *
+ * @param {Object} rawSupports Support for the block.
+ *
+ * @return {Object} Stabilized supports.
+ */
+function stabilizeBorderSupports( rawSupports ) {
+	if ( ! rawSupports ) {
+		return rawSupports;
+	}
+
+	const supports = { ...rawSupports };
+
+	if (
+		supports?.__experimentalBorder &&
+		typeof supports.__experimentalBorder === 'object'
+	) {
+		supports.border = supports.__experimentalBorder;
+	}
+
+	return supports;
+}
+
+/**
  * Takes the unprocessed block type settings, merges them with block type metadata
  * and applies all the existing filters for the registered block type.
  * Next, it validates all the settings and performs additional processing to the block type definition.
@@ -102,12 +130,20 @@ export const processBlockType =
 			),
 		};
 
+		blockType.supports = stabilizeBorderSupports( blockType.supports );
+
 		const settings = applyFilters(
 			'blocks.registerBlockType',
 			blockType,
 			name,
 			null
 		);
+
+		// Re-stabilize any experimental supports after applying filters.
+		// This ensures that any supports updated by filters are also stabilized.
+		// Reference from - https://github.com/WordPress/gutenberg/pull/63401/
+
+		blockType.supports = stabilizeBorderSupports( blockType.supports );
 
 		if (
 			settings.description &&
@@ -119,29 +155,40 @@ export const processBlockType =
 		}
 
 		if ( settings.deprecated ) {
-			settings.deprecated = settings.deprecated.map( ( deprecation ) =>
-				Object.fromEntries(
-					Object.entries(
-						// Only keep valid deprecation keys.
-						applyFilters(
-							'blocks.registerBlockType',
-							// Merge deprecation keys with pre-filter settings
-							// so that filters that depend on specific keys being
-							// present don't fail.
-							{
-								// Omit deprecation keys here so that deprecations
-								// can opt out of specific keys like "supports".
-								...omit( blockType, DEPRECATED_ENTRY_KEYS ),
-								...deprecation,
-							},
-							blockType.name,
-							deprecation
-						)
-					).filter( ( [ key ] ) =>
+			settings.deprecated = settings.deprecated.map( ( deprecation ) => {
+				// Stabilize any experimental supports before applying filters.
+				deprecation.supports = stabilizeBorderSupports(
+					deprecation.supports
+				);
+
+				const filteredDeprecation = // Only keep valid deprecation keys.
+					applyFilters(
+						'blocks.registerBlockType',
+						// Merge deprecation keys with pre-filter settings
+						// so that filters that depend on specific keys being
+						// present don't fail.
+						{
+							// Omit deprecation keys here so that deprecations
+							// can opt out of specific keys like "supports".
+							...omit( blockType, DEPRECATED_ENTRY_KEYS ),
+							...deprecation,
+						},
+						blockType.name,
+						deprecation
+					);
+
+				// Re-stabilize any experimental supports after applying filters.
+				// This ensures that any supports updated by filters are also stabilized.
+				filteredDeprecation.supports = stabilizeBorderSupports(
+					filteredDeprecation.supports
+				);
+
+				return Object.fromEntries(
+					Object.entries( filteredDeprecation ).filter( ( [ key ] ) =>
 						DEPRECATED_ENTRY_KEYS.includes( key )
 					)
-				)
-			);
+				);
+			} );
 		}
 
 		if ( ! isPlainObject( settings ) ) {
