@@ -1,6 +1,6 @@
 # Tutorial: Build your first block
 
-In this tutorial, you will build a "Copyright Date Block"—a basic yet practical block that displays the copyright symbol (©), the current year, and an optional starting year. This type of content is commonly used in website footers.
+In this tutorial, you will build a "Copyright Date Block" — a basic yet practical block that displays the copyright symbol (©), the current year, and an optional starting year. This type of content is commonly used in website footers.
 
 The tutorial will guide you through the complete process, from scaffolding the block plugin using the [`create-block`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/) package to modifying each file. While previous WordPress development experience is beneficial, it's not a prerequisite for this tutorial.
 
@@ -12,7 +12,7 @@ Here's a quick look at what you're going to build.
 
 ![What you're going to build](https://developer.wordpress.org/files/2023/12/block-tutorial-1.png)
 
-You can also interact with the finished project in [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WordPress/block-development-examples/trunk/plugins/copyright-date-block-09aac3/_playground/blueprint.json) or use the [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) to install the complete block plugin in your local WordPress environment.
+You can also interact with the finished project in [WordPress Playground](https://playground.wordpress.net/?blueprint-url=https://raw.githubusercontent.com/WordPress/block-development-examples/trunk/plugins/copyright-date-block-09aac3/_playground/blueprint.json), or use the [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) to install the complete block plugin in your local WordPress environment.
 
 ## Prerequisites
 
@@ -25,43 +25,86 @@ To complete this tutorial, you will need:
 If you don't have one or more of these items, the [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) documentation will help you get started. Come back here once you are all set up.
 
 <div class="callout callout-info">
-	This tutorial uses <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/"><code>wp-env</code></a> to create a local WordPress development environment. However, feel free to use alternate local development tools if you already have one that you prefer.
+	The procedure that you use to scaffold the initial block structure depends on how you set up your local WordPress environment. If you want to use the <code>wp-env</code> tool to create a new WordPress environment in Docker, then you will proceed differently than if you previously created a WordPress environment without the <code>wp-env</code> tool. For more information about the different local WordPress environments, see <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/#local-wordpress-environment">Local WordPress environment</a>.
 </div>
 
 ## Scaffolding the block
 
-The first step in creating the Copyright Date Block is to scaffold the initial block structure using the [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
+The first step in creating the Copyright Date Block is to scaffold the initial block structure using the `@wordpress/create-block` package.
+
+How you use the `create-block` package depends on weather you want to use the `wp-env` tool to generate your local WordPress environment in a Docker container. If so, follow the procedure in [Using Docker and wp-env tool](#using-wp-env).
+
+If you have an alternate [local WordPress environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#local-wordpress-environment), follow the procedure [Using alternate WordPress environment](#alternate).
 
 <div class="callout callout-info">
-	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/">Get started with create-block</a> documentation for an introduction to using this package.
+This tutorial provides the basics about the <code>create-block</code> and the <code>wp-env</code> packages, which is enough information to scaffold the Copyright Date Block with minimal development considerations. However, each package supports extensive usage, which you may later find helpful in addressing your complete development requirements.
+
+For overviews of these packages, see [Get started with create-block](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/) and [Get started with wp-env](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/).
+
+For package details, see [@wordpress/create-block](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) and [@wordpress/env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#starting-the-environment).
+
 </div>
 
-You can use `create-block` from just about any directory (folder) on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
+<h3 id='using-wp-env'>Using Docker and wp-env tool</h3>
 
-Therefore, choose a directory to place the block plugin or optionally create a new folder called "Block Tutorial". Open your terminal and `cd` to this directory. Then run the following command.
+1. Choose a directory to place the block plugin, or, optionally, create a new folder called “Block Tutorial”.
+2. Open your terminal and `cd` to this directory.
+3. Generate the `copyright-date-block` plugin:
+
+   ```bash
+   npx @wordpress/create-block@latest copyright-date-block –-wp-env --variant=dynamic
+   ```
+
+   This command includes two options. With the `ws-env` option, `create-block` will add to the generated plugin the configuration and the script to run `wp-env` package within the plugin. The `--variant=dynamic` option tells `create-block` to scaffold a dynamically rendered block. Later in this tutorial, you will learn about dynamic and static rendering and add static rendering to this block.
+
+   After executing this command, you’ll find a new directory named `copyright-date-block` in the plugin folder. This directory contains all the initial files needed to start customizing your block.
+
+   This command also sets up the basic structure of your block, with `copyright-date-block` as its slug. This slug uniquely identifies your block within WordPress.
+
+4. Go to the new directory: `cd copyright-date-block`.
+
+5. If it's not already running, start Docker Desktop.
+
+6. Run the `wp-env` tool: `wp-env start`.
+
+   It will generate a new Docker container with a WordPress environment. This environment includes the `copyright-date-block` plugin.
+
+7. Navigate to `http://localhost:8888/wp-admin`, and log into the WordPress dashboard using username `admin` and password `password`.
+
+8. Navigate to the Plugins page in the WordPress dashboard and confirm that the plugin is active.
+
+9. As shown below, [test the Copyright Date Block](#test) in a page or a post.
 
 <div class="callout callout-info">
-	If you are not using <code>wp-env</code>, instead, navigate to the <code>plugins/</code> folder in your local WordPress installation using the terminal and run the following command.
+If you later want to restart this same Docker container, return to this  <code>copyright-date-block</code> directory and run <code>wp-env start</code>.
 </div>
 
-```bash
-npx @wordpress/create-block@latest copyright-date-block --variant=dynamic
-cd copyright-date-block
-```
+<h3 id='alternate'>Using alternate WordPress environment</h3>
 
-After executing this command, you'll find a new directory named `copyright-date-block` in the plugins folder. This directory contains all the initial files needed to start customizing your block.
+1. Navigate to the `plugins` folder in your local WordPress installation.
 
-This command also sets up the basic structure of your block, with `copyright-date-block` as its slug. This slug uniquely identifies your block within WordPress.
+2. Generate the `copyright-date-block` plugin from the `plugins` folder:
 
-<div class="callout callout-info">
-	You might have noticed that the command uses the <code>--variant=dynamic</code> flag. This tells <code>create-block</code> you want to scaffold a dynamically rendered block. Later in this tutorial, you will learn about dynamic and static rendering and add static rendering to this block.
-</div>
+   ```bash
+   npx @wordpress/create-block@latest copyright-date-block --variant=dynamic
+   ```
 
-Navigate to the Plugins page in the WordPress admin and confirm that the plugin is active. Then, create a new page or post and ensure you can insert the Copyright Date Block. It should look like this once inserted.
+   The `--variant=dynamic` option tells `create-block` to scaffold a dynamically rendered block. Later in this tutorial, you will learn about dynamic and static rendering and add static rendering to this block.
+
+3. Log into the WordPress dashboard.
+
+4. Navigate to the Plugins page in the WordPress dashboard and confirm that the plugin is active.
+
+5. As follows, test the Copyright Date Block.
+
+<h3 id="test">Testing Copyright Date Block</h3>
+
+Create a new page or post and ensure you can insert the Copyright Date Block. It should look like this once inserted.
 
 ![The scaffolded block in the Editor](https://developer.wordpress.org/files/2023/12/block-tutorial-2.png)
 
 ## Reviewing the files
+
 Before we begin modifying the scaffolded block, it's important to review the plugin's file structure. Open the plugin folder in your code editor.
 
 ![The files that make up the block plugin](https://developer.wordpress.org/files/2023/12/block-tutorial-3.png)
@@ -206,12 +249,12 @@ Open the [`index.js`](https://developer.wordpress.org/block-editor/getting-start
 Start by looking at the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/) function. This function accepts the name of the block, which we are getting from the imported `block.json` file, and the block configuration object.
 
 ```js
-import Edit from './edit';
-import metadata from './block.json';
+import Edit from "./edit";
+import metadata from "./block.json";
 
-registerBlockType( metadata.name, {
+registerBlockType(metadata.name, {
 	edit: Edit,
-} );
+});
 ```
 
 By default, the object just includes the `edit` property, but you can add many more, including `icon`. While most of these properties are already defined in `block.json`, you need to specify the icon here to use a custom SVG.
@@ -232,10 +275,10 @@ const calendarIcon = (
 	</svg>
 );
 
-registerBlockType( metadata.name, {
+registerBlockType(metadata.name, {
 	icon: calendarIcon,
-	edit: Edit
-} );
+	edit: Edit,
+});
 ```
 
 <div class="callout callout-tip">
@@ -257,11 +300,11 @@ Open the file and see that the `Edit()` function returns a paragraph tag with th
 ```js
 export default function Edit() {
 	return (
-		<p { ...useBlockProps() }>
-			{ __(
-				'Copyright Date Block – hello from the editor!',
-				'copyright-date-block-demo'
-			) }
+		<p {...useBlockProps()}>
+			{__(
+				"Copyright Date Block – hello from the editor!",
+				"copyright-date-block-demo"
+			)}
 		</p>
 	);
 }
@@ -288,9 +331,7 @@ Next, update the function to display the correct information.
 export default function Edit() {
 	const currentYear = new Date().getFullYear().toString();
 
-	return (
-		<p { ...useBlockProps() }>© { currentYear }</p>
-	);
+	return <p {...useBlockProps()}>© {currentYear}</p>;
 }
 ```
 
@@ -385,7 +426,7 @@ Earlier in this tutorial, you added block supports that automatically created Co
 The `InspectorControls` belongs to the [`@wordpress/block-editor`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/) package, so you can import it into the `edit.js` file by adding the component name on line 14. The result should look like this.
 
 ```js
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from "@wordpress/block-editor";
 ```
 
 Next, update the Edit function to return the current block content and an `InspectorControls` component that includes the text "Testing." You can wrap everything in a [Fragment](https://react.dev/reference/react/Fragment) (`<></>`) to ensure proper JSX syntax. The result should look like this.
@@ -396,14 +437,13 @@ export default function Edit() {
 
 	return (
 		<>
-			<InspectorControls>
-				Testing
-			</InspectorControls>
-			<p { ...useBlockProps() }>© { currentYear }</p>
+			<InspectorControls>Testing</InspectorControls>
+			<p {...useBlockProps()}>© {currentYear}</p>
 		</>
 	);
 }
 ```
+
 Save the file and refresh the Editor. When selecting the block, you should see the "Testing" message in the Settings Sidebar.
 
 ![The Setting Sidebar now displays the message](https://developer.wordpress.org/files/2023/12/block-tutorial-9.png)
@@ -415,7 +455,7 @@ Now, let's use a few more Core components to add a custom panel and the user int
 Add the following line below the other imports in the `edit.js` file.
 
 ```js
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl } from "@wordpress/components";
 ```
 
 Then wrap the "Testing" message in the `PanelBody` component and set the `title` parameter to "Settings". Refer to the [component documentation](https://developer.wordpress.org/block-editor/reference-guides/components/panel/#panelbody) for additional parameter options.
@@ -427,11 +467,11 @@ export default function Edit() {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+				<PanelBody title={__("Settings", "copyright-date-block")}>
 					Testing
 				</PanelBody>
 			</InspectorControls>
-			<p { ...useBlockProps() }>© { currentYear }</p>
+			<p {...useBlockProps()}>© {currentYear}</p>
 		</>
 	);
 }
@@ -471,27 +511,22 @@ Now, you can remove the "Testing" message and add a `TextControl`. It should inc
 Putting it all together, the `Edit()` function should look like the following.
 
 ```js
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit({ attributes, setAttributes }) {
 	const { showStartingYear, startingYear } = attributes;
 	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+				<PanelBody title={__("Settings", "copyright-date-block")}>
 					<TextControl
-						label={ __(
-							'Starting year',
-							'copyright-date-block'
-						) }
-						value={ startingYear || '' }
-						onChange={ ( value ) =>
-							setAttributes( { startingYear: value } )
-						}
+						label={__("Starting year", "copyright-date-block")}
+						value={startingYear || ""}
+						onChange={(value) => setAttributes({ startingYear: value })}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<p { ...useBlockProps() }>© { currentYear }</p>
+			<p {...useBlockProps()}>© {currentYear}</p>
 		</>
 	);
 }
@@ -518,41 +553,33 @@ You can also update the "Starting year" text input so it's only displayed when `
 The `Edit()` function should look like the following.
 
 ```js
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit({ attributes, setAttributes }) {
 	const { showStartingYear, startingYear } = attributes;
 	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+				<PanelBody title={__("Settings", "copyright-date-block")}>
 					<ToggleControl
-						checked={ !! showStartingYear }
-						label={ __(
-							'Show starting year',
-							'copyright-date-block'
-						) }
-						onChange={ () =>
-							setAttributes( {
-								showStartingYear: ! showStartingYear,
-							} )
+						checked={!!showStartingYear}
+						label={__("Show starting year", "copyright-date-block")}
+						onChange={() =>
+							setAttributes({
+								showStartingYear: !showStartingYear,
+							})
 						}
 					/>
-					{ showStartingYear && (
+					{showStartingYear && (
 						<TextControl
-							label={ __(
-								'Starting year',
-								'copyright-date-block'
-							) }
-							value={ startingYear || '' }
-							onChange={ ( value ) =>
-								setAttributes( { startingYear: value } )
-							}
+							label={__("Starting year", "copyright-date-block")}
+							value={startingYear || ""}
+							onChange={(value) => setAttributes({ startingYear: value })}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			<p { ...useBlockProps() }>© { currentYear }</p>
+			<p {...useBlockProps()}>© {currentYear}</p>
 		</>
 	);
 }
@@ -573,8 +600,8 @@ The code should look something like this.
 ```js
 let displayDate;
 
-if ( showStartingYear && startingYear ) {
-	displayDate = startingYear + '–' + currentYear;
+if (showStartingYear && startingYear) {
+	displayDate = startingYear + "–" + currentYear;
 } else {
 	displayDate = currentYear;
 }
@@ -589,14 +616,14 @@ Next, you just need to update the block content to use the `displayDate` instead
 The `Edit()` function should look like the following.
 
 ```js
-export default function Edit( { attributes, setAttributes } ) {
+export default function Edit({ attributes, setAttributes }) {
 	const { showStartingYear, startingYear } = attributes;
 	const currentYear = new Date().getFullYear().toString();
 
 	let displayDate;
 
-	if ( showStartingYear && startingYear ) {
-			displayDate = startingYear + '–' + currentYear;
+	if (showStartingYear && startingYear) {
+		displayDate = startingYear + "–" + currentYear;
 	} else {
 		displayDate = currentYear;
 	}
@@ -604,34 +631,26 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+				<PanelBody title={__("Settings", "copyright-date-block")}>
 					<ToggleControl
-						checked={ !! showStartingYear }
-						label={ __(
-							'Show starting year',
-							'copyright-date-block'
-						) }
-						onChange={ () =>
-							setAttributes( {
-								showStartingYear: ! showStartingYear,
-							} )
+						checked={!!showStartingYear}
+						label={__("Show starting year", "copyright-date-block")}
+						onChange={() =>
+							setAttributes({
+								showStartingYear: !showStartingYear,
+							})
 						}
 					/>
-					{ showStartingYear && (
+					{showStartingYear && (
 						<TextControl
-							label={ __(
-								'Starting year',
-								'copyright-date-block'
-							) }
-							value={ startingYear || '' }
-							onChange={ ( value ) =>
-								setAttributes( { startingYear: value } )
-							}
+							label={__("Starting year", "copyright-date-block")}
+							value={startingYear || ""}
+							onChange={(value) => setAttributes({ startingYear: value })}
 						/>
-					) }
+					)}
 				</PanelBody>
 			</InspectorControls>
-			<p { ...useBlockProps() }>© { displayDate }</p>
+			<p {...useBlockProps()}>© {displayDate}</p>
 		</>
 	);
 }
@@ -734,12 +753,12 @@ Adding static rendering is also a good exploration of how block content is store
 Start by adding a new file named `save.js` to the `src/` folder. In this file, add the following.
 
 ```js
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from "@wordpress/block-editor";
 
 export default function save() {
 	return (
-		<p { ...useBlockProps.save() }>
-			{ 'Copyright Date Block – hello from the saved content!' }
+		<p {...useBlockProps.save()}>
+			{"Copyright Date Block – hello from the saved content!"}
 		</p>
 	);
 }
@@ -785,7 +804,9 @@ After preforming block recovery, open the Code editor and you will see the marku
 
 ```html
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} -->
-<p class="wp-block-create-block-copyright-date-block">Copyright Date Block – hello from the saved content!</p>
+<p class="wp-block-create-block-copyright-date-block">
+	Copyright Date Block – hello from the saved content!
+</p>
 <!-- /wp:create-block/copyright-date-block -->
 ```
 
@@ -803,21 +824,19 @@ Next, let's update the output of the `save()` function to display the correct co
 The result should look like this.
 
 ```js
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const { showStartingYear, startingYear } = attributes;
 	const currentYear = new Date().getFullYear().toString();
 
 	let displayDate;
 
-	if ( showStartingYear && startingYear ) {
-		displayDate = startingYear + '–' + currentYear;
+	if (showStartingYear && startingYear) {
+		displayDate = startingYear + "–" + currentYear;
 	} else {
 		displayDate = currentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p {...useBlockProps.save()}>© {displayDate}</p>;
 }
 ```
 
@@ -864,20 +883,18 @@ Open the `block.json` file and add a new attribute called `fallbackCurrentYear` 
 Next, open the `save.js` file and use the new `fallbackCurrentYear` attribute in place of `currentYear`. Your updated `save()` function should look like this.
 
 ```js
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const { fallbackCurrentYear, showStartingYear, startingYear } = attributes;
 
 	let displayDate;
 
-	if ( showStartingYear && startingYear ) {
-		displayDate = startingYear + '–' + fallbackCurrentYear;
+	if (showStartingYear && startingYear) {
+		displayDate = startingYear + "–" + fallbackCurrentYear;
 	} else {
 		displayDate = fallbackCurrentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p {...useBlockProps.save()}>© {displayDate}</p>;
 }
 ```
 
@@ -890,24 +907,22 @@ Instead of returning just the copyright symbol, let's add a condition that if `f
 The final `save()` function should look like this.
 
 ```js
-export default function save( { attributes } ) {
+export default function save({ attributes }) {
 	const { fallbackCurrentYear, showStartingYear, startingYear } = attributes;
 
-	if ( ! fallbackCurrentYear ) {
+	if (!fallbackCurrentYear) {
 		return null;
 	}
 
 	let displayDate;
 
-	if ( showStartingYear && startingYear ) {
-		displayDate = startingYear + '–' + fallbackCurrentYear;
+	if (showStartingYear && startingYear) {
+		displayDate = startingYear + "–" + fallbackCurrentYear;
 	} else {
 		displayDate = fallbackCurrentYear;
 	}
 
-	return (
-		<p { ...useBlockProps.save() }>© { displayDate }</p>
-	);
+	return <p {...useBlockProps.save()}>© {displayDate}</p>;
 }
 ```
 
@@ -924,8 +939,8 @@ When the block loads in the Editor, the `currentYear` variable is defined. The f
 Now, let's set the `fallbackCurrentYear` attribute to the `currentYear` when the block loads if the attribute is not already set.
 
 ```js
-if ( currentYear !== fallbackCurrentYear ) {
-	setAttributes( { fallbackCurrentYear: currentYear } );
+if (currentYear !== fallbackCurrentYear) {
+	setAttributes({ fallbackCurrentYear: currentYear });
 }
 ```
 
@@ -934,7 +949,7 @@ This will work but can be improved by ensuring this code only runs once when the
 First, import `useEffect` with the following code.
 
 ```js
-import { useEffect } from 'react';
+import { useEffect } from "react";
 ```
 
 Then wrap the `setAttribute()` code above in a `useEffect` and place this code after the `currentYear` definition in the `Edit()` function. The result should look like this.
@@ -965,7 +980,7 @@ You will not get any block validation errors, but the Editor will detect that ch
 
 #### Optimizing render.php
 
-The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the  `render.php` file via the `$content` variable.
+The final step is to optimize the `render.php` file. If the `currentYear` and the `fallbackCurrentYear` attribute are the same, then there is no need to dynamically create the block content. It is already saved in the database and is available in the `render.php` file via the `$content` variable.
 
 Therefore, update the file to render the generated content if `currentYear` and `fallbackCurrentYear` do not match.
 
