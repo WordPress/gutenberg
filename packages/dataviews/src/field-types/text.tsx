@@ -63,8 +63,6 @@ function Edit< Item >( {
 
 		return (
 			<SelectControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ label }
 				value={ value }
 				options={ elements }
