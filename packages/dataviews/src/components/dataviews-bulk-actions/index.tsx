@@ -212,7 +212,7 @@ function renderFooterContent< Item >(
 			<span className="dataviews-bulk-actions-footer__item-count">
 				{ sprintf(
 					/* translators: %d: number of items. */
-					_n( '%d Item selected', '%d Items selected', countToShow ),
+					_n( '%d Item', '%d Items', countToShow ),
 					countToShow
 				) }
 			</span>
