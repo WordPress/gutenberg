@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl, TimePicker } from '@wordpress/components';
+import { BaseControl, TimePicker, SelectControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -47,6 +48,31 @@ function Edit< Item >( {
 			} ) ),
 		[ id, onChange ]
 	);
+
+	if ( field.elements ) {
+		const elements = [
+			/*
+			 * Value can be undefined when:
+			 *
+			 * - the field is not required
+			 * - in bulk editing
+			 *
+			 */
+			{ label: __( 'Select item' ), value: '' },
+			...field.elements,
+		];
+
+		return (
+			<SelectControl
+				label={ label }
+				value={ value }
+				options={ elements }
+				onChange={ onChangeControl }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			/>
+		);
+	}
 
 	return (
 		<BaseControl id={ id } label={ label }>
