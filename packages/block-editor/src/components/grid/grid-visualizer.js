@@ -13,8 +13,8 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import GridUnderlay from './grid-underlay';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopoverCover from '../block-popover/cover';
 import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
@@ -84,12 +84,11 @@ const GridVisualizerGrid = forwardRef(
 		}, [] );
 
 		return (
-			<BlockPopoverCover
+			<GridUnderlay
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
-				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }
@@ -110,7 +109,7 @@ const GridVisualizerGrid = forwardRef(
 						) )
 					) }
 				</div>
-			</BlockPopoverCover>
+			</GridUnderlay>
 		);
 	}
 );
