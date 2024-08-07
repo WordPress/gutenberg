@@ -303,7 +303,10 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								} )
 							}
 						/>
-						<BaseControl className="editor-latest-posts-image-alignment-control">
+						<BaseControl
+							className="editor-latest-posts-image-alignment-control"
+							__nextHasNoMarginBottom
+						>
 							<BaseControl.VisualLabel>
 								{ __( 'Image alignment' ) }
 							</BaseControl.VisualLabel>
