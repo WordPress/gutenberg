@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import userEvent from '@testing-library/user-event';
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
