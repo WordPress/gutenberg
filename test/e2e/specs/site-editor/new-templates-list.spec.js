@@ -25,7 +25,7 @@ test.describe( 'Templates', () => {
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
 		await page.getByRole( 'combobox', { name: 'Sort by' } ).click();
-		await page.getByRole( 'option', { name: 'Template' } ).click();
+		await page.getByRole( 'option', { name: 'title' } ).click();
 		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
 		const firstTitle = page
 			.getByRole( 'region', {
