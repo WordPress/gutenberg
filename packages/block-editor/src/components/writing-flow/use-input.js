@@ -45,7 +45,7 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
-		function onBeforeInput() {
+		function onBeforeInput( event ) {
 			// If writing flow is editable, NEVER allow the browser to alter the
 			// DOM. This will cause React errors (and the DOM should only be
 			// altered in a controlled fashion).
@@ -56,13 +56,15 @@ export default function useInput() {
 					: null;
 				const root = getSelectionRoot( node.ownerDocument );
 
-				node.contentEditable = false;
 				if ( root ) {
+					node.contentEditable = false;
 					root.focus();
 					selection.removeAllRanges();
 					if ( range ) {
 						selection.addRange( range );
 					}
+				} else {
+					event.preventDefault();
 				}
 			}
 		}
