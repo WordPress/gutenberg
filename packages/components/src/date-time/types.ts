@@ -29,6 +29,11 @@ export type TimePickerProps = {
 	 * time as an argument.
 	 */
 	onChange?: ( time: string ) => void;
+
+	/**
+	 * Whether to render the time picker with labels. True by default.
+	 */
+	withLabels?: boolean;
 };
 
 export type TimeInputValue = {
