@@ -239,6 +239,7 @@ It is recommended that compound components use dot notation to separate the name
 Dedicated React context should also use dot notation, while hooks should not.
 
 ```tsx
+//=======================
 // Component.tsx
 //=======================
 import { forwardRef, createContext } from '@wordpress/element';
@@ -257,21 +258,19 @@ SubComponent.displayName = 'Component.SubComponent';
 const Context = createContext();
 
 /** The top-level component's JSDoc. */
-export const Component = Object.assign(
-	TopLevelComponent,
-	{
-		/** The sub-component's JSDoc. */
-		SubComponent,
-		/** The sub-component's JSDoc. */
-		Context,
-	}
-);
+export const Component = Object.assign( TopLevelComponent, {
+	/** The sub-component's JSDoc. */
+	SubComponent,
+	/** The context's JSDoc. */
+	Context,
+} );
 
 /** The hook's JSDoc. */
 export function useComponent() {
 	/* ... */
 }
 
+//=======================
 // App.tsx
 //=======================
 import { Component, useComponent } from '@wordpress/components';
