@@ -23,7 +23,7 @@ export const TabListWrapper = styled.div`
 		text-align: start;
 	}
 
-	&:not( [aria-orientation='vertical'] ) {
+	:where( &:not( [aria-orientation='vertical'] ) ) {
 		width: fit-content;
 	}
 
