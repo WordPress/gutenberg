@@ -334,8 +334,7 @@ function BackgroundImageControls( {
 				},
 				backgroundPosition:
 					/*
-					 * A background image uploaded and set in the editor (an image with a record id),
-					 * receives a default background position of '50% 0',
+					 * A background image uploaded and set in the editor receives a default background position of '50% 0',
 					 * when the background image size is the equivalent of "Tile".
 					 * This is to increase the chance that the image's focus point is visible.
 					 * This is in-editor only to assist with the user experience.
