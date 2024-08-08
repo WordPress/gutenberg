@@ -193,15 +193,15 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 
 			$matching_templates = array();
 			foreach ( $all_templates as $template_name => $template ) {
-				if ( ! empty( $slugs_to_include ) && ! in_array( $template->slug, $slugs_to_include, true ) ) {
+				if ( $slugs_to_include && ! in_array( $template->slug, $slugs_to_include, true ) ) {
 					continue;
 				}
 
-				if ( ! empty( $slugs_to_skip ) && in_array( $template->slug, $slugs_to_skip, true ) ) {
+				if ( $slugs_to_skip && in_array( $template->slug, $slugs_to_skip, true ) ) {
 					continue;
 				}
 
-				if ( ! empty( $post_types ) && ! in_array( $post_type, $template->post_types, true ) ) {
+				if ( $post_types && ! in_array( $post_type, $template->post_types, true ) ) {
 					continue;
 				}
 
