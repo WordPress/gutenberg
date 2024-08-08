@@ -238,6 +238,22 @@ It is recommended that compound components use dot notation to separate the name
 
 Dedicated React context should also use dot notation, while hooks should not.
 
+When exporting compound components and preparing them to be consumed, it is important that:
+
+-   the JSDocs appear correctly in IntelliSense;
+-   the top-level component's JSDoc appears in the Storybook docs page;
+-   the top-level and subcomponent's prop types appear correctly in the Storybook props table.
+
+To meet the above requirements, we recommend:
+
+-   using `Object.assign()` to add subcomponents as properties of the top-level component;
+-   using named functions for all components;
+-   setting explicitly the `displayName` on all subcomponents;
+-   adding the top-level JSDoc to the result of the `Object.assign` call;
+-   adding inline subcomponent JSDocs inside the `Object.assign` call.
+
+The following example implements all of the above recommendations.
+
 ```tsx
 //=======================
 // Component.tsx
@@ -259,7 +275,7 @@ const Context = createContext();
 
 /** The top-level component's JSDoc. */
 export const Component = Object.assign( TopLevelComponent, {
-	/** The sub-component's JSDoc. */
+	/** The subcomponent's JSDoc. */
 	SubComponent,
 	/** The context's JSDoc. */
 	Context,
@@ -677,7 +693,7 @@ As the needs of the package evolve with time, sometimes we may opt to fully rewr
 Here is some terminology that will be used in the upcoming sections:
 
 -   "Legacy" component: the version(s) of the component that existsted on `trunk` before the rewrite;
--   API surface: the component's public APIs. It includes the list of components (and sub-components) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
+-   API surface: the component's public APIs. It includes the list of components (and subcomponents) exported from the package, their props, any associated React context. It does not include internal classnames and internal DOM structure of the components.
 
 ### Approaches
 
