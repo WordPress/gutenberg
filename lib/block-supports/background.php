@@ -66,7 +66,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			$background_styles['backgroundSize'] = 'cover';
 		}
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
-		if ( 'contain' === $background_styles['backgroundSize'] || 'contain' === $inherited_background_size ) {
+		if ( 'contain' === $background_styles['backgroundSize'] || ( ! isset( $background_styles['backgroundSize'] ) && 'contain' === $inherited_background_size ) ) {
 			if ( ! isset( $background_styles['backgroundPosition'] ) && ! isset( $global_block_background_styles['backgroundPosition'] ) ) {
 				$background_styles['backgroundPosition'] = '50% 50%';
 			}

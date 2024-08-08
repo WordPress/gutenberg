@@ -68,7 +68,6 @@ export function setBackgroundStyleDefaults(
 
 	// Set block background defaults.
 	if ( !! backgroundImage?.url ) {
-		// if style is set, it MUST override inherited style
 		if (
 			! backgroundStyle?.backgroundSize &&
 			! inheritedBackgroundStyle?.backgroundSize
@@ -76,20 +75,12 @@ export function setBackgroundStyleDefaults(
 			backgroundStylesWithDefaults = {
 				backgroundSize: 'cover',
 			};
-			return backgroundStylesWithDefaults;
-		}
-
-		// Don't process position defaults for any other value other than "contain".
-		if (
-			!! backgroundStyle?.backgroundSize &&
-			backgroundStyle?.backgroundSize !== 'contain'
-		) {
-			return backgroundStylesWithDefaults;
 		}
 
 		if (
-			'contain' === inheritedBackgroundStyle?.backgroundSize ||
-			'contain' === backgroundStyle?.backgroundSize
+			'contain' === backgroundStyle?.backgroundSize ||
+			( ! backgroundStyle?.backgroundSize &&
+				'contain' === inheritedBackgroundStyle?.backgroundSize )
 		) {
 			if (
 				! backgroundStyle?.backgroundPosition &&
