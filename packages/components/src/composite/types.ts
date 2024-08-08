@@ -192,3 +192,34 @@ export type CompositeRowProps = {
 	 */
 	children?: Ariakit.CompositeRowProps[ 'children' ];
 };
+
+export type CompositeHoverProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeHoverProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeHoverProps[ 'children' ];
+	focusOnHover?: Ariakit.CompositeHoverProps[ 'focusOnHover' ];
+	blurOnHoverEnd?: Ariakit.CompositeHoverProps[ 'blurOnHoverEnd' ];
+};
+
+// TODO: check that props make sense
+export type CompositeTypeaheadProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeTypeaheadProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeTypeaheadProps[ 'children' ];
+};

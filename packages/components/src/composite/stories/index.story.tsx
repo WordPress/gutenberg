@@ -28,6 +28,10 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		'Composite.Row': Composite.Row,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Hover': Composite.Hover,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Typeahead': Composite.Typeahead,
 	},
 	argTypes: {
 		activeId: { control: 'text' },
@@ -227,6 +231,14 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
 					'Composite.Item': commonArgTypes,
+					'Composite.Hover': {
+						...commonArgTypes,
+						// TODO
+					},
+					'Composite.Typeahead': {
+						...commonArgTypes,
+						// TODO
+					},
 				};
 
 				const name = component.displayName ?? '';
