@@ -339,9 +339,15 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
+	const {
+		defaultActions,
+		postTypeObject,
+		userCanCreatePostType,
+		isBlockBasedTheme,
+	} = useSelect(
 		( select ) => {
-			const { getPostType, canUser } = select( coreStore );
+			const { getPostType, canUser, getCurrentTheme } =
+				select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
 				postTypeObject: getPostType( postType ),
@@ -350,10 +356,12 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 					kind: 'postType',
 					name: postType,
 				} ),
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		},
 		[ postType ]
 	);
+
 	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
 		registerPostTypeActions( postType );
@@ -382,6 +390,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				: false,
 			isTemplateOrTemplatePart &&
 				userCanCreatePostType &&
+				isBlockBasedTheme &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			...defaultActions,
