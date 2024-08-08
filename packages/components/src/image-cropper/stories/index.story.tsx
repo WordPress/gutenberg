@@ -6,11 +6,12 @@ import type { Meta, StoryObj, StoryFn } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState, useContext } from '@wordpress/element';
+import { aspectRatio } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import { ImageCropper, ImageCropperContext } from '../';
-import { Button, RangeControl, Flex, FlexItem } from '../../';
+import { Button, RangeControl, Flex, FlexItem, DropdownMenu } from '../../';
 
 const meta: Meta< typeof ImageCropper.Provider > = {
 	component: ImageCropper.Provider,
@@ -99,6 +100,44 @@ function TemplateControls() {
 				>
 					Flip horizontally
 				</Button>
+				<DropdownMenu
+					label="Aspect ratio"
+					text="Aspect ratio"
+					icon={ null }
+					toggleProps={ { variant: 'secondary' } }
+					controls={ [
+						{ value: 0, title: 'Free' },
+						{
+							value: state.image.width / state.image.height,
+							title: 'Original',
+						},
+						{ value: 1, title: 'Square' },
+						{ value: 4 / 3, title: '4:3' },
+						{ value: 16 / 9, title: '16:9' },
+						{ value: 9 / 16, title: '9:16' },
+						{ value: 3 / 4, title: '3:4' },
+					].map( ( control ) => ( {
+						title: control.title,
+						role: 'menuitemradio',
+						icon: aspectRatio,
+						isActive: state.cropper.lockAspectRatio
+							? state.cropper.width / state.cropper.height ===
+							  control.value
+							: 0 === control.value,
+						onClick: () => {
+							if ( control.value === 0 ) {
+								dispatch( {
+									type: 'UNLOCK_ASPECT_RATIO',
+								} );
+							} else {
+								dispatch( {
+									type: 'LOCK_ASPECT_RATIO',
+									aspectRatio: control.value,
+								} );
+							}
+						},
+					} ) ) }
+				/>
 			</Flex>
 			<Flex justify="flex-start">
 				<Button

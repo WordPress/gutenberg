@@ -29,8 +29,7 @@ const MIN_PADDING = 20; // 20px;
 function CropWindow() {
 	const {
 		state: {
-			image,
-			transforms: { rotations, scale },
+			transforms: { scale },
 			cropper,
 			isResizing,
 		},
@@ -39,45 +38,31 @@ function CropWindow() {
 	} = useContext( ImageCropperContext );
 	const [ resizableScope, animate ] = useAnimate();
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
-	const isAxisSwapped = rotations % 2 !== 0;
 
 	useEffect( () => {
 		if ( resizableScope.current ) {
 			animate( [ resizableScope.current ], {
-				'--wp-cropper-window-x': `${ cropper.x }px`,
-				'--wp-cropper-window-y': `${ cropper.y }px`,
+				'--wp-cropper-window-x': '0px',
+				'--wp-cropper-window-y': '0px',
 				width: `${ cropper.width }px`,
 				height: `${ cropper.height }px`,
 			} );
 		}
-	}, [
-		resizableScope,
-		animate,
-		cropper.x,
-		cropper.y,
-		cropper.width,
-		cropper.height,
-	] );
+	}, [ resizableScope, animate, cropper.width, cropper.height ] );
 
 	return (
 		<Resizable
-			layout="position"
 			size={ {
 				width: cropper.width,
 				height: cropper.height,
 			} }
-			maxWidth={ isAxisSwapped ? image.height : image.width }
-			maxHeight={ isAxisSwapped ? image.width : image.height }
+			// maxWidth={ isAxisSwapped ? image.height : image.width }
+			// maxHeight={ isAxisSwapped ? image.width : image.height }
 			showHandle
+			lockAspectRatio={ cropper.lockAspectRatio }
 			// Emulate the resizing thresholds.
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
 			onResizeStart={ ( event ) => {
-				// Set the temporary offset on resizing.
-				animate( [ resizableScope.current ], {
-					'--wp-cropper-window-x': `${ cropper.x }px`,
-					'--wp-cropper-window-y': `${ cropper.y }px`,
-				} ).complete();
-
 				if ( event.type === 'mousedown' ) {
 					const mouseEvent = event as MouseEvent;
 					initialMousePositionRef.current = {
@@ -122,19 +107,16 @@ function CropWindow() {
 						dispatch( { type: 'RESIZE_START' } );
 					}
 				} else {
-					let { x, y } = cropper;
-					if (
-						[ 'left', 'topLeft', 'bottomLeft' ].includes(
+					const x =
+						( [ 'left', 'topLeft', 'bottomLeft' ].includes(
 							direction
 						)
-					) {
-						x -= delta.width;
-					}
-					if (
-						[ 'top', 'topLeft', 'topRight' ].includes( direction )
-					) {
-						y -= delta.height;
-					}
+							? -delta.width
+							: delta.width ) / 2;
+					const y =
+						( [ 'top', 'topLeft', 'topRight' ].includes( direction )
+							? -delta.height
+							: delta.height ) / 2;
 					animate( [ resizableScope.current ], {
 						'--wp-cropper-window-x': `${ x }px`,
 						'--wp-cropper-window-y': `${ y }px`,
@@ -175,22 +157,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		() => originalWidth / originalHeight,
 		[ originalWidth, originalHeight ]
 	);
-
-	const squareImageHorizontalOffset = ( image.width - image.height ) / 2;
-	const paddingY = Math.max(
-		MIN_PADDING + squareImageHorizontalOffset,
-		MIN_PADDING
-	);
-	const paddingX = Math.max(
-		MIN_PADDING - squareImageHorizontalOffset,
-		MIN_PADDING
-	);
-	const paddingInline = isAxisSwapped ? paddingY : paddingX;
-	const paddingBlock = isAxisSwapped ? paddingX : paddingY;
-	const imageOffset = {
-		top: isAxisSwapped ? paddingX + squareImageHorizontalOffset : paddingY,
-		left: isAxisSwapped ? paddingY - squareImageHorizontalOffset : paddingX,
-	};
+	const largerDimension = Math.max( image.width, image.height );
 
 	const containerRef = useRef< HTMLDivElement >( null! );
 	useEffect( () => {
@@ -242,17 +209,13 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 					  } ),
 			} }
 			style={ {
-				width: `${
-					paddingInline * 2 +
-					( isAxisSwapped ? originalHeight : originalWidth )
-				}px`,
+				width: `${ largerDimension + MIN_PADDING * 2 }px`,
 				aspectRatio: '1 / 1',
 				'--wp-cropper-image-x': `${ image.x }px`,
 				'--wp-cropper-image-y': `${ image.y }px`,
 				'--wp-cropper-scale-x': scale.x,
 				'--wp-cropper-scale-y': scale.y,
-				paddingBlock: `${ paddingBlock }px`,
-				paddingInline: `${ paddingInline }px`,
+				padding: `${ MIN_PADDING }px`,
 			} }
 			ref={ useMergeRefs( [ containerRef, ref ] ) }
 		>
@@ -263,7 +226,6 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				alt=""
 				crossOrigin="anonymous"
 				ref={ imageRef }
-				style={ imageOffset }
 			/>
 			<CropWindow />
 		</Container>

@@ -47,7 +47,14 @@ const MotionResizable = motion(
 );
 
 export const Resizable = styled( MotionResizable )`
-	translate: var( --wp-cropper-window-x ) var( --wp-cropper-window-y );
+	--wp-cropper-window-x: 0px;
+	--wp-cropper-window-y: 0px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform-origin: center center;
+	translate: calc( var( --wp-cropper-window-x ) - 50% )
+		calc( var( --wp-cropper-window-y ) - 50% );
 	box-shadow: 0 0 0 100vmax rgba( 0, 0, 0, 0.5 );
 	will-change: translate;
 	contain: layout size style;
@@ -100,10 +107,13 @@ export const Container = styled( motion.div )`
 export const Img = styled( motion.img )`
 	position: absolute;
 	pointer-events: none;
+	top: 50%;
+	left: 50%;
 	transform-origin: center center;
 	rotate: var( --wp-cropper-angle );
 	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
-	translate: var( --wp-cropper-image-x ) var( --wp-cropper-image-y );
+	translate: calc( var( --wp-cropper-image-x ) - 50% )
+		calc( var( --wp-cropper-image-y ) - 50% );
 	will-change: rotate, scale, translate;
 	contain: strict;
 `;

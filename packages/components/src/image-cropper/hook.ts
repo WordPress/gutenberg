@@ -118,10 +118,24 @@ export const useImageCropper = ( {
 					cropperState.transforms.rotations * 90
 			)
 		);
-		const isAxisSwapped = cropperState.transforms.rotations % 2 !== 0;
 		ctx.scale(
 			cropperState.transforms.scale.x,
 			cropperState.transforms.scale.y
+		);
+		const isAxisSwapped = cropperState.transforms.rotations % 2 !== 0;
+		const imageDimensions = {
+			width: isAxisSwapped
+				? cropperState.image.height
+				: cropperState.image.width,
+			height: isAxisSwapped
+				? cropperState.image.width
+				: cropperState.image.height,
+		};
+		ctx.translate(
+			-( ( imageDimensions.width - cropperState.cropper.width ) / 2 ) *
+				scaleFactor,
+			-( ( imageDimensions.height - cropperState.cropper.height ) / 2 ) *
+				scaleFactor
 		);
 		const imageOffset = {
 			x: isAxisSwapped ? ( naturalHeight - naturalWidth ) / 2 : 0,
@@ -129,12 +143,8 @@ export const useImageCropper = ( {
 		};
 		ctx.drawImage(
 			image,
-			-cropperState.cropper.x * scaleFactor -
-				offscreenCanvas.width / 2 +
-				imageOffset.x,
-			-cropperState.cropper.y * scaleFactor -
-				offscreenCanvas.height / 2 +
-				imageOffset.y
+			-offscreenCanvas.width / 2 + imageOffset.x,
+			-offscreenCanvas.height / 2 + imageOffset.y
 		);
 		const blob = await offscreenCanvas.convertToBlob();
 		return blob;

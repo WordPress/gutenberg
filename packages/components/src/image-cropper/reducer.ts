@@ -32,14 +32,12 @@ export type State = {
 	};
 	// The cropper window dimensions.
 	cropper: {
-		// The x position of the cropper window center.
-		x: number;
-		// The y position of the cropper window center.
-		y: number;
 		// The width of the cropper window.
 		width: number;
 		// The height of the cropper window
 		height: number;
+		// Whether the cropper window aspect ratio is locked.
+		lockAspectRatio: boolean;
 	};
 	// Whether the cropper window is resizing.
 	isResizing: boolean;
@@ -74,6 +72,13 @@ type Action =
 			direction: ResizeDirection;
 			delta: { width: number; height: number };
 	  }
+	// Lock the aspect ratio of the cropper window.
+	| {
+			type: 'LOCK_ASPECT_RATIO';
+			aspectRatio: number;
+	  }
+	// Unlock the aspect ratio of the cropper window.
+	| { type: 'UNLOCK_ASPECT_RATIO' }
 	// Resize the container and image to a new width.
 	| { type: 'RESIZE_CONTAINER'; width: number }
 	// Reset the state to the initial state.
@@ -101,8 +106,7 @@ function createInitialState( {
 		cropper: {
 			width,
 			height,
-			x: 0,
-			y: 0,
+			lockAspectRatio: false,
 		},
 		isResizing: false,
 		isDragging: false,
@@ -242,8 +246,6 @@ function imageCropperReducer( state: State, action: Action ) {
 					...state.cropper,
 					width: cropper.height,
 					height: cropper.width,
-					x: cropper.y,
-					y: cropper.x,
 				},
 			};
 		}
@@ -375,10 +377,58 @@ function imageCropperReducer( state: State, action: Action ) {
 					...state.cropper,
 					width: scaledSize.width,
 					height: scaledSize.height,
-					x: translated.x,
-					y: translated.y,
 				},
 				isResizing: false,
+			};
+		}
+		case 'LOCK_ASPECT_RATIO': {
+			// Calculate the size of the cropper based on the aspect ratio.
+			const largerDimension = Math.max( image.width, image.height );
+			const cropperSize =
+				action.aspectRatio > 1
+					? {
+							width: largerDimension,
+							height: largerDimension / action.aspectRatio,
+					  }
+					: {
+							width: largerDimension / action.aspectRatio,
+							height: largerDimension,
+					  };
+
+			const minScale = getMinScale(
+				radian,
+				image.width,
+				image.height,
+				cropperSize.width,
+				cropperSize.height,
+				image.x,
+				image.y
+			);
+			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
+
+			return {
+				...state,
+				transforms: {
+					...state.transforms,
+					scale: {
+						x: nextScale * Math.sign( scale.x ),
+						y: nextScale * Math.sign( scale.y ),
+					},
+				},
+				cropper: {
+					...state.cropper,
+					...cropperSize,
+					lockAspectRatio: true,
+				},
+			};
+		}
+		case 'UNLOCK_ASPECT_RATIO': {
+			return {
+				...state,
+				cropper: {
+					...state.cropper,
+					lockAspectRatio: false,
+				},
 			};
 		}
 		case 'RESIZE_CONTAINER': {
@@ -403,8 +453,6 @@ function imageCropperReducer( state: State, action: Action ) {
 					...state.cropper,
 					width: cropper.width * ratio,
 					height: cropper.height * ratio,
-					x: cropper.x * ratio,
-					y: cropper.y * ratio,
 				},
 			};
 		}
