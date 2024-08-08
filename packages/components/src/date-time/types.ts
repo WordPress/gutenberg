@@ -5,12 +5,6 @@ import type { MinutesInput } from './time/styles';
 
 export type TimePickerProps = {
 	/**
-	 * The HTML `id` of the control element to which labels and help text are being generated.
-	 * This is necessary to accessibly associate the label with that element.
-	 */
-	id?: string;
-
-	/**
 	 * The initial current time the time picker should render.
 	 */
 	currentTime?: Date | string | number | null;
@@ -57,12 +51,6 @@ export type TimeInputValue = {
 };
 
 export type TimeInputProps = {
-	/**
-	 * The HTML `id` of the control element to which labels and help text are being generated.
-	 * This is necessary to accessibly associate the label with that element.
-	 */
-	id?: string;
-
 	/**
 	 * Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is
 	 * displayed
