@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-import { DataForm, isItemValid } from '@wordpress/dataviews';
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -56,10 +56,6 @@ const fields = [
 
 const formDuplicateAction = {
 	fields: [ 'title' ],
-};
-
-const formOrderAction = {
-	fields: [ 'menu_order' ],
 };
 
 /**
@@ -237,110 +233,6 @@ const renamePostAction = {
 		);
 	},
 };
-
-function ReorderModal( { items, closeModal, onActionPerformed } ) {
-	const [ item, setItem ] = useState( items[ 0 ] );
-	const orderInput = item.menu_order;
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	async function onOrder( event ) {
-		event.preventDefault();
-
-		if ( ! isItemValid( item, fields, formOrderAction ) ) {
-			return;
-		}
-
-		try {
-			await editEntityRecord( 'postType', item.type, item.id, {
-				menu_order: orderInput,
-			} );
-			closeModal();
-			// Persist edited entity.
-			await saveEditedEntityRecord( 'postType', item.type, item.id, {
-				throwOnError: true,
-			} );
-			createSuccessNotice( __( 'Order updated' ), {
-				type: 'snackbar',
-			} );
-			onActionPerformed?.( items );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while updating the order' );
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
-	}
-	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
-	return (
-		<form onSubmit={ onOrder }>
-			<VStack spacing="5">
-				<div>
-					{ __(
-						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
-					) }
-				</div>
-				<DataForm
-					data={ item }
-					fields={ fields }
-					form={ formOrderAction }
-					onChange={ setItem }
-				/>
-				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal();
-						} }
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						type="submit"
-						accessibleWhenDisabled
-						disabled={ isSaveDisabled }
-						__experimentalIsFocusable
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		</form>
-	);
-}
-
-function useReorderPagesAction( postType ) {
-	const supportsPageAttributes = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			const postTypeObject = getPostType( postType );
-
-			return !! postTypeObject?.supports?.[ 'page-attributes' ];
-		},
-		[ postType ]
-	);
-
-	return useMemo(
-		() =>
-			supportsPageAttributes && {
-				id: 'order-pages',
-				label: __( 'Order' ),
-				isEligible( { status } ) {
-					return status !== 'trash';
-				},
-				RenderModal: ReorderModal,
-			},
-		[ supportsPageAttributes ]
-	);
-}
 
 const useDuplicatePostAction = ( postType ) => {
 	const userCanCreatePost = useSelect(
@@ -595,7 +487,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	}, [ registerPostTypeActions, postType ] );
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const reorderPagesAction = useReorderPagesAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -622,7 +513,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostAction,
-			reorderPagesAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -693,7 +583,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
-		reorderPagesAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,

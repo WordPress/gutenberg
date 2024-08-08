@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import getFieldTypeDefinition from './field-types';
-import type { Field, NormalizedField } from './types';
+import type { Field, NormalizedField, ItemRecord } from './types';
 
 /**
  * Apply default values and normalize the fields config.
@@ -18,7 +18,8 @@ export function normalizeFields< Item >(
 
 		const getValue =
 			field.getValue ||
-			( ( { item }: { item: Item } ) => item[ field.id as keyof Item ] );
+			// @ts-ignore
+			( ( { item }: { item: ItemRecord } ) => item[ field.id ] );
 
 		const sort =
 			field.sort ??
