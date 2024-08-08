@@ -28,17 +28,21 @@ import * as Ariakit from '@ariakit/react';
  */
 export const useCompositeStore = Ariakit.useCompositeStore;
 
-const Group = Ariakit.CompositeGroup;
-Group.displayName = 'Composite.Group';
+const Group = Object.assign( Ariakit.CompositeGroup, {
+	displayName: 'Composite.Group',
+} );
 
-export const GroupLabel = Ariakit.CompositeGroupLabel;
-GroupLabel.displayName = 'Composite.GroupLabel';
+export const GroupLabel = Object.assign( Ariakit.CompositeGroupLabel, {
+	displayName: 'Composite.GroupLabel',
+} );
 
-export const Item = Ariakit.CompositeItem;
-Item.displayName = 'Composite.Item';
+export const Item = Object.assign( Ariakit.CompositeItem, {
+	displayName: 'Composite.Item',
+} );
 
-export const Row = Ariakit.CompositeRow;
-Row.displayName = 'Composite.Row';
+export const Row = Object.assign( Ariakit.CompositeRow, {
+	displayName: 'Composite.Row',
+} );
 
 /**
  * Renders a composite widget.
@@ -53,6 +57,7 @@ Row.displayName = 'Composite.Row';
  * ```
  */
 export const Composite = Object.assign( Ariakit.Composite, {
+	displayName: 'Composite',
 	/**
 	 * Renders a group element for composite items.
 	 * @see https://ariakit.org/reference/composite-group
