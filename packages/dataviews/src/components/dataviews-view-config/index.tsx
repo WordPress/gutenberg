@@ -22,7 +22,7 @@ import {
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
 import { arrowDown, arrowUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
@@ -287,11 +287,11 @@ function FieldControl() {
 										} )
 									}
 									icon={ arrowUp }
-									label={
-										isVisible
-											? __( 'Remove from sort' )
-											: __( 'Add to sort' )
-									}
+									label={ sprintf(
+										/* translators: %s: field label */
+										__( 'Sort ascending by: %s' ),
+										field.label
+									) }
 								/>
 								<Button
 									isPressed={
@@ -311,11 +311,11 @@ function FieldControl() {
 										} )
 									}
 									icon={ arrowDown }
-									label={
-										isVisible
-											? __( 'Remove from sort' )
-											: __( 'Add to sort' )
-									}
+									label={ sprintf(
+										/* translators: %s: field label */
+										__( 'Sort descending by: %s' ),
+										field.label
+									) }
 								/>
 								<Button
 									disabled={ ! isHidable }
