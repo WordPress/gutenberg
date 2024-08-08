@@ -36,7 +36,7 @@ class WP_Block_Templates_Registry_Test extends WP_UnitTestCase {
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'template_name_no_string', $result->get_error_code(), 'Error code mismatch.' );
-		$this->assertSame( 'Template names must be a string.', $result->get_error_message(), 'Error message mismatch.' );
+		$this->assertSame( 'Template names must be strings.', $result->get_error_message(), 'Error message mismatch.' );
 	}
 
 	public function test_register_template_invalid_name_uppercase() {

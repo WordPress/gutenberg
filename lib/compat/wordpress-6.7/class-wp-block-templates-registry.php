@@ -45,7 +45,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 			$error_message = '';
 			$error_code    = '';
 			if ( ! is_string( $template_name ) ) {
-				$error_message = __( 'Template names must be a string.', 'gutenberg' );
+				$error_message = __( 'Template names must be strings.', 'gutenberg' );
 				$error_code    = 'template_name_no_string';
 			} elseif ( preg_match( '/[A-Z]+/', $template_name ) ) {
 				$error_message = __( 'Template names must not contain uppercase characters.', 'gutenberg' );
