@@ -234,9 +234,9 @@ TDB -->
 
 ## Naming Conventions
 
-It is recommended for compound components to use dot notation to separate the namespace from the individual component names. The top-level compound component should be called as the namespace (no dot notation).
+It is recommended that compound components use dot notation to separate the namespace from the individual component names. The top-level compound component should be called the namespace (no dot notation).
 
-Dedicated React context should also use the dot notation, while hooks should not.
+Dedicated React context should also use dot notation, while hooks should not.
 
 ```tsx
 // Component.tsx
