@@ -583,7 +583,7 @@ function BackgroundSizeControls( {
 		);
 
 	return (
-		<VStack spacing={ 4 } className="single-column">
+		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
@@ -681,7 +681,7 @@ function BackgroundToolsPanel( {
 	return (
 		<VStack
 			as={ ToolsPanel }
-			spacing={ 4 }
+			spacing={ 2 }
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
