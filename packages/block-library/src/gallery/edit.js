@@ -98,6 +98,52 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
+// Thanks StackOverflow! https://stackoverflow.com/questions/17445231/js-how-to-find-the-greatest-common-divisor
+const gcd = ( a, b ) => {
+	if ( ! b ) {
+		return a;
+	}
+
+	return gcd( b, a % b );
+};
+
+const lcm = ( a, b ) => {
+	return ( a * b ) / gcd( a, b );
+};
+
+/*
+ * Returns an array of image column-span attributes to apply to each image block.
+ * The spans are based on the column count and the number of images, so that each
+ * row in the grid is filled to its full width.
+ */
+function getColumnSpans( columns = 3, images ) {
+	if ( images < columns ) {
+		return {
+			minimumColumnCount: images.length,
+			columnSpans: Array( images.length ).fill( 1 ),
+		};
+	}
+	const remainder = images % columns;
+	const minimumColumnCount = lcm( columns, remainder );
+	const multiples = images - remainder;
+	const multiplesSpans = minimumColumnCount / columns;
+	const remainderSpans = minimumColumnCount / remainder;
+
+	const columnSpans = [];
+	for ( let i = 0; i < images; i++ ) {
+		if ( i < multiples ) {
+			columnSpans[ i ] = multiplesSpans;
+		} else {
+			columnSpans[ i ] = remainderSpans;
+		}
+	}
+
+	return {
+		minimumColumnCount,
+		columnSpans,
+	};
+}
+
 function GalleryEdit( props ) {
 	const {
 		setAttributes,
@@ -110,8 +156,15 @@ function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
-		attributes;
+	const {
+		columns,
+		imageCrop,
+		randomOrder,
+		linkTarget,
+		linkTo,
+		sizeSlug,
+		layout,
+	} = attributes;
 
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
@@ -159,17 +212,60 @@ function GalleryEdit( props ) {
 		[ clientId ]
 	);
 
-	const images = useMemo(
-		() =>
-			innerBlockImages?.map( ( block ) => ( {
+	const { minimumColumnCount, columnSpans } = getColumnSpans(
+		columns,
+		innerBlockImages.length
+	);
+
+	const images = useMemo( () => {
+		return innerBlockImages?.map( ( block, index ) => {
+			const newAttributes = {
+				...block.attributes,
+				style: {
+					...block.attributes?.style,
+					layout: {
+						...block.attributes?.style?.layout,
+						columnSpan: columnSpans[ index ],
+					},
+				},
+			};
+			return {
 				clientId: block.clientId,
 				id: block.attributes.id,
 				url: block.attributes.url,
-				attributes: block.attributes,
+				attributes: newAttributes,
 				fromSavedContent: Boolean( block.originalContent ),
-			} ) ),
-		[ innerBlockImages ]
-	);
+			};
+		} );
+	}, [ innerBlockImages, columns ] );
+
+	/* Set the minimumColumnCount attribute to the parent gallery block
+	 * and update the image attributes.
+	 */
+	useEffect( () => {
+		if ( minimumColumnCount !== layout?.columnCount ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				layout: {
+					...layout,
+					type: 'grid',
+					columnCount: minimumColumnCount || columns,
+				},
+			} );
+			images?.forEach( ( image ) => {
+				// Update the image attributes without creating new undo levels.
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( image.clientId, {
+					style: {
+						layout: {
+							columnSpan:
+								image.attributes?.style?.layout?.columnSpan,
+						},
+					},
+				} );
+			} );
+		}
+	}, [ minimumColumnCount, columns ] );
 
 	const imageData = useGetMedia( innerBlockImages );
 
@@ -240,8 +336,8 @@ function GalleryEdit( props ) {
 			...newLinkTarget,
 			className: newClassName,
 			sizeSlug,
-			caption: imageAttributes.caption || image.caption?.raw,
-			alt: imageAttributes.alt || image.alt_text,
+			caption: imageAttributes.caption || image?.caption?.raw,
+			alt: imageAttributes.alt || image?.alt_text,
 		};
 	}
 
@@ -683,7 +779,6 @@ function GalleryEdit( props ) {
 			<Gallery
 				{ ...props }
 				isContentLocked={ isContentLocked }
-				images={ images }
 				mediaPlaceholder={
 					! hasImages || Platform.isNative
 						? mediaPlaceholder

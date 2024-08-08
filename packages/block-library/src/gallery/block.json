@@ -141,11 +141,10 @@
 			"gradients": true
 		},
 		"layout": {
-			"allowSwitching": false,
-			"allowInheriting": false,
-			"allowEditing": false,
+			"allowSizingOnChildren": true,
 			"default": {
-				"type": "flex"
+				"type": "grid",
+				"columnCount": 3
 			}
 		},
 		"interactivity": {
