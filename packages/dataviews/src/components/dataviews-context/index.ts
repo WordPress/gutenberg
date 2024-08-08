@@ -8,7 +8,7 @@ import { createContext } from '@wordpress/element';
  */
 import type { View, Action, NormalizedField } from '../../types';
 import type { SetSelection } from '../../private-types';
-import { LAYOUT_TABLE } from '../../constants';
+import { LAYOUT_TABLE } from '../../utils/constants';
 
 type DataViewsContextType< Item > = {
 	view: View;

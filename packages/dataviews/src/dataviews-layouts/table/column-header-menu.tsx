@@ -20,7 +20,11 @@ import { forwardRef, Children, Fragment } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import { sanitizeOperators } from '../../utils';
-import { SORTING_DIRECTIONS, sortArrows, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	sortArrows,
+	sortLabels,
+} from '../../utils/constants';
 import type {
 	NormalizedField,
 	SortDirection,

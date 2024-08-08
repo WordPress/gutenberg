@@ -35,7 +35,7 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
-} from '../../constants';
+} from '../../utils/constants';
 import type {
 	Filter,
 	NormalizedFilter,

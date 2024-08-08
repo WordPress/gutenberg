@@ -7,7 +7,7 @@ import {
 	OPERATOR_IS_NOT,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
-} from './constants';
+} from './utils/constants';
 import type { NormalizedField } from './types';
 
 export function sanitizeOperators< Item >( field: NormalizedField< Item > ) {

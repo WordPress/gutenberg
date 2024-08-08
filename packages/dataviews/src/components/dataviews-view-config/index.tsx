@@ -30,7 +30,11 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	sortIcons,
+	sortLabels,
+} from '../../utils/constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';

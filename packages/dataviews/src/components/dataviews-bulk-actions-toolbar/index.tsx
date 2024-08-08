@@ -20,7 +20,7 @@ import { useRegistry } from '@wordpress/data';
 import { useSomeItemHasAPossibleBulkAction } from '../dataviews-bulk-actions';
 import DataViewsContext from '../dataviews-context';
 import { ActionWithModal } from '../dataviews-item-actions';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../../utils/constants';
 import type { Action } from '../../types';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import type { SetSelection } from '../../private-types';

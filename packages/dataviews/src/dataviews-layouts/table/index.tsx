@@ -26,7 +26,7 @@ import {
  */
 import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import ItemActions from '../../components/dataviews-item-actions';
-import { sortValues } from '../../constants';
+import { sortValues } from '../../utils/constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,

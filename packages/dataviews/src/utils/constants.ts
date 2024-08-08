@@ -7,7 +7,7 @@ import { arrowDown, arrowUp } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import type { Operator } from './types';
+import type { Operator } from '../types';
 
 // Filter operators.
 export const OPERATOR_IS = 'is';

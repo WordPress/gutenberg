@@ -13,7 +13,7 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
-} from './constants';
+} from './utils/constants';
 import { normalizeFields } from './normalize-fields';
 import type { Field, View } from './types';
 

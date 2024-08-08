@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { LAYOUT_TABLE } from '../../../constants';
+import { LAYOUT_TABLE } from '../../../utils/constants';
 
 export const data = [
 	{

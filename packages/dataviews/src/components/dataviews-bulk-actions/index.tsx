@@ -14,7 +14,7 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
-import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal } from '../../types';
 

@@ -20,7 +20,11 @@ import { default as AddFilter, AddFilterDropdownMenu } from './add-filter';
 import ResetFilters from './reset-filters';
 import DataViewsContext from '../dataviews-context';
 import { sanitizeOperators } from '../../utils';
-import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../../constants';
+import {
+	ALL_OPERATORS,
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+} from '../../utils/constants';
 import type { NormalizedFilter, NormalizedField, View } from '../../types';
 
 export function useFilters( fields: NormalizedField< any >[], view: View ) {
