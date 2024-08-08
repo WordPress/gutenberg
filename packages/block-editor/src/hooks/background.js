@@ -24,7 +24,7 @@ import {
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
 // Initial control values.
-const BACKGROUND_DEFAULT_VALUES = {
+export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
 	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
@@ -59,38 +59,39 @@ export function setBackgroundStyleDefaults(
 	backgroundStyle,
 	inheritedBackgroundStyle = {}
 ) {
-	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.id ) {
+	if (
+		! backgroundStyle ||
+		! backgroundStyle?.backgroundImage?.id ||
+		! backgroundStyle?.backgroundImage?.url
+	) {
 		return;
 	}
 
-	const backgroundImage = backgroundStyle?.backgroundImage;
 	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if ( !! backgroundImage?.url ) {
+	if (
+		! backgroundStyle?.backgroundSize &&
+		! inheritedBackgroundStyle?.backgroundSize
+	) {
+		backgroundStylesWithDefaults = {
+			backgroundSize: BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundSize,
+		};
+	}
+
+	if (
+		'contain' === backgroundStyle?.backgroundSize ||
+		( ! backgroundStyle?.backgroundSize &&
+			'contain' === inheritedBackgroundStyle?.backgroundSize )
+	) {
 		if (
-			! backgroundStyle?.backgroundSize &&
-			! inheritedBackgroundStyle?.backgroundSize
+			! backgroundStyle?.backgroundPosition &&
+			! inheritedBackgroundStyle?.backgroundPosition
 		) {
 			backgroundStylesWithDefaults = {
-				backgroundSize: BACKGROUND_DEFAULT_VALUES.backgroundSize,
+				backgroundPosition:
+					BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundPosition,
 			};
-		}
-
-		if (
-			'contain' === backgroundStyle?.backgroundSize ||
-			( ! backgroundStyle?.backgroundSize &&
-				'contain' === inheritedBackgroundStyle?.backgroundSize )
-		) {
-			if (
-				! backgroundStyle?.backgroundPosition &&
-				! inheritedBackgroundStyle?.backgroundPosition
-			) {
-				backgroundStylesWithDefaults = {
-					backgroundPosition:
-						BACKGROUND_DEFAULT_VALUES.backgroundPosition,
-				};
-			}
 		}
 	}
 
@@ -211,7 +212,7 @@ export function BackgroundImagePanel( {
 			inheritedValue={ inheritedValue }
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
-			defaultValues={ BACKGROUND_DEFAULT_VALUES }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }
