@@ -33,9 +33,9 @@ import {
 	list,
 	grid,
 	alignNone,
-	alignLeft,
-	alignCenter,
-	alignRight,
+	positionLeft,
+	positionCenter,
+	positionRight,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
@@ -213,17 +213,17 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		},
 		{
 			value: 'left',
-			icon: alignLeft,
+			icon: positionLeft,
 			label: __( 'Left' ),
 		},
 		{
 			value: 'center',
-			icon: alignCenter,
+			icon: positionCenter,
 			label: __( 'Center' ),
 		},
 		{
 			value: 'right',
-			icon: alignRight,
+			icon: positionRight,
 			label: __( 'Right' ),
 		},
 	];
@@ -337,6 +337,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 						<ToggleGroupControl
 							className="editor-latest-posts-image-alignment-control"
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Image alignment' ) }
 							value={ featuredImageAlign || 'none' }
 							onChange={ ( value ) =>
