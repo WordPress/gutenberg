@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps } from '../../types';
+import type { DataFormProps, Field } from '../../types';
 
 export default function FormRegular< Item >( {
 	data,
@@ -19,7 +19,11 @@ export default function FormRegular< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				fields.filter( ( { id } ) => !! form.fields?.includes( id ) )
+				( form.fields ?? [] )
+					.map( ( fieldId ) =>
+						fields.find( ( { id } ) => id === fieldId )
+					)
+					.filter( ( field ): field is Field< Item > => !! field )
 			),
 		[ fields, form.fields ]
 	);
