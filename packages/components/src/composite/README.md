@@ -7,7 +7,6 @@ See the [Ariakit docs for the `Composite` component](https://ariakit.org/compone
 ## Usage
 
 ```jsx
-const useCompositeStore = useCompositeStore();
 const store = useCompositeStore();
 <Composite store={store}>
   <Composite.Group>

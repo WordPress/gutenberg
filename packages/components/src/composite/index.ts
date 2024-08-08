@@ -18,7 +18,6 @@ import * as Ariakit from '@ariakit/react';
  * @see https://ariakit.org/reference/use-composite-store
  * @example
  * ```jsx
- * const useCompositeStore = useCompositeStore();
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item</Composite.Item>
@@ -46,7 +45,6 @@ Row.displayName = 'Composite.Row';
  * @see https://ariakit.org/reference/composite
  * @example
  * ```jsx
- * const useCompositeStore = useCompositeStore();
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item 1</Composite.Item>
@@ -60,7 +58,6 @@ export const Composite = Object.assign( Ariakit.Composite, {
 	 * @see https://ariakit.org/reference/composite-group
 	 * @example
 	 * ```jsx
-	 * const useCompositeStore = useCompositeStore();
 	 * const store = useCompositeStore();
 	 * <Composite store={store}>
 	 *   <Composite.Group>
@@ -79,7 +76,6 @@ export const Composite = Object.assign( Ariakit.Composite, {
 	 * @see https://ariakit.org/reference/composite-group-label
 	 * @example
 	 * ```jsx
-	 * const useCompositeStore = useCompositeStore();
 	 * const store = useCompositeStore();
 	 * <Composite store={store}>
 	 *   <Composite.Group>
@@ -96,7 +92,6 @@ export const Composite = Object.assign( Ariakit.Composite, {
 	 * @see https://ariakit.org/reference/composite-item
 	 * @example
 	 * ```jsx
-	 * const useCompositeStore = useCompositeStore();
 	 * const store = useCompositeStore();
 	 * <Composite store={store}>
 	 *   <Composite.Item>Item 1</Composite.Item>
@@ -113,7 +108,6 @@ export const Composite = Object.assign( Ariakit.Composite, {
 	 * @see https://ariakit.org/reference/composite-row
 	 * @example
 	 * ```jsx
-	 * const useCompositeStore = useCompositeStore();
 	 * const store = useCompositeStore();
 	 * <Composite store={store}>
 	 *   <Composite.Row>
