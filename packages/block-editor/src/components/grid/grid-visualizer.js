@@ -84,39 +84,57 @@ const GridVisualizerGrid = forwardRef(
 		}, [] );
 
 		return (
-			<BlockPopoverCover
-				inline
-				className={ clsx( 'block-editor-grid-visualizer', {
-					'is-dropping-allowed': isDroppingAllowed,
-				} ) }
-				clientId={ gridClientId }
-				contentStyle={ { margin: 0, zIndex: 0 } }
-			>
-				<div
-					ref={ ref }
-					className="block-editor-grid-visualizer__grid"
-					style={ gridInfo.style }
+			<>
+				<BlockPopoverCover
+					inline
+					className={ clsx( 'block-editor-grid-visualizer', {
+						'is-dropping-allowed': isDroppingAllowed,
+					} ) }
+					clientId={ gridClientId }
+					contentStyle={ { margin: 0, zIndex: 0 } }
 				>
-					{ isManualGrid ? (
-						<ManualGridVisualizer
-							gridClientId={ gridClientId }
-							gridInfo={ gridInfo }
-						/>
-					) : (
-						Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-							<GridVisualizerCell
-								key={ i }
-								color={ gridInfo.currentColor }
+					<div
+						ref={ ref }
+						className="block-editor-grid-visualizer__grid"
+						style={ gridInfo.style }
+					>
+						{ Array.from(
+							{ length: gridInfo.numItems },
+							( _, i ) => (
+								<GridVisualizerCell
+									key={ i }
+									color={ gridInfo.currentColor }
+								/>
+							)
+						) }
+					</div>
+				</BlockPopoverCover>
+				{ isManualGrid && (
+					<BlockPopoverCover
+						className={ clsx( 'block-editor-grid-visualizer', {
+							'is-dropping-allowed': isDroppingAllowed,
+						} ) }
+						clientId={ gridClientId }
+						__unstablePopoverSlot="__unstable-block-tools-after"
+					>
+						<div
+							ref={ ref }
+							className="block-editor-grid-visualizer__grid"
+							style={ gridInfo.style }
+						>
+							<InteractiveManualGrid
+								gridClientId={ gridClientId }
+								gridInfo={ gridInfo }
 							/>
-						) )
-					) }
-				</div>
-			</BlockPopoverCover>
+						</div>
+					</BlockPopoverCover>
+				) }
+			</>
 		);
 	}
 );
 
-function ManualGridVisualizer( { gridClientId, gridInfo } ) {
+function InteractiveManualGrid( { gridClientId, gridInfo } ) {
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
 	const gridItems = useSelect(
@@ -154,10 +172,11 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 			);
 			const isHighlighted =
 				highlightedRect?.contains( column, row ) ?? false;
+
 			return (
 				<GridVisualizerCell
+					invisible
 					key={ `${ row }-${ column }` }
-					color={ gridInfo.currentColor }
 					className={ isHighlighted && 'is-highlighted' }
 				>
 					{ isCellOccupied ? (
@@ -183,19 +202,23 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 	);
 }
 
-function GridVisualizerCell( { color, children, className } ) {
+function GridVisualizerCell( { color, children, className, invisible } ) {
+	const style = invisible
+		? undefined
+		: {
+				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
+				color,
+				background: 'cornflowerblue',
+				opacity: 0.1,
+		  };
+
 	return (
 		<div
 			className={ clsx(
 				'block-editor-grid-visualizer__cell',
 				className
 			) }
-			style={ {
-				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
-				color,
-				background: 'cornflowerblue',
-				opacity: 0.1,
-			} }
+			style={ style }
 		>
 			{ children }
 		</div>
