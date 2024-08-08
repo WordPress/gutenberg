@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade `framer-motion` package to version `^11.3.18` ([#64003](https://github.com/WordPress/gutenberg/pull/64003)).
+
 ## 28.5.0 (2024-08-07)
 
 ### Bug Fixes
@@ -28,7 +32,6 @@
 -   Upgraded `@ariakit/react` (v0.4.7) and `@ariakit/test` (v0.4.0) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
 -   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
--   Upgrade `framer-motion` package to version `^11.3.18` ([#64003](https://github.com/WordPress/gutenberg/pull/64003)).
 
 ## 28.4.0 (2024-07-24)
 
