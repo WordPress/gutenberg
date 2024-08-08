@@ -77,10 +77,28 @@ export function TimePicker( {
 		);
 	}, [ currentTime ] );
 
+	const monthOptions = [
+		{ value: '01', label: __( 'January' ) },
+		{ value: '02', label: __( 'February' ) },
+		{ value: '03', label: __( 'March' ) },
+		{ value: '04', label: __( 'April' ) },
+		{ value: '05', label: __( 'May' ) },
+		{ value: '06', label: __( 'June' ) },
+		{ value: '07', label: __( 'July' ) },
+		{ value: '08', label: __( 'August' ) },
+		{ value: '09', label: __( 'September' ) },
+		{ value: '10', label: __( 'October' ) },
+		{ value: '11', label: __( 'November' ) },
+		{ value: '12', label: __( 'December' ) },
+	] as const;
+
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
 			day: format( date, 'dd' ),
-			month: format( date, 'MM' ),
+			month: format(
+				date,
+				'MM'
+			) as ( typeof monthOptions )[ number ][ 'value' ],
 			year: format( date, 'yyyy' ),
 			minutes: format( date, 'mm' ),
 			hours: format( date, 'HH' ),
@@ -146,20 +164,7 @@ export function TimePicker( {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ month }
-				options={ [
-					{ value: '01', label: __( 'January' ) },
-					{ value: '02', label: __( 'February' ) },
-					{ value: '03', label: __( 'March' ) },
-					{ value: '04', label: __( 'April' ) },
-					{ value: '05', label: __( 'May' ) },
-					{ value: '06', label: __( 'June' ) },
-					{ value: '07', label: __( 'July' ) },
-					{ value: '08', label: __( 'August' ) },
-					{ value: '09', label: __( 'September' ) },
-					{ value: '10', label: __( 'October' ) },
-					{ value: '11', label: __( 'November' ) },
-					{ value: '12', label: __( 'December' ) },
-				] }
+				options={ monthOptions }
 				onChange={ ( value ) => {
 					const newDate = setMonth( date, Number( value ) - 1 );
 					setDate( newDate );

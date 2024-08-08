@@ -24,9 +24,7 @@ test.describe( 'Templates', () => {
 
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Sort by' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Template' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'descending' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
 		const firstTitle = page
 			.getByRole( 'region', {
 				name: 'Template',
@@ -37,7 +35,7 @@ test.describe( 'Templates', () => {
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
 		// Ascending by title.
-		await page.getByRole( 'menuitemradio', { name: 'ascending' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 

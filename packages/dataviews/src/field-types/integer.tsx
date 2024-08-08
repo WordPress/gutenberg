@@ -45,6 +45,7 @@ function Edit< Item >( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description } = field;
 	const value = field.getValue( { item: data } ) ?? '';
@@ -76,6 +77,9 @@ function Edit< Item >( {
 				value={ value }
 				options={ elements }
 				onChange={ onChangeControl }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				hideLabelFromVision={ hideLabelFromVision }
 			/>
 		);
 	}
@@ -87,6 +91,7 @@ function Edit< Item >( {
 			value={ value }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
+			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }

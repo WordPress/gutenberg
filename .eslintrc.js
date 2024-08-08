@@ -295,7 +295,10 @@ module.exports = {
 						'FocalPointPicker',
 						'RangeControl',
 						'SearchControl',
+						'SelectControl',
+						'TextControl',
 						'TextareaControl',
+						'ToggleControl',
 						'ToggleGroupControl',
 						'TreeSelect',
 					].map( ( componentName ) => ( {

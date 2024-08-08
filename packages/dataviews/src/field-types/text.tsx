@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
+import { SelectControl, TextControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ function Edit< Item >( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label, placeholder } = field;
 	const value = field.getValue( { item: data } );
@@ -47,6 +49,32 @@ function Edit< Item >( {
 		[ id, onChange ]
 	);
 
+	if ( field.elements ) {
+		const elements = [
+			/*
+			 * Value can be undefined when:
+			 *
+			 * - the field is not required
+			 * - in bulk editing
+			 *
+			 */
+			{ label: __( 'Select item' ), value: '' },
+			...field.elements,
+		];
+
+		return (
+			<SelectControl
+				label={ label }
+				value={ value }
+				options={ elements }
+				onChange={ onChangeControl }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				hideLabelFromVision={ hideLabelFromVision }
+			/>
+		);
+	}
+
 	return (
 		<TextControl
 			label={ label }
@@ -54,6 +82,8 @@ function Edit< Item >( {
 			value={ value ?? '' }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
+			__nextHasNoMarginBottom
+			hideLabelFromVision={ hideLabelFromVision }
 		/>
 	);
 }
