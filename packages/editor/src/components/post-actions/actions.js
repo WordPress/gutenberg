@@ -9,7 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
 import { DataForm } from '@wordpress/dataviews';
 import {
@@ -30,10 +29,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 import { getItemTitle } from '../../dataviews/actions/utils';
-
-// Patterns.
-const { CreatePatternModalContents, useDuplicatePatternProps } =
-	unlock( patternsPrivateApis );
 
 // TODO: this should be shared with other components (see post-fields in edit-site).
 const fields = [
@@ -268,27 +263,6 @@ const useDuplicatePostAction = ( postType ) => {
 	);
 };
 
-export const duplicatePatternAction = {
-	id: 'duplicate-pattern',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
-	modalHeader: _x( 'Duplicate pattern', 'action label' ),
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const duplicatedProps = useDuplicatePatternProps( {
-			pattern: item,
-			onSuccess: () => closeModal(),
-		} );
-		return (
-			<CreatePatternModalContents
-				onClose={ closeModal }
-				confirmLabel={ _x( 'Duplicate', 'action label' ) }
-				{ ...duplicatedProps }
-			/>
-		);
-	},
-};
-
 export const duplicateTemplatePartAction = {
 	id: 'duplicate-template-part',
 	label: _x( 'Duplicate', 'action label' ),
@@ -383,7 +357,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isTemplateOrTemplatePart &&
 				userCanCreatePostType &&
 				duplicateTemplatePartAction,
-			isPattern && userCanCreatePostType && duplicatePatternAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
