@@ -60,7 +60,13 @@ function useSortedBlockTypes() {
 		groupByType,
 		{ core: [], noncore: [] }
 	);
-	return [ ...coreItems, ...nonCoreItems ];
+
+	const alphasort = ( blockA, blockB ) =>
+		blockA.title.localeCompare( blockB.title );
+	return [
+		...coreItems.sort( alphasort ),
+		...nonCoreItems.sort( alphasort ),
+	];
 }
 
 export function useBlockHasGlobalStyles( blockName ) {
