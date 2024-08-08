@@ -10,6 +10,14 @@ import type { useCompositeStore } from '..';
 
 /**
  * Renders a composite widget.
+ *
+ * ```jsx
+ * const store = useCompositeStore();
+ * <Composite store={ store }>
+ *   <Composite.Item>Item 1</Composite.Item>
+ *   <Composite.Item>Item 2</Composite.Item>
+ * </Composite>
+ * ```
  */
 export function UseCompositeStorePlaceholder(
 	props: Parameters< typeof useCompositeStore >
