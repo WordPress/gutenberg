@@ -19,7 +19,7 @@ import { forwardRef, Children, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { sanitizeOperators } from '../../utils';
+import { sanitizeOperators } from '../../utils/sanitize-operators';
 import {
 	SORTING_DIRECTIONS,
 	sortArrows,

@@ -19,7 +19,7 @@ import FilterSummary from './filter-summary';
 import { default as AddFilter, AddFilterDropdownMenu } from './add-filter';
 import ResetFilters from './reset-filters';
 import DataViewsContext from '../dataviews-context';
-import { sanitizeOperators } from '../../utils';
+import { sanitizeOperators } from '../../utils/sanitize-operators';
 import {
 	ALL_OPERATORS,
 	OPERATOR_IS,
