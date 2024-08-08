@@ -20,7 +20,7 @@ import {
 	useFilters,
 	FilterVisibilityToggle,
 } from '../dataviews-filters';
-import DataViewsLayout from '../dataviews-layout';
+import DataViewsLayout from '../dataviews-layouts';
 import DataviewsPagination from '../dataviews-pagination';
 import DataViewsSearch from '../dataviews-search';
 import DataViewsViewConfig from '../dataviews-view-config';
