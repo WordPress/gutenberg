@@ -55,9 +55,11 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 };
 export default meta;
 
-export const Default: StoryFn< typeof Composite > = ( { ...initialState } ) => {
+export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
 	const rtl = isRTL();
-	const store = useCompositeStore( { rtl, ...initialState } );
+	const store = useCompositeStore( { rtl, ...storeProps } );
 
 	return (
 		<Composite role="grid" store={ store } aria-label="Composite">
