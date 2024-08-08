@@ -40,7 +40,6 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 import { unlock } from '../../lock-unlock';
-import { useBlockRefProvider } from './use-block-props/use-block-refs';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -111,7 +110,6 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				useTypingObserver(),
-				useBlockRefProvider( '' ),
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
