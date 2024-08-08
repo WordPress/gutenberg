@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { DataFormProps } from '../../types';
-import { getFormLayout } from '../../dataforms-layouts';
+import { getFormLayout } from '../dataform-layouts';
 
 export default function DataForm< Item >( {
 	form,

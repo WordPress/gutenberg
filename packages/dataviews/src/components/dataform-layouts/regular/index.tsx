@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, Field } from '../../types';
+import { normalizeFields } from '../../../normalize-fields';
+import type { DataFormProps, Field } from '../../../types';
 
 export default function FormRegular< Item >( {
 	data,

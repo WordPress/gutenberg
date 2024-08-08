@@ -16,8 +16,8 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, NormalizedField, Field } from '../../types';
+import { normalizeFields } from '../../../normalize-fields';
+import type { DataFormProps, NormalizedField, Field } from '../../../types';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -34,7 +34,7 @@ function DropdownHeader( {
 } ) {
 	return (
 		<VStack
-			className="dataforms-layouts-panel__dropdown-header"
+			className="dataform-layouts-panel__dropdown-header"
 			spacing={ 4 }
 		>
 			<HStack alignment="center">
@@ -44,7 +44,7 @@ function DropdownHeader( {
 				<Spacer />
 				{ onClose && (
 					<Button
-						className="dataforms-layouts-panel__dropdown-header-action"
+						className="dataform-layouts-panel__dropdown-header-action"
 						label={ __( 'Close' ) }
 						icon={ closeSmall }
 						onClick={ onClose }
@@ -81,14 +81,14 @@ function FormField< Item >( {
 	return (
 		<HStack
 			ref={ setPopoverAnchor }
-			className="dataforms-layouts-panel__field"
+			className="dataform-layouts-panel__field"
 		>
-			<div className="dataforms-layouts-panel__field-label">
+			<div className="dataform-layouts-panel__field-label">
 				{ field.label }
 			</div>
 			<div>
 				<Dropdown
-					contentClassName="dataforms-layouts-panel__field-dropdown"
+					contentClassName="dataform-layouts-panel__field-dropdown"
 					popoverProps={ popoverProps }
 					focusOnMount
 					toggleProps={ {
@@ -98,7 +98,7 @@ function FormField< Item >( {
 					} }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							className="dataforms-layouts-panel__field-control"
+							className="dataform-layouts-panel__field-control"
 							size="compact"
 							variant="tertiary"
 							aria-expanded={ isOpen }
