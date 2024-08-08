@@ -1204,10 +1204,28 @@ wp_interactivity_state(
 ```
 
 ```js
+// view.js
+
 const { state } = store( 'myPlugin', {
-	console.log( state.ajaxUrl );
-	// Expected output: https://yoursite.com/wp-admin/admin-ajax.php
-}
+	actions: {
+		*doSomething() {
+			try {
+				const formData = new FormData();
+				formData.append( 'action', 'do_something' );
+				formData.append( '_ajax_nonce', state.nonce );
+
+				const data = yield fetch( state.ajaxUrl, {
+					method: 'POST',
+					body: formData,
+				} ).then( ( response ) => response.json() );
+					console.log( 'Server data!', data );
+				} catch ( e ) {
+					// Something went wrong!
+				}
+			},
+		},
+	}
+);
 ```
 
 ### wp_interactivity_process_directives
