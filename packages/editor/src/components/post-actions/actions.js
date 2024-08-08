@@ -333,6 +333,7 @@ export const duplicateTemplatePartAction = {
 				onCreate={ onTemplatePartSuccess }
 				onError={ closeModal }
 				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+				closeModal={ closeModal }
 			/>
 		);
 	},
