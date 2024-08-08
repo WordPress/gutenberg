@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { filterSortAndPaginate } from '../filter-and-sort-data-view';
+import { filterSortAndPaginate } from '../utils/filter-sort-paginate';
 import { data, fields } from '../components/dataviews/stories/fixtures';
 
 describe( 'filters', () => {
