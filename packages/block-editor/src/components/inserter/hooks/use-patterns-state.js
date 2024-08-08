@@ -23,18 +23,25 @@ import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
-	const { patternCategories, patterns, userPatternCategories } = useSelect(
+	const {
+		patternCategories,
+		patterns,
+		userPatternCategories,
+		hasResolvingRequests,
+	} = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } =
 				select( blockEditorStore );
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
+				__experimentalHasResolvingRequests,
 			} = getSettings();
 			return {
 				patterns: __experimentalGetAllowedPatterns( rootClientId ),
 				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
+				hasResolvingRequests: __experimentalHasResolvingRequests,
 			};
 		},
 		[ rootClientId ]
@@ -94,7 +101,7 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 		[ createSuccessNotice, onInsert, selectedCategory ]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ patterns, allCategories, onClickPattern, hasResolvingRequests ];
 };
 
 export default usePatternsState;

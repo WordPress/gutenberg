@@ -120,6 +120,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		hasResolvingRequests,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -128,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getBlockPatternCategories,
+				hasResolvingSelectors,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -184,6 +186,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				hasResolvingRequests: hasResolvingSelectors(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -325,6 +328,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			__experimentalHasResolvingRequests: hasResolvingRequests,
 		};
 		lock( blockEditorSettings, {
 			sectionRootClientId,
@@ -354,6 +358,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
+		hasResolvingRequests,
 	] );
 }
 
