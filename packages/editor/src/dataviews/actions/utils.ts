@@ -58,7 +58,7 @@ export function isTemplateRemovable( template: Template | TemplatePart ) {
 		[ template.source, template.source ].includes(
 			TEMPLATE_ORIGINS.custom
 		) &&
-		! Boolean( template?.plugin ) &&
+		! Boolean( template.type === 'wp_template' && template?.plugin ) &&
 		! template.has_theme_file
 	);
 }
