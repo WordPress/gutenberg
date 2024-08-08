@@ -21,9 +21,9 @@ export type CompositeProps = Pick<
 	'render' | 'children'
 > & {
 	/**
-	 * Object returned by the `useCompositeStore` hook
+	 * Object returned by the `useCompositeStore` hook.
 	 */
-	store?: Ariakit.CompositeProps[ 'store' ];
+	store?: Ariakit.CompositeStore;
 };
 
 export type CompositeGroupProps = Pick<
