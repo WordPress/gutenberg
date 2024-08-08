@@ -18,13 +18,13 @@ export const TabListWrapper = styled.div`
 	text-align: center;
 	overflow-x: auto;
 
-	:where( & ) {
-		width: fit-content;
-	}
-
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 		text-align: start;
+	}
+
+	&:not( [aria-orientation='vertical'] ) {
+		width: fit-content;
 	}
 
 	@media not ( prefers-reduced-motion: reduce ) {
