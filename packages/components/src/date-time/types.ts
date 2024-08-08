@@ -137,7 +137,10 @@ export type DatePickerProps = {
 };
 
 export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
-	Omit< TimePickerProps, 'currentTime' | 'onChange' > & {
+	Omit<
+		TimePickerProps,
+		'currentTime' | 'onChange' | 'hideLabelFromVision'
+	> & {
 		/**
 		 * The function called when a new date or time has been selected. It is
 		 * passed the date and time as an argument.
