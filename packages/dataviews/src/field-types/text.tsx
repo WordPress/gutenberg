@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl, TextControl } from '@wordpress/components';
+import {
+	SelectControl,
+	TextControl,
+	RadioControl,
+} from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -48,6 +52,18 @@ function Edit< Item >( {
 			} ) ),
 		[ id, onChange ]
 	);
+
+	if ( field.elements && field.editAs === 'radio' ) {
+		return (
+			<RadioControl
+				label={ label }
+				onChange={ onChangeControl }
+				options={ field.elements }
+				selected={ value }
+				hideLabelFromVision={ hideLabelFromVision }
+			/>
+		);
+	}
 
 	if ( field.elements ) {
 		const elements = [

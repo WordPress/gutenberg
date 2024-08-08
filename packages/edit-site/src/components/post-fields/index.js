@@ -345,6 +345,16 @@ function usePostFields( viewType ) {
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
+			{
+				id: 'comment_status',
+				label: __( 'Discussion' ),
+				type: 'text',
+				editAs: 'radio',
+				elements: [
+					{ value: 'open', label: __( 'Open' ) },
+					{ value: 'closed', label: __( 'Closed' ) },
+				],
+			},
 		],
 		[ authors, viewType, frontPageId, postsPageId ]
 	);

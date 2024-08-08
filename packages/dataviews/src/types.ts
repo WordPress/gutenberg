@@ -93,6 +93,11 @@ export type Field< Item > = {
 	Edit?: ComponentType< DataFormControlProps< Item > >;
 
 	/**
+	 * Optional config for editing the field.
+	 */
+	editAs?: 'radio';
+
+	/**
 	 * Callback used to sort the field.
 	 */
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
