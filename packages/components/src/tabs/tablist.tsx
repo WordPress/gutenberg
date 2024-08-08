@@ -27,15 +27,16 @@ export const TabList = forwardRef<
 	const context = useTabsContext();
 
 	const selectedId = context?.store.useState( 'selectedId' );
-	const indicatorPosition = useTrackElementOffsetRect(
-		context?.store.item( selectedId )?.element
-	);
+	const selectedElement = context?.store.item( selectedId )?.element;
+	const indicatorPosition = useTrackElementOffsetRect( selectedElement );
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
-	useOnValueUpdate(
-		selectedId,
-		( { previousValue } ) => previousValue && setAnimationEnabled( true )
-	);
+	useOnValueUpdate( selectedId, ( { previousValue } ) => {
+		selectedElement?.scrollIntoView( { behavior: 'instant' } );
+		if ( previousValue ) {
+			setAnimationEnabled( true );
+		}
+	} );
 
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
