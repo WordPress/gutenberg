@@ -15,8 +15,7 @@ describe( 'background', () => {
 			backgroundImage: { id: 123, url: 'image.png' },
 			backgroundSize: 'contain',
 		};
-		const backgroundStylesNoId = { backgroundImage: { id: 123 } };
-		const backgroundStylesNoURL = { backgroundImage: { url: 'image.png' } };
+		const backgroundStylesNoURL = { backgroundImage: { id: 123 } };
 		it.each( [
 			[
 				'return background size default',
@@ -29,7 +28,7 @@ describe( 'background', () => {
 			[ 'return early if no styles are passed', undefined, undefined ],
 			[
 				'return early if images has no id',
-				backgroundStylesNoId,
+				backgroundStylesNoURL,
 				undefined,
 			],
 			[

@@ -340,9 +340,7 @@ function BackgroundImageControls( {
 					 * This is to increase the chance that the image's focus point is visible.
 					 * This is in-editor only to assist with the user experience.
 					 */
-					! positionValue &&
-					media.id &&
-					( 'auto' === sizeValue || ! sizeValue )
+					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
 						: positionValue,
 				backgroundSize: sizeValue,
@@ -379,7 +377,9 @@ function BackgroundImageControls( {
 
 	const onRemove = () =>
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+			setImmutably( style, [ 'background' ], {
+				backgroundImage: 'none',
+			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
 	const imgLabel =
@@ -461,9 +461,7 @@ function BackgroundSizeControls( {
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
-	const isUploadedImage =
-		style?.background?.backgroundImage?.id ||
-		inheritedValue?.background?.backgroundImage?.id;
+	const isUploadedImage = style?.background?.backgroundImage?.id;
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
@@ -750,7 +748,7 @@ export default function BackgroundPanel( {
 				) }
 			>
 				<ToolsPanelItem
-					hasValue={ () => hasBackgroundImageValue( value ) }
+					hasValue={ () => !! value?.background }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }

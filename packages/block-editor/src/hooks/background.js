@@ -56,11 +56,7 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 }
 
 export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if (
-		! backgroundStyle ||
-		! backgroundStyle?.backgroundImage?.id ||
-		! backgroundStyle?.backgroundImage?.url
-	) {
+	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.url ) {
 		return;
 	}
 

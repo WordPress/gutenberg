@@ -146,7 +146,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background image style with contain, position, attachment, and repeat is applied' => array(
