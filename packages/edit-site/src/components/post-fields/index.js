@@ -351,8 +351,20 @@ function usePostFields( viewType ) {
 				type: 'text',
 				editAs: 'radio',
 				elements: [
-					{ value: 'open', label: __( 'Open' ) },
-					{ value: 'closed', label: __( 'Closed' ) },
+					{
+						value: 'open',
+						label: __( 'Open' ),
+						description: __(
+							'Visitors can add new comments and replies.'
+						),
+					},
+					{
+						value: 'closed',
+						label: __( 'Closed' ),
+						description: __(
+							'Visitors cannot add new comments or replies. Existing comments remain visible.'
+						),
+					},
 				],
 			},
 		],
