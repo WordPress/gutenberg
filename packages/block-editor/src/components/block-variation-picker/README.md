@@ -26,7 +26,7 @@ import {
 const MyBlockVariationPicker = ( { blockName } ) => {
 	const variations = useSelect(
 		( select ) => {
-			const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations } = select( blockEditorStore );
 			return getBlockVariations( blockName, 'block' );
 		},
 		[ blockName ]
