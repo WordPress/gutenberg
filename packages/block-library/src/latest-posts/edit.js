@@ -16,7 +16,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
@@ -28,7 +28,15 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { pin, list, grid } from '@wordpress/icons';
+import {
+	pin,
+	list,
+	grid,
+	alignNone,
+	alignLeft,
+	alignCenter,
+	alignRight,
+} from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
@@ -197,6 +205,29 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		setAttributes( { categories: allCategories } );
 	};
 
+	const imageAlignmentOptions = [
+		{
+			value: 'none',
+			icon: alignNone,
+			label: __( 'None' ),
+		},
+		{
+			value: 'left',
+			icon: alignLeft,
+			label: __( 'Left' ),
+		},
+		{
+			value: 'center',
+			icon: alignCenter,
+			label: __( 'Center' ),
+		},
+		{
+			value: 'right',
+			icon: alignRight,
+			label: __( 'Right' ),
+		},
+	];
+
 	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
@@ -307,30 +338,27 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							className="editor-latest-posts-image-alignment-control"
 							__nextHasNoMarginBottom
 							label={ __( 'Image alignment' ) }
-							value={ featuredImageAlign }
+							value={ featuredImageAlign || 'none' }
 							onChange={ ( value ) =>
 								setAttributes( {
-									featuredImageAlign: value,
+									featuredImageAlign:
+										value !== 'none' ? value : undefined,
 								} )
 							}
 							isBlock
 						>
-							<ToggleGroupControlOption
-								value="none"
-								label={ __( 'None' ) }
-							/>
-							<ToggleGroupControlOption
-								value="left"
-								label={ __( 'Left' ) }
-							/>
-							<ToggleGroupControlOption
-								value="center"
-								label={ __( 'Center' ) }
-							/>
-							<ToggleGroupControlOption
-								value="right"
-								label={ __( 'Right' ) }
-							/>
+							{ imageAlignmentOptions.map(
+								( { value, icon, label } ) => {
+									return (
+										<ToggleGroupControlOptionIcon
+											key={ value }
+											value={ value }
+											icon={ icon }
+											label={ label }
+										/>
+									);
+								}
+							) }
 						</ToggleGroupControl>
 						<ToggleControl
 							__nextHasNoMarginBottom
