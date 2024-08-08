@@ -66,7 +66,6 @@ export const Tab = styled( Ariakit.Tab )`
 		flex-grow: 1;
 		display: inline-flex;
 		align-items: center;
-		justify-content: center;
 		position: relative;
 		border-radius: 0;
 		min-height: ${ space(
@@ -133,6 +132,10 @@ export const Tab = styled( Ariakit.Tab )`
 		min-height: ${ space(
 			10
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+	}
+
+	:not( [aria-orientation='vertical'] ) & {
+		justify-content: center;
 	}
 `;
 
