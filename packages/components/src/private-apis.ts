@@ -24,6 +24,7 @@ import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
 import { kebabCase } from './utils/strings';
+import { ImageCropper, ImageCropperContext } from './image-cropper';
 import { lock } from './lock-unlock';
 
 export const privateApis = {};
@@ -47,4 +48,6 @@ lock( privateApis, {
 	DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpTextV2,
 	kebabCase,
+	ImageCropper,
+	ImageCropperContext,
 } );

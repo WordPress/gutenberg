@@ -12,6 +12,7 @@ import {
 	useRef,
 	useEffect,
 	useMemo,
+	useState,
 } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 /**
@@ -288,8 +289,72 @@ function ImageCropperProvider( {
 	);
 }
 
+function ImageCropperAutoSizer( {
+	src,
+	width,
+	height,
+	children,
+}: {
+	src: string;
+	width?: number;
+	height?: number;
+	children: ReactNode;
+} ) {
+	const [ size, setSize ] = useState< { width: number; height: number } >( {
+		width: width || 0,
+		height: height || 0,
+	} );
+
+	useEffect( () => {
+		const image = new Image();
+		image.src = src;
+		if ( width ) {
+			image.width = width;
+		}
+		if ( height ) {
+			image.height = height;
+		}
+
+		function onLoadImage() {
+			setSize( ( currentSize ) => {
+				if (
+					image.width === currentSize.width &&
+					image.height === currentSize.height
+				) {
+					return currentSize;
+				}
+				return { width: image.width, height: image.height };
+			} );
+		}
+
+		if ( image.complete ) {
+			onLoadImage();
+		}
+
+		image.addEventListener( 'load', onLoadImage, false );
+
+		return () => {
+			image.removeEventListener( 'load', onLoadImage );
+		};
+	}, [ src, width, height ] );
+
+	if ( ! size.width || ! size.height ) {
+		return null;
+	}
+
+	return (
+		<ImageCropperProvider
+			src={ src }
+			width={ size.width }
+			height={ size.height }
+		>
+			{ children }
+		</ImageCropperProvider>
+	);
+}
+
 const ImageCropper = Object.assign( Cropper, {
-	Provider: ImageCropperProvider,
+	Provider: ImageCropperAutoSizer,
 } );
 
 export { ImageCropper };
