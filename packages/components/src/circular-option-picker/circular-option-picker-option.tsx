@@ -68,7 +68,6 @@ function UnforwardedOptionAsOption(
 					ref={ forwardedRef }
 				/>
 			}
-			store={ compositeStore }
 			id={ id }
 		/>
 	);
