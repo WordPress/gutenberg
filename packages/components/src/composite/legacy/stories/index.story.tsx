@@ -15,8 +15,8 @@ import {
 import { UseCompositeStatePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	// TODO: should we keep this story around? If so, how should we call it?
-	title: 'Components/Composite/Legacy',
+	title: 'Components (Deprecated)/Composite (Unstable)',
+	id: 'components-composite-unstable',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
 		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
