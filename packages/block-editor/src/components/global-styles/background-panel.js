@@ -327,7 +327,7 @@ function BackgroundImageControls( {
 		 * save an already-inherited style to the
 		 * block styles.
 		 */
-		const sizeValue =
+		const newSizeValue =
 			style?.background?.backgroundSize ||
 			( ! inheritedValue?.background?.backgroundSize
 				? defaultValues?.backgroundSize
@@ -335,7 +335,9 @@ function BackgroundImageControls( {
 		const positionValue =
 			style?.background?.backgroundPosition ||
 			inheritedValue?.background?.backgroundPosition;
-
+		// sizeValue is used to test whether to set a background position.
+		const sizeValue =
+			newSizeValue || inheritedValue?.background?.backgroundSize;
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
@@ -346,10 +348,19 @@ function BackgroundImageControls( {
 					title: media.title || undefined,
 				},
 				backgroundPosition:
-					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
+					/*
+					 * A background image uploaded and set in the editor (an image with a record id),
+					 * receives a default background position of '50% 0',
+					 * when the background image size is the equivalent of "Tile".
+					 * This is to increase the chance that the image's focus point is visible.
+					 * This is in-editor only to assist with the user experience.
+					 */
+					! positionValue &&
+					media.id &&
+					( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
 						: style?.background?.backgroundPosition,
-				backgroundSize: sizeValue,
+				backgroundSize: newSizeValue,
 			} )
 		);
 	};
@@ -530,6 +541,7 @@ function BackgroundSizeControls( {
 			 * receives a default background position of '50% 0',
 			 * when the toggle switches to "Tile". This is to increase the chance that
 			 * the image's focus point is visible.
+			 * This is in-editor only to assist with the user experience.
 			 */
 			if ( !! style?.background?.backgroundImage?.id ) {
 				nextPosition = '50% 0';
@@ -582,6 +594,12 @@ function BackgroundSizeControls( {
 			)
 		);
 
+	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
+	const backgroundPositionValue =
+		! positionValue && isUploadedImage && 'contain' === sizeValue
+			? defaultValues?.backgroundPosition
+			: positionValue;
+
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
@@ -589,11 +607,7 @@ function BackgroundSizeControls( {
 				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
-				value={ backgroundPositionToCoords(
-					! positionValue && 'contain' === sizeValue
-						? '50% 50%'
-						: positionValue
-				) }
+				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl

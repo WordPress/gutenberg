@@ -23,9 +23,10 @@ import {
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
-// Initial control values where no block style is set.
+// Initial control values.
 const BACKGROUND_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
 
 /**
@@ -54,8 +55,11 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if ( ! backgroundStyle || !! backgroundStyle?.backgroundImage?.id ) {
+export function setBackgroundStyleDefaults(
+	backgroundStyle,
+	inheritedBackgroundStyle = {}
+) {
+	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.id ) {
 		return;
 	}
 
@@ -64,19 +68,37 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 
 	// Set block background defaults.
 	if ( !! backgroundImage?.url ) {
-		if ( ! backgroundStyle?.backgroundSize ) {
+		// if style is set, it MUST override inherited style
+		if (
+			! backgroundStyle?.backgroundSize &&
+			! inheritedBackgroundStyle?.backgroundSize
+		) {
 			backgroundStylesWithDefaults = {
 				backgroundSize: 'cover',
 			};
+			return backgroundStylesWithDefaults;
+		}
+
+		// Don't process position defaults for any other value other than "contain".
+		if (
+			!! backgroundStyle?.backgroundSize &&
+			backgroundStyle?.backgroundSize !== 'contain'
+		) {
+			return backgroundStylesWithDefaults;
 		}
 
 		if (
-			'contain' === backgroundStyle?.backgroundSize &&
-			! backgroundStyle?.backgroundPosition
+			'contain' === inheritedBackgroundStyle?.backgroundSize ||
+			'contain' === backgroundStyle?.backgroundSize
 		) {
-			backgroundStylesWithDefaults = {
-				backgroundPosition: '50% 50%',
-			};
+			if (
+				! backgroundStyle?.backgroundPosition &&
+				! inheritedBackgroundStyle?.backgroundPosition
+			) {
+				backgroundStylesWithDefaults = {
+					backgroundPosition: '50% 50%',
+				};
+			}
 		}
 	}
 
@@ -84,6 +106,12 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 }
 
 function useBlockProps( { name, style } ) {
+	const inheritedValue = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
+				?.blocks?.[ name ],
+		[ name ]
+	);
 	if (
 		! hasBackgroundSupport( name ) ||
 		! style?.background?.backgroundImage
@@ -91,7 +119,10 @@ function useBlockProps( { name, style } ) {
 		return;
 	}
 
-	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
+	const backgroundStyles = setBackgroundStyleDefaults(
+		style?.background,
+		inheritedValue?.background
+	);
 
 	if ( ! backgroundStyles ) {
 		return;
@@ -147,6 +178,7 @@ export function BackgroundImagePanel( {
 				style: getBlockAttributes( clientId )?.style,
 				_links: _settings[ globalStylesLinksDataKey ],
 				/*
+				 * To ensure we pass down the right inherited values:
 				 * @TODO 1. Pass inherited value down to all block style controls,
 				 *   See: packages/block-editor/src/hooks/style.js
 				 * @TODO 2. Add support for block style variations,
