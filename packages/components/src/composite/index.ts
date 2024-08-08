@@ -12,7 +12,6 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import type { CompositeStore, CompositeStoreProps } from '@ariakit/react';
 
 /**
  * Creates a composite store.
@@ -132,6 +131,3 @@ export const Composite = Object.assign( Ariakit.Composite, {
 	 */
 	Row,
 } );
-
-export type Store = CompositeStore;
-export type StoreProps = CompositeStoreProps;

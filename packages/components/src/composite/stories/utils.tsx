@@ -6,12 +6,14 @@ import type { StoryContext } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import type { StoreProps as CompositeStoreProps } from '..';
+import type { useCompositeStore } from '..';
 
 /**
  * Renders a composite widget.
  */
-export function UseCompositeStorePlaceholder( props: CompositeStoreProps ) {
+export function UseCompositeStorePlaceholder(
+	props: Parameters< typeof useCompositeStore >
+) {
 	return (
 		<dl>
 			{ Object.entries( props ).map( ( [ name, value ] ) => (

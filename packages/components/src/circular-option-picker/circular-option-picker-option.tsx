@@ -18,7 +18,7 @@ import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
 import { Composite } from '../composite';
 import Tooltip from '../tooltip';
-import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
+import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
 	props: {
@@ -45,7 +45,9 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
-		compositeStore: CircularOptionPickerCompositeStore;
+		compositeStore: NonNullable<
+			React.ComponentProps< typeof Composite >[ 'store' ]
+		>;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
