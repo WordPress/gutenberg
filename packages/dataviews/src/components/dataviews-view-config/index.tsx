@@ -30,11 +30,17 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	LAYOUT_GRID,
+	sortIcons,
+	sortLabels,
+} from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
+import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -99,10 +105,6 @@ function ViewTypeMenu( {
 			} ) }
 		</DropdownMenu>
 	);
-}
-
-interface ViewActionsProps {
-	defaultLayouts?: SupportedLayouts;
 }
 
 function SortFieldControl() {
@@ -305,7 +307,14 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent() {
+function DataviewsViewConfigContent( {
+	density,
+	setDensity,
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+} ) {
+	const { view } = useContext( DataViewsContext );
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection title={ __( 'Appearance' ) }>
@@ -313,6 +322,12 @@ function DataviewsViewConfigContent() {
 					<SortFieldControl />
 					<SortDirectionControl />
 				</HStack>
+				{ view.type === LAYOUT_GRID && (
+					<DensityPicker
+						density={ density }
+						setDensity={ setDensity }
+					/>
+				) }
 				<ItemsPerPageControl />
 			</SettingsSection>
 			<SettingsSection title={ __( 'Properties' ) }>
@@ -323,8 +338,14 @@ function DataviewsViewConfigContent() {
 }
 
 function _DataViewsViewConfig( {
+	density,
+	setDensity,
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+	defaultLayouts?: SupportedLayouts;
+} ) {
 	const [ isShowingViewPopover, setIsShowingViewPopover ] =
 		useState< boolean >( false );
 
@@ -346,7 +367,10 @@ function _DataViewsViewConfig( {
 						} }
 						focusOnMount
 					>
-						<DataviewsViewConfigContent />
+						<DataviewsViewConfigContent
+							density={ density }
+							setDensity={ setDensity }
+						/>
 					</Popover>
 				) }
 			</div>

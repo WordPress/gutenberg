@@ -133,12 +133,6 @@ export default function DataViews< Item >( {
 							isShowingFilter={ isShowingFilter }
 						/>
 					</HStack>
-					{ view.type === LAYOUT_GRID && (
-						<DensityPicker
-							density={ density }
-							setDensity={ setDensity }
-						/>
-					) }
 					<DataViewsBulkActions />
 					<HStack
 						spacing={ 1 }
@@ -147,6 +141,8 @@ export default function DataViews< Item >( {
 					>
 						<DataViewsViewConfig
 							defaultLayouts={ defaultLayouts }
+							density={ density }
+							setDensity={ setDensity }
 						/>
 						{ header }
 					</HStack>

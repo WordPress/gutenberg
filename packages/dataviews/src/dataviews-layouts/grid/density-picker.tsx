@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { RangeControl, Button } from '@wordpress/components';
+import {
+	BaseControl,
+	RangeControl,
+	Button,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { plus, reset } from '@wordpress/icons';
@@ -87,50 +92,55 @@ export default function DensityPicker( {
 
 	const step = 100 / ( breakValues.max - breakValues.min + 1 );
 	return (
-		<>
-			<Button
-				size="compact"
-				icon={ reset }
-				disabled={ rangeValue <= 0 }
-				accessibleWhenDisabled
-				label={ __( 'Decrease size' ) }
-				onClick={ () => {
-					setDensity( densityToUse + 1 );
-				} }
-			/>
-			<RangeControl
-				__nextHasNoMarginBottom
-				showTooltip={ false }
-				className="dataviews-density-picker__range-control"
-				label={ __( 'Item size' ) }
-				hideLabelFromVision
-				value={ rangeValue }
-				min={ 0 }
-				max={ 100 }
-				withInputField={ false }
-				onChange={ ( value = 0 ) => {
-					const inverseValue = 100 - value;
-					setDensity(
-						Math.round(
-							( inverseValue *
-								( breakValues.max - breakValues.min ) ) /
-								100 +
-								breakValues.min
-						)
-					);
-				} }
-				step={ step }
-			/>
-			<Button
-				size="compact"
-				icon={ plus }
-				disabled={ rangeValue >= 100 }
-				accessibleWhenDisabled
-				label={ __( 'Increase size' ) }
-				onClick={ () => {
-					setDensity( densityToUse - 1 );
-				} }
-			/>
-		</>
+		<BaseControl>
+			<BaseControl.VisualLabel>
+				{ __( 'Item size' ) }
+			</BaseControl.VisualLabel>
+			<HStack>
+				<Button
+					size="compact"
+					icon={ reset }
+					disabled={ rangeValue <= 0 }
+					accessibleWhenDisabled
+					label={ __( 'Decrease size' ) }
+					onClick={ () => {
+						setDensity( densityToUse + 1 );
+					} }
+				/>
+				<RangeControl
+					__nextHasNoMarginBottom
+					showTooltip={ false }
+					className="dataviews-density-picker__range-control"
+					label={ __( 'Item size' ) }
+					hideLabelFromVision
+					value={ rangeValue }
+					min={ 0 }
+					max={ 100 }
+					withInputField={ false }
+					onChange={ ( value = 0 ) => {
+						const inverseValue = 100 - value;
+						setDensity(
+							Math.round(
+								( inverseValue *
+									( breakValues.max - breakValues.min ) ) /
+									100 +
+									breakValues.min
+							)
+						);
+					} }
+					step={ step }
+				/>
+				<Button
+					size="compact"
+					icon={ plus }
+					disabled={ rangeValue >= 100 }
+					accessibleWhenDisabled
+					label={ __( 'Increase size' ) }
+					onClick={ () => {
+						setDensity( densityToUse - 1 );
+					} }
+				/>
+			</HStack>
+		</BaseControl>
 	);
 }
