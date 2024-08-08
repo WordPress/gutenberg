@@ -47,8 +47,6 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Object;
-
 export type FieldType = 'text' | 'integer';
 
 export type ValidationContext = {
@@ -128,21 +126,13 @@ export type Field< Item > = {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-} & ( Item extends ItemRecord
-	? {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue?: ( args: { item: Item } ) => any;
-	  }
-	: {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue: ( args: { item: Item } ) => any;
-	  } );
+
+	/**
+	 * Callback used to retrieve the value of the field from the item.
+	 * Defaults to `item[ field.id ]`.
+	 */
+	getValue?: ( args: { item: Item } ) => any;
+};
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
