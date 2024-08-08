@@ -20,8 +20,13 @@
 	}
 
 	.postbox-header {
-		border-top: $border-width solid $gray-300;
 		border-bottom: 0;
+	}
+
+	// Headers of postboxes that follow another visible postbox.
+	.postbox:not(.is-hidden) + .postbox .postbox-header,
+	&:has(.postbox:not(.is-hidden)) + & .postbox-header {
+		border-top: $border-width solid $gray-300;
 	}
 
 	/* Match width and positioning of the meta boxes. Override default styles. */
