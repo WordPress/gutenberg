@@ -350,6 +350,10 @@ function usePostFields( viewType ) {
 				label: __( 'Discussion' ),
 				type: 'text',
 				editAs: 'radio',
+				enableSorting: false,
+				filterBy: {
+					operators: [],
+				},
 				elements: [
 					{
 						value: 'open',
