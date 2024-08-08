@@ -18,15 +18,15 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 	title: 'Components/Composite',
 	component: UseCompositeStorePlaceholder,
 	subcomponents: {
-		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Composite,
-		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Group': Composite.Group,
-		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.GroupLabel': Composite.GroupLabel,
-		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Row': Composite.Row,
-		// @ts-expect-error Storybook doesn't like overloaded exports as subcomponents
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
 	},
 	parameters: {
