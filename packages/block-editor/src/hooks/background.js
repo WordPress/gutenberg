@@ -73,7 +73,7 @@ export function setBackgroundStyleDefaults(
 			! inheritedBackgroundStyle?.backgroundSize
 		) {
 			backgroundStylesWithDefaults = {
-				backgroundSize: 'cover',
+				backgroundSize: BACKGROUND_DEFAULT_VALUES.backgroundSize,
 			};
 		}
 
@@ -87,7 +87,8 @@ export function setBackgroundStyleDefaults(
 				! inheritedBackgroundStyle?.backgroundPosition
 			) {
 				backgroundStylesWithDefaults = {
-					backgroundPosition: '50% 50%',
+					backgroundPosition:
+						BACKGROUND_DEFAULT_VALUES.backgroundPosition,
 				};
 			}
 		}
