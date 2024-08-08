@@ -17,12 +17,12 @@
 	}
 }
 
-.edit-site-style-book__tabs {
-	[role="tablist"] {
-		background: $white;
-		color: $gray-900;
-	}
+.edit-site-style-book__tablist-container {
+	background: $white;
+	width: 100%;
+}
 
+.edit-site-style-book__tabs {
 	[role="tabpanel"] {
 		bottom: 0;
 		left: 0;
