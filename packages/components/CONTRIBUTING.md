@@ -260,14 +260,14 @@ The following example implements all of the above recommendations.
 //=======================
 import { forwardRef, createContext } from '@wordpress/element';
 
-const UnforwardedTopLevelComponent = function TopLevel( props, ref ) {
+function UnforwardedTopLevelComponent( props, ref ) {
 	/* ... */
-};
+}
 const TopLevelComponent = forwardRef( UnforwardedTopLevelComponent );
 
-const UnforwardedSubComponent = function Sub( props, ref ) {
+function UnforwardedSubComponent( props, ref ) {
 	/* ... */
-};
+}
 const SubComponent = forwardRef( UnforwardedSubComponent );
 SubComponent.displayName = 'Component.SubComponent';
 
