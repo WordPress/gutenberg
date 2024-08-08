@@ -66,8 +66,8 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<div className="font-library-modal__tabs">
-				<Tabs defaultTabId={ defaultTabId }>
+			<Tabs defaultTabId={ defaultTabId }>
+				<div className="font-library-modal__tablist-container">
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>
@@ -75,30 +75,30 @@ function FontLibraryModal( {
 							</Tabs.Tab>
 						) ) }
 					</Tabs.TabList>
-					{ tabs.map( ( { id } ) => {
-						let contents;
-						switch ( id ) {
-							case 'upload-fonts':
-								contents = <UploadFonts />;
-								break;
-							case 'installed-fonts':
-								contents = <InstalledFonts />;
-								break;
-							default:
-								contents = <FontCollection slug={ id } />;
-						}
-						return (
-							<Tabs.TabPanel
-								key={ id }
-								tabId={ id }
-								focusable={ false }
-							>
-								{ contents }
-							</Tabs.TabPanel>
-						);
-					} ) }
-				</Tabs>
-			</div>
+				</div>
+				{ tabs.map( ( { id } ) => {
+					let contents;
+					switch ( id ) {
+						case 'upload-fonts':
+							contents = <UploadFonts />;
+							break;
+						case 'installed-fonts':
+							contents = <InstalledFonts />;
+							break;
+						default:
+							contents = <FontCollection slug={ id } />;
+					}
+					return (
+						<Tabs.TabPanel
+							key={ id }
+							tabId={ id }
+							focusable={ false }
+						>
+							{ contents }
+						</Tabs.TabPanel>
+					);
+				} ) }
+			</Tabs>
 		</Modal>
 	);
 }
