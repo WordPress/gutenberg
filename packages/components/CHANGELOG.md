@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+-   `Fieldset` is a new exported component ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
 -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
