@@ -4,6 +4,18 @@
 		margin-bottom: 0;
 	}
 
+	.is-marked {
+		.components-range-control__track {
+			transition: width ease 0.1s;
+			@include reduce-motion("transition");
+		}
+
+		.components-range-control__thumb-wrapper {
+			transition: left ease 0.1s;
+			@include reduce-motion("transition");
+		}
+	}
+
 	.spacing-sizes-control__range-control,
 	.spacing-sizes-control__custom-value-range {
 		height: 40px;
@@ -20,18 +32,16 @@
 	}
 
 	.components-range-control__mark {
+		transform: translateX(-50%);
 		height: $grid-unit-05;
-		width: 3px;
-		background-color: #fff;
+		width: math.div($grid-unit-05, 2);
+		background-color: $white;
 		z-index: 1;
+		top: -#{$grid-unit-05};
 	}
 
 	.components-range-control__marks {
 		margin-top: 17px;
-
-		:first-child {
-			display: none;
-		}
 	}
 
 	.components-range-control__thumb-wrapper {
