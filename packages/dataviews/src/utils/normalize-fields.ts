@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import getFieldTypeDefinition from './field-types';
-import type { Field, NormalizedField } from './types';
+import getFieldTypeDefinition from '../field-types';
+import type { Field, NormalizedField } from '../types';
 
 /**
  * Apply default values and normalize the fields config.

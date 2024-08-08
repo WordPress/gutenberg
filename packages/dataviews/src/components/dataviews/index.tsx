@@ -24,7 +24,7 @@ import DataViewsLayout from '../dataviews-layout';
 import DataviewsPagination from '../dataviews-pagination';
 import DataViewsSearch from '../dataviews-search';
 import DataViewsViewConfig from '../dataviews-view-config';
-import { normalizeFields } from '../../normalize-fields';
+import { normalizeFields } from '../../utils/normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';

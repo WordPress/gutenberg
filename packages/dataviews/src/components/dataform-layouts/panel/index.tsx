@@ -16,7 +16,7 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../../../normalize-fields';
+import { normalizeFields } from '../../../utils/normalize-fields';
 import type { DataFormProps, NormalizedField, Field } from '../../../types';
 
 interface FormFieldProps< Item > {
