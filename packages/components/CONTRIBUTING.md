@@ -243,9 +243,15 @@ Dedicated React context should also use dot notation, while hooks should not.
 //=======================
 import { forwardRef, createContext } from '@wordpress/element';
 
-function TopLevelComponent = forwardRef( function TopLevel( props, ref ) { /* ... */ });
+const UnforwardedTopLevelComponent = function TopLevel( props, ref ) {
+	/* ... */
+};
+const TopLevelComponent = forwardRef( UnforwardedTopLevelComponent );
 
-function SubComponent = forwardRef( function Sub( props, ref ) { /* ... */ });
+const UnforwardedSubComponent = function Sub( props, ref ) {
+	/* ... */
+};
+const SubComponent = forwardRef( UnforwardedSubComponent );
 SubComponent.displayName = 'Component.SubComponent';
 
 const Context = createContext();
