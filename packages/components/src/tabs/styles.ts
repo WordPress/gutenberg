@@ -16,6 +16,11 @@ export const TabListWrapper = styled.div`
 	align-items: stretch;
 	flex-direction: row;
 	text-align: center;
+	overflow-x: auto;
+
+	:where( & ) {
+		width: fit-content;
+	}
 
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
@@ -58,8 +63,10 @@ export const TabListWrapper = styled.div`
 
 export const Tab = styled( Ariakit.Tab )`
 	& {
+		flex-grow: 1;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		position: relative;
 		border-radius: 0;
 		min-height: ${ space(
