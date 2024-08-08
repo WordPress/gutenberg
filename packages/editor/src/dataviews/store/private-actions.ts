@@ -9,6 +9,7 @@ import { doAction } from '@wordpress/hooks';
  * Internal dependencies
  */
 import deletePost from '../actions/delete-post';
+import duplicatePattern from '../actions/duplicate-pattern';
 import exportPattern from '../actions/export-pattern';
 import resetPost from '../actions/reset-post';
 import trashPost from '../actions/trash-post';
@@ -74,7 +75,17 @@ export const registerPostTypeActions =
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
 
+		const canCreate = await registry
+			.resolveSelect( coreStore )
+			.canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
+
 		const actions = [
+			canCreate && postTypeConfig.slug === 'wp_block'
+				? duplicatePattern
+				: undefined,
 			postTypeConfig.supports?.title ? renamePost : undefined,
 			postTypeConfig?.supports?.[ 'page-attributes' ]
 				? reorderPage
