@@ -139,6 +139,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
+		contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -370,6 +371,7 @@ const UnforwardedPopover = (
 	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
 		? {
 				style: {
+					...contentStyle,
 					...motionInlineStyles,
 					...style,
 				},
@@ -378,7 +380,10 @@ const UnforwardedPopover = (
 		  }
 		: {
 				animate: false,
-				style,
+				style: {
+					...contentStyle,
+					...style,
+				},
 		  };
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating

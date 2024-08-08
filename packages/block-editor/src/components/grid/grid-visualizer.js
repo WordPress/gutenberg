@@ -90,6 +90,7 @@ const GridVisualizerGrid = forwardRef(
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
+				contentStyle={ { margin: 0 } }
 			>
 				<div
 					ref={ ref }
