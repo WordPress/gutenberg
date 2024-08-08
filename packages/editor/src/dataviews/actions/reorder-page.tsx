@@ -53,7 +53,7 @@ function ReorderModal( {
 			await saveEditedEntityRecord( 'postType', item.type, item.id, {
 				throwOnError: true,
 			} );
-			createSuccessNotice( __( 'Order updated' ), {
+			createSuccessNotice( __( 'Order updated.' ), {
 				type: 'snackbar',
 			} );
 			onActionPerformed?.( items );
