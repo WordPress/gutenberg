@@ -23,7 +23,7 @@ export const TabListWrapper = styled.div`
 		text-align: start;
 	}
 
-	:where( &:not( [aria-orientation='vertical'] ) ) {
+	:where( [aria-orientation='horizontal'] ) {
 		width: fit-content;
 	}
 
@@ -134,7 +134,7 @@ export const Tab = styled( Ariakit.Tab )`
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
 	}
 
-	:not( [aria-orientation='vertical'] ) & {
+	[aria-orientation='horizontal'] & {
 		justify-content: center;
 	}
 `;
