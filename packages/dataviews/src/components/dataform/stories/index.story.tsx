@@ -78,14 +78,7 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 	} );
 
 	const form = {
-		fields: [
-			'title',
-			'order',
-			'author',
-			'status',
-			'date',
-			'birthdate',
-		],
+		fields: [ 'title', 'order', 'author', 'status', 'date', 'birthdate' ],
 	};
 
 	return (
