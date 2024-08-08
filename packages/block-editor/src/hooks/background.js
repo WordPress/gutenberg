@@ -55,10 +55,7 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function setBackgroundStyleDefaults(
-	backgroundStyle,
-	inheritedBackgroundStyle = {}
-) {
+export function setBackgroundStyleDefaults( backgroundStyle ) {
 	if (
 		! backgroundStyle ||
 		! backgroundStyle?.backgroundImage?.id ||
@@ -70,41 +67,25 @@ export function setBackgroundStyleDefaults(
 	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if (
-		! backgroundStyle?.backgroundSize &&
-		! inheritedBackgroundStyle?.backgroundSize
-	) {
+	if ( ! backgroundStyle?.backgroundSize ) {
 		backgroundStylesWithDefaults = {
 			backgroundSize: BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundSize,
 		};
 	}
 
 	if (
-		'contain' === backgroundStyle?.backgroundSize ||
-		( ! backgroundStyle?.backgroundSize &&
-			'contain' === inheritedBackgroundStyle?.backgroundSize )
+		'contain' === backgroundStyle?.backgroundSize &&
+		! backgroundStyle?.backgroundPosition
 	) {
-		if (
-			! backgroundStyle?.backgroundPosition &&
-			! inheritedBackgroundStyle?.backgroundPosition
-		) {
-			backgroundStylesWithDefaults = {
-				backgroundPosition:
-					BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundPosition,
-			};
-		}
+		backgroundStylesWithDefaults = {
+			backgroundPosition:
+				BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundPosition,
+		};
 	}
-
 	return backgroundStylesWithDefaults;
 }
 
 function useBlockProps( { name, style } ) {
-	const inheritedValue = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings()[ globalStylesDataKey ]
-				?.blocks?.[ name ],
-		[ name ]
-	);
 	if (
 		! hasBackgroundSupport( name ) ||
 		! style?.background?.backgroundImage
@@ -112,10 +93,7 @@ function useBlockProps( { name, style } ) {
 		return;
 	}
 
-	const backgroundStyles = setBackgroundStyleDefaults(
-		style?.background,
-		inheritedValue?.background
-	);
+	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
 
 	if ( ! backgroundStyles ) {
 		return;

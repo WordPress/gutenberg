@@ -59,17 +59,10 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	$background_styles['backgroundRepeat']     = $block_attributes['style']['background']['backgroundRepeat'] ?? null;
 	$background_styles['backgroundAttachment'] = $block_attributes['style']['background']['backgroundAttachment'] ?? null;
 	if ( isset( $background_styles['backgroundImage']['id'] ) ) {
-		$inherited_styles                  = gutenberg_get_global_styles();
-		$inherited_block_background_styles = $inherited_styles['blocks'][ $block['blockName'] ]['background'] ?? null;
-		$inherited_background_size         = $inherited_block_background_styles['backgroundSize'] ?? null;
-		if ( ! isset( $background_styles['backgroundSize'] ) && ! $inherited_background_size ) {
-			$background_styles['backgroundSize'] = 'cover';
-		}
+		$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
-		if ( 'contain' === $background_styles['backgroundSize'] || ( ! isset( $background_styles['backgroundSize'] ) && 'contain' === $inherited_background_size ) ) {
-			if ( ! isset( $background_styles['backgroundPosition'] ) && ! isset( $global_block_background_styles['backgroundPosition'] ) ) {
-				$background_styles['backgroundPosition'] = '50% 50%';
-			}
+		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
+			$background_styles['backgroundPosition'] = '50% 50%';
 		}
 	}
 

@@ -320,24 +320,9 @@ function BackgroundImageControls( {
 			return;
 		}
 
-		/*
-		 * Only apply a default size value if
-		 * one doesn't exist on the block styles,
-		 * or in global styles. We should never
-		 * save an already-inherited style to the
-		 * block styles.
-		 */
-		const newSizeValue =
-			style?.background?.backgroundSize ||
-			( ! inheritedValue?.background?.backgroundSize
-				? defaultValues?.backgroundSize
-				: undefined );
-		const positionValue =
-			style?.background?.backgroundPosition ||
-			inheritedValue?.background?.backgroundPosition;
-		// sizeValue is used to test whether to set a background position.
 		const sizeValue =
-			newSizeValue || inheritedValue?.background?.backgroundSize;
+			style?.background?.backgroundSize || defaultValues?.backgroundSize;
+		const positionValue = style?.background?.backgroundPosition;
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
@@ -359,8 +344,8 @@ function BackgroundImageControls( {
 					media.id &&
 					( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
-						: style?.background?.backgroundPosition,
-				backgroundSize: newSizeValue,
+						: positionValue,
+				backgroundSize: sizeValue,
 			} )
 		);
 	};
