@@ -188,7 +188,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					continue;
 				}
 
-				if ( $post_types && ! in_array( $post_type, $template->post_types, true ) ) {
+				if ( $post_type && ! in_array( $post_type, $template->post_types, true ) ) {
 					continue;
 				}
 
