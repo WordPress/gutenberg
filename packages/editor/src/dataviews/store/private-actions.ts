@@ -13,8 +13,9 @@ import exportPattern from '../actions/export-pattern';
 import resetPost from '../actions/reset-post';
 import trashPost from '../actions/trash-post';
 import permanentlyDeletePost from '../actions/permanently-delete-post';
-import restorePost from '../actions/restore-post';
+import renamePost from '../actions/rename-post';
 import reorderPage from '../actions/reorder-page';
+import restorePost from '../actions/restore-post';
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -74,6 +75,7 @@ export const registerPostTypeActions =
 			.getPostType( postType ) ) as PostType;
 
 		const actions = [
+			postTypeConfig.supports?.title ? renamePost : undefined,
 			postTypeConfig?.supports?.[ 'page-attributes' ]
 				? reorderPage
 				: undefined,

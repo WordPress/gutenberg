@@ -13,8 +13,17 @@ export interface BasePost {
 	type: string;
 	id: string | number;
 }
-export interface TemplateOrTemplatePart extends BasePost {
-	type: 'wp_template' | 'wp_template_part';
+
+export interface Template extends BasePost {
+	type: 'wp_template';
+	is_custom: boolean;
+	source: string;
+	has_theme_file: boolean;
+	id: string;
+}
+
+export interface TemplatePart extends BasePost {
+	type: 'wp_template_part';
 	source: string;
 	has_theme_file: boolean;
 	id: string;
@@ -31,7 +40,7 @@ export interface PostWithPageAttributesSupport extends BasePost {
 	menu_order: number;
 }
 
-export type Post = TemplateOrTemplatePart | Pattern | BasePost;
+export type Post = Template | TemplatePart | Pattern | BasePost;
 
 export type PostWithPermissions = Post & {
 	permissions: {
@@ -44,6 +53,7 @@ export interface PostType {
 	slug: string;
 	supports?: {
 		'page-attributes'?: boolean;
+		title?: boolean;
 	};
 }
 
