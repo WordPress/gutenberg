@@ -27,7 +27,7 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../utils/normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
-import DensityPicker from '../../dataviews-layouts/grid/density-picker';
+import DensityPicker from '../dataviews-layouts/grid/density-picker';
 import { LAYOUT_GRID } from '../../utils/constants';
 
 type ItemWithId = { id: string };

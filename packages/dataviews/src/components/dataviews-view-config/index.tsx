@@ -35,7 +35,7 @@ import {
 	sortIcons,
 	sortLabels,
 } from '../../utils/constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS, getMandatoryFields } from '../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';

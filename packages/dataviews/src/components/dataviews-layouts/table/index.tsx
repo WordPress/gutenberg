@@ -24,21 +24,21 @@ import {
 /**
  * Internal dependencies
  */
-import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
-import ItemActions from '../../components/dataviews-item-actions';
-import { sortValues } from '../../utils/constants';
+import SingleSelectionCheckbox from '../../dataviews-selection-checkbox';
+import ItemActions from '../../dataviews-item-actions';
+import { sortValues } from '../../../utils/constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-} from '../../components/dataviews-bulk-actions';
+} from '../../dataviews-bulk-actions';
 import type {
 	Action,
 	NormalizedField,
 	ViewTable as ViewTableType,
 	ViewTableProps,
 	CombinedField,
-} from '../../types';
-import type { SetSelection } from '../../private-types';
+} from '../../../types';
+import type { SetSelection } from '../../../private-types';
 import ColumnHeaderMenu from './column-header-menu';
 
 interface BulkSelectionCheckboxProps< Item > {

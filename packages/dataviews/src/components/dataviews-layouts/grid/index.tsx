@@ -19,11 +19,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from '../../components/dataviews-item-actions';
-import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
-import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
-import type { Action, NormalizedField, ViewGridProps } from '../../types';
-import type { SetSelection } from '../../private-types';
+import ItemActions from '../../dataviews-item-actions';
+import SingleSelectionCheckbox from '../../dataviews-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../dataviews-bulk-actions';
+import type { Action, NormalizedField, ViewGridProps } from '../../../types';
+import type { SetSelection } from '../../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];

@@ -18,18 +18,18 @@ import { forwardRef, Children, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { sanitizeOperators } from '../../utils/sanitize-operators';
+import { unlock } from '../../../lock-unlock';
+import { sanitizeOperators } from '../../../utils/sanitize-operators';
 import {
 	SORTING_DIRECTIONS,
 	sortArrows,
 	sortLabels,
-} from '../../utils/constants';
+} from '../../../utils/constants';
 import type {
 	NormalizedField,
 	SortDirection,
 	ViewTable as ViewTableType,
-} from '../../types';
+} from '../../../types';
 
 const {
 	DropdownMenuV2: DropdownMenu,

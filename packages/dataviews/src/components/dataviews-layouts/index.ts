@@ -15,8 +15,8 @@ import {
 import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../utils/constants';
-import type { View } from '../types';
+import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../utils/constants';
+import type { View } from '../../types';
 
 export const VIEW_LAYOUTS = [
 	{
