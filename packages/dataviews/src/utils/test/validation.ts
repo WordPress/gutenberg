@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { isItemValid } from '../utils/validation';
-import type { Field } from '../types';
+import { isItemValid } from '../validation';
+import type { Field } from '../../types';
 
 describe( 'validation', () => {
 	it( 'fields not visible in form are not validated', () => {

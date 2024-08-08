@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { filterSortAndPaginate } from '../utils/filter-sort-paginate';
-import { data, fields } from '../components/dataviews/stories/fixtures';
+import { filterSortAndPaginate } from '../filter-sort-paginate';
+import { data, fields } from '../../components/dataviews/stories/fixtures';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {
