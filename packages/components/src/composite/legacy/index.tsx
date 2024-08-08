@@ -155,7 +155,6 @@ const unproxiedCompositeGroup = forwardRef<
 	const Component = role === 'row' ? Current.Row : Current.Group;
 	return <Component ref={ ref } role={ role } { ...props } />;
 } );
-unproxiedCompositeGroup.displayName = 'CompositeGroup';
 
 export const Composite = proxyComposite( Current, { baseId: 'id' } );
 export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
