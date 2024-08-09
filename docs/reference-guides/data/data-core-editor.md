@@ -435,6 +435,10 @@ _Related_
 
 -   getInserterItems in core/block-editor store.
 
+### getInserterSearchInputRef
+
+Undocumented declaration.
+
 ### getLastMultiSelectedBlockClientId
 
 _Related_

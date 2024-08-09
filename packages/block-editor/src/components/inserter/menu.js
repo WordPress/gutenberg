@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDebouncedInput, useFocusOnMount } from '@wordpress/compose';
+import { useDebouncedInput } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -50,12 +50,10 @@ function InserterMenu(
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
-		__experimentalFocusSearchOnMount,
+		__experimentalSearchInputRef,
 	},
 	ref
 ) {
-	const focusSearchOnMountRef = useFocusOnMount();
-
 	const isZoomOutMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
@@ -155,27 +153,21 @@ function InserterMenu(
 
 		return (
 			<>
-				<div
-					ref={
-						__experimentalFocusSearchOnMount
-							? focusSearchOnMountRef
-							: null
-					}
-				>
-					<SearchControl
-						__nextHasNoMarginBottom
-						className="block-editor-inserter__search"
-						onChange={ ( value ) => {
-							if ( hoveredItem ) {
-								setHoveredItem( null );
-							}
-							setFilterValue( value );
-						} }
-						value={ filterValue }
-						label={ __( 'Search for blocks and patterns' ) }
-						placeholder={ __( 'Search' ) }
-					/>
-				</div>
+				<SearchControl
+					__nextHasNoMarginBottom
+					className="block-editor-inserter__search"
+					onChange={ ( value ) => {
+						if ( hoveredItem ) {
+							setHoveredItem( null );
+						}
+						setFilterValue( value );
+					} }
+					value={ filterValue }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
+					ref={ __experimentalSearchInputRef }
+				/>
+
 				{ !! delayedFilterValue && (
 					<InserterSearchResults
 						filterValue={ delayedFilterValue }
@@ -196,18 +188,18 @@ function InserterMenu(
 		);
 	}, [
 		selectedTab,
-		hoveredItem,
-		setHoveredItem,
-		setFilterValue,
 		filterValue,
+		__experimentalSearchInputRef,
 		delayedFilterValue,
 		onSelect,
 		onHover,
-		shouldFocusBlock,
-		clientId,
 		rootClientId,
-		__experimentalInsertionIndex,
+		clientId,
 		isAppender,
+		__experimentalInsertionIndex,
+		shouldFocusBlock,
+		hoveredItem,
+		setFilterValue,
 	] );
 
 	const blocksTab = useMemo( () => {
