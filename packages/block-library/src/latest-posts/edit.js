@@ -346,7 +346,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 										value !== 'none' ? value : undefined,
 								} )
 							}
-							isBlock
 						>
 							{ imageAlignmentOptions.map(
 								( { value, icon, label } ) => {
