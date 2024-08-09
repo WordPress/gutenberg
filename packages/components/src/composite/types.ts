@@ -209,7 +209,6 @@ export type CompositeHoverProps = {
 	blurOnHoverEnd?: Ariakit.CompositeHoverProps[ 'blurOnHoverEnd' ];
 };
 
-// TODO: check that props make sense
 export type CompositeTypeaheadProps = {
 	/**
 	 * Allows the component to be rendered as a different HTML element or React

@@ -259,10 +259,7 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 							},
 						},
 					},
-					'Composite.Typeahead': {
-						...commonArgTypes,
-						// TODO
-					},
+					'Composite.Typeahead': commonArgTypes,
 				};
 
 				const name = component.displayName ?? '';
@@ -399,6 +396,28 @@ Hover.parameters = {
 	docs: {
 		description: {
 			story: 'Elements in the composite widget will receive focus on mouse move and lose focus to the composite base element on mouse leave.',
+		},
+	},
+};
+
+export const Typeahead: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store } render={ <Composite.Typeahead /> }>
+			<Composite.Item>Apple</Composite.Item>
+			<Composite.Item>Banana</Composite.Item>
+			<Composite.Item>Peach</Composite.Item>
+		</Composite>
+	);
+};
+Typeahead.parameters = {
+	docs: {
+		description: {
+			story: 'When focus in on the composite widget, hitting printable character keys will move focus to the next composite item that begins with the input characters.',
 		},
 	},
 };

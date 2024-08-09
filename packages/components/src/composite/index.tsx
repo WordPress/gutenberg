@@ -242,9 +242,8 @@ export const Composite = Object.assign(
 		Hover,
 		/**
 		 * Renders a component that adds typeahead functionality to composite
-		 * components. When the `typeahead` prop is enabled, which it is by default,
-		 * hitting printable character keys will move focus to the next composite item
-		 * that begins with the input characters.
+		 * components. Hitting printable character keys will move focus to the next
+		 * composite item that begins with the input characters.
 		 * @see https://ariakit.org/reference/composite-typeahead
 		 * @example
 		 * ```jsx
