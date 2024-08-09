@@ -3,14 +3,19 @@
  */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
-const DEFAULT_CONTENT_ONLY_BLOCKS = [
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
 	'core/post-featured-image',
 	'core/post-content',
-	'core/template-part',
 ];
 
 /**
@@ -18,32 +23,30 @@ const DEFAULT_CONTENT_ONLY_BLOCKS = [
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyBlocks = applyFilters(
-		'editor.postContentBlockTypes',
-		DEFAULT_CONTENT_ONLY_BLOCKS
+	const contentOnlyBlockTypes = useMemo(
+		() => [
+			...applyFilters(
+				'editor.postContentBlockTypes',
+				POST_CONTENT_BLOCK_TYPES
+			),
+			'core/template-part',
+		],
+		[]
 	);
 
-	// Note that there are two separate subscription because the result for each
+	// Note that there are two separate subscriptions because the result for each
 	// returns a new array.
-	const contentOnlyIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockParents, getBlockName } =
-			select( blockEditorStore );
-		return getBlocksByName( contentOnlyBlocks ).filter( ( clientId ) =>
-			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = getBlockName( parentClientId );
-				return (
-					// Ignore descendents of the query block.
-					parentBlockName !== 'core/query' &&
-					// Enable only the top-most block.
-					! contentOnlyBlocks.includes( parentBlockName )
-				);
-			} )
-		);
-	}, [] );
+	const contentOnlyIds = useSelect(
+		( select ) => {
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName( contentOnlyBlockTypes );
+		},
+		[ contentOnlyBlockTypes ]
+	);
 	const disabledIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
-			( clientId ) => getBlockOrder( clientId )
+		return getBlocksByName( 'core/template-part' ).flatMap( ( clientId ) =>
+			getBlockOrder( clientId )
 		);
 	}, [] );
 

@@ -10,6 +10,7 @@ import { usePrevious } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
+import { setImmutably } from '../../utils/object';
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
 	const { gridLayout, blockOrder, selectedBlockLayout } = useSelect(
@@ -26,7 +27,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		[ gridClientId ]
 	);
 
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { getBlockAttributes, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -37,6 +39,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	);
 
 	const previouslySelectedBlockRect = usePrevious( selectedBlockRect );
+	const previousIsManualPlacement = usePrevious(
+		gridLayout.isManualPlacement
+	);
+	const previousBlockOrder = usePrevious( blockOrder );
 
 	useEffect( () => {
 		const updates = {};
@@ -120,20 +126,65 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					},
 				};
 			}
+
+			// Unset grid layout attributes for blocks removed from the grid.
+			for ( const clientId of previousBlockOrder ?? [] ) {
+				if ( ! blockOrder.includes( clientId ) ) {
+					const rootClientId = getBlockRootClientId( clientId );
+
+					// Block was removed from the editor, so nothing to do.
+					if ( rootClientId === null ) {
+						continue;
+					}
+
+					// Check if the block is being moved to another grid.
+					// If so, do nothing and let the new grid parent handle
+					// the attributes.
+					const rootAttributes = getBlockAttributes( rootClientId );
+					if ( rootAttributes?.layout?.type === 'grid' ) {
+						continue;
+					}
+
+					const attributes = getBlockAttributes( clientId );
+					const {
+						columnStart,
+						rowStart,
+						columnSpan,
+						rowSpan,
+						...layout
+					} = attributes.style?.layout ?? {};
+
+					if ( columnStart || rowStart || columnSpan || rowSpan ) {
+						const hasEmptyLayoutAttribute =
+							Object.keys( layout ).length === 0;
+
+						updates[ clientId ] = setImmutably(
+							attributes,
+							[ 'style', 'layout' ],
+							hasEmptyLayoutAttribute ? undefined : layout
+						);
+					}
+				}
+			}
 		} else {
-			// When in auto mode, remove all of the columnStart and rowStart values.
-			for ( const clientId of blockOrder ) {
-				const attributes = getBlockAttributes( clientId );
-				const { columnStart, rowStart, ...layout } =
-					attributes.style?.layout ?? {};
-				// Only update attributes if columnStart or rowStart are set.
-				if ( columnStart || rowStart ) {
-					updates[ clientId ] = {
-						style: {
-							...attributes.style,
-							layout,
-						},
-					};
+			// Remove all of the columnStart and rowStart values
+			// when switching from manual to auto mode,
+			if ( previousIsManualPlacement === true ) {
+				for ( const clientId of blockOrder ) {
+					const attributes = getBlockAttributes( clientId );
+					const { columnStart, rowStart, ...layout } =
+						attributes.style?.layout ?? {};
+					// Only update attributes if columnStart or rowStart are set.
+					if ( columnStart || rowStart ) {
+						const hasEmptyLayoutAttribute =
+							Object.keys( layout ).length === 0;
+
+						updates[ clientId ] = setImmutably(
+							attributes,
+							[ 'style', 'layout' ],
+							hasEmptyLayoutAttribute ? undefined : layout
+						);
+					}
 				}
 			}
 
@@ -160,11 +211,14 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		// Actual deps to sync:
 		gridClientId,
 		gridLayout,
+		previousBlockOrder,
 		blockOrder,
 		previouslySelectedBlockRect,
+		previousIsManualPlacement,
 		// These won't change, but the linter thinks they might:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
+		getBlockRootClientId,
 		updateBlockAttributes,
 	] );
 }

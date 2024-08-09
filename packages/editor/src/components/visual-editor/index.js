@@ -34,7 +34,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import ResizableEditor from '../resizable-editor';
-import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import useSelectNearestEditableBlock from './use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
 	PATTERN_POST_TYPE,
@@ -107,6 +107,7 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -341,12 +342,13 @@ function VisualEditor( {
 		} ),
 	] );
 
-	const zoomOutProps = isZoomOutMode
-		? {
-				scale: 'default',
-				frameSize: '48px',
-		  }
-		: {};
+	const zoomOutProps =
+		isZoomOutMode && ! isTabletViewport
+			? {
+					scale: 'default',
+					frameSize: '48px',
+			  }
+			: {};
 
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =

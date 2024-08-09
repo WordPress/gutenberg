@@ -21,7 +21,8 @@
 		{ "path": "../rich-text" },
 		{ "path": "../sync" },
 		{ "path": "../undo-manager" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../warning" }
 	],
 	"include": [ "src/**/*" ]
 }

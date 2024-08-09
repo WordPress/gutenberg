@@ -13,7 +13,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -206,8 +206,12 @@ function useGridVisualizerDropZone(
 	gridInfo,
 	setHighlightedRect
 ) {
-	const { getBlockAttributes, getBlockRootClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getBlockRootClientId,
+		canInsertBlockType,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -221,6 +225,10 @@ function useGridVisualizerDropZone(
 
 	return useDropZoneWithValidation( {
 		validateDrag( srcClientId ) {
+			const blockName = getBlockName( srcClientId );
+			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
+				return false;
+			}
 			const attributes = getBlockAttributes( srcClientId );
 			const rect = new GridRect( {
 				columnStart: column,

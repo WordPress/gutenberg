@@ -192,12 +192,12 @@ Existing comments in `lib/load.php` should act as a guide.
 
 ## When to sync changes to Gutenberg PHP with Core and vice versa
 
-If you've changed or added PHP files to the Gutenberg plugin, you'll need to confirm whether the changes are to be synced to WordPress Core, and therefore featured in the next release of WordPress.
+On open Gutenberg PRs, changes to certain files are flagged as requiring syncing (also called "backporting") to WordPress Core, for example, PHP files in `/lib` and PHP unit tests.
 
-The Gutenberg GitHub pull request in question should be labeled with the `Needs PHP backport` label if the changes are to be synced to Core.
+The CI checks will indicate whether you need to create a Core PR. If you do, you'll need to create a corresponding markdown file and place it within the appropriate release subdirectory in the [Core backport changelog](https://github.com/WordPress/gutenberg/tree/trunk/backport-changelog/).
 
-If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core GitHub repository](https://github.com/WordPress/wordpress-develop) soon after your pull request is merged.
+For more information, please refer to the [Core backport changelog documentation](https://github.com/WordPress/gutenberg/tree/trunk/backport-changelog/readme.md).
 
-So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced (often called "backporting") to Gutenberg. The relevant Gutenberg GitHub pull request should be labeled with the `Backport from WordPress Core` label.
+So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced to Gutenberg. The relevant Gutenberg GitHub pull request should be labeled with the `Backport from WordPress Core` label.
 
 If you're unsure, you can always ask for help in the #core-editor channel in [WordPress Slack](https://make.wordpress.org/chat/).

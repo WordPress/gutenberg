@@ -28,8 +28,10 @@ import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
 
-const { registerDefaultActions, registerCoreBlockBindingsSources } =
-	unlock( editorPrivateApis );
+const {
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -46,6 +48,7 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
@@ -55,7 +58,6 @@ export function initializeEditor( id, settings ) {
 			enableFSEBlocks: true,
 		} );
 	}
-	registerDefaultActions();
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.

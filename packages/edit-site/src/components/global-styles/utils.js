@@ -52,7 +52,19 @@ function getFontFamilyFromSetting( fontFamilies, setting ) {
 }
 
 export function getFontFamilies( themeJson ) {
-	const fontFamilies = themeJson?.settings?.typography?.fontFamilies?.theme; // TODO this could not be under theme.
+	const themeFontFamilies =
+		themeJson?.settings?.typography?.fontFamilies?.theme;
+	const customFontFamilies =
+		themeJson?.settings?.typography?.fontFamilies?.custom;
+
+	let fontFamilies = [];
+	if ( themeFontFamilies && customFontFamilies ) {
+		fontFamilies = [ ...themeFontFamilies, ...customFontFamilies ];
+	} else if ( themeFontFamilies ) {
+		fontFamilies = themeFontFamilies;
+	} else if ( customFontFamilies ) {
+		fontFamilies = customFontFamilies;
+	}
 	const bodyFontFamilySetting = themeJson?.styles?.typography?.fontFamily;
 	const bodyFontFamily = getFontFamilyFromSetting(
 		fontFamilies,
