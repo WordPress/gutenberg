@@ -186,7 +186,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 			<div { ...useBlockProps() }>
 				<Disabled>
 					<ServerSideRender
-						skipBlockSupportAttributes
 						block="core/tag-cloud"
 						attributes={ attributes }
 					/>
