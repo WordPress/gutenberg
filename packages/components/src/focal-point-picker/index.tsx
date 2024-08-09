@@ -284,7 +284,6 @@ export function FocalPointPicker( {
 			</MediaWrapper>
 			<Controls
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				__next40pxDefaultSize
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {
