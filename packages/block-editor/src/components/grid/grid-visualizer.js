@@ -50,7 +50,6 @@ const GridVisualizerGrid = forwardRef(
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
-		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 
 		useEffect( () => {
 			const observers = [];
@@ -68,80 +67,112 @@ const GridVisualizerGrid = forwardRef(
 			};
 		}, [ gridElement ] );
 
-		useEffect( () => {
-			function onGlobalDrag() {
-				setIsDroppingAllowed( true );
-			}
-			function onGlobalDragEnd() {
-				setIsDroppingAllowed( false );
-			}
-			document.addEventListener( 'drag', onGlobalDrag );
-			document.addEventListener( 'dragend', onGlobalDragEnd );
-			return () => {
-				document.removeEventListener( 'drag', onGlobalDrag );
-				document.removeEventListener( 'dragend', onGlobalDragEnd );
-			};
-		}, [] );
-
 		return (
 			<>
-				<BlockPopoverCover
-					inline
-					className={ clsx( 'block-editor-grid-visualizer', {
-						'is-dropping-allowed': isDroppingAllowed,
-					} ) }
-					clientId={ gridClientId }
-					contentStyle={ { margin: 0, zIndex: 0 } }
-				>
-					<div
-						ref={ ref }
-						className="block-editor-grid-visualizer__grid"
-						style={ gridInfo.style }
-					>
-						{ Array.from(
-							{ length: gridInfo.numItems },
-							( _, i ) => (
-								<GridVisualizerCell
-									key={ i }
-									color={ gridInfo.currentColor }
-									isManualGrid={ isManualGrid }
-								/>
-							)
-						) }
-					</div>
-				</BlockPopoverCover>
+				<GridPopunder
+					gridClientId={ gridClientId }
+					gridInfo={ gridInfo }
+					isManualGrid={ isManualGrid }
+				/>
 				{ isManualGrid && (
-					<BlockPopoverCover
-						className={ clsx( 'block-editor-grid-visualizer', {
-							'is-dropping-allowed': isDroppingAllowed,
-						} ) }
-						clientId={ gridClientId }
-						__unstablePopoverSlot="__unstable-block-tools-after"
-					>
-						<div
-							ref={ ref }
-							className="block-editor-grid-visualizer__grid"
-							style={ gridInfo.style }
-						>
-							<InteractiveManualGrid
-								gridClientId={ gridClientId }
-								gridInfo={ gridInfo }
-							/>
-						</div>
-					</BlockPopoverCover>
+					<GridPopover
+						ref={ ref }
+						gridClientId={ gridClientId }
+						gridInfo={ gridInfo }
+					/>
 				) }
 			</>
 		);
 	}
 );
 
-function InteractiveManualGrid( { gridClientId, gridInfo } ) {
+/**
+ * A popover component that renders inline under the grid block.
+ *
+ * This provides non-interactive elements of the grid visualization and
+ * renders under the block so that the background colors are not atop
+ * the block content.
+ *
+ * @param {Object}  props
+ * @param {string}  props.gridClientId
+ * @param {Object}  props.gridInfo
+ * @param {boolean} props.isManualGrid
+ */
+function GridPopunder( { gridClientId, gridInfo, isManualGrid } ) {
+	const color = gridInfo.currentColor;
+	const cellStyle = isManualGrid
+		? {
+				backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
+				border: `1px dashed rgb(var(--wp-admin-theme-color--rgb))`,
+				borderRadius: '2px',
+				color,
+				opacity: 0.2,
+		  }
+		: {
+				border: `1px dashed ${ color }`,
+				borderRadius: '2px',
+				color,
+				opacity: 0.2,
+		  };
+
+	return (
+		<BlockPopoverCover
+			inline
+			className="block-editor-grid-visualizer"
+			clientId={ gridClientId }
+			// Override layout margin and popover's zIndex.
+			contentStyle={ { margin: 0, zIndex: 0 } }
+		>
+			<div
+				className="block-editor-grid-visualizer__grid"
+				style={ gridInfo.style }
+			>
+				{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
+					<div
+						key={ i }
+						className="block-editor-grid-visualizer__cell"
+						style={ cellStyle }
+					></div>
+				) ) }
+			</div>
+		</BlockPopoverCover>
+	);
+}
+
+/**
+ * A popover component that renders in a slot over the grid block.
+ *
+ * This provides interactive elements of the grid visualization —
+ * block inserters and drop zones.
+ *
+ * @param {Object} props
+ * @param {string} props.gridClientId
+ * @param {Object} props.gridInfo
+ */
+const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
+	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
 	const gridItems = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( gridClientId ),
 		[ gridClientId ]
 	);
+
+	useEffect( () => {
+		function onGlobalDrag() {
+			setIsDroppingAllowed( true );
+		}
+		function onGlobalDragEnd() {
+			setIsDroppingAllowed( false );
+		}
+		document.addEventListener( 'drag', onGlobalDrag );
+		document.addEventListener( 'dragend', onGlobalDragEnd );
+		return () => {
+			document.removeEventListener( 'drag', onGlobalDrag );
+			document.removeEventListener( 'dragend', onGlobalDragEnd );
+		};
+	}, [] );
+
 	const occupiedRects = useMemo( () => {
 		const rects = [];
 		for ( const block of gridItems ) {
@@ -166,81 +197,66 @@ function InteractiveManualGrid( { gridClientId, gridInfo } ) {
 		return rects;
 	}, [ gridItems ] );
 
-	return range( 1, gridInfo.numRows ).map( ( row ) =>
-		range( 1, gridInfo.numColumns ).map( ( column ) => {
-			const isCellOccupied = occupiedRects.some( ( rect ) =>
-				rect.contains( column, row )
-			);
-			const isHighlighted =
-				highlightedRect?.contains( column, row ) ?? false;
-
-			return (
-				<GridVisualizerCell
-					key={ `${ row }-${ column }` }
-					className={ isHighlighted && 'is-highlighted' }
-					isInvisible
-				>
-					{ isCellOccupied ? (
-						<GridVisualizerDropZone
-							column={ column }
-							row={ row }
-							gridClientId={ gridClientId }
-							gridInfo={ gridInfo }
-							setHighlightedRect={ setHighlightedRect }
-						/>
-					) : (
-						<GridVisualizerAppender
-							column={ column }
-							row={ row }
-							gridClientId={ gridClientId }
-							gridInfo={ gridInfo }
-							setHighlightedRect={ setHighlightedRect }
-						/>
-					) }
-				</GridVisualizerCell>
-			);
-		} )
-	);
-}
-
-function GridVisualizerCell( {
-	color,
-	children,
-	className,
-	isInvisible,
-	isManualGrid,
-} ) {
-	let style;
-
-	if ( ! isInvisible ) {
-		style = isManualGrid
-			? {
-					backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
-					border: `1px dashed rgb(var(--wp-admin-theme-color--rgb))`,
-					borderRadius: '2px',
-					color,
-					opacity: 0.2,
-			  }
-			: {
-					border: `1px dashed ${ color }`,
-					borderRadius: '2px',
-					color,
-					opacity: 0.2,
-			  };
-	}
-
 	return (
-		<div
-			className={ clsx(
-				'block-editor-grid-visualizer__cell',
-				className
-			) }
-			style={ style }
+		<BlockPopoverCover
+			__unstablePopoverSlot="__unstable-block-tools-after"
+			className={ clsx( 'block-editor-grid-visualizer', {
+				'is-dropping-allowed': isDroppingAllowed,
+			} ) }
+			clientId={ gridClientId }
 		>
-			{ children }
-		</div>
+			<div
+				ref={ ref }
+				className="block-editor-grid-visualizer__grid"
+				style={ gridInfo.style }
+			>
+				{ range( 1, gridInfo.numRows ).map( ( row ) =>
+					range( 1, gridInfo.numColumns ).map( ( column ) => {
+						const isCellOccupied = occupiedRects.some( ( rect ) =>
+							rect.contains( column, row )
+						);
+						const isHighlighted =
+							highlightedRect?.contains( column, row ) ?? false;
+
+						return (
+							<div
+								key={ `${ row }-${ column }` }
+								className={ clsx(
+									'block-editor-grid-visualizer__cell',
+									{
+										'is-highlighted': isHighlighted,
+									}
+								) }
+							>
+								{ isCellOccupied ? (
+									<GridVisualizerDropZone
+										column={ column }
+										row={ row }
+										gridClientId={ gridClientId }
+										gridInfo={ gridInfo }
+										setHighlightedRect={
+											setHighlightedRect
+										}
+									/>
+								) : (
+									<GridVisualizerAppender
+										column={ column }
+										row={ row }
+										gridClientId={ gridClientId }
+										gridInfo={ gridInfo }
+										setHighlightedRect={
+											setHighlightedRect
+										}
+									/>
+								) }
+							</div>
+						);
+					} )
+				) }
+			</div>
+		</BlockPopoverCover>
 	);
-}
+} );
 
 function useGridVisualizerDropZone(
 	column,
