@@ -92,6 +92,7 @@ function PatternOverridesControls( {
 		<>
 			<InspectorControls group="advanced">
 				<BaseControl
+					__nextHasNoMarginBottom
 					id={ controlId }
 					label={ __( 'Overrides' ) }
 					help={ helpText }
