@@ -9,7 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
 import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
@@ -27,7 +26,6 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 import { getItemTitle } from '../../dataviews/actions/utils';
 
 // TODO: this should be shared with other components (see post-fields in edit-site).
@@ -263,75 +261,14 @@ const useDuplicatePostAction = ( postType ) => {
 	);
 };
 
-export const duplicateTemplatePartAction = {
-	id: 'duplicate-template-part',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
-	modalHeader: _x( 'Duplicate template part', 'action label' ),
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const blocks = useMemo( () => {
-			return (
-				item.blocks ??
-				parse(
-					typeof item.content === 'string'
-						? item.content
-						: item.content.raw,
-					{
-						__unstableSkipMigrationLogs: true,
-					}
-				)
-			);
-		}, [ item.content, item.blocks ] );
-		const { createSuccessNotice } = useDispatch( noticesStore );
-		function onTemplatePartSuccess() {
-			createSuccessNotice(
-				sprintf(
-					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
-					__( '"%s" duplicated.' ),
-					getItemTitle( item )
-				),
-				{ type: 'snackbar', id: 'edit-site-patterns-success' }
-			);
-			closeModal();
-		}
-		return (
-			<CreateTemplatePartModalContents
-				blocks={ blocks }
-				defaultArea={ item.area }
-				defaultTitle={ sprintf(
-					/* translators: %s: Existing template part title */
-					__( '%s (Copy)' ),
-					getItemTitle( item )
-				) }
-				onCreate={ onTemplatePartSuccess }
-				onError={ closeModal }
-				confirmLabel={ _x( 'Duplicate', 'action label' ) }
-				closeModal={ closeModal }
-			/>
-		);
-	},
-};
-
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const {
-		defaultActions,
-		postTypeObject,
-		userCanCreatePostType,
-		isBlockBasedTheme,
-	} = useSelect(
+	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
-			const { getPostType, canUser, getCurrentTheme } =
-				select( coreStore );
+			const { getPostType } = select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
 				postTypeObject: getPostType( postType ),
 				defaultActions: getEntityActions( 'postType', postType ),
-				userCanCreatePostType: canUser( 'create', {
-					kind: 'postType',
-					name: postType,
-				} ),
-				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		},
 		[ postType ]
@@ -363,10 +300,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				  ! isPattern &&
 				  duplicatePostAction
 				: false,
-			isTemplateOrTemplatePart &&
-				userCanCreatePostType &&
-				isBlockBasedTheme &&
-				duplicateTemplatePartAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -432,7 +365,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		return actions;
 	}, [
 		defaultActions,
-		userCanCreatePostType,
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,
