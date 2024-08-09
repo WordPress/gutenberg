@@ -3,18 +3,15 @@
  */
 import {
 	ToolbarGroup,
-	// ToolbarItem,
+	ToolbarItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-// import AspectRatioDropdown from './aspect-ratio-dropdown';
+import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../../block-controls';
-// import ImageEditingProvider from './context';
-// import Cropper from './cropper';
-// import ZoomDropdown from './zoom-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
 import { unlock } from '../../../lock-unlock';
@@ -34,12 +31,11 @@ export default function ImageEditor( {
 
 			<BlockControls>
 				<ToolbarGroup>
-					{ /* <ZoomDropdown /> */ }
-					{ /* <ToolbarItem>
+					<ToolbarItem>
 						{ ( toggleProps ) => (
 							<AspectRatioDropdown toggleProps={ toggleProps } />
 						) }
-					</ToolbarItem> */ }
+					</ToolbarItem>
 					<RotationButton />
 				</ToolbarGroup>
 				<ToolbarGroup>

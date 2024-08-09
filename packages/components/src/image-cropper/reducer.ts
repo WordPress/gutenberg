@@ -447,7 +447,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 							height: largerDimension / action.aspectRatio,
 					  }
 					: {
-							width: largerDimension / action.aspectRatio,
+							width: largerDimension * action.aspectRatio,
 							height: largerDimension,
 					  };
 
