@@ -12,14 +12,14 @@ Let's now dive into each of these concepts to study them in more detail and prov
 
 **Global state** in the Interactivity API refers to global data that can be accessed and modified by any interactive block on the page. It serves as a shared information hub, allowing different parts of your application to communicate and stay in sync. Global state is the ideal mechanism for exchanging information between blocks, regardless of their position in the DOM tree.
 
-### When to use global state
+You should use global state when:
 
 -   You need to share data between multiple blocks that are not directly related in the DOM hierarchy.
 -   You want to maintain a single source of truth for certain data across your entire application.
 -   You're dealing with data that affects multiple parts of your UI simultaneously.
 -   You want to implement features that are global for the page.
 
-### How to work with global state
+### Working with global state
 
 -   **Initializing the global state**
 
@@ -238,13 +238,13 @@ Local context is data defined within a specific element in the HTML structure. U
 
 Local context is particularly useful when you need independent state for individual blocks, ensuring that each instance of a block can maintain its own unique data without interfering with others.
 
-### When to use local context
+You should use local context when:
 
 -   You need to maintain separate state for multiple instances of the same block.
 -   You want to encapsulate data that's only relevant to a specific block and its children.
 -   You need to implement features that are isolated to a specific part of your UI.
 
-### How to work with local context
+### Working with local context
 
 -   **Initializing the local context**
 
@@ -373,8 +373,6 @@ A user will be able to add multiple instances of this block to a page, and each 
 
 Derived state is a computed value based on other parts of the global state or local context. It's calculated on demand rather than stored.
 
-## Why is there a need for derived state?
-
 Derived state is a fundamental concept in state management, not unique to the Interactivity API. It's also used in other popular state management systems like Redux (where it's called "Selectors") or Preact Signals (where it's known as "computed" values).
 
 At its core, derived state addresses a common challenge in application development: maintaining consistency and reducing redundancy in your data.
@@ -393,14 +391,14 @@ Here's why derived state is important:
 
 In essence, derived state allows you to express relationships between different pieces of data in your application declaratively. Instead of imperatively updating related values whenever something changes, you define how these values should be computed based on your raw state.
 
-### When to use derived state
+You should use derived state:
 
 -   When a part of your global state or local context can be computed from other state values.
 -   To avoid redundant data that needs to be manually kept in sync.
 -   To ensure consistency across your application by automatically updating derived values.
 -   To simplify your actions by removing the need to update multiple related state properties.
 
-### How to work with derived state
+### Working with derived state
 
 -   **Initializing the derived state**
 
