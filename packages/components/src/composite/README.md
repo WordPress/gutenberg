@@ -27,7 +27,7 @@ Creates a composite store.
 
 ##### `activeId`: `string | null`
 
-The current active item id. The active item is the element within the composite widget that has either DOM or virtual focus.
+The current active item id. The active item is the element within the composite widget that has either DOM or virtual focus. `null` represents the base composite element (the one with a composite role). Users will be able to navigate out of it using arrow keys.
 
 -   Required: no
 
