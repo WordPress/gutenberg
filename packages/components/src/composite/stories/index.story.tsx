@@ -29,7 +29,26 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
 	},
+	argTypes: {
+		activeId: { control: 'text' },
+		defaultActiveId: { control: 'text' },
+		setActiveId: { control: { type: null } },
+		focusLoop: {
+			control: 'select',
+			options: [ true, false, 'horizontal', 'vertical', 'both' ],
+		},
+		focusShift: { control: 'boolean' },
+		focusWrap: { control: 'boolean' },
+		virtualFocus: { control: 'boolean' },
+		rtl: { control: 'boolean' },
+		orientation: {
+			control: 'select',
+			options: [ 'horizontal', 'vertical', 'both' ],
+		},
+	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
+		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { transform },
