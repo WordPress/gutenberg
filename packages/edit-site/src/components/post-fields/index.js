@@ -261,6 +261,7 @@ function usePostFields( viewType ) {
 				type: 'text',
 				elements: STATUSES,
 				render: PostStatusField,
+				Edit: 'radio',
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
