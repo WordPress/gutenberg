@@ -42,10 +42,9 @@ function Edit< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
+			onChange( {
 				[ id ]: newValue,
-			} ) ),
+			} ),
 		[ id, onChange ]
 	);
 

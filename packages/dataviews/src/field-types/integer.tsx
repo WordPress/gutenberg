@@ -51,10 +51,9 @@ function Edit< Item >( {
 	const value = field.getValue( { item: data } ) ?? '';
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
+			onChange( {
 				[ id ]: Number( newValue ),
-			} ) ),
+			} ),
 		[ id, onChange ]
 	);
 
