@@ -93,6 +93,12 @@ Renders a composite widget.
 
 #### Props
 
+##### `store`: `CompositeStore<CompositeStoreItem>`
+
+Object returned by the `useCompositeStore` hook.
+
+-   Required: yes
+
 ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
 
 Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
@@ -102,12 +108,6 @@ Allows the component to be rendered as a different HTML element or React compone
 ##### `children`: `React.ReactNode`
 
 The contents of the component.
-
--   Required: no
-
-##### `store`: `CompositeStore<CompositeStoreItem>`
-
-Object returned by the `useCompositeStore` hook.
 
 -   Required: no
 

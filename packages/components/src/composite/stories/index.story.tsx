@@ -45,7 +45,6 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 									'RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>',
 							},
 						},
-						// type: { required: true },
 					},
 					children: {
 						name: 'children',
@@ -171,6 +170,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 										'CompositeStore<CompositeStoreItem>',
 								},
 							},
+							type: { required: true },
 						},
 					},
 					'Composite.Group': commonArgTypes,

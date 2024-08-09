@@ -23,7 +23,7 @@ export type CompositeProps = Pick<
 	/**
 	 * Object returned by the `useCompositeStore` hook.
 	 */
-	store?: Ariakit.CompositeStore;
+	store: Ariakit.CompositeStore;
 };
 
 export type CompositeGroupProps = Pick<
