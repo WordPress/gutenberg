@@ -9,12 +9,10 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-import { DataForm, isItemValid } from '@wordpress/dataviews';
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
-	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -23,7 +21,6 @@ import {
  * Internal dependencies
  */
 import {
-	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	PATTERN_POST_TYPE,
@@ -32,10 +29,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 import { getItemTitle } from '../../dataviews/actions/utils';
-
-// Patterns.
-const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
-	unlock( patternsPrivateApis );
 
 // TODO: this should be shared with other components (see post-fields in edit-site).
 const fields = [
@@ -55,31 +48,8 @@ const fields = [
 ];
 
 const formDuplicateAction = {
-	visibleFields: [ 'title' ],
+	fields: [ 'title' ],
 };
-
-const formOrderAction = {
-	visibleFields: [ 'menu_order' ],
-};
-
-/**
- * Check if a template is removable.
- *
- * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is removable.
- */
-function isTemplateRemovable( template ) {
-	if ( ! template ) {
-		return false;
-	}
-	// In patterns list page we map the templates parts to a different object
-	// than the one returned from the endpoint. This is why we need to check for
-	// two props whether is custom or has a theme file.
-	return (
-		template?.source === TEMPLATE_ORIGINS.custom &&
-		! template?.has_theme_file
-	);
-}
 
 const viewPostAction = {
 	id: 'view-post',
@@ -131,216 +101,6 @@ const postRevisionsAction = {
 		}
 	},
 };
-
-const renamePostAction = {
-	id: 'rename-post',
-	label: __( 'Rename' ),
-	isEligible( post ) {
-		if ( post.status === 'trash' ) {
-			return false;
-		}
-		// Templates, template parts and patterns have special checks for renaming.
-		if (
-			! [
-				TEMPLATE_POST_TYPE,
-				TEMPLATE_PART_POST_TYPE,
-				...Object.values( PATTERN_TYPES ),
-			].includes( post.type )
-		) {
-			return post.permissions?.update;
-		}
-		// In the case of templates, we can only rename custom templates.
-		if ( post.type === TEMPLATE_POST_TYPE ) {
-			return (
-				isTemplateRemovable( post ) &&
-				post.is_custom &&
-				post.permissions?.update
-			);
-		}
-		// Make necessary checks for template parts and patterns.
-		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
-		const isUserPattern = post.type === PATTERN_TYPES.user;
-		// In patterns list page we map the templates parts to a different object
-		// than the one returned from the endpoint. This is why we need to check for
-		// two props whether is custom or has a theme file.
-		const isCustomPattern =
-			isUserPattern ||
-			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
-		const hasThemeFile = post?.has_theme_file;
-		return isCustomPattern && ! hasThemeFile && post.permissions?.update;
-	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-
-		async function onRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord( 'postType', item.type, item.id, {
-					title,
-				} );
-				// Update state before saving rerenders the list.
-				setTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveEditedEntityRecord( 'postType', item.type, item.id, {
-					throwOnError: true,
-				} );
-				createSuccessNotice( __( 'Name updated' ), {
-					type: 'snackbar',
-				} );
-				onActionPerformed?.( items );
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while updating the name' );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		return (
-			<form onSubmit={ onRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
-};
-
-function ReorderModal( { items, closeModal, onActionPerformed } ) {
-	const [ item, setItem ] = useState( items[ 0 ] );
-	const orderInput = item.menu_order;
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-
-	async function onOrder( event ) {
-		event.preventDefault();
-
-		if ( ! isItemValid( item, fields, formOrderAction ) ) {
-			return;
-		}
-
-		try {
-			await editEntityRecord( 'postType', item.type, item.id, {
-				menu_order: orderInput,
-			} );
-			closeModal();
-			// Persist edited entity.
-			await saveEditedEntityRecord( 'postType', item.type, item.id, {
-				throwOnError: true,
-			} );
-			createSuccessNotice( __( 'Order updated' ), {
-				type: 'snackbar',
-			} );
-			onActionPerformed?.( items );
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while updating the order' );
-			createErrorNotice( errorMessage, {
-				type: 'snackbar',
-			} );
-		}
-	}
-	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
-	return (
-		<form onSubmit={ onOrder }>
-			<VStack spacing="5">
-				<div>
-					{ __(
-						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
-					) }
-				</div>
-				<DataForm
-					data={ item }
-					fields={ fields }
-					form={ formOrderAction }
-					onChange={ setItem }
-				/>
-				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal();
-						} }
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						type="submit"
-						accessibleWhenDisabled
-						disabled={ isSaveDisabled }
-						__experimentalIsFocusable
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		</form>
-	);
-}
-
-function useReorderPagesAction( postType ) {
-	const supportsPageAttributes = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			const postTypeObject = getPostType( postType );
-
-			return !! postTypeObject?.supports?.[ 'page-attributes' ];
-		},
-		[ postType ]
-	);
-
-	return useMemo(
-		() =>
-			supportsPageAttributes && {
-				id: 'order-pages',
-				label: __( 'Order' ),
-				isEligible( { status } ) {
-					return status !== 'trash';
-				},
-				RenderModal: ReorderModal,
-			},
-		[ supportsPageAttributes ]
-	);
-}
 
 const useDuplicatePostAction = ( postType ) => {
 	const userCanCreatePost = useSelect(
@@ -503,27 +263,6 @@ const useDuplicatePostAction = ( postType ) => {
 	);
 };
 
-export const duplicatePatternAction = {
-	id: 'duplicate-pattern',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
-	modalHeader: _x( 'Duplicate pattern', 'action label' ),
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const duplicatedProps = useDuplicatePatternProps( {
-			pattern: item,
-			onSuccess: () => closeModal(),
-		} );
-		return (
-			<CreatePatternModalContents
-				onClose={ closeModal }
-				confirmLabel={ _x( 'Duplicate', 'action label' ) }
-				{ ...duplicatedProps }
-			/>
-		);
-	},
-};
-
 export const duplicateTemplatePartAction = {
 	id: 'duplicate-template-part',
 	label: _x( 'Duplicate', 'action label' ),
@@ -568,15 +307,22 @@ export const duplicateTemplatePartAction = {
 				onCreate={ onTemplatePartSuccess }
 				onError={ closeModal }
 				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+				closeModal={ closeModal }
 			/>
 		);
 	},
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
+	const {
+		defaultActions,
+		postTypeObject,
+		userCanCreatePostType,
+		isBlockBasedTheme,
+	} = useSelect(
 		( select ) => {
-			const { getPostType, canUser } = select( coreStore );
+			const { getPostType, canUser, getCurrentTheme } =
+				select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
 				postTypeObject: getPostType( postType ),
@@ -585,17 +331,18 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 					kind: 'postType',
 					name: postType,
 				} ),
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		},
 		[ postType ]
 	);
+
 	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
 		registerPostTypeActions( postType );
 	}, [ registerPostTypeActions, postType ] );
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const reorderPagesAction = useReorderPagesAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -603,7 +350,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
 	const supportsRevisions = !! postTypeObject?.supports?.revisions;
-	const supportsTitle = !! postTypeObject?.supports?.title;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -619,10 +365,8 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				: false,
 			isTemplateOrTemplatePart &&
 				userCanCreatePostType &&
+				isBlockBasedTheme &&
 				duplicateTemplatePartAction,
-			isPattern && userCanCreatePostType && duplicatePatternAction,
-			supportsTitle && renamePostAction,
-			reorderPagesAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -693,11 +437,9 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
-		reorderPagesAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
-		supportsTitle,
 		context,
 	] );
 }

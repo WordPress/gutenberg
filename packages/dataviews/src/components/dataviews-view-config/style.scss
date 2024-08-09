@@ -1,0 +1,44 @@
+.dataviews-view-config {
+	width: 320px;
+	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
+	container-type: inline-size;
+	padding: $grid-unit-20;
+}
+.dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
+	text-transform: uppercase;
+}
+
+.dataviews-settings-section__title.dataviews-settings-section__title {
+	line-height: $grid-unit-30;
+	font-size: 15px;
+}
+
+.dataviews-settings-section__sidebar {
+	grid-column: span 4;
+}
+
+.dataviews-settings-section__content,
+.dataviews-settings-section__content > * {
+	grid-column: span 8;
+}
+
+.dataviews-settings-section__content .is-divided-in-two {
+	display: contents;
+	& > * {
+		grid-column: span 4;
+	}
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 500px) {
+	.dataviews-settings-section.dataviews-settings-section {
+		grid-template-columns: repeat(2, 1fr);
+		.dataviews-settings-section__sidebar {
+			grid-column: span 2;
+		}
+
+		.dataviews-settings-section__content {
+			grid-column: span 2;
+		}
+	}
+}

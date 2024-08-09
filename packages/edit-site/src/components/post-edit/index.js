@@ -46,9 +46,10 @@ function PostEditForm( { postType, postId } ) {
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const { fields } = usePostFields();
 	const form = {
-		visibleFields: [ 'title', 'author' ],
+		type: 'panel',
+		fields: [ 'title', 'author', 'date' ],
 	};
-	const [ edits, setEdits ] = useState( {} );
+	const [ edits, setEdits ] = useState( initialEdits );
 	const itemWithEdits = useMemo( () => {
 		return {
 			...initialEdits,
@@ -70,7 +71,6 @@ function PostEditForm( { postType, postId } ) {
 				...edits,
 			} );
 		}
-		setEdits( {} );
 	};
 
 	const isUpdateDisabled = ! isItemValid( itemWithEdits, fields, form );

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.0.0 (2024-08-07)
+
 ### Breaking Changes
 
 -   `URLInput`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64282](https://github.com/WordPress/gutenberg/pull/64282)).

@@ -3,6 +3,7 @@
 	flex-direction: column;
 	height: 100%;
 	width: 100%;
+	border-radius: $radius-medium;
 
 	.page-templates-preview-field__button {
 		box-shadow: none;
@@ -13,7 +14,7 @@
 		cursor: pointer;
 		overflow: hidden;
 		height: 100%;
-		border-radius: $grid-unit-05;
+		border-radius: $radius-medium;
 
 		&:focus-visible {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);

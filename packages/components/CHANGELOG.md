@@ -2,12 +2,22 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+
+## 28.5.0 (2024-08-07)
+
 ### Bug Fixes
 
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
 -   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
 -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
+-   `Button`: Fix tertiary destructive hover style ([#64152](https://github.com/WordPress/gutenberg/pull/64152)).
+-   `Autocompleter UI`: Fix text color when hovering selected item ([#64294](https://github.com/WordPress/gutenberg/pull/64294)).
+-   `Heading`: Add the missing `size` prop to the component's props type ([#64299](https://github.com/WordPress/gutenberg/pull/64299)).
+-   `TextControl`: Fix the padding of the component to be consistent with the rest of the controls. ([#64326](https://github.com/WordPress/gutenberg/pull/64326)).
 
 ### Enhancements
 
