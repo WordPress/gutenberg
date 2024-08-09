@@ -6,8 +6,19 @@ import type { StoryContext } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import type { CompositeStoreProps } from '..';
+import type { CompositeStoreProps } from '../types';
 
+/**
+ * Renders a composite widget.
+ *
+ * ```jsx
+ * const store = useCompositeStore();
+ * <Composite store={ store }>
+ *   <Composite.Item>Item 1</Composite.Item>
+ *   <Composite.Item>Item 2</Composite.Item>
+ * </Composite>
+ * ```
+ */
 export function UseCompositeStorePlaceholder( props: CompositeStoreProps ) {
 	return (
 		<dl>

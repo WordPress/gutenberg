@@ -206,8 +206,12 @@ function useGridVisualizerDropZone(
 	gridInfo,
 	setHighlightedRect
 ) {
-	const { getBlockAttributes, getBlockRootClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getBlockRootClientId,
+		canInsertBlockType,
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -221,6 +225,10 @@ function useGridVisualizerDropZone(
 
 	return useDropZoneWithValidation( {
 		validateDrag( srcClientId ) {
+			const blockName = getBlockName( srcClientId );
+			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
+				return false;
+			}
 			const attributes = getBlockAttributes( srcClientId );
 			const rect = new GridRect( {
 				columnStart: column,

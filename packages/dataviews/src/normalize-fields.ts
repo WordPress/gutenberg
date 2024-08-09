@@ -3,6 +3,7 @@
  */
 import getFieldTypeDefinition from './field-types';
 import type { Field, NormalizedField } from './types';
+import { getControl } from './components/dataform-controls';
 
 /**
  * Apply default values and normalize the fields config.
@@ -17,8 +18,7 @@ export function normalizeFields< Item >(
 		const fieldTypeDefinition = getFieldTypeDefinition( field.type );
 
 		const getValue =
-			field.getValue ||
-			( ( { item }: { item: Item } ) => item[ field.id as keyof Item ] );
+			field.getValue || ( ( { item } ) => ( item as any )[ field.id ] );
 
 		const sort =
 			field.sort ??
@@ -39,17 +39,14 @@ export function normalizeFields< Item >(
 				);
 			};
 
-		const Edit = field.Edit || fieldTypeDefinition.Edit;
+		const Edit = getControl( field, fieldTypeDefinition );
 
 		const renderFromElements = ( { item }: { item: Item } ) => {
 			const value = getValue( { item } );
-			const label = field?.elements?.find( ( element ) => {
-				// Intentionally using == here to allow for type coercion.
-				// eslint-disable-next-line eqeqeq
-				return element.value == value;
-			} )?.label;
-
-			return label || value;
+			return (
+				field?.elements?.find( ( element ) => element.value === value )
+					?.label || getValue( { item } )
+			);
 		};
 
 		const render =

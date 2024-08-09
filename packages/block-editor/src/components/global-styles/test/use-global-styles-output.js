@@ -1061,7 +1061,7 @@ describe( 'global styles renderer', () => {
 				)
 			).toEqual( [
 				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
-				'background-position: center',
+				'background-position: 50% 50%',
 				'background-size: contain',
 			] );
 		} );

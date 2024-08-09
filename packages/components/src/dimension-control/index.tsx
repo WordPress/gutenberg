@@ -31,6 +31,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  *
  * 	return (
  * 		<DimensionControl
+ * 			__nextHasNoMarginBottom
  * 			label={ 'Padding' }
  * 			icon={ 'desktop' }
  * 			onChange={ ( value ) => setPaddingSize( value ) }
@@ -43,6 +44,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
 export function DimensionControl( props: DimensionControlProps ) {
 	const {
 		__next40pxDefaultSize = false,
+		__nextHasNoMarginBottom = false,
 		label,
 		value,
 		sizes = sizesTable,
@@ -87,6 +89,7 @@ export function DimensionControl( props: DimensionControlProps ) {
 	return (
 		<SelectControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ clsx( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }

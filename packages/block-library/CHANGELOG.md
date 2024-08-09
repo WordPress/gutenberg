@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.5.0 (2024-08-07)
+
 ### New Feature
 
 -   Query Loop Block: Moves per page, offset, and pages controls into Inspector Controls. ([#58207](https://github.com/WordPress/gutenberg/pull/58207))
