@@ -290,6 +290,7 @@ module.exports = {
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
 					...[
+						'BaseControl',
 						'CheckboxControl',
 						'ComboboxControl',
 						'DimensionControl',
