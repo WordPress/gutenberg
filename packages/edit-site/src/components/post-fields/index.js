@@ -345,6 +345,32 @@ function usePostFields( viewType ) {
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
+			{
+				id: 'comment_status',
+				label: __( 'Discussion' ),
+				type: 'text',
+				Edit: 'radio',
+				enableSorting: false,
+				filterBy: {
+					operators: [],
+				},
+				elements: [
+					{
+						value: 'open',
+						label: __( 'Open' ),
+						description: __(
+							'Visitors can add new comments and replies.'
+						),
+					},
+					{
+						value: 'closed',
+						label: __( 'Closed' ),
+						description: __(
+							'Visitors cannot add new comments or replies. Existing comments remain visible.'
+						),
+					},
+				],
+			},
 		],
 		[ authors, viewType, frontPageId, postsPageId ]
 	);
