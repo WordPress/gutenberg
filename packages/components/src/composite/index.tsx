@@ -36,6 +36,8 @@ import type {
  *
  * @example
  * ```jsx
+ * import { Composite, useCompositeStore } from '@wordpress/components';
+ *
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item</Composite.Item>
@@ -84,8 +86,11 @@ Row.displayName = 'Composite.Row';
  * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
  * role, which provides a single tab stop on the page and arrow key navigation
  * through the focusable descendants.
+ *
  * @example
  * ```jsx
+ * import { Composite, useCompositeStore } from '@wordpress/components';
+ *
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item 1</Composite.Item>
@@ -107,6 +112,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Group>
@@ -125,6 +132,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Group>
@@ -141,6 +150,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Item>Item 1</Composite.Item>
@@ -157,6 +168,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Row>

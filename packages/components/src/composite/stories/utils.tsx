@@ -14,6 +14,8 @@ import type { CompositeStoreProps } from '../types';
  * through the focusable descendants.
  *
  * ```jsx
+ * import { Composite, useCompositeStore } from '@wordpress/components';
+ *
  * const store = useCompositeStore();
  * <Composite store={ store }>
  *   <Composite.Item>Item 1</Composite.Item>

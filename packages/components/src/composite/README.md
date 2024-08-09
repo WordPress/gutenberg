@@ -5,6 +5,8 @@
 ## Usage
 
 ```jsx
+import { Composite, useCompositeStore } from '@wordpress/components';
+
 const store = useCompositeStore();
 <Composite store={store}>
   <Composite.Group>
