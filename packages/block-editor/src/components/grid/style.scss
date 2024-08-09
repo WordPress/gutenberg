@@ -33,7 +33,7 @@
 		overflow: hidden;
 
 		.block-editor-grid-visualizer__appender {
-			box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor  20%, #0000);
+			box-shadow: none;
 			color: inherit;
 			overflow: hidden;
 			height: 100%;
@@ -54,7 +54,11 @@
 	&:hover .block-editor-grid-visualizer__appender,
 	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
-		background-color: color-mix(in srgb, currentColor  20%, #0000);
+		box-shadow: none;
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.05);
+		border: 1px dashed;
+		border-radius: 2px;
+		color: var(--wp-admin-theme-color);
 	}
 }
 

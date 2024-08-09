@@ -178,6 +178,7 @@ function InteractiveManualGrid( { gridClientId, gridInfo } ) {
 				<GridVisualizerCell
 					key={ `${ row }-${ column }` }
 					className={ isHighlighted && 'is-highlighted' }
+					isInvisible
 				>
 					{ isCellOccupied ? (
 						<GridVisualizerDropZone
@@ -206,12 +207,12 @@ function GridVisualizerCell( {
 	color,
 	children,
 	className,
-	invisible,
+	isInvisible,
 	isManualGrid,
 } ) {
 	let style;
 
-	if ( ! invisible ) {
+	if ( ! isInvisible ) {
 		style = isManualGrid
 			? {
 					backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
