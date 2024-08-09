@@ -8,7 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PluginPostStatusInfo from '../plugin-post-status-info';
-import PostActions from '../post-actions';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
 import PostContentInformation from '../post-content-information';
@@ -63,11 +62,7 @@ export default function PostSummary( { onActionPerformed } ) {
 							<PostCardPanel
 								postType={ postType }
 								postId={ postId }
-								actions={
-									<PostActions
-										onActionPerformed={ onActionPerformed }
-									/>
-								}
+								onActionPerformed={ onActionPerformed }
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />
