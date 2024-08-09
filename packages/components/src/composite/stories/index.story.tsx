@@ -47,7 +47,6 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		},
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
