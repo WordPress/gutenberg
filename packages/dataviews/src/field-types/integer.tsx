@@ -53,7 +53,7 @@ function Edit< Item >( {
 		( newValue: string | undefined ) =>
 			onChange( ( prevItem: Item ) => ( {
 				...prevItem,
-				[ id ]: newValue,
+				[ id ]: Number( newValue ),
 			} ) ),
 		[ id, onChange ]
 	);
