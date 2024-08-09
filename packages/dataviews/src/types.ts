@@ -49,8 +49,6 @@ export type Operator =
 
 export type FieldType = 'text' | 'integer' | 'datetime';
 
-export type ItemRecord = Record< string, unknown >;
-
 export type ValidationContext = {
 	elements?: Option[];
 };
