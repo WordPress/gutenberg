@@ -17,8 +17,7 @@ export function normalizeFields< Item >(
 		const fieldTypeDefinition = getFieldTypeDefinition( field.type );
 
 		const getValue =
-			field.getValue ||
-			( ( { item }: { item: Item } ) => item[ field.id as keyof Item ] );
+			field.getValue || ( ( { item } ) => ( item as any )[ field.id ] );
 
 		const sort =
 			field.sort ??
