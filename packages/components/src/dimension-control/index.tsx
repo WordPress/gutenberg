@@ -21,7 +21,7 @@ import { ContextSystemProvider } from '../context';
 const CONTEXT_VALUE = {
 	BaseControl: {
 		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
-		// via the context system to override the value set by SearchControl.
+		// via the context system to override the value set by SelectControl.
 		_overrides: { __associatedWPComponentName: 'DimensionControl' },
 	},
 };
