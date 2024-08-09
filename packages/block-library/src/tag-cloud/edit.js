@@ -107,6 +107,14 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		setAttributes( updateObj );
 	};
 
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+		},
+	};
+
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
@@ -188,7 +196,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<ServerSideRender
 						skipBlockSupportAttributes
 						block="core/tag-cloud"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>
