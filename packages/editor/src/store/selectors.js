@@ -1302,6 +1302,10 @@ export function isInserterOpened( state ) {
 	return !! state.blockInserterPanel;
 }
 
+export function inserterSearchFocused( state ) {
+	return !! state.blockInserterPanel?.focusSearch;
+}
+
 /**
  * Returns the current editing mode.
  *
