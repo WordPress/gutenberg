@@ -55,5 +55,6 @@
 		},
 		"html": false
 	},
+	"editorStyle": "wp-block-comment-content-editor",
 	"style": "wp-block-comment-content"
 }
