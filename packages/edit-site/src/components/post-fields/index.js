@@ -271,6 +271,7 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Date' ),
 				id: 'date',
+				type: 'datetime',
 				render: ( { item } ) => {
 					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 						item.status
