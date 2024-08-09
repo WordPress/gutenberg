@@ -349,7 +349,7 @@ function usePostFields( viewType ) {
 				id: 'comment_status',
 				label: __( 'Discussion' ),
 				type: 'text',
-				editAs: 'radio',
+				Edit: 'radio',
 				enableSorting: false,
 				filterBy: {
 					operators: [],

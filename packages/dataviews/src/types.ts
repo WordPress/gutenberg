@@ -54,6 +54,26 @@ export type ValidationContext = {
 };
 
 /**
+ * An abstract interface for Field based on the field type.
+ */
+export type FieldTypeDefinition< Item > = {
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+
+	/**
+	 * Callback used to render an edit control for the field.
+	 */
+	Edit: ComponentType< DataFormControlProps< Item > >;
+};
+
+/**
  * A dataview field for a specific property of a data type.
  */
 export type Field< Item > = {
@@ -90,12 +110,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > >;
-
-	/**
-	 * Optional config for editing the field.
-	 */
-	editAs?: 'radio';
+	Edit?: ComponentType< DataFormControlProps< Item > > | 'radio';
 
 	/**
 	 * Callback used to sort the field.

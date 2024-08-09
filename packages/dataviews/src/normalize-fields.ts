@@ -3,6 +3,7 @@
  */
 import getFieldTypeDefinition from './field-types';
 import type { Field, NormalizedField } from './types';
+import { getControl } from './components/dataform-controls';
 
 /**
  * Apply default values and normalize the fields config.
@@ -38,7 +39,7 @@ export function normalizeFields< Item >(
 				);
 			};
 
-		const Edit = field.Edit || fieldTypeDefinition.Edit;
+		const Edit = getControl( field, fieldTypeDefinition );
 
 		const renderFromElements = ( { item }: { item: Item } ) => {
 			const value = getValue( { item } );
