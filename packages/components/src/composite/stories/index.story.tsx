@@ -249,6 +249,41 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 			},
 		},
 	},
+	decorators: [
+		( Story ) => {
+			return (
+				<>
+					{ /* Visually style the active composite item  */ }
+					<style>{ `
+						[data-active-item] {
+							background-color: #ffc0b5;
+						}
+					` }</style>
+					<Story />
+					<div
+						style={ {
+							marginTop: '2em',
+							fontSize: '12px',
+							fontStyle: 'italic',
+						} }
+					>
+						{ /* eslint-disable-next-line no-restricted-syntax */ }
+						<p id="list-title">Notes</p>
+						<ul aria-labelledby="list-title">
+							<li>
+								The active composite item is highlighted with a
+								different background color;
+							</li>
+							<li>
+								A composite item can be the active item even
+								when it doesn&apos;t have keyboard focus.
+							</li>
+						</ul>
+					</div>
+				</>
+			);
+		},
+	],
 };
 export default meta;
 
@@ -312,6 +347,27 @@ export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
 				<Composite.Item role="gridcell">Item C2</Composite.Item>
 				<Composite.Item role="gridcell">Item C3</Composite.Item>
 			</Composite.Row>
+		</Composite>
+	);
+};
+
+export const Hover: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item one
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item two
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item three
+			</Composite.Hover>
 		</Composite>
 	);
 };
