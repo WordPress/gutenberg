@@ -70,7 +70,7 @@ export default function PostCardPanel( { postType, postId, actions } ) {
 				isPostsPage: siteSettings?.page_for_posts === postId,
 			};
 		},
-		[]
+		[ postId, postType ]
 	);
 	return (
 		<div className="editor-post-card-panel">
