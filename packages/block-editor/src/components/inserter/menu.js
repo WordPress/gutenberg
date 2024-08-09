@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useDebouncedInput, useFocusOnMount } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -50,9 +50,12 @@ function InserterMenu(
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
+		__experimentalFocusSearchOnMount,
 	},
 	ref
 ) {
+	const focusSearchOnMountRef = useFocusOnMount();
+
 	const isZoomOutMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
@@ -152,19 +155,27 @@ function InserterMenu(
 
 		return (
 			<>
-				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
-					onChange={ ( value ) => {
-						if ( hoveredItem ) {
-							setHoveredItem( null );
-						}
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
-					placeholder={ __( 'Search' ) }
-				/>
+				<div
+					ref={
+						__experimentalFocusSearchOnMount
+							? focusSearchOnMountRef
+							: null
+					}
+				>
+					<SearchControl
+						__nextHasNoMarginBottom
+						className="block-editor-inserter__search"
+						onChange={ ( value ) => {
+							if ( hoveredItem ) {
+								setHoveredItem( null );
+							}
+							setFilterValue( value );
+						} }
+						value={ filterValue }
+						label={ __( 'Search for blocks and patterns' ) }
+						placeholder={ __( 'Search' ) }
+					/>
+				</div>
 				{ !! delayedFilterValue && (
 					<InserterSearchResults
 						filterValue={ delayedFilterValue }

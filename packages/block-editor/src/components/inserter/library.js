@@ -27,6 +27,7 @@ function InserterLibrary(
 		onSelect = noop,
 		shouldFocusBlock = false,
 		onClose,
+		__experimentalFocusSearchOnMount = false,
 	},
 	ref
 ) {
@@ -58,6 +59,9 @@ function InserterLibrary(
 			shouldFocusBlock={ shouldFocusBlock }
 			ref={ ref }
 			onClose={ onClose }
+			__experimentalFocusSearchOnMount={
+				__experimentalFocusSearchOnMount
+			}
 		/>
 	);
 }

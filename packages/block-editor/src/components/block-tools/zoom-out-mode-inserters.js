@@ -59,6 +59,14 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
+	useEffect( () => {
+		return () => {
+			setInserterIsOpened( {
+				focusSearch: false,
+			} );
+		};
+	}, [ setInserterIsOpened ] );
+
 	if ( ! isReady ) {
 		return null;
 	}
@@ -106,6 +114,7 @@ function ZoomOutModeInserters() {
 								insertionIndex: index,
 								tab: 'patterns',
 								category: 'all',
+								focusSearch: true,
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',

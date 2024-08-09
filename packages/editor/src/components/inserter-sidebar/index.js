@@ -27,11 +27,13 @@ export default function InserterSidebar() {
 		insertionPoint,
 		showMostUsedBlocks,
 		sidebarIsOpened,
+		isInserterSearchFocused,
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
 			getInsertionPoint,
 			isPublishSidebarOpened,
+			inserterSearchFocused,
 		} = unlock( select( editorStore ) );
 		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
 			select( blockEditorStore );
@@ -54,6 +56,7 @@ export default function InserterSidebar() {
 			sidebarIsOpened: !! (
 				getActiveComplementaryArea( 'core' ) || isPublishSidebarOpened()
 			),
+			isInserterSearchFocused: inserterSearchFocused(),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
@@ -99,6 +102,7 @@ export default function InserterSidebar() {
 				}
 				ref={ libraryRef }
 				onClose={ closeInserterSidebar }
+				__experimentalFocusSearchOnMount={ isInserterSearchFocused }
 			/>
 		</div>
 	);
