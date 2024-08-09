@@ -46,8 +46,24 @@ import type {
  * </Composite>
  * ```
  */
-export function useCompositeStore( props: CompositeStoreProps ) {
-	return Ariakit.useCompositeStore( props );
+export function useCompositeStore( {
+	focusLoop = false,
+	focusWrap = false,
+	focusShift = false,
+	virtualFocus = false,
+	orientation = 'both',
+	rtl = false,
+	...props
+}: CompositeStoreProps ) {
+	return Ariakit.useCompositeStore( {
+		focusLoop,
+		focusWrap,
+		focusShift,
+		virtualFocus,
+		orientation,
+		rtl,
+		...props,
+	} );
 }
 
 const Group = forwardRef<
