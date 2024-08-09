@@ -16,12 +16,16 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import Page from '../page';
 import usePostFields from '../post-fields';
+import { unlock } from '../../lock-unlock';
+
+const { PostCardPanel } = unlock( editorPrivateApis );
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
@@ -76,6 +80,9 @@ function PostEditForm( { postType, postId } ) {
 	const isUpdateDisabled = ! isItemValid( itemWithEdits, fields, form );
 	return (
 		<VStack as="form" onSubmit={ onSubmit } spacing={ 4 }>
+			{ ids.length === 1 && (
+				<PostCardPanel postType={ postType } postId={ ids[ 0 ] } />
+			) }
 			<DataForm
 				data={ itemWithEdits }
 				fields={ fields }
