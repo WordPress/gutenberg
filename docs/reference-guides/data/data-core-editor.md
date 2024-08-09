@@ -675,10 +675,6 @@ _Related_
 
 -   hasSelectedInnerBlock in core/block-editor store.
 
-### inserterSearchFocused
-
-Undocumented declaration.
-
 ### inSomeHistory
 
 > **Deprecated** since Gutenberg 9.7.0.
