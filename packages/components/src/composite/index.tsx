@@ -227,6 +227,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Hover render={ <Composite.Item /> }>
@@ -246,6 +248,8 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store} render={ <CompositeTypeahead /> }>
 		 *   <Composite.Item>Item 1</Composite.Item>
