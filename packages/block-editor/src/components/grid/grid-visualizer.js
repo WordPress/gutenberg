@@ -104,6 +104,7 @@ const GridVisualizerGrid = forwardRef(
 								<GridVisualizerCell
 									key={ i }
 									color={ gridInfo.currentColor }
+									isManualGrid={ isManualGrid }
 								/>
 							)
 						) }
@@ -175,7 +176,6 @@ function InteractiveManualGrid( { gridClientId, gridInfo } ) {
 
 			return (
 				<GridVisualizerCell
-					invisible
 					key={ `${ row }-${ column }` }
 					className={ isHighlighted && 'is-highlighted' }
 				>
@@ -202,15 +202,31 @@ function InteractiveManualGrid( { gridClientId, gridInfo } ) {
 	);
 }
 
-function GridVisualizerCell( { color, children, className, invisible } ) {
-	const style = invisible
-		? undefined
-		: {
-				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
-				color,
-				background: 'cornflowerblue',
-				opacity: 0.1,
-		  };
+function GridVisualizerCell( {
+	color,
+	children,
+	className,
+	invisible,
+	isManualGrid,
+} ) {
+	let style;
+
+	if ( ! invisible ) {
+		style = isManualGrid
+			? {
+					backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
+					border: `1px dashed rgb(var(--wp-admin-theme-color--rgb))`,
+					borderRadius: '2px',
+					color,
+					opacity: 0.2,
+			  }
+			: {
+					border: `1px dashed ${ color }`,
+					borderRadius: '2px',
+					color,
+					opacity: 0.2,
+			  };
+	}
 
 	return (
 		<div
