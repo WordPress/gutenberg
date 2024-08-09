@@ -216,6 +216,21 @@ export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
 	const store = useCompositeStore( { rtl, ...storeProps } );
 
 	return (
+		<Composite store={ store }>
+			<Composite.Item>Item one</Composite.Item>
+			<Composite.Item>Item two</Composite.Item>
+			<Composite.Item>Item three</Composite.Item>
+		</Composite>
+	);
+};
+
+export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
 		<Composite role="grid" store={ store } aria-label="Composite">
 			<Composite.Row role="row">
 				<Composite.Item role="gridcell">Item A1</Composite.Item>
