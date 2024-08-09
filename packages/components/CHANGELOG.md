@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade `framer-motion` package to version `^11.3.18` ([#64003](https://github.com/WordPress/gutenberg/pull/64003)).
+
 ## 28.5.0 (2024-08-07)
 
 ### Bug Fixes
