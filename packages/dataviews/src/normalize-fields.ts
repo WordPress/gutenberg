@@ -3,7 +3,7 @@
  */
 import getFieldTypeDefinition from './field-types';
 import type { Field, NormalizedField } from './types';
-import { getControl } from './components/dataform-controls';
+import { getControl } from './dataform-controls';
 
 /**
  * Apply default values and normalize the fields config.
