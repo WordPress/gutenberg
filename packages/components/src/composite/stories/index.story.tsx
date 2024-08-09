@@ -231,34 +231,7 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
 					'Composite.Item': commonArgTypes,
-					'Composite.Hover': {
-						...commonArgTypes,
-						focusOnHover: {
-							name: 'focusOnHover',
-							description:
-								"Determines if the composite item should be focused when hovered over. Note that the actual DOM focus will stay on the composite element. This item will get the `data-active-item` attribute so it can be styled as if it's focused.",
-							table: {
-								defaultValue: {
-									summary: 'true',
-								},
-								type: {
-									summary:
-										'boolean | React.MouseEvent<HTMLElement, MouseEvent>',
-								},
-							},
-						},
-						blurOnHoverEnd: {
-							name: 'blurOnHoverEnd',
-							description:
-								'Determines if the composite item should lose focus when the mouse leaves. By default, this is set to true if `focusOnHover` is true.',
-							table: {
-								type: {
-									summary:
-										'boolean | React.MouseEvent<HTMLElement, MouseEvent>',
-								},
-							},
-						},
-					},
+					'Composite.Hover': commonArgTypes,
 					'Composite.Typeahead': commonArgTypes,
 				};
 

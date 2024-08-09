@@ -205,8 +205,6 @@ export type CompositeHoverProps = {
 	 * The contents of the component.
 	 */
 	children?: Ariakit.CompositeHoverProps[ 'children' ];
-	focusOnHover?: Ariakit.CompositeHoverProps[ 'focusOnHover' ];
-	blurOnHoverEnd?: Ariakit.CompositeHoverProps[ 'blurOnHoverEnd' ];
 };
 
 export type CompositeTypeaheadProps = {

@@ -223,9 +223,8 @@ export const Composite = Object.assign(
 		/**
 		 * Renders an element in a composite widget that receives focus on mouse move
 		 * and loses focus to the composite base element on mouse leave. This should
-		 * be combined with the `Composite.Item` component. The `focusOnHover` and
-		 * `blurOnHoverEnd` props can be used to customize the behavior.
-		 * @see https://ariakit.org/reference/composite-hover
+		 * be combined with the `Composite.Item` component.
+		 *
 		 * @example
 		 * ```jsx
 		 * const store = useCompositeStore();

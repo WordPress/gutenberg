@@ -219,7 +219,7 @@ The contents of the component.
 
 ### `Composite.Hover`
 
-Renders an element in a composite widget that receives focus on mouse move and loses focus to the composite base element on mouse leave. This should be combined with the `Composite.Item` component. The `focusOnHover` and `blurOnHoverEnd` props can be used to customize the behavior.
+Renders an element in a composite widget that receives focus on mouse move and loses focus to the composite base element on mouse leave. This should be combined with the `Composite.Item` component.
 
 ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
 
@@ -230,19 +230,6 @@ Allows the component to be rendered as a different HTML element or React compone
 ##### `children`: `React.ReactNode`
 
 The contents of the component.
-
--   Required: no
-
-##### `focusOnHover`: `boolean | React.MouseEvent<HTMLElement, MouseEvent>`
-
-Determines if the composite item should be focused when hovered over. Note that the actual DOM focus will stay on the composite element. This item will get the `data-active-item` attribute so it can be styled as if it's focused.
-
--   Required: no
--   Default: `true`
-
-##### `blurOnHoverEnd`: `boolean | React.MouseEvent<HTMLElement, MouseEvent>`
-
-Determines if the composite item should lose focus when the mouse leaves. By default, this is set to true if `focusOnHover` is true.
 
 -   Required: no
 
