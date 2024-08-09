@@ -82,8 +82,10 @@ const Row = forwardRef<
 Row.displayName = 'Composite.Row';
 
 /**
- * Renders a composite widget.
  * @see https://ariakit.org/reference/composite
+ * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
+ * role, which provides a single tab stop on the page and arrow key navigation
+ * through the focusable descendants.
  * @example
  * ```jsx
  * const store = useCompositeStore();

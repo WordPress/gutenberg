@@ -9,7 +9,9 @@ import type { StoryContext } from '@storybook/react';
 import type { CompositeStoreProps } from '../types';
 
 /**
- * Renders a composite widget.
+ * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
+ * role, which provides a single tab stop on the page and arrow key navigation
+ * through the focusable descendants.
  *
  * ```jsx
  * const store = useCompositeStore();
