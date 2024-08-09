@@ -224,6 +224,28 @@ export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
 	);
 };
 
+export const Groups: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Group>
+				<Composite.GroupLabel>Group one</Composite.GroupLabel>
+				<Composite.Item>Item 1.1</Composite.Item>
+				<Composite.Item>Item 1.2</Composite.Item>
+			</Composite.Group>
+			<Composite.Group>
+				<Composite.GroupLabel>Group two</Composite.GroupLabel>
+				<Composite.Item>Item 2.1</Composite.Item>
+				<Composite.Item>Item 2.1</Composite.Item>
+			</Composite.Group>
+		</Composite>
+	);
+};
+
 export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
 	storeProps
 ) => {
