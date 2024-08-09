@@ -33,8 +33,7 @@ import type {
 
 /**
  * Creates a composite store.
- * @param props
- * @see https://ariakit.org/reference/use-composite-store
+ *
  * @example
  * ```jsx
  * const store = useCompositeStore();
@@ -82,7 +81,6 @@ const Row = forwardRef<
 Row.displayName = 'Composite.Row';
 
 /**
- * @see https://ariakit.org/reference/composite
  * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
  * role, which provides a single tab stop on the page and arrow key navigation
  * through the focusable descendants.
@@ -106,7 +104,7 @@ export const Composite = Object.assign(
 		displayName: 'Composite',
 		/**
 		 * Renders a group element for composite items.
-		 * @see https://ariakit.org/reference/composite-group
+		 *
 		 * @example
 		 * ```jsx
 		 * const store = useCompositeStore();
@@ -124,7 +122,7 @@ export const Composite = Object.assign(
 		 * Renders a label in a composite group. This component must be wrapped with
 		 * `Composite.Group` so the `aria-labelledby` prop is properly set on the
 		 * composite group element.
-		 * @see https://ariakit.org/reference/composite-group-label
+		 *
 		 * @example
 		 * ```jsx
 		 * const store = useCompositeStore();
@@ -140,7 +138,7 @@ export const Composite = Object.assign(
 		GroupLabel,
 		/**
 		 * Renders a composite item.
-		 * @see https://ariakit.org/reference/composite-item
+		 *
 		 * @example
 		 * ```jsx
 		 * const store = useCompositeStore();
@@ -156,7 +154,7 @@ export const Composite = Object.assign(
 		 * Renders a composite row. Wrapping `Composite.Item` elements within
 		 * `Composite.Row` will create a two-dimensional composite widget, such as a
 		 * grid.
-		 * @see https://ariakit.org/reference/composite-row
+		 *
 		 * @example
 		 * ```jsx
 		 * const store = useCompositeStore();
