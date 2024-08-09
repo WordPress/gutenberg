@@ -6,8 +6,11 @@ import {
 	SVG,
 	Popover,
 	Button,
-	__experimentalNumberControl as NumberControl,
+	ExternalLink,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalNumberControl as NumberControl,
+	TextareaControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -17,7 +20,6 @@ import {
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -41,8 +43,11 @@ export const image = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style } = activeObjectAttributes;
-	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+	const { style, alt } = activeObjectAttributes;
+	const width = style?.replace( /\D/g, '' );
+	const [ editedWidth, setEditedWidth ] = useState( width );
+	const [ editedAlt, setEditedAlt ] = useState( alt );
+	const hasChanged = editedWidth !== width || editedAlt !== alt;
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: image,
@@ -64,7 +69,8 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
-							style: width ? `width: ${ width }px;` : '',
+							style: width ? `width: ${ editedWidth }px;` : '',
+							alt: editedAlt,
 						},
 					};
 
@@ -76,21 +82,54 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 					event.preventDefault();
 				} }
 			>
-				<HStack alignment="bottom" spacing="0">
+				<VStack spacing={ 4 }>
 					<NumberControl
-						className="block-editor-format-toolbar__image-container-value"
+						__next40pxDefaultSize
 						label={ __( 'Width' ) }
-						value={ width }
+						value={ editedWidth }
 						min={ 1 }
-						onChange={ ( newWidth ) => setWidth( newWidth ) }
+						onChange={ ( newWidth ) => {
+							setEditedWidth( newWidth );
+						} }
 					/>
-					<Button
-						className="block-editor-format-toolbar__image-container-button"
-						icon={ keyboardReturn }
-						label={ __( 'Apply' ) }
-						type="submit"
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						__nextHasNoMarginBottom
+						value={ editedAlt }
+						onChange={ ( newAlt ) => {
+							setEditedAlt( newAlt );
+						} }
+						help={
+							<>
+								<ExternalLink
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
 					/>
-				</HStack>
+					<HStack justify="right">
+						<Button
+							disabled={ ! hasChanged }
+							accessibleWhenDisabled
+							variant="primary"
+							type="submit"
+							size="compact"
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</HStack>
+				</VStack>
 			</form>
 		</Popover>
 	);

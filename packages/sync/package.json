@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/sync",
-	"version": "1.3.0",
+	"version": "1.5.0",
 	"description": "Sync Data.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

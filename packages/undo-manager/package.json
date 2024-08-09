@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/undo-manager",
-	"version": "1.3.0",
+	"version": "1.5.0",
 	"description": "A small package to manage undo/redo.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

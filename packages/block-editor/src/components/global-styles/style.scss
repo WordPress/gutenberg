@@ -193,25 +193,22 @@
 .block-editor-global-styles-background-panel__dropdown-content-wrapper {
 	min-width: 260px;
 	overflow-x: hidden;
-	.components-base-control__help,
-	.components-toggle-control {
-		margin-bottom: 0;
-	}
+
 	.components-focal-point-picker-wrapper {
 		background-color: $gray-100;
 		width: 100%;
 		border-radius: $radius-block-ui;
 		border: $border-width solid $gray-300;
 	}
+
 	.components-focal-point-picker__media--image {
 		max-height: 180px;
 	}
-}
 
-.block-editor-global-styles-background-panel__hidden-tools-panel-item {
-	height: 0;
-	width: 0;
-	position: absolute;
+	// Override focal picker to avoid a double border.
+	.components-focal-point-picker::after {
+		content: none;
+	}
 }
 
 // Push control panel into the background when the media modal is open.

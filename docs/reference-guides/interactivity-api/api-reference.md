@@ -55,7 +55,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive="myPlugin"
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -66,7 +66,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -840,7 +840,7 @@ const { state } = store("myPlugin", {
 });
 ```
 
-As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is reqired whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
+As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
 
 ```js
 // Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.

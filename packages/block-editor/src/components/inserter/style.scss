@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -23,6 +23,12 @@ $block-inserter-tabs-height: 44px;
 
 	&.show-as-tabs {
 		gap: 0;
+	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
 	}
 }
 
@@ -85,6 +91,12 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -299,14 +311,13 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
-		width: 300px;
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
 		background: $gray-100;
 		border-top: $border-width solid $gray-200;
-		box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 
 		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
@@ -366,7 +377,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
@@ -523,11 +534,11 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		margin-bottom: $grid-unit-20;
+		margin-bottom: $grid-unit-30;
 		// TODO: Consider using the Theme component to automatically adapt to a gray background.
 		@include break-medium() {
 			margin-bottom: 0;
-			padding: $grid-unit-20 $grid-unit-30 $grid-unit-10;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
 
 			&:not(:focus-within) {
 				--wp-components-color-background: #{$white};
@@ -653,30 +664,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__hint {
 	margin: $grid-unit-20 $grid-unit-20 0;
-}
-
-.reusable-blocks-menu-items__rename-hint {
-	align-items: top;
-	background: $gray-100;
-	border-radius: $radius-block-ui;
-	color: $gray-900;
-	display: flex;
-	flex-direction: row;
-	max-width: 380px;
-}
-
-.reusable-blocks-menu-items__rename-hint-content {
-	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
-}
-
-.reusable-blocks-menu-items__rename-hint-dismiss {
-	// The dismiss button has a lot of empty space through its padding.
-	// Apply margin to visually align the icon with the top of the text to its left.
-	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
-}
-
-.components-menu-group .reusable-blocks-menu-items__rename-hint {
-	margin: 0;
 }
 
 .block-editor-patterns__sync-status-filter {

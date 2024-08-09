@@ -48,15 +48,26 @@ export default function QueryContent( {
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { getEntityRecord, canUser } = select( coreStore );
+		const { getEntityRecord, getEntityRecordEdits, canUser } =
+			select( coreStore );
 		const settingPerPage = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
 		} )
 			? +getEntityRecord( 'root', 'site' )?.posts_per_page
 			: +getSettings().postsPerPage;
+
+		// Gets changes made via the template area posts per page setting. These won't be saved
+		// until the page is saved, but we should reflect this setting within the query loops
+		// that inherit it.
+		const editedSettingPerPage = +getEntityRecordEdits( 'root', 'site' )
+			?.posts_per_page;
+
 		return {
-			postsPerPage: settingPerPage || DEFAULTS_POSTS_PER_PAGE,
+			postsPerPage:
+				editedSettingPerPage ||
+				settingPerPage ||
+				DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
 	// There are some effects running where some initialization logic is

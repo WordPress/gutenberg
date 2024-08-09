@@ -1443,9 +1443,16 @@ class WP_Theme_JSON_Gutenberg {
 	protected function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
+		if ( empty( $css ) ) {
+			return $processed_css;
+		}
+
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
+			if ( empty( $part ) ) {
+				continue;
+			}
 			$is_root_css = ( ! str_contains( $part, '{' ) );
 			if ( $is_root_css ) {
 				// If the part doesn't contain braces, it applies to the root level.
@@ -1458,11 +1465,24 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				$nested_selector = $part[0];
 				$css_value       = $part[1];
-				$part_selector   = str_starts_with( $nested_selector, ' ' )
+
+				/*
+				 * Handle pseudo elements such as ::before, ::after etc. Regex will also
+				 * capture any leading combinator such as >, +, or ~, as well as spaces.
+				 * This allows pseudo elements as descendants e.g. `.parent ::before`.
+				 */
+				$matches            = array();
+				$has_pseudo_element = preg_match( '/([>+~\s]*::[a-zA-Z-]+)/', $nested_selector, $matches );
+				$pseudo_part        = $has_pseudo_element ? $matches[1] : '';
+				$nested_selector    = $has_pseudo_element ? str_replace( $pseudo_part, '', $nested_selector ) : $nested_selector;
+
+				// Finalize selector and re-append pseudo element if required.
+				$part_selector  = str_starts_with( $nested_selector, ' ' )
 					? static::scope_selector( $selector, $nested_selector )
 					: static::append_to_selector( $selector, $nested_selector );
-				$final_selector  = ":root :where($part_selector)";
-				$processed_css  .= $final_selector . '{' . trim( $css_value ) . '}';
+				$final_selector = ":root :where($part_selector)$pseudo_part";
+
+				$processed_css .= $final_selector . '{' . trim( $css_value ) . '}';
 			}
 		}
 		return $processed_css;
@@ -2363,6 +2383,17 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Processes background styles.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
+				/*
+				 * For user-uploaded images at the block level, assign defaults.
+				 * Matches defaults applied in the editor and in block supports: background.php.
+				 */
+				if ( static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
+					$styles['background']['backgroundSize'] = $styles['background']['backgroundSize'] ?? 'cover';
+					// If the background size is set to `contain` and no position is set, set the position to `center`.
+					if ( 'contain' === $styles['background']['backgroundSize'] && empty( $styles['background']['backgroundPosition'] ) ) {
+						$styles['background']['backgroundPosition'] = '50% 50%';
+					}
+				}
 				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
 				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
 			}
@@ -2921,6 +2952,9 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
+		 * Root selector (body) styles should not be wrapped in `:root where()` to keep
+		 * specificity at (0,0,1) and maintain backwards compatibility.
+		 *
 		 * Top-level element styles using element-only specificity selectors should
 		 * not get wrapped in `:root :where()` to maintain backwards compatibility.
 		 *
@@ -2928,11 +2962,13 @@ class WP_Theme_JSON_Gutenberg {
 		 * still need to be wrapped in `:root :where` to cap specificity for nested
 		 * variations etc. Pseudo selectors won't match the ELEMENTS selector exactly.
 		 */
-		$element_only_selector = $current_element &&
-			isset( static::ELEMENTS[ $current_element ] ) &&
-			// buttons, captions etc. still need `:root :where()` as they are class based selectors.
-			! isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $current_element ] ) &&
-			static::ELEMENTS[ $current_element ] === $selector;
+		$element_only_selector = $is_root_selector || (
+				$current_element &&
+				isset( static::ELEMENTS[ $current_element ] ) &&
+				// buttons, captions etc. still need `:root :where()` as they are class based selectors.
+				! isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $current_element ] ) &&
+				static::ELEMENTS[ $current_element ] === $selector
+			);
 
 		// 2. Generate and append the rules that use the general selector.
 		$general_selector = $element_only_selector ? $selector : ":root :where($selector)";

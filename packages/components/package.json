@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "28.3.0",
+	"version": "28.5.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 	],
 	"types": "build-types",
 	"dependencies": {
-		"@ariakit/react": "^0.3.12",
+		"@ariakit/react": "^0.4.7",
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",

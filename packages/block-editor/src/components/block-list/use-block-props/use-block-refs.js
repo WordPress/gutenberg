@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useContext, useMemo, useRef } from '@wordpress/element';
-import { useRefEffect, useObservableValue } from '@wordpress/compose';
+import { useContext, useState, useLayoutEffect } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { useRefEffect, useObservableValue } from '@wordpress/compose';
 import { BlockRefs } from '../../provider/block-refs-provider';
 
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
+/** @typedef {import('@wordpress/element').Ref} Ref */
 
 /**
  * Provides a ref to the BlockRefs context.
@@ -30,31 +30,33 @@ export function useBlockRefProvider( clientId ) {
 	);
 }
 
-/**
- * Gets a ref pointing to the current block element. Continues to return the same
- * stable ref object even if the `clientId` argument changes. This hook is not
- * reactive, i.e., it won't trigger a rerender of the calling component if the
- * ref value changes. For reactive use cases there is the `useBlockElement` hook.
- *
- * @param {string} clientId The client ID to get a ref for.
- *
- * @return {RefObject} A ref containing the element.
- */
-function useBlockRef( clientId ) {
-	const { refsMap } = useContext( BlockRefs );
-	const latestClientId = useRef();
-	latestClientId.current = clientId;
+function assignRef( ref, value ) {
+	if ( typeof ref === 'function' ) {
+		ref( value );
+	} else if ( ref ) {
+		ref.current = value;
+	}
+}
 
-	// Always return an object, even if no ref exists for a given client ID, so
-	// that `current` works at a later point.
-	return useMemo(
-		() => ( {
-			get current() {
-				return refsMap.get( latestClientId.current ) ?? null;
-			},
-		} ),
-		[ refsMap ]
-	);
+/**
+ * Tracks the DOM element for the block identified by `clientId` and assigns it to the `ref`
+ * whenever it changes.
+ *
+ * @param {string} clientId The client ID to track.
+ * @param {Ref}    ref      The ref object/callback to assign to.
+ */
+export function useBlockElementRef( clientId, ref ) {
+	const { refsMap } = useContext( BlockRefs );
+	useLayoutEffect( () => {
+		assignRef( ref, refsMap.get( clientId ) );
+		const unsubscribe = refsMap.subscribe( clientId, () =>
+			assignRef( ref, refsMap.get( clientId ) )
+		);
+		return () => {
+			unsubscribe();
+			assignRef( ref, null );
+		};
+	}, [ refsMap, clientId, ref ] );
 }
 
 /**
@@ -65,10 +67,8 @@ function useBlockRef( clientId ) {
  *
  * @return {Element|null} The block's wrapper element.
  */
-function useBlockElement( clientId ) {
-	const { refsMap } = useContext( BlockRefs );
-	return useObservableValue( refsMap, clientId ) ?? null;
+export function useBlockElement( clientId ) {
+	const [ blockElement, setBlockElement ] = useState( null );
+	useBlockElementRef( clientId, setBlockElement );
+	return blockElement;
 }
-
-export { useBlockRef as __unstableUseBlockRef };
-export { useBlockElement as __unstableUseBlockElement };

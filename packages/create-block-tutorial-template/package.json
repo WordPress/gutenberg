@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block-tutorial-template",
-	"version": "4.3.0",
+	"version": "4.5.0",
 	"description": "This is a template for @wordpress/create-block that creates an example 'Copyright Date' block. This block is used in the official WordPress block development Quick Start Guide.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

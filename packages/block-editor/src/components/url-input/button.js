@@ -57,7 +57,6 @@ class URLInputButton extends Component {
 								onClick={ this.toggle }
 							/>
 							<URLInput
-								__nextHasNoMarginBottom
 								value={ url || '' }
 								onChange={ onChange }
 							/>

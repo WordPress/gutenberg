@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity",
-	"version": "6.3.0",
+	"version": "6.5.0",
 	"description": "Package that provides a standard and simple way to handle the frontend interactivity of Gutenberg blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,7 +28,6 @@
 	"types": "build-types",
 	"dependencies": {
 		"@preact/signals": "^1.2.2",
-		"deepsignal": "^1.4.0",
 		"preact": "^10.19.3"
 	},
 	"publishConfig": {

@@ -764,8 +764,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations( $scope = 'theme' ) {
+		return static::get_style_variations_from_directory( get_stylesheet_directory(), $scope );
+	}
+
+	/**
+	 * Returns the style variation files defined by the theme (parent and child).
+	 *
+	 * @since 6.7.0
+	 *
+	 * @return array An array of style variation files.
+	 */
+	protected static function get_style_variation_files_from_current_theme() {
 		$variation_files    = array();
-		$variations         = array();
 		$base_directory     = get_stylesheet_directory() . '/styles';
 		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
@@ -782,6 +792,29 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				}
 			}
 			$variation_files = array_merge( $variation_files, $variation_files_parent );
+		}
+
+		return $variation_files;
+	}
+
+	/**
+	 * Returns the style variations in the given directory.
+	 *
+	 * @since 6.7.0
+	 *
+	 * @param string $directory The directory to get the style variations from.
+	 * @param string $scope     The scope or type of style variation to retrieve e.g. theme, block etc.
+	 * @return array
+	 */
+	public static function get_style_variations_from_directory( $directory, $scope = 'theme' ) {
+		$variation_files = array();
+		$variations      = array();
+		if ( is_dir( $directory ) ) {
+			if ( get_stylesheet_directory() === $directory ) {
+				$variation_files = static::get_style_variation_files_from_current_theme();
+			} else {
+				$variation_files = static::recursively_iterate_json( $directory );
+			}
 		}
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {

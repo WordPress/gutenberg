@@ -6,7 +6,7 @@ import type { FocusEventHandler, MouseEventHandler } from 'react';
 /**
  * The object structure for the options array.
  */
-type Option = {
+export type CustomSelectOption = {
 	key: string;
 	name: string;
 	style?: React.CSSProperties;
@@ -24,15 +24,15 @@ type Option = {
 /**
  * The object returned from the onChange event.
  */
-type ChangeObject = {
+type CustomSelectChangeObject< T extends CustomSelectOption > = {
 	highlightedIndex?: number;
 	inputValue?: string;
 	isOpen?: boolean;
 	type?: string;
-	selectedItem: Option;
+	selectedItem: T;
 };
 
-export type CustomSelectProps = {
+export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Optional classname for the component.
 	 */
@@ -55,7 +55,7 @@ export type CustomSelectProps = {
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
-	onChange?: ( newValue: ChangeObject ) => void;
+	onChange?: ( newValue: CustomSelectChangeObject< T > ) => void;
 	/**
 	 * A handler for `blur` events on the trigger button.
 	 *
@@ -83,7 +83,7 @@ export type CustomSelectProps = {
 	/**
 	 * The list of options that can be chosen from.
 	 */
-	options: Array< Option >;
+	options: Array< T >;
 	/**
 	 * The size of the control.
 	 *
@@ -93,7 +93,7 @@ export type CustomSelectProps = {
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: Option;
+	value?: T;
 	/**
 	 * Use the `showSelectedHint` property instead.
 	 * @deprecated

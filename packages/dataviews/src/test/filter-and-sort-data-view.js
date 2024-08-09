@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
-import { data, fields } from '../stories/fixtures';
+import { data, fields } from '../components/dataviews/stories/fixtures';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {
@@ -233,7 +233,22 @@ describe( 'filters', () => {
 } );
 
 describe( 'sorting', () => {
-	it( 'should sort by string', () => {
+	it( 'should sort integer field types', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'satellites', direction: 'desc' },
+			},
+			fields
+		);
+
+		expect( result ).toHaveLength( 11 );
+		expect( result[ 0 ].title ).toBe( 'Saturn' );
+		expect( result[ 1 ].title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].title ).toBe( 'Uranus' );
+	} );
+
+	it( 'should sort text field types', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
@@ -253,19 +268,75 @@ describe( 'sorting', () => {
 		expect( result[ 1 ].title ).toBe( 'Neptune' );
 	} );
 
-	it( 'should sort by number', () => {
+	it( 'should sort datetime field types', () => {
+		const { data: resultDesc } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'date', direction: 'desc' },
+			},
+			fields
+		);
+		expect( resultDesc ).toHaveLength( 11 );
+		expect( resultDesc[ 0 ].title ).toBe( 'NASA' );
+		expect( resultDesc[ 1 ].title ).toBe( 'Earth' );
+		expect( resultDesc[ 9 ].title ).toBe( 'Space' );
+		expect( resultDesc[ 10 ].title ).toBe( 'Jupiter' );
+
+		const { data: resultAsc } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'date', direction: 'asc' },
+			},
+			fields
+		);
+		expect( resultAsc ).toHaveLength( 11 );
+		expect( resultAsc[ 0 ].title ).toBe( 'Jupiter' );
+		expect( resultAsc[ 1 ].title ).toBe( 'Space' );
+		expect( resultAsc[ 9 ].title ).toBe( 'Earth' );
+		expect( resultAsc[ 10 ].title ).toBe( 'NASA' );
+	} );
+
+	it( 'should sort untyped fields if the value is a number', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				sort: { field: 'satellites', direction: 'desc' },
 			},
-			fields
+			// Remove type information for satellites field to test sorting untyped fields.
+			fields.map( ( field ) =>
+				field.id === 'satellites'
+					? { ...field, type: undefined }
+					: field
+			)
 		);
 
 		expect( result ).toHaveLength( 11 );
 		expect( result[ 0 ].title ).toBe( 'Saturn' );
 		expect( result[ 1 ].title ).toBe( 'Jupiter' );
 		expect( result[ 2 ].title ).toBe( 'Uranus' );
+	} );
+
+	it( 'should sort untyped fields if the value is string', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'title', direction: 'desc' },
+				filters: [
+					{
+						field: 'type',
+						operator: 'isAny',
+						value: [ 'Ice giant' ],
+					},
+				],
+			},
+			// Remove type information for the title field to test sorting untyped fields.
+			fields.map( ( field ) =>
+				field.id === 'title' ? { ...field, type: undefined } : field
+			)
+		);
+		expect( result ).toHaveLength( 2 );
+		expect( result[ 0 ].title ).toBe( 'Uranus' );
+		expect( result[ 1 ].title ).toBe( 'Neptune' );
 	} );
 } );
 

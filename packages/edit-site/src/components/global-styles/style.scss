@@ -112,9 +112,9 @@
 .edit-site-global-styles__block-preview-panel {
 	position: relative;
 	width: 100%;
-	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
+	overflow: hidden;
 }
 
 .edit-site-global-styles__shadow-preview-panel {
@@ -135,16 +135,13 @@
 	}
 }
 
-.edit-site-global-styles__shadow-editor-panel {
+.edit-site-global-styles__shadow-editor__dropdown-content {
 	width: 280px;
-	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles__shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: $grid-unit-05;
-
-	& .edit-site-global-styles__shadow-editor-color-palette {
-		// color palette adds empty .components-circular-option-picker
-		margin-bottom: -1 * $grid-unit-05;
-	}
 }
 
 .edit-site-global-styles__shadow-editor__dropdown {

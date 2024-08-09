@@ -230,6 +230,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.
 	$p->set_attribute( 'data-wp-on-async--click', 'actions.showLightbox' );
+	$p->set_attribute( 'data-wp-class--hide', 'state.isContentHidden' );
+	$p->set_attribute( 'data-wp-class--show', 'state.isContentVisible' );
 
 	$body_content = $p->get_updated_html();
 
@@ -303,15 +305,15 @@ function block_core_image_print_lightbox_overlay() {
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>
 				</button>
 				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.currentImage.figureStyles">
+					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.currentImage.currentSrc">
 					</figure>
 				</div>
 				<div class="lightbox-image-container">
-					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.currentImage.figureStyles">
+					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.enlargedSrc">
 					</figure>
 				</div>
