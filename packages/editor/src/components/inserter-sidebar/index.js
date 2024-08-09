@@ -30,13 +30,16 @@ export default function InserterSidebar() {
 		sidebarIsOpened,
 	} = useSelect( ( select ) => {
 		const {
-			getBlockInsertionPoint,
 			getInserterSidebarToggleRef,
 			getInsertionPoint,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
-		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
-			select( blockEditorStore );
+		const {
+			getBlockInsertionPoint,
+			getBlockRootClientId,
+			__unstableGetEditorMode,
+			getSettings,
+		} = select( blockEditorStore );
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
