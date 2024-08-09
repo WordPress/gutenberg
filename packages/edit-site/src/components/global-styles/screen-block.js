@@ -25,9 +25,10 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 
-// Initial control values where no block style is set.
+// Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
 
 function applyFallbackStyle( border ) {

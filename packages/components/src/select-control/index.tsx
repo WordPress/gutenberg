@@ -153,6 +153,7 @@ function UnforwardedSelectControl< V extends string >(
  *
  *   return (
  *     <SelectControl
+ *       __nextHasNoMarginBottom
  *       label="Size"
  *       value={ size }
  *       options={ [
