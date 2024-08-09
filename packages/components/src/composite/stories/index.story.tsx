@@ -179,7 +179,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 					'Composite.Item': commonArgTypes,
 				};
 
-				const name = component.displayName ?? 'useCompositeStore';
+				const name = component.displayName ?? '';
 
 				return name in argTypes
 					? argTypes[ name as keyof typeof argTypes ]
