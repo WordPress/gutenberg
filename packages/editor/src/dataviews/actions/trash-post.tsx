@@ -6,7 +6,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import {
 	Button,
 	__experimentalText as Text,
@@ -44,10 +44,11 @@ const trashPost: Action< PostWithPermissions > = {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
+		const initialItemCount = useRef( items.length );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ items.length === 1
+					{ initialItemCount.current === 1
 						? sprintf(
 								// translators: %s: The item's title.
 								__(
@@ -60,9 +61,9 @@ const trashPost: Action< PostWithPermissions > = {
 								_n(
 									'Are you sure you want to move %d item to the trash ?',
 									'Are you sure you want to move %d items to the trash ?',
-									items.length
+									initialItemCount.current
 								),
-								items.length
+								initialItemCount.current
 						  ) }
 				</Text>
 				<HStack justify="right">
