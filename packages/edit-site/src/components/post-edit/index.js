@@ -46,7 +46,7 @@ function PostEditForm( { postType, postId } ) {
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const { fields } = usePostFields();
 	const form = {
-		type: 'regular',
+		type: 'panel',
 		fields: [ 'title', 'author', 'date', 'comment_status' ],
 	};
 	const [ edits, setEdits ] = useState( initialEdits );
