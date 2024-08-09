@@ -4,7 +4,6 @@
 
 ### Enhancements
 
--   `Fieldset`: new exported component ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 
 ## 28.5.0 (2024-08-07)

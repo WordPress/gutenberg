@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	BaseControl,
-	TimePicker,
-	Fieldset,
-	SelectControl,
-} from '@wordpress/components';
+import { BaseControl, TimePicker, SelectControl } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -80,7 +75,7 @@ function Edit< Item >( {
 	}
 
 	return (
-		<Fieldset>
+		<fieldset>
 			<BaseControl.VisualLabel as="legend">
 				{ label }
 			</BaseControl.VisualLabel>
@@ -89,7 +84,7 @@ function Edit< Item >( {
 				onChange={ onChangeControl }
 				hideLabelFromVision
 			/>
-		</Fieldset>
+		</fieldset>
 	);
 }
 
