@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import type {
-	ReactElement,
-	ComponentType,
-	Dispatch,
-	SetStateAction,
-} from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -181,7 +176,7 @@ export type Form = {
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onChange: Dispatch< SetStateAction< Item > >;
+	onChange: ( value: Record< string, any > ) => void;
 	hideLabelFromVision?: boolean;
 };
 
@@ -516,5 +511,5 @@ export interface DataFormProps< Item > {
 	data: Item;
 	fields: Field< Item >[];
 	form: Form;
-	onChange: Dispatch< SetStateAction< Item > >;
+	onChange: ( value: Record< string, any > ) => void;
 }

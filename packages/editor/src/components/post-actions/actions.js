@@ -234,7 +234,12 @@ const useDuplicatePostAction = ( postType ) => {
 									data={ item }
 									fields={ fields }
 									form={ formDuplicateAction }
-									onChange={ setItem }
+									onChange={ ( changes ) =>
+										setItem( {
+											...item,
+											...changes,
+										} )
+									}
 								/>
 								<HStack spacing={ 2 } justify="end">
 									<Button

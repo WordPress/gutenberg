@@ -16,6 +16,7 @@
 -   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
 -   `header` field property has been renamed to `label`.
 -   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
+-   `DataForm`'s `onChange` prop has been update to receive as argument only the fields that have changed.
 
 ### New features
 
