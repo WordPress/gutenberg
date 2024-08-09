@@ -28,6 +28,10 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		'Composite.Row': Composite.Row,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Hover': Composite.Hover,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Typeahead': Composite.Typeahead,
 	},
 	argTypes: {
 		activeId: { control: 'text' },
@@ -227,6 +231,8 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
 					'Composite.Item': commonArgTypes,
+					'Composite.Hover': commonArgTypes,
+					'Composite.Typeahead': commonArgTypes,
 				};
 
 				const name = component.displayName ?? '';
@@ -237,6 +243,41 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 			},
 		},
 	},
+	decorators: [
+		( Story ) => {
+			return (
+				<>
+					{ /* Visually style the active composite item  */ }
+					<style>{ `
+						[data-active-item] {
+							background-color: #ffc0b5;
+						}
+					` }</style>
+					<Story />
+					<div
+						style={ {
+							marginTop: '2em',
+							fontSize: '12px',
+							fontStyle: 'italic',
+						} }
+					>
+						{ /* eslint-disable-next-line no-restricted-syntax */ }
+						<p id="list-title">Notes</p>
+						<ul aria-labelledby="list-title">
+							<li>
+								The active composite item is highlighted with a
+								different background color;
+							</li>
+							<li>
+								A composite item can be the active item even
+								when it doesn&apos;t have keyboard focus.
+							</li>
+						</ul>
+					</div>
+				</>
+			);
+		},
+	],
 };
 export default meta;
 
@@ -302,4 +343,54 @@ export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
 			</Composite.Row>
 		</Composite>
 	);
+};
+
+export const Hover: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item one
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item two
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item three
+			</Composite.Hover>
+		</Composite>
+	);
+};
+Hover.parameters = {
+	docs: {
+		description: {
+			story: 'Elements in the composite widget will receive focus on mouse move and lose focus to the composite base element on mouse leave.',
+		},
+	},
+};
+
+export const Typeahead: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store } render={ <Composite.Typeahead /> }>
+			<Composite.Item>Apple</Composite.Item>
+			<Composite.Item>Banana</Composite.Item>
+			<Composite.Item>Peach</Composite.Item>
+		</Composite>
+	);
+};
+Typeahead.parameters = {
+	docs: {
+		description: {
+			story: 'When focus in on the composite widget, hitting printable character keys will move focus to the next composite item that begins with the input characters.',
+		},
+	},
 };

@@ -29,6 +29,8 @@ import type {
 	CompositeGroupLabelProps,
 	CompositeItemProps,
 	CompositeRowProps,
+	CompositeHoverProps,
+	CompositeTypeaheadProps,
 } from './types';
 
 /**
@@ -97,6 +99,22 @@ const Row = forwardRef<
 	return <Ariakit.CompositeRow { ...props } ref={ ref } />;
 } );
 Row.displayName = 'Composite.Row';
+
+const Hover = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< CompositeHoverProps, 'div', false >
+>( function CompositeHover( props, ref ) {
+	return <Ariakit.CompositeHover { ...props } ref={ ref } />;
+} );
+Hover.displayName = 'Composite.Hover';
+
+const Typeahead = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
+>( function CompositeTypeahead( props, ref ) {
+	return <Ariakit.CompositeTypeahead { ...props } ref={ ref } />;
+} );
+Typeahead.displayName = 'Composite.Typeahead';
 
 /**
  * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
@@ -202,5 +220,43 @@ export const Composite = Object.assign(
 		 * ```
 		 */
 		Row,
+		/**
+		 * Renders an element in a composite widget that receives focus on mouse move
+		 * and loses focus to the composite base element on mouse leave. This should
+		 * be combined with the `Composite.Item` component.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
+		 * const store = useCompositeStore();
+		 * <Composite store={store}>
+		 *   <Composite.Hover render={ <Composite.Item /> }>
+		 *     Item 1
+		 *   </Composite.Hover>
+		 *   <Composite.Hover render={ <Composite.Item /> }>
+		 *     Item 2
+		 *   </Composite.Hover>
+		 * </Composite>
+		 * ```
+		 */
+		Hover,
+		/**
+		 * Renders a component that adds typeahead functionality to composite
+		 * components. Hitting printable character keys will move focus to the next
+		 * composite item that begins with the input characters.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
+		 * const store = useCompositeStore();
+		 * <Composite store={store} render={ <CompositeTypeahead /> }>
+		 *   <Composite.Item>Item 1</Composite.Item>
+		 *   <Composite.Item>Item 2</Composite.Item>
+		 * </Composite>
+		 * ```
+		 */
+		Typeahead,
 	}
 );

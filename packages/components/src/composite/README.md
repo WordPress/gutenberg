@@ -216,3 +216,35 @@ Allows the component to be rendered as a different HTML element or React compone
 The contents of the component.
 
 -   Required: no
+
+### `Composite.Hover`
+
+Renders an element in a composite widget that receives focus on mouse move and loses focus to the composite base element on mouse leave. This should be combined with the `Composite.Item` component.
+
+##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
+
+Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
+
+-   Required: no
+
+##### `children`: `React.ReactNode`
+
+The contents of the component.
+
+-   Required: no
+
+### `Composite.Typeahead`
+
+Renders a component that adds typeahead functionality to composite components. Hitting printable character keys will move focus to the next composite item that begins with the input characters.
+
+##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
+
+Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
+
+-   Required: no
+
+##### `children`: `React.ReactNode`
+
+The contents of the component.
+
+-   Required: no
