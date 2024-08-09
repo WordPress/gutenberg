@@ -54,7 +54,7 @@ export function useCompositeStore( {
 	orientation = 'both',
 	rtl = false,
 	...props
-}: CompositeStoreProps ) {
+}: CompositeStoreProps = {} ) {
 	return Ariakit.useCompositeStore( {
 		focusLoop,
 		focusWrap,
