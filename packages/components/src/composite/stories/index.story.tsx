@@ -233,7 +233,31 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 					'Composite.Item': commonArgTypes,
 					'Composite.Hover': {
 						...commonArgTypes,
-						// TODO
+						focusOnHover: {
+							name: 'focusOnHover',
+							description:
+								"Determines if the composite item should be focused when hovered over. Note that the actual DOM focus will stay on the composite element. This item will get the `data-active-item` attribute so it can be styled as if it's focused.",
+							table: {
+								defaultValue: {
+									summary: 'true',
+								},
+								type: {
+									summary:
+										'boolean | React.MouseEvent<HTMLElement, MouseEvent>',
+								},
+							},
+						},
+						blurOnHoverEnd: {
+							name: 'blurOnHoverEnd',
+							description:
+								'Determines if the composite item should lose focus when the mouse leaves. By default, this is set to true if `focusOnHover` is true.',
+							table: {
+								type: {
+									summary:
+										'boolean | React.MouseEvent<HTMLElement, MouseEvent>',
+								},
+							},
+						},
 					},
 					'Composite.Typeahead': {
 						...commonArgTypes,
@@ -370,4 +394,11 @@ export const Hover: StoryFn< typeof UseCompositeStorePlaceholder > = (
 			</Composite.Hover>
 		</Composite>
 	);
+};
+Hover.parameters = {
+	docs: {
+		description: {
+			story: 'Elements in the composite widget will receive focus on mouse move and lose focus to the composite base element on mouse leave.',
+		},
+	},
 };
