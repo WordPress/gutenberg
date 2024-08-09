@@ -28,19 +28,21 @@ const {
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, permissions } = useSelect( ( select ) => {
-		const { getEditedEntityRecord, getEntityRecordPermissions } = unlock(
-			select( coreStore )
-		);
-		return {
-			item: getEditedEntityRecord( 'postType', postType, postId ),
-			permissions: getEntityRecordPermissions(
-				'postType',
-				postType,
-				postId
-			),
-		};
-	}, [] );
+	const { item, permissions } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecordPermissions } =
+				unlock( select( coreStore ) );
+			return {
+				item: getEditedEntityRecord( 'postType', postType, postId ),
+				permissions: getEntityRecordPermissions(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
+		[ postId, postType ]
+	);
 	const itemWithPermissions = useMemo( () => {
 		return {
 			...item,
