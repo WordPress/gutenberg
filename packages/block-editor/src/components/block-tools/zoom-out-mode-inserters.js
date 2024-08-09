@@ -110,12 +110,11 @@ function ZoomOutModeInserters() {
 								insertionIndex: index,
 								tab: 'patterns',
 								category: 'all',
-								// focusSearch: true,
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',
 							} );
-							inserterSearchInputRef.current?.focus();
+							inserterSearchInputRef?.current?.focus();
 						} }
 					/>
 				) }
