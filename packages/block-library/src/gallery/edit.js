@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -17,7 +16,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	ToolbarDropdownMenu,
-	withNotices,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -696,7 +694,4 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [
-	withNotices,
-	withViewportMatch( { isNarrow: '< small' } ),
-] )( GalleryEdit );
+export default withViewportMatch( { isNarrow: '< small' } )( GalleryEdit );
