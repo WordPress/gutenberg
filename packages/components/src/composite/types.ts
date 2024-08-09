@@ -80,7 +80,6 @@ export type CompositeStoreProps = {
 	 * @default false
 	 */
 	focusShift?: Ariakit.CompositeStoreProps[ 'focusShift' ];
-
 	/**
 	 * If enabled, the composite element will act as an
 	 * [`aria-activedescendant`](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_focus_activedescendant)
