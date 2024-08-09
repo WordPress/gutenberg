@@ -57,6 +57,17 @@ const fields = [
 		],
 	},
 	{
+		id: 'reviewer',
+		label: 'Reviewer',
+		type: 'text' as const,
+		Edit: 'radio' as const,
+		elements: [
+			{ value: 'fulano', label: 'Fulano' },
+			{ value: 'mengano', label: 'Mengano' },
+			{ value: 'zutano', label: 'Zutano' },
+		],
+	},
+	{
 		id: 'status',
 		label: 'Status',
 		type: 'text' as const,
@@ -73,12 +84,21 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 		order: 2,
 		author: 1,
 		status: 'draft',
+		reviewer: 'fulano',
 		date: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
 	} );
 
 	const form = {
-		fields: [ 'title', 'order', 'author', 'status', 'date', 'birthdate' ],
+		fields: [
+			'title',
+			'order',
+			'author',
+			'reviewer',
+			'status',
+			'date',
+			'birthdate',
+		],
 	};
 
 	return (
