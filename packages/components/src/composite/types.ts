@@ -119,32 +119,76 @@ export type CompositeStoreProps = {
 	rtl?: Ariakit.CompositeStoreProps[ 'rtl' ];
 };
 
-export type CompositeProps = Pick<
-	Ariakit.CompositeProps,
-	'render' | 'children'
-> & {
+export type CompositeProps = {
 	/**
 	 * Object returned by the `useCompositeStore` hook.
 	 */
 	store: Ariakit.CompositeStore;
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeProps[ 'children' ];
 };
 
-export type CompositeGroupProps = Pick<
-	Ariakit.CompositeGroupProps,
-	'render' | 'children'
->;
+export type CompositeGroupProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeGroupProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeGroupProps[ 'children' ];
+};
 
-export type CompositeGroupLabelProps = Pick<
-	Ariakit.CompositeGroupLabelProps,
-	'render' | 'children'
->;
+export type CompositeGroupLabelProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeGroupLabelProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeGroupLabelProps[ 'children' ];
+};
 
-export type CompositeItemProps = Pick<
-	Ariakit.CompositeItemProps,
-	'render' | 'children'
->;
+export type CompositeItemProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeItemProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeItemProps[ 'children' ];
+};
 
-export type CompositeRowProps = Pick<
-	Ariakit.CompositeRowProps,
-	'render' | 'children'
->;
+export type CompositeRowProps = {
+	/**
+	 * Allows the component to be rendered as a different HTML element or React
+	 * component. The value can be a React element or a function that takes in the
+	 * original component props and gives back a React element with the props
+	 * merged.
+	 */
+	render?: Ariakit.CompositeRowProps[ 'render' ];
+	/**
+	 * The contents of the component.
+	 */
+	children?: Ariakit.CompositeRowProps[ 'children' ];
+};
