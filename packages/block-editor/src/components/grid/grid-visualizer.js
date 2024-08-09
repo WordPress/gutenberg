@@ -87,59 +87,6 @@ const GridVisualizerGrid = forwardRef(
 );
 
 /**
- * A popover component that renders inline under the grid block.
- *
- * This provides non-interactive elements of the grid visualization and
- * renders under the block so that the background colors are not atop
- * the block content.
- *
- * @param {Object}  props
- * @param {string}  props.gridClientId
- * @param {Object}  props.gridInfo
- * @param {boolean} props.isManualGrid
- */
-function GridPopunder( { gridClientId, gridInfo, isManualGrid } ) {
-	const color = gridInfo.currentColor;
-	const cellStyle = isManualGrid
-		? {
-				backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
-				border: `1px dashed rgb(var(--wp-admin-theme-color--rgb))`,
-				borderRadius: '2px',
-				color,
-				opacity: 0.2,
-		  }
-		: {
-				border: `1px dashed ${ color }`,
-				borderRadius: '2px',
-				color,
-				opacity: 0.2,
-		  };
-
-	return (
-		<BlockPopoverCover
-			inline
-			className="block-editor-grid-visualizer"
-			clientId={ gridClientId }
-			// Override layout margin and popover's zIndex.
-			contentStyle={ { margin: 0, zIndex: 0 } }
-		>
-			<div
-				className="block-editor-grid-visualizer__grid"
-				style={ gridInfo.style }
-			>
-				{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-					<div
-						key={ i }
-						className="block-editor-grid-visualizer__cell"
-						style={ cellStyle }
-					></div>
-				) ) }
-			</div>
-		</BlockPopoverCover>
-	);
-}
-
-/**
  * A popover component that renders in a slot over the grid block.
  *
  * This provides interactive elements of the grid visualization —
@@ -257,6 +204,59 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 		</BlockPopoverCover>
 	);
 } );
+
+/**
+ * A popover component that renders inline under the grid block.
+ *
+ * This provides non-interactive elements of the grid visualization and
+ * renders under the block so that the background colors are not atop
+ * the block content.
+ *
+ * @param {Object}  props
+ * @param {string}  props.gridClientId
+ * @param {Object}  props.gridInfo
+ * @param {boolean} props.isManualGrid
+ */
+function GridPopunder( { gridClientId, gridInfo, isManualGrid } ) {
+	const color = gridInfo.currentColor;
+	const cellStyle = isManualGrid
+		? {
+				backgroundColor: `rgba(var(--wp-admin-theme-color--rgb), 0.2)`,
+				border: `1px dashed rgb(var(--wp-admin-theme-color--rgb))`,
+				borderRadius: '2px',
+				color,
+				opacity: 0.2,
+		  }
+		: {
+				border: `1px dashed ${ color }`,
+				borderRadius: '2px',
+				color,
+				opacity: 0.2,
+		  };
+
+	return (
+		<BlockPopoverCover
+			inline
+			className="block-editor-grid-visualizer"
+			clientId={ gridClientId }
+			// Override layout margin and popover's zIndex.
+			contentStyle={ { margin: 0, zIndex: 0 } }
+		>
+			<div
+				className="block-editor-grid-visualizer__grid"
+				style={ gridInfo.style }
+			>
+				{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
+					<div
+						key={ i }
+						className="block-editor-grid-visualizer__cell"
+						style={ cellStyle }
+					></div>
+				) ) }
+			</div>
+		</BlockPopoverCover>
+	);
+}
 
 function useGridVisualizerDropZone(
 	column,
