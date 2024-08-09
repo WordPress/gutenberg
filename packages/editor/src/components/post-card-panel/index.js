@@ -26,8 +26,13 @@ import {
 	GLOBAL_POST_TYPES,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import PostActions from '../post-actions';
 
-export default function PostCardPanel( { postType, postId, actions } ) {
+export default function PostCardPanel( {
+	postType,
+	postId,
+	onActionPerformed,
+} ) {
 	const { isFrontPage, isPostsPage, title, icon, isSync } = useSelect(
 		( select ) => {
 			const { __experimentalGetTemplateInfo } = select( editorStore );
@@ -105,7 +110,11 @@ export default function PostCardPanel( { postType, postId, actions } ) {
 						</span>
 					) }
 				</Text>
-				{ actions }
+				<PostActions
+					postType={ postType }
+					postId={ postId }
+					onActionPerformed={ onActionPerformed }
+				/>
 			</HStack>
 		</div>
 	);
