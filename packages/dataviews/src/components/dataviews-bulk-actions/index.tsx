@@ -192,10 +192,22 @@ function renderFooterContent< Item >(
 	onChangeSelection: SetSelection,
 	selectableItems: Item[]
 ) {
-	const countToShow =
+	const message =
 		selectedItems.length > 0
-			? selectedItems.length
-			: selectableItems.length;
+			? sprintf(
+					/* translators: %d: number of items. */
+					_n(
+						'%d Item selected',
+						'%d Items selected',
+						selectedItems.length
+					),
+					selectedItems.length
+			  )
+			: sprintf(
+					/* translators: %d: number of items. */
+					_n( '%d Item', '%d Items', data.length ),
+					data.length
+			  );
 	return (
 		<HStack
 			expanded={ false }
@@ -210,11 +222,7 @@ function renderFooterContent< Item >(
 				getItemId={ getItemId }
 			/>
 			<span className="dataviews-bulk-actions-footer__item-count">
-				{ sprintf(
-					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', countToShow ),
-					countToShow
-				) }
+				{ message }
 			</span>
 			<HStack
 				className="dataviews-bulk-actions-footer__action-buttons"
