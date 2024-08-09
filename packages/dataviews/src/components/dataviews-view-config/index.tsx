@@ -239,7 +239,6 @@ function FieldControl() {
 						<HStack expanded>
 							<span>{ field.label }</span>
 							<Button
-								className="'dataviews-view-config__field-control-button"
 								size="compact"
 								onClick={ () =>
 									onChangeView( {
