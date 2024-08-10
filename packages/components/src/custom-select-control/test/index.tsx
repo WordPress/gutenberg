@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UncontrolledCustomSelectControl from '..';
+import type { CustomSelectChangeObject, CustomSelectOption } from '../types';
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -687,5 +688,129 @@ describe.each( [
 				`Currently selected: ${ props.options[ 0 ].name }`
 			);
 		} );
+	} );
+} );
+
+describe( 'Type checking', () => {
+	// eslint-disable-next-line jest/expect-expect
+	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
+		const options = [
+			{
+				key: 'narrow',
+				name: 'Narrow',
+			},
+			{
+				key: 'value',
+				name: 'Value',
+			},
+		];
+		const optionsReadOnly = [
+			{
+				key: 'narrow',
+				name: 'Narrow',
+			},
+			{
+				key: 'value',
+				name: 'Value',
+			},
+		] as const;
+
+		const onChange: (
+			changeObject: CustomSelectChangeObject< CustomSelectOption >
+		) => void = () => {};
+		const onChangeWithFoo: (
+			changeObject: CustomSelectChangeObject<
+				CustomSelectOption & {
+					foo: string;
+				}
+			>
+		) => void = () => {};
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ options }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ options }
+			value={ {
+				key: 'random string is also accepted for non-readonly options',
+				name: 'Narrow',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ options }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+				// @ts-expect-error: the option type should not be inferred from `value`
+				foo: 'foo',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ options }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+			} }
+			// @ts-expect-error: the option type should not be inferred from `onChange`
+			onChange={ onChangeWithFoo }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ optionsReadOnly }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ optionsReadOnly }
+			value={ {
+				// @ts-expect-error: random string is not accepted for immutable options
+				key: 'random string is not accepted for readonly options',
+				name: 'Narrow',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ optionsReadOnly }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+				// @ts-expect-error: the option type should not be inferred from `value`
+				foo: 'foo',
+			} }
+			onChange={ onChange }
+		/>;
+
+		<UncontrolledCustomSelectControl
+			label="Label"
+			options={ optionsReadOnly }
+			value={ {
+				key: 'narrow',
+				name: 'Narrow',
+			} }
+			// @ts-expect-error: the option type should not be inferred from `onChange`
+			onChange={ onChangeWithFoo }
+		/>;
 	} );
 } );
