@@ -308,6 +308,14 @@ module.exports = {
 							componentName +
 							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
 					} ) ),
+					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
+					...[ 'TextControl' ].map( ( componentName ) => ( {
+						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
+						message:
+							componentName +
+							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					} ) ),
 				],
 			},
 		},
