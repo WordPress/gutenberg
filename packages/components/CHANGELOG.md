@@ -14,7 +14,7 @@
 
 ### Internal
 
--   `CustomSelectControl`: Improve type inferring ([#todo](https://github.com/WordPress/gutenberg/pull/todo)).
+-   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
 
 ## 28.5.0 (2024-08-07)
 
