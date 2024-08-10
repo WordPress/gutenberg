@@ -58,4 +58,61 @@ describe( 'TextControl', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	describe( 'Check typings', () => {
+		// eslint-disable-next-line jest/expect-expect
+		it( 'should infer the value type from `type` prop', () => {
+			const onChangeString: ( value: string ) => void = () => {};
+			const onChangeNumber: ( value: number ) => void = () => {};
+
+			// default type is 'text'
+			<TextControl onChange={ onChangeString } value="foo" />;
+			<TextControl
+				// @ts-expect-error: onChange should accept a string
+				onChange={ onChangeNumber }
+				value="foo"
+			/>;
+			<TextControl
+				onChange={ onChangeString }
+				// @ts-expect-error: value should be a string
+				value={ 1 }
+			/>;
+
+			// explicitly set type to 'text'
+			<TextControl type="text" onChange={ onChangeString } value="foo" />;
+			<TextControl
+				type="text"
+				// @ts-expect-error: onChange should accept a string
+				onChange={ onChangeNumber }
+				value="foo"
+			/>;
+			<TextControl
+				type="text"
+				onChange={ onChangeString }
+				// @ts-expect-error: value should be a string
+				value={ 1 }
+			/>;
+
+			// explicitly set type to 'number'
+			<TextControl
+				type="number"
+				onChange={ onChangeNumber }
+				value={ 1 }
+			/>;
+
+			<TextControl
+				type="number"
+				onChange={ onChangeNumber }
+				// @ts-expect-error: value should be a number
+				value="foo"
+			/>;
+
+			<TextControl
+				type="number"
+				// @ts-expect-error: onChange should accept a number
+				onChange={ onChangeString }
+				value={ 1 }
+			/>;
+		} );
+	} );
 } );

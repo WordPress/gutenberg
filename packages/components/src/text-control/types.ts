@@ -3,7 +3,22 @@
  */
 import type { BaseControlProps } from '../base-control/types';
 
-export type TextControlProps< T extends string | number > = Pick<
+export type TextControlPropsType =
+	| 'date'
+	| 'datetime-local'
+	| 'email'
+	| 'number'
+	| 'password'
+	| 'tel'
+	| 'text'
+	| 'time'
+	| 'search'
+	| 'url';
+
+export type TextControlProps<
+	Type extends TextControlPropsType = 'text',
+	Value extends string | number = Type extends 'number' ? number : string,
+> = Pick<
 	BaseControlProps,
 	| 'className'
 	| 'hideLabelFromVision'
@@ -14,27 +29,17 @@ export type TextControlProps< T extends string | number > = Pick<
 	/**
 	 * A function that receives the value of the input.
 	 */
-	onChange: ( value: T ) => void;
+	onChange: ( value: NoInfer< Value > ) => void;
 	/**
 	 * The current value of the input.
 	 */
-	value: T;
+	value: NoInfer< Value >;
 	/**
 	 * Type of the input element to render. Defaults to "text".
 	 *
 	 * @default 'text'
 	 */
-	type?:
-		| 'date'
-		| 'datetime-local'
-		| 'email'
-		| 'number'
-		| 'password'
-		| 'tel'
-		| 'text'
-		| 'time'
-		| 'search'
-		| 'url';
+	type?: Type;
 
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
