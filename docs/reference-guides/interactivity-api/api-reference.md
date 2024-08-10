@@ -84,7 +84,7 @@ It provides a **local** state available to a specific HTML node and its children
 The `wp-context` directive accepts a stringified JSON as a value.
 
 ```php
-//render.php
+// render.php
 <div data-wp-context='{ "post": { "id": <?php echo $post->ID; ?> } }' >
   <button data-wp-on--click="actions.logId" >
     Click Me!
@@ -110,13 +110,13 @@ store( "myPlugin", {
 Different contexts can be defined at different levels, and deeper levels will merge their own context with any parent one:
 
 ```html
-<div data-wp-context="{ foo: 'bar' }">
+<div data-wp-context='{ "foo": "bar" }'>
   <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
 
-  <div data-wp-context="{ bar: 'baz' }">
+  <div data-wp-context='{ "bar": "baz" }'>
     <span data-wp-text="context.foo"><!-- Will output: "bar" --></span>
 
-    <div data-wp-context="{ foo: 'bob' }">
+    <div data-wp-context='{ "foo": "bob" }'>
       <span data-wp-text="context.foo"><!-- Will output: "bob" --></span>
     </div>
 
@@ -356,8 +356,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-async`
 
-This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread
-to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
+This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
 
 ### `wp-on-window`
 
@@ -369,8 +368,7 @@ This directive allows you to attach global window events like `resize`, `copy`, 
 
 [List of supported window events.](https://developer.mozilla.org/en-US/docs/Web/API/Window#events)
 
-The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize`
-or `data-wp-on-window--languagechange`).
+The syntax of this directive is `data-wp-on-window--[window-event]` (like `data-wp-on-window--resize` or `data-wp-on-window--languagechange`).
 
 ```php
 <div data-wp-on-window--resize="callbacks.logWidth"></div>
@@ -406,8 +404,7 @@ This directive allows you to attach global document events like `scroll`, `mouse
 
 [List of supported document events.](https://developer.mozilla.org/en-US/docs/Web/API/Document#events)
 
-The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown`
-or `data-wp-on-document--selectionchange`).
+The syntax of this directive is `data-wp-on-document--[document-event]` (like `data-wp-on-document--keydown` or `data-wp-on-document--selectionchange`).
 
 ```php
 <div data-wp-on-document--keydown="callbacks.logKeydown"></div>
@@ -501,7 +498,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
 
 ```html
 <div data-wp-init="callbacks.logTimeInit">
-  <p>Hi!</>
+  <p>Hi!</p>
 </div>
 ```
 
@@ -520,6 +517,8 @@ Here's another example with several `wp-init` directives on the same DOM element
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
+import { store, getElement } from '@wordpress/interactivity';
+
 store( "myPlugin", {
   callbacks: {
     logTimeInit: () => console.log( `Init at ` + new Date() ),
@@ -882,10 +881,10 @@ const { state } = store( "myPlugin", {
       GBP: 0.85,
     },
     get amountInUSD() {
-      return state.currencyExchange[ 'USD' ] * state.amount,
+      return state.currencyExchange[ 'USD' ] * state.amount;
     },
     get amountInGBP() {
-      return state.currencyExchange[ 'GBP' ] * state.amount,
+      return state.currencyExchange[ 'GBP' ] * state.amount;
     },
   },
 } );
@@ -965,7 +964,7 @@ This approach enables some functionalities that make directives flexible and pow
 
 *In the `view.js` file of each block* the developer can define both the state and the elements of the store referencing functions like actions, side effects or derived state.
 
-The `store` method used to set the store in javascript can be imported from `@wordpress/interactivity`.
+The `store` method used to set the store in JavaScript can be imported from `@wordpress/interactivity`.
 
 ```js
 // store
@@ -1111,7 +1110,7 @@ store( "myPlugin", {
   actions: {
     log: () => {
       const element = getElement();
-			 // Logs "false"
+			 // Logs attributes
       console.log('element attributes => ', element.attributes)
     },
   },
@@ -1122,7 +1121,7 @@ The code will log:
 
 ```json
 {
-	"data-wp-on--click": 'actions.increaseCounter',
+	"data-wp-on--click": 'actions.log',
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
@@ -1147,6 +1146,7 @@ store('mySliderPlugin', {
 				3_000
 			);
 		},
+  },
 })
 ```
 
@@ -1245,7 +1245,7 @@ echo $processed_html;
 
 will output:
 ```html
-<div data-wp-text="create-block::state.greeting">Hello, World!</div>
+<div data-wp-text="myPlugin::state.greeting">Hello, World!</div>
 ```
 
 ### wp_interactivity_data_wp_context
