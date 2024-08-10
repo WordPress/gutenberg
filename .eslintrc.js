@@ -315,7 +315,8 @@ module.exports = {
 						'DimensionControl',
 						'FontSizePicker',
 					].map( ( componentName ) => ( {
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
+						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
 						message:
 							componentName +
 							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
