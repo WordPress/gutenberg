@@ -35,7 +35,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 	onChange,
 	...args
 } ) => {
-	const [ value, setValue ] = useState( '' );
+	const [ value, setValue ] = useState< string | number >( '' );
 
 	return (
 		<TextControl
