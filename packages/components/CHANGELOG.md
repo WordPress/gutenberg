@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+-   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+
+### Enhancements
+
+-   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+-   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+
 ## 28.5.0 (2024-08-07)
 
 ### Bug Fixes
@@ -22,6 +32,7 @@
 -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
+-   `DimensionControl`: Add `__nextHasNoMarginBottom` prop to remove bottom margin ([#64346](https://github.com/WordPress/gutenberg/pull/64346)).
 
 ### Internal
 
