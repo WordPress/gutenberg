@@ -315,6 +315,8 @@ function FontCollection( { slug } ) {
 								</FlexItem>
 								<FlexItem>
 									<SelectControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
 										label={ __( 'Category' ) }
 										value={ filters.category }
 										onChange={ handleCategoryFilter }

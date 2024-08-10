@@ -2383,6 +2383,17 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Processes background styles.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
+				/*
+				 * For user-uploaded images at the block level, assign defaults.
+				 * Matches defaults applied in the editor and in block supports: background.php.
+				 */
+				if ( static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
+					$styles['background']['backgroundSize'] = $styles['background']['backgroundSize'] ?? 'cover';
+					// If the background size is set to `contain` and no position is set, set the position to `center`.
+					if ( 'contain' === $styles['background']['backgroundSize'] && empty( $styles['background']['backgroundPosition'] ) ) {
+						$styles['background']['backgroundPosition'] = '50% 50%';
+					}
+				}
 				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
 				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
 			}

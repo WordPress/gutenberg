@@ -79,6 +79,7 @@ function UnforwardedTextControl< T extends string | number >(
  *
  *   return (
  *     <TextControl
+ *       __nextHasNoMarginBottom
  *       label="Additional CSS Class"
  *       value={ className }
  *       onChange={ ( value ) => setClassName( value ) }

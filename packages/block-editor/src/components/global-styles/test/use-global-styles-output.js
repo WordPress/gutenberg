@@ -1028,6 +1028,43 @@ describe( 'global styles renderer', () => {
 				'letter-spacing: 2px',
 			] );
 		} );
+		it( 'should set default values for block background styles', () => {
+			const backgroundStyles = {
+				background: {
+					backgroundImage: {
+						url: 'https://wordpress.org/assets/image.jpg',
+						id: 123,
+					},
+				},
+			};
+			expect(
+				getStylesDeclarations( backgroundStyles, '.wp-block-group' )
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+				'background-size: cover',
+			] );
+			// Test with root-level styles.
+			expect(
+				getStylesDeclarations( backgroundStyles, ROOT_BLOCK_SELECTOR )
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+			] );
+			expect(
+				getStylesDeclarations(
+					{
+						background: {
+							...backgroundStyles.background,
+							backgroundSize: 'contain',
+						},
+					},
+					'.wp-block-group'
+				)
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+				'background-position: 50% 50%',
+				'background-size: contain',
+			] );
+		} );
 	} );
 
 	describe( 'processCSSNesting', () => {

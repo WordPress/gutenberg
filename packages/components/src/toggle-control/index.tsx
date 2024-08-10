@@ -113,6 +113,7 @@ function UnforwardedToggleControl(
  *
  *   return (
  *     <ToggleControl
+ *       __nextHasNoMarginBottom
  *       label="Fixed Background"
  *       checked={ value }
  *       onChange={ () => setValue( ( state ) => ! state ) }
