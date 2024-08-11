@@ -146,7 +146,10 @@ function VideoEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className={ clsx( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSingleSelected,
+				} ) }
 				withIllustration
 				icon={ icon }
 				label={ __( 'Video' ) }
