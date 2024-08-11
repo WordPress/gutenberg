@@ -137,7 +137,7 @@ test.describe( 'Media & Text', () => {
 		await page.locator( `role=checkbox[checked=false]` ).click();
 		await page.locator( 'role=button[name="Select"i]' ).click();
 		expect( await editor.getEditedPostContent() )
-			.toMatch( `<!-- wp:media-text {"mediaId":${ secondaryImage.id },"mediaLink":"${ secondaryImage.link }","mediaType":"image"} -->
+			.toMatch( `<!-- wp:media-text {"mediaId":${ secondaryImage.id },"mediaLink":"${ secondaryImage.link }","mediaType":"image","mediaSizeSlug":"full"} -->
 <div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ secondaryImage.source_url }" alt="" class="wp-image-${ secondaryImage.id } size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
 <p></p>
 <!-- /wp:paragraph --></div></div>

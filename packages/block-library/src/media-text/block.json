@@ -75,8 +75,7 @@
 			"default": 50
 		},
 		"mediaSizeSlug": {
-			"type": "string",
-			"default": "full"
+			"type": "string"
 		},
 		"isStackedOnMobile": {
 			"type": "boolean",
