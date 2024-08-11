@@ -4,6 +4,8 @@
 	video {
 		width: 100%;
 		vertical-align: middle;
+		// Video tag has customizable border, border-box makes that more predictable.
+		box-sizing: border-box;
 	}
 
 	@supports (position: sticky) {
