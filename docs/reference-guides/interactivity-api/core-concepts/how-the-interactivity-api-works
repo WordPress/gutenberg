@@ -75,7 +75,7 @@ data-wp-context='{"openItemMessage":"Current open item is","closedItemMessage":"
 
 #### 2.3) WordPress, upon encountering `data-wp-interactive="accordion"`, processes the block directives.
 
-In this case, there are 5 directives to be processed: 2 `data-wp-bind--hidden`, 5 `data-wp-text`
+In this case, there are 7 directives to be processed: 2 `data-wp-bind--hidden`, 5 `data-wp-text`
 and `data-wp-class--dark`. Using the HTML
 API and defined data (state in the global block-related PHP variable and variables as JSON attributes), WordPress will
 process them and change the markup.
