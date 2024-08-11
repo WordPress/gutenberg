@@ -1,21 +1,22 @@
-To get a complete picture of how the API works, let's review a request to the imagined `/interactive` page.
+To get a complete picture of how the Interactivity API works, let's review a request to an imagined `/interactive` page.
 
-The `/interactive` page is a plain page that contains an interactive "accordion" block among static content. In this
+The `/interactive` page is a standard page that contains an accordion block among static content. In this
 case, the request will pass through the following phases:
 
-## Part A: Backend
+## Server side processing begins
 
 ### 1. Initial processing
 
 The initial request to the `/interactive` page is processed by WordPress, and all the hooks are fired as usual.
 
-### 2. Page body HTML generation
+### 2. HTML DOM processing
 
 At this stage, the current theme generates markup for the current request. During it, the place with the interactive
 accordion block
 is reached:
 
 ```php
+// render.php
 <?php wp_interactivity_state('accordion', ['isClosed' => true]); ?>
 
 <div data-wp-interactive="accordion"
@@ -34,11 +35,11 @@ is reached:
 ```
 
 Note: The `wp_interactivity_state` and `wp_interactivity_data_wp_context` calls are optional,
-while `data-wp-interactive="accordion"` is a necessary directive that defines our block.
+while `data-wp-interactive="accordion"` is a required directive to tell the Interactivity API that we want this element and its nested DOM elements to be recognized by the Interactivity API.
 
 The following will happen:
 
-#### 2.1) The `wp_interactivity_state` call defines the state variables of our block.
+#### 2.1) The `wp_interactivity_state` call initializes some server-side state for the block.
 
 It's stored in a global variable that keeps state of all blocks throughout the request.
 
