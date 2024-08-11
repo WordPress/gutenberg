@@ -18,6 +18,7 @@ is reached:
 ```php
 // render.php
 // render.php
+// render.php
 <?php wp_interactivity_state('accordion', ['isClosed' => true]); ?>
 
 <div data-wp-interactive="accordion"
