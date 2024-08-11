@@ -54,11 +54,11 @@ test.describe( 'Media & Text', () => {
 		await page.locator( 'role=button[name="Select"i]' ).click();
 		await page
 			.locator( `role=combobox[name="Resolution"i]` )
-			.selectOption( 'Thumbnail' );
+			.selectOption( 'Medium' );
 
 		expect( await editor.getEditedPostContent() )
-			.toMatch( `<!-- wp:media-text {"mediaId":${ primaryImage.id },"mediaLink":"${ primaryImage.link }","mediaType":"image","mediaSizeSlug":"thumbnail"} -->
-<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ primaryImage.media_details.sizes.thumbnail.source_url }" alt="" class="wp-image-${ primaryImage.id } size-thumbnail"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
+			.toMatch( `<!-- wp:media-text {"mediaId":${ primaryImage.id },"mediaLink":"${ primaryImage.link }","mediaType":"image","mediaSizeSlug":"medium"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ primaryImage.media_details.sizes.medium.source_url }" alt="" class="wp-image-${ primaryImage.id } size-medium"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
 <p></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->` );
@@ -78,8 +78,8 @@ test.describe( 'Media & Text', () => {
 		await page.locator( `role=checkbox[checked=false]` ).click();
 		await page.locator( 'role=button[name="Select"i]' ).click();
 		expect( await editor.getEditedPostContent() )
-			.toMatch( `<!-- wp:media-text {"mediaId":${ secondaryImage.id },"mediaLink":"${ secondaryImage.link }","mediaType":"image","mediaSizeSlug":"thumbnail"} -->
-<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ secondaryImage.media_details.sizes.thumbnail.source_url }" alt="" class="wp-image-${ secondaryImage.id } size-thumbnail"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
+			.toMatch( `<!-- wp:media-text {"mediaId":${ secondaryImage.id },"mediaLink":"${ secondaryImage.link }","mediaType":"image","mediaSizeSlug":"medium"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ secondaryImage.media_details.sizes.medium.source_url }" alt="" class="wp-image-${ secondaryImage.id } size-medium"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
 <p></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->` );
