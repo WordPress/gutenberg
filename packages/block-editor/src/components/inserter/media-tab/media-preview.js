@@ -129,13 +129,8 @@ export function MediaPreview( { media, onClick, category } ) {
 	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const { imageDefaultSize } = getSettings();
 	const [ block, preview ] = useMemo(
-		() =>
-			getBlockAndPreviewFromMedia(
-				media,
-				category.mediaType,
-				imageDefaultSize
-			),
-		[ media, category.mediaType, imageDefaultSize ]
+		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
+		[ media, category.mediaType ]
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
@@ -187,7 +182,7 @@ export function MediaPreview( { media, onClick, category } ) {
 								return;
 							}
 
-if ( ! getBlock( clonedBlock.clientId ) ) {
+							if ( ! getBlock( clonedBlock.clientId ) ) {
 								// Ensure the block is only inserted once.
 								if (
 									clonedBlock.name === 'core/image' &&
@@ -256,7 +251,6 @@ if ( ! getBlock( clonedBlock.clientId ) ) {
 			createSuccessNotice,
 			updateBlockAttributes,
 			createErrorNotice,
-<<<<<<< HEAD
 			getBlock,
 			imageDefaultSize,
 		]

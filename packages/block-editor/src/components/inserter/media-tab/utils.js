@@ -12,14 +12,9 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
  *
  * @param {InserterMediaItem}         media     The media object to create the block from.
  * @param {('image'|'audio'|'video')} mediaType The media type to create the block for.
- * @param {string}                    sizeSlug  The size slug to use for the images.
  * @return {[WPBlock, JSX.Element]} An array containing the block and the preview element.
  */
-export function getBlockAndPreviewFromMedia(
-	media,
-	mediaType,
-	sizeSlug = 'full'
-) {
+export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	// Add the common attributes between the different media types.
 	const attributes = {
 		id: media.id || undefined,
@@ -30,12 +25,6 @@ export function getBlockAndPreviewFromMedia(
 	if ( mediaType === 'image' ) {
 		attributes.url = mediaSrc;
 		attributes.alt = alt;
-		attributes.sizeSlug =
-			// Try `sizeSlug` and fall back to 'full'.
-			media.sizes?.[ sizeSlug ] ||
-			media.media_details?.sizes?.[ sizeSlug ]
-				? sizeSlug
-				: 'full';
 	} else if ( [ 'video', 'audio' ].includes( mediaType ) ) {
 		attributes.src = mediaSrc;
 	}
