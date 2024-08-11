@@ -206,6 +206,7 @@
 		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "3.2.7",
+		"file-loader": "6.2.0",
 		"filenamify": "4.2.0",
 		"glob": "7.1.2",
 		"husky": "7.0.0",
@@ -263,6 +264,7 @@
 		"webdriverio": "8.16.20",
 		"webpack": "5.88.2",
 		"webpack-bundle-analyzer": "4.9.1",
+		"webpack-dev-server": "4.15.1",
 		"worker-farm": "1.7.0"
 	},
 	"overrides": {
@@ -277,7 +279,7 @@
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsc --build --clean && rimraf \"./packages/*/build-types\"",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
-		"dev": "cross-env NODE_ENV=development npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
+		"dev": "cross-env NODE_ENV=development npm run build:packages && concurrently \"wp-scripts serve\" \"npm run dev:packages\"",
 		"dev:packages": "cross-env NODE_ENV=development concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",

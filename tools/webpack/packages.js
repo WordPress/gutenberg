@@ -1,9 +1,11 @@
 /**
  * External dependencies
  */
+const webpack = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
-const { join } = require( 'path' );
+const { join, resolve } = require( 'path' );
+const glob = require( 'fast-glob' );
 
 /**
  * WordPress dependencies
@@ -19,6 +21,7 @@ const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extrac
 const { dependencies } = require( '../../package' );
 const { baseConfig, plugins, stylesTransform } = require( './shared' );
 
+const WEBPACK_DEV_SERVER_PORT = 8887;
 const WORDPRESS_NAMESPACE = '@wordpress/';
 
 // Experimental or other packages that should be private are bundled when used.
@@ -39,8 +42,8 @@ const BUNDLED_PACKAGES = [
 // PHP files in packages that have to be copied during build.
 const bundledPackagesPhpConfig = [
 	{
-		from: './packages/style-engine/',
-		to: 'build/style-engine/',
+		from: './packages/style-engine',
+		to: 'style-engine/',
 		replaceClasses: [
 			'WP_Style_Engine_CSS_Declarations',
 			'WP_Style_Engine_CSS_Rules_Store',
@@ -109,28 +112,34 @@ const copiedVendors = {
 	'react-dom.min.js': 'react-dom/umd/react-dom.production.min.js',
 };
 
-module.exports = {
+const config = {
 	...baseConfig,
 	name: 'packages',
-	entry: Object.fromEntries(
-		gutenbergPackages.map( ( packageName ) => [
-			packageName,
-			{
-				import: `./packages/${ packageName }`,
-				library: {
-					name: [ 'wp', camelCaseDash( packageName ) ],
-					type: 'window',
-					export: exportDefaultPackages.includes( packageName )
-						? 'default'
-						: undefined,
+	entry: {
+		...Object.fromEntries(
+			gutenbergPackages.map( ( packageName ) => [
+				packageName,
+				{
+					import: [ `./packages/${ packageName }` ],
+					library: {
+						name: [ 'wp', camelCaseDash( packageName ) ],
+						type: 'window',
+						export: exportDefaultPackages.includes( packageName )
+							? 'default'
+							: undefined,
+					},
 				},
-			},
-		] )
-	),
+			] )
+		),
+	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/[name]/index.min.js',
-		path: join( __dirname, '..', '..' ),
+		filename( { chunk } ) {
+			return chunk.name === 'runtime'
+				? 'runtime.min.js'
+				: './[name]/index.min.js';
+		},
+		path: join( __dirname, '..', '..', 'build' ),
 		devtoolModuleFilenameTemplate: ( info ) => {
 			if ( info.resourcePath.includes( '/@wordpress/' ) ) {
 				const resourcePath =
@@ -143,25 +152,22 @@ module.exports = {
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},
+	optimization: {
+		...baseConfig.optimization,
+		runtimeChunk: {
+			name: 'runtime',
+		},
+	},
 	plugins: [
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 		new CopyWebpackPlugin( {
-			patterns: gutenbergPackages
-				.map( ( packageName ) => ( {
-					from: '*.css',
-					context: `./packages/${ packageName }/build-style`,
-					to: `./build/${ packageName }`,
-					transform: stylesTransform,
-					noErrorOnMissing: true,
+			patterns: bundledPackagesPhpConfig.concat(
+				Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
+					from: `node_modules/${ from }`,
+					to: `vendors/${ to }`,
 				} ) )
-				.concat( bundledPackagesPhpConfig )
-				.concat(
-					Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
-						from: `node_modules/${ from }`,
-						to: `build/vendors/${ to }`,
-					} ) )
-				),
+			),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,
@@ -169,3 +175,80 @@ module.exports = {
 		} ),
 	].filter( Boolean ),
 };
+
+if ( baseConfig.mode === 'development' ) {
+	Object.keys( config.entry ).forEach( ( packageName ) => {
+		config.entry[ packageName ].import.unshift(
+			...glob.sync( `./packages/${ packageName }/build-style/*.css` )
+		);
+	} );
+	config.entry[ '🔥hot' ] = {
+		import: [
+			// Runtime code for hot module replacement.
+			'webpack/hot/only-dev-server.js',
+			// Set the log level for HMR to "error".
+			'./tools/webpack/set-hot-log-level.js',
+			// Dev server client for web socket transport, hot and live reload logic.
+			`webpack-dev-server/client/index.js?hot=true&live-reload=false&port=${ WEBPACK_DEV_SERVER_PORT }`,
+		],
+		filename: '🔥hot.js',
+	};
+
+	config.devServer = {
+		static: {
+			directory: resolve( __dirname, '../../build' ),
+			publicPath: '/build/',
+		},
+		liveReload: false,
+		devMiddleware: {
+			writeToDisk( filePath ) {
+				return ! /\.hot-update\.js(on)?$/.test( filePath );
+			},
+		},
+		headers: {
+			'Access-Control-Allow-Origin': '*',
+		},
+		allowedHosts: 'auto',
+		host: 'localhost',
+		port: WEBPACK_DEV_SERVER_PORT,
+		client: false,
+		hot: false,
+	};
+
+	config.module ||= { rules: [] };
+	config.module.rules ||= [];
+	config.module.rules.push( {
+		test: /\.css$/,
+		use: [
+			resolve( __dirname, '../../packages/css-hmr-loader' ),
+			{
+				loader: 'file-loader',
+				options: {
+					name( resourcePath ) {
+						const [ , packageName, fileName ] = resourcePath.match(
+							/\/([^/]+)\/build-style\/(.+\.css)/
+						);
+						return `${ packageName }/${ fileName }?[contenthash]`;
+					},
+					publicPath: `/build/`,
+				},
+			},
+		],
+	} );
+
+	config.plugins.push( new webpack.HotModuleReplacementPlugin() );
+} else {
+	config.plugins.push(
+		new CopyWebpackPlugin( {
+			patterns: gutenbergPackages.map( ( packageName ) => ( {
+				from: '*.css',
+				context: `./packages/${ packageName }/build-style`,
+				to: `./${ packageName }`,
+				transform: stylesTransform,
+				noErrorOnMissing: true,
+			} ) ),
+		} )
+	);
+}
+
+module.exports = config;

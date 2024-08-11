@@ -1,0 +1,34 @@
+{
+	"name": "@wordpress/css-hmr-loader",
+	"version": "0.0.0",
+	"private": true,
+	"description": "A webpack loader to enable CSS Hot Module Replacement in Gutenberg.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"CSS",
+		"HMR",
+		"webpack",
+		"loader"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/css-hmr-loader/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/css-hmr-loader"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "lib/index.js",
+	"peerDependencies": {
+		"webpack": "*"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

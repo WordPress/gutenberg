@@ -14,6 +14,7 @@ module.exports = [
 	...Object.entries( importedVendors ).flatMap( ( [ name, config ] ) => {
 		return [ 'production', 'development' ].map( ( mode ) => {
 			return {
+				name: `${ name }-${ mode }`,
 				mode,
 				target: 'browserslist',
 				output: {
