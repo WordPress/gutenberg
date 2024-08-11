@@ -62,5 +62,26 @@ test.describe( 'Media & Text', () => {
 <p></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->` );
+
+		const secondaryImage = await requestUtils.uploadMedia(
+			path.join(
+				'./test/e2e/assets',
+				'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+			)
+		);
+
+		await editor.clickBlockToolbarButton( 'Replace' );
+		await page
+			.locator( 'role=menuitem[name="Open Media Library"i]' )
+			.click();
+
+		await page.locator( `role=checkbox[checked=false]` ).click();
+		await page.locator( 'role=button[name="Select"i]' ).click();
+		expect( await editor.getEditedPostContent() )
+			.toMatch( `<!-- wp:media-text {"mediaId":${ secondaryImage.id },"mediaLink":"${ secondaryImage.link }","mediaType":"image","mediaSizeSlug":"thumbnail"} -->
+<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"><img src="${ secondaryImage.media_details.sizes.thumbnail.source_url }" alt="" class="wp-image-${ secondaryImage.id } size-thumbnail"/></figure><div class="wp-block-media-text__content"><!-- wp:paragraph {"placeholder":"Content…"} -->
+<p></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:media-text -->` );
 	} );
 } );
