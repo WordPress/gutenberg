@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -6,14 +11,17 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	MenuItemsChoice,
 	VisuallyHidden,
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check, desktop, mobile, tablet, external } from '@wordpress/icons';
+import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -22,21 +30,50 @@ import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
-	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
-		useSelect( ( select ) => {
-			const { getDeviceType, getCurrentPostType } = select( editorStore );
-			const { getUnstableBase, getPostType } = select( coreStore );
-			const { get } = select( preferencesStore );
-			const _currentPostType = getCurrentPostType();
-			return {
-				deviceType: getDeviceType(),
-				homeUrl: getUnstableBase()?.home,
-				isTemplate: _currentPostType === 'wp_template',
-				isViewable: getPostType( _currentPostType )?.viewable ?? false,
-				showIconLabels: get( 'core', 'showIconLabels' ),
-			};
-		}, [] );
+	const {
+		deviceType,
+		editorMode,
+		homeUrl,
+		isTemplate,
+		isViewable,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { getDeviceType, getCurrentPostType } = select( editorStore );
+		const { getUnstableBase, getPostType } = select( coreStore );
+		const { get } = select( preferencesStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const _currentPostType = getCurrentPostType();
+		return {
+			deviceType: getDeviceType(),
+			editorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
+			isTemplate: _currentPostType === 'wp_template',
+			isViewable: getPostType( _currentPostType )?.viewable ?? false,
+			showIconLabels: get( 'core', 'showIconLabels' ),
+		};
+	}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
+	/**
+	 * Save the original editing mode in a ref to restore it when we exit zoom out.
+	 */
+	const originalEditingMode = useRef( editorMode );
+	useEffect( () => {
+		if ( editorMode !== 'zoom-out' ) {
+			originalEditingMode.current = editorMode;
+		}
+
+		return () => {
+			if (
+				editorMode === 'zoom-out' &&
+				editorMode !== originalEditingMode.current
+			) {
+				__unstableSetEditorMode( originalEditingMode.current );
+			}
+		};
+	}, [ editorMode, __unstableSetEditorMode ] );
+
 	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) {
 		return null;
@@ -47,6 +84,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 	const toggleProps = {
 		className: 'editor-preview-dropdown__toggle',
+		iconPosition: 'right',
 		size: 'compact',
 		showTooltip: ! showIconLabels,
 		disabled,
@@ -57,42 +95,81 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const deviceIcons = {
+		desktop,
 		mobile,
 		tablet,
-		desktop,
+	};
+
+	/**
+	 * The choices for the device type.
+	 *
+	 * @type {Array}
+	 */
+	const choices = [
+		{
+			value: 'Desktop',
+			label: __( 'Desktop' ),
+			icon: desktop,
+		},
+		{
+			value: 'ZoomOut',
+			label: __( 'Desktop (50%)' ),
+			icon: desktop,
+		},
+		{
+			value: 'Tablet',
+			label: __( 'Tablet' ),
+			icon: tablet,
+		},
+		{
+			value: 'Mobile',
+			label: __( 'Mobile' ),
+			icon: mobile,
+		},
+	];
+
+	const previewValue = editorMode === 'zoom-out' ? 'ZoomOut' : deviceType;
+
+	/**
+	 * Handles the selection of a device type.
+	 *
+	 * @param {string} value The device type.
+	 */
+	const onSelect = ( value ) => {
+		let newEditorMode = originalEditingMode.current;
+
+		if ( value === 'ZoomOut' ) {
+			newEditorMode = 'zoom-out';
+			setDeviceType( 'Desktop' );
+		} else {
+			setDeviceType( value );
+		}
+
+		__unstableSetEditorMode( newEditorMode );
 	};
 
 	return (
 		<DropdownMenu
-			className="editor-preview-dropdown"
+			className={ clsx(
+				'editor-preview-dropdown',
+				`editor-preview-dropdown--${ deviceType.toLowerCase() }`
+			) }
 			popoverProps={ popoverProps }
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
+			text={ editorMode === 'zoom-out' ? __( '50%' ) : undefined }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && check }
-						>
-							{ __( 'Desktop' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && check }
-						>
-							{ __( 'Tablet' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && check }
-						>
-							{ __( 'Mobile' ) }
-						</MenuItem>
+						<MenuItemsChoice
+							choices={ choices }
+							value={ previewValue }
+							onSelect={ onSelect }
+						/>
 					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
@@ -118,6 +195,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								className="editor-preview-dropdown__button-external"
 								role="menuitem"
 								forceIsAutosaveable={ forceIsAutosaveable }
+								aria-label={ __( 'Preview in new tab' ) }
 								textContent={
 									<>
 										{ __( 'Preview in new tab' ) }

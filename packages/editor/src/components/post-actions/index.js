@@ -17,7 +17,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-import { store as editorStore } from '../../store';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -27,28 +26,38 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-export default function PostActions( { onActionPerformed, buttonProps } ) {
+export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _postType = getCurrentPostType();
+	const { item, permissions } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecordPermissions } =
+				unlock( select( coreStore ) );
+			return {
+				item: getEditedEntityRecord( 'postType', postType, postId ),
+				permissions: getEntityRecordPermissions(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
+		[ postId, postType ]
+	);
+	const itemWithPermissions = useMemo( () => {
 		return {
-			item: getEditedEntityRecord(
-				'postType',
-				_postType,
-				getCurrentPostId()
-			),
-			postType: _postType,
+			...item,
+			permissions,
 		};
-	}, [] );
+	}, [ item, permissions ] );
 	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
-			return ! action.isEligible || action.isEligible( item );
+			return (
+				! action.isEligible || action.isEligible( itemWithPermissions )
+			);
 		} );
-	}, [ allActions, item ] );
+	}, [ allActions, itemWithPermissions ] );
 
 	return (
 		<DropdownMenu
@@ -64,7 +73,6 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
 					}
-					{ ...buttonProps }
 				/>
 			}
 			onOpenChange={ setIsActionsMenuOpen }
@@ -72,7 +80,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		>
 			<ActionsDropdownMenuGroup
 				actions={ actions }
-				item={ item }
+				item={ itemWithPermissions }
 				onClose={ () => {
 					setIsActionsMenuOpen( false );
 				} }

@@ -69,6 +69,7 @@ $footer-height: 70px;
 	color: $gray-900;
 }
 
+// TODO: See if this can be removed after https://github.com/WordPress/gutenberg/issues/38730
 .font-library-modal__tabpanel-layout .components-base-control__field {
 	margin-bottom: 0;
 }
@@ -184,5 +185,13 @@ button.font-library-modal__upload-area {
 	.components-button {
 		width: 100%;
 		justify-content: center;
+	}
+}
+
+.font-library-modal__select-all {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 + $border-width;
+
+	.components-checkbox-control__label {
+		padding-left: $grid-unit-20;
 	}
 }

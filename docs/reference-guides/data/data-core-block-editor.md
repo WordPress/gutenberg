@@ -412,7 +412,7 @@ Returns all blocks that match a blockName. Results include nested blocks.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+-   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
 
 _Returns_
 

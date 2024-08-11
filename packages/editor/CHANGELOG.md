@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 14.5.0 (2024-08-07)
+
+## 14.4.0 (2024-07-24)
+
 ### Deprecations
 
 -   `PostTaxonomiesFlatTermSelector`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
