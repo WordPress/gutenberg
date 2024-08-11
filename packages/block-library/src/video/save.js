@@ -5,6 +5,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 
 /**
@@ -25,6 +26,9 @@ export default function save( { attributes } ) {
 		playsInline,
 		tracks,
 	} = attributes;
+
+	const borderProps = getBorderClassesAndStyles( attributes );
+
 	return (
 		<figure { ...useBlockProps.save() }>
 			{ src && (
@@ -37,6 +41,10 @@ export default function save( { attributes } ) {
 					preload={ preload !== 'metadata' ? preload : undefined }
 					src={ src }
 					playsInline={ playsInline }
+					className={ borderProps.className }
+					style={ {
+						...borderProps.style,
+					} }
 				>
 					<Tracks tracks={ tracks } />
 				</video>
