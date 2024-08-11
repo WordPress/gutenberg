@@ -247,6 +247,13 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
 
+	// Clear floats internal synced pattern.
+	&.is-reusable::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
 	// Clear floats.
 	&[data-clear="true"] {
 		float: none;
