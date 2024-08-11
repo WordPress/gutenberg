@@ -134,7 +134,6 @@ export function MediaPreview( { media, onClick, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { getSettings } = useSelect( blockEditorStore );
 
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
