@@ -24,6 +24,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -42,23 +43,6 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 
-// Much of this description is duplicated from MediaPlaceholder.
-const placeholder = ( content ) => {
-	return (
-		<Placeholder
-			className="block-editor-media-placeholder"
-			withIllustration
-			icon={ icon }
-			label={ __( 'Video' ) }
-			instructions={ __(
-				'Upload a video file, pick one from your media library, or add one with a URL.'
-			) }
-		>
-			{ content }
-		</Placeholder>
-	);
-};
-
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -75,6 +59,7 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const borderProps = useBorderProps( attributes );
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -156,6 +141,26 @@ function VideoEdit( {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className="block-editor-media-placeholder"
+				withIllustration
+				icon={ icon }
+				label={ __( 'Video' ) }
+				instructions={ __(
+					'Upload a video file, pick one from your media library, or add one with a URL.'
+				) }
+				style={ {
+					...borderProps.style,
+				} }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	if ( ! src && ! temporaryURL ) {
 		return (
@@ -277,9 +282,13 @@ function VideoEdit( {
 				*/ }
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
+						className={ borderProps.className }
 						controls={ controls }
 						poster={ poster }
 						src={ src || temporaryURL }
+						style={ {
+							...borderProps.style,
+						} }
 						ref={ videoPlayer }
 					>
 						<Tracks tracks={ tracks } />
