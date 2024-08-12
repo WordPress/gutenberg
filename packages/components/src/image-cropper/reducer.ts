@@ -244,14 +244,10 @@ function imageCropperReducer( state: State, action: Action ): State {
 				...state,
 				transforms: {
 					...state.transforms,
-					translate: {
-						...translate,
-						x: -translate.x,
-					},
-					rotate: -rotate,
+					rotate: rotate + Math.PI,
 					scale: {
-						x: scale.x * ( isAxisSwapped ? 1 : -1 ),
-						y: scale.y * ( isAxisSwapped ? -1 : 1 ),
+						x: isAxisSwapped ? -scale.x : scale.x,
+						y: isAxisSwapped ? scale.y : -scale.y,
 					},
 				},
 			};
