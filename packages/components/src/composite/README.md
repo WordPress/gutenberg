@@ -189,6 +189,24 @@ The contents of the component.
 
 Renders a composite item.
 
+##### `accessibleWhenDisabled`: `boolean`
+
+Indicates whether the element should be focusable even when it is
+`disabled`.
+
+This is important when discoverability is a concern. For example:
+
+> A toolbar in an editor contains a set of special smart paste functions
+> that are disabled when the clipboard is empty or when the function is not
+> applicable to the current content of the clipboard. It could be helpful to
+> keep the disabled buttons focusable if the ability to discover their
+> functionality is primarily via their presence on the toolbar.
+
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
+
+-   Required: no
+
 ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
 
 Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.

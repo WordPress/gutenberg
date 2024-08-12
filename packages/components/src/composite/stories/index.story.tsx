@@ -74,6 +74,28 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						table: { type: { summary: 'React.ReactNode' } },
 					},
 				};
+				const accessibleWhenDisabled = {
+					name: 'accessibleWhenDisabled',
+					description: `Indicates whether the element should be focusable even when it is
+\`disabled\`.
+
+This is important when discoverability is a concern. For example:
+
+> A toolbar in an editor contains a set of special smart paste functions
+> that are disabled when the clipboard is empty or when the function is not
+> applicable to the current content of the clipboard. It could be helpful to
+> keep the disabled buttons focusable if the ability to discover their
+> functionality is primarily via their presence on the toolbar.
+
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).`,
+					table: {
+						type: {
+							summary: 'boolean',
+						},
+					},
+				};
+
 				const argTypes = {
 					useCompositeStore: {
 						activeId: {
@@ -230,7 +252,10 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 					'Composite.Group': commonArgTypes,
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
-					'Composite.Item': commonArgTypes,
+					'Composite.Item': {
+						...commonArgTypes,
+						accessibleWhenDisabled,
+					},
 					'Composite.Hover': commonArgTypes,
 					'Composite.Typeahead': commonArgTypes,
 				};

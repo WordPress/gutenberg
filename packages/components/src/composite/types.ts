@@ -177,6 +177,22 @@ export type CompositeItemProps = {
 	 * The contents of the component.
 	 */
 	children?: Ariakit.CompositeItemProps[ 'children' ];
+	/**
+	 * Indicates whether the element should be focusable even when it is
+	 * `disabled`.
+	 *
+	 * This is important when discoverability is a concern. For example:
+	 *
+	 * > A toolbar in an editor contains a set of special smart paste functions
+	 * that are disabled when the clipboard is empty or when the function is not
+	 * applicable to the current content of the clipboard. It could be helpful to
+	 * keep the disabled buttons focusable if the ability to discover their
+	 * functionality is primarily via their presence on the toolbar.
+	 *
+	 * Learn more on [Focusability of disabled
+	 * controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
+	 */
+	accessibleWhenDisabled?: Ariakit.CompositeItemProps[ 'accessibleWhenDisabled' ];
 };
 
 export type CompositeRowProps = {
