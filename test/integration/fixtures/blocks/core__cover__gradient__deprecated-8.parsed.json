@@ -20,9 +20,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        \n    </div>\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\" style=\"opacity: 1;\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        \n    </div>\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"has-background-dim-100 wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        ",
+			"\n<div class=\"wp-block-cover is-light\">\n    <span aria-hidden=\"true\" class=\"wp-block-cover__gradient-background has-electric-grass-gradient-background has-background-dim has-background-gradient has-electric-grass-gradient-background\" style=\"opacity: 1;\"></span>\n    <div class=\"wp-block-cover__inner-container\">\n        ",
 			null,
 			"\n    </div>\n</div>\n"
 		]

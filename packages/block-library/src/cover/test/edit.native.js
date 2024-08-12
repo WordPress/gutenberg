@@ -46,20 +46,20 @@ jest.mock( '@wordpress/compose', () => ( {
 } ) );
 
 const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover {"isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="opacity: 1;"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->`;
 const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim" style="opacity: 1;"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim" style="opacity:0.5"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","minHeight":20,"minHeightUnit":"vw","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim" style="opacity:0.5"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;

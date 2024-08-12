@@ -19,7 +19,6 @@ import {
 import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
@@ -66,6 +65,7 @@ export default function save( { attributes } ) {
 	};
 
 	const bgStyle = {
+		opacity: dimRatio / 100,
 		backgroundColor: ! overlayColorClass ? customOverlayColor : undefined,
 		background: customGradient ? customGradient : undefined,
 	};
@@ -109,7 +109,6 @@ export default function save( { attributes } ) {
 				className={ clsx(
 					'wp-block-cover__background',
 					overlayColorClass,
-					dimRatioToClass( dimRatio ),
 					{
 						'has-background-dim': dimRatio !== undefined,
 						// For backwards compatibility. Former versions of the Cover Block applied
