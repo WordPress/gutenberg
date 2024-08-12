@@ -11,7 +11,9 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	BlockIcon,
 	useBlockProps,
+	MediaPlaceholder,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
@@ -24,6 +26,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -109,6 +112,16 @@ export function ImageEdit( {
 		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const [ resizeListener, sizes ] = useResizeObserver();
+	const parentWidth = sizes?.width;
+	const parsedWidth = width && parseInt( width.replace( /px$/, '' ), 10 );
+
+	const isSmallLayout =
+		( parentWidth && parentWidth < 140 ) || parsedWidth < 140;
+
+	const isExtraSmallLayout =
+		( parentWidth && parentWidth < 60 ) || parsedWidth < 60;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -269,6 +282,8 @@ export function ImageEdit( {
 		onError: onUploadError,
 	} );
 
+	const isExternal = isExternalImage( id, url );
+	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -331,7 +346,17 @@ export function ImageEdit( {
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
 				withIllustration
-				icon={ lockUrlControls ? pluginsIcon : icon }
+				icon={
+					! isExtraSmallLayout &&
+					( lockUrlControls ? pluginsIcon : icon )
+				}
+				label={ ! isSmallLayout && __( 'Image' ) }
+				instructions={
+					! lockUrlControls &&
+					__(
+						'Upload an image file, pick one from your media library, or add one with a URL.'
+					)
+				}
 				style={ {
 					aspectRatio:
 						! ( width && height ) && aspectRatio
@@ -356,52 +381,72 @@ export function ImageEdit( {
 	};
 
 	return (
-		<figure { ...blockProps }>
-			{ ! ( temporaryURL || url ) && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						name={ __( 'Choose Image' ) }
-						onSelect={ onSelectImage }
-						onError={ onUploadError }
-					>
-						<form className="block-editor-media-flow__url-input has-siblings">
-							<span className="block-editor-media-replace-flow__image-url-label">
-								{ __( 'Insert from URL:' ) }
-							</span>
+		<>
+			{ resizeListener }
+			<figure { ...blockProps }>
+				{ ! ( temporaryURL || url ) && (
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*"
+							name={ __( 'Choose Image' ) }
+							onSelect={ onSelectImage }
+							onError={ onUploadError }
+						>
+							<form className="block-editor-media-flow__url-input has-siblings">
+								<span className="block-editor-media-replace-flow__image-url-label">
+									{ __( 'Insert from URL:' ) }
+								</span>
 
-							<LinkControl
-								value={ { url } }
-								settings={ [] }
-								showSuggestions={ false }
-								onChange={ ( value ) => {
-									onSelectURL( value.url );
-								} }
-							/>
-						</form>
-					</MediaReplaceFlow>
-				</BlockControls>
-			) }
-			<Image
-				temporaryURL={ temporaryURL }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSingleSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				onReplace={ onReplace }
-				onSelectImage={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onUploadError={ onUploadError }
-				context={ context }
-				clientId={ clientId }
-				blockEditingMode={ blockEditingMode }
-				parentLayoutType={ parentLayout?.type }
-			/>
-			{ ! ( temporaryURL || url ) && placeholder( mediaPreview ) }
-		</figure>
+								<LinkControl
+									value={ { url } }
+									settings={ [] }
+									showSuggestions={ false }
+									onChange={ ( value ) => {
+										onSelectURL( value.url );
+									} }
+								/>
+							</form>
+						</MediaReplaceFlow>
+					</BlockControls>
+				) }
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ parentLayout?.type }
+				/>
+				{ ! temporaryURL &&
+					! url &&
+					( isSmallLayout ? (
+						placeholder( mediaPreview )
+					) : (
+						<MediaPlaceholder
+							icon={ <BlockIcon icon={ icon } /> }
+							onSelect={ onSelectImage }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+							placeholder={ placeholder }
+							accept="image/*"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							value={ { id, src } }
+							mediaPreview={ mediaPreview }
+							disableMediaButtons={ temporaryURL || url }
+						/>
+					) ) }
+			</figure>
+		</>
 	);
 }
 
