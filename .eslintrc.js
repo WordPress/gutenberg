@@ -278,7 +278,6 @@ module.exports = {
 			},
 		},
 		{
-			// Temporary rules until we're ready to officially deprecate the bottom margins.
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
 				'packages/components/src/**/@(test|stories)/**',
@@ -289,6 +288,7 @@ module.exports = {
 					'error',
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
+					// Temporary rules until we're ready to officially deprecate the bottom margins.
 					...[
 						'CheckboxControl',
 						'ComboboxControl',
@@ -307,6 +307,12 @@ module.exports = {
 						message:
 							componentName +
 							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+					} ) ),
+					// Accessibility rules for components.
+					...[ 'RangeControl' ].map( ( componentName ) => ( {
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="label"]))`,
+						message:
+							'Component must be accessibly labeled with a `label` prop. Use the `hideLabelFromVision` prop if desired. Only ignore this error if you chose another means of accessible labeling, and confirmed it in the rendered accessibility tree.',
 					} ) ),
 				],
 			},
