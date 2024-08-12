@@ -66,7 +66,7 @@ Take, for example, this interactive block with two buttons and a paragraph:
 </script>
 ```
 
-As you can see, for each condition, we have to use JavaScript to modify everything in the DOM that has changed, taking into account the previous state.
+As you can see, for each condition, you have to use JavaScript to modify everything in the DOM that has changed, taking into account the previous state.
 
 ### The declarative approach
 
@@ -130,7 +130,7 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-In this declarative example, the UI automatically updates based on the current state. All we have to do as developers is to declare the necessary state, any derived state, the actions that modify the state, and which parts of the DOM depend on which parts of the state. The framework takes care of making all the necessary updates to the DOM so that it is always in sync with the current state. The logic remains simple and maintainable regardless of the number of elements controlled by the framework.
+In this declarative example, the UI automatically updates based on the current state. All you have to do as developers is to declare the necessary state, any derived state, the actions that modify the state, and which parts of the DOM depend on which parts of the state. The framework takes care of making all the necessary updates to the DOM so that it is always in sync with the current state. The logic remains simple and maintainable regardless of the number of elements controlled by the framework.
 
 ### Can you spot the bug?
 
@@ -139,11 +139,11 @@ In the imperative example, a bug has been intentionally introduced for didactica
 <details>
 <summary>Show me the answer!</summary>
 
-In the case that the Show button is pressed first, then the Activate button, and finally the Hide button, we forgot to add the `inactive` class using `statusParagraph.classList.add('inactive');`. Therefore, the next time the user presses Show, the paragraph will not appear in red.
+In the case that the Show button is pressed first, then the Activate button, and finally the Hide button, it doesn't add the `inactive` class using `statusParagraph.classList.add('inactive');`. Therefore, the next time the user presses Show, the paragraph will not appear in red.
 
 </details>
 
-These types of bugs are very common in imperative code because we have to manually control all the conditions. On the other hand, they do not exist in declarative code because the framework takes care of updating the DOM and never forgets about anything.
+These types of bugs are very common in imperative code because you have to manually control all the conditions. On the other hand, they do not exist in declarative code because the framework takes care of updating the DOM and never forgets about anything.
 
 ### Benefits of the declarative approach
 
