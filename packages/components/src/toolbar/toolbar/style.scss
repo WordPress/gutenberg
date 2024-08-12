@@ -1,7 +1,7 @@
 .components-accessible-toolbar {
 	display: inline-flex;
 	border: $border-width solid $gray-900;
-	border-radius: $radius-medium;
+	border-radius: $radius-small;
 	flex-shrink: 0;
 
 	& > .components-toolbar-group:last-child {
