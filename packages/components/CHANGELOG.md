@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate bottom margin on `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version. See linked PR for full list of affected components ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
+
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
