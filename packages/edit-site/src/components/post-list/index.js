@@ -30,7 +30,10 @@ import {
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostAction,
+	useQuickEditPostAction,
+} from '../dataviews-actions';
 import { usePrevious } from '@wordpress/compose';
 import usePostFields from '../post-fields';
 
@@ -302,11 +305,14 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
-	);
-
+	const quickEditAction = useQuickEditPostAction();
+	const actions = useMemo( () => {
+		const extraActions = [ editAction ];
+		if ( window.__experimentalQuickEditDataViews && view.type === 'list' ) {
+			extraActions.push( quickEditAction );
+		}
+		return [ ...extraActions, ...postTypeActions ];
+	}, [ postTypeActions, editAction, quickEditAction, view.type ] );
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
 	const openModal = () => setShowAddPostModal( true );

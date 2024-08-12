@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { edit } from '@wordpress/icons';
+import { edit, settings } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -35,6 +35,34 @@ export const useEditPostAction = () => {
 					postId: post.id,
 					postType: post.type,
 					canvas: 'edit',
+				} );
+			},
+		} ),
+		[ history ]
+	);
+};
+
+export const useQuickEditPostAction = () => {
+	const history = useHistory();
+	return useMemo(
+		() => ( {
+			id: 'quick-edit-post',
+			label: __( 'Quick Edit' ),
+			isPrimary: true,
+			icon: settings,
+			isEligible( post ) {
+				if ( post.status === 'trash' ) {
+					return false;
+				}
+				// It's eligible for all post types except theme patterns.
+				return post.type !== PATTERN_TYPES.theme;
+			},
+			callback( items ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					quickEdit: true,
 				} );
 			},
 		} ),
