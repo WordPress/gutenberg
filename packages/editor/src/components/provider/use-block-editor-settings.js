@@ -226,13 +226,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { _getInserterSearchInputRef } = useSelect( ( select ) => {
-		const { getInserterSearchInputRef } = select( editorStore );
-		return {
-			_getInserterSearchInputRef: getInserterSearchInputRef,
-		};
-	}, [] );
-
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -332,7 +325,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			__experimentalGetInserterSearchInputRef: _getInserterSearchInputRef,
 		};
 		lock( blockEditorSettings, {
 			sectionRootClientId,
@@ -362,7 +354,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
-		_getInserterSearchInputRef,
 	] );
 }
 

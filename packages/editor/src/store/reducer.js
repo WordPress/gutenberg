@@ -372,10 +372,6 @@ export function inserterSidebarToggleRef( state = { current: null } ) {
 	return state;
 }
 
-export function inserterSearchInputRef( state = { current: null } ) {
-	return state;
-}
-
 export function publishSidebarActive( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_PUBLISH_SIDEBAR':
@@ -408,5 +404,4 @@ export default combineReducers( {
 	listViewToggleRef,
 	publishSidebarActive,
 	dataviews: dataviewsReducer,
-	inserterSearchInputRef,
 } );

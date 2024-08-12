@@ -33,6 +33,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -50,15 +51,19 @@ function InserterMenu(
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
-		__experimentalSearchInputRef,
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
+	const { isZoomOutMode, inserterSearchInputRef } = useSelect( ( select ) => {
+		const { __unstableGetEditorMode, getInserterSearchInputRef } = unlock(
+			select( blockEditorStore )
+		);
+		return {
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			inserterSearchInputRef: getInserterSearchInputRef(),
+		};
+	}, [] );
+
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -105,7 +110,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -114,7 +119,7 @@ function InserterMenu(
 			onInsertBlocks( blocks, { patternName } );
 			onSelect();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -165,7 +170,7 @@ function InserterMenu(
 					value={ filterValue }
 					label={ __( 'Search for blocks and patterns' ) }
 					placeholder={ __( 'Search' ) }
-					ref={ __experimentalSearchInputRef }
+					ref={ inserterSearchInputRef }
 				/>
 
 				{ !! delayedFilterValue && (
@@ -189,7 +194,7 @@ function InserterMenu(
 	}, [
 		selectedTab,
 		filterValue,
-		__experimentalSearchInputRef,
+		inserterSearchInputRef,
 		delayedFilterValue,
 		onSelect,
 		onHover,

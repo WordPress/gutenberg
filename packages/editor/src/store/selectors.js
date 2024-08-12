@@ -1796,7 +1796,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-export function getInserterSearchInputRef( state ) {
-	return state.inserterSearchInputRef;
-}

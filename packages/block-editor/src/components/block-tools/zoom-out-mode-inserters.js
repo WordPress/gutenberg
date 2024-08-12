@@ -33,7 +33,9 @@ function ZoomOutModeInserters() {
 			getSelectedBlockClientId,
 			getHoveredBlockClientId,
 			isBlockInsertionPointVisible,
-		} = select( blockEditorStore );
+			getInserterSearchInputRef,
+		} = unlock( select( blockEditorStore ) );
+
 		const { sectionRootClientId: root } = unlock( getSettings() );
 
 		return {
@@ -46,8 +48,7 @@ function ZoomOutModeInserters() {
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
 			hoveredBlockClientId: getHoveredBlockClientId(),
-			inserterSearchInputRef:
-				getSettings().__experimentalGetInserterSearchInputRef(),
+			inserterSearchInputRef: getInserterSearchInputRef(),
 		};
 	}, [] );
 
