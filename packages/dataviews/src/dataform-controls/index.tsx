@@ -10,15 +10,23 @@ import type {
 	DataFormControlProps,
 	Field,
 	FieldTypeDefinition,
-} from '../../types';
+} from '../types';
+import datetime from './datetime';
+import integer from './integer';
 import radio from './radio';
+import select from './select';
+import text from './text';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
 }
 
 const FORM_CONTROLS: FormControls = {
+	datetime,
+	integer,
 	radio,
+	select,
+	text,
 };
 
 export function getControl< Item >(
@@ -29,12 +37,19 @@ export function getControl< Item >(
 		return field.Edit;
 	}
 
-	let control;
 	if ( typeof field.Edit === 'string' ) {
-		control = getControlByType( field.Edit );
+		return getControlByType( field.Edit );
 	}
 
-	return control || fieldTypeDefinition.Edit;
+	if ( field.elements ) {
+		return getControlByType( 'select' );
+	}
+
+	if ( typeof fieldTypeDefinition.Edit === 'string' ) {
+		return getControlByType( fieldTypeDefinition.Edit );
+	}
+
+	return fieldTypeDefinition.Edit;
 }
 
 export function getControlByType( type: string ) {
@@ -42,5 +57,5 @@ export function getControlByType( type: string ) {
 		return FORM_CONTROLS[ type ];
 	}
 
-	return null;
+	throw 'Control ' + type + ' not found';
 }

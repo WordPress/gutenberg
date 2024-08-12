@@ -63,9 +63,9 @@ export type FieldTypeDefinition< Item > = {
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
-	 * Callback used to render an edit control for the field.
+	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > >;
+	Edit: ComponentType< DataFormControlProps< Item > > | string;
 };
 
 /**
@@ -105,7 +105,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | 'radio';
+	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
 	 * Callback used to sort the field.
