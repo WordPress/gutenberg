@@ -23,6 +23,11 @@ const orderOptions = [
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
+	{
+		/* translators: label for ordering posts in random order */
+		label: __( 'Random' ),
+		value: 'rand/desc',
+	},
 ];
 function OrderControl( { order, orderBy, onChange } ) {
 	return (
