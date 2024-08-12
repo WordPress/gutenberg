@@ -14,14 +14,8 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import {
-	getScope,
-	setScope,
-	resetScope,
-	getNamespace,
-	setNamespace,
-	resetNamespace,
-} from './hooks';
+import { getScope, setScope, resetScope } from './scopes';
+import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 
 interface Flusher {
 	readonly flush: () => void;
@@ -145,18 +139,26 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 				try {
 					it = gen.next( value );
 				} finally {
-					resetNamespace();
 					resetScope();
+					resetNamespace();
 				}
+
 				try {
 					value = await it.value;
 				} catch ( e ) {
+					setNamespace( ns );
+					setScope( scope );
 					gen.throw( e );
+				} finally {
+					resetScope();
+					resetNamespace();
 				}
+
 				if ( it.done ) {
 					break;
 				}
 			}
+
 			return value;
 		};
 	}
@@ -344,5 +346,52 @@ export const warn = ( message: string ): void => {
 			// Do nothing.
 		}
 		logged.add( message );
+	}
+};
+
+/**
+ * Checks if the passed `candidate` is a plain object with just the `Object`
+ * prototype.
+ *
+ * @param candidate The item to check.
+ * @return Whether `candidate` is a plain object.
+ */
+export const isPlainObject = (
+	candidate: unknown
+): candidate is Record< string, unknown > =>
+	Boolean(
+		candidate &&
+			typeof candidate === 'object' &&
+			candidate.constructor === Object
+	);
+
+export const deepMerge = (
+	target: any,
+	source: any,
+	override: boolean = true
+) => {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		for ( const key in source ) {
+			const desc = Object.getOwnPropertyDescriptor( source, key );
+			if (
+				typeof desc?.get === 'function' ||
+				typeof desc?.set === 'function'
+			) {
+				if ( override || ! ( key in target ) ) {
+					Object.defineProperty( target, key, {
+						...desc,
+						configurable: true,
+						enumerable: true,
+					} );
+				}
+			} else if ( isPlainObject( source[ key ] ) ) {
+				if ( ! target[ key ] ) {
+					target[ key ] = {};
+				}
+				deepMerge( target[ key ], source[ key ], override );
+			} else if ( override || ! ( key in target ) ) {
+				Object.defineProperty( target, key, desc! );
+			}
+		}
 	}
 };

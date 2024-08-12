@@ -42,9 +42,31 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Record< string, unknown >;
+export type FieldType = 'text' | 'integer' | 'datetime';
 
-export type FieldType = 'text' | 'integer';
+export type ValidationContext = {
+	elements?: Option[];
+};
+
+/**
+ * An abstract interface for Field based on the field type.
+ */
+export type FieldTypeDefinition< Item > = {
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+
+	/**
+	 * Callback used to render an edit control for the field.
+	 */
+	Edit: ComponentType< DataFormControlProps< Item > >;
+};
 
 /**
  * A dataview field for a specific property of a data type.
@@ -81,6 +103,21 @@ export type Field< Item > = {
 	render?: ComponentType< { item: Item } >;
 
 	/**
+	 * Callback used to render an edit control for the field.
+	 */
+	Edit?: ComponentType< DataFormControlProps< Item > > | 'radio';
+
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
+
+	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
@@ -104,26 +141,21 @@ export type Field< Item > = {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-} & ( Item extends ItemRecord
-	? {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue?: ( args: { item: Item } ) => any;
-	  }
-	: {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue: ( args: { item: Item } ) => any;
-	  } );
+
+	/**
+	 * Callback used to retrieve the value of the field from the item.
+	 * Defaults to `item[ field.id ]`.
+	 */
+	getValue?: ( args: { item: Item } ) => any;
+};
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
+	Edit: ComponentType< DataFormControlProps< Item > >;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 };
 
 /**
@@ -137,7 +169,15 @@ export type Data< Item > = Item[];
  * The form configuration.
  */
 export type Form = {
-	visibleFields?: string[];
+	type?: 'regular' | 'panel';
+	fields?: string[];
+};
+
+export type DataFormControlProps< Item > = {
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
 };
 
 /**
@@ -388,6 +428,12 @@ interface ActionBase< Item > {
 	supportsBulk?: boolean;
 }
 
+export interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
 export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
@@ -396,11 +442,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 		items,
 		closeModal,
 		onActionPerformed,
-	}: {
-		items: Item[];
-		closeModal?: () => void;
-		onActionPerformed?: ( items: Item[] ) => void;
-	} ) => ReactElement;
+	}: RenderModalProps< Item > ) => ReactElement;
 
 	/**
 	 * Whether to hide the modal header.
@@ -463,4 +505,11 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+}
+
+export interface DataFormProps< Item > {
+	data: Item;
+	fields: Field< Item >[];
+	form: Form;
+	onChange: ( value: Record< string, any > ) => void;
 }
