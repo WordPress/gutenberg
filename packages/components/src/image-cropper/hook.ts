@@ -15,7 +15,6 @@ import { useRef, useMemo, useReducer, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { degreeToRadian } from './math';
 import { imageCropperReducer, createInitialState } from './reducer';
 import type { State } from './reducer';
 
@@ -57,7 +56,7 @@ export const useImageCropper = ( {
 					} = imageRef.current.getBoundingClientRect();
 					// Save the initial position and distances from the origin.
 					memo = {
-						initial: { x: state.image.x, y: state.image.y },
+						initial: state.transforms.translate,
 						distances: {
 							x: originX - ( x + imageWidth / 2 ),
 							y: originY - ( y + imageHeight / 2 ),
@@ -95,7 +94,12 @@ export const useImageCropper = ( {
 				scaleBounds: { min: 1, max: 10 },
 				from: () => [ Math.abs( state.transforms.scale.x ), 0 ],
 			},
-			drag: { from: () => [ state.image.x, state.image.y ] },
+			drag: {
+				from: () => [
+					state.transforms.translate.x,
+					state.transforms.translate.y,
+				],
+			},
 		}
 	);
 
@@ -109,20 +113,17 @@ export const useImageCropper = ( {
 		);
 		const ctx = offscreenCanvas.getContext( '2d' )!;
 		ctx.translate(
-			cropperState.image.x * scaleFactor + offscreenCanvas.width / 2,
-			cropperState.image.y * scaleFactor + offscreenCanvas.height / 2
+			cropperState.transforms.translate.x * scaleFactor +
+				offscreenCanvas.width / 2,
+			cropperState.transforms.translate.y * scaleFactor +
+				offscreenCanvas.height / 2
 		);
-		ctx.rotate(
-			degreeToRadian(
-				cropperState.transforms.angle +
-					cropperState.transforms.rotations * 90
-			)
-		);
+		ctx.rotate( cropperState.transforms.rotate );
 		ctx.scale(
 			cropperState.transforms.scale.x,
 			cropperState.transforms.scale.y
 		);
-		const isAxisSwapped = cropperState.transforms.rotations % 2 !== 0;
+		const isAxisSwapped = cropperState.isAxisSwapped;
 		const imageDimensions = {
 			width: isAxisSwapped
 				? cropperState.image.height

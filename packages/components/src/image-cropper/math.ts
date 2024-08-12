@@ -7,7 +7,15 @@ import memize from 'memize';
  */
 import type { Position } from './types';
 
-const DEGREE_TO_RADIAN = Math.PI / 180;
+/**
+ * The conversion factor from degrees to radians.
+ */
+export const DEGREE_TO_RADIAN = Math.PI / 180;
+
+/**
+ * 90 degrees in radians.
+ */
+export const PI_OVER_TWO = Math.PI / 2;
 
 /**
  * Rotate a point around a center point by a given degree.

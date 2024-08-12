@@ -7,15 +7,12 @@ import {
 	degreeToRadian,
 	calculateRotatedBounds,
 	getMinScale,
+	PI_OVER_TWO,
 } from './math';
 
 export type State = {
 	/** The image dimensions. */
 	image: {
-		/** The x position of the image center. */
-		x: number;
-		/** The y position of the image center. */
-		y: number;
 		/** The width of the image. */
 		width: number;
 		/** The height of the image. */
@@ -23,12 +20,12 @@ export type State = {
 	};
 	/** The image transforms. */
 	transforms: {
-		/** The angle of the image in degrees, from -45 to 45 degrees. */
-		angle: number;
-		/** The number of 90-degree rotations clockwise. */
-		rotations: number;
+		/** The rotation angle of the image in radians. */
+		rotate: number;
 		/** The image scale. */
 		scale: { x: number; y: number };
+		/** Position of the image relative to the container in pixels. */
+		translate: { x: number; y: number };
 	};
 	/** The cropper window dimensions. */
 	cropper: {
@@ -36,9 +33,13 @@ export type State = {
 		width: number;
 		/** The height of the cropper window */
 		height: number;
-		/** Whether the cropper window aspect ratio is locked. */
-		lockAspectRatio: boolean;
 	};
+	/** The tilt angle in degrees from -45 to 45 for UI state. */
+	tilt: number;
+	/** Whether the image axis is swapped from 90 degree turns. */
+	isAxisSwapped: boolean;
+	/** Whether the cropper window aspect ratio is locked. */
+	isAspectRatioLocked: boolean;
 	/** Whether the cropper window is resizing. */
 	isResizing: boolean;
 	/** Whether the image is dragging/moving. */
@@ -69,12 +70,12 @@ type FlipAction = {
 	type: 'FLIP';
 };
 
-/** Rotate the image to an angle. */
-type RotateAction = {
+/** Set the image tilt to an angle. */
+type SetTiltAction = {
 	/** Rotate type action. */
-	type: 'ROTATE';
-	/** Rotate angle in degrees. */
-	angle: number;
+	type: 'SET_TILT';
+	/** Angle in degrees from -45 to 45. */
+	tilt: number;
 };
 
 /** Rotate the image 90-degree clockwise or counter-clockwise. */
@@ -155,7 +156,7 @@ type Action =
 	| ZoomAction
 	| ZoomEndAction
 	| FlipAction
-	| RotateAction
+	| SetTiltAction
 	| Rotate90DegAction
 	| MoveAction
 	| MoveEndAction
@@ -177,19 +178,19 @@ function createInitialState( {
 		image: {
 			width,
 			height,
-			x: 0,
-			y: 0,
 		},
 		transforms: {
-			angle: 0,
-			rotations: 0,
+			rotate: 0,
 			scale: { x: 1, y: 1 },
+			translate: { x: 0, y: 0 },
 		},
 		cropper: {
 			width,
 			height,
-			lockAspectRatio: false,
 		},
+		tilt: 0,
+		isAxisSwapped: false,
+		isAspectRatioLocked: false,
 		isResizing: false,
 		isDragging: false,
 		isZooming: false,
@@ -199,23 +200,23 @@ function createInitialState( {
 function imageCropperReducer( state: State, action: Action ): State {
 	const {
 		image,
-		transforms: { angle, rotations, scale },
+		transforms: { rotate, scale, translate },
 		cropper,
+		isAxisSwapped,
 	} = state;
-	const radian = degreeToRadian( angle + ( rotations % 4 ) * 90 );
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const absScale = Math.abs( scale.x );
 
 	switch ( action.type ) {
 		case 'ZOOM': {
 			const minScale = getMinScale(
-				radian,
+				rotate,
 				image.width,
 				image.height,
 				cropper.width,
 				cropper.height,
-				image.x,
-				image.y
+				translate.x,
+				translate.y
 			);
 			const nextScale = Math.min(
 				Math.max( action.scale, minScale ),
@@ -224,12 +225,9 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			return {
 				...state,
-				image: {
-					...state.image,
-					...action.position,
-				},
 				transforms: {
 					...state.transforms,
+					translate: action.position,
 					scale: {
 						x: nextScale * Math.sign( scale.x ),
 						y: nextScale * Math.sign( scale.y ),
@@ -245,16 +243,15 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 		}
 		case 'FLIP': {
-			const isAxisSwapped = rotations % 2 !== 0;
 			return {
 				...state,
-				image: {
-					...state.image,
-					x: -image.x,
-				},
 				transforms: {
 					...state.transforms,
-					angle: -angle,
+					translate: {
+						...translate,
+						x: -translate.x,
+					},
+					rotate: -rotate,
 					scale: {
 						x: scale.x * ( isAxisSwapped ? 1 : -1 ),
 						y: scale.y * ( isAxisSwapped ? -1 : 1 ),
@@ -262,25 +259,26 @@ function imageCropperReducer( state: State, action: Action ): State {
 				},
 			};
 		}
-		case 'ROTATE': {
-			const nextRadian = degreeToRadian( action.angle + rotations * 90 );
+		case 'SET_TILT': {
+			const radian = degreeToRadian( state.tilt );
+			const nextRadian = degreeToRadian( action.tilt );
+			const nextRotate = rotate - radian + nextRadian;
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
 
 			// Calculate the translation of the image center after the rotation.
 			// This is needed to rotate from the center of the cropper rather than the
 			// center of the image.
-			const deltaRadians = nextRadian - radian;
 			const rotatedPosition = rotatePoint(
-				{ x: image.x, y: image.y },
-				deltaRadians
+				translate,
+				nextRotate - rotate
 			);
 
 			// Calculate the minimum scale to fit the image within the cropper.
 			// TODO: Optimize the performance?
 			const minScale =
 				getMinScale(
-					nextRadian,
+					nextRotate,
 					scaledWidth,
 					scaledHeight,
 					cropper.width,
@@ -292,50 +290,43 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			return {
 				...state,
-				image: {
-					...state.image,
-					...rotatedPosition,
-				},
 				transforms: {
 					...state.transforms,
-					angle: action.angle,
+					rotate: nextRotate,
+					translate: rotatedPosition,
 					scale: {
 						x: nextScale * Math.sign( scale.x ),
 						y: nextScale * Math.sign( scale.y ),
 					},
 				},
+				tilt: action.tilt,
 			};
 		}
 		case 'ROTATE_90_DEG': {
-			const isCounterClockwise = action.isCounterClockwise;
-			const nextRotations = rotations + ( isCounterClockwise ? -1 : 1 );
-			const rotatedPosition = rotatePoint(
-				{ x: image.x, y: image.y },
-				( Math.PI / 2 ) * ( isCounterClockwise ? -1 : 1 )
-			);
+			const angle = action.isCounterClockwise
+				? -PI_OVER_TWO
+				: PI_OVER_TWO;
+			const rotatedPosition = rotatePoint( translate, angle );
 			return {
 				...state,
-				image: {
-					...state.image,
-					x: rotatedPosition.x,
-					y: rotatedPosition.y,
-				},
 				transforms: {
 					...state.transforms,
-					rotations: nextRotations,
+					translate: rotatedPosition,
+					rotate: rotate + angle,
 				},
 				cropper: {
 					...state.cropper,
 					width: cropper.height,
 					height: cropper.width,
 				},
+				isAxisSwapped: ! isAxisSwapped,
 			};
 		}
 		case 'MOVE': {
 			// Calculate the boundaries of the area where the cropper can move.
 			// These boundaries ensure the cropper stays within the image.
 			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
-				radian,
+				rotate,
 				image.width * absScale,
 				image.height * absScale,
 				cropper.width,
@@ -345,7 +336,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			// Rotate the action point to align with the non-rotated coordinate system.
 			const rotatedPoint = rotatePoint(
 				{ x: action.x, y: action.y },
-				-radian
+				-rotate
 			);
 
 			// Constrain the rotated point to within the calculated boundaries.
@@ -356,14 +347,13 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 
 			// Rotate the constrained point back to the original coordinate system.
-			const nextPosition = rotatePoint( boundPoint, radian );
+			const nextPosition = rotatePoint( boundPoint, rotate );
 
 			return {
 				...state,
-				image: {
-					...state.image,
-					x: nextPosition.x,
-					y: nextPosition.y,
+				transforms: {
+					...state.transforms,
+					translate: nextPosition,
 				},
 				isDragging: true,
 			};
@@ -390,7 +380,6 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 
 			// Determine the actual dimensions of the image, considering rotations.
-			const isAxisSwapped = rotations % 2 !== 0;
 			const imageDimensions = {
 				width: isAxisSwapped ? image.height : image.width,
 				height: isAxisSwapped ? image.width : image.height,
@@ -432,13 +421,12 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			return {
 				...state,
-				image: {
-					...state.image,
-					x: ( image.x + deltaX / 2 ) * windowScale,
-					y: ( image.y + deltaY / 2 ) * windowScale,
-				},
 				transforms: {
 					...state.transforms,
+					translate: {
+						x: ( translate.x + deltaX / 2 ) * windowScale,
+						y: ( translate.y + deltaY / 2 ) * windowScale,
+					},
 					scale: {
 						x: nextScale * Math.sign( scale.x ),
 						y: nextScale * Math.sign( scale.y ),
@@ -467,13 +455,13 @@ function imageCropperReducer( state: State, action: Action ): State {
 					  };
 
 			const minScale = getMinScale(
-				radian,
+				rotate,
 				image.width,
 				image.height,
 				cropperSize.width,
 				cropperSize.height,
-				image.x,
-				image.y
+				translate.x,
+				translate.y
 			);
 			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
 
@@ -489,21 +477,17 @@ function imageCropperReducer( state: State, action: Action ): State {
 				cropper: {
 					...state.cropper,
 					...cropperSize,
-					lockAspectRatio: true,
 				},
+				isAspectRatioLocked: true,
 			};
 		}
 		case 'UNLOCK_ASPECT_RATIO': {
 			return {
 				...state,
-				cropper: {
-					...state.cropper,
-					lockAspectRatio: false,
-				},
+				isAspectRatioLocked: false,
 			};
 		}
 		case 'RESIZE_CONTAINER': {
-			const isAxisSwapped = rotations % 2 !== 0;
 			const imageInlineSize = isAxisSwapped ? image.height : image.width;
 			const ratio = action.width / imageInlineSize;
 
@@ -517,13 +501,18 @@ function imageCropperReducer( state: State, action: Action ): State {
 					...state.image,
 					width: image.width * ratio,
 					height: image.height * ratio,
-					x: image.x * ratio,
-					y: image.y * ratio,
 				},
 				cropper: {
 					...state.cropper,
 					width: cropper.width * ratio,
 					height: cropper.height * ratio,
+				},
+				transforms: {
+					...state.transforms,
+					translate: {
+						x: translate.x * ratio,
+						y: translate.y * ratio,
+					},
 				},
 			};
 		}

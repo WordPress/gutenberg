@@ -63,11 +63,11 @@ function TemplateControls() {
 						min={ -45 }
 						max={ 45 }
 						step={ 1 }
-						value={ state.transforms.angle }
+						value={ state.tilt }
 						onChange={ ( value ) => {
 							dispatch( {
-								type: 'ROTATE',
-								angle: Number( value ),
+								type: 'SET_TILT',
+								tilt: Number( value ),
 							} );
 						} }
 					/>
@@ -120,7 +120,7 @@ function TemplateControls() {
 						title: control.title,
 						role: 'menuitemradio',
 						icon: aspectRatio,
-						isActive: state.cropper.lockAspectRatio
+						isActive: state.isAspectRatioLocked
 							? state.cropper.width / state.cropper.height ===
 							  control.value
 							: 0 === control.value,

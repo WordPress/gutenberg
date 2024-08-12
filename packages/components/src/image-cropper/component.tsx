@@ -32,6 +32,7 @@ function CropWindow() {
 			transforms: { scale },
 			cropper,
 			isResizing,
+			isAspectRatioLocked,
 		},
 		refs: { cropperWindowRef },
 		dispatch,
@@ -59,7 +60,7 @@ function CropWindow() {
 			// maxWidth={ isAxisSwapped ? image.height : image.width }
 			// maxHeight={ isAxisSwapped ? image.width : image.height }
 			showHandle
-			lockAspectRatio={ cropper.lockAspectRatio }
+			lockAspectRatio={ isAspectRatioLocked }
 			// Emulate the resizing thresholds.
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
 			onResizeStart={ ( event ) => {
@@ -141,7 +142,8 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
 		state: {
 			image,
-			transforms: { angle, rotations, scale },
+			transforms: { rotate, scale, translate },
+			isAxisSwapped,
 			isDragging,
 			isZooming,
 		},
@@ -151,8 +153,6 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		refs: { imageRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const isAxisSwapped = rotations % 2 !== 0;
-	const degree = angle + rotations * 90;
 	const aspectRatio = useMemo(
 		() => originalWidth / originalHeight,
 		[ originalWidth, originalHeight ]
@@ -194,7 +194,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	return (
 		<Container
 			animate={ {
-				'--wp-cropper-angle': `${ degree }deg`,
+				'--wp-cropper-angle': `${ rotate }rad`,
 				...( isZooming
 					? {}
 					: {
@@ -204,15 +204,15 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				...( isDragging || isZooming
 					? {}
 					: {
-							'--wp-cropper-image-x': `${ image.x }px`,
-							'--wp-cropper-image-y': `${ image.y }px`,
+							'--wp-cropper-image-x': `${ translate.x }px`,
+							'--wp-cropper-image-y': `${ translate.y }px`,
 					  } ),
 			} }
 			style={ {
 				width: `${ largerDimension + MIN_PADDING * 2 }px`,
 				aspectRatio: '1 / 1',
-				'--wp-cropper-image-x': `${ image.x }px`,
-				'--wp-cropper-image-y': `${ image.y }px`,
+				'--wp-cropper-image-x': `${ translate.x }px`,
+				'--wp-cropper-image-y': `${ translate.y }px`,
 				'--wp-cropper-scale-x': scale.x,
 				'--wp-cropper-scale-y': scale.y,
 				padding: `${ MIN_PADDING }px`,
