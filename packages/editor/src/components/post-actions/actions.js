@@ -4,50 +4,15 @@
 import { external } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf, _x } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState, useEffect } from '@wordpress/element';
-import { DataForm } from '@wordpress/dataviews';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-	PATTERN_POST_TYPE,
-} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { getItemTitle } from '../../dataviews/actions/utils';
-
-// TODO: this should be shared with other components (see post-fields in edit-site).
-const fields = [
-	{
-		type: 'text',
-		id: 'title',
-		label: __( 'Title' ),
-		placeholder: __( 'No title' ),
-		getValue: ( { item } ) => item.title,
-	},
-	{
-		type: 'integer',
-		id: 'menu_order',
-		label: __( 'Order' ),
-		description: __( 'Determines the order of pages.' ),
-	},
-];
-
-const formDuplicateAction = {
-	fields: [ 'title' ],
-};
 
 const viewPostAction = {
 	id: 'view-post',
@@ -100,172 +65,6 @@ const postRevisionsAction = {
 	},
 };
 
-const useDuplicatePostAction = ( postType ) => {
-	const userCanCreatePost = useSelect(
-		( select ) => {
-			return select( coreStore ).canUser( 'create', {
-				kind: 'postType',
-				name: postType,
-			} );
-		},
-		[ postType ]
-	);
-	return useMemo(
-		() =>
-			userCanCreatePost && {
-				id: 'duplicate-post',
-				label: _x( 'Duplicate', 'action label' ),
-				isEligible( { status } ) {
-					return status !== 'trash';
-				},
-				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-					const [ item, setItem ] = useState( {
-						...items[ 0 ],
-						title: sprintf(
-							/* translators: %s: Existing template title */
-							__( '%s (Copy)' ),
-							getItemTitle( items[ 0 ] )
-						),
-					} );
-
-					const [ isCreatingPage, setIsCreatingPage ] =
-						useState( false );
-
-					const { saveEntityRecord } = useDispatch( coreStore );
-					const { createSuccessNotice, createErrorNotice } =
-						useDispatch( noticesStore );
-
-					async function createPage( event ) {
-						event.preventDefault();
-
-						if ( isCreatingPage ) {
-							return;
-						}
-
-						const newItemOject = {
-							status: 'draft',
-							title: item.title,
-							slug: item.title || __( 'No title' ),
-							comment_status: item.comment_status,
-							content:
-								typeof item.content === 'string'
-									? item.content
-									: item.content.raw,
-							excerpt: item.excerpt.raw,
-							meta: item.meta,
-							parent: item.parent,
-							password: item.password,
-							template: item.template,
-							format: item.format,
-							featured_media: item.featured_media,
-							menu_order: item.menu_order,
-							ping_status: item.ping_status,
-						};
-						const assignablePropertiesPrefix = 'wp:action-assign-';
-						// Get all the properties that the current user is able to assign normally author, categories, tags,
-						// and custom taxonomies.
-						const assignableProperties = Object.keys(
-							item?._links || {}
-						)
-							.filter( ( property ) =>
-								property.startsWith(
-									assignablePropertiesPrefix
-								)
-							)
-							.map( ( property ) =>
-								property.slice(
-									assignablePropertiesPrefix.length
-								)
-							);
-						assignableProperties.forEach( ( property ) => {
-							if ( item[ property ] ) {
-								newItemOject[ property ] = item[ property ];
-							}
-						} );
-						setIsCreatingPage( true );
-						try {
-							const newItem = await saveEntityRecord(
-								'postType',
-								item.type,
-								newItemOject,
-								{ throwOnError: true }
-							);
-
-							createSuccessNotice(
-								sprintf(
-									// translators: %s: Title of the created template e.g: "Category".
-									__( '"%s" successfully created.' ),
-									decodeEntities(
-										newItem.title?.rendered || item.title
-									)
-								),
-								{
-									id: 'duplicate-post-action',
-									type: 'snackbar',
-								}
-							);
-
-							if ( onActionPerformed ) {
-								onActionPerformed( [ newItem ] );
-							}
-						} catch ( error ) {
-							const errorMessage =
-								error.message && error.code !== 'unknown_error'
-									? error.message
-									: __(
-											'An error occurred while duplicating the page.'
-									  );
-
-							createErrorNotice( errorMessage, {
-								type: 'snackbar',
-							} );
-						} finally {
-							setIsCreatingPage( false );
-							closeModal();
-						}
-					}
-
-					return (
-						<form onSubmit={ createPage }>
-							<VStack spacing={ 3 }>
-								<DataForm
-									data={ item }
-									fields={ fields }
-									form={ formDuplicateAction }
-									onChange={ ( changes ) =>
-										setItem( {
-											...item,
-											...changes,
-										} )
-									}
-								/>
-								<HStack spacing={ 2 } justify="end">
-									<Button
-										variant="tertiary"
-										onClick={ closeModal }
-										__next40pxDefaultSize
-									>
-										{ __( 'Cancel' ) }
-									</Button>
-									<Button
-										variant="primary"
-										type="submit"
-										isBusy={ isCreatingPage }
-										aria-disabled={ isCreatingPage }
-										__next40pxDefaultSize
-									>
-										{ _x( 'Duplicate', 'action label' ) }
-									</Button>
-								</HStack>
-							</VStack>
-						</form>
-					);
-				},
-			},
-		[ userCanCreatePost ]
-	);
-};
-
 export function usePostActions( { postType, onActionPerformed, context } ) {
 	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
@@ -284,12 +83,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		registerPostTypeActions( postType );
 	}, [ registerPostTypeActions, postType ] );
 
-	const duplicatePostAction = useDuplicatePostAction( postType );
-	const isTemplateOrTemplatePart = [
-		TEMPLATE_POST_TYPE,
-		TEMPLATE_PART_POST_TYPE,
-	].includes( postType );
-	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
 	const supportsRevisions = !! postTypeObject?.supports?.revisions;
 	return useMemo( () => {
@@ -300,11 +93,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		let actions = [
 			postTypeObject?.viewable && viewPostAction,
 			supportsRevisions && postRevisionsAction,
-			globalThis.IS_GUTENBERG_PLUGIN
-				? ! isTemplateOrTemplatePart &&
-				  ! isPattern &&
-				  duplicatePostAction
-				: false,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -370,10 +158,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		return actions;
 	}, [
 		defaultActions,
-		isTemplateOrTemplatePart,
-		isPattern,
 		postTypeObject?.viewable,
-		duplicatePostAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
