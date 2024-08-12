@@ -198,22 +198,17 @@ function createInitialState( {
 }
 
 function imageCropperReducer( state: State, action: Action ): State {
-	const {
-		image,
-		transforms: { rotate, scale, translate },
-		cropper,
-		isAxisSwapped,
-	} = state;
+	const { image, transforms, cropper, isAxisSwapped } = state;
 	switch ( action.type ) {
 		case 'ZOOM': {
 			const minScale = getMinScale(
-				rotate,
+				transforms.rotate,
 				image.width,
 				image.height,
 				cropper.width,
 				cropper.height,
-				translate.x,
-				translate.y
+				transforms.translate.x,
+				transforms.translate.y
 			);
 			const nextScale = Math.min(
 				Math.max( action.scale, minScale ),
@@ -226,8 +221,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 					...state.transforms,
 					translate: action.position,
 					scale: {
-						x: nextScale * Math.sign( scale.x ),
-						y: nextScale * Math.sign( scale.y ),
+						x: nextScale * Math.sign( transforms.scale.x ),
+						y: nextScale * Math.sign( transforms.scale.y ),
 					},
 				},
 				isZooming: true,
@@ -244,10 +239,14 @@ function imageCropperReducer( state: State, action: Action ): State {
 				...state,
 				transforms: {
 					...state.transforms,
-					rotate: rotate + Math.PI,
+					rotate: transforms.rotate + Math.PI,
 					scale: {
-						x: isAxisSwapped ? -scale.x : scale.x,
-						y: isAxisSwapped ? scale.y : -scale.y,
+						x: isAxisSwapped
+							? -transforms.scale.x
+							: transforms.scale.x,
+						y: isAxisSwapped
+							? transforms.scale.y
+							: -transforms.scale.y,
 					},
 				},
 			};
@@ -255,8 +254,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 		case 'SET_TILT': {
 			const radian = degreeToRadian( state.tilt );
 			const nextRadian = degreeToRadian( action.tilt );
-			const nextRotate = rotate - radian + nextRadian;
-			const absScale = Math.abs( scale.x );
+			const nextRotate = transforms.rotate - radian + nextRadian;
+			const absScale = Math.abs( transforms.scale.x );
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
 
@@ -264,8 +263,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 			// This is needed to rotate from the center of the cropper rather than the
 			// center of the image.
 			const rotatedPosition = rotatePoint(
-				translate,
-				nextRotate - rotate
+				transforms.translate,
+				nextRotate - transforms.rotate
 			);
 
 			// Calculate the minimum scale to fit the image within the cropper.
@@ -289,8 +288,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 					rotate: nextRotate,
 					translate: rotatedPosition,
 					scale: {
-						x: nextScale * Math.sign( scale.x ),
-						y: nextScale * Math.sign( scale.y ),
+						x: nextScale * Math.sign( transforms.scale.x ),
+						y: nextScale * Math.sign( transforms.scale.y ),
 					},
 				},
 				tilt: action.tilt,
@@ -300,13 +299,13 @@ function imageCropperReducer( state: State, action: Action ): State {
 			const angle = action.isCounterClockwise
 				? -PI_OVER_TWO
 				: PI_OVER_TWO;
-			const rotatedPosition = rotatePoint( translate, angle );
+			const rotatedPosition = rotatePoint( transforms.translate, angle );
 			return {
 				...state,
 				transforms: {
 					...state.transforms,
 					translate: rotatedPosition,
-					rotate: rotate + angle,
+					rotate: transforms.rotate + angle,
 				},
 				cropper: {
 					...state.cropper,
@@ -317,12 +316,12 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 		}
 		case 'MOVE': {
-			const absScale = Math.abs( scale.x );
+			const absScale = Math.abs( transforms.scale.x );
 
 			// Calculate the boundaries of the area where the cropper can move.
 			// These boundaries ensure the cropper stays within the image.
 			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
-				rotate,
+				transforms.rotate,
 				image.width * absScale,
 				image.height * absScale,
 				cropper.width,
@@ -332,7 +331,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			// Rotate the action point to align with the non-rotated coordinate system.
 			const rotatedPoint = rotatePoint(
 				{ x: action.x, y: action.y },
-				-rotate
+				-transforms.rotate
 			);
 
 			// Constrain the rotated point to within the calculated boundaries.
@@ -343,7 +342,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 
 			// Rotate the constrained point back to the original coordinate system.
-			const nextPosition = rotatePoint( boundPoint, rotate );
+			const nextPosition = rotatePoint( boundPoint, transforms.rotate );
 
 			return {
 				...state,
@@ -385,7 +384,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			const widthScale = imageDimensions.width / newSize.width;
 			const heightScale = imageDimensions.height / newSize.height;
 			const windowScale = Math.min( widthScale, heightScale );
-			const absScale = Math.abs( scale.x );
+			const absScale = Math.abs( transforms.scale.x );
 			const nextScale = absScale * windowScale;
 
 			const scaledSize = {
@@ -421,12 +420,16 @@ function imageCropperReducer( state: State, action: Action ): State {
 				transforms: {
 					...state.transforms,
 					translate: {
-						x: ( translate.x + deltaX / 2 ) * windowScale,
-						y: ( translate.y + deltaY / 2 ) * windowScale,
+						x:
+							( transforms.translate.x + deltaX / 2 ) *
+							windowScale,
+						y:
+							( transforms.translate.y + deltaY / 2 ) *
+							windowScale,
 					},
 					scale: {
-						x: nextScale * Math.sign( scale.x ),
-						y: nextScale * Math.sign( scale.y ),
+						x: nextScale * Math.sign( transforms.scale.x ),
+						y: nextScale * Math.sign( transforms.scale.y ),
 					},
 				},
 				cropper: {
@@ -452,15 +455,15 @@ function imageCropperReducer( state: State, action: Action ): State {
 					  };
 
 			const minScale = getMinScale(
-				rotate,
+				transforms.rotate,
 				image.width,
 				image.height,
 				cropperSize.width,
 				cropperSize.height,
-				translate.x,
-				translate.y
+				transforms.translate.x,
+				transforms.translate.y
 			);
-			const absScale = Math.abs( scale.x );
+			const absScale = Math.abs( transforms.scale.x );
 			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
 
 			return {
@@ -468,8 +471,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 				transforms: {
 					...state.transforms,
 					scale: {
-						x: nextScale * Math.sign( scale.x ),
-						y: nextScale * Math.sign( scale.y ),
+						x: nextScale * Math.sign( transforms.scale.x ),
+						y: nextScale * Math.sign( transforms.scale.y ),
 					},
 				},
 				cropper: {
@@ -508,8 +511,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 				transforms: {
 					...state.transforms,
 					translate: {
-						x: translate.x * ratio,
-						y: translate.y * ratio,
+						x: transforms.translate.x * ratio,
+						y: transforms.translate.y * ratio,
 					},
 				},
 			};
