@@ -1,3 +1,5 @@
+# Understanding global state, local context and derived state
+
 The Interactivity API offers a powerful framework for creating interactive blocks. To make the most of its capabilities, it's crucial to understand when to use global state, local context, or derived state. This guide will clarify these concepts and provide practical examples to help you decide when to use each one.
 
 Let's start with a brief definition of global state, local context and derived state.
