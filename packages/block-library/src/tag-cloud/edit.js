@@ -107,6 +107,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		setAttributes( updateObj );
 	};
 
+	// Remove border styles from the server-side attributes to prevent duplicate border.
 	const serverSideAttributes = {
 		...attributes,
 		style: {
