@@ -130,7 +130,8 @@ function Iframe( {
 		useResizeObserver();
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { __unstableGetEditorMode, __unstableSetEditorMode } =
+		useDispatch( blockEditorStore );
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -431,12 +432,18 @@ function Iframe( {
 								...bodyClasses
 							) }
 							onClick={ ( event ) => {
-								if ( event.target === event.currentTarget ) {
+								if (
+									__unstableGetEditorMode() === 'zoom-out' &&
+									event.target === event.currentTarget
+								) {
 									__unstableSetEditorMode( 'edit' );
 								}
 							} }
 							onKeyDown={ ( event ) => {
-								if ( event.key === 'Enter' ) {
+								if (
+									__unstableGetEditorMode() === 'zoom-out' &&
+									event.key === 'Enter'
+								) {
 									__unstableSetEditorMode( 'edit' );
 								}
 							} }
