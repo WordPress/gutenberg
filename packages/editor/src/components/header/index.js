@@ -57,7 +57,6 @@ function Header( {
 		showIconLabels,
 		hasFixedToolbar,
 		isNestedEntity,
-		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -136,7 +135,7 @@ function Header( {
 				) }
 				<PreviewDropdown
 					forceIsAutosaveable={ forceIsDirty }
-					disabled={ isNestedEntity || isZoomedOutView }
+					disabled={ isNestedEntity }
 				/>
 				<PostPreviewButton
 					className="editor-header__post-preview-button"

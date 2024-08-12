@@ -214,6 +214,7 @@ export default function PageTemplates() {
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { press, sleep } from '@ariakit/test';
+import { press } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -70,7 +70,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -90,7 +89,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -110,7 +108,6 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();

@@ -171,6 +171,7 @@ export default function DataviewsPatterns() {
 					descriptionId={ `${ id }-description` }
 				/>
 				<DataViews
+					key={ categoryId + postType }
 					paginationInfo={ paginationInfo }
 					fields={ fields }
 					actions={ actions }

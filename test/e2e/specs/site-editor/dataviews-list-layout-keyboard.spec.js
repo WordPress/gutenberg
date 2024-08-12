@@ -43,11 +43,6 @@ test.describe( 'Dataviews List Layout', () => {
 
 		await page.keyboard.press( 'Tab' );
 		await expect(
-			page.getByRole( 'button', { name: 'Reset' } )
-		).toBeFocused();
-
-		await page.keyboard.press( 'Tab' );
-		await expect(
 			page.getByRole( 'button', { name: 'Layout' } )
 		).toBeFocused();
 
@@ -74,12 +69,16 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+
+		const firstItem = page
+			.getByRole( 'grid' )
+			.getByRole( 'button' )
+			.first();
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect( firstItem ).toBeFocused();
 
 		// Go to the preview.
 		await page.keyboard.press( 'Tab' );
@@ -91,7 +90,7 @@ test.describe( 'Dataviews List Layout', () => {
 
 		// Go back to the items list using SHIFT+TAB.
 		await page.keyboard.press( 'Shift+Tab' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect( firstItem ).toBeFocused();
 	} );
 
 	test( 'Navigates the items list via UP/DOWN arrow keys', async ( {
@@ -101,7 +100,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -125,7 +123,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -167,7 +164,6 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
-		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
