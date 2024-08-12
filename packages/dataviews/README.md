@@ -30,6 +30,9 @@ const Example = () => {
 };
 ```
 
+> [!TIP]
+> At https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs there's an example implementation of the Dataviews component."
+
 ## Properties
 
 ### `data`: `Object[]`
@@ -79,41 +82,37 @@ const fields = [
 		id: 'date',
 		label: 'Date',
 		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		}
+			return <time>{ getFormattedDate( item.date ) }</time>;
+		},
 	},
 	{
 		id: 'author',
 		label: __( 'Author' ),
 		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
+			return <a href="...">{ item.author }</a>;
 		},
 		elements: [
 			{ value: 1, label: 'Admin' },
-			{ value: 2, label: 'User' }
+			{ value: 2, label: 'User' },
 		],
 		filterBy: {
-			operators: [ 'is', 'isNot' ]
+			operators: [ 'is', 'isNot' ],
 		},
-		enableSorting: false
+		enableSorting: false,
 	},
 	{
 		label: __( 'Status' ),
 		id: 'status',
 		getValue: ( { item } ) =>
-			STATUSES.find( ( { value } ) => value === item.status )
-				?.label ?? item.status,
+			STATUSES.find( ( { value } ) => value === item.status )?.label ??
+			item.status,
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
 		},
 		enableSorting: false,
 	},
-]
+];
 ```
 
 Each field is an object with the following properties:
@@ -256,6 +255,8 @@ Each action is an object with the following properties:
 -   `callback`: function, required unless `RenderModal` is provided. Callback function that takes the record as input and performs the required action.
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
+-   `supportsBulk`: Whether the action can be used as a bulk action. False by default.
+-   `disabled`: Whether the action is disabled. False by default.
 
 ### `paginationInfo`: `Object`
 
@@ -289,8 +290,8 @@ const defaultLayouts = {
 	table: {
 		layout: {
 			primaryKey: 'my-key',
-		}
-	}
+		},
+	},
 };
 ```
 
