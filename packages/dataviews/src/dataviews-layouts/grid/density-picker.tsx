@@ -1,16 +1,10 @@
 /**
  * WordPress dependencies
  */
-import {
-	BaseControl,
-	RangeControl,
-	Button,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { plus, reset } from '@wordpress/icons';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 
 const viewportBreaks = {
 	xhuge: { min: 3, max: 6, default: 5 },
@@ -83,64 +77,54 @@ export default function DensityPicker( {
 			return _density;
 		} );
 	}, [ setDensity, viewport ] );
-	if ( ! viewport ) {
-		return null;
-	}
-	const breakValues = viewportBreaks[ viewport ];
+	const breakValues = viewportBreaks[ viewport || 'mobile' ];
 	const densityToUse = density || breakValues.default;
 	const rangeValue = getRangeValue( densityToUse, breakValues );
 
 	const step = 100 / ( breakValues.max - breakValues.min + 1 );
+	const marks = useMemo(
+		() =>
+			Array.from(
+				{ length: breakValues.max - breakValues.min + 1 },
+				( _, i ) => {
+					const value = getRangeValue(
+						i + breakValues.min,
+						breakValues
+					);
+					return {
+						value,
+					};
+				}
+			),
+		[ breakValues ]
+	);
+	if ( ! viewport ) {
+		return null;
+	}
 	return (
-		<BaseControl>
-			<BaseControl.VisualLabel>
-				{ __( 'Item size' ) }
-			</BaseControl.VisualLabel>
-			<HStack>
-				<Button
-					size="compact"
-					icon={ reset }
-					disabled={ rangeValue <= 0 }
-					accessibleWhenDisabled
-					label={ __( 'Decrease size' ) }
-					onClick={ () => {
-						setDensity( densityToUse + 1 );
-					} }
-				/>
-				<RangeControl
-					__nextHasNoMarginBottom
-					showTooltip={ false }
-					className="dataviews-density-picker__range-control"
-					label={ __( 'Item size' ) }
-					hideLabelFromVision
-					value={ rangeValue }
-					min={ 0 }
-					max={ 100 }
-					withInputField={ false }
-					onChange={ ( value = 0 ) => {
-						const inverseValue = 100 - value;
-						setDensity(
-							Math.round(
-								( inverseValue *
-									( breakValues.max - breakValues.min ) ) /
-									100 +
-									breakValues.min
-							)
-						);
-					} }
-					step={ step }
-				/>
-				<Button
-					size="compact"
-					icon={ plus }
-					disabled={ rangeValue >= 100 }
-					accessibleWhenDisabled
-					label={ __( 'Increase size' ) }
-					onClick={ () => {
-						setDensity( densityToUse - 1 );
-					} }
-				/>
-			</HStack>
-		</BaseControl>
+		<RangeControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			showTooltip={ false }
+			className="dataviews-density-picker__range-control"
+			label={ __( 'Preview size' ) }
+			value={ rangeValue }
+			min={ 0 }
+			max={ 100 }
+			marks={ marks }
+			withInputField={ false }
+			onChange={ ( value = 0 ) => {
+				const inverseValue = 100 - value;
+				setDensity(
+					Math.round(
+						( inverseValue *
+							( breakValues.max - breakValues.min ) ) /
+							100 +
+							breakValues.min
+					)
+				);
+			} }
+			step={ step }
+		/>
 	);
 }
