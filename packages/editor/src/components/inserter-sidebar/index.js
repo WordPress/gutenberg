@@ -30,7 +30,6 @@ export default function InserterSidebar() {
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
-
 			getInsertionPoint,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
