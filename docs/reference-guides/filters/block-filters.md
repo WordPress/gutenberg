@@ -144,7 +144,7 @@ Filters the font-end content of any block. This filter has no impact on the beha
 The callback function for this filter receives three parameters:
 
 - `$block_content` (`string`): The block content.
-- `block` (`array`): The full block, including name and attributes.
+- `$block` (`array`): The full block, including name and attributes.
 - `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Here the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used to easily add the class instead of relying on regex.
@@ -177,7 +177,7 @@ Filters the font-end content of the defined block. This is just a simpler form o
 The callback function for this filter receives three parameters:
 
 - `$block_content` (`string`): The block content.
-- `block` (`array`): The full block, including name and attributes.
+- `$block` (`array`): The full block, including name and attributes.
 - `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Notice that compared to the `render_block` example above, you no longer need to check the block type before modifying the content. Again, the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used instead of regex.

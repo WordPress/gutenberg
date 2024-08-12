@@ -81,7 +81,12 @@ function ReorderModal( {
 					data={ item }
 					fields={ fields }
 					form={ formOrderAction }
-					onChange={ setItem }
+					onChange={ ( changes ) =>
+						setItem( {
+							...item,
+							...changes,
+						} )
+					}
 				/>
 				<HStack justify="right">
 					<Button

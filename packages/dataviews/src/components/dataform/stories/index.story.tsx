@@ -109,7 +109,12 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 				...form,
 				type,
 			} }
-			onChange={ setPost }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
 		/>
 	);
 };
