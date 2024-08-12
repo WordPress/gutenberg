@@ -152,7 +152,6 @@ const useDuplicatePostAction = ( postType ) => {
 									? item.content
 									: item.content.raw,
 							excerpt: item.excerpt.raw,
-							meta: item.meta,
 							parent: item.parent,
 							password: item.password,
 							template: item.template,
@@ -161,6 +160,24 @@ const useDuplicatePostAction = ( postType ) => {
 							menu_order: item.menu_order,
 							ping_status: item.ping_status,
 						};
+						if ( item.meta ) {
+							const metaKeys = Object.keys( item.meta );
+							if ( metaKeys.length > 0 ) {
+								const { footnotes, ...restMeta } = item.meta;
+								if (
+									footnotes ||
+									Object.keys( restMeta ).length > 0
+								) {
+									newItemOject.meta = footnotes
+										? {
+												footnotes,
+												...restMeta,
+										  }
+										: restMeta;
+								}
+							}
+						}
+
 						const assignablePropertiesPrefix = 'wp:action-assign-';
 						// Get all the properties that the current user is able to assign normally author, categories, tags,
 						// and custom taxonomies.
