@@ -2400,8 +2400,9 @@ class WP_Theme_JSON_Gutenberg {
 					$value = 'cover';
 				}
 				// If the background size is set to `contain` and no position is set, set the position to `center`.
-				if ( 'background-position' === $css_property && 'contain' === $styles['background']['backgroundSize'] ) {
-					$value = '50% 50%';
+				if ( 'background-position' === $css_property ) {
+					$background_size = $styles['background']['backgroundSize'] ?? null;
+					$value           = 'contain' === $background_size ? '50% 50%' : null;
 				}
 			}
 

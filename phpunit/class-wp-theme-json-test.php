@@ -4898,6 +4898,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'backgroundImage' => array(
 									'url' => 'http://example.org/verse.png',
 									'id'  => 123,
+									// Merged theme.json and global styles will retain the "ref" value.
+									'ref' => 'styles.background.backgroundImage',
 								),
 							),
 						),
