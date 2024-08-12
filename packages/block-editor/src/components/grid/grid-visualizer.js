@@ -36,7 +36,7 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 		parentLayout?.isManualPlacement &&
 		window.__experimentalEnableGridInteractivity;
 	return (
-		<GridVisualizerGrid
+		<GridVisualizerUI
 			gridClientId={ clientId }
 			gridElement={ gridElement }
 			isManualGrid={ isManualGrid }
@@ -45,7 +45,7 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	);
 }
 
-const GridVisualizerGrid = forwardRef(
+const GridVisualizerUI = forwardRef(
 	( { gridClientId, gridElement, isManualGrid }, ref ) => {
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
@@ -105,21 +105,6 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 		[ gridClientId ]
 	);
 
-	useEffect( () => {
-		function onGlobalDrag() {
-			setIsDroppingAllowed( true );
-		}
-		function onGlobalDragEnd() {
-			setIsDroppingAllowed( false );
-		}
-		document.addEventListener( 'drag', onGlobalDrag );
-		document.addEventListener( 'dragend', onGlobalDragEnd );
-		return () => {
-			document.removeEventListener( 'drag', onGlobalDrag );
-			document.removeEventListener( 'dragend', onGlobalDragEnd );
-		};
-	}, [] );
-
 	const occupiedRects = useMemo( () => {
 		const rects = [];
 		for ( const block of gridItems ) {
@@ -143,6 +128,21 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 		}
 		return rects;
 	}, [ gridItems ] );
+
+	useEffect( () => {
+		function onGlobalDrag() {
+			setIsDroppingAllowed( true );
+		}
+		function onGlobalDragEnd() {
+			setIsDroppingAllowed( false );
+		}
+		document.addEventListener( 'drag', onGlobalDrag );
+		document.addEventListener( 'dragend', onGlobalDragEnd );
+		return () => {
+			document.removeEventListener( 'drag', onGlobalDrag );
+			document.removeEventListener( 'dragend', onGlobalDragEnd );
+		};
+	}, [] );
 
 	return (
 		<BlockPopoverCover
