@@ -146,6 +146,20 @@ type ResetAction = {
 	type: 'RESET';
 };
 
+/** Lock the aspect ratio of the cropper window. */
+type lockAspectRatioAction = {
+	/** Lock aspect ratio type action. */
+	type: 'LOCK_ASPECT_RATIO';
+	/** Aspect ratio to lock. */
+	aspectRatio: number;
+};
+
+/** Unlock the aspect ratio of the cropper window. */
+type unlockAspectRatioAction = {
+	/** Unlock aspect ratio type action. */
+	type: 'UNLOCK_ASPECT_RATIO';
+};
+
 /** All possible actions. */
 type Action =
 	| ZoomAction
@@ -159,7 +173,9 @@ type Action =
 	| MoveWindowAction
 	| ResizeWindowAction
 	| ResizeContainerAction
-	| ResetAction;
+	| ResetAction
+	| lockAspectRatioAction
+	| unlockAspectRatioAction;
 
 function createInitialState( {
 	width,
