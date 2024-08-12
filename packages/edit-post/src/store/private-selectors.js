@@ -50,8 +50,11 @@ export const getEditedPostTemplateId = createRegistrySelector(
 		} else {
 			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		}
-		return select( coreStore ).getDefaultTemplateId( {
-			slug: slugToCheck,
-		} );
+
+		if ( postType ) {
+			return select( coreStore ).getDefaultTemplateId( {
+				slug: slugToCheck,
+			} );
+		}
 	}
 );
