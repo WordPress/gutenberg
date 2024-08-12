@@ -42,9 +42,7 @@ export default function save( { attributes } ) {
 					src={ src }
 					playsInline={ playsInline }
 					className={ borderProps.className }
-					style={ {
-						...borderProps.style,
-					} }
+					style={ borderProps.style }
 				>
 					<Tracks tracks={ tracks } />
 				</video>
