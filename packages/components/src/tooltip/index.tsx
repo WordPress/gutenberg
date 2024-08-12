@@ -128,7 +128,12 @@ function UnforwardedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
-					className={ clsx( 'components-tooltip', className ) }
+					className={ clsx(
+						'components-tooltip',
+						{ 'move-up': text?.toLowerCase().includes( 'up' ) },
+						{ 'move-down': text?.toLowerCase().includes( 'down' ) },
+						className
+					) }
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }
