@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { BaseControl, TimePicker } from '@wordpress/components';
+import { BaseControl, TimePicker, VisuallyHidden } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 
 /**
@@ -13,6 +13,7 @@ export default function DateTime< Item >( {
 	data,
 	field,
 	onChange,
+	hideLabelFromVision,
 }: DataFormControlProps< Item > ) {
 	const { id, label } = field;
 	const value = field.getValue( { item: data } );
@@ -23,10 +24,15 @@ export default function DateTime< Item >( {
 	);
 
 	return (
-		<fieldset>
-			<BaseControl.VisualLabel as="legend">
-				{ label }
-			</BaseControl.VisualLabel>
+		<fieldset className="dataviews-controls__datetime">
+			{ ! hideLabelFromVision && (
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+			{ hideLabelFromVision && (
+				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+			) }
 			<TimePicker
 				currentTime={ value }
 				onChange={ onChangeControl }
