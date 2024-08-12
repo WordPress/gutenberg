@@ -20,6 +20,7 @@
 -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
+-   `AlignmentMatrixControl`, `AnglePickerControl`, `BorderControl`, `ButtonGroup`, `Button`, `CircularOptionPicker`, `ColorIndicator`, `ColorPalette`, `CustomGradientPicker`, `DropZone`, `DropdownMenuV2`, `FocalPointPicker`, `Guide`, `Modal`, `Placeholder`, `Popover`, `ProgressBar`, `RadioControl`, `Snackbar`, `TabPanel`, `Text`, `ToggleGroupControl`, `ToolbarGroup`, `Toolbar`, `Tooltip`, `UnitControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 
 ### Internal
 
