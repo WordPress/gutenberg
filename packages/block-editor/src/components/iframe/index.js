@@ -130,8 +130,8 @@ function Iframe( {
 		useResizeObserver();
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
-	const { __unstableGetEditorMode, __unstableSetEditorMode } =
-		useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
