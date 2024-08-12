@@ -204,9 +204,6 @@ function imageCropperReducer( state: State, action: Action ): State {
 		cropper,
 		isAxisSwapped,
 	} = state;
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const absScale = Math.abs( scale.x );
-
 	switch ( action.type ) {
 		case 'ZOOM': {
 			const minScale = getMinScale(
@@ -263,6 +260,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			const radian = degreeToRadian( state.tilt );
 			const nextRadian = degreeToRadian( action.tilt );
 			const nextRotate = rotate - radian + nextRadian;
+			const absScale = Math.abs( scale.x );
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
 
@@ -323,6 +321,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 		}
 		case 'MOVE': {
+			const absScale = Math.abs( scale.x );
+
 			// Calculate the boundaries of the area where the cropper can move.
 			// These boundaries ensure the cropper stays within the image.
 			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
@@ -389,6 +389,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			const widthScale = imageDimensions.width / newSize.width;
 			const heightScale = imageDimensions.height / newSize.height;
 			const windowScale = Math.min( widthScale, heightScale );
+			const absScale = Math.abs( scale.x );
 			const nextScale = absScale * windowScale;
 
 			const scaledSize = {
@@ -463,6 +464,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 				translate.x,
 				translate.y
 			);
+			const absScale = Math.abs( scale.x );
 			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
 
 			return {
