@@ -28,8 +28,30 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		'Composite.Row': Composite.Row,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Item': Composite.Item,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Hover': Composite.Hover,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Typeahead': Composite.Typeahead,
+	},
+	argTypes: {
+		activeId: { control: 'text' },
+		defaultActiveId: { control: 'text' },
+		setActiveId: { control: { type: null } },
+		focusLoop: {
+			control: 'select',
+			options: [ true, false, 'horizontal', 'vertical', 'both' ],
+		},
+		focusShift: { control: 'boolean' },
+		focusWrap: { control: 'boolean' },
+		virtualFocus: { control: 'boolean' },
+		rtl: { control: 'boolean' },
+		orientation: {
+			control: 'select',
+			options: [ 'horizontal', 'vertical', 'both' ],
+		},
 	},
 	parameters: {
+		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { transform },
@@ -56,8 +78,9 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 					useCompositeStore: {
 						activeId: {
 							name: 'activeId',
-							description:
-								'The current active item id. The active item is the element within the composite widget that has either DOM or virtual focus.',
+							description: `The current active item \`id\`. The active item is the element within the composite widget that has either DOM or virtual focus (in case the \`virtualFocus\` prop is enabled).
+- \`null\` represents the base composite element (the one with a [composite role](https://w3c.github.io/aria/#composite)). Users will be able to navigate out of it using arrow keys.
+- If \`activeId\` is initially set to \`null\`, the base composite element itself will have focus and users will be able to navigate to it using arrow keys.`,
 							table: { type: { summary: 'string | null' } },
 						},
 						defaultActiveId: {
@@ -69,7 +92,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						setActiveId: {
 							name: 'setActiveId',
 							description:
-								'A callback that gets called when the activeId state changes.',
+								'A callback that gets called when the `activeId` state changes.',
 							table: {
 								type: {
 									summary:
@@ -79,8 +102,20 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						focusLoop: {
 							name: 'focusLoop',
-							description:
-								'Determines how the focus behaves when the user reaches the end of the composite widget.',
+							description: `On one-dimensional composite widgets:
+
+- \`true\` loops from the last item to the first item and vice-versa.
+- \`horizontal\` loops only if \`orientation\` is \`horizontal\` or not set.
+- \`vertical\` loops only if \`orientation\` is \`vertical\` or not set.
+- If \`activeId\` is initially set to \`null\`, the composite element will be focused in between the last and first items.
+
+On two-dimensional composite widgets (ie. when using \`CompositeRow\`):
+
+- \`true\` loops from the last row/column item to the first item in the same row/column and vice-versa. If it's the last item in the last row, it moves to the first item in the first row and vice-versa.
+- \`horizontal\` loops only from the last row item to the first item in the same row.
+- \`vertical\` loops only from the last column item to the first item in the column row.
+- If \`activeId\` is initially set to \`null\`, vertical loop will have no effect as moving down from the last row or up from the first row will focus on the composite element.
+- If \`focusWrap\` matches the value of \`focusLoop\`, it'll wrap between the last item in the last row or column and the first item in the first row or column and vice-versa.`,
 							table: {
 								defaultValue: {
 									summary: 'false',
@@ -93,8 +128,9 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						focusShift: {
 							name: 'focusShift',
-							description:
-								"Works only on two-dimensional composite widgets. If enabled, moving up or down when there's no next item or when the next item is disabled will shift to the item right before it.",
+							description: `**Works only on two-dimensional composite widgets**.
+
+If enabled, moving up or down when there's no next item or when the next item is disabled will shift to the item right before it.`,
 							table: {
 								defaultValue: {
 									summary: 'false',
@@ -106,8 +142,17 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						focusWrap: {
 							name: 'focusWrap',
-							description:
-								'Works only on two-dimensional composite widgets. If enabled, moving to the next item from the last one in a row or column will focus on the first item in the next row or column and vice-versa.',
+							description: `**Works only on two-dimensional composite widgets**.
+
+If enabled, moving to the next item from the last one in a row or column
+will focus on the first item in the next row or column and vice-versa.
+
+- \`true\` wraps between rows and columns.
+- \`horizontal\` wraps only between rows.
+- \`vertical\` wraps only between columns.
+- If \`focusLoop\` matches the value of \`focusWrap\`, it'll wrap between the
+    last item in the last row or column and the first item in the first row or
+    column and vice-versa.`,
 							table: {
 								defaultValue: {
 									summary: 'false',
@@ -119,8 +164,11 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						virtualFocus: {
 							name: 'virtualFocus',
-							description:
-								'If enabled, the composite element will act as an aria-activedescendant⁠ container instead of roving tabindex⁠. DOM focus will remain on the composite element while its items receive virtual focus. In both scenarios, the item in focus will carry the data-active-item attribute.',
+							description: `If enabled, the composite element will act as an [\`aria-activedescendant\`](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_focus_activedescendant)
+container instead of [roving tabindex](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#kbd_roving_tabindex). DOM focus will remain on the composite element while its items receive
+virtual focus.
+
+In both scenarios, the item in focus will carry the \`data-active-item\` attribute.`,
 							table: {
 								defaultValue: {
 									summary: 'false',
@@ -132,8 +180,13 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						orientation: {
 							name: 'orientation',
-							description:
-								"Defines the orientation of the composite widget. If the composite has a single row or column (one-dimensional), the orientation value determines which arrow keys can be used to move focus. It doesn't have any effect on two-dimensional composites.",
+							description: `Defines the orientation of the composite widget. If the composite has a single row or column (one-dimensional), the \`orientation\` value determines which arrow keys can be used to move focus:
+
+- \`both\`: all arrow keys work.
+- \`horizontal\`: only left and right arrow keys work.
+- \`vertical\`: only up and down arrow keys work.
+
+It doesn't have any effect on two-dimensional composites.`,
 							table: {
 								defaultValue: {
 									summary: "'both'",
@@ -146,8 +199,9 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						},
 						rtl: {
 							name: 'rtl',
-							description:
-								'Determines how the next and previous functions will behave. If rtl is set to true, they will be inverted. This only affects the composite widget behavior. You still need to set dir="rtl" on HTML/CSS.',
+							description: `Determines how the \`store\`'s \`next\` and \`previous\` functions will behave. If \`rtl\` is set to \`true\`, they will be inverted.
+
+This only affects the composite widget behavior. You still need to set \`dir="rtl"\` on HTML/CSS.`,
 							table: {
 								defaultValue: {
 									summary: 'false',
@@ -177,6 +231,8 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
 					'Composite.Item': commonArgTypes,
+					'Composite.Hover': commonArgTypes,
+					'Composite.Typeahead': commonArgTypes,
 				};
 
 				const name = component.displayName ?? '';
@@ -187,10 +243,82 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 			},
 		},
 	},
+	decorators: [
+		( Story ) => {
+			return (
+				<>
+					{ /* Visually style the active composite item  */ }
+					<style>{ `
+						[data-active-item] {
+							background-color: #ffc0b5;
+						}
+					` }</style>
+					<Story />
+					<div
+						style={ {
+							marginTop: '2em',
+							fontSize: '12px',
+							fontStyle: 'italic',
+						} }
+					>
+						{ /* eslint-disable-next-line no-restricted-syntax */ }
+						<p id="list-title">Notes</p>
+						<ul aria-labelledby="list-title">
+							<li>
+								The active composite item is highlighted with a
+								different background color;
+							</li>
+							<li>
+								A composite item can be the active item even
+								when it doesn&apos;t have keyboard focus.
+							</li>
+						</ul>
+					</div>
+				</>
+			);
+		},
+	],
 };
 export default meta;
 
 export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Item>Item one</Composite.Item>
+			<Composite.Item>Item two</Composite.Item>
+			<Composite.Item>Item three</Composite.Item>
+		</Composite>
+	);
+};
+
+export const Groups: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Group>
+				<Composite.GroupLabel>Group one</Composite.GroupLabel>
+				<Composite.Item>Item 1.1</Composite.Item>
+				<Composite.Item>Item 1.2</Composite.Item>
+			</Composite.Group>
+			<Composite.Group>
+				<Composite.GroupLabel>Group two</Composite.GroupLabel>
+				<Composite.Item>Item 2.1</Composite.Item>
+				<Composite.Item>Item 2.1</Composite.Item>
+			</Composite.Group>
+		</Composite>
+	);
+};
+
+export const Grid: StoryFn< typeof UseCompositeStorePlaceholder > = (
 	storeProps
 ) => {
 	const rtl = isRTL();
@@ -215,4 +343,54 @@ export const Default: StoryFn< typeof UseCompositeStorePlaceholder > = (
 			</Composite.Row>
 		</Composite>
 	);
+};
+
+export const Hover: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store }>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item one
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item two
+			</Composite.Hover>
+			<Composite.Hover render={ <Composite.Item /> }>
+				Hover item three
+			</Composite.Hover>
+		</Composite>
+	);
+};
+Hover.parameters = {
+	docs: {
+		description: {
+			story: 'Elements in the composite widget will receive focus on mouse move and lose focus to the composite base element on mouse leave.',
+		},
+	},
+};
+
+export const Typeahead: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	storeProps
+) => {
+	const rtl = isRTL();
+	const store = useCompositeStore( { rtl, ...storeProps } );
+
+	return (
+		<Composite store={ store } render={ <Composite.Typeahead /> }>
+			<Composite.Item>Apple</Composite.Item>
+			<Composite.Item>Banana</Composite.Item>
+			<Composite.Item>Peach</Composite.Item>
+		</Composite>
+	);
+};
+Typeahead.parameters = {
+	docs: {
+		description: {
+			story: 'When focus in on the composite widget, hitting printable character keys will move focus to the next composite item that begins with the input characters.',
+		},
+	},
 };

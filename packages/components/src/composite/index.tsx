@@ -29,14 +29,17 @@ import type {
 	CompositeGroupLabelProps,
 	CompositeItemProps,
 	CompositeRowProps,
+	CompositeHoverProps,
+	CompositeTypeaheadProps,
 } from './types';
 
 /**
  * Creates a composite store.
- * @param props
- * @see https://ariakit.org/reference/use-composite-store
+ *
  * @example
  * ```jsx
+ * import { Composite, useCompositeStore } from '@wordpress/components';
+ *
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item</Composite.Item>
@@ -45,8 +48,24 @@ import type {
  * </Composite>
  * ```
  */
-export function useCompositeStore( props: CompositeStoreProps ) {
-	return Ariakit.useCompositeStore( props );
+export function useCompositeStore( {
+	focusLoop = false,
+	focusWrap = false,
+	focusShift = false,
+	virtualFocus = false,
+	orientation = 'both',
+	rtl = false,
+	...props
+}: CompositeStoreProps = {} ) {
+	return Ariakit.useCompositeStore( {
+		focusLoop,
+		focusWrap,
+		focusShift,
+		virtualFocus,
+		orientation,
+		rtl,
+		...props,
+	} );
 }
 
 const Group = forwardRef<
@@ -81,11 +100,31 @@ const Row = forwardRef<
 } );
 Row.displayName = 'Composite.Row';
 
+const Hover = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< CompositeHoverProps, 'div', false >
+>( function CompositeHover( props, ref ) {
+	return <Ariakit.CompositeHover { ...props } ref={ ref } />;
+} );
+Hover.displayName = 'Composite.Hover';
+
+const Typeahead = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
+>( function CompositeTypeahead( props, ref ) {
+	return <Ariakit.CompositeTypeahead { ...props } ref={ ref } />;
+} );
+Typeahead.displayName = 'Composite.Typeahead';
+
 /**
- * Renders a composite widget.
- * @see https://ariakit.org/reference/composite
+ * Renders a widget based on the WAI-ARIA [`composite`](https://w3c.github.io/aria/#composite)
+ * role, which provides a single tab stop on the page and arrow key navigation
+ * through the focusable descendants.
+ *
  * @example
  * ```jsx
+ * import { Composite, useCompositeStore } from '@wordpress/components';
+ *
  * const store = useCompositeStore();
  * <Composite store={store}>
  *   <Composite.Item>Item 1</Composite.Item>
@@ -104,9 +143,11 @@ export const Composite = Object.assign(
 		displayName: 'Composite',
 		/**
 		 * Renders a group element for composite items.
-		 * @see https://ariakit.org/reference/composite-group
+		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Group>
@@ -122,9 +163,11 @@ export const Composite = Object.assign(
 		 * Renders a label in a composite group. This component must be wrapped with
 		 * `Composite.Group` so the `aria-labelledby` prop is properly set on the
 		 * composite group element.
-		 * @see https://ariakit.org/reference/composite-group-label
+		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Group>
@@ -138,9 +181,11 @@ export const Composite = Object.assign(
 		GroupLabel,
 		/**
 		 * Renders a composite item.
-		 * @see https://ariakit.org/reference/composite-item
+		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Item>Item 1</Composite.Item>
@@ -154,9 +199,11 @@ export const Composite = Object.assign(
 		 * Renders a composite row. Wrapping `Composite.Item` elements within
 		 * `Composite.Row` will create a two-dimensional composite widget, such as a
 		 * grid.
-		 * @see https://ariakit.org/reference/composite-row
+		 *
 		 * @example
 		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
 		 * const store = useCompositeStore();
 		 * <Composite store={store}>
 		 *   <Composite.Row>
@@ -173,5 +220,43 @@ export const Composite = Object.assign(
 		 * ```
 		 */
 		Row,
+		/**
+		 * Renders an element in a composite widget that receives focus on mouse move
+		 * and loses focus to the composite base element on mouse leave. This should
+		 * be combined with the `Composite.Item` component.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
+		 * const store = useCompositeStore();
+		 * <Composite store={store}>
+		 *   <Composite.Hover render={ <Composite.Item /> }>
+		 *     Item 1
+		 *   </Composite.Hover>
+		 *   <Composite.Hover render={ <Composite.Item /> }>
+		 *     Item 2
+		 *   </Composite.Hover>
+		 * </Composite>
+		 * ```
+		 */
+		Hover,
+		/**
+		 * Renders a component that adds typeahead functionality to composite
+		 * components. Hitting printable character keys will move focus to the next
+		 * composite item that begins with the input characters.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 *
+		 * const store = useCompositeStore();
+		 * <Composite store={store} render={ <CompositeTypeahead /> }>
+		 *   <Composite.Item>Item 1</Composite.Item>
+		 *   <Composite.Item>Item 2</Composite.Item>
+		 * </Composite>
+		 * ```
+		 */
+		Typeahead,
 	}
 );

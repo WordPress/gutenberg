@@ -31,7 +31,7 @@ const ITEM_PADDING_INLINE = space( 3 );
 const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.gray[ 200 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
