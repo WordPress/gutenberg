@@ -23,8 +23,8 @@ import useSelectionObserver from './use-selection-observer';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
+import useEventRedirect from './use-event-redirect';
 import { store as blockEditorStore } from '../../store';
-import { getSelectionRoot } from './utils';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
@@ -66,59 +66,7 @@ export function useWritingFlow() {
 				},
 				[ hasMultiSelection ]
 			),
-			useRefEffect( ( node ) => {
-				function onInput( event ) {
-					if ( event.target !== node || event.__isRedirected ) {
-						return;
-					}
-
-					const { ownerDocument } = node;
-					const { defaultView } = ownerDocument;
-					const prototype = Object.getPrototypeOf( event );
-					const constructorName = prototype.constructor.name;
-					const Constructor = defaultView[ constructorName ];
-					const root = getSelectionRoot( ownerDocument );
-
-					if ( ! root ) {
-						return;
-					}
-
-					const init = {};
-
-					for ( const key in event ) {
-						init[ key ] = event[ key ];
-					}
-
-					init.bubbles = false;
-
-					const newEvent = new Constructor( event.type, init );
-					newEvent.__isRedirected = true;
-					const cancelled = ! root.dispatchEvent( newEvent );
-
-					if ( cancelled ) {
-						event.preventDefault();
-					}
-				}
-
-				const events = [
-					'beforeinput',
-					'input',
-					'compositionstart',
-					'compositionend',
-					'compositionupdate',
-					'keydown',
-				];
-
-				events.forEach( ( eventType ) => {
-					node.addEventListener( eventType, onInput );
-				} );
-
-				return () => {
-					events.forEach( ( eventType ) => {
-						node.removeEventListener( eventType, onInput );
-					} );
-				};
-			}, [] ),
+			useEventRedirect(),
 		] ),
 		after,
 	];

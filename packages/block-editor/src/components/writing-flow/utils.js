@@ -117,6 +117,11 @@ function toPlainText( html ) {
 	return plainText.replace( /\n\n+/g, '\n\n' );
 }
 
+/**
+ * Gets the current content editable root element based on the selection.
+ * @param {Document} ownerDocument
+ * @return {Element|undefined} The content editable root element.
+ */
 export function getSelectionRoot( ownerDocument ) {
 	const { defaultView } = ownerDocument;
 	const { anchorNode, focusNode } = defaultView.getSelection();

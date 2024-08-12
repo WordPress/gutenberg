@@ -56,6 +56,8 @@ export default function useInput() {
 					: null;
 				const root = getSelectionRoot( node.ownerDocument );
 
+				// If selection is contained within a nested editable, allow
+				// input. We need to ensure that selection is maintained.
 				if ( root ) {
 					node.contentEditable = false;
 					root.focus();
