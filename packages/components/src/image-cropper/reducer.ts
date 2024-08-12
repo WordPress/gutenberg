@@ -108,16 +108,6 @@ type ResizeStartAction = {
 };
 
 /** Resize the cropper window by a delta size in a direction. */
-type MoveWindowAction = {
-	/** Move window type action. */
-	type: 'MOVE_WINDOW';
-	/** Move x position. */
-	x: number;
-	/** Move y position. */
-	y: number;
-};
-
-/** Resize the cropper window by a delta size in a direction. */
 type ResizeWindowAction = {
 	/** Resize window type action. */
 	type: 'RESIZE_WINDOW';
@@ -170,7 +160,6 @@ type Action =
 	| MoveAction
 	| MoveEndAction
 	| ResizeStartAction
-	| MoveWindowAction
 	| ResizeWindowAction
 	| ResizeContainerAction
 	| ResetAction
@@ -389,17 +378,6 @@ function imageCropperReducer( state: State, action: Action ): State {
 			return {
 				...state,
 				isResizing: true,
-			};
-		}
-		case 'MOVE_WINDOW': {
-			const { x, y } = action;
-			return {
-				...state,
-				cropper: {
-					...state.cropper,
-					x,
-					y,
-				},
 			};
 		}
 		case 'RESIZE_WINDOW': {
