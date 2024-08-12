@@ -371,13 +371,13 @@ describe( 'Cover block', () => {
 						name: 'Styles',
 					} )
 				);
-				await userEvent.clear(
-					screen.getByLabelText( 'Minimum height of cover' )
-				);
-				await userEvent.type(
-					screen.getByLabelText( 'Minimum height of cover' ),
-					'300'
-				);
+
+				const heightControl = screen.getByRole( 'spinbutton', {
+					name: 'Minimum height',
+				} );
+
+				await userEvent.clear( heightControl );
+				await userEvent.type( heightControl, '300' );
 
 				expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveStyle(
 					'min-height: 300px;'

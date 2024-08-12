@@ -156,9 +156,9 @@ test.describe( 'Cover', () => {
 			.getByRole( 'tab', { name: 'Styles' } )
 			.click();
 
-		// Ensure there the default value for the minimum height of cover is undefined.
+		// Ensure there the default value for the Minimum height is undefined.
 		const defaultHeightValue = await coverBlockEditorSettings
-			.getByLabel( 'Minimum height of cover' )
+			.getByRole( 'spinbutton', { name: 'Minimum height' } )
 			.inputValue();
 		expect( defaultHeightValue ).toBeFalsy();
 

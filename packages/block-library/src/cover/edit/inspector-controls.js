@@ -12,18 +12,15 @@ import {
 	TextareaControl,
 	ToggleControl,
 	SelectControl,
-	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
-	useSettings,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	HeightControl,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -31,7 +28,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -42,26 +39,19 @@ function CoverHeightInput( {
 	unit = 'px',
 	value = '',
 } ) {
-	const instanceId = useInstanceId( UnitControl );
-	const inputId = `block-cover-height-input-${ instanceId }`;
-	const isPx = unit === 'px';
-
-	const [ availableUnits ] = useSettings( 'spacing.units' );
-	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
-		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
-	} );
-
 	const handleOnChange = ( unprocessedValue ) => {
-		const inputValue =
-			unprocessedValue !== ''
-				? parseFloat( unprocessedValue )
-				: undefined;
+		const parsedQuantityAndUnit =
+			parseQuantityAndUnitFromRawValue( unprocessedValue );
+		const currentValue = parsedQuantityAndUnit[ 0 ];
 
-		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+		if ( isNaN( currentValue ) && currentValue !== undefined ) {
 			return;
 		}
-		onChange( inputValue );
+
+		const currentUnit = parsedQuantityAndUnit[ 1 ];
+
+		onUnitChange( currentUnit );
+		onChange( currentValue );
 	};
 
 	const computedValue = useMemo( () => {
@@ -69,19 +59,11 @@ function CoverHeightInput( {
 		return [ parsedQuantity, unit ].join( '' );
 	}, [ unit, value ] );
 
-	const min = isPx ? COVER_MIN_HEIGHT : 0;
-
 	return (
-		<UnitControl
-			label={ __( 'Minimum height of cover' ) }
-			id={ inputId }
-			isResetValueOnUnitChange
-			min={ min }
-			onChange={ handleOnChange }
-			onUnitChange={ onUnitChange }
-			__unstableInputWidth="80px"
-			units={ units }
+		<HeightControl
+			label={ __( 'Minimum height' ) }
 			value={ computedValue }
+			onChange={ handleOnChange }
 		/>
 	);
 }
