@@ -72,12 +72,12 @@ const STATUSES = [
 const fields = [
 	{
 		id: 'title',
-		header: 'Title',
+		label: 'Title',
 		enableHiding: false,
 	},
 	{
 		id: 'date',
-		header: 'Date',
+		label: 'Date',
 		render: ( { item } ) => {
 			return (
 				<time>{ getFormattedDate( item.date ) }</time>
@@ -86,7 +86,7 @@ const fields = [
 	},
 	{
 		id: 'author',
-		header: __( 'Author' ),
+		label: __( 'Author' ),
 		render: ( { item } ) => {
 			return (
 				<a href="...">{ item.author }</a>
@@ -102,7 +102,7 @@ const fields = [
 		enableSorting: false
 	},
 	{
-		header: __( 'Status' ),
+		label: __( 'Status' ),
 		id: 'status',
 		getValue: ( { item } ) =>
 			STATUSES.find( ( { value } ) => value === item.status )
@@ -119,13 +119,14 @@ const fields = [
 Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
--   `header`: the field's name to be shown in the UI.
+-   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
 -   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
+-   `enableGlobalSearch`: whether the field is searchable. False by default.
 -   `filterBy`: configuration for the filters.
     -   `operators`: the list of operators supported by the field.
     -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
