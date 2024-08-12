@@ -207,7 +207,7 @@ function createInitialState( {
 	};
 }
 
-function imageCropperReducer( state: State, action: Action ) {
+function imageCropperReducer( state: State, action: Action ): State {
 	const {
 		image,
 		transforms: { angle, rotations, scale },
