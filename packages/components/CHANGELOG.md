@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `AutoComplete`: Improve compatibility ([https://github.com/WordPress/gutenberg/pull/63671](https://github.com/WordPress/gutenberg/pull/63671)).
+-   `AutoComplete`: Improve compatibility ([#63671](https://github.com/WordPress/gutenberg/pull/63671)).
 
 ### New Features
 
