@@ -97,7 +97,7 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content:
-					showQuickEdit && isListLayout ? (
+					showQuickEdit && isListLayout && !! postId ? (
 						<PostEdit
 							postType={ postType }
 							postId={ postId }
