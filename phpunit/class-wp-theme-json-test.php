@@ -4847,17 +4847,8 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
-					'background' => array(
-						'backgroundImage'      => array(
-							'url' => 'http://example.org/top.png',
-						),
-						'backgroundSize'       => 'contain',
-						'backgroundRepeat'     => 'repeat',
-						'backgroundPosition'   => '10% 20%',
-						'backgroundAttachment' => 'scroll',
-					),
-					'blocks'     => array(
-						'core/group'        => array(
+					'blocks' => array(
+						'core/group' => array(
 							'background' => array(
 								'backgroundImage'      => "url('http://example.org/group.png')",
 								'backgroundRepeat'     => 'no-repeat',
@@ -4865,26 +4856,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'backgroundAttachment' => 'fixed',
 							),
 						),
-						'core/post-content' => array(
-							'background' => array(
-								'backgroundImage'      => array(
-									'ref' => 'styles.background.backgroundImage',
-								),
-								'backgroundSize'       => array(
-									'ref' => 'styles.background.backgroundSize',
-								),
-								'backgroundRepeat'     => array(
-									'ref' => 'styles.background.backgroundRepeat',
-								),
-								'backgroundPosition'   => array(
-									'ref' => 'styles.background.backgroundPosition',
-								),
-								'backgroundAttachment' => array(
-									'ref' => 'styles.background.backgroundAttachment',
-								),
-							),
-						),
-						'core/quote'        => array(
+						'core/quote' => array(
 							'background' => array(
 								'backgroundImage' => array(
 									'url' => 'http://example.org/quote.png',
@@ -4893,13 +4865,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'backgroundSize'  => 'contain',
 							),
 						),
-						'core/verse'        => array(
+						'core/verse' => array(
 							'background' => array(
 								'backgroundImage' => array(
 									'url' => 'http://example.org/verse.png',
 									'id'  => 123,
-									// Merged theme.json and global styles will retain the "ref" value.
-									'ref' => 'styles.background.backgroundImage',
 								),
 							),
 						),
@@ -4929,18 +4899,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$post_content_node = array(
-			'name'      => 'core/post-content',
-			'path'      => array( 'styles', 'blocks', 'core/post-content' ),
-			'selector'  => '.wp-block-post-content',
-			'selectors' => array(
-				'root' => '.wp-block-post-content',
-			),
-		);
-
-		$post_content_styles = ":root :where(.wp-block-post-content){background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}";
-		$this->assertSameCSS( $post_content_styles, $theme_json->get_styles_for_block( $post_content_node ), 'Styles returned from "::get_styles_for_block()" with core/post-content background ref styles as string type do not match expectations' );
-
 		$quote_styles = ":root :where(.wp-block-quote){background-image: url('http://example.org/quote.png');background-position: 50% 50%;background-size: contain;}";
 		$this->assertSameCSS( $quote_styles, $theme_json->get_styles_for_block( $quote_node ), 'Styles returned from "::get_styles_for_block()" with core/quote default background styles do not match expectations' );
 
@@ -4955,6 +4913,65 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$verse_styles = ":root :where(.wp-block-verse){background-image: url('http://example.org/verse.png');background-size: cover;}";
 		$this->assertSameCSS( $verse_styles, $theme_json->get_styles_for_block( $verse_node ), 'Styles returned from "::get_styles_for_block()" with default core/verse background styles as string type do not match expectations' );
+	}
+
+	/**
+	 * Testing background dynamic properties in theme.json.
+	 */
+	public function test_get_resolved_background_image_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage'      => array(
+							'url' => 'http://example.org/top.png',
+						),
+						'backgroundSize'       => 'contain',
+						'backgroundRepeat'     => 'repeat',
+						'backgroundPosition'   => '10% 20%',
+						'backgroundAttachment' => 'scroll',
+					),
+					'blocks'     => array(
+						'core/group'        => array(
+							'background' => array(
+								'backgroundImage' => array(
+									/*
+									 * Merged theme.json and global styles retain the "ref" value,
+									 * even though the URL is provided in the global styles.
+									 */
+									'id'  => 123,
+									'ref' => 'styles.background.backgroundImage',
+									'url' => 'http://example.org/group.png',
+								),
+							),
+						),
+						'core/post-content' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'ref' => 'styles.background.backgroundImage',
+								),
+								'backgroundSize'       => array(
+									'ref' => 'styles.background.backgroundSize',
+								),
+								'backgroundRepeat'     => array(
+									'ref' => 'styles.background.backgroundRepeat',
+								),
+								'backgroundPosition'   => array(
+									'ref' => 'styles.background.backgroundPosition',
+								),
+								'backgroundAttachment' => array(
+									'ref' => 'styles.background.backgroundAttachment',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}:root :where(.wp-block-group){background-image: url('http://example.org/group.png');background-size: cover;}:root :where(.wp-block-post-content){background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}";
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
 	/**

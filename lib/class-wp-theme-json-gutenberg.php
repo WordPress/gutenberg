@@ -2492,9 +2492,13 @@ class WP_Theme_JSON_Gutenberg {
 		 * where the value is an array with a "ref" key, pointing to a path.
 		 * For example: { "ref": "style.color.background" } => "#fff".
 		 * In the case of backgroundImage, if both a ref and a URL are present in the value,
-		 * the URL takes precedence.
+		 * the URL takes precedence and the ref is ignored.
 		 */
-		if ( is_array( $value ) && isset( $value['ref'] ) && ! isset( $value['url'] ) ) {
+		if ( is_array( $value ) && isset( $value['ref'] ) ) {
+			if ( isset( $value['url'] ) ) {
+				unset( $value['ref'] );
+				return $value;
+			}
 			$value_path = explode( '.', $value['ref'] );
 			$ref_value  = _wp_array_get( $theme_json, $value_path, null );
 			// Background Image refs can refer to a string or an array containing a URL string.

@@ -444,6 +444,20 @@ describe( 'editor utils', () => {
 				{ url: 'file:./assets/image.jpg' },
 				themeJson,
 			],
+			/*
+			 * Merged theme.json and global styles retain the "ref" value,
+			 * even though the URL is provided in the global styles.
+			 */
+			[
+				{
+					ref: 'styles.background.backgroundImage',
+					url: 'https://wordpress.org/assets/image.jpg',
+				},
+				{
+					url: 'https://wordpress.org/assets/image.jpg',
+				},
+				themeJson,
+			],
 			[
 				{
 					ref: 'styles.blocks.core/group.background.backgroundImage',

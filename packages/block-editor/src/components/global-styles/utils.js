@@ -562,7 +562,19 @@ export function getResolvedRefValue( ruleValue, tree ) {
 		return ruleValue;
 	}
 
+	/*
+	 * This converts references to a path to the value at that path
+	 * where the value is an array with a "ref" key, pointing to a path.
+	 * For example: { "ref": "style.color.background" } => "#fff".
+	 * In the case of backgroundImage, if both a ref and a URL are present in the value,
+	 * the URL takes precedence and the ref is ignored.
+	 */
 	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+		if ( 'string' === typeof ruleValue?.url ) {
+			delete ruleValue.ref;
+			return ruleValue;
+		}
+
 		const refPath = ruleValue.ref.split( '.' );
 		const resolvedRuleValue = getCSSValueFromRawStyle(
 			getValueFromObjectPath( tree, refPath )
