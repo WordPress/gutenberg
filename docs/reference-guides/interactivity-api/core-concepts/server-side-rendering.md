@@ -120,10 +120,10 @@ One of the key strengths of the Interactivity API is how it bridges the gap betw
 Let's extend this example to include a button that the user can click to add a new fruit to the list:
 
 ```html
-<button data-wp-on--click="actions.addMango">Add Mango</button>
+<button data-wp-on-async--click="actions.addMango">Add Mango</button>
 ```
 
-This new button has a `data-wp-on--click` directive that references `actions.addMango`, which is defined in our JavaScript store:
+This new button has a `data-wp-on-async--click` directive that references `actions.addMango`, which is defined in our JavaScript store:
 
 ```javascript
 const { state } = store( 'myFruitPlugin', {
@@ -180,7 +180,9 @@ store( 'myFruitPlugin', {
 Let's imagine adding a button that can delete all fruits:
 
 ```html
-<button data-wp-on--click="actions.deleteFruits">Delete all fruits</button>
+<button data-wp-on-async--click="actions.deleteFruits">
+	Delete all fruits
+</button>
 ```
 
 ```javascript
@@ -236,7 +238,7 @@ To fix this, you must define the initial value of the derived state in the serve
 -   Or it can be defined by doing the necessary computations on the server:
 
     ```php
-    $fruits = array( 'Apple', 'Banana', 'Cherry' );
+    $fruits    = array( 'Apple', 'Banana', 'Cherry' );
     $hasFruits = count( $fruits ) > 0;
 
     wp_interactivity_state( 'myFruitPlugin', array(
@@ -319,10 +321,10 @@ wp_interactivity_state( 'myFruitPlugin', array(
 ?>
 
 <div data-wp-interactive="myFruitPlugin">
-	<button data-wp-on--click="actions.deleteFruits">
+	<button data-wp-on-async--click="actions.deleteFruits">
 		<?php echo __( 'Delete all fruits' ); ?>
 	</button>
-	<button data-wp-on--click="actions.addMango">
+	<button data-wp-on-async--click="actions.addMango">
 		<?php echo __( 'Add Mango' ); ?>
 	</button>
 	<ul data-wp-bind--hidden="!state.hasFruits">
@@ -466,11 +468,11 @@ If you want to use `wp_interactivity_process_directives` in a template file, you
 
 ```php
 <?php
-wp_interactivity_state( '...', /* ... */ );
+wp_interactivity_state( 'myClassicTheme', /* ... */ );
 ob_start();
 ?>
 
-<div data-wp-interactive="myFruitPlugin">
+<div data-wp-interactive="myClassicTheme">
 	...
 </div>
 
