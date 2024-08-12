@@ -139,7 +139,7 @@ The following PHP filters are available to change the output of a block on the f
 
 ### `render_block`
 
-Filters the font-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
+Filters the front-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
 
 The callback function for this filter receives three parameters:
 
@@ -172,7 +172,7 @@ add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 2
 
 ### `render_block_{namespace/block}`
 
-Filters the font-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
+Filters the front-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
 
 The callback function for this filter receives three parameters:
 
