@@ -283,7 +283,7 @@ const EmbedEdit = ( props ) => {
 					setAttributes={ setAttributes }
 					isSelected={ isSelected }
 					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Add Caption' ) }
+					label={ __( 'Embed caption text' ) }
 					showToolbarButton={ isSelected }
 				/>
 			</View>
