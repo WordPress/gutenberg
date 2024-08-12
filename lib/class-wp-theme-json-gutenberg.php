@@ -2382,7 +2382,12 @@ class WP_Theme_JSON_Gutenberg {
 				$root_variable_duplicates[] = substr( $css_property, $root_style_length );
 			}
 
-			// Processes background image styles.
+			/*
+			 * Processes background image styles.
+			 * If the value is a URL, it will be converted to a CSS `url()` value.
+			 * For uploaded image (images with a database ID), apply size and position defaults,
+			 * equal to those applied in block supports in lib/background.php.
+			 */
 			if ( 'background-image' === $css_property && ! empty( $value ) ) {
 				$background_styles = gutenberg_style_engine_get_styles(
 					array( 'background' => array( 'backgroundImage' => $value ) )
@@ -2390,17 +2395,15 @@ class WP_Theme_JSON_Gutenberg {
 
 				$value = $background_styles['declarations'][ $css_property ];
 			}
-
-			if ( static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
-				if ( 'background-size' === $css_property && empty( $value ) ) {
+			if ( empty( $value ) && static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
+				if ( 'background-size' === $css_property ) {
 					$value = 'cover';
 				}
 				// If the background size is set to `contain` and no position is set, set the position to `center`.
-				if ( 'background-position' === $css_property && empty( $value ) && 'contain' === $styles['background']['backgroundSize'] ) {
+				if ( 'background-position' === $css_property && 'contain' === $styles['background']['backgroundSize'] ) {
 					$value = '50% 50%';
 				}
 			}
-
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
@@ -2467,6 +2470,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added support for values of array type, which are returned as is.
 	 * @since 6.1.0 Added the `$theme_json` parameter.
+	 * @since 6.7.0 Added support for background image refs
 	 *
 	 * @param array $styles Styles subtree.
 	 * @param array $path   Which property to process.
@@ -2484,10 +2488,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		/*
 		 * This converts references to a path to the value at that path
-		 * where the values is an array with a "ref" key, pointing to a path.
+		 * where the value is an array with a "ref" key, pointing to a path.
 		 * For example: { "ref": "style.color.background" } => "#fff".
+		 * In the case of backgroundImage, if both a ref and a URL are present in the value,
+		 * the URL takes precedence.
 		 */
-		if ( is_array( $value ) && isset( $value['ref'] ) ) {
+		if ( is_array( $value ) && isset( $value['ref'] ) && ! isset( $value['url'] ) ) {
 			$value_path = explode( '.', $value['ref'] );
 			$ref_value  = _wp_array_get( $theme_json, $value_path, null );
 			// Background Image refs can refer to a string or an array containing a URL string.
