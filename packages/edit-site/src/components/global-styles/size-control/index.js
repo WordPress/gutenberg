@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +21,7 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 function SizeControl( props ) {
 	const { baseControlProps } = useBaseControlProps( props );
-	const { value, onChange, fallbackValue, disabled } = props;
+	const { value, onChange, fallbackValue, disabled, label } = props;
 
 	const units = useCustomUnits( {
 		availableUnits: DEFAULT_UNITS,
@@ -51,7 +50,7 @@ function SizeControl( props ) {
 					<UnitControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
-						label={ __( 'Custom' ) }
+						label={ label }
 						hideLabelFromVision
 						value={ value }
 						onChange={ handleUnitControlChange }
@@ -65,7 +64,7 @@ function SizeControl( props ) {
 						<RangeControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Custom Size' ) }
+							label={ label }
 							hideLabelFromVision
 							value={ valueQuantity }
 							initialPosition={ fallbackValue }
