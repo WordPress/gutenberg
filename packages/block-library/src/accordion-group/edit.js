@@ -30,7 +30,7 @@ export default function Edit( { attributes: { autoclose }, setAttributes } ) {
 					<ToggleControl
 						isBlock
 						__nextHasNoMarginBottom
-						label={ __( 'Close automatically' ) }
+						label={ __( 'Auto-close' ) }
 						onChange={ ( value ) => {
 							setAttributes( {
 								autoclose: value,
@@ -38,7 +38,7 @@ export default function Edit( { attributes: { autoclose }, setAttributes } ) {
 						} }
 						checked={ autoclose }
 						help={ __(
-							'Clicking one accordion section automatically closes all other open sections.'
+							'Automatically close accordions when a new one is opened.'
 						) }
 					/>
 				</PanelBody>
