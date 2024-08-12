@@ -10,7 +10,7 @@ The Interactivity API is a reactive and declarative framework, similar to other 
 
 In the early days of web development, the imperative approach was predominant. This method involves manually updating the DOM with JavaScript to reflect changes.
 
-Take, for example, this application with two buttons and a paragraph:
+Take, for example, this interactive block with two buttons and a paragraph:
 
 -   **The show/hide button**: Toggles paragraph visibility and enables/disables the "Activate" button.
 -   **The activate button**: Toggles the paragraph's text and color between "active" (green) and "inactive" (red).
@@ -134,7 +134,7 @@ In this declarative example, the UI automatically updates based on the current s
 
 ### Can you spot the bug?
 
-In the imperative example, we intentionally introduced a bug. Can you find it? It's not easy!
+In the imperative example, a bug has been intentionally introduced for didactical purposes. Can you find it? It's not easy!
 
 <details>
 <summary>Show me the answer!</summary>
@@ -143,13 +143,11 @@ In the case that the Show button is pressed first, then the Activate button, and
 
 </details>
 
-These types of bugs are very common in imperative code because we have to manually control all the conditions. On the other hand, they do not exist in declarative code because the framework takes care of updating the DOM and never forgets about anything :)
+These types of bugs are very common in imperative code because we have to manually control all the conditions. On the other hand, they do not exist in declarative code because the framework takes care of updating the DOM and never forgets about anything.
 
 ### Benefits of the declarative approach
 
-As demonstrated, the imperative approach requires detailed steps and direct manipulation of the DOM, which can quickly become complex and hard to maintain as the application grows. The more possible states and elements there are, the more conditional logic needs to be added, making the code exponentially more complicated. The declarative approach, on the other hand, simplifies the process by managing the state and letting the framework handle the DOM updates. This leads to more readable, maintainable, and scalable code.
-
-By adopting a declarative mindset, developers can leverage the Interactivity API to create dynamic and interactive applications more efficiently. Since everything is tied to the state, modifying the state will automatically update the entire application to the correct state. Understanding this core concept is essential for mastering the Interactivity API and writing effective code.
+As demonstrated, the imperative approach requires detailed steps and direct manipulation of the DOM, which can quickly become complex and hard to maintain as the interactivity grows. The more possible states and elements there are, the more conditional logic needs to be added, making the code exponentially more complicated. The declarative approach, on the other hand, simplifies the process by managing the state and letting the framework handle the DOM updates. This leads to more readable, maintainable, and scalable code.
 
 ## Reactivity
 
@@ -159,25 +157,24 @@ The Interactivity API is a declarative framework thanks to its leverage of react
 
 The Interactivity API uses a fine-grained reactivity system. Here's how it works:
 
-1. **Reactive State**: In the Interactivity API, both the state and the context (from the `data-wp-context` directive) are reactive. This means that when either of these data sources changes, any parts of the UI that depend on them will automatically update.
+1. **Reactive State**: In the Interactivity API, both the global state and the local context (from the `data-wp-context` directive) are reactive. This means that when either of these data sources changes, any parts of the UI that depend on them will automatically update.
 
-    - **State**: This is global data that can be accessed throughout your application.
-    - **Context**: This is local data that is specific to a particular element and its children.
+    - **Global state**: This is global data that can be accessed throughout your interactive blocks.
+    - **Local context**: This is local data that is specific to a particular element and its children.
+    - **Derived State**: In addition to basic state properties, you can define computed properties (derived state) that automatically update when their dependencies change.
 
-2. **Derived State**: In addition to basic state properties, you can define computed properties (derived state) that automatically update when their dependencies change.
+    _Please, visit the [Understanding global state, local context and derived state guide](./undestanding-global-state-local-context-and-derived-state.md) to learn more about how to work with the different types of reactive state._
 
-3. **Actions**: These are functions that modify the state.
+2. **Actions**: These are functions that modify the state.
 
-4. **Reactive Bindings**: HTML elements are bound to state values using special attributes like `data-wp-bind`, `data-wp-text`, or `data-wp-class`.
+3. **Reactive Bindings**: HTML elements are bound to state values using special attributes like `data-wp-bind`, `data-wp-text`, or `data-wp-class`.
 
-5. **Automatic Updates**: When the state or context changes (through actions), the Interactivity API automatically updates all parts of the DOM that depend on that state (or derived state).
+4. **Automatic Updates**: When the actions mutate the global state or local context, the Interactivity API automatically updates all the parts of the DOM that depend on that state (either directly or through the derived state).
 
-Let's break down these concepts with an example from the code we've seen:
+Let's break down these concepts by reviewing the previous example:
 
 ```javascript
-import { store } from '@wordpress/interactivity';
-
-const { state } = store( 'myPlugin', {
+const { state } = store( 'myCounterPlugin', {
 	state: {
 		isVisible: false,
 		isActive: false,
@@ -224,30 +221,28 @@ Here's how reactivity works in practice:
 
 ### Mutability vs immutability
 
-Unlike many other reactive frameworks, **the Interactivity API does not require the use of immutability** when updating state or context. You can directly mutate objects and arrays, and the reactivity system will still work as expected. This can lead to more intuitive and straightforward code in many cases.
+Unlike many other reactive frameworks, **the Interactivity API does not require the use of immutability** when updating the global state or the local context. You can directly mutate objects and arrays, and the reactivity system will still work as expected. This can lead to more intuitive and straightforward code in many cases.
 
-For example, you can push to an array like this:
+For example, you can push an new item to an array like this:
 
 ```javascript
-import { store } from '@wordpress/interactivity';
-
-const { state } = store( 'myPlugin', {
+const { state } = store( 'myArrayPlugin', {
 	state: {
-		items: [ 'item 1', 'item 2' ],
+		list: [ 'item 1', 'item 2' ],
 	},
 	actions: {
 		addItem() {
 			// Right:
-			state.items.push( 'new item' );
+			state.list.push( 'new item' );
 
 			// Wrong:
-			state.items = [ ...state.items, 'new item' ]; // Don't do this!
+			state.list = [ ...state.list, 'new item' ]; // Don't do this!
 		},
 	},
 } );
 ```
 
-There's no need to create a new array or use the spread operator as you might in other frameworks. The Interactivity API will detect this change and update any parts of the UI that depend on `state.items`.
+There's no need to create a new array or use the spread operator as you might in other frameworks. The Interactivity API will detect this change and update any parts of the UI that depend on `state.list`.
 
 ### Reactive side effects
 
@@ -256,27 +251,28 @@ In addition to automatically updating the UI, the Interactivity API allows you t
 Here's an example of how you might use `data-wp-watch`:
 
 ```html
-<div data-wp-watch="callbacks.logCount">
-	<p>Count: <span data-wp-text="state.count"></span></p>
+<div
+	data-wp-interactive="myCounterPlugin"
+	data-wp-context='{ "counter": 0 }'
+	data-wp-watch="callbacks.logCount"
+>
+	<p>Counter: <span data-wp-text="context.counter"></span></p>
 	<button data-wp-on--click="actions.increment">Increment</button>
 </div>
 ```
 
 ```javascript
-import { store } from '@wordpress/interactivity';
-
-const { state } = store( 'myPlugin', {
-	state: {
-		count: 0,
-	},
+store( 'myCounterPlugin', {
 	actions: {
 		increment() {
-			state.count += 1;
+			const context = getContext();
+			context.counter += 1;
 		},
 	},
 	callbacks: {
 		logCount: () => {
-			console.log( `The count is now: ${ state.count }` );
+			const context = getContext();
+			console.log( `The counter is now: ${ context.counter }` );
 		},
 	},
 } );
@@ -284,22 +280,21 @@ const { state } = store( 'myPlugin', {
 
 In this example:
 
-1. We have a simple counter implemented using the local context.
+1. The `data-wp-context` directive adds a local context with a property `counter` whose value is `0`.
 2. The `data-wp-watch` directive is set to `callbacks.logCount`.
-3. Every time `state.count` changes, the `logCount` callback will be executed.
-4. The `logCount` callback logs the current count to the console.
+3. Every time `context.counter` changes, the `logCount` callback will be executed.
+4. The `logCount` callback logs the current counter to the console.
 
 This allows you to create powerful side effects that automatically run in response to data changes. Some other use cases for `data-wp-watch` might include:
 
--   Saving data to localStorage when it changes.
+-   Saving data to `localStorage` when it changes.
 -   Sending analytics events.
+-   Changing the focus for accessibility purposes.
 -   Updating the page title, meta tags, or body attributes.
 -   Triggering animations.
 
-### Benefits of reactivity in the Interactivity API
+## Conclusion
 
-1. **Simplicity**: You can focus on your data and logic without worrying about manually updating the UI.
-2. **Consistency**: The UI is always in sync with your data, reducing the chance of inconsistencies.
-3. **Performance**: Only the parts of the UI that need to change are updated, leading to efficient rendering.
+Embracing a declarative and reactive mindset is a fundamental shift in how you approach building interactive blocks with the Interactivity API. By focusing on what your block should accomplish, rather than how to accomplish it, you can create more efficient, scalable, and maintainable code.
 
-By leveraging the reactive nature of the Interactivity API, you can create dynamic, responsive WordPress interfaces with less code and fewer bugs. The system takes care of the complex task of keeping your UI in sync with your data, allowing you to focus on building great features for your users.
+As you continue to work with the Interactivity API, remember to think in terms of state, actions, and side effects. Define your data, describe how it should change, and let the Interactivity API handle the rest. This mental shift may take some time, especially if you're used to more imperative programming styles. But by doing so, you'll unlock the full potential of the Interactivity API to create truly dynamic and interactive WordPress blocks that delight your users.
