@@ -23,6 +23,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import duplicatePost from '../actions/duplicate-post';
 import viewPostRevisions from '../actions/view-post-revisions';
+import viewPost from '../actions/view-post';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -89,6 +90,7 @@ export const registerPostTypeActions =
 			.getCurrentTheme();
 
 		const actions = [
+			postTypeConfig.viewable ? viewPost : undefined,
 			!! postTypeConfig?.supports?.revisions
 				? viewPostRevisions
 				: undefined,
