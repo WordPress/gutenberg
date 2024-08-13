@@ -109,6 +109,10 @@ figure.wp-block-gallery.has-nested-images {
 				margin: 0;
 				padding: 10px 10px 9px;
 				position: relative;
+				text-shadow: none;
+			}
+			&::before {
+				content: none;
 			}
 		}
 	}
