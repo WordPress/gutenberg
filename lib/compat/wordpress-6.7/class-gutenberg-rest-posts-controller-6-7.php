@@ -18,6 +18,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 	 * Retrieves a collection of posts.
 	 *
 	 * @since 4.7.0
+	 * @since 6.7.0 Added support for the `format` query parameter.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -280,6 +281,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 	 * Retrieves the post's schema, conforming to JSON Schema.
 	 *
 	 * @since 4.7.0
+	 * @since 6.7.0 Added support for the `format` query parameter.
 	 *
 	 * @return array Item schema data.
 	 */
@@ -743,6 +745,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 	 * @since 4.7.0
 	 * @since 5.4.0 The `tax_relation` query parameter was added.
 	 * @since 5.7.0 The `modified_after` and `modified_before` query parameters were added.
+	 * @since 6.7.0 Added support for the `format` query parameter.
 	 *
 	 * @return array Collection parameters.
 	 */
