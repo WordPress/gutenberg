@@ -47,7 +47,10 @@ function isMajorMinorVersionLower( version, compareVersion ) {
 
 	// If the major version is the same, we need to compare the minor version.
 	if ( versionParts[ 0 ] === compareVersionParts[ 0 ] ) {
-		if ( versionParts[ 1 ] !== undefined && compareVersionParts[ 1 ] === undefined ) {
+		if (
+			versionParts[ 1 ] !== undefined &&
+			compareVersionParts[ 1 ] === undefined
+		) {
 			return versionParts[ 1 ] < compareVersionParts[ 1 ];
 		}
 
@@ -90,7 +93,11 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 async function configureWordPress( environment, config, spinner ) {
 	let wpVersion = '';
 	try {
-		wpVersion = readWordPressVersion( config.env[ environment ].coreSource, spinner, config.debug );
+		wpVersion = readWordPressVersion(
+			config.env[ environment ].coreSource,
+			spinner,
+			config.debug
+		);
 	} catch ( err ) {
 		// Ignore error.
 	}
@@ -101,7 +108,10 @@ async function configureWordPress( environment, config, spinner ) {
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
 
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
-	const configAnchor = wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' ) ? `"define('WP_DEBUG',"` : `"define( 'WP_DEBUG',"`;
+	const configAnchor =
+		wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' )
+			? `"define('WP_DEBUG',"`
+			: `"define( 'WP_DEBUG',"`;
 
 	// Set wp-config.php values.
 	for ( let [ key, value ] of Object.entries(
