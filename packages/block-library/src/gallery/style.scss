@@ -44,26 +44,21 @@ figure.wp-block-gallery.has-nested-images {
 		}
 
 		// Position caption and scrim at the bottom.
-		figcaption,
-		figcaption::after {
+		&:has(figcaption)::after,
+		figcaption {
 			position: absolute;
 			bottom: 0;
 			right: 0;
 			left: 0;
-			max-height: 80%;
+			max-height: 100%;
 		}
 
-		// Put the scrim on its own layer.
-		figcaption::after {
+		// Create a background blur layer.
+		&:has(figcaption)::after {
 			content: "";
-			z-index: -1;
+			z-index: 0;
 			height: 100%;
-			max-height: none;
-
-			// Dark gradient scrim. This can just be a solid color, as the mask will make it a
-			//background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.6) 0, rgba($color: $black, $alpha: 0.3) 50%, transparent);
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0.2) 100%, transparent);
-			//filter: blur(10px);
+			max-height: 40%;
 
 			// Blur the background under the gradient scrim.
 			backdrop-filter: blur(4px);
@@ -72,7 +67,9 @@ figure.wp-block-gallery.has-nested-images {
 			mask-image: linear-gradient(0deg, rgba($color: $black, $alpha: 1) 20%, rgba($color: $black, $alpha: 0) 100%);
 		}
 
+		// Place the caption at the bottom.
 		figcaption {
+			z-index: 1;
 			color: $white;
 			text-shadow: 0 0 1.5px rgba($color: $black, $alpha: 1);
 			font-size: $default-font-size;
@@ -82,6 +79,9 @@ figure.wp-block-gallery.has-nested-images {
 			text-align: center;
 			box-sizing: border-box;
 			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
+
+			// Dark gradient scrim.
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0) 100%, transparent);
 
 			img {
 				display: inline;
