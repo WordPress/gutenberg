@@ -8,12 +8,6 @@
 	font-size: 12px;
 	padding: $grid-unit-05 $grid-unit-10;
 	z-index: z-index(".components-tooltip");
-	&.move-up {
-		margin-top: 25px;
-	}
-	&.move-down {
-		margin-top: 5px;
-	}
 }
 
 .components-tooltip__shortcut {
