@@ -3259,14 +3259,12 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes(
-			$incoming_data,
-			$blocks_metadata,
-			array(
-				'include_block_style_variations' => true,
-			)
-		);
+		/*
+		 * Style values are merged at the leaf level, however
+		 * some values provide exceptions, namely style values that are
+		 * objects and represent unique definitions for the style.
+		 */
+		$style_nodes = static::get_styles_block_nodes();
 		foreach ( $style_nodes as $style_node ) {
 			$path = $style_node['path'];
 			/*
