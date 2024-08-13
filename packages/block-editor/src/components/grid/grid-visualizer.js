@@ -74,13 +74,12 @@ const GridVisualizerUI = forwardRef(
 					gridInfo={ gridInfo }
 					isManualGrid={ isManualGrid }
 				/>
-				{ isManualGrid && (
-					<GridPopover
-						ref={ ref }
-						gridClientId={ gridClientId }
-						gridInfo={ gridInfo }
-					/>
-				) }
+				<GridPopover
+					ref={ ref }
+					gridClientId={ gridClientId }
+					gridInfo={ gridInfo }
+					isManualGrid={ isManualGrid }
+				/>
 			</>
 		);
 	}
@@ -96,10 +95,48 @@ const GridVisualizerUI = forwardRef(
  * @param {string} props.gridClientId
  * @param {Object} props.gridInfo
  */
-const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
-	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
-	const [ highlightedRect, setHighlightedRect ] = useState( null );
+const GridPopover = forwardRef(
+	( { gridClientId, gridInfo, isManualGrid }, ref ) => {
+		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 
+		useEffect( () => {
+			function onGlobalDrag() {
+				setIsDroppingAllowed( true );
+			}
+			function onGlobalDragEnd() {
+				setIsDroppingAllowed( false );
+			}
+			document.addEventListener( 'drag', onGlobalDrag );
+			document.addEventListener( 'dragend', onGlobalDragEnd );
+			return () => {
+				document.removeEventListener( 'drag', onGlobalDrag );
+				document.removeEventListener( 'dragend', onGlobalDragEnd );
+			};
+		}, [] );
+
+		return (
+			<BlockPopoverCover
+				__unstablePopoverSlot="__unstable-block-tools-after"
+				className={ clsx( 'block-editor-grid-visualizer-popover', {
+					'is-dropping-allowed': isDroppingAllowed,
+				} ) }
+				clientId={ gridClientId }
+			>
+				<div ref={ ref } style={ gridInfo.style }>
+					{ isManualGrid && (
+						<ManualGridPopoverItems
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+						/>
+					) }
+				</div>
+			</BlockPopoverCover>
+		);
+	}
+);
+
+function ManualGridPopoverItems( { gridClientId, gridInfo } ) {
+	const [ highlightedRect, setHighlightedRect ] = useState( null );
 	const gridItems = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks( gridClientId ),
 		[ gridClientId ]
@@ -129,77 +166,46 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 		return rects;
 	}, [ gridItems ] );
 
-	useEffect( () => {
-		function onGlobalDrag() {
-			setIsDroppingAllowed( true );
-		}
-		function onGlobalDragEnd() {
-			setIsDroppingAllowed( false );
-		}
-		document.addEventListener( 'drag', onGlobalDrag );
-		document.addEventListener( 'dragend', onGlobalDragEnd );
-		return () => {
-			document.removeEventListener( 'drag', onGlobalDrag );
-			document.removeEventListener( 'dragend', onGlobalDragEnd );
-		};
-	}, [] );
+	return range( 1, gridInfo.numRows ).map( ( row ) =>
+		range( 1, gridInfo.numColumns ).map( ( column ) => {
+			const isCellOccupied = occupiedRects.some( ( rect ) =>
+				rect.contains( column, row )
+			);
+			const isHighlighted =
+				highlightedRect?.contains( column, row ) ?? false;
 
-	return (
-		<BlockPopoverCover
-			__unstablePopoverSlot="__unstable-block-tools-after"
-			className={ clsx( 'block-editor-grid-visualizer-popover', {
-				'is-dropping-allowed': isDroppingAllowed,
-			} ) }
-			clientId={ gridClientId }
-		>
-			<div ref={ ref } style={ gridInfo.style }>
-				{ range( 1, gridInfo.numRows ).map( ( row ) =>
-					range( 1, gridInfo.numColumns ).map( ( column ) => {
-						const isCellOccupied = occupiedRects.some( ( rect ) =>
-							rect.contains( column, row )
-						);
-						const isHighlighted =
-							highlightedRect?.contains( column, row ) ?? false;
-
-						return (
-							<div
-								key={ `${ row }-${ column }` }
-								className={ clsx(
-									'block-editor-grid-visualizer-popover__cell',
-									{
-										'is-highlighted': isHighlighted,
-									}
-								) }
-							>
-								{ isCellOccupied ? (
-									<GridVisualizerDropZone
-										column={ column }
-										row={ row }
-										gridClientId={ gridClientId }
-										gridInfo={ gridInfo }
-										setHighlightedRect={
-											setHighlightedRect
-										}
-									/>
-								) : (
-									<GridVisualizerAppender
-										column={ column }
-										row={ row }
-										gridClientId={ gridClientId }
-										gridInfo={ gridInfo }
-										setHighlightedRect={
-											setHighlightedRect
-										}
-									/>
-								) }
-							</div>
-						);
-					} )
-				) }
-			</div>
-		</BlockPopoverCover>
+			return (
+				<div
+					key={ `${ row }-${ column }` }
+					className={ clsx(
+						'block-editor-grid-visualizer-popover__cell',
+						{
+							'is-highlighted': isHighlighted,
+						}
+					) }
+				>
+					{ isCellOccupied ? (
+						<GridVisualizerDropZone
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+						/>
+					) : (
+						<GridVisualizerAppender
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+						/>
+					) }
+				</div>
+			);
+		} )
 	);
-} );
+}
 
 /**
  * A popover component that renders inline under the grid block.
