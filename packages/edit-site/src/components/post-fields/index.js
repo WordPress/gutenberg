@@ -271,6 +271,7 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Date' ),
 				id: 'date',
+				type: 'datetime',
 				render: ( { item } ) => {
 					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 						item.status
@@ -343,6 +344,32 @@ function usePostFields( viewType ) {
 					// Unknow status.
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
+			},
+			{
+				id: 'comment_status',
+				label: __( 'Discussion' ),
+				type: 'text',
+				Edit: 'radio',
+				enableSorting: false,
+				filterBy: {
+					operators: [],
+				},
+				elements: [
+					{
+						value: 'open',
+						label: __( 'Open' ),
+						description: __(
+							'Visitors can add new comments and replies.'
+						),
+					},
+					{
+						value: 'closed',
+						label: __( 'Closed' ),
+						description: __(
+							'Visitors cannot add new comments or replies. Existing comments remain visible.'
+						),
+					},
+				],
 			},
 		],
 		[ authors, viewType, frontPageId, postsPageId ]
