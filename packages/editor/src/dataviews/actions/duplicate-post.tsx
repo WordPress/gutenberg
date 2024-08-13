@@ -34,7 +34,7 @@ const duplicatePost: Action< BasePost > = {
 		return status !== 'trash';
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item, setItem ] = useState( {
+		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],
 			title: sprintf(
 				/* translators: %s: Existing template title */
@@ -44,7 +44,6 @@ const duplicatePost: Action< BasePost > = {
 		} );
 
 		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-
 		const { saveEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
@@ -141,7 +140,12 @@ const duplicatePost: Action< BasePost > = {
 						data={ item }
 						fields={ fields }
 						form={ formDuplicateAction }
-						onChange={ setItem }
+						onChange={ ( changes ) =>
+							setItem( ( prev ) => ( {
+								...prev,
+								...changes,
+							} ) )
+						}
 					/>
 					<HStack spacing={ 2 } justify="end">
 						<Button
