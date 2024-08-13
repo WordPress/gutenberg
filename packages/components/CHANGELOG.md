@@ -20,7 +20,32 @@
 -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
--   `AlignmentMatrixControl`, `AnglePickerControl`, `BorderControl`, `ButtonGroup`, `Button`, `CircularOptionPicker`, `ColorIndicator`, `ColorPalette`, `CustomGradientPicker`, `DropZone`, `DropdownMenuV2`, `FocalPointPicker`, `Guide`, `Modal`, `Placeholder`, `Popover`, `ProgressBar`, `RadioControl`, `Snackbar`, `TabPanel`, `Text`, `ToggleGroupControl`, `ToolbarGroup`, `Toolbar`, `Tooltip`, `UnitControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `AlignmentMatrixControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `AnglePickerControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `BorderControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ButtonGroup`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Button`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `CircularOptionPicker`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ColorIndicator`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ColorPalette`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `CustomGradientPicker`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `DropZone`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `DropdownMenuV2`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `FocalPointPicker`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Guide`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Modal`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Placeholder`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Popover`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ProgressBar`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `RadioControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Snackbar`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `TabPanel`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Text`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ToggleGroupControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `ToolbarGroup`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Toolbar`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `Tooltip`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
+-   `UnitControl`: Adopt radius scale. ([#64368](https://github.com/WordPress/gutenberg/pull/64368))
 
 ### Internal
 
