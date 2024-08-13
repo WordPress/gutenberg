@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   `AutoComplete`: Improve compatibility ([#63671](https://github.com/WordPress/gutenberg/pull/63671)).
-
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
