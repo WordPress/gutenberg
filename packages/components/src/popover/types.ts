@@ -160,12 +160,13 @@ export type PopoverProps = {
 	 * @default false
 	 */
 	inline?: boolean;
+
 	/**
 	 * Styles to apply to the main popover element.
 	 *
 	 * @default undefined
 	 */
-	contentStyle?: React.CSSProperties;
+	style?: React.CSSProperties;
 
 	// Deprecated props
 	/**

@@ -235,7 +235,7 @@ function GridPopunder( { gridClientId, gridInfo, isManualGrid } ) {
 			inline
 			clientId={ gridClientId }
 			// Override layout margin and popover's zIndex.
-			contentStyle={ { margin: 0, zIndex: 0 } }
+			style={ { margin: 0, zIndex: 0 } }
 		>
 			<div style={ gridInfo.style }>
 				{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (

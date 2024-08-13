@@ -113,8 +113,8 @@ const UnforwardedPopover = (
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
+		// props (except for `animate`, `children` and `style`, which are re-defined in `PopoverProps`).
+		keyof Omit< MotionProps, 'animate' | 'children' | 'style' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -138,8 +138,8 @@ const UnforwardedPopover = (
 		resize = true,
 		shift = false,
 		inline = false,
+		style: contentStyle,
 		variant,
-		contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
