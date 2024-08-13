@@ -15,7 +15,11 @@ import { forwardRef } from '@wordpress/element';
  */
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
-import type { TextControlProps, TextControlPropsType } from './types';
+import type {
+	TextControlProps,
+	TextControlPropsType,
+	ValueOfType,
+} from './types';
 
 function UnforwardedTextControl< T extends TextControlPropsType = 'text' >(
 	props: WordPressComponentProps< TextControlProps< T >, 'input', false >,
@@ -39,7 +43,7 @@ function UnforwardedTextControl< T extends TextControlPropsType = 'text' >(
 		onChange(
 			( type === 'number'
 				? event.target.valueAsNumber
-				: event.target.value ) as T extends 'number' ? number : string
+				: event.target.value ) as ValueOfType< T >
 		);
 
 	return (

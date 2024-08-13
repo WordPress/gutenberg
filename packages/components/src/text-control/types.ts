@@ -15,7 +15,7 @@ export type TextControlPropsType =
 	| 'search'
 	| 'url';
 
-type ValueOfType< T extends TextControlPropsType > = T extends 'number'
+export type ValueOfType< T extends TextControlPropsType > = T extends 'number'
 	? number
 	: string;
 
