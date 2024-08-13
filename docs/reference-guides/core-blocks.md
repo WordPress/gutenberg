@@ -865,7 +865,7 @@ Display an icon linking to a social profile or site. ([Source](https://github.co
 -	**Name:** core/social-link
 -	**Category:** widgets
 -	**Parent:** core/social-links
--	**Supports:** color (background, gradients, text, ~~link~~), interactivity (clientNavigation), spacing (margin, padding, units), ~~html~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), spacing (margin, padding, units), ~~html~~, ~~reusable~~
 -	**Attributes:** label, rel, service, url
 
 ## Social Icons

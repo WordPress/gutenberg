@@ -44,12 +44,6 @@
 				"padding": false
 			}
 		},
-		"color": {
-			"background": true,
-			"text": true,
-			"gradients": true,
-			"link": false
-		},
 		"__experimentalBorder": {
 			"radius": true,
 			"color": true,
