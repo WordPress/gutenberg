@@ -7,17 +7,18 @@ import type { Field } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { BasePost, PostWithPageAttributesSupport } from '../types';
+import type { BasePost } from '../types';
+import { getItemTitle } from '../actions/utils';
 
 export const titleField: Field< BasePost > = {
 	type: 'text',
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),
-	getValue: ( { item } ) => item.title,
+	getValue: ( { item } ) => getItemTitle( item ),
 };
 
-export const orderField: Field< PostWithPageAttributesSupport > = {
+export const orderField: Field< BasePost > = {
 	type: 'integer',
 	id: 'menu_order',
 	label: __( 'Order' ),

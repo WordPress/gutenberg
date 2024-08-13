@@ -7,7 +7,7 @@ type PostStatus =
 	| 'auto-draft'
 	| 'trash';
 
-export interface BasePost {
+export interface CommonPost {
 	status?: PostStatus;
 	title: string | { rendered: string } | { raw: string };
 	content: string | { raw: string; rendered: string };
@@ -16,7 +16,21 @@ export interface BasePost {
 	blocks?: Object[];
 }
 
-export interface Template extends BasePost {
+export interface BasePost extends CommonPost {
+	comment_status?: 'open' | 'closed';
+	excerpt?: string | { raw: string; rendered: string };
+	meta?: Record< string, any >;
+	parent?: number;
+	password?: string;
+	template?: string;
+	format?: string;
+	featured_media?: number;
+	menu_order?: number;
+	ping_status?: 'open' | 'closed';
+	_links?: Record< string, { href: string }[] >;
+}
+
+export interface Template extends CommonPost {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
@@ -24,7 +38,7 @@ export interface Template extends BasePost {
 	id: string;
 }
 
-export interface TemplatePart extends BasePost {
+export interface TemplatePart extends CommonPost {
 	type: 'wp_template_part';
 	source: string;
 	has_theme_file: boolean;
@@ -32,14 +46,10 @@ export interface TemplatePart extends BasePost {
 	area: string;
 }
 
-export interface Pattern extends BasePost {
+export interface Pattern extends CommonPost {
 	slug: string;
 	title: { raw: string };
 	wp_pattern_sync_status: string;
-}
-
-export interface PostWithPageAttributesSupport extends BasePost {
-	menu_order: number;
 }
 
 export type Post = Template | TemplatePart | Pattern | BasePost;
