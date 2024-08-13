@@ -12,6 +12,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
@@ -136,11 +138,17 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
-	// TODO: this condition does not work for custom post types,
-	// useTaxonomies util does not return the post format taxonomy
-	// for custom post types, only posts?
-	const showPostFormatControl =
-		taxonomies && taxonomies.some( ( { slug } ) => slug === 'post_format' );
+	// Check if post formats are supported.
+	// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
+	// and in this case the control should not be shown since the user has no other formats to choose from.
+	const showPostFormatControl = useSelect( ( select ) => {
+		const themeSupports = select( coreStore ).getThemeSupports();
+		return (
+			themeSupports.formats &&
+			themeSupports.formats.length > 0 &&
+			themeSupports.formats.some( ( format ) => format !== 'standard' )
+		);
+	}, [] );
 
 	const showFiltersPanel =
 		showTaxControl ||

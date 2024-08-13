@@ -41,10 +41,6 @@ export default function PostFormatControls( { onChange, query } ) {
 		};
 	}, [] );
 
-	// TODO: It seems that even when the theme does not support post formats,
-	// the 'standard' format is still returned, so the control shows.
-	// We probably don't want this control to show in the filter in this case.
-
 	const postFormats = POST_FORMATS.filter( ( format ) =>
 		supportedFormats.includes( format.slug )
 	);

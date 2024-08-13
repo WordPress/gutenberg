@@ -138,10 +138,7 @@ export default function PostTemplateEdit( {
 							( { slug } ) => slug === taxonomySlug
 						);
 						if ( taxonomy?.rest_base ) {
-							// Skip post formats, as they are handled separately.
-							if ( ! taxonomy.rest_base === 'post_format' ) {
-								accumulator[ taxonomy.rest_base ] = terms;
-							}
+							accumulator[ taxonomy.rest_base ] = terms;
 						}
 						return accumulator;
 					},
