@@ -34,6 +34,7 @@ export interface BasePost extends CommonPost {
 	featured_media?: number;
 	menu_order?: number;
 	ping_status?: 'open' | 'closed';
+	link?: string;
 }
 
 export interface Template extends CommonPost {
@@ -72,6 +73,7 @@ export type PostWithPermissions = Post & {
 
 export interface PostType {
 	slug: string;
+	viewable: boolean;
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;

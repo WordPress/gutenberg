@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
 
 /**
@@ -13,30 +10,11 @@ import { useMemo, useEffect } from '@wordpress/element';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const viewPostAction = {
-	id: 'view-post',
-	label: __( 'View' ),
-	isPrimary: true,
-	icon: external,
-	isEligible( post ) {
-		return post.status !== 'trash';
-	},
-	callback( posts, { onActionPerformed } ) {
-		const post = posts[ 0 ];
-		window.open( post.link, '_blank' );
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
-	},
-};
-
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions, postTypeObject } = useSelect(
+	const { defaultActions } = useSelect(
 		( select ) => {
-			const { getPostType } = select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
-				postTypeObject: getPostType( postType ),
 				defaultActions: getEntityActions( 'postType', postType ),
 			};
 		},
@@ -48,23 +26,14 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		registerPostTypeActions( postType );
 	}, [ registerPostTypeActions, postType ] );
 
-	const isLoaded = !! postTypeObject;
 	return useMemo( () => {
-		if ( ! isLoaded ) {
-			return [];
-		}
-
-		let actions = [
-			postTypeObject?.viewable && viewPostAction,
-			...defaultActions,
-		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
 		// all actions are returned. We'll have a single entry for getting the actions
 		// and the consumer should provide the context to filter the actions, if needed.
 		// Actions should also provide the `context` they support, if it's specific, to
 		// compare with the provided context to get all the actions.
 		// Right now the only supported context is `list`.
-		actions = actions.filter( ( action ) => {
+		const actions = defaultActions.filter( ( action ) => {
 			if ( ! action.context ) {
 				return true;
 			}
@@ -119,11 +88,5 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
-	}, [
-		defaultActions,
-		postTypeObject?.viewable,
-		onActionPerformed,
-		isLoaded,
-		context,
-	] );
+	}, [ defaultActions, onActionPerformed, context ] );
 }
