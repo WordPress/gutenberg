@@ -48,6 +48,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open by default' ) }
 						checked={ showContent }
 						onChange={ () =>

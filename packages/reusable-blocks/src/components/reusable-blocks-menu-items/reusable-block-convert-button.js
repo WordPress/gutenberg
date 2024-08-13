@@ -176,6 +176,7 @@ export default function ReusableBlockConvertButton( {
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'

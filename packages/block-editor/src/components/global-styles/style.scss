@@ -211,12 +211,6 @@
 	}
 }
 
-.block-editor-global-styles-background-panel__hidden-tools-panel-item {
-	height: 0;
-	width: 0;
-	position: absolute;
-}
-
 // Push control panel into the background when the media modal is open.
 .modal-open .block-editor-global-styles-background-panel__popover {
 	z-index: z-index(".block-editor-global-styles-background-panel__popover");

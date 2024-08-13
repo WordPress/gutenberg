@@ -32,29 +32,18 @@ interface AddFilterProps {
 	setOpenedFilter: ( filter: string | null ) => void;
 }
 
-function AddFilter(
-	{ filters, view, onChangeView, setOpenedFilter }: AddFilterProps,
-	ref: Ref< HTMLButtonElement >
-) {
-	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
-		return null;
-	}
+export function AddFilterDropdownMenu( {
+	filters,
+	view,
+	onChangeView,
+	setOpenedFilter,
+	trigger,
+}: AddFilterProps & {
+	trigger: React.ReactNode;
+} ) {
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
-		<DropdownMenu
-			trigger={
-				<Button
-					accessibleWhenDisabled
-					size="compact"
-					className="dataviews-filters__button"
-					variant="tertiary"
-					disabled={ ! inactiveFilters.length }
-					ref={ ref }
-				>
-					{ __( 'Add filter' ) }
-				</Button>
-			}
-		>
+		<DropdownMenu trigger={ trigger }>
 			{ inactiveFilters.map( ( filter ) => {
 				return (
 					<DropdownMenuItem
@@ -82,6 +71,33 @@ function AddFilter(
 				);
 			} ) }
 		</DropdownMenu>
+	);
+}
+
+function AddFilter(
+	{ filters, view, onChangeView, setOpenedFilter }: AddFilterProps,
+	ref: Ref< HTMLButtonElement >
+) {
+	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
+		return null;
+	}
+	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
+	return (
+		<AddFilterDropdownMenu
+			trigger={
+				<Button
+					accessibleWhenDisabled
+					size="compact"
+					className="dataviews-filters-button"
+					variant="tertiary"
+					disabled={ ! inactiveFilters.length }
+					ref={ ref }
+				>
+					{ __( 'Add filter' ) }
+				</Button>
+			}
+			{ ...{ filters, view, onChangeView, setOpenedFilter } }
+		/>
 	);
 }
 
