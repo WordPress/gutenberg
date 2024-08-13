@@ -186,6 +186,10 @@ function usePostFields( viewType ) {
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( viewType ) &&
 						item.status !== 'trash';
+					const renderedTitle =
+						typeof item.title === 'string'
+							? item.title
+							: item.title?.rendered;
 					const title = addLink ? (
 						<Link
 							params={ {
@@ -194,12 +198,12 @@ function usePostFields( viewType ) {
 								canvas: 'edit',
 							} }
 						>
-							{ decodeEntities( item.title?.rendered ) ||
+							{ decodeEntities( renderedTitle ) ||
 								__( '(no title)' ) }
 						</Link>
 					) : (
 						<span>
-							{ decodeEntities( item.title?.rendered ) ||
+							{ decodeEntities( renderedTitle ) ||
 								__( '(no title)' ) }
 						</span>
 					);
@@ -267,6 +271,7 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Date' ),
 				id: 'date',
+				type: 'datetime',
 				render: ( { item } ) => {
 					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 						item.status
@@ -339,6 +344,32 @@ function usePostFields( viewType ) {
 					// Unknow status.
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
+			},
+			{
+				id: 'comment_status',
+				label: __( 'Discussion' ),
+				type: 'text',
+				Edit: 'radio',
+				enableSorting: false,
+				filterBy: {
+					operators: [],
+				},
+				elements: [
+					{
+						value: 'open',
+						label: __( 'Open' ),
+						description: __(
+							'Visitors can add new comments and replies.'
+						),
+					},
+					{
+						value: 'closed',
+						label: __( 'Closed' ),
+						description: __(
+							'Visitors cannot add new comments or replies. Existing comments remain visible.'
+						),
+					},
+				],
 			},
 		],
 		[ authors, viewType, frontPageId, postsPageId ]

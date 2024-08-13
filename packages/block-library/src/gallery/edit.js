@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import {
 	BaseControl,
 	PanelBody,
@@ -17,7 +16,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	ToolbarDropdownMenu,
-	withNotices,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -32,7 +30,6 @@ import {
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
@@ -108,7 +105,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
-function GalleryEdit( props ) {
+export default function GalleryEdit( props ) {
 	const {
 		setAttributes,
 		attributes,
@@ -653,7 +650,10 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className="gallery-image-sizes">
+						<BaseControl
+							className="gallery-image-sizes"
+							__nextHasNoMarginBottom
+						>
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
@@ -748,7 +748,3 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [
-	withNotices,
-	withViewportMatch( { isNarrow: '< small' } ),
-] )( GalleryEdit );

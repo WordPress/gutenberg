@@ -37,7 +37,7 @@ function getSelectOptions(
  *
  * 	return (
  * 		<TreeSelect
- *      __nextHasNoMarginBottom
+ * 			__nextHasNoMarginBottom
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -73,7 +73,6 @@ function getSelectOptions(
  * }
  * ```
  */
-
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
 		label,

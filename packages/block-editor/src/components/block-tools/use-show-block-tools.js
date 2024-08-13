@@ -20,6 +20,7 @@ export function useShowBlockTools() {
 			getSelectedBlockClientId,
 			getFirstMultiSelectedBlockClientId,
 			getBlock,
+			getBlockMode,
 			getSettings,
 			hasMultiSelection,
 			__unstableGetEditorMode,
@@ -33,7 +34,9 @@ export function useShowBlockTools() {
 		const editorMode = __unstableGetEditorMode();
 		const hasSelectedBlock = !! clientId && !! block;
 		const isEmptyDefaultBlock =
-			hasSelectedBlock && isUnmodifiedDefaultBlock( block );
+			hasSelectedBlock &&
+			isUnmodifiedDefaultBlock( block ) &&
+			getBlockMode( clientId ) !== 'html';
 		const _showEmptyBlockSideInserter =
 			clientId &&
 			! isTyping() &&

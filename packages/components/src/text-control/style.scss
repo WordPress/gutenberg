@@ -20,5 +20,10 @@
 
 	&.is-next-40px-default-size {
 		height: $grid-unit-50;
+
+		// Subtract 1px to account for the border, which isn't included on the element
+		// on newer components like InputControl, SelectControl, etc.
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
 	}
 }
