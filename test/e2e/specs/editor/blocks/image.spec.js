@@ -746,6 +746,36 @@ test.describe( 'Image', () => {
 		expect( src ).toMatch( /\/wp-content\/uploads\// );
 	} );
 
+	test( 'uploads data url through blobs from raw handling', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const blobUrl = await page.evaluate( async () => {
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = 20;
+			canvas.height = 20;
+
+			const ctx = canvas.getContext( '2d' );
+			ctx.fillStyle = 'red';
+			ctx.fillRect( 0, 0, 20, 20 );
+
+			return canvas.toDataURL( 'image/png' );
+		} );
+
+		pageUtils.setClipboardData( { html: `<img src="${ blobUrl }">` } );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		const image = imageBlock.locator( 'img[src^="http"]' );
+		const src = await image.getAttribute( 'src' );
+
+		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	} );
+
 	test( 'should have keyboard navigable link UI popover', async ( {
 		editor,
 		page,
