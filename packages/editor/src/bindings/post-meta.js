@@ -82,31 +82,65 @@ export default {
 		return true;
 	},
 	getFieldsList( { registry, context } ) {
-		const metaFields = registry
-			.select( coreDataStore )
-			.getEditedEntityRecord(
+		let metaFields = {};
+		const {
+			type,
+			is_custom: isCustom,
+			slug,
+		} = registry.select( editorStore ).getCurrentPost();
+		const { getPostTypes, getEntityRecord, getEditedEntityRecord } =
+			registry.select( coreDataStore );
+
+		// If it is a template, use the default values.
+		if ( type === 'wp_template' ) {
+			let postType;
+			let isGlobalTemplate = false;
+			// Get the 'kind' from the start of the slug.
+			const [ kind ] = slug.split( '-' );
+			if ( isCustom || slug === 'index' ) {
+				isGlobalTemplate = true;
+				// Use 'post' as the default.
+				postType = 'post';
+			} else if ( kind === 'page' ) {
+				postType = 'page';
+			} else if ( kind === 'single' ) {
+				const postTypes =
+					getPostTypes( { per_page: -1 } )?.map(
+						( entity ) => entity.slug
+					) || [];
+
+				// Infer the post type from the slug.
+				const match = slug.match(
+					`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
+				);
+				postType = match ? match[ 1 ] : 'post';
+			}
+
+			// TODO: Fields returns undefined on the first click.
+			const fields = getEntityRecord(
+				'root',
+				'postType',
+				postType
+			)?.meta;
+
+			// Populate the `metaFields` object with the default values.
+			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
+				// If the template is global, skip the fields with a subtype.
+				if ( isGlobalTemplate && props.subtype ) {
+					return;
+				}
+				metaFields[ key ] = props.default;
+			} );
+		} else {
+			metaFields = getEditedEntityRecord(
 				'postType',
 				context?.postType,
 				context?.postId
 			).meta;
-
-		// TODO: Fields returns undefined on the first click.
-		const fields = registry
-			.select( coreDataStore )
-			// TODO: Last item 'post' should not be hardcoded.
-			.getEntityRecord( 'root', 'postType', 'post' );
+		}
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
-			if ( ! fields?.meta ) {
-				return null;
-			}
-			const metaDefaults = {};
-			for ( const key in fields.meta ) {
-				if ( fields.meta.hasOwnProperty( key ) ) {
-					metaDefaults[ key ] = fields.meta[ key ].default;
-				}
-			}
-			return metaDefaults;
+			return null;
 		}
 
 		// Remove footnotes or private keys from the list of fields.
