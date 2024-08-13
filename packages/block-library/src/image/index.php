@@ -169,11 +169,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$img_height       = 'none';
 	$aria_label       = __( 'Enlarge image' );
 
-	if ( $alt ) {
-		/* translators: %s: Image alt text. */
-		$aria_label = sprintf( __( 'Enlarge image: %s' ), $alt );
-	}
-
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
 		$img_metadata     = wp_get_attachment_metadata( $block['attrs']['id'] );
@@ -202,7 +197,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 					'targetWidth'      => $img_width,
 					'targetHeight'     => $img_height,
 					'scaleAttr'        => $block['attrs']['scale'] ?? false,
-					'ariaLabel'        => $aria_label,
 					'alt'              => $alt,
 				),
 			),
@@ -293,7 +287,7 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-interactive="core/image"
 			data-wp-context='{}'
 			data-wp-bind--role="state.roleAttribute"
-			data-wp-bind--aria-label="state.currentImage.ariaLabel"
+			data-wp-bind--aria-label="state.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.overlayEnabled"
 			data-wp-class--show-closing-animation="state.showClosingAnimation"

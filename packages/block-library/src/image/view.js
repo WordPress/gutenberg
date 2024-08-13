@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
+// import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -52,6 +53,29 @@ const { state, actions, callbacks } = store(
 			},
 			get overlayOpened() {
 				return state.currentImageId !== null;
+			},
+			get ariaLabel() {
+				if ( ! state.overlayOpened ) {
+					return null;
+				}
+				if ( state.images.length === 1 ) {
+					return state.currentImage.alt
+						? `Enlarged image: ${ state.currentImage.alt }`
+						: 'Enlarged image';
+				}
+				return state.currentImage.alt
+					? `Enlarged image ${ state.currentImageIndex + 1 } of ${
+							state.images.length
+					  }: ${ state.currentImage.alt }`
+					: `Enlarged image ${ state.currentImageIndex + 1 } of ${
+							state.images.length
+					  }`;
+				// sprintf(
+				// 	/* translators: %s: number of stars. */
+				// 	__( 'Enlarged image %1s of %2s' ),
+				// 	state.currentImageIndex + 1,
+				// 	state.images.length
+				// );
 			},
 			get roleAttribute() {
 				return state.overlayOpened ? 'dialog' : null;
