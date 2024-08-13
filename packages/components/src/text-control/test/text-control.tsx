@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -56,6 +57,38 @@ describe( 'TextControl', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: labelValue } )
 			).toBeVisible();
+		} );
+	} );
+
+	describe( 'When a type prop is provided', () => {
+		it( 'should return string onChange', async () => {
+			const mockOnChange = jest.fn();
+
+			render(
+				<TextControl type="text" onChange={ mockOnChange } value="" />
+			);
+
+			await userEvent.type( screen.getByRole( 'textbox' ), '6' );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( '6' );
+		} );
+
+		it( 'should return number onChange', async () => {
+			const mockOnChange = jest.fn();
+
+			render(
+				<TextControl
+					type="number"
+					onChange={ mockOnChange }
+					value={ 0 }
+				/>
+			);
+
+			await userEvent.type( screen.getByRole( 'spinbutton' ), '6' );
+
+			expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+			expect( mockOnChange ).toHaveBeenLastCalledWith( 6 );
 		} );
 	} );
 
