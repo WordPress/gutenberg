@@ -10,6 +10,7 @@ import { doAction } from '@wordpress/hooks';
  */
 import deletePost from '../actions/delete-post';
 import duplicatePattern from '../actions/duplicate-pattern';
+import duplicateTemplatePart from '../actions/duplicate-template-part';
 import exportPattern from '../actions/export-pattern';
 import resetPost from '../actions/reset-post';
 import trashPost from '../actions/trash-post';
@@ -20,6 +21,7 @@ import restorePost from '../actions/restore-post';
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import duplicatePost from '../actions/duplicate-post';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -81,8 +83,23 @@ export const registerPostTypeActions =
 				kind: 'postType',
 				name: postType,
 			} );
+		const currentTheme = await registry
+			.resolveSelect( coreStore )
+			.getCurrentTheme();
 
 		const actions = [
+			// @ts-ignore
+			globalThis.IS_GUTENBERG_PLUGIN
+				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
+						postTypeConfig.slug
+				  ) &&
+				  canCreate &&
+				  duplicatePost
+				: undefined,
+			postTypeConfig.slug === 'wp_template_part' &&
+				canCreate &&
+				currentTheme?.is_block_theme &&
+				duplicateTemplatePart,
 			canCreate && postTypeConfig.slug === 'wp_block'
 				? duplicatePattern
 				: undefined,
