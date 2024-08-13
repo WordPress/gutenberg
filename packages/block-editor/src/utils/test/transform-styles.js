@@ -242,6 +242,23 @@ describe( 'transformStyles', () => {
 
 			expect( output ).toEqual( expected );
 		} );
+
+		it( 'should not try to prefix pseudo elements on `:where` selectors', () => {
+			const input = `:where(.wp-element-button, .wp-block-button__link)::before { color: blue; }`;
+			const prefix = '.my-namespace';
+			const expected = [ `${ prefix } ${ input }` ];
+
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				prefix
+			);
+
+			expect( output ).toEqual( expected );
+		} );
 	} );
 
 	it( 'should not break with data urls', () => {
