@@ -444,14 +444,8 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 			function _onKeyDown( event: KeyboardEvent ) {
 				onKeyDownRef.current?.( event );
 			}
-			// To do: comment.
-			element.ownerDocument.addEventListener( 'keydown', _onKeyDown );
 			element.addEventListener( 'keydown', _onKeyDown );
 			return () => {
-				element.ownerDocument.removeEventListener(
-					'keydown',
-					_onKeyDown
-				);
 				element.removeEventListener( 'keydown', _onKeyDown );
 			};
 		}, [] ),
