@@ -208,6 +208,12 @@
 						"docs/reference-guides/interactivity-api/core-concepts/README.md": [
 							{
 								"docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md": []
 							}
 						]
 					},
