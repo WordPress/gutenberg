@@ -83,7 +83,7 @@ let linkOptions = [
 		label: __( 'Expand on click' ),
 		value: LINK_DESTINATION_LIGHTBOX,
 		noticeText: __( 'Lightbox effect' ),
-		infoText: __( 'Scales the image with a lightbox effect' ),
+		infoText: __( 'Scale images with a lightbox effect' ),
 	},
 	{
 		icon: linkOff,
@@ -117,11 +117,7 @@ export default function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const [ blockSetting ] = useSettings( 'blocks' );
-
-	const lightboxSetting = blockSetting.hasOwnProperty( 'core/image' )
-		? blockSetting[ 'core/image' ]?.lightbox
-		: false;
+	const lightboxSetting = useSettings( 'blocks.core/image.lightbox' );
 
 	useEffect( () => {
 		if ( ! lightboxSetting?.allowEditing ) {
@@ -697,7 +693,7 @@ export default function GalleryEdit( props ) {
 												onClose();
 											} }
 											role="menuitemradio"
-											info={ linkItem.infoText ?? false }
+											info={ linkItem.infoText }
 										>
 											{ linkItem.label }
 										</MenuItem>
