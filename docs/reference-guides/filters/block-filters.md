@@ -139,12 +139,12 @@ The following PHP filters are available to change the output of a block on the f
 
 ### `render_block`
 
-Filters the font-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
+Filters the front-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
 
 The callback function for this filter receives three parameters:
 
 - `$block_content` (`string`): The block content.
-- `block` (`array`): The full block, including name and attributes.
+- `$block` (`array`): The full block, including name and attributes.
 - `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Here the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used to easily add the class instead of relying on regex.
@@ -172,12 +172,12 @@ add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 2
 
 ### `render_block_{namespace/block}`
 
-Filters the font-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
+Filters the front-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
 
 The callback function for this filter receives three parameters:
 
 - `$block_content` (`string`): The block content.
-- `block` (`array`): The full block, including name and attributes.
+- `$block` (`array`): The full block, including name and attributes.
 - `$instance` (`WP_Block`): The block instance.
 
 In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Notice that compared to the `render_block` example above, you no longer need to check the block type before modifying the content. Again, the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used instead of regex.
