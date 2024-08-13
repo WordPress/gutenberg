@@ -690,6 +690,8 @@ export default function Image( {
 						) }
 						renderContent={ () => (
 							<TextControl
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								className="wp-block-image__toolbar_content_textarea"
 								__nextHasNoMarginBottom
 								label={ __( 'Title attribute' ) }
