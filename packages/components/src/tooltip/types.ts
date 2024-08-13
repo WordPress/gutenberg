@@ -62,6 +62,10 @@ export type TooltipProps = {
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
+	/**
+	 * The direction of the tooltip arrow.
+	 */
+	direction?: string;
 };
 
 export type TooltipInternalContext = {
