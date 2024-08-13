@@ -7,5 +7,41 @@
 		"innerContent": [
 			"\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<input class=\"wp-block-form-input__input\" type=\"text\" name=\"label\" aria-required=\"false\"/>\n</label>\n"
 		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "checkbox"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<input class=\"wp-block-form-input__input\" type=\"checkbox\" name=\"label\" aria-required=\"false\"/>\n</label>\n",
+		"innerContent": [
+			"\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<input class=\"wp-block-form-input__input\" type=\"checkbox\" name=\"label\" aria-required=\"false\"/>\n</label>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "radio"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<input class=\"wp-block-form-input__input\" type=\"radio\" name=\"label\" aria-required=\"false\"/>\n</label>\n",
+		"innerContent": [
+			"\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<input class=\"wp-block-form-input__input\" type=\"radio\" name=\"label\" aria-required=\"false\"/>\n</label>\n"
+		]
 	}
 ]

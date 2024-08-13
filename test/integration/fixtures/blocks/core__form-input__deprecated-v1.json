@@ -11,5 +11,31 @@
 			"visibilityPermissions": "all"
 		},
 		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "checkbox",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "radio",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
 	}
 ]
