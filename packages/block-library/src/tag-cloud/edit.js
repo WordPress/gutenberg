@@ -11,8 +11,8 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalVStack as VStack,
 	Disabled,
-	BaseControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -107,20 +107,32 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		setAttributes( updateObj );
 	};
 
+	// Remove border styles from the server-side attributes to prevent duplicate border.
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+		},
+	};
+
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				<SelectControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Taxonomy' ) }
-					options={ getTaxonomyOptions() }
-					value={ taxonomy }
-					onChange={ ( selectedTaxonomy ) =>
-						setAttributes( { taxonomy: selectedTaxonomy } )
-					}
-				/>
-				<BaseControl>
+				<VStack
+					spacing={ 4 }
+					className="wp-block-tag-cloud__inspector-settings"
+				>
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Taxonomy' ) }
+						options={ getTaxonomyOptions() }
+						value={ taxonomy }
+						onChange={ ( selectedTaxonomy ) =>
+							setAttributes( { taxonomy: selectedTaxonomy } )
+						}
+					/>
 					<Flex gap={ 4 }>
 						<FlexItem isBlock>
 							<UnitControl
@@ -155,27 +167,27 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 							/>
 						</FlexItem>
 					</Flex>
-				</BaseControl>
-				<RangeControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Number of tags' ) }
-					value={ numberOfTags }
-					onChange={ ( value ) =>
-						setAttributes( { numberOfTags: value } )
-					}
-					min={ MIN_TAGS }
-					max={ MAX_TAGS }
-					required
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Show tag counts' ) }
-					checked={ showTagCounts }
-					onChange={ () =>
-						setAttributes( { showTagCounts: ! showTagCounts } )
-					}
-				/>
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Number of tags' ) }
+						value={ numberOfTags }
+						onChange={ ( value ) =>
+							setAttributes( { numberOfTags: value } )
+						}
+						min={ MIN_TAGS }
+						max={ MAX_TAGS }
+						required
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Show tag counts' ) }
+						checked={ showTagCounts }
+						onChange={ () =>
+							setAttributes( { showTagCounts: ! showTagCounts } )
+						}
+					/>
+				</VStack>
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -188,7 +200,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<ServerSideRender
 						skipBlockSupportAttributes
 						block="core/tag-cloud"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>

@@ -10,8 +10,10 @@ type PostStatus =
 export interface BasePost {
 	status?: PostStatus;
 	title: string | { rendered: string } | { raw: string };
+	content: string | { raw: string; rendered: string };
 	type: string;
 	id: string | number;
+	blocks?: Object[];
 }
 
 export interface Template extends BasePost {
@@ -27,12 +29,12 @@ export interface TemplatePart extends BasePost {
 	source: string;
 	has_theme_file: boolean;
 	id: string;
+	area: string;
 }
 
 export interface Pattern extends BasePost {
 	slug: string;
 	title: { raw: string };
-	content: { raw: string } | string;
 	wp_pattern_sync_status: string;
 }
 

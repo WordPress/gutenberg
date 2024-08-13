@@ -19,7 +19,11 @@ import {
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
-function SizeControl( props ) {
+function SizeControl( {
+	// Do not allow manipulation of margin bottom
+	__nextHasNoMarginBottom,
+	...props
+} ) {
 	const { baseControlProps } = useBaseControlProps( props );
 	const { value, onChange, fallbackValue, disabled, label } = props;
 
@@ -44,7 +48,7 @@ function SizeControl( props ) {
 	};
 
 	return (
-		<BaseControl { ...baseControlProps }>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
