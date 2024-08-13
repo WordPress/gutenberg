@@ -9,6 +9,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -468,7 +469,7 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
 				alternative: `select( 'core/editor' ).getDeviceType`,
 			}
 		);
-		return select( editorStore ).getDeviceType();
+		return select( blockEditorStore ).getDeviceType();
 	}
 );
 

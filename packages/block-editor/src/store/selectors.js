@@ -3113,3 +3113,14 @@ export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
 	);
 	return getTemporarilyEditingFocusModeToRevert( state );
 }
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getDeviceType( state ) {
+	return state.deviceType;
+}

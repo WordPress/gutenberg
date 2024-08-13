@@ -38,10 +38,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		isViewable,
 		showIconLabels,
 	} = useSelect( ( select ) => {
-		const { getDeviceType, getCurrentPostType } = select( editorStore );
+		const { getCurrentPostType } = select( editorStore );
 		const { getUnstableBase, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { __unstableGetEditorMode, getDeviceType } =
+			select( blockEditorStore );
 		const _currentPostType = getCurrentPostType();
 		return {
 			deviceType: getDeviceType(),
@@ -52,8 +53,8 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 		};
 	}, [] );
-	const { setDeviceType } = useDispatch( editorStore );
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode, setDeviceType } =
+		useDispatch( blockEditorStore );
 
 	/**
 	 * Save the original editing mode in a ref to restore it when we exit zoom out.

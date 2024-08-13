@@ -500,6 +500,18 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+### getDeviceType
+
+Returns the current editing canvas device type.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Device type.
+
 ### getDirectInsertBlock
 
 Returns the block to be directly inserted by the block appender.
@@ -1674,6 +1686,18 @@ Action that sets whether given blocks are visible on the canvas.
 _Parameters_
 
 -   _updates_ `Record<string,boolean>`: For each block's clientId, its new visibility setting.
+
+### setDeviceType
+
+Action that changes the width of the editing canvas.
+
+_Parameters_
+
+-   _deviceType_ `string`:
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### setHasControlledInnerBlocks
 

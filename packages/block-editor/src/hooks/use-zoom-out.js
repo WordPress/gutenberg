@@ -15,7 +15,8 @@ import { store as blockEditorStore } from '../store';
  * @param {boolean} zoomOut If we should enter into zoomOut mode or not
  */
 export function useZoomOut( zoomOut = true ) {
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode, setDeviceType } =
+		useDispatch( blockEditorStore );
 	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 
 	const originalEditingMode = useRef( null );
@@ -42,6 +43,7 @@ export function useZoomOut( zoomOut = true ) {
 	useEffect( () => {
 		if ( zoomOut && mode !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
+			setDeviceType( 'Desktop' );
 		} else if (
 			! zoomOut &&
 			__unstableGetEditorMode() === 'zoom-out' &&

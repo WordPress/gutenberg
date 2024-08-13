@@ -114,7 +114,6 @@ function VisualEditor( {
 		editedPostTemplate = {},
 		wrapperBlockName,
 		wrapperUniqueId,
-		deviceType,
 		isFocusedEntity,
 		isDesignPostType,
 		postType,
@@ -126,7 +125,6 @@ function VisualEditor( {
 			getCurrentTemplateId,
 			getEditorSettings,
 			getRenderingMode,
-			getDeviceType,
 		} = select( editorStore );
 		const { getPostType, canUser, getEditedEntityRecord } =
 			select( coreStore );
@@ -170,7 +168,6 @@ function VisualEditor( {
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
-			deviceType: getDeviceType(),
 			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
 			postType: postTypeSlug,
 			isPreview: editorSettings.__unstableIsPreviewMode,
@@ -178,15 +175,17 @@ function VisualEditor( {
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
 	const {
+		deviceType,
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const { getSettings, __unstableGetEditorMode } =
+		const { getSettings, __unstableGetEditorMode, getDeviceType } =
 			select( blockEditorStore );
 		const _settings = getSettings();
 		return {
+			deviceType: getDeviceType(),
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:

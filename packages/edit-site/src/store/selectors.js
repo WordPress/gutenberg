@@ -62,7 +62,7 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
 				alternative: `select( 'core/editor' ).getDeviceType`,
 			}
 		);
-		return select( editorStore ).getDeviceType();
+		return select( blockEditorStore ).getDeviceType();
 	}
 );
 

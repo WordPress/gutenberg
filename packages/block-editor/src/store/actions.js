@@ -2191,3 +2191,17 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
+	};
+}

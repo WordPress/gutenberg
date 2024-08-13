@@ -2091,6 +2091,23 @@ export function inserterSearchInputRef( state = { current: null } ) {
 	return state;
 }
 
+/**
+ * Reducer returning the editing canvas device type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function deviceType( state = 'Desktop', action ) {
+	switch ( action.type ) {
+		case 'SET_DEVICE_TYPE':
+			return action.deviceType;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2125,6 +2142,7 @@ const combinedReducers = combineReducers( {
 	registeredInserterMediaCategories,
 	hoveredBlockClientId,
 	inserterSearchInputRef,
+	deviceType,
 } );
 
 function withAutomaticChangeReset( reducer ) {
