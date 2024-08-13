@@ -26,6 +26,24 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 		}
 	}
 
+	if ( 'core/edit-post' === $context->name ) {
+		$reusable_blocks_key = array_search(
+			add_query_arg(
+				array(
+					'context'  => 'edit',
+					'per_page' => -1,
+				),
+				rest_get_route_for_post_type_items( 'wp_block' )
+			),
+			$paths,
+			true
+		);
+
+		if ( false !== $parts_key ) {
+			unset( $paths[ $reusable_blocks_key ] );
+		}
+	}
+
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_7', 10, 2 );
