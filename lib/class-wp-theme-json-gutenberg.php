@@ -2488,8 +2488,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		 * This converts references to a path to the value at that path
-		 * where the value is an array with a "ref" key, pointing to a path.
+		 * Where the current value is an array with a 'ref' key pointing
+		 * to a path, this converts that path into the value at that path.
 		 * For example: { "ref": "style.color.background" } => "#fff".
 		 */
 		if ( is_array( $value ) && isset( $value['ref'] ) ) {

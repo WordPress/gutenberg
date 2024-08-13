@@ -563,8 +563,8 @@ export function getResolvedRefValue( ruleValue, tree ) {
 	}
 
 	/*
-	 * This converts references to a path to the value at that path
-	 * where the value is an array with a "ref" key, pointing to a path.
+	 * Where the rule value is an object with a 'ref' property pointing
+	 * to a path, this converts that path into the value at that path.
 	 * For example: { "ref": "style.color.background" } => "#fff".
 	 */
 	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
