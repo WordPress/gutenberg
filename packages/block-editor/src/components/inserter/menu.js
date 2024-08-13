@@ -33,6 +33,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -53,11 +54,16 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
-		[]
-	);
+	const { isZoomOutMode, inserterSearchInputRef } = useSelect( ( select ) => {
+		const { __unstableGetEditorMode, getInserterSearchInputRef } = unlock(
+			select( blockEditorStore )
+		);
+		return {
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			inserterSearchInputRef: getInserterSearchInputRef(),
+		};
+	}, [] );
+
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -67,9 +73,16 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState(
-		__experimentalInitialTab
-	);
+	function getInitialTab() {
+		if ( __experimentalInitialTab ) {
+			return __experimentalInitialTab;
+		}
+
+		if ( isZoomOutMode ) {
+			return 'patterns';
+		}
+	}
+	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -104,7 +117,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -113,7 +126,7 @@ function InserterMenu(
 			onInsertBlocks( blocks, { patternName } );
 			onSelect();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -164,7 +177,9 @@ function InserterMenu(
 					value={ filterValue }
 					label={ __( 'Search for blocks and patterns' ) }
 					placeholder={ __( 'Search' ) }
+					ref={ inserterSearchInputRef }
 				/>
+
 				{ !! delayedFilterValue && (
 					<InserterSearchResults
 						filterValue={ delayedFilterValue }
@@ -185,18 +200,18 @@ function InserterMenu(
 		);
 	}, [
 		selectedTab,
-		hoveredItem,
-		setHoveredItem,
-		setFilterValue,
 		filterValue,
+		inserterSearchInputRef,
 		delayedFilterValue,
 		onSelect,
 		onHover,
-		shouldFocusBlock,
-		clientId,
 		rootClientId,
-		__experimentalInsertionIndex,
+		clientId,
 		isAppender,
+		__experimentalInsertionIndex,
+		shouldFocusBlock,
+		hoveredItem,
+		setFilterValue,
 	] );
 
 	const blocksTab = useMemo( () => {

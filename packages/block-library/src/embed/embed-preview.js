@@ -13,13 +13,8 @@ import clsx from 'clsx';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import {
-	RichText,
-	BlockIcon,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
+import { BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
 
 /**
@@ -57,19 +52,8 @@ class EmbedPreview extends Component {
 	}
 
 	render() {
-		const {
-			preview,
-			previewable,
-			url,
-			type,
-			caption,
-			onCaptionChange,
-			isSelected,
-			className,
-			icon,
-			label,
-			insertBlocksAfter,
-		} = this.props;
+		const { preview, previewable, url, type, className, icon, label } =
+			this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
 
@@ -138,24 +122,6 @@ class EmbedPreview extends Component {
 							) }
 						</p>
 					</Placeholder>
-				) }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						identifier="caption"
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ onCaptionChange }
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
 				) }
 			</figure>
 		);

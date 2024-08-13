@@ -63,9 +63,9 @@ export type FieldTypeDefinition< Item > = {
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
-	 * Callback used to render an edit control for the field.
+	 * Callback used to render an edit control for the field or control name.
 	 */
-	Edit: ComponentType< DataFormControlProps< Item > >;
+	Edit: ComponentType< DataFormControlProps< Item > > | string;
 };
 
 /**
@@ -105,7 +105,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > > | 'radio';
+	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
 	 * Callback used to sort the field.
@@ -426,6 +426,12 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
 }
 
 export interface RenderModalProps< Item > {
