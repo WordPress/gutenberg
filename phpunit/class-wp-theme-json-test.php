@@ -2308,27 +2308,29 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'typography' => array(
 						'fontSize' => '10px',
 					),
-					'core/group' => array(
-						'background' => array(
-							'backgroundImage'      => array(
-								'ref' => 'styles.blocks.core/verse.background.backgroundImage',
-							),
-							'backgroundAttachment' => 'fixed',
-						),
-					),
-					'core/quote' => array(
-						'background' => array(
-							'backgroundImage'      => array(
-								'url' => 'http://example.org/quote.png',
-							),
-							'backgroundAttachment' => array(
-								'ref' => 'styles.blocks.core/group.background.backgroundAttachment',
+					'blocks'     => array(
+						'core/group' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'ref' => 'styles.blocks.core/verse.background.backgroundImage',
+								),
+								'backgroundAttachment' => 'fixed',
 							),
 						),
-					),
-					'core/verse' => array(
-						'background' => array(
-							'backgroundImage' => "url(''http://example.org/verse.png')",
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'url' => 'http://example.org/quote.png',
+								),
+								'backgroundAttachment' => array(
+									'ref' => 'styles.blocks.core/group.background.backgroundAttachment',
+								),
+							),
+						),
+						'core/verse' => array(
+							'background' => array(
+								'backgroundImage' => "url('http://example.org/verse.png')",
+							),
 						),
 					),
 				),
@@ -2377,8 +2379,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'blocks'     => array(
 					'core/group' => array(
 						'background' => array(
-							'backgroundImage' => array(
+							'backgroundImage'      => array(
 								'url' => 'http://example.org/group.png',
+							),
+							'backgroundAttachment' => 'fixed',
+						),
+					),
+					'core/quote' => array(
+						'background' => array(
+							'backgroundImage'      => array(
+								'url' => 'http://example.org/quote.png',
+							),
+							'backgroundAttachment' => array(
+								'ref' => 'styles.blocks.core/group.background.backgroundAttachment',
 							),
 						),
 					),
