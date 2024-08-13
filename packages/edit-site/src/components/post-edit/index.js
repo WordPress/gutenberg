@@ -42,13 +42,38 @@ function PostEditForm( { postType, postId } ) {
 	);
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { fields } = usePostFields();
+	const { fields: _fields } = usePostFields();
+	const fields = useMemo(
+		() =>
+			_fields?.map( ( field ) => {
+				if ( field.id === 'status' ) {
+					return {
+						...field,
+						elements: field.elements.filter(
+							( element ) => element.value !== 'trash'
+						),
+					};
+				}
+				return field;
+			} ),
+		[ _fields ]
+	);
 	const form = {
 		type: 'panel',
-		fields: [ 'title', 'author', 'date', 'comment_status' ],
+		fields: [ 'title', 'status', 'date', 'author', 'comment_status' ],
 	};
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
+			if (
+				edits.status !== 'future' &&
+				record.status === 'future' &&
+				new Date( record.date ) > new Date()
+			) {
+				edits.date = null;
+			}
+			if ( edits.status === 'private' && record.password ) {
+				edits.password = '';
+			}
 			editEntityRecord( 'postType', postType, id, edits );
 			if ( ids.length > 1 ) {
 				setMultiEdits( ( prev ) => ( {
