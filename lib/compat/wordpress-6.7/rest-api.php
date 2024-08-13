@@ -39,7 +39,7 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 			true
 		);
 
-		if ( false !== $parts_key ) {
+		if ( false !== $reusable_blocks_key ) {
 			unset( $paths[ $reusable_blocks_key ] );
 		}
 	}
