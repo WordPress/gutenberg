@@ -62,7 +62,7 @@ function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $bloc
 			$block->context['query']['postFormat']
 		);
 
-		$query['tax_query'] = array(
+		$query['tax_query'][] = array(
 			array(
 				'taxonomy' => 'post_format',
 				'field'    => 'slug',
