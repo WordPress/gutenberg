@@ -18,3 +18,13 @@
 		content: none !important;
 	}
 }
+
+[draggable="true"],
+[data-fully-selected],
+img {
+	cursor: grab;
+
+	[contenteditable] {
+		cursor: text;
+	}
+}
