@@ -1744,7 +1744,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '.%2$s %3$s' : '%1$s-%2$s %3$s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':root :where(.%2$s)%3$s' : ':root :where(%1$s-%2$s)%3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -2391,7 +2391,7 @@ class WP_Theme_JSON_Gutenberg {
 					$styles['background']['backgroundSize'] = $styles['background']['backgroundSize'] ?? 'cover';
 					// If the background size is set to `contain` and no position is set, set the position to `center`.
 					if ( 'contain' === $styles['background']['backgroundSize'] && empty( $styles['background']['backgroundPosition'] ) ) {
-						$styles['background']['backgroundPosition'] = 'center';
+						$styles['background']['backgroundPosition'] = '50% 50%';
 					}
 				}
 				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
