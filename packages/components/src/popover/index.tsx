@@ -114,7 +114,7 @@ const UnforwardedPopover = (
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
 		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
+		keyof Omit< MotionProps, 'animate' | 'children' | 'style' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -372,13 +372,17 @@ const UnforwardedPopover = (
 				style: {
 					...motionInlineStyles,
 					...style,
+					...contentProps.style,
 				},
 				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
 		  }
 		: {
 				animate: false,
-				style,
+				style: {
+					...style,
+					...contentProps.style,
+				},
 		  };
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating
