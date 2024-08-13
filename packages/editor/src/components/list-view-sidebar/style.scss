@@ -1,5 +1,9 @@
 .editor-list-view-sidebar {
 	height: 100%;
+
+	@include break-medium {
+		width: $secondary-sidebar-width;
+	}
 }
 
 .editor-list-view-sidebar__list-view-panel-content,

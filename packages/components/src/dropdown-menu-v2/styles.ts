@@ -31,7 +31,7 @@ const ITEM_PADDING_INLINE = space( 3 );
 const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.gray[ 200 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
@@ -101,23 +101,23 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	outline: 2px solid transparent !important;
 
 	/* Animation */
-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	will-change: transform, opacity;
-	/* Default animation.*/
-	animation-name: ${ slideDownAndFade };
-
-	&[data-side='left'] {
-		animation-name: ${ slideLeftAndFade };
-	}
-	&[data-side='up'] {
-		animation-name: ${ slideUpAndFade };
-	}
-	&[data-side='right'] {
-		animation-name: ${ slideRightAndFade };
-	}
-	@media ( prefers-reduced-motion ) {
-		animation-duration: 0s;
+	&[data-open] {
+		@media not ( prefers-reduced-motion ) {
+			animation-duration: ${ ANIMATION_PARAMS.DURATION };
+			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+			will-change: transform, opacity;
+			/* Default animation.*/
+			animation-name: ${ slideDownAndFade };
+			&[data-side='left'] {
+				animation-name: ${ slideLeftAndFade };
+			}
+			&[data-side='up'] {
+				animation-name: ${ slideUpAndFade };
+			}
+			&[data-side='right'] {
+				animation-name: ${ slideRightAndFade };
+			}
+		}
 	}
 `;
 

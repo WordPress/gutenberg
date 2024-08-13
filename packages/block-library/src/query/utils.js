@@ -136,11 +136,15 @@ export const usePostTypes = () => {
 export const useTaxonomies = ( postType ) => {
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			return getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
+			const { getTaxonomies, getPostType } = select( coreStore );
+			// Does the post type have taxonomies?
+			if ( getPostType( postType )?.taxonomies?.length > 0 ) {
+				return getTaxonomies( {
+					type: postType,
+					per_page: -1,
+				} );
+			}
+			return [];
 		},
 		[ postType ]
 	);

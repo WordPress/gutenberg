@@ -38,7 +38,7 @@ test.describe( 'data-wp-context', () => {
 		} );
 	} );
 
-	test( 'is correctly extended', async ( { page } ) => {
+	test( 'is correctly extended (shallow)', async ( { page } ) => {
 		const childContext = await parseContent(
 			page.getByTestId( 'child context' )
 		);
@@ -47,12 +47,12 @@ test.describe( 'data-wp-context', () => {
 			prop1: 'parent',
 			prop2: 'child',
 			prop3: 'child',
-			obj: { prop4: 'parent', prop5: 'child', prop6: 'child' },
+			obj: { prop5: 'child', prop6: 'child' },
 			array: [ 4, 5, 6 ],
 		} );
 	} );
 
-	test( 'changes in inherited properties are reflected (child)', async ( {
+	test( "changes in inherited properties are reflected and don't leak down (child)", async ( {
 		page,
 	} ) => {
 		await page.getByTestId( 'child prop1' ).click();
@@ -70,10 +70,10 @@ test.describe( 'data-wp-context', () => {
 		);
 
 		expect( parentContext.prop1 ).toBe( 'modifiedFromChild' );
-		expect( parentContext.obj.prop4 ).toBe( 'modifiedFromChild' );
+		expect( parentContext.obj.prop4 ).toBe( 'parent' );
 	} );
 
-	test( 'changes in inherited properties are reflected (parent)', async ( {
+	test( "changes in inherited properties are reflected and don't leak up (parent)", async ( {
 		page,
 	} ) => {
 		await page.getByTestId( 'parent prop1' ).click();
@@ -84,7 +84,7 @@ test.describe( 'data-wp-context', () => {
 		);
 
 		expect( childContext.prop1 ).toBe( 'modifiedFromParent' );
-		expect( childContext.obj.prop4 ).toBe( 'modifiedFromParent' );
+		expect( childContext.obj.prop4 ).toBeUndefined();
 
 		const parentContext = await parseContent(
 			page.getByTestId( 'parent context' )
@@ -170,7 +170,7 @@ test.describe( 'data-wp-context', () => {
 		expect( childContext.array ).toMatchObject( [ 4, 5, 6 ] );
 	} );
 
-	test( 'overwritten objects updates inherited values', async ( {
+	test( "overwritten objects don't inherit values (shallow)", async ( {
 		page,
 	} ) => {
 		await page.getByTestId( 'parent replace' ).click();
@@ -182,7 +182,7 @@ test.describe( 'data-wp-context', () => {
 		expect( childContext.obj.prop4 ).toBeUndefined();
 		expect( childContext.obj.prop5 ).toBe( 'child' );
 		expect( childContext.obj.prop6 ).toBe( 'child' );
-		expect( childContext.obj.overwritten ).toBe( true );
+		expect( childContext.obj.overwritten ).toBeUndefined();
 
 		const parentContext = await parseContent(
 			page.getByTestId( 'parent context' )
@@ -230,13 +230,13 @@ test.describe( 'data-wp-context', () => {
 		await expect( element ).toHaveAttribute( 'value', 'Text 1' );
 	} );
 
-	test( 'should replace values on navigation', async ( { page } ) => {
+	test( 'should preserve values on navigation', async ( { page } ) => {
 		const element = page.getByTestId( 'navigation text' );
 		await expect( element ).toHaveText( 'first page' );
 		await page.getByTestId( 'toggle text' ).click();
 		await expect( element ).toHaveText( 'changed dynamically' );
 		await page.getByTestId( 'navigate' ).click();
-		await expect( element ).toHaveText( 'second page' );
+		await expect( element ).toHaveText( 'changed dynamically' );
 	} );
 
 	test( 'should preserve the previous context values', async ( { page } ) => {
@@ -248,16 +248,16 @@ test.describe( 'data-wp-context', () => {
 		await expect( element ).toHaveText( 'some new text' );
 	} );
 
-	test( 'should update values when navigating back or forward', async ( {
+	test( 'should preserve values when navigating back or forward', async ( {
 		page,
 	} ) => {
 		const element = page.getByTestId( 'navigation text' );
 		await page.getByTestId( 'navigate' ).click();
-		await expect( element ).toHaveText( 'second page' );
+		await expect( element ).toHaveText( 'first page' );
 		await page.goBack();
 		await expect( element ).toHaveText( 'first page' );
 		await page.goForward();
-		await expect( element ).toHaveText( 'second page' );
+		await expect( element ).toHaveText( 'first page' );
 	} );
 
 	test( 'should inherit values on navigation', async ( { page } ) => {
@@ -270,15 +270,14 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'add text2' ).click();
 		await expect( text2 ).toHaveText( 'some new text' );
 		await page.getByTestId( 'navigate' ).click();
-		await expect( text ).toHaveText( 'second page' );
-		await expect( text2 ).toHaveText( 'second page' );
+		await expect( text ).toHaveText( 'changed dynamically' );
+		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goBack();
-		await expect( text ).toHaveText( 'first page' );
-		// text2 maintains its value as it is not defined in the first page.
-		await expect( text2 ).toHaveText( 'second page' );
+		await expect( text ).toHaveText( 'changed dynamically' );
+		await expect( text2 ).toHaveText( 'some new text' );
 		await page.goForward();
-		await expect( text ).toHaveText( 'second page' );
-		await expect( text2 ).toHaveText( 'second page' );
+		await expect( text ).toHaveText( 'changed dynamically' );
+		await expect( text2 ).toHaveText( 'some new text' );
 	} );
 
 	test( 'should maintain the same context reference on async actions', async ( {
@@ -289,11 +288,14 @@ test.describe( 'data-wp-context', () => {
 		await page.getByTestId( 'async navigate' ).click();
 		await expect( element ).toHaveText( 'changed from async action' );
 	} );
+
 	test( 'should bail out if the context is not a default directive', async ( {
 		page,
 	} ) => {
-		// This test is to ensure that the context directive is only applied to the default directive
-		// and not to any other directive.
+		/*
+		 * This test is to ensure that the context directive is only applied to the
+		 * default directive and not to any other directive.
+		 */
 		const defaultElement = page.getByTestId( 'default suffix context' );
 		await expect( defaultElement ).toHaveText( 'default' );
 		const element = page.getByTestId( 'non-default suffix context' );
@@ -363,7 +365,7 @@ test.describe( 'data-wp-context', () => {
 			page.getByTestId( 'child context' )
 		);
 
-		expect( childContextBefore.obj2.prop4 ).toBe( 'parent' );
+		expect( childContextBefore.obj2.prop4 ).toBeUndefined();
 		expect( childContextBefore.obj2.prop5 ).toBe( 'child' );
 		expect( childContextBefore.obj2.prop6 ).toBe( 'child' );
 
@@ -376,6 +378,6 @@ test.describe( 'data-wp-context', () => {
 		expect( childContextAfter.obj2.prop4 ).toBeUndefined();
 		expect( childContextAfter.obj2.prop5 ).toBe( 'child' );
 		expect( childContextAfter.obj2.prop6 ).toBe( 'child' );
-		expect( childContextAfter.obj2.overwritten ).toBe( true );
+		expect( childContextAfter.obj2.overwritten ).toBeUndefined();
 	} );
 } );

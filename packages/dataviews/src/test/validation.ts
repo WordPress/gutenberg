@@ -17,7 +17,7 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'valid_order' ] };
+		const form = { fields: [ 'valid_order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );
@@ -30,7 +30,7 @@ describe( 'validation', () => {
 				id: 'order',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );
@@ -43,7 +43,7 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -56,12 +56,12 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
 
-	it( 'field is invalid if value is not one of the elements', () => {
+	it( 'integer field is invalid if value is not one of the elements', () => {
 		const item = { id: 1, author: 3 };
 		const fields: Field< {} >[] = [
 			{
@@ -73,8 +73,59 @@ describe( 'validation', () => {
 				],
 			},
 		];
-		const form = { visibleFields: [ 'author' ] };
+		const form = { fields: [ 'author' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
+	} );
+
+	it( 'text field is invalid if value is not one of the elements', () => {
+		const item = { id: 1, author: 'not-in-elements' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'author',
+				type: 'text',
+				elements: [
+					{ value: 'jane', label: 'Jane' },
+					{ value: 'john', label: 'John' },
+				],
+			},
+		];
+		const form = { fields: [ 'author' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'untyped field is invalid if value is not one of the elements', () => {
+		const item = { id: 1, author: 'not-in-elements' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'author',
+				elements: [
+					{ value: 'jane', label: 'Jane' },
+					{ value: 'john', label: 'John' },
+				],
+			},
+		];
+		const form = { fields: [ 'author' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'fields can provide its own isValid function', () => {
+		const item = { id: 1, order: 'd' };
+		const fields: Field< {} >[] = [
+			{
+				id: 'order',
+				type: 'integer',
+				elements: [
+					{ value: 'a', label: 'A' },
+					{ value: 'b', label: 'B' },
+				],
+				isValid: () => true, // Overrides the validation provided for integer types.
+			},
+		];
+		const form = { fields: [ 'order' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( true );
 	} );
 } );

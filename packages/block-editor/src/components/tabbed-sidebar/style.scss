@@ -1,13 +1,10 @@
 .block-editor-tabbed-sidebar {
+	background-color: $white;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 	overflow: hidden;
-
-	@include break-medium() {
-		width: 350px;
-	}
 }
 
 .block-editor-tabbed-sidebar__tablist-and-close-button {
@@ -26,22 +23,7 @@
 }
 
 .block-editor-tabbed-sidebar__tablist {
-	box-sizing: border-box;
-	flex-grow: 1;
 	margin-bottom: -$border-width;
-	width: 100%;
-}
-
-.block-editor-tabbed-sidebar__tab {
-	flex-grow: 1;
-	margin-bottom: -$border-width;
-
-	&[id$="reusable"] {
-		flex-grow: inherit;
-		// These are to align the `reusable` icon with the search icon.
-		padding-left: $grid-unit-20;
-		padding-right: $grid-unit-20;
-	}
 }
 
 .block-editor-tabbed-sidebar__tabpanel {

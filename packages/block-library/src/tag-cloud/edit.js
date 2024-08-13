@@ -12,6 +12,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	Disabled,
+	BaseControl,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -106,11 +107,21 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		setAttributes( updateObj );
 	};
 
+	// Remove border styles from the server-side attributes to prevent duplicate border.
+	const serverSideAttributes = {
+		...attributes,
+		style: {
+			...attributes?.style,
+			border: undefined,
+		},
+	};
+
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Taxonomy' ) }
 					options={ getTaxonomyOptions() }
 					value={ taxonomy }
@@ -118,14 +129,42 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 						setAttributes( { taxonomy: selectedTaxonomy } )
 					}
 				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Show post counts' ) }
-					checked={ showTagCounts }
-					onChange={ () =>
-						setAttributes( { showTagCounts: ! showTagCounts } )
-					}
-				/>
+				<BaseControl>
+					<Flex gap={ 4 }>
+						<FlexItem isBlock>
+							<UnitControl
+								label={ __( 'Smallest size' ) }
+								value={ smallestFontSize }
+								onChange={ ( value ) => {
+									onFontSizeChange(
+										'smallestFontSize',
+										value
+									);
+								} }
+								units={ units }
+								min={ MIN_FONT_SIZE }
+								max={ MAX_FONT_SIZE }
+								size="__unstable-large"
+							/>
+						</FlexItem>
+						<FlexItem isBlock>
+							<UnitControl
+								label={ __( 'Largest size' ) }
+								value={ largestFontSize }
+								onChange={ ( value ) => {
+									onFontSizeChange(
+										'largestFontSize',
+										value
+									);
+								} }
+								units={ units }
+								min={ MIN_FONT_SIZE }
+								max={ MAX_FONT_SIZE }
+								size="__unstable-large"
+							/>
+						</FlexItem>
+					</Flex>
+				</BaseControl>
 				<RangeControl
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
@@ -138,32 +177,14 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					max={ MAX_TAGS }
 					required
 				/>
-				<Flex>
-					<FlexItem isBlock>
-						<UnitControl
-							label={ __( 'Smallest size' ) }
-							value={ smallestFontSize }
-							onChange={ ( value ) => {
-								onFontSizeChange( 'smallestFontSize', value );
-							} }
-							units={ units }
-							min={ MIN_FONT_SIZE }
-							max={ MAX_FONT_SIZE }
-						/>
-					</FlexItem>
-					<FlexItem isBlock>
-						<UnitControl
-							label={ __( 'Largest size' ) }
-							value={ largestFontSize }
-							onChange={ ( value ) => {
-								onFontSizeChange( 'largestFontSize', value );
-							} }
-							units={ units }
-							min={ MIN_FONT_SIZE }
-							max={ MAX_FONT_SIZE }
-						/>
-					</FlexItem>
-				</Flex>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Show tag counts' ) }
+					checked={ showTagCounts }
+					onChange={ () =>
+						setAttributes( { showTagCounts: ! showTagCounts } )
+					}
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -176,7 +197,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<ServerSideRender
 						skipBlockSupportAttributes
 						block="core/tag-cloud"
-						attributes={ attributes }
+						attributes={ serverSideAttributes }
 					/>
 				</Disabled>
 			</div>
