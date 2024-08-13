@@ -2491,14 +2491,8 @@ class WP_Theme_JSON_Gutenberg {
 		 * This converts references to a path to the value at that path
 		 * where the value is an array with a "ref" key, pointing to a path.
 		 * For example: { "ref": "style.color.background" } => "#fff".
-		 * In the case of backgroundImage, if both a ref and a URL are present in the value,
-		 * the URL takes precedence and the ref is ignored.
 		 */
 		if ( is_array( $value ) && isset( $value['ref'] ) ) {
-			if ( isset( $value['url'] ) ) {
-				unset( $value['ref'] );
-				return $value;
-			}
 			$value_path = explode( '.', $value['ref'] );
 			$ref_value  = _wp_array_get( $theme_json, $value_path, null );
 			// Background Image refs can refer to a string or an array containing a URL string.
@@ -3262,6 +3256,27 @@ class WP_Theme_JSON_Gutenberg {
 
 					_wp_array_set( $this->theme_json, $path, $content );
 				}
+			}
+		}
+
+		$blocks_metadata = static::get_blocks_metadata();
+		$style_nodes     = static::get_style_nodes(
+			$incoming_data,
+			$blocks_metadata,
+			array(
+				'include_block_style_variations' => true,
+			)
+		);
+		foreach ( $style_nodes as $style_node ) {
+			$path = $style_node['path'];
+			/*
+			 * Background image styles should be replaced, not merged,
+			 * as they themselves are specific object definitions for the style.
+			 */
+			$background_image_path = array_merge( $path, static::PROPERTIES_METADATA['background-image'] );
+			$content               = _wp_array_get( $incoming_data, $background_image_path, null );
+			if ( isset( $content ) ) {
+				_wp_array_set( $this->theme_json, $background_image_path, $content );
 			}
 		}
 	}
