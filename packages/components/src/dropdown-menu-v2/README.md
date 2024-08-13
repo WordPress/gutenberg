@@ -68,13 +68,14 @@ The contents of the dropdown
 
 ##### `defaultOpen`: `boolean`
 
-The open state of the dropdown menu when it is initially rendered. Use when you do not need to control its open state.
+The open state of the dropdown menu when it is initially rendered. Use when not wanting to control its open state.
 
 - Required: no
+- Default: `false`
 
 ##### `open`: `boolean`
 
-The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`
+The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`.
 
 - Required: no
 
@@ -91,33 +92,26 @@ The modality of the dropdown menu. When set to true, interaction with outside el
 - Required: no
 - Default: `true`
 
-##### `side`: `"bottom" | "left" | "right" | "top"`
+##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
 
-The preferred side of the trigger to render against when open. Will be reversed when collisions occur and avoidCollisions is enabled.
+The placement of the dropdown menu popover.
 
 - Required: no
-- Default: `"bottom"`
+- Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
 
-##### `sideOffset`: `number`
+##### `gutter`: `number`
 
 The distance in pixels from the trigger.
 
 - Required: no
-- Default: `0`
+- Default: `8` for root-level menus, `16` for nested menus
 
-##### `align`: `"end" | "start" | "center"`
+##### `shift`: `number`
 
-The preferred alignment against the trigger. May change when collisions occur.
-
-- Required: no
-- Default: `"start"`
-
-##### `alignOffset`: `number`
-
-An offset in pixels from the "start" or "end" alignment options.
+The skidding of the popover along the anchor element. Can be set to negative values to make the popover shift to the opposite side.
 
 - Required: no
-- Default: `0`
+- Default: `0` for root-level menus, `-8` for nested menus
 
 ### `DropdownMenuItem`
 
@@ -133,110 +127,31 @@ The contents of the item
 
 - Required: yes
 
+##### `prefix`: `React.ReactNode`
+
+The contents of the item's prefix.
+
+- Required: no
+
+##### `suffix`: `React.ReactNode`
+
+The contents of the item's suffix.
+
+- Required: no
+
+##### `hideOnClick`: `boolean`
+
+Whether to hide the dropdown menu when the menu item is clicked.
+
+- Required: no
+- Default: `true`
+
 ##### `disabled`: `boolean`
+
+Determines if the element is disabled.
 
 - Required: no
 - Default: `false`
-
-##### `onSelect`: `(event: Event) => void`
-
-Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
-
-- Required: no
-
-##### `textValue`: `string`
-
-Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
-
-- Required: no
-
-##### `prefix`: `React.ReactNode`
-
-The contents of the item's prefix.
-
-- Required: no
-
-##### `suffix`: `React.ReactNode`
-
-The contents of the item's suffix.
-
-- Required: no
-
-### `DropdownSubMenu`
-
-Used to render a nested submenu.
-
-#### Props
-
-The component accepts the following props:
-##### `trigger`: `React.ReactNode`
-
-The contents rendered inside the trigger. The trigger should be an instance of the `DropdownSubMenuTrigger` component.
-
-- Required: yes
-
-##### `children`: `React.ReactNode`
-
-The contents of the dropdown
-
-- Required: yes
-
-##### `defaultOpen`: `boolean`
-
-The open state of the dropdown menu when it is initially rendered. Use when you do not need to control its open state.
-
-- Required: no
-
-##### `open`: `boolean`
-
-The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`
-
-- Required: no
-
-##### `onOpenChange`: `(open: boolean) => void`
-
-Event handler called when the open state of the dropdown menu changes.
-
-- Required: no
-
-##### `disabled`: `boolean`
-
-When `true`, prevents the user from interacting with the item.
-
-- Required: no
-
-##### `textValue`: `string`
-
-Optional text used for typeahead purposes for the trigger. By default the typeahead behavior will use the `.textContent` of the trigger. Use this when the content is complex, or you have non-textual content inside.
-
-- Required: no
-
-### `DropdownSubMenuTrigger`
-
-Used to render a submenu trigger.
-
-#### Props
-
-The component accepts the following props:
-
-##### `children`: `React.ReactNode`
-
-The contents of the item
-
-- Required: yes
-
-##### `prefix`: `React.ReactNode`
-
-The contents of the item's prefix.
-
-- Required: no
-
-##### `suffix`: `React.ReactNode`
-
-The contents of the item's suffix.
-
-- Default: a chevron icon
-- Required: The standard chevron icon for a submenu trigger
 
 ### `DropdownMenuCheckboxItem`
 
@@ -248,70 +163,59 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The contents of the checkbox item
+The contents of the item
 
 - Required: yes
 
-##### `checked`: `boolean`
+##### `suffix`: `React.ReactNode`
 
-The controlled checked state of the item. Must be used in conjunction with `onCheckedChange`.
+The contents of the item's suffix.
+
+- Required: no
+
+##### `hideOnClick`: `boolean`
+
+Whether to hide the dropdown menu when the menu item is clicked.
 
 - Required: no
 - Default: `false`
 
-##### `onCheckedChange`: `(checked: boolean) => void)`
-
-Event handler called when the checked state changes.
-
-- Required: no
-
 ##### `disabled`: `boolean`
 
-When `true`, prevents the user from interacting with the item.
+Determines if the element is disabled.
 
 - Required: no
+- Default: `false`
 
-##### `onSelect`: `(event: Event) => void`
+##### `name`: `string`
 
-Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
-
-- Required: no
-
-##### `textValue`: `string`
-
-Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
-
-- Required: no
-
-##### `suffix`: `React.ReactNode`
-
-The contents of the checkbox item's suffix.
-
-- Required: no
-
-### `DropdownMenuRadioGroup`
-
-Used to render a radio group.
-
-#### Props
-
-The component accepts the following props:
-
-##### `children`: `React.ReactNode`
-
-The contents of the radio group
+The checkbox item's name.
 
 - Required: yes
 
 ##### `value`: `string`
 
-The value of the selected item in the group.
+The checkbox item's value, useful when using multiple checkbox items
+ associated to the same `name`.
 
 - Required: no
 
-##### `onValueChange`: `(value: string) => void`
+##### `checked`: `boolean`
 
-Event handler called when the value changes.
+The checkbox item's value, useful when using multiple checkbox items
+ associated to the same `name`.
+
+- Required: no
+
+##### `defaultChecked`: `boolean`
+
+The checked state of the checkbox menu item when it is initially rendered. Use when not wanting to control its checked state.
+
+- Required: no
+
+##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
+
+Event handler called when the checked state of the checkbox menu item changes.
 
 - Required: no
 
@@ -325,43 +229,64 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The contents of the item.
+The contents of the item
 
 - Required: yes
 
-##### `value`: `string`
+##### `suffix`: `React.ReactNode`
 
-The unique value of the item.
+The contents of the item's suffix.
 
-- Required: yes
+- Required: no
+
+##### `hideOnClick`: `boolean`
+
+Whether to hide the dropdown menu when the menu item is clicked.
+
+- Required: no
+- Default: `false`
 
 ##### `disabled`: `boolean`
 
-When `true`, prevents the user from interacting with the item.
+Determines if the element is disabled.
+
+- Required: no
+- Default: `false`
+
+##### `name`: `string`
+
+The radio item's name.
+
+- Required: yes
+
+##### `value`: `string | number`
+
+The radio item's value.
+
+- Required: yes
+
+##### `checked`: `boolean`
+
+The checkbox item's value, useful when using multiple checkbox items
+ associated to the same `name`.
 
 - Required: no
 
-##### `onSelect`: `(event: Event) => void`
+##### `defaultChecked`: `boolean`
 
-Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
-
-- Required: no
-
-##### `textValue`: `string`
-
-Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
+The checked state of the radio menu item when it is initially rendered. Use when not wanting to control its checked state.
 
 - Required: no
 
-##### `suffix`: `React.ReactNode
+##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
 
-The contents of the radio item's suffix.
+Event handler called when the checked radio menu item changes.
 
 - Required: no
 
-### `DropdownMenuLabel`
+### `DropdownMenuItemLabel`
 
-Used to render a group label.
+Used to render the menu item's label.
 
 #### Props
 
@@ -369,7 +294,21 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The contents of the group.
+The label contents.
+
+- Required: yes
+
+### `DropdownMenuItemHelpText`
+
+Used to render the menu item's help text.
+
+#### Props
+
+The component accepts the following props:
+
+##### `children`: `React.ReactNode`
+
+The help text contents.
 
 - Required: yes
 

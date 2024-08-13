@@ -1,9 +1,24 @@
 .wp-block-image {
+
+	a {
+		display: inline-block;
+	}
+
 	img {
 		height: auto;
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+
+		@media (prefers-reduced-motion: no-preference) {
+			&.hide {
+				visibility: hidden;
+			}
+
+			&.show {
+				animation: show-content-image 0.4s;
+			}
+		}
 	}
 
 	// The following style maintains border radius application for deprecated
@@ -25,6 +40,11 @@
 
 	&.aligncenter {
 		text-align: center;
+	}
+
+	&.alignfull a,
+	&.alignwide a {
+		width: 100%;
 	}
 
 	&.alignfull img,
@@ -78,31 +98,23 @@
 	// Supply caption styles to images, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
-	figcaption {
+	:where(figcaption) {
 		@include caption-style();
-	}
-
-	// Variations
-	&.is-style-rounded img,
-	.is-style-rounded img {
-		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
-		// to rectangular images. A pill-shape is better than otherwise.
-		border-radius: 9999px;
 	}
 
 	// The following variation is deprecated.
 	// The CSS is kept here for the time being, to support blocks using the old variation.
+	// The selector is not scoped with `:root :where()` like global styles are to keep its
+	// specificity the same as it was when it was deprecated.
 	&.is-style-circle-mask img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
 		border-radius: 9999px;
 
 		// If a browser supports it, we will switch to using a circular SVG mask.
-		// The stylelint override is necessary to use the SVG inline here.
 		@supports (mask-image: none) or (-webkit-mask-image: none) {
-			/* stylelint-disable */
+			/* stylelint-disable-next-line function-url-quotes -- We need quotes for the data URL to use the SVG inline. */
 			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
-			/* stylelint-enable */
 			mask-mode: alpha;
 			mask-repeat: no-repeat;
 			mask-size: contain;
@@ -110,42 +122,13 @@
 			border-radius: 0;
 		}
 	}
+}
 
-	// The following is required to overcome WP Core applying styles that clear
-	// img borders with a higher specificity than those added by the border
-	// block support to provide a default border-style of solid when a border
-	// color or width has been set.
-	:where(.has-border-color) {
-		border-style: solid;
-	}
-	:where([style*="border-top-color"]) {
-		border-top-style: solid;
-	}
-	:where([style*="border-right-color"]) {
-		border-right-style: solid;
-	}
-	:where([style*="border-bottom-color"]) {
-		border-bottom-style: solid;
-	}
-	:where([style*="border-left-color"]) {
-		border-left-style: solid;
-	}
-
-	:where([style*="border-width"]) {
-		border-style: solid;
-	}
-	:where([style*="border-top-width"]) {
-		border-top-style: solid;
-	}
-	:where([style*="border-right-width"]) {
-		border-right-style: solid;
-	}
-	:where([style*="border-bottom-width"]) {
-		border-bottom-style: solid;
-	}
-	:where([style*="border-left-width"]) {
-		border-left-style: solid;
-	}
+// Variations
+:root :where(.wp-block-image.is-style-rounded img, .wp-block-image .is-style-rounded img) {
+	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+	// to rectangular images. A pill-shape is better than otherwise.
+	border-radius: 9999px;
 }
 
 .wp-block-image figure {
@@ -215,7 +198,7 @@
 	left: 0;
 	z-index: 100000;
 	overflow: hidden;
-	width: 100vw;
+	width: 100%;
 	height: 100vh;
 	box-sizing: border-box;
 	visibility: hidden;
@@ -301,7 +284,7 @@
 			animation: both turn-on-visibility 0.35s;
 		}
 	}
-	&.hideanimationenabled {
+	&.show-closing-animation {
 		&:not(.active) {
 			animation: both turn-off-visibility 0.35s;
 			img {
@@ -327,7 +310,7 @@
 					animation: turn-on-visibility 0.4s forwards;
 				}
 			}
-			&.hideanimationenabled {
+			&.show-closing-animation {
 				&:not(.active) {
 					animation: none;
 					.lightbox-image-container {
@@ -343,6 +326,18 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes show-content-image {
+	0% {
+		visibility: hidden;
+	}
+	99% {
+		visibility: hidden;
+	}
+	100% {
+		visibility: visible;
 	}
 }
 
@@ -372,7 +367,7 @@
 
 @keyframes lightbox-zoom-in {
 	0% {
-		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		transform: translate(-50%, -50%) scale(1, 1);
@@ -389,6 +384,6 @@
 	}
 	100% {
 		visibility: hidden;
-		transform: translate(calc(-50vw + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

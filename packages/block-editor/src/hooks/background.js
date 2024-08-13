@@ -1,55 +1,33 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
 import { getBlockSupport } from '@wordpress/blocks';
-import {
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	DropZone,
-	FlexItem,
-	MenuItem,
-	VisuallyHidden,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { Platform, useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
-import { getFilename } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import MediaReplaceFlow from '../components/media-replace-flow';
-import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
+import {
+	default as StylesBackgroundPanel,
+	useHasBackgroundPanel,
+	hasBackgroundImageValue,
+} from '../components/global-styles/background-panel';
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../store/private-keys';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
-export const IMAGE_BACKGROUND_TYPE = 'image';
 
-/**
- * Checks if there is a current value in the background image block support
- * attributes.
- *
- * @param {Object} props Block props.
- * @return {boolean}     Whether or not the block has a background image value set.
- */
-export function hasBackgroundImageValue( props ) {
-	const hasValue =
-		!! props.attributes.style?.background?.backgroundImage?.id ||
-		!! props.attributes.style?.background?.backgroundImage?.url;
-
-	return hasValue;
-}
+// Initial control values.
+export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
+};
 
 /**
  * Determine whether there is block support for background.
@@ -60,10 +38,6 @@ export function hasBackgroundImageValue( props ) {
  * @return {boolean} Whether there is support.
  */
 export function hasBackgroundSupport( blockName, feature = 'any' ) {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
-
 	const support = getBlockSupport( blockName, BACKGROUND_SUPPORT_KEY );
 
 	if ( support === true ) {
@@ -71,227 +45,158 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	}
 
 	if ( feature === 'any' ) {
-		return !! support?.backgroundImage;
+		return (
+			!! support?.backgroundImage ||
+			!! support?.backgroundSize ||
+			!! support?.backgroundRepeat
+		);
 	}
 
 	return !! support?.[ feature ];
 }
 
+export function setBackgroundStyleDefaults( backgroundStyle ) {
+	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.url ) {
+		return;
+	}
+
+	let backgroundStylesWithDefaults;
+
+	// Set block background defaults.
+	if ( ! backgroundStyle?.backgroundSize ) {
+		backgroundStylesWithDefaults = {
+			backgroundSize: BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundSize,
+		};
+	}
+
+	if (
+		'contain' === backgroundStyle?.backgroundSize &&
+		! backgroundStyle?.backgroundPosition
+	) {
+		backgroundStylesWithDefaults = {
+			backgroundPosition:
+				BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundPosition,
+		};
+	}
+	return backgroundStylesWithDefaults;
+}
+
+function useBlockProps( { name, style } ) {
+	if (
+		! hasBackgroundSupport( name ) ||
+		! style?.background?.backgroundImage
+	) {
+		return;
+	}
+
+	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
+
+	if ( ! backgroundStyles ) {
+		return;
+	}
+
+	return {
+		style: {
+			...backgroundStyles,
+		},
+	};
+}
+
 /**
- * Resets the background image block support attributes. This can be used when disabling
- * the background image controls for a block via a `ToolsPanel`.
+ * Generates a CSS class name if an background image is set.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param {Object} style A block's style attribute.
+ *
+ * @return {string} CSS class name.
  */
-export function resetBackgroundImage( { attributes = {}, setAttributes } ) {
-	const { style = {} } = attributes;
-
-	setAttributes( {
-		style: cleanEmptyObject( {
-			...style,
-			background: {
-				...style?.background,
-				backgroundImage: undefined,
-			},
-		} ),
-	} );
+export function getBackgroundImageClasses( style ) {
+	return hasBackgroundImageValue( style ) ? 'has-background' : '';
 }
 
-function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel = label || getFilename( imgUrl );
-	return (
-		<ItemGroup as="span">
-			<HStack justify="flex-start" as="span">
-				<span
-					className={ classnames(
-						'block-editor-hooks__background__inspector-image-indicator-wrapper',
-						{
-							'has-image': imgUrl,
-						}
-					) }
-					aria-hidden
-				>
-					{ imgUrl && (
-						<span
-							className="block-editor-hooks__background__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					) }
-				</span>
-				<FlexItem as="span">
-					<Truncate
-						numberOfLines={ 1 }
-						className="block-editor-hooks__background__inspector-media-replace-title"
-					>
-						{ imgLabel }
-					</Truncate>
-					<VisuallyHidden as="span">
-						{ filename
-							? sprintf(
-									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
-							  )
-							: __( 'No image selected' ) }
-					</VisuallyHidden>
-				</FlexItem>
-			</HStack>
-		</ItemGroup>
-	);
-}
-
-function BackgroundImagePanelItem( props ) {
-	const { attributes, clientId, setAttributes } = props;
-
-	const { id, title, url } =
-		attributes.style?.background?.backgroundImage || {};
-
-	const { mediaUpload } = useSelect( ( select ) => {
+function BackgroundInspectorControl( { children } ) {
+	const resetAllFilter = useCallback( ( attributes ) => {
 		return {
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
-		};
-	} );
-
-	const { createErrorNotice } = useDispatch( noticesStore );
-	const onUploadError = ( message ) => {
-		createErrorNotice( message, { type: 'snackbar' } );
-	};
-
-	const onSelectMedia = ( media ) => {
-		if ( ! media || ! media.url ) {
-			const newStyle = {
-				...attributes.style,
-				background: {
-					...attributes.style?.background,
-					backgroundImage: undefined,
-				},
-			};
-
-			const newAttributes = {
-				style: cleanEmptyObject( newStyle ),
-			};
-
-			setAttributes( newAttributes );
-			return;
-		}
-
-		if ( isBlobURL( media.url ) ) {
-			return;
-		}
-
-		// For media selections originated from a file upload.
-		if (
-			( media.media_type &&
-				media.media_type !== IMAGE_BACKGROUND_TYPE ) ||
-			( ! media.media_type &&
-				media.type &&
-				media.type !== IMAGE_BACKGROUND_TYPE )
-		) {
-			onUploadError(
-				__( 'Only images can be used as a background image.' )
-			);
-			return;
-		}
-
-		const newStyle = {
-			...attributes.style,
-			background: {
-				...attributes.style?.background,
-				backgroundImage: {
-					url: media.url,
-					id: media.id,
-					source: 'file',
-					title: media.title || undefined,
-				},
-			},
-		};
-
-		const newAttributes = {
-			style: cleanEmptyObject( newStyle ),
-		};
-
-		setAttributes( newAttributes );
-	};
-
-	const onFilesDrop = ( filesList ) => {
-		mediaUpload( {
-			allowedTypes: [ 'image' ],
-			filesList,
-			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
-				onSelectMedia( image );
-			},
-			onError: onUploadError,
-		} );
-	};
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
+			...attributes,
 			style: {
-				...previousValue.style,
+				...attributes.style,
 				background: undefined,
 			},
 		};
 	}, [] );
-
 	return (
-		<ToolsPanelItem
-			className="single-column"
-			hasValue={ () => hasBackgroundImageValue( props ) }
-			label={ __( 'Background image' ) }
-			onDeselect={ () => resetBackgroundImage( props ) }
-			isShownByDefault={ true }
-			resetAllFilter={ resetAllFilter }
-			panelId={ clientId }
-		>
-			<div className="block-editor-hooks__background__inspector-media-replace-container">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-					accept="image/*"
-					onSelect={ onSelectMedia }
-					name={
-						<InspectorImagePreview
-							label={ __( 'Background image' ) }
-							filename={ title }
-							url={ url }
-						/>
-					}
-					variant="secondary"
-				>
-					<MenuItem onClick={ () => resetBackgroundImage( props ) }>
-						{ __( 'Reset ' ) }
-					</MenuItem>
-				</MediaReplaceFlow>
-				<DropZone
-					onFilesDrop={ onFilesDrop }
-					label={ __( 'Drop to upload' ) }
-				/>
-			</div>
-		</ToolsPanelItem>
+		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
+			{ children }
+		</InspectorControls>
 	);
 }
 
-export function BackgroundImagePanel( props ) {
-	const [ backgroundImage ] = useSettings( 'background.backgroundImage' );
+export function BackgroundImagePanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+} ) {
+	const { style, inheritedValue, _links } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			const _settings = getSettings();
+			return {
+				style: getBlockAttributes( clientId )?.style,
+				_links: _settings[ globalStylesLinksDataKey ],
+				/*
+				 * To ensure we pass down the right inherited values:
+				 * @TODO 1. Pass inherited value down to all block style controls,
+				 *   See: packages/block-editor/src/hooks/style.js
+				 * @TODO 2. Add support for block style variations,
+				 *   See implementation: packages/block-editor/src/hooks/block-style-variation.js
+				 */
+				inheritedValue:
+					_settings[ globalStylesDataKey ]?.blocks?.[ name ],
+			};
+		},
+		[ clientId, name ]
+	);
+
 	if (
-		! backgroundImage ||
-		! hasBackgroundSupport( props.name, 'backgroundImage' )
+		! useHasBackgroundPanel( settings ) ||
+		! hasBackgroundSupport( name, 'backgroundImage' )
 	) {
 		return null;
 	}
 
+	const onChange = ( newStyle ) => {
+		setAttributes( {
+			style: cleanEmptyObject( newStyle ),
+		} );
+	};
+
+	const updatedSettings = {
+		...settings,
+		background: {
+			...settings.background,
+			backgroundSize:
+				settings?.background?.backgroundSize &&
+				hasBackgroundSupport( name, 'backgroundSize' ),
+		},
+	};
+
 	return (
-		<InspectorControls group="background">
-			<BackgroundImagePanelItem { ...props } />
-		</InspectorControls>
+		<StylesBackgroundPanel
+			inheritedValue={ inheritedValue }
+			as={ BackgroundInspectorControl }
+			panelId={ clientId }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+			settings={ updatedSettings }
+			onChange={ onChange }
+			value={ style }
+			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
+		/>
 	);
 }
+
+export default {
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport: hasBackgroundSupport,
+};

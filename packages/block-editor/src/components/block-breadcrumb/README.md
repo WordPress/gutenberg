@@ -6,11 +6,6 @@ The block breadcrumb trail displays the hierarchy of the current block selection
 
 ![Image in column block breadcrumb](https://make.wordpress.org/core/files/2020/08/gutenberg-image-in-column-block-breadcrumb.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 #### Props

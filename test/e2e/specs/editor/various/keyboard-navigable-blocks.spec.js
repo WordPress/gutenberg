@@ -12,8 +12,9 @@ test.use( {
 } );
 
 test.describe( 'Order of block keyboard navigation', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test( 'permits tabbing through paragraph blocks in the expected order', async ( {
@@ -75,9 +76,7 @@ test.describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Post (selected)'
-		);
+		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
 	} );
 
 	test( 'allows tabbing in navigation mode if no block is selected (reverse)', async ( {
@@ -107,14 +106,6 @@ test.describe( 'Order of block keyboard navigation', () => {
 				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();
 		} );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Add block' );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Add default block'
-		);
 
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
@@ -151,7 +142,7 @@ test.describe( 'Order of block keyboard navigation', () => {
 		);
 
 		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
+		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
 
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
@@ -233,7 +224,7 @@ class KeyboardNavigableBlocks {
 		await expect( activeElement ).toHaveText( paragraphText );
 
 		await this.page.keyboard.press( 'Tab' );
-		await this.expectLabelToHaveFocus( 'Post' );
+		await this.expectLabelToHaveFocus( 'Block' );
 
 		// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
 		await this.pageUtils.pressKeys( 'shift+Tab' );

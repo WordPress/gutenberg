@@ -6,7 +6,11 @@ import type { MutableRefObject, ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import type { NoticeProps, NoticeChildren } from '../notice/types';
+import type {
+	NoticeProps,
+	NoticeChildren,
+	NoticeAction,
+} from '../notice/types';
 
 type SnackbarOnlyProps = {
 	/**
@@ -28,7 +32,32 @@ type SnackbarOnlyProps = {
 	listRef?: MutableRefObject< HTMLDivElement | null >;
 };
 
-export type SnackbarProps = NoticeProps & SnackbarOnlyProps;
+export type SnackbarProps = Pick<
+	NoticeProps,
+	| 'className'
+	| 'children'
+	| 'spokenMessage'
+	| 'onRemove'
+	| 'politeness'
+	| 'onDismiss'
+> &
+	SnackbarOnlyProps & {
+		/**
+		 * An array of action objects. Each member object should contain:
+		 *
+		 * - `label`: `string` containing the text of the button/link
+		 * - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify
+		 *    what the action does.
+		 *
+		 * The default appearance of an action button is inferred based on whether
+		 * `url` or `onClick` are provided, rendering the button as a link if
+		 * appropriate. If both props are provided, `url` takes precedence, and the
+		 * action button will render as an anchor tag.
+		 *
+		 * @default []
+		 */
+		actions?: Pick< NoticeAction, 'label' | 'url' | 'onClick' >[];
+	};
 
 export type SnackbarListProps = {
 	notices: Array<

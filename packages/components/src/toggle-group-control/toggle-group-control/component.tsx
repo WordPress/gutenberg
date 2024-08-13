@@ -2,14 +2,12 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
 import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -31,6 +29,7 @@ function UnconnectedToggleGroupControl(
 ) {
 	const {
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
@@ -46,17 +45,23 @@ function UnconnectedToggleGroupControl(
 	} = useContextSystem( props, 'ToggleGroupControl' );
 
 	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+	const normalizedSize =
+		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.toggleGroupControl( { isBlock, isDeselectable, size } ),
+				styles.toggleGroupControl( {
+					isBlock,
+					isDeselectable,
+					size: normalizedSize,
+				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, size ]
+		[ className, cx, isBlock, isDeselectable, normalizedSize ]
 	);
 
 	const MainControl = isDeselectable
@@ -80,7 +85,7 @@ function UnconnectedToggleGroupControl(
 				label={ label }
 				onChange={ onChange }
 				ref={ forwardedRef }
-				size={ size }
+				size={ normalizedSize }
 				value={ value }
 			>
 				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
@@ -110,7 +115,12 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __nextHasNoMarginBottom
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>

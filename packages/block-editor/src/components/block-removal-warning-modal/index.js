@@ -17,9 +17,8 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
@@ -37,7 +36,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! blockNamesForPrompt ) {
+	if ( ! message ) {
 		return;
 	}
 
@@ -48,28 +47,24 @@ export function BlockRemovalWarningModal( { rules } ) {
 
 	return (
 		<Modal
-			title={ __( 'Are you sure?' ) }
+			title={ __( 'Be careful!' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
-			{ blockNamesForPrompt.length === 1 ? (
-				<p>{ rules[ blockNamesForPrompt[ 0 ] ] }</p>
-			) : (
-				<ul style={ { listStyleType: 'disc', paddingLeft: '1rem' } }>
-					{ blockNamesForPrompt.map( ( name ) => (
-						<li key={ name }>{ rules[ name ] }</li>
-					) ) }
-				</ul>
-			) }
-			<p>
-				{ blockNamesForPrompt.length > 1
-					? __( 'Removing these blocks is not advised.' )
-					: __( 'Removing this block is not advised.' ) }
-			</p>
+			<p>{ message }</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
+				<Button
+					variant="tertiary"
+					onClick={ clearBlockRemovalPrompt }
+					__next40pxDefaultSize
+				>
 					{ __( 'Cancel' ) }
 				</Button>
-				<Button variant="primary" onClick={ onConfirmRemoval }>
+				<Button
+					variant="primary"
+					onClick={ onConfirmRemoval }
+					__next40pxDefaultSize
+				>
 					{ __( 'Delete' ) }
 				</Button>
 			</HStack>

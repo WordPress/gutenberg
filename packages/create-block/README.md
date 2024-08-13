@@ -8,18 +8,6 @@ _It is largely inspired by [create-react-app](https://create-react-app.dev/docs/
 
 > _Learn more about the [Block API at the Gutenberg HandBook](https://developer.wordpress.org/block-editor/developers/block-api/block-registration/)._
 
-## Table of Contents
-
-- [Quick start](#quick-start)
-- [Usage](#usage)
-    - [Interactive Mode](#interactive-mode)
-    - [`slug`](#slug)
-    - [`options`](#options)
-- [Available Commands](#available-commands)
-- [External Project Templates](#external-project-templates)
-- [Contributing to this package](#contributing-to-this-package)
-
-
 ## Quick start
 
 ```bash
@@ -31,7 +19,7 @@ $ npm start
 The `slug` provided (`todo-list` in the example) defines the folder name for the scaffolded plugin and the internal block name. The WordPress plugin generated must [be installed manually](https://wordpress.org/documentation/article/manage-plugins/#manual-plugin-installation-1).
 
 
-_(requires `node` version `14.0.0` or above, and `npm` version `6.14.4` or above)_
+_(requires `node` version `20.10.0` or above, and `npm` version `10.2.3` or above)_
 
 
 > [Watch a video introduction to create-block on Learn.wordpress.org](https://learn.wordpress.org/tutorial/using-the-create-block-tool/)
@@ -141,7 +129,7 @@ For example, running the `start` script from inside the generated folder (`npm s
 
 ## External Project Templates
 
-[Click here](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/docs/external-template.md) for information on External Project Templates
+[Click here](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/packages-create-block-external-template/) for information on External Project Templates
 
 ## Contributing to this package
 

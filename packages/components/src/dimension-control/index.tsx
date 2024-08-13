@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  *
  * 	return (
  * 		<DimensionControl
+ * 			__nextHasNoMarginBottom
  * 			label={ 'Padding' }
  * 			icon={ 'desktop' }
  * 			onChange={ ( value ) => setPaddingSize( value ) }
@@ -42,6 +43,8 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  */
 export function DimensionControl( props: DimensionControlProps ) {
 	const {
+		__next40pxDefaultSize = false,
+		__nextHasNoMarginBottom = false,
 		label,
 		value,
 		sizes = sizesTable,
@@ -85,10 +88,9 @@ export function DimensionControl( props: DimensionControlProps ) {
 
 	return (
 		<SelectControl
-			className={ classnames(
-				className,
-				'block-editor-dimension-control'
-			) }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			className={ clsx( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
 			value={ value }

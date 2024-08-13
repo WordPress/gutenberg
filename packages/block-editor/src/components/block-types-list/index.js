@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,11 +26,10 @@ function BlockTypesList( {
 	label,
 	isDraggable = true,
 } ) {
+	const className = 'block-editor-block-types-list';
+	const listId = useInstanceId( BlockTypesList, className );
 	return (
-		<InserterListboxGroup
-			className="block-editor-block-types-list"
-			aria-label={ label }
-		>
+		<InserterListboxGroup className={ className } aria-label={ label }>
 			{ chunk( items, 3 ).map( ( row, i ) => (
 				<InserterListboxRow key={ i }>
 					{ row.map( ( item, j ) => (
@@ -43,6 +43,7 @@ function BlockTypesList( {
 							onHover={ onHover }
 							isDraggable={ isDraggable && ! item.isDisabled }
 							isFirst={ i === 0 && j === 0 }
+							rowId={ `${ listId }-${ i }` }
 						/>
 					) ) }
 				</InserterListboxRow>

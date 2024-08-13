@@ -333,6 +333,67 @@ describe( 'TimePicker', () => {
 		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
+	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					dateOrder="ymd"
+				/>
+			</form>
+		);
+
+		const form = screen.getByRole( 'form' ) as HTMLFormElement;
+
+		const yearInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Year' )
+		);
+
+		const monthInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Month' )
+		);
+		const dayInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex > yearInputIndex ).toBe( true );
+		expect( dayInputIndex > monthInputIndex ).toBe( true );
+	} );
+
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					dateOrder="ymd"
+					is12Hour
+				/>
+			</form>
+		);
+
+		const form = screen.getByRole( 'form' ) as HTMLFormElement;
+
+		const yearInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Year' )
+		);
+
+		const monthInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Month' )
+		);
+		const dayInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex > yearInputIndex ).toBe( true );
+		expect( dayInputIndex > monthInputIndex ).toBe( true );
+	} );
+
 	it( 'Should set a time when passed a null currentTime', () => {
 		const onChangeSpy = jest.fn();
 

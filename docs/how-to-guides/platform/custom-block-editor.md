@@ -10,21 +10,6 @@ This flexibility and interoperability makes blocks a powerful tool for building 
 
 This guide covers the basics of creating your first custom block editor.
 
-## Table of contents
-
--   [Introduction](#introduction)
-- 	[Code Syntax](#code-syntax)
--   [What you're going to be building](#what-youre-going-to-be-building)
--   [Plugin setup and organization](#plugin-setup-and-organization)
--   [The "Core" of the editor](#the-core-of-the-editor)
--   [Creating the custom "Block Editor" page](#creating-the-custom-block-editor-page)
--   [Registering and rendering the custom block editor](#registering-and-rendering-the-custom-block-editor)
--   [Reviewing the `<Editor>` component](#reviewing-the-editor-component)
--   [The custom `<BlockEditor>`](#the-custom-blockeditor)
--   [Reviewing the sidebar](#reviewing-the-sidebar)
--   [Block persistence](#block-persistence)
--   [Wrapping up](#wrapping-up)
-
 ## Introduction
 
 With its many packages and components, the Gutenberg codebase can be daunting at first. But at its core, it's all about managing and editing blocks. So if you want to work on the editor, it's essential to understand how block editing works at a fundamental level.
@@ -39,7 +24,7 @@ By the end of this article, you will have a solid understanding of the block edi
 
 ## Code syntax
 
-The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so most code examples in the Block Editor Handbook use this syntax.
+The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so all code examples in the Block Editor Handbook use this syntax.
 
 ## What you're going to be building
 
@@ -292,7 +277,7 @@ function Editor( { settings } ) {
 }
 ```
 
-In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://reactjs.org/docs/context.html#contextprovider) that make specific functionality available throughout the component hierarchy.
+In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://react.dev/reference/react/createContext#provider) that make specific functionality available throughout the component hierarchy.
 
 Let's examine these in more detail:
 

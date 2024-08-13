@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type {
 	ToggleGroupControlProps,
 	ToggleGroupControlOptionBaseProps,
@@ -50,17 +50,23 @@ export const buttonView = ( {
 	padding: 0 12px;
 	position: relative;
 	text-align: center;
-	transition:
-		background ${ CONFIG.transitionDurationFast } linear,
-		color ${ CONFIG.transitionDurationFast } linear,
-		font-weight 60ms linear;
-	${ reduceMotion( 'transition' ) }
+	@media not ( prefers-reduced-motion ) {
+		transition:
+			background ${ CONFIG.transitionDurationFast } linear,
+			color ${ CONFIG.transitionDurationFast } linear,
+			font-weight 60ms linear;
+	}
 	user-select: none;
 	width: 100%;
 	z-index: 2;
 
 	&::-moz-focus-inner {
 		border: 0;
+	}
+
+	&[disabled] {
+		opacity: 0.4;
+		cursor: default;
 	}
 
 	&:active {
@@ -102,12 +108,13 @@ const isIconStyles = ( {
 }: Pick< ToggleGroupControlProps, 'size' > ) => {
 	const iconButtonSizes = {
 		default: '30px',
-		'__unstable-large': '34px',
+		'__unstable-large': '32px',
 	};
 
 	return css`
 		color: ${ COLORS.gray[ 900 ] };
-		width: ${ iconButtonSizes[ size ] };
+		height: ${ iconButtonSizes[ size ] };
+		aspect-ratio: 1;
 		padding-left: 0;
 		padding-right: 0;
 	`;

@@ -8,6 +8,10 @@
 /**
  * Renders the `core/template-part` block on the server.
  *
+ * @since 5.9.0
+ *
+ * @global WP_Embed $wp_embed WordPress Embed object.
+ *
  * @param array $attributes The block attributes.
  *
  * @return string The render.
@@ -43,10 +47,10 @@ function render_block_core_template_part( $attributes ) {
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
-			$content    = $template_part_post->post_content;
-			$area_terms = get_the_terms( $template_part_post, 'wp_template_part_area' );
-			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
-				$area = $area_terms[0]->name;
+			$block_template = _build_block_template_result_from_post( $template_part_post );
+			$content        = $block_template->content;
+			if ( isset( $block_template->area ) ) {
+				$area = $block_template->area;
 			}
 			/**
 			 * Fires when a block template part is loaded from a template post stored in the database.
@@ -69,6 +73,12 @@ function render_block_core_template_part( $attributes ) {
 				$content = $block_template->content;
 				if ( isset( $block_template->area ) ) {
 					$area = $block_template->area;
+				}
+
+				// Needed for the `render_block_core_template_part_file` and `render_block_core_template_part_none` actions below.
+				$block_template_file = _get_block_template_file( 'wp_template_part', $attributes['slug'] );
+				if ( $block_template_file ) {
+					$template_part_file_path = $block_template_file['path'];
 				}
 			}
 
@@ -103,16 +113,16 @@ function render_block_core_template_part( $attributes ) {
 	// is set in `wp_debug_mode()`.
 	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
-	if ( is_null( $content ) && $is_debug ) {
-		if ( ! isset( $attributes['slug'] ) ) {
-			// If there is no slug this is a placeholder and we dont want to return any message.
-			return;
+	if ( is_null( $content ) ) {
+		if ( $is_debug && isset( $attributes['slug'] ) ) {
+			return sprintf(
+				/* translators: %s: Template part slug. */
+				__( 'Template part has been deleted or is unavailable: %s' ),
+				$attributes['slug']
+			);
 		}
-		return sprintf(
-			/* translators: %s: Template part slug. */
-			__( 'Template part has been deleted or is unavailable: %s' ),
-			$attributes['slug']
-		);
+
+		return '';
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
@@ -151,7 +161,7 @@ function render_block_core_template_part( $attributes ) {
 	global $wp_embed;
 	$content = $wp_embed->autoembed( $content );
 
-	if ( empty( $attributes['tagName'] ) ) {
+	if ( empty( $attributes['tagName'] ) || tag_escape( $attributes['tagName'] ) !== $attributes['tagName'] ) {
 		$area_tag = 'div';
 		if ( $area_definition && isset( $area_definition['area_tag'] ) ) {
 			$area_tag = $area_definition['area_tag'];
@@ -167,6 +177,8 @@ function render_block_core_template_part( $attributes ) {
 
 /**
  * Returns an array of area variation objects for the template part block.
+ *
+ * @since 6.1.0
  *
  * @param array $instance_variations The variations for instances.
  *
@@ -205,6 +217,8 @@ function build_template_part_block_area_variations( $instance_variations ) {
 
 /**
  * Returns an array of instance variation objects for the template part block
+ *
+ * @since 6.1.0
  *
  * @return array Array containing the block variation objects.
  */
@@ -260,6 +274,8 @@ function build_template_part_block_instance_variations() {
 /**
  * Returns an array of all template part block variations.
  *
+ * @since 5.9.0
+ *
  * @return array Array containing the block variation objects.
  */
 function build_template_part_block_variations() {
@@ -270,13 +286,15 @@ function build_template_part_block_variations() {
 
 /**
  * Registers the `core/template-part` block on the server.
+ *
+ * @since 5.9.0
  */
 function register_block_core_template_part() {
 	register_block_type_from_metadata(
 		__DIR__ . '/template-part',
 		array(
-			'render_callback' => 'render_block_core_template_part',
-			'variations'      => build_template_part_block_variations(),
+			'render_callback'    => 'render_block_core_template_part',
+			'variation_callback' => 'build_template_part_block_variations',
 		)
 	);
 }

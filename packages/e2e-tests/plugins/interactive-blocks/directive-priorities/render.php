@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-priorities">
 	<pre data-testid="execution order"></pre>
 
 	<!-- Element with test directives -->
@@ -20,5 +20,8 @@
 </div>
 
 <div data-testid="non-existent-directives">
-	<div data-wp-interactive ><div data-wp-non-existent-directive></div></div>
+	<!-- WARNING: the `div` with `data-wp-non-existent-directive` should remain
+		inline (i.e., without new line or blank characters in between) to
+		ensure it is the only child node. Otherwise, tests could fail. -->
+	<div data-wp-interactive="directive-priorities"><div data-wp-non-existent-directive></div></div>
 </div>

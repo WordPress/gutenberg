@@ -4,34 +4,19 @@
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
+ * WordPress dependencies
+ */
+import { useViewportMatch } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -77,10 +62,7 @@ export const PRESET_METADATA = [
 	{
 		path: [ 'typography', 'fontSizes' ],
 		valueFunc: ( preset, settings ) =>
-			getTypographyFontSizeValue(
-				preset,
-				getFluidTypographyOptionsFromSettings( settings )
-			),
+			getTypographyFontSizeValue( preset, settings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -158,6 +140,19 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontSize': 'fontSize',
 	'typography.fontFamily': 'fontFamily',
 };
+
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+}
 
 function findInPresetsBy(
 	features,
@@ -380,6 +375,10 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( ! scope || ! selector ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
@@ -391,6 +390,57 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Scopes a collection of selectors for features and subfeatures.
+ *
+ * @example
+ * ```js
+ * const scope = '.custom-scope';
+ * const selectors = {
+ *     color: '.wp-my-block p',
+ *     typography: { fontSize: '.wp-my-block caption' },
+ * };
+ * const result = scopeFeatureSelector( scope, selectors );
+ * // result is {
+ * //     color: '.custom-scope .wp-my-block p',
+ * //     typography: { fonSize: '.custom-scope .wp-my-block caption' },
+ * // }
+ * ```
+ *
+ * @param {string} scope     Selector to scope collection of selectors with.
+ * @param {Object} selectors Collection of feature selectors e.g.
+ *
+ * @return {Object|undefined} Scoped collection of feature selectors.
+ */
+export function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			featureSelectors[ feature ] = {};
+
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
 }
 
 /**
@@ -438,4 +488,152 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 		fastDeepEqual( original?.styles, variation?.styles ) &&
 		fastDeepEqual( original?.settings, variation?.settings )
 	);
+}
+
+/**
+ * Generates the selector for a block style variation by creating the
+ * appropriate CSS class and adding it to the ancestor portion of the block's
+ * selector.
+ *
+ * For example, take the Button block which has a compound selector:
+ * `.wp-block-button .wp-block-button__link`. With a variation named 'custom',
+ * the class `.is-style-custom` should be added to the `.wp-block-button`
+ * ancestor only.
+ *
+ * This function will take into account comma separated and complex selectors.
+ *
+ * @param {string} variation     Name for the variation.
+ * @param {string} blockSelector CSS selector for the block.
+ *
+ * @return {string} CSS selector for the block style variation.
+ */
+export function getBlockStyleVariationSelector( variation, blockSelector ) {
+	const variationClass = `.is-style-${ variation }`;
+
+	if ( ! blockSelector ) {
+		return variationClass;
+	}
+
+	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
+	const addVariationClass = ( _match, group1, group2 ) => {
+		return group1 + group2 + variationClass;
+	};
+
+	const result = blockSelector
+		.split( ',' )
+		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+
+	return result.join( ',' );
+}
+
+/**
+ * Converts style preset values `var:` to CSS custom var values.
+ * TODO: Export and use the style engine util: getCSSVarFromStyleValue().
+ *
+ * Example:
+ *
+ * compileStyleValue( 'var:preset|color|primary' ) // returns 'var(--wp--color-primary)'
+ *
+ * @param {string} uncompiledValue A block style value.
+ * @return {string} The compiled, or original value.
+ */
+export function compileStyleValue( uncompiledValue ) {
+	const VARIABLE_REFERENCE_PREFIX = 'var:';
+	if (
+		'string' === typeof uncompiledValue &&
+		uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX )
+	) {
+		const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+		const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
+/**
+ * Looks up a theme file URI based on a relative path.
+ *
+ * @param {string}        file          A relative path.
+ * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
+ * @return {string} A resolved theme file URI, if one is found in the themeFileURIs collection.
+ */
+export function getResolvedThemeFilePath( file, themeFileURIs ) {
+	if ( ! file || ! themeFileURIs || ! Array.isArray( themeFileURIs ) ) {
+		return file;
+	}
+
+	const uri = themeFileURIs.find(
+		( themeFileUri ) => themeFileUri?.name === file
+	);
+
+	if ( ! uri?.href ) {
+		return file;
+	}
+
+	return uri?.href;
+}
+
+/**
+ * Resolves ref values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedRefValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+		const refPath = ruleValue.ref.split( '.' );
+		const resolvedRuleValue = compileStyleValue(
+			getValueFromObjectPath( tree, refPath )
+		);
+
+		/*
+		 * Presence of another ref indicates a reference to another dynamic value.
+		 * Pointing to another dynamic value is not supported.
+		 */
+		if ( resolvedRuleValue?.ref ) {
+			return undefined;
+		}
+
+		if ( ! resolvedRuleValue ) {
+			return ruleValue;
+		}
+
+		return resolvedRuleValue;
+	}
+	return ruleValue;
+}
+
+/**
+ * Resolves ref and relative path values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	// Resolve ref values.
+	const resolvedValue = getResolvedRefValue( ruleValue, tree );
+
+	// Resolve relative paths.
+	if ( resolvedValue?.url ) {
+		resolvedValue.url = getResolvedThemeFilePath(
+			resolvedValue.url,
+			tree?._links?.[ 'wp:theme-file' ]
+		);
+	}
+
+	return resolvedValue;
 }

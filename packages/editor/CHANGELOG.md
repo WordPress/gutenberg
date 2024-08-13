@@ -2,6 +2,61 @@
 
 ## Unreleased
 
+## 14.5.0 (2024-08-07)
+
+## 14.4.0 (2024-07-24)
+
+### Deprecations
+
+-   `PostTaxonomiesFlatTermSelector`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
+
+## 14.3.0 (2024-07-10)
+
+## 14.2.0 (2024-06-26)
+
+## 14.1.0 (2024-06-15)
+
+## 14.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 13.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 13.34.0 (2024-05-02)
+
+## 13.33.0 (2024-04-19)
+
+## 13.32.0 (2024-04-03)
+
+## 13.31.0 (2024-03-21)
+
+## 13.30.0 (2024-03-06)
+
+## 13.29.0 (2024-02-21)
+
+## 13.28.0 (2024-02-09)
+
+## 13.27.0 (2024-01-24)
+
+## 13.26.0 (2024-01-10)
+
+### New Features
+
+-   Add the editor panels visibility state to the editor store in addition to the following actions and selectors: `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.
+
+## 13.25.0 (2023-12-13)
+
+## 13.24.0 (2023-11-29)
+
+## 13.23.0 (2023-11-16)
+
 ## 13.22.0 (2023-11-02)
 
 ## 13.21.0 (2023-10-18)
@@ -96,34 +151,34 @@
 
 ### Deprecations
 
-- Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
+-   Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
 
 ## 12.2.0 (2022-02-10)
 
-### Enhancement
+### Enhancements
 
 -   Export `PostTaxonomiesFlatTermSelector` and `PostTaxonomiesHierarchicalTermSelector` components to allow using them to customize the default term selector for a taxonomy.
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/autop`, `@wordpress/blob` and `@wordpress/is-shallow-equal` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ### Deprecations
 
-- the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
+-   the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
 
 ## 12.1.0 (2022-01-27)
 
 ## 12.0.0 (2021-10-12)
 
-### Breaking changes
+### Breaking Changes
 
 -   Removed the deprecated `resetAutosave` action ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
 -   Removed the deprecated `getAutosave`, `hasAutosave` and `getBlockForSerialization` selectors ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
 
 ## 11.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -135,20 +190,20 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 9.26.0 (2021-03-17)
 
 ## 9.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the editor namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 9.21.0 (2020-09-03)
 
-### Enhancement
+### Enhancements
 
 -   The `UnsavedChangesWarning` component is now using `__experimentalGetDirtyEntityRecords` to determine if there were changes.
 
@@ -374,7 +429,7 @@
 
 ## 7.0.1 (2018-11-12)
 
-### Polish
+### Internal
 
 -   Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
 
@@ -384,11 +439,11 @@
 
 ## 7.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `PanelColor` component has been removed.
 
-### New Feature
+### New Features
 
 -   In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
 
@@ -406,7 +461,7 @@
 
 -   `PostPublishPanelToggle` has been deprecated in favor of `PostPublishButton`.
 
-### Polish
+### Internal
 
 -   Reactive block styles.
 
@@ -418,7 +473,7 @@
 
 ## 6.1.1 (2018-11-03)
 
-### Polish
+### Internal
 
 -   Remove `findDOMNode` usage from the `Inserter` component.
 -   Remove `findDOMNode` usage from the `Block` component.
@@ -451,7 +506,7 @@
 -   New actions `lockPostSaving` and `unlockPostSaving` were introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 -   New selector `isPostSavingLocked` was introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 
-### Polish
+### Internal
 
 -   Add animated logo to preview interstitial screen.
 -   Tweak the editor styles support.

@@ -105,8 +105,21 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useBlockContext( clientId );
 
+	const { nestingLevel, parentLock } = useSelect(
+		( select ) => {
+			const { getBlockParents, getTemplateLock, getBlockRootClientId } =
+				select( blockEditorStore );
+			return {
+				nestingLevel: getBlockParents( clientId )?.length,
+				parentLock: getTemplateLock( getBlockRootClientId( clientId ) ),
+			};
+		},
+		[ clientId ]
+	);
+
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -126,13 +139,6 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const nestingLevel = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlockParents( clientId )
-				?.length;
-		},
-		[ clientId ]
-	);
 	if ( nestingLevel >= MAX_NESTING_DEPTH ) {
 		return <WarningMaxDepthExceeded clientId={ clientId } />;
 	}

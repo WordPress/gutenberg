@@ -13,11 +13,16 @@ import styles from './gallery-styles.scss';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockCaption, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	RichText,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 const TILE_SPACING = 8;
 
@@ -60,7 +65,6 @@ export const Gallery = ( props ) => {
 		{},
 		{
 			contentResizeMode: 'stretch',
-			allowedBlocks: [ 'core/image' ],
 			orientation: 'horizontal',
 			renderAppender: false,
 			numColumns: displayedColumns,
@@ -97,9 +101,9 @@ export const Gallery = ( props ) => {
 			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
-				accessible={ true }
+				accessible
 				accessibilityLabelCreator={ ( caption ) =>
-					! caption
+					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
 
 						  'Gallery caption. Empty'
@@ -117,4 +121,4 @@ export const Gallery = ( props ) => {
 	);
 };
 
-export default Gallery;
+export default withViewportMatch( { isNarrow: '< small' } )( Gallery );

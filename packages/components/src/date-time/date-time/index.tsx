@@ -7,7 +7,6 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,6 +24,7 @@ function UnforwardedDateTimePicker(
 	{
 		currentDate,
 		is12Hour,
+		dateOrder,
 		isInvalidDate,
 		onMonthPreviewed = noop,
 		onChange,
@@ -40,6 +40,7 @@ function UnforwardedDateTimePicker(
 					currentTime={ currentDate }
 					onChange={ onChange }
 					is12Hour={ is12Hour }
+					dateOrder={ dateOrder }
 				/>
 				<DatePicker
 					currentDate={ currentDate }

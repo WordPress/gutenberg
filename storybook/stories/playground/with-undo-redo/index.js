@@ -7,7 +7,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	BlockEditorProvider,
 	BlockCanvas,
-	BlockTools,
+	BlockToolbar,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
@@ -49,16 +49,18 @@ export default function EditorWithUndoRedo() {
 					<Button
 						onClick={ undo }
 						disabled={ ! hasUndo }
+						accessibleWhenDisabled
 						icon={ undoIcon }
 						label="Undo"
 					/>
 					<Button
 						onClick={ redo }
 						disabled={ ! hasRedo }
+						accessibleWhenDisabled
 						icon={ redoIcon }
 						label="Redo"
 					/>
-					<BlockTools />
+					<BlockToolbar hideDragHandle />
 				</div>
 				<BlockCanvas height="100%" styles={ editorStyles } />
 			</BlockEditorProvider>

@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
@@ -57,11 +57,12 @@ Starting in WordPress 5.8 release, we recommend using the `block.json` metadata 
 	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
 	"editorStyle": "file:./index.css",
 	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ],
 	"render": "file:./render.php"
 }
 ```
 
-## Benefits using the metadata file
+## Benefits of using the metadata file
 
 The block definition allows code sharing between JavaScript, PHP, and other languages when processing block types stored as JSON, and registering blocks with the `block.json` metadata file provides multiple benefits on top of it.
 
@@ -69,7 +70,7 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to submit your block(s) to the Block Directory all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
 
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
@@ -77,71 +78,15 @@ Development is improved by using a defined schema definition file. Supported edi
 "$schema": "https://schemas.wp.org/trunk/block.json"
 ```
 
-## Block registration
-
-### PHP (server-side)
-
-The [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function that aims to simplify the block type registration on the server, can read metadata stored in the `block.json` file.
-
-This function takes two params relevant in this context (`$block_type` accepts more types and variants):
-
--   `$block_type` (`string`) – path to the folder where the `block.json` file is located or full path to the metadata file if named differently.
--   `$args` (`array`) – an optional array of block type arguments. Default value: `[]`. Any arguments may be defined. However, the one described below is supported by default:
-    -   `$render_callback` (`callable`) – callback used to render blocks of this block type, it's an alternative to the `render` field in `block.json`.
-
-It returns the registered block type (`WP_Block_Type`) on success or `false` on failure.
-
-**Example:**
-
-```php
-register_block_type(
-	__DIR__ . '/notice',
-	array(
-		'render_callback' => 'render_block_core_notice',
-	)
-);
-```
-
-### JavaScript (client-side)
-
-When the block is registered on the server, you only need to register the client-side settings on the client using the same block’s name.
-
-**Example:**
-
-```js
-registerBlockType( 'my-plugin/notice', {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
-
-Although registering the block also on the server with PHP is still recommended for the reasons above, if you want to register it only client-side you can now use `registerBlockType` method from `@wordpress/blocks` package to register a block type using the metadata loaded from `block.json` file.
-
-The function takes two params:
-
--   `$blockNameOrMetadata` (`string`|`Object`) – block type name (supported previously) or the metadata object loaded from the `block.json` file with a bundler (e.g., webpack) or a custom Babel plugin.
--   `$settings` (`Object`) – client-side block settings.
-
-It returns the registered block type (`WPBlock`) on success or `undefined` on failure.
-
-**Example:**
-
-```js
-import { registerBlockType } from '@wordpress/blocks';
-import Edit from './edit';
-import metadata from './block.json';
-
-registerBlockType( metadata, {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
+<div class="callout callout-info">
+Check <a href="https://developer.wordpress.org/block-editor/getting-started/fundamentals-block-development/registration-of-a-block">Registration of a block</a> to learn more about how to register a block using its metadata.
+</div>
 
 ## Block API
 
 This section describes all the properties that can be added to the `block.json` file to define the behavior and metadata of block types.
 
-### API Version
+### API version
 
 -   Type: `number`
 -   Optional
@@ -155,7 +100,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
-See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
 
 ### Name
 
@@ -242,6 +187,20 @@ Setting `parent` lets a block require that it is only available when nested with
 
 The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block. In comparison to the `parent` property blocks that specify their `ancestor` can be placed anywhere in the subtree whilst blocks with a specified `parent` need to be direct children.
 
+### Allowed Blocks
+
+-   Type: `string[]`
+-   Optional
+-   Localized: No
+-   Property: `allowedBlocks`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "allowedBlocks": [ "my-block/product" ] }
+```
+
+The `allowedBlocks` specifies which block types can be the direct children of the block. For example, a ‘List’ block can allow only ‘List Item’ blocks as children.
+
 ### Icon
 
 -   Type: `string`
@@ -253,9 +212,9 @@ The `ancestor` property makes a block available inside the specified block types
 { "icon": "smile" }
 ```
 
-An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).
+An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/) (slug serving also as a fallback in non-js contexts).
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
+**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. These colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
 ### Description
 
@@ -342,7 +301,7 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
-See the [the attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
+See [the attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ### Provides Context
 
@@ -352,7 +311,7 @@ See the [the attributes documentation](/docs/reference-guides/block-api/block-at
 -   Property: `providesContext`
 -   Default: `{}`
 
-Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
+Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attributes.
 
 See [the block context documentation](/docs/reference-guides/block-api/block-context.md) for more details.
 
@@ -397,7 +356,7 @@ Providing custom selectors allows more fine grained control over which styles
 apply to what block elements, e.g. applying typography styles only to an inner
 heading while colors are still applied on the outer block wrapper etc.
 
-See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
+See [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 
 ```json
 {
@@ -422,7 +381,7 @@ See the [the selectors documentation](/docs/reference-guides/block-api/block-sel
 -   Property: `supports`
 -   Default: `{}`
 
-It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
+It contains a set of options to control features used in the editor. See [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 ### Block Styles
 
@@ -443,7 +402,7 @@ It contains as set of options to control features used in the editor. See the [t
 
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
+Plugins and Themes can also register [custom block styles](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 ### Example
 
@@ -468,7 +427,7 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 
 ### Variations
 
--   Type: `object[]`
+-   Type: `object[]|WPDefinedPath` ([learn more](#wpdefinedpath))
 -   Optional
 -   Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 -   Property: `variations`
@@ -495,7 +454,49 @@ Block Variations is the API that allows a block to have similar versions of it, 
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
-See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+Starting with version 6.7, it is possible to specify a PHP file in `block.json` that generates the list of block variations on the server side:
+
+```json
+{ "variations": "file:./variations.php" }
+```
+
+That PHP file is expected to `return` an array that contains the block variations. Strings found in the variations returned from the PHP file will not be localized automatically; instead, use the `__()` function as usual.
+
+For example:
+
+```php
+<?php
+// Generate variations for a Social Icon kind of block.
+
+return array(
+	array(
+		'isDefault'  => true,
+		'name'       => 'wordpress',
+		'title'      => 'WordPress',
+		'icon'       => 'wordpress',
+		'attributes' => array(
+			'service' => 'wordpress',
+		),
+		'isActive'   => array( 'service' )
+	),
+	array(
+		'name'       => 'mail',
+		'title'      => __( 'Mail' ),
+		'keywords'   => array(
+			__( 'email' ),
+			__( 'e-mail' )
+		),
+		'icon'       => 'mail',
+		'attributes' => array(
+			'service' => 'mail',
+		),
+		'isActive'   => array( 'mail' )
+	),
+);
+
+```
+
+See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
 ### Block Hooks
 
@@ -516,7 +517,7 @@ Block Hooks is an API that allows a block to automatically insert itself next to
 
 The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
 
-### Editor Script
+### Editor script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -550,7 +551,7 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of scripts exists since WordPress `6.1.0`._
 
-### View Script
+### View script
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -568,7 +569,27 @@ It's possible to pass a script handle registered with the [`wp_register_script`]
 
 _Note: An option to pass also an array of view scripts exists since WordPress `6.1.0`._
 
-### Editor Style
+### View script module
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewScriptModule`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "viewScriptModule": [ "file:./view.js", "example-shared-script-module-id" ] }
+```
+
+Block type frontend script module definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a script module ID registered with the [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/) function, a path to a JavaScript module relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. [More functionality](https://core.trac.wordpress.org/ticket/60647) will gradually become available to Script Modules.
+
+_Note: Available since WordPress `6.5.0`._
+
+### Editor style
 
 -   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
 -   Optional
@@ -602,6 +623,24 @@ It's possible to pass a style handle registered with the [`wp_register_style`](h
 
 _Note: An option to pass also an array of styles exists since WordPress `5.9.0`._
 
+### View Style
+
+-   Type: `WPDefinedAsset`|`WPDefinedAsset[]` ([learn more](#wpdefinedasset))
+-   Optional
+-   Localized: No
+-   Property: `viewStyle`
+-   Since: `WordPress 6.5.0`
+
+```json
+{ "viewStyle": [ "file:./view.css", "example-view-style" ] }
+```
+
+Block type frontend styles definition. They will be enqueued only when viewing the content on the front of the site.
+
+It's possible to pass a style handle registered with the [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/) function, a path to a CSS file relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
+
+Frontend-only styles are especially useful for interactive blocks, to style parts that will only be visible after a user performs some action and where those styles will never be needed in the editor. You can start with using the `style` property to put all your common styles in one stylesheet. Only when you need editor-specific styling or frontend-specific styling, you can expand to `editorStyle` and `viewStyle`, but still keep the common part of your styling in the main stylesheet.
+
 ### Render
 
 -   Type: `WPDefinedPath` ([learn more](#wpdefinedpath))
@@ -634,7 +673,7 @@ _Note: This file loads for every instance of the block type when rendering the p
 
 ### `WPDefinedPath`
 
-The `WPDefinedPath` type is a subtype of string, where the value represents a path to a JavaScript, CSS or PHP file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
+The `WPDefinedPath` type is a subtype of string, where the value represents a path to a JavaScript, CSS or PHP file relative to where the `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
 
 **Example:**
 
@@ -648,7 +687,7 @@ In `block.json`:
 
 ### `WPDefinedAsset`
 
-It extends `WPDefinedPath` for JavaScript and CSS files. An alternative to the file path would be a script or style handle name referencing an already registered asset using WordPress helpers.
+It extends `WPDefinedPath` for JavaScript and CSS files. An alternative to the file path would be a script handle, script module ID, or style handle referencing an already registered asset using WordPress helpers.
 
 **Example:**
 
@@ -658,23 +697,27 @@ In `block.json`:
 {
 	"editorScript": "file:./index.js",
 	"script": "file:./script.js",
-	"viewScript": [ "file:./view.js", "example-shared-view-script" ],
+	"viewScriptModule": [
+		"file:./view.js",
+		"example-registered-script-module-id"
+	],
 	"editorStyle": "file:./index.css",
-	"style": [ "file:./style.css", "example-shared-style" ]
+	"style": [ "file:./style.css", "example-shared-style" ],
+	"viewStyle": [ "file:./view.css", "example-view-style" ]
 }
 ```
 
-In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts and styles that are found in the `block.json` file and use file paths rather than asset handles.
+In the context of WordPress, when a block is registered with PHP, it will automatically register all scripts, script modules, and styles that are found in the `block.json` file and use file paths rather than asset handles.
 
-That's why, the `WPDefinedAsset` type has to offer a way to mirror also the shape of params necessary to register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
+That's why the `WPDefinedAsset` type has to offer a way to mirror the parameters necessary to register scripts, script modules, and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/), [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/), and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), and then assign these as handles or script module IDs associated with the block.
 
 It's possible to provide an object which takes the following shape:
 
 -   `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
--   `dependencies` (`string[]`) - an array of registered script handles this script depends on. Default value: `[]`.
--   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
+-   `dependencies` (`string[]`|`{ id: string, import?: 'dynamic'|'static' }[]`) - an array of registered script handles this script depends on. Script modules may use a simple string for static dependencies or the object form to indicate a dynamic dependency. Dynamic dependencies are dependencies that may or may not be used at runtime and are typically used with the dynamic `import('module-id')` syntax. Default value: `[]`.
+-   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to the currently installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-The definition is stored inside separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
+The definition is stored inside a separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
 
@@ -705,13 +748,14 @@ return array(
 );
 ```
 
-### Frontend Enqueueing
+### Frontend enqueueing
 
 Starting in the WordPress 5.8 release, it is possible to instruct WordPress to enqueue scripts and styles for a block type only when rendered on the frontend. It applies to the following asset fields in the `block.json` file:
 
 -   `script`
 -   `viewScript`
 -   `style`
+-   `viewStyle` (Added in WordPress 6.5.0)
 
 ## Internationalization
 
@@ -743,7 +787,7 @@ $metadata = array(
 );
 ```
 
-Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+Implementation follows the existing [get_plugin_data](https://developer.wordpress.org/reference/functions/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
 
 ### JavaScript
 
@@ -762,7 +806,7 @@ registerBlockType( metadata, {
 } );
 ```
 
-## Backward Compatibility
+## Backward compatibility
 
 The existing registration mechanism (both server side and frontend) will continue to work, it will serve as low-level implementation detail for the `block.json` based registration.
 
@@ -795,4 +839,4 @@ registerBlockType( 'my-plugin/block-name', {
 } );
 ```
 
-In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.
+In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should still be possible to register the `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) functions on the server.

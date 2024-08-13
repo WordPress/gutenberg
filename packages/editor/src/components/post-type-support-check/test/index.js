@@ -29,7 +29,7 @@ function setupUseSelectMock( postType ) {
 }
 
 describe( 'PostTypeSupportCheck', () => {
-	it( 'renders its children when post type is not known', () => {
+	it( 'does not render its children when post type is not known', () => {
 		setupUseSelectMock( undefined );
 
 		const { container } = render(
@@ -38,7 +38,7 @@ describe( 'PostTypeSupportCheck', () => {
 			</PostTypeSupportCheck>
 		);
 
-		expect( container ).toHaveTextContent( 'Supported' );
+		expect( container ).not.toHaveTextContent( 'Supported' );
 	} );
 
 	it( 'does not render its children when post type is known and not supports', () => {

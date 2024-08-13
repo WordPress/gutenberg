@@ -17,8 +17,6 @@ const STORE_NAME = 'core/commands';
 /**
  * Store definition for the commands namespace.
  *
- * See how the Commands Store is being used in components like [site-hub](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-site/src/components/site-hub/index.js#L23) and [document-actions](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/header/document-actions/index.js#L14).
- *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}

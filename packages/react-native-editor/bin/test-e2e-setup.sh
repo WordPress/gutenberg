@@ -1,4 +1,12 @@
-#!/bin/bash -eu
+#!/bin/bash -e
+
+# =================================================================
+# Appium Drivers
+#
+# NOTE: Please update the following versions when upgrading Appium.
+# =================================================================
+UI_AUTOMATOR_2_VERSION="2.32.3"
+XCUITEST_VERSION="5.7.0"
 
 set -o pipefail
 
@@ -23,18 +31,30 @@ function log_error() {
 
 output=$($APPIUM_CMD driver list --installed --json)
 
-if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 is installed, skipping installation."
+# UiAutomator2 driver installation
+matched_version=$(echo "$output" | jq -r '.uiautomator2.version // empty')
+if [ -z "$matched_version" ]; then
+	log_info "UiAutomator2 not installed, installing version $UI_AUTOMATOR_2_VERSION..."
+	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
+elif [ "$matched_version" = "$UI_AUTOMATOR_2_VERSION" ]; then
+	log_info "UiAutomator2 version $UI_AUTOMATOR_2_VERSION is available."
 else
-	log_info "UiAutomator2 not found, installing..."
-	$APPIUM_CMD driver install uiautomator2
+	log_info "UiAutomator2 version $matched_version is installed, replacing it with version $UI_AUTOMATOR_2_VERSION..."
+	$APPIUM_CMD driver uninstall uiautomator2
+	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
 fi
 
-if echo "$output" | grep -q 'xcuitest'; then
-	log_info "XCUITest is installed, skipping installation."
+# XCUITest driver installation
+matched_version=$(echo "$output" | jq -r '.xcuitest.version // empty')
+if [ -z "$matched_version" ]; then
+	log_info "XCUITest not installed, installing version $XCUITEST_VERSION..."
+	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
+elif [ "$matched_version" = "$XCUITEST_VERSION" ]; then
+	log_info "XCUITest version $XCUITEST_VERSION is available."
 else
-	log_info "XCUITest not found, installing..."
-	$APPIUM_CMD driver install xcuitest
+	log_info "XCUITest version $matched_version is installed, replacing it with version $XCUITEST_VERSION..."
+	$APPIUM_CMD driver uninstall xcuitest
+	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
@@ -54,7 +74,7 @@ function detect_or_create_simulator() {
 	local simulators=$(xcrun simctl list devices -j | jq -r --arg runtime "$runtime_name" '.devices | to_entries[] | select(.key | contains($runtime)) | .value[] | .name + "," + .udid')
 
 	if ! echo "$simulators" | grep -q "$simulator_name"; then
-		log_info "$simulator_name ($runtime_name_display) not available, creating..."
+		log_info "$simulator_name ($runtime_name_display) not found, creating..."
 		xcrun simctl create "$simulator_name" "$simulator_name" "com.apple.CoreSimulator.SimRuntime.$runtime_name" > /dev/null
 		log_success "$simulator_name ($runtime_name_display) created."
 	else
@@ -69,6 +89,37 @@ IOS_DEVICE_TABLET_NAME=$(jq -r '.ios.local.deviceTabletName' "$CONFIG_FILE")
 detect_or_create_simulator "$IOS_DEVICE_NAME"
 detect_or_create_simulator "$IOS_DEVICE_TABLET_NAME"
 
+function detect_or_create_emulator() {
+	if [[ "${CI}" ]]; then
+		log_info "Detected CI server, skipping Android emulator creation."
+		return
+	fi
+
+	if [[ -z $(command -v avdmanager) ]]; then
+		log_error "avdmanager not found! Please install the Android SDK command-line tools.\n    https://developer.android.com/tools/"
+		exit 1;
+	fi
+
+	local emulator_name=$1
+	local emulator_id=$(echo "$emulator_name" | sed 's/ /_/g; s/\./_/g')
+	local device_id=$(echo "$emulator_id" | awk -F '_' '{print tolower($1)"_"tolower($2)"_"tolower($3)}')
+	local runtime_api=$(echo "$emulator_id" | awk -F '_' '{print $NF}')
+	local emulator=$(emulator -list-avds | grep "$emulator_id")
+
+	if [[ -z $emulator ]]; then
+		log_info "$emulator_name not found, creating..."
+		avdmanager create avd -n "$emulator_id" -k "system-images;android-$runtime_api;google_apis;arm64-v8a" -d "$device_id" > /dev/null
+		log_success "$emulator_name created."
+	else
+		log_info "$emulator_name available."
+	fi
+}
+
+ANDROID_DEVICE_NAME=$(jq -r '.android.local.deviceName' "$CONFIG_FILE")
+
+# Create the required Android emulators, if they don't exist
+detect_or_create_emulator $ANDROID_DEVICE_NAME
+
 # Mitigate conflicts between development server caches and E2E tests
 npm run clean:runtime > /dev/null
-log_info 'Runtime cache cleaned.'
+log_info 'Runtime cache cleared.'

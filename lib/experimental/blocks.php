@@ -78,108 +78,45 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	}
 }
 
-
-
-
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-connections', $gutenberg_experiments ) ) {
+/*
+ * WP_Block_Styles_Registry was marked as `final` in core so it cannot be
+ * updated via Gutenberg to allow registration of a style across multiple
+ * block types as well as with an optional style object. This function will
+ * support the desired functionality until the styles registry can be updated
+ * in core.
+ */
+if ( ! function_exists( 'gutenberg_register_block_style' ) ) {
 	/**
-	 * Renders the block meta attributes.
+	 * Registers a new block style for one or more block types.
 	 *
-	 * @param string   $block_content Block Content.
-	 * @param array    $block Block attributes.
-	 * @param WP_Block $block_instance The block instance.
+	 * @param string|array $block_name       Block type name including namespace or array of namespaced block type names.
+	 * @param array        $style_properties Array containing the properties of the style name, label,
+	 *                                       style_handle (name of the stylesheet to be enqueued),
+	 *                                       inline_style (string containing the CSS to be added),
+	 *                                       style_data (theme.json-like object to generate CSS from).
+	 *
+	 * @return bool True if all block styles were registered with success and false otherwise.
 	 */
-	function gutenberg_render_block_connections( $block_content, $block, $block_instance ) {
-		$connection_sources = require __DIR__ . '/connection-sources/index.php';
-		$block_type         = $block_instance->block_type;
-
-		// Allowlist of blocks that support block connections.
-		// Currently, we only allow the following blocks and attributes:
-		// - Paragraph: content.
-		// - Image: url.
-		$blocks_attributes_allowlist = array(
-			'core/paragraph' => array( 'content' ),
-			'core/image'     => array( 'url' ),
-		);
-
-		// Whitelist of the block types that support block connections.
-		// Currently, we only allow the Paragraph and Image blocks to use block connections.
-		if ( ! in_array( $block['blockName'], array_keys( $blocks_attributes_allowlist ), true ) ) {
-			return $block_content;
-		}
-
-		// If for some reason, the block type is not found, skip it.
-		if ( null === $block_type ) {
-			return $block_content;
-		}
-
-		// If the block does not have support for block connections, skip it.
-		if ( ! block_has_support( $block_type, array( '__experimentalConnections' ), false ) ) {
-			return $block_content;
-		}
-
-		// Get all the attributes that have a connection.
-		$connected_attributes = $block['attrs']['connections']['attributes'] ?? false;
-		if ( ! $connected_attributes ) {
-			return $block_content;
-		}
-
-		foreach ( $connected_attributes as $attribute_name => $attribute_value ) {
-
-			// If the attribute is not in the allowlist, skip it.
-			if ( ! in_array( $attribute_name, $blocks_attributes_allowlist[ $block['blockName'] ], true ) ) {
-				continue;
-			}
-
-			// If the source value is not "meta_fields", skip it because the only supported
-			// connection source is meta (custom fields) for now.
-			if ( 'meta_fields' !== $attribute_value['source'] ) {
-				continue;
-			}
-
-			// If the attribute does not have a source, skip it.
-			if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
-				continue;
-			}
-
-			// If the attribute does not specify the name of the custom field, skip it.
-			if ( ! isset( $attribute_value['value'] ) ) {
-				continue;
-			}
-
-			// Get the content from the connection source.
-			$custom_value = $connection_sources[ $attribute_value['source'] ](
-				$block_instance,
-				$attribute_value['value']
+	function gutenberg_register_block_style( $block_name, $style_properties ) {
+		if ( ! is_string( $block_name ) && ! is_array( $block_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Block name must be a string or array.', 'gutenberg' ),
+				'6.6.0'
 			);
 
-			$tags  = new WP_HTML_Tag_Processor( $block_content );
-			$found = $tags->next_tag(
-				array(
-					// TODO: In the future, when blocks other than Paragraph and Image are
-					// supported, we should build the full query from CSS selector.
-					'tag_name' => $block_type->attributes[ $attribute_name ]['selector'],
-				)
-			);
-			if ( ! $found ) {
-				return $block_content;
-			}
-			$tag_name     = $tags->get_tag();
-			$markup       = "<$tag_name>$custom_value</$tag_name>";
-			$updated_tags = new WP_HTML_Tag_Processor( $markup );
-			$updated_tags->next_tag();
-
-			// Get all the attributes from the original block and add them to the new markup.
-			$names = $tags->get_attribute_names_with_prefix( '' );
-			foreach ( $names as $name ) {
-				$updated_tags->set_attribute( $name, $tags->get_attribute( $name ) );
-			}
-
-			return $updated_tags->get_updated_html();
+			return false;
 		}
 
-		return $block_content;
+		$block_names = is_string( $block_name ) ? array( $block_name ) : $block_name;
+		$result      = true;
+
+		foreach ( $block_names as $name ) {
+			if ( ! WP_Block_Styles_Registry::get_instance()->register( $name, $style_properties ) ) {
+				$result = false;
+			}
+		}
+
+		return $result;
 	}
-	add_filter( 'render_block', 'gutenberg_render_block_connections', 10, 3 );
 }

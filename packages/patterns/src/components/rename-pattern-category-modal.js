@@ -138,6 +138,7 @@ export default function RenamePatternCategoryModal( {
 						<TextControl
 							ref={ textControlRef }
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Name' ) }
 							value={ name }
 							onChange={ onChange }
@@ -154,10 +155,15 @@ export default function RenamePatternCategoryModal( {
 						) }
 					</VStack>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onRequestClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onRequestClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							aria-disabled={

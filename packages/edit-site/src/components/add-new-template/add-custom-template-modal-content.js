@@ -15,12 +15,12 @@ import {
 } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import useDebouncedInput from '../../utils/use-debounced-input';
 import { mapToIHasNameAndId } from './utils';
 
 const {
@@ -99,7 +99,9 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 		);
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
-		if ( ! searchHasResolved ) return;
+		if ( ! searchHasResolved ) {
+			return;
+		}
 		let newSuggestions = EMPTY_ARRAY;
 		if ( searchResults?.length ) {
 			newSuggestions = searchResults;

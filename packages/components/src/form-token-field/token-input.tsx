@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef, FocusEventHandler } from 'react';
 
 /**
@@ -48,9 +48,7 @@ export function UnForwardedTokenInput(
 		onFocus?.( e );
 	};
 
-	const onBlurHandler: React.FocusEventHandler< HTMLInputElement > = (
-		e
-	) => {
+	const onBlurHandler: FocusEventHandler< HTMLInputElement > = ( e ) => {
 		setHasFocus( false );
 		onBlur?.( e );
 	};
@@ -66,7 +64,7 @@ export function UnForwardedTokenInput(
 			onFocus={ onFocusHandler }
 			onBlur={ onBlurHandler }
 			size={ size }
-			className={ classnames(
+			className={ clsx(
 				className,
 				'components-form-token-field__input'
 			) }

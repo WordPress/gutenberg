@@ -20,6 +20,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * A modal component that is displayed when a post is locked for editing by another user.
+ * The modal provides information about the lock status and options to take over or exit the editor.
+ *
+ * @return {JSX.Element|null} The rendered PostLockedModal component.
+ */
 export default function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
@@ -168,11 +174,11 @@ export default function PostLockedModal() {
 					? __( 'Someone else has taken over this post' )
 					: __( 'This post is already being edited' )
 			}
-			focusOnMount={ true }
+			focusOnMount
 			shouldCloseOnClickOutside={ false }
 			shouldCloseOnEsc={ false }
 			isDismissible={ false }
-			className="editor-post-locked-modal"
+			size="medium"
 		>
 			<HStack alignment="top" spacing={ 6 }>
 				{ !! userAvatar && (

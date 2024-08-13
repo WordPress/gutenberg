@@ -39,7 +39,7 @@ const DefaultControlsGroup = ( {
 	const resetSuffix = <ResetLabel aria-hidden>{ __( 'Reset' ) }</ResetLabel>;
 
 	return (
-		<MenuGroup label={ __( 'Defaults' ) }>
+		<>
 			{ items.map( ( [ label, hasValue ] ) => {
 				if ( hasValue ) {
 					return (
@@ -73,6 +73,7 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
+						icon={ check }
 						className={ itemClassName }
 						role="menuitemcheckbox"
 						isSelected
@@ -82,7 +83,7 @@ const DefaultControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -95,7 +96,7 @@ const OptionalControlsGroup = ( {
 	}
 
 	return (
-		<MenuGroup label={ __( 'Tools' ) }>
+		<>
 			{ items.map( ( [ label, isSelected ] ) => {
 				const itemLabel = isSelected
 					? sprintf(
@@ -143,7 +144,7 @@ const OptionalControlsGroup = ( {
 					</MenuItem>
 				);
 			} ) }
-		</MenuGroup>
+		</>
 	);
 };
 
@@ -162,6 +163,7 @@ const ToolsPanelHeader = (
 		menuItems,
 		resetAll,
 		toggleItem,
+		dropdownMenuProps,
 		...headerProps
 	} = useToolsPanelHeader( props );
 
@@ -192,32 +194,37 @@ const ToolsPanelHeader = (
 			</Heading>
 			{ hasMenuItems && (
 				<DropdownMenu
+					{ ...dropdownMenuProps }
 					icon={ dropDownMenuIcon }
 					label={ dropDownMenuLabelText }
 					menuProps={ { className: dropdownMenuClassName } }
 					toggleProps={ {
-						isSmall: true,
-						describedBy: dropdownMenuDescriptionText,
+						size: 'small',
+						description: dropdownMenuDescriptionText,
 					} }
 				>
 					{ () => (
 						<>
-							<DefaultControlsGroup
-								items={ defaultItems }
-								toggleItem={ toggleItem }
-								itemClassName={ defaultControlsItemClassName }
-							/>
-							<OptionalControlsGroup
-								items={ optionalItems }
-								toggleItem={ toggleItem }
-							/>
+							<MenuGroup label={ labelText }>
+								<DefaultControlsGroup
+									items={ defaultItems }
+									toggleItem={ toggleItem }
+									itemClassName={
+										defaultControlsItemClassName
+									}
+								/>
+								<OptionalControlsGroup
+									items={ optionalItems }
+									toggleItem={ toggleItem }
+								/>
+							</MenuGroup>
 							<MenuGroup>
 								<MenuItem
 									aria-disabled={ ! canResetAll }
 									// @ts-expect-error - TODO: If this "tertiary" style is something we really want to allow on MenuItem,
 									// we should rename it and explicitly allow it as an official API. All the other Button variants
 									// don't make sense in a MenuItem context, and should be disallowed.
-									variant={ 'tertiary' }
+									variant="tertiary"
 									onClick={ () => {
 										if ( canResetAll ) {
 											resetAll();

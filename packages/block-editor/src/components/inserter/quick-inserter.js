@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +32,7 @@ export default function QuickInserter( {
 	isAppender,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	hasSearch = true,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -43,7 +44,8 @@ export default function QuickInserter( {
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
-		onInsertBlocks
+		onInsertBlocks,
+		true
 	);
 
 	const [ patterns ] = usePatternsState(
@@ -70,8 +72,9 @@ export default function QuickInserter( {
 	const showPatterns =
 		patterns.length && ( !! filterValue || prioritizePatterns );
 	const showSearch =
-		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
-		blockTypes.length > SEARCH_THRESHOLD;
+		hasSearch &&
+		( ( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
+			blockTypes.length > SEARCH_THRESHOLD );
 
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
@@ -79,10 +82,18 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
+	const { showInsertionPoint } = useDispatch( blockEditorStore );
+
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, insertionIndex, filterValue } );
+		setInserterIsOpened( {
+			rootClientId,
+			insertionIndex,
+			filterValue,
+			onSelect,
+		} );
+		showInsertionPoint( rootClientId, insertionIndex );
 	};
 
 	let maxBlockPatterns = 0;
@@ -94,7 +105,7 @@ export default function QuickInserter( {
 
 	return (
 		<div
-			className={ classnames( 'block-editor-inserter__quick-inserter', {
+			className={ clsx( 'block-editor-inserter__quick-inserter', {
 				'has-search': showSearch,
 				'has-expand': setInserterIsOpened,
 			} ) }
@@ -124,6 +135,7 @@ export default function QuickInserter( {
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					isQuick
 				/>
 			</div>
 

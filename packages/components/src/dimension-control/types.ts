@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { IconType } from '../icon';
+import type { SelectControlProps } from '../select-control/types';
 
 export type Size = {
 	/**
@@ -14,7 +15,10 @@ export type Size = {
 	slug: string;
 };
 
-export type DimensionControlProps = {
+export type DimensionControlProps = Pick<
+	SelectControlProps,
+	'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+> & {
 	/**
 	 * Label for the control.
 	 */

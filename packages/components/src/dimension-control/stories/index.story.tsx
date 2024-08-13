@@ -13,7 +13,7 @@ import sizes from '../sizes';
  */
 import { desktop, tablet, mobile } from '@wordpress/icons';
 
-export default {
+const meta: Meta< typeof DimensionControl > = {
 	component: DimensionControl,
 	title: 'Components (Experimental)/DimensionControl',
 	argTypes: {
@@ -29,12 +29,13 @@ export default {
 				mobile,
 			},
 		},
-		parameters: {
-			controls: { expanded: true },
-			docs: { canvas: { sourceState: 'shown' } },
-		},
 	},
-} as Meta< typeof DimensionControl >;
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
+	},
+};
+export default meta;
 
 const Template: StoryFn< typeof DimensionControl > = ( args ) => (
 	<DimensionControl { ...args } />

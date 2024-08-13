@@ -2,20 +2,23 @@
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
+import { forwardRef } from '@wordpress/element';
 
-export default function UndoButton() {
+function UndoButton( props, ref ) {
 	const hasUndo = useSelect(
 		( select ) => select( coreStore ).hasUndo(),
 		[]
 	);
 	const { undo } = useDispatch( coreStore );
 	return (
-		<ToolbarButton
+		<Button
+			{ ...props }
+			ref={ ref }
 			icon={ ! isRTL() ? undoIcon : redoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
@@ -24,6 +27,9 @@ export default function UndoButton() {
 			// See: https://github.com/WordPress/gutenberg/issues/3486
 			aria-disabled={ ! hasUndo }
 			onClick={ hasUndo ? undo : undefined }
+			size="compact"
 		/>
 	);
 }
+
+export default forwardRef( UndoButton );

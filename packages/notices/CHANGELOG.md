@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.26.0 (2024-05-16)
+
+## 4.25.0 (2024-05-02)
+
+## 4.24.0 (2024-04-19)
+
+## 4.23.0 (2024-04-03)
+
+## 4.22.0 (2024-03-21)
+
+## 4.21.0 (2024-03-06)
+
+## 4.20.0 (2024-02-21)
+
+## 4.19.0 (2024-02-09)
+
+## 4.18.0 (2024-01-24)
+
+## 4.17.0 (2024-01-10)
+
+## 4.16.0 (2023-12-13)
+
+## 4.15.0 (2023-11-29)
+
+## 4.14.0 (2023-11-16)
+
 ## 4.13.0 (2023-11-02)
 
 ## 4.12.0 (2023-10-18)
@@ -24,7 +66,7 @@
 
 ## 4.3.0 (2023-06-07)
 
-### New Feature
+### New Features
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 -   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
@@ -35,7 +77,7 @@
 
 ## 4.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
 
@@ -112,13 +154,13 @@
 
 ## 2.12.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the notices namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.0.0 (2020-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/notice).
 
@@ -134,7 +176,7 @@
 
 ## 1.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 

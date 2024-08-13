@@ -30,8 +30,8 @@ const chalk = require( 'chalk' );
 const { readConfig, getPuppeteer } = require( './config' );
 
 let browser;
-
 let didAlreadyRunInWatchMode = false;
+let servers = [];
 
 async function setup( jestConfig = {} ) {
 	const config = await readConfig();
@@ -45,13 +45,15 @@ async function setup( jestConfig = {} ) {
 
 	// If we are in watch mode, - only setupServer() once.
 	if ( jestConfig.watch || jestConfig.watchAll ) {
-		if ( didAlreadyRunInWatchMode ) return;
+		if ( didAlreadyRunInWatchMode ) {
+			return;
+		}
 		didAlreadyRunInWatchMode = true;
 	}
 
 	if ( config.server ) {
 		try {
-			await setupServer( config.server );
+			servers = await setupServer( config.server );
 		} catch ( error ) {
 			const { error: printError } = console;
 			if ( error.code === ERROR_TIMEOUT ) {
@@ -89,7 +91,7 @@ async function teardown( jestConfig = {} ) {
 	}
 
 	if ( ! jestConfig.watch && ! jestConfig.watchAll ) {
-		await teardownServer();
+		await teardownServer( servers );
 	}
 }
 

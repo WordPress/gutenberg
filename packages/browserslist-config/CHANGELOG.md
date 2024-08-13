@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
+## 6.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 5.41.0 (2024-05-16)
+
+## 5.40.0 (2024-05-02)
+
+## 5.39.0 (2024-04-19)
+
+## 5.38.0 (2024-04-03)
+
+## 5.37.0 (2024-03-21)
+
+## 5.36.0 (2024-03-06)
+
+## 5.35.0 (2024-02-21)
+
+## 5.34.0 (2024-02-09)
+
+## 5.33.0 (2024-01-24)
+
+## 5.32.0 (2024-01-10)
+
+## 5.31.0 (2023-12-13)
+
+## 5.30.0 (2023-11-29)
+
+## 5.29.0 (2023-11-16)
+
 ## 5.28.0 (2023-11-02)
 
 ## 5.27.0 (2023-10-18)
@@ -60,7 +102,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -85,56 +127,56 @@
 
 ## 2.1.4 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 2.1.3 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Docs update of the Browserslist example repo URL ([#98](https://github.com/WordPress/packages/pull/98))
 
 ## 2.1.2 (2018-02-28)
 
-### Polish
+### Internal
 
 -   Removed `package-lock.json` file, lockfiles for apps, not packages ([#88](https://github.com/WordPress/packages/pull/88))
 
 ## 2.1.1 (2018-02-21)
 
-### Polish
+### Internal
 
 -   Added "Code is Poetry" footer to README.md ([#82](https://github.com/WordPress/packages/pull/82))
 
 ## 2.1.0 (2018-02-15)
 
-### New Feature
+### New Features
 
 -   Updated Browserslist to v3.1.0 ([#81](https://github.com/WordPress/packages/pull/81))
 
 ## 2.0.0
 
-### Breaking Change
+### Breaking Changes
 
 -   Transfer to @wordpress npm organization.
 -   Published as @wordpress/browserslist-config.
 
 ## 1.1.0
 
-### New Feature
+### New Features
 
 -   Add browserslist tests.
 -   Refactor per coding standards.
 
 ## 1.0.1
 
-### Polish
+### Internal
 
 -   Update installation documentation.
 
 ## 1.0.0
 
-### New Feature
+### New Features
 
 -   Initial release.

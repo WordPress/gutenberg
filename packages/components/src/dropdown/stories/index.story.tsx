@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '..';
 import Button from '../../button';
+import MenuGroup from '../../menu-group';
+import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
@@ -39,34 +41,37 @@ const meta: Meta< typeof Dropdown > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof Dropdown > = ( args ) => (
-	<div style={ { height: 150 } }>
-		<Dropdown { ...args } />
-	</div>
-);
-
-export const Default = Template.bind( {} );
-Default.args = {
-	renderToggle: ( { isOpen, onToggle } ) => (
-		<Button onClick={ onToggle } aria-expanded={ isOpen } variant="primary">
-			Open dropdown
-		</Button>
-	),
-	renderContent: () => <div>This is the dropdown content.</div>,
+export const Default: StoryObj< typeof Dropdown > = {
+	args: {
+		renderToggle: ( { isOpen, onToggle } ) => (
+			<Button
+				onClick={ onToggle }
+				aria-expanded={ isOpen }
+				variant="primary"
+			>
+				Open dropdown
+			</Button>
+		),
+		renderContent: () => <div>This is the dropdown content.</div>,
+	},
 };
 
 /**
  * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
  * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
  */
-export const WithMorePadding = Template.bind( {} );
-WithMorePadding.args = {
-	...Default.args,
-	renderContent: () => (
-		<DropdownContentWrapper paddingSize="medium">
-			Content wrapped with <code>{ `paddingSize="medium"` }</code>.
-		</DropdownContentWrapper>
-	),
+export const WithMorePadding: StoryObj< typeof Dropdown > = {
+	...Default,
+	args: {
+		...Default.args,
+		renderContent: () => (
+			<DropdownContentWrapper paddingSize="medium">
+				{ /* eslint-disable react/no-unescaped-entities */ }
+				Content wrapped with <code>paddingSize="medium"</code>.
+				{ /* eslint-enable react/no-unescaped-entities */ }
+			</DropdownContentWrapper>
+		),
+	},
 };
 
 /**
@@ -74,12 +79,35 @@ WithMorePadding.args = {
  * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
  * paddings, for example when child components already have padding on their own.
  */
-export const WithNoPadding = Template.bind( {} );
-WithNoPadding.args = {
-	...Default.args,
-	renderContent: () => (
-		<DropdownContentWrapper paddingSize="none">
-			Content wrapped with <code>{ `paddingSize="none"` }</code>.
-		</DropdownContentWrapper>
-	),
+export const WithNoPadding: StoryObj< typeof Dropdown > = {
+	...Default,
+	args: {
+		...Default.args,
+		renderContent: () => (
+			<DropdownContentWrapper paddingSize="none">
+				{ /* eslint-disable react/no-unescaped-entities */ }
+				Content wrapped with <code>paddingSize="none"</code>.
+				{ /* eslint-enable react/no-unescaped-entities */ }
+			</DropdownContentWrapper>
+		),
+	},
+};
+
+export const WithMenuItems: StoryObj< typeof Dropdown > = {
+	...Default,
+	args: {
+		...Default.args,
+		renderContent: () => (
+			<>
+				<MenuGroup label="Group 1">
+					<MenuItem>Item 1</MenuItem>
+					<MenuItem>Item 2</MenuItem>
+				</MenuGroup>
+				<MenuGroup label="Group 2">
+					<MenuItem>Item 1</MenuItem>
+					<MenuItem>Item 2</MenuItem>
+				</MenuGroup>
+			</>
+		),
+	},
 };

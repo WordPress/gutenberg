@@ -4,10 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
 
-<div data-wp-interactive>
+<div data-wp-interactive="directive-style">
 	<button
 		data-wp-on--click="actions.toggleColor"
 		data-testid="toggle color"

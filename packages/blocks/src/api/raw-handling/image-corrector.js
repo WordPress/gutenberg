@@ -3,11 +3,6 @@
  */
 import { createBlobURL } from '@wordpress/blob';
 
-/**
- * Browser dependencies
- */
-const { atob, File } = window;
-
 export default function imageCorrector( node ) {
 	if ( node.nodeName !== 'IMG' ) {
 		return;
@@ -44,7 +39,7 @@ export default function imageCorrector( node ) {
 		}
 
 		const name = type.replace( '/', '.' );
-		const file = new File( [ uint8Array ], name, { type } );
+		const file = new window.File( [ uint8Array ], name, { type } );
 
 		node.src = createBlobURL( file );
 	}

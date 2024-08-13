@@ -6,6 +6,8 @@ import {
 	initializeEditor,
 	fireEvent,
 	within,
+	setupApiFetch,
+	triggerBlockListLayout,
 } from 'test/helpers';
 
 /**
@@ -42,6 +44,8 @@ const getMockedReusableBlock = ( id ) => ( {
 	id,
 	title: { raw: `Reusable block - ${ id }` },
 	type: 'wp_block',
+	meta: { footnotes: '' },
+	wp_pattern_category: [],
 } );
 
 beforeAll( () => {
@@ -154,7 +158,9 @@ describe( 'Synced patterns', () => {
 			if ( path.startsWith( endpoint ) ) {
 				response = getMockedReusableBlock( id );
 			}
-			return Promise.resolve( response );
+			return Promise.resolve( {
+				json: () => Promise.resolve( response ),
+			} );
 		} );
 
 		const screen = await initializeEditor( {
@@ -186,5 +192,71 @@ describe( 'Synced patterns', () => {
 
 		expect( reusableBlock ).toBeDefined();
 		expect( headingInnerBlock ).toBeDefined();
+	} );
+
+	it( 'renders block after content is updated due to a side effect', async () => {
+		// We have to use different ids because entities are cached in memory.
+		const id = 5;
+		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
+		const endpoint = `/wp/v2/blocks/${ id }`;
+		const fetchMedia = {
+			request: {
+				path: `/wp/v2/media/1?context=edit`,
+			},
+			response: {
+				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+				id: 1,
+				// We need to include the sizes to trigger the side effect.
+				media_details: {
+					sizes: {
+						large: {
+							source_url:
+								'https://cldup.com/cXyG__fTLN.jpg?w=500',
+						},
+					},
+				},
+			},
+		};
+
+		// Return mocked response for the block endpoint.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
+			if ( path.startsWith( endpoint ) ) {
+				response = getMockedReusableBlock( id );
+			}
+			// Replace content with an Image block to trigger a side effect.
+			// The side effect will be produced when the `source` attribute is replaced
+			// with an URL that includes the width query parameter:
+			// https://cldup.com/cXyG__fTLN.jpg => https://cldup.com/cXyG__fTLN.jpg?w=500
+			response.content.raw = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
+<!-- /wp:image -->`;
+			return Promise.resolve( {
+				json: () => Promise.resolve( response ),
+			} );
+		} );
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		const reusableBlock = await screen.findByLabelText(
+			/Pattern Block\. Row 1/
+		);
+
+		// Mock media fetch requests
+		setupApiFetch( [ fetchMedia ] );
+
+		await triggerBlockListLayout(
+			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
+		);
+
+		const imageBlock =
+			await within( reusableBlock ).getByLabelText(
+				'Image Block. Row 1'
+			);
+
+		expect( reusableBlock ).toBeDefined();
+		expect( imageBlock ).toBeDefined();
 	} );
 } );

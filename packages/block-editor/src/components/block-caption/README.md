@@ -4,11 +4,6 @@ The `BlockCaption` component renders block-level UI for adding and editing capti
 
 `BlockCaption` is used in several native blocks, including `Video`, `Image`, `Audio`, etc.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -16,7 +11,7 @@ The `BlockCaption` component renders block-level UI for adding and editing capti
 Renders an editable caption field designed specifically for block-level use.
 
 ```jsx
-import { BlockCaption } from '@wordpress/block-editor';
+import { BlockCaption, RichText } from '@wordpress/block-editor';
 
 const MyBlockCaption = (
 	clientId,
@@ -29,7 +24,7 @@ const MyBlockCaption = (
 		clientId={ clientId }
 		accessible={ true }
 		accessibilityLabelCreator={ ( caption ) =>
-			! caption
+			RichText.isEmpty( caption )
 				? /* translators: accessibility text. Empty caption. */
 				  'Caption. Empty'
 				: sprintf(

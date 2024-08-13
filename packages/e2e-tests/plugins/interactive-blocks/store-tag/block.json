@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "test/store-tag",
 	"title": "E2E Interactivity tests - store tag",
@@ -9,6 +10,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "store-tag-view",
+	"viewScriptModule": "file:./view.js",
 	"render": "file:./render.php"
 }

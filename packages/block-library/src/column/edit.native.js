@@ -160,7 +160,7 @@ function ColumnEdit( {
 						/>
 					</BlockControls>
 					<InspectorControls>
-						<PanelBody title={ __( 'Column settings' ) }>
+						<PanelBody title={ __( 'Settings' ) }>
 							<UnitControl
 								label={ __( 'Width' ) }
 								min={ 1 }
@@ -220,7 +220,9 @@ function ColumnEditWrapper( props ) {
 	const { verticalAlignment } = props.attributes;
 
 	const getVerticalAlignmentRemap = ( alignment ) => {
-		if ( ! alignment ) return styles.flexBase;
+		if ( ! alignment ) {
+			return styles.flexBase;
+		}
 		return {
 			...styles.flexBase,
 			...styles[ `is-vertically-aligned-${ alignment }` ],

@@ -30,13 +30,14 @@ export class PerfUtils {
 	 * Returns the locator for the editor canvas element. This supports both the
 	 * legacy and the iframed canvas.
 	 *
+	 * @param canvasLocator
 	 * @return Locator for the editor canvas element.
 	 */
-	async getCanvas() {
-		const canvasLocator = this.page.locator(
+	async getCanvas(
+		canvasLocator = this.page.locator(
 			'.wp-block-post-content, iframe[name=editor-canvas]'
-		);
-
+		)
+	) {
 		const isFramed = await canvasLocator.evaluate(
 			( node ) => node.tagName === 'IFRAME'
 		);
@@ -59,7 +60,9 @@ export class PerfUtils {
 			this.page.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
-		return this.page.url();
+		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
+
+		return postId;
 	}
 
 	/**

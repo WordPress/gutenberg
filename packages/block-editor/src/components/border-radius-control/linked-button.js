@@ -13,7 +13,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
 			<Button
 				{ ...props }
 				className="component-border-radius-control__linked-button"
-				isSmall
+				size="small"
 				icon={ isLinked ? link : linkOff }
 				iconSize={ 24 }
 				aria-label={ label }

@@ -49,7 +49,7 @@ describe( 'Code', () => {
 		const screen = await initializeEditor( {
 			initialHtml,
 		} );
-		const { getByDisplayValue } = screen;
+		const { findByPlaceholderText } = screen;
 
 		// Get block
 		const codeBlock = await getBlock( screen, 'Code' );
@@ -57,7 +57,7 @@ describe( 'Code', () => {
 		fireEvent.press( codeBlock );
 
 		// Get initial text
-		const codeBlockText = getByDisplayValue( 'Sample text' );
+		const codeBlockText = await findByPlaceholderText( 'Write code…' );
 		expect( codeBlockText ).toBeVisible();
 
 		expect( getEditorHtml() ).toMatchSnapshot();

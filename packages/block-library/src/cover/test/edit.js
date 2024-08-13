@@ -53,7 +53,7 @@ async function createAndSelectBlock() {
 	);
 	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select Cover',
+			name: 'Select parent block: Cover',
 		} )
 	);
 }
@@ -163,7 +163,7 @@ describe( 'Cover block', () => {
 				await setup();
 				expect(
 					screen.queryByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
 			} );
@@ -175,7 +175,7 @@ describe( 'Cover block', () => {
 				await selectBlock( 'Block: Cover' );
 				expect(
 					screen.getByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).toBeInTheDocument();
 			} );

@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v1.8.0'
+        aztecVersion = 'v2.1.2'
         wordpressUtilsVersion = '3.3.0'
 
         // main
@@ -36,7 +36,7 @@ plugins {
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
-group = 'org.wordpress-mobile.gutenberg-mobile'
+group = 'org.wordpress.gutenberg-mobile'
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
@@ -53,12 +53,12 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -119,7 +119,7 @@ project.afterEvaluate {
             ReactNativeAztecPublication(MavenPublication) {
                 artifact bundleReleaseAar
 
-                groupId 'org.wordpress-mobile.gutenberg-mobile'
+                groupId 'org.wordpress.gutenberg-mobile'
                 artifactId 'react-native-aztec'
                 // version is set by 'publish-to-s3' plugin
 

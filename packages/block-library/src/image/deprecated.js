@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -207,7 +207,7 @@ const v3 = {
 		const { url, alt, caption, align, href, width, height, id } =
 			attributes;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			'is-resized': width || height,
 		} );
@@ -329,7 +329,7 @@ const v4 = {
 
 		const newRel = ! rel ? undefined : rel;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -499,7 +499,7 @@ const v5 = {
 
 		const newRel = ! rel ? undefined : rel;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -651,6 +651,14 @@ const v6 = {
 			},
 		},
 	},
+	migrate( attributes ) {
+		const { height, width } = attributes;
+		return {
+			...attributes,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
+		};
+	},
 	save( { attributes } ) {
 		const {
 			url,
@@ -673,7 +681,7 @@ const v6 = {
 		const newRel = ! rel ? undefined : rel;
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -683,7 +691,7 @@ const v6 = {
 					Object.keys( borderProps.style ).length > 0 ),
 		} );
 
-		const imageClasses = classnames( borderProps.className, {
+		const imageClasses = clsx( borderProps.className, {
 			[ `wp-image-${ id }` ]: !! id,
 		} );
 
@@ -875,7 +883,7 @@ const v7 = {
 		const newRel = ! rel ? undefined : rel;
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -885,7 +893,7 @@ const v7 = {
 					Object.keys( borderProps.style ).length > 0 ),
 		} );
 
-		const imageClasses = classnames( borderProps.className, {
+		const imageClasses = clsx( borderProps.className, {
 			[ `wp-image-${ id }` ]: !! id,
 		} );
 
@@ -1047,6 +1055,14 @@ const v8 = {
 		},
 	},
 	migrate( { width, height, ...attributes } ) {
+		// We need to perform a check here because in cases
+		// where attributes are added dynamically to blocks,
+		// block invalidation overrides the isEligible() method
+		// and forces the migration to run, so it's not guaranteed
+		// that `behaviors` or `behaviors.lightbox` will be defined.
+		if ( ! attributes.behaviors?.lightbox ) {
+			return attributes;
+		}
 		const {
 			behaviors: {
 				lightbox: { enabled },
@@ -1086,7 +1102,7 @@ const v8 = {
 		const newRel = ! rel ? undefined : rel;
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -1096,7 +1112,7 @@ const v8 = {
 					Object.keys( borderProps.style ).length > 0 ),
 		} );
 
-		const imageClasses = classnames( borderProps.className, {
+		const imageClasses = clsx( borderProps.className, {
 			[ `wp-image-${ id }` ]: !! id,
 		} );
 

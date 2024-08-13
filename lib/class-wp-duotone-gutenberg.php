@@ -32,10 +32,6 @@
  * @since 6.3.0
  */
 
-if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Manages duotone block supports and global styles.
  *
@@ -627,7 +623,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS for global styles.
 	 */
 	private static function get_global_styles_presets( $sources ) {
-		$css = 'body{';
+		$css = WP_Theme_JSON_Gutenberg::ROOT_CSS_PROPERTIES_SELECTOR . '{';
 		foreach ( $sources as $filter_id => $filter_data ) {
 			$slug              = $filter_data['slug'];
 			$colors            = $filter_data['colors'];
@@ -901,6 +897,45 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Fixes the issue with our generated class name not being added to the block's outer container
+	 * in classic themes due to gutenberg_restore_image_outer_container from layout block supports.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param  string $block_content Rendered block content.
+	 * @return string                Filtered block content.
+	 */
+	public static function restore_image_outer_container( $block_content ) {
+		if ( wp_theme_has_theme_json() ) {
+			return $block_content;
+		}
+
+		$tags          = new WP_HTML_Tag_Processor( $block_content );
+		$wrapper_query = array(
+			'tag_name'   => 'div',
+			'class_name' => 'wp-block-image',
+		);
+		if ( ! $tags->next_tag( $wrapper_query ) ) {
+			return $block_content;
+		}
+
+		$tags->set_bookmark( 'wrapper-div' );
+		$tags->next_tag();
+
+		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
+		foreach ( $inner_classnames as $classname ) {
+			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+				$tags->remove_class( $classname );
+				$tags->seek( 'wrapper-div' );
+				$tags->add_class( $classname );
+				break;
+			}
+		}
+
+		return $tags->get_updated_html();
+	}
+
+	/**
 	 * Appends the used block duotone filter declarations to the inline block supports CSS.
 	 *
 	 * @since 6.3.0
@@ -938,9 +973,17 @@ class WP_Duotone_Gutenberg {
 			echo self::get_svg_definitions( self::$used_svg_filter_data );
 		}
 
-		// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
-		if ( ! wp_is_block_theme() && ! empty( self::$used_global_styles_presets ) ) {
-			wp_add_inline_style( 'core-block-supports', self::get_global_styles_presets( self::$used_global_styles_presets ) );
+		// In block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
+		if ( ! wp_is_block_theme() ) {
+			$style_tag_id = 'core-block-supports-duotone';
+			wp_register_style( $style_tag_id, false );
+			if ( ! empty( self::$used_global_styles_presets ) ) {
+				wp_add_inline_style( $style_tag_id, self::get_global_styles_presets( self::$used_global_styles_presets ) );
+			}
+			if ( ! empty( self::$block_css_declarations ) ) {
+				wp_add_inline_style( $style_tag_id, gutenberg_style_engine_get_stylesheet_from_css_rules( self::$block_css_declarations ) );
+			}
+			wp_enqueue_style( $style_tag_id );
 		}
 	}
 

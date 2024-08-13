@@ -1,15 +1,40 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
+	Popover,
+} from '@wordpress/components';
+
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
-export default function ListViewDropIndicator( {
+/**
+ * Internal dependencies
+ */
+import BlockIcon from '../block-icon';
+import useBlockDisplayInformation from '../use-block-display-information';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import ListViewExpander from './expander';
+
+export default function ListViewDropIndicatorPreview( {
+	draggedBlockClientId,
 	listViewRef,
 	blockDropTarget,
 } ) {
+	const blockInformation = useBlockDisplayInformation( draggedBlockClientId );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId: draggedBlockClientId,
+		context: 'list-view',
+	} );
+
 	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 
 	const [ rootBlockElement, blockElement ] = useMemo( () => {
@@ -35,7 +60,7 @@ export default function ListViewDropIndicator( {
 			: undefined;
 
 		return [ _rootBlockElement, _blockElement ];
-	}, [ rootClientId, clientId ] );
+	}, [ listViewRef, rootClientId, clientId ] );
 
 	// The targetElement is the element that the drop indicator will appear
 	// before or after. When dropping into an empty block list, blockElement
@@ -43,27 +68,6 @@ export default function ListViewDropIndicator( {
 	const targetElement = blockElement || rootBlockElement;
 
 	const rtl = isRTL();
-
-	const getDropIndicatorIndent = useCallback(
-		( targetElementRect ) => {
-			if ( ! rootBlockElement ) {
-				return 0;
-			}
-
-			// Calculate the indent using the block icon of the root block.
-			// Using a classname selector here might be flaky and could be
-			// improved.
-			const rootBlockIconElement = rootBlockElement.querySelector(
-				'.block-editor-block-icon'
-			);
-			const rootBlockIconRect =
-				rootBlockIconElement.getBoundingClientRect();
-			return rtl
-				? targetElementRect.right - rootBlockIconRect.left
-				: rootBlockIconRect.right - targetElementRect.left;
-		},
-		[ rootBlockElement, rtl ]
-	);
 
 	const getDropIndicatorWidth = useCallback(
 		( targetElementRect, indent ) => {
@@ -143,12 +147,69 @@ export default function ListViewDropIndicator( {
 		}
 
 		const targetElementRect = targetElement.getBoundingClientRect();
-		const indent = getDropIndicatorIndent( targetElementRect );
 
 		return {
-			width: getDropIndicatorWidth( targetElementRect, indent ),
+			width: getDropIndicatorWidth( targetElementRect, 0 ),
 		};
-	}, [ getDropIndicatorIndent, getDropIndicatorWidth, targetElement ] );
+	}, [ getDropIndicatorWidth, targetElement ] );
+
+	const horizontalScrollOffsetStyle = useMemo( () => {
+		if ( ! targetElement ) {
+			return {};
+		}
+
+		const scrollContainer = getScrollContainer( targetElement );
+		const ownerDocument = targetElement.ownerDocument;
+		const windowScroll =
+			scrollContainer === ownerDocument.body ||
+			scrollContainer === ownerDocument.documentElement;
+
+		if ( scrollContainer && ! windowScroll ) {
+			const scrollContainerRect = scrollContainer.getBoundingClientRect();
+			const targetElementRect = targetElement.getBoundingClientRect();
+
+			const distanceBetweenContainerAndTarget = rtl
+				? scrollContainerRect.right - targetElementRect.right
+				: targetElementRect.left - scrollContainerRect.left;
+
+			if ( ! rtl && scrollContainerRect.left > targetElementRect.left ) {
+				return {
+					transform: `translateX( ${ distanceBetweenContainerAndTarget }px )`,
+				};
+			}
+
+			if ( rtl && scrollContainerRect.right < targetElementRect.right ) {
+				return {
+					transform: `translateX( ${
+						distanceBetweenContainerAndTarget * -1
+					}px )`,
+				};
+			}
+		}
+
+		return {};
+	}, [ rtl, targetElement ] );
+
+	const ariaLevel = useMemo( () => {
+		if ( ! rootBlockElement ) {
+			return 1;
+		}
+
+		const _ariaLevel = parseInt(
+			rootBlockElement.getAttribute( 'aria-level' ),
+			10
+		);
+
+		return _ariaLevel ? _ariaLevel + 1 : 1;
+	}, [ rootBlockElement ] );
+
+	const hasAdjacentSelectedBranch = useMemo( () => {
+		if ( ! targetElement ) {
+			return false;
+		}
+
+		return targetElement.classList.contains( 'is-branch-selected' );
+	}, [ targetElement ] );
 
 	const popoverAnchor = useMemo( () => {
 		const isValidDropPosition =
@@ -163,16 +224,15 @@ export default function ListViewDropIndicator( {
 			contextElement: targetElement,
 			getBoundingClientRect() {
 				const rect = targetElement.getBoundingClientRect();
-				const indent = getDropIndicatorIndent( rect );
 				// In RTL languages, the drop indicator should be positioned
 				// to the left of the target element, with the width of the
 				// indicator determining the indent at the right edge of the
 				// target element. In LTR languages, the drop indicator should
 				// end at the right edge of the target element, with the indent
 				// added to the position of the left edge of the target element.
-				let left = rtl ? rect.left : rect.left + indent;
+				// let left = rtl ? rect.left : rect.left + indent;
+				let left = rect.left;
 				let top = 0;
-				let bottom = 0;
 
 				// In deeply nested lists, where a scrollbar is present,
 				// the width of the drop indicator should be the width of
@@ -212,27 +272,19 @@ export default function ListViewDropIndicator( {
 				}
 
 				if ( dropPosition === 'top' ) {
-					top = rect.top;
-					bottom = rect.top;
+					top = rect.top - rect.height * 2;
 				} else {
 					// `dropPosition` is either `bottom` or `inside`
-					top = rect.bottom;
-					bottom = rect.bottom;
+					top = rect.top;
 				}
 
-				const width = getDropIndicatorWidth( rect, indent );
-				const height = bottom - top;
+				const width = getDropIndicatorWidth( rect, 0 );
+				const height = rect.height;
 
 				return new window.DOMRect( left, top, width, height );
 			},
 		};
-	}, [
-		targetElement,
-		dropPosition,
-		getDropIndicatorIndent,
-		getDropIndicatorWidth,
-		rtl,
-	] );
+	}, [ targetElement, dropPosition, getDropIndicatorWidth, rtl ] );
 
 	if ( ! targetElement ) {
 		return null;
@@ -243,13 +295,54 @@ export default function ListViewDropIndicator( {
 			animate={ false }
 			anchor={ popoverAnchor }
 			focusOnMount={ false }
-			className="block-editor-list-view-drop-indicator"
+			className="block-editor-list-view-drop-indicator--preview"
 			variant="unstyled"
+			flip={ false }
+			resize
 		>
 			<div
 				style={ style }
-				className="block-editor-list-view-drop-indicator__line"
-			/>
+				className={ clsx(
+					'block-editor-list-view-drop-indicator__line',
+					{
+						'block-editor-list-view-drop-indicator__line--darker':
+							hasAdjacentSelectedBranch,
+					}
+				) }
+			>
+				<div
+					className="block-editor-list-view-leaf"
+					aria-level={ ariaLevel }
+				>
+					<div
+						className={ clsx(
+							'block-editor-list-view-block-select-button',
+							'block-editor-list-view-block-contents'
+						) }
+						style={ horizontalScrollOffsetStyle }
+					>
+						<ListViewExpander onClick={ () => {} } />
+						<BlockIcon
+							icon={ blockInformation?.icon }
+							showColors
+							context="list-view"
+						/>
+						<HStack
+							alignment="center"
+							className="block-editor-list-view-block-select-button__label-wrapper"
+							justify="flex-start"
+							spacing={ 1 }
+						>
+							<span className="block-editor-list-view-block-select-button__title">
+								<Truncate ellipsizeMode="auto">
+									{ blockTitle }
+								</Truncate>
+							</span>
+						</HStack>
+					</div>
+					<div className="block-editor-list-view-block__menu-cell"></div>
+				</div>
+			</div>
 		</Popover>
 	);
 }

@@ -2,15 +2,7 @@
 
 RangeControls are used to make selections from a range of incremental values.
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
-
-A RangeControl for volume
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![A RangeControl for volume](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
 
 ## Design guidelines
 
@@ -98,6 +90,7 @@ const MyRangeControl = () => {
 
 	return(
 		<RangeControl
+			__nextHasNoMarginBottom
 			label="Columns"
 			value={ columns }
 			onChange={ ( value ) => setColumns( value ) }
@@ -368,6 +361,13 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 
 -   Required: No
 -   Platform: Web
+
+### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

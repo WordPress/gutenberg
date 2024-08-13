@@ -1,0 +1,19 @@
+.editor-post-parent__panel,
+.editor-post-order__panel {
+	padding-top: $grid-unit-10;
+	.editor-post-panel__row-control > div {
+		width: 100%;
+	}
+}
+
+.editor-post-parent__panel-dialog,
+.editor-post-order__panel-dialog {
+	.editor-post-parent,
+	.editor-post-order {
+		margin: $grid-unit-10;
+	}
+
+	.components-popover__content {
+		min-width: 320px;
+	}
+}

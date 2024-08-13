@@ -58,13 +58,21 @@ export default function usePatternCategories() {
 
 		// Update the category counts to reflect user registered patterns.
 		userPatterns.forEach( ( pattern ) => {
-			pattern.categories?.forEach( ( category ) => {
+			pattern.wp_pattern_category?.forEach( ( catId ) => {
+				const category = userPatternCategories.find(
+					( cat ) => cat.id === catId
+				)?.name;
 				if ( categoryMap[ category ] ) {
 					categoryMap[ category ].count += 1;
 				}
 			} );
 			// If the pattern has no categories, add it to uncategorized.
-			if ( ! pattern.categories?.length ) {
+			if (
+				! pattern.wp_pattern_category?.length ||
+				! pattern.wp_pattern_category.some( ( catId ) =>
+					userPatternCategories.find( ( cat ) => cat.id === catId )
+				)
+			) {
 				categoryMap.uncategorized.count += 1;
 			}
 		} );
@@ -95,7 +103,7 @@ export default function usePatternCategories() {
 		sortedCategories.unshift( {
 			name: PATTERN_DEFAULT_CATEGORY,
 			label: __( 'All patterns' ),
-			description: __( 'A list of all patterns from all sources' ),
+			description: __( 'A list of all patterns from all sources.' ),
 			count: themePatterns.length + userPatterns.length,
 		} );
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,19 +9,18 @@ import classnames from 'classnames';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
 	__experimentalHStack as HStack,
+	VisuallyHidden,
 } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { memo } from '@wordpress/element';
-import { search, external } from '@wordpress/icons';
+import { memo, forwardRef, useContext } from '@wordpress/element';
+import { search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { filterURLForDisplay } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -29,177 +28,170 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../lock-unlock';
+const { useHistory } = unlock( routerPrivateApis );
+import { SidebarNavigationContext } from '../sidebar';
 
-const HUB_ANIMATION_DURATION = 0.3;
-
-const SiteHub = memo( ( { isTransparent, className } ) => {
-	const { canvasMode, dashboardLink, homeUrl, siteTitle } = useSelect(
-		( select ) => {
-			const { getCanvasMode, getSettings } = unlock(
-				select( editSiteStore )
-			);
+const SiteHub = memo(
+	forwardRef( ( { isTransparent }, ref ) => {
+		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
 
 			const {
 				getSite,
 				getUnstableBase, // Site index.
 			} = select( coreStore );
-
+			const _site = getSite();
 			return {
-				canvasMode: getCanvasMode(),
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
 				homeUrl: getUnstableBase()?.home,
-				siteTitle: getSite()?.title,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
 			};
-		},
-		[]
-	);
-	const { open: openCommandCenter } = useDispatch( commandsStore );
+		}, [] );
+		const { open: openCommandCenter } = useDispatch( commandsStore );
 
-	const disableMotion = useReducedMotion();
-	const {
-		setCanvasMode,
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = unlock( useDispatch( editSiteStore ) );
-	const { clearSelectedBlock } = useDispatch( blockEditorStore );
-	const isBackToDashboardButton = canvasMode === 'view';
-	const siteIconButtonProps = isBackToDashboardButton
-		? {
-				href: dashboardLink,
-				label: __( 'Go to the Dashboard' ),
-		  }
-		: {
-				href: dashboardLink, // We need to keep the `href` here so the component doesn't remount as a `<button>` and break the animation.
-				role: 'button',
-				label: __( 'Open Navigation' ),
-				onClick: ( event ) => {
-					event.preventDefault();
-					if ( canvasMode === 'edit' ) {
-						clearSelectedBlock();
-						setPreviewDeviceType( 'Desktop' );
-						setCanvasMode( 'view' );
-					}
-				},
-		  };
-
-	return (
-		<motion.div
-			className={ classnames( 'edit-site-site-hub', className ) }
-			variants={ {
-				isDistractionFree: { x: '-100%' },
-				isDistractionFreeHovering: { x: 0 },
-				view: { x: 0 },
-				edit: { x: 0 },
-			} }
-			initial={ false }
-			transition={ {
-				type: 'tween',
-				duration: disableMotion ? 0 : HUB_ANIMATION_DURATION,
-				ease: 'easeOut',
-			} }
-		>
-			<HStack
-				justify="space-between"
-				alignment="center"
-				className="edit-site-site-hub__container"
-			>
-				<HStack
-					justify="flex-start"
-					className="edit-site-site-hub__text-content"
-					spacing="0"
-				>
-					<motion.div
-						className={ classnames(
+		return (
+			<div className="edit-site-site-hub">
+				<HStack justify="flex-start" spacing="0">
+					<div
+						className={ clsx(
 							'edit-site-site-hub__view-mode-toggle-container',
 							{
 								'has-transparent-background': isTransparent,
 							}
 						) }
-						layout
-						transition={ {
-							type: 'tween',
-							duration: disableMotion
-								? 0
-								: HUB_ANIMATION_DURATION,
-							ease: 'easeOut',
-						} }
 					>
 						<Button
-							{ ...siteIconButtonProps }
+							ref={ ref }
+							href={ dashboardLink }
+							label={ __( 'Go to the Dashboard' ) }
 							className="edit-site-layout__view-mode-toggle"
+							style={ {
+								transform: 'scale(0.5)',
+								borderRadius: 4,
+							} }
 						>
-							<motion.div
-								initial={ false }
-								animate={ {
-									scale: canvasMode === 'view' ? 0.5 : 1,
-								} }
-								whileHover={ {
-									scale: canvasMode === 'view' ? 0.5 : 0.96,
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: HUB_ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
-								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-							</motion.div>
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>
-					</motion.div>
+					</div>
 
-					<AnimatePresence>
-						<motion.div
-							layout={ canvasMode === 'edit' }
-							animate={ {
-								opacity: canvasMode === 'view' ? 1 : 0,
-							} }
-							exit={ {
-								opacity: 0,
-							} }
-							className={ classnames(
-								'edit-site-site-hub__site-title',
-								{ 'is-transparent': isTransparent }
-							) }
-							transition={ {
-								type: 'tween',
-								duration: disableMotion ? 0 : 0.2,
-								ease: 'easeOut',
-								delay: canvasMode === 'view' ? 0.1 : 0,
-							} }
+					<HStack>
+						<div className="edit-site-site-hub__title">
+							<Button
+								variant="link"
+								href={ homeUrl }
+								target="_blank"
+							>
+								{ decodeEntities( siteTitle ) }
+								<VisuallyHidden as="span">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</VisuallyHidden>
+							</Button>
+						</div>
+						<HStack
+							spacing={ 0 }
+							expanded={ false }
+							className="edit-site-site-hub__actions"
 						>
-							{ decodeEntities( siteTitle ) }
-						</motion.div>
-					</AnimatePresence>
-					{ canvasMode === 'view' && (
-						<Button
-							href={ homeUrl }
-							target="_blank"
-							label={ __( 'View site (opens in a new tab)' ) }
-							aria-label={ __(
-								'View site (opens in a new tab)'
-							) }
-							icon={ external }
-							className="edit-site-site-hub__site-view-link"
-						/>
-					) }
+							<Button
+								className="edit-site-site-hub_toggle-command-center"
+								icon={ search }
+								onClick={ () => openCommandCenter() }
+								label={ __( 'Open command palette' ) }
+								shortcut={ displayShortcut.primary( 'k' ) }
+							/>
+						</HStack>
+					</HStack>
 				</HStack>
-				{ canvasMode === 'view' && (
-					<Button
-						className={ classnames(
-							'edit-site-site-hub_toggle-command-center',
-							{ 'is-transparent': isTransparent }
-						) }
-						icon={ search }
-						onClick={ () => openCommandCenter() }
-						label={ __( 'Open command palette' ) }
-						shortcut={ displayShortcut.primary( 'k' ) }
-					/>
-				) }
-			</HStack>
-		</motion.div>
-	);
-} );
+			</div>
+		);
+	} )
+);
 
 export default SiteHub;
+
+export const SiteHubMobile = memo(
+	forwardRef( ( { isTransparent }, ref ) => {
+		const history = useHistory();
+		const { navigate } = useContext( SidebarNavigationContext );
+
+		const { homeUrl, siteTitle } = useSelect( ( select ) => {
+			const {
+				getSite,
+				getUnstableBase, // Site index.
+			} = select( coreStore );
+			const _site = getSite();
+			return {
+				homeUrl: getUnstableBase()?.home,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
+			};
+		}, [] );
+		const { open: openCommandCenter } = useDispatch( commandsStore );
+
+		return (
+			<div className="edit-site-site-hub">
+				<HStack justify="flex-start" spacing="0">
+					<div
+						className={ clsx(
+							'edit-site-site-hub__view-mode-toggle-container',
+							{
+								'has-transparent-background': isTransparent,
+							}
+						) }
+					>
+						<Button
+							ref={ ref }
+							label={ __( 'Go to Site Editor' ) }
+							className="edit-site-layout__view-mode-toggle"
+							style={ {
+								transform: 'scale(0.5)',
+								borderRadius: 4,
+							} }
+							onClick={ () => {
+								history.push( {} );
+								navigate( 'back' );
+							} }
+						>
+							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+						</Button>
+					</div>
+
+					<HStack>
+						<div className="edit-site-site-hub__title">
+							<Button
+								variant="link"
+								href={ homeUrl }
+								target="_blank"
+								label={ __( 'View site (opens in a new tab)' ) }
+							>
+								{ decodeEntities( siteTitle ) }
+							</Button>
+						</div>
+						<HStack
+							spacing={ 0 }
+							expanded={ false }
+							className="edit-site-site-hub__actions"
+						>
+							<Button
+								className="edit-site-site-hub_toggle-command-center"
+								icon={ search }
+								onClick={ () => openCommandCenter() }
+								label={ __( 'Open command palette' ) }
+								shortcut={ displayShortcut.primary( 'k' ) }
+							/>
+						</HStack>
+					</HStack>
+				</HStack>
+			</div>
+		);
+	} )
+);

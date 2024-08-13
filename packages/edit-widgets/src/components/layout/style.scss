@@ -18,19 +18,11 @@
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
 
+	.block-editor-inserter__tablist-and-close {
+		display: none;
+	}
+
 	@include break-medium() {
 		height: 100%;
 	}
-}
-
-.blocks-widgets-container {
-	// making the header be lower than the content
-	// so the fixed toolbar can be positioned on top of it
-	// but only on desktop
-	@include break-medium() {
-		.interface-interface-skeleton__header:not(:focus-within) {
-			z-index: 19;
-		}
-	}
-
 }

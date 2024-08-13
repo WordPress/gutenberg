@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Retrieves the root plugin path.
  *
- * @return string Root path to the gutenberg plugin.
- *
  * @since 0.1.0
+ *
+ * @return string Root path to the gutenberg plugin.
  */
 function gutenberg_dir_path() {
 	return plugin_dir_path( __DIR__ );
@@ -24,11 +24,11 @@ function gutenberg_dir_path() {
 /**
  * Retrieves a URL to a file in the gutenberg plugin.
  *
+ * @since 0.1.0
+ *
  * @param  string $path Relative path of the desired file.
  *
  * @return string       Fully qualified URL pointing to the desired file.
- *
- * @since 0.1.0
  */
 function gutenberg_url( $path ) {
 	return plugins_url( $path, __DIR__ );
@@ -244,7 +244,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  * `build/` location.
  *
  * @since 6.7.0
-
+ *
+ * @global array $editor_styles
+ *
  * @param WP_Styles $styles WP_Styles instance.
  */
 function gutenberg_register_packages_styles( $styles ) {
@@ -266,7 +268,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components' ),
+		array( 'wp-components', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
@@ -275,7 +277,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-editor',
 		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-patterns', 'wp-reusable-blocks' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-patterns', 'wp-reusable-blocks', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
@@ -284,7 +286,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-commands', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
@@ -409,7 +411,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-site',
 		gutenberg_url( 'build/edit-site/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-commands' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-commands', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
@@ -418,7 +420,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-edit-widgets',
 		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-reusable-blocks', 'wp-widgets' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-patterns', 'wp-reusable-blocks', 'wp-widgets', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
@@ -436,7 +438,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-customize-widgets',
 		gutenberg_url( 'build/customize-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-widgets' ),
+		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-widgets', 'wp-preferences' ),
 		$version
 	);
 	$styles->add_data( 'wp-customize-widgets', 'rtl', 'replace' );
@@ -466,6 +468,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		array( 'wp-components' )
 	);
 	$styles->add_data( 'wp-widgets', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-preferences',
+		gutenberg_url( 'build/preferences/style.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-preferences', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 
@@ -576,6 +587,14 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		$scripts,
 		'react-dom',
 		gutenberg_url( 'build/vendors/react-dom' . $extension ),
+		array( 'react' ),
+		'18'
+	);
+
+	gutenberg_override_script(
+		$scripts,
+		'react-jsx-runtime',
+		gutenberg_url( 'build/vendors/react-jsx-runtime' . $extension ),
 		array( 'react' ),
 		'18'
 	);

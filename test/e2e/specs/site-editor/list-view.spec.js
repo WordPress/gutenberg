@@ -12,40 +12,37 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		// Select a template part with a few blocks.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {
 		page,
+		editor,
 	} ) => {
 		await expect(
-			page.locator( 'role=region[name="List View"i]' )
+			page.locator( 'role=region[name="Document Overview"i]' )
 		).toBeHidden();
 
 		// Turn on block list view by default.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', true );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: true,
 		} );
 
 		await page.reload();
 
 		await expect(
-			page.locator( 'role=region[name="List View"i]' )
+			page.locator( 'role=region[name="Document Overview"i]' )
 		).toBeVisible();
 
 		// The preferences cleanup.
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'showListViewByDefault', false );
+		await editor.setPreferences( 'core', {
+			showListViewByDefault: false,
 		} );
 	} );
 
@@ -109,7 +106,7 @@ test.describe( 'Site Editor List View', () => {
 
 		// Focus should now be on the list view toggle button.
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// Open List View.
@@ -121,9 +118,10 @@ test.describe( 'Site Editor List View', () => {
 		// out of range of the sidebar region. Must shift+tab 1 time to reach
 		// close button before list view area.
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
-				.getByRole( 'region', { name: 'List View' } )
+				.getByRole( 'region', { name: 'Document Overview' } )
 				.getByRole( 'button', {
 					name: 'Close',
 				} )
@@ -131,7 +129,7 @@ test.describe( 'Site Editor List View', () => {
 		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).toBeHidden();
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 	} );
 } );

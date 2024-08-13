@@ -4,7 +4,7 @@ The [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/referenc
 
 A JavaScript build step refers to the process of transforming, bundling, and optimizing JavaScript source code and related assets into a format suitable for production environments. These build steps often take modern JavaScript (ESNext and JSX) and convert it to a version compatible with most browsers. They can also bundle multiple files into one, minify the code to reduce file size and perform various other tasks to optimize the code.
 
-You will typically be working with ESNext and JSX when building for the Block Editor, and most examples in the Block Editor Handbook are written in these syntaxes. Learning how to set up a build step is essential. However, configuring the necessary tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), and [ESLint](https://eslint.org/) can become complex. This is where `wp-scripts` comes in. 
+You will typically be working with ESNext and JSX when building for the Block Editor, and all examples in the Block Editor Handbook are written in these syntaxes. Learning how to set up a build step is essential. However, configuring the necessary tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), and [ESLint](https://eslint.org/) can become complex. This is where `wp-scripts` comes in.
 
 Here are a few things that `wp-scripts` can do: 
 
@@ -20,7 +20,7 @@ The package abstracts away much of the initial setup, configuration, and boilerp
 ## Quick start
 
 <div class="callout callout-tip">
-    If you want to build a custom block, the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/"><code>@wordpress/create-block</code></a> package allows you to scaffold the structure of files needed to create and register a block. It generates all the necessary code to start a project and integrates a modern JavaScript build setup (using <code>wp-scripts</code>) with no configuration required. Refer to <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with <code>create-block</code></a> for more details.
+    If you use <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/"><code>@wordpress/create-block</code></a> package to scaffold the structure of files needed to create and register a block, you'll also get a modern JavaScript build setup (using <code>wp-scripts</code>) with no configuration required, so you don't need to worry about installing <code>wp-scripts</code> or enqueuing assets. Refer to <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with <code>create-block</code></a> for more details.
 </div>
 
 ### Installation
@@ -64,15 +64,25 @@ Once installed, you can run the predefined scripts provided with `wp-scripts` by
 }
 ```
 
-These scripts can then be run using the command `npm run {script name}`. The two scripts you will use most often are `start` and `build` since they handle the build step. See the [package documentation](https://developer.wordpress.org/block-editor/packages/packages-scripts/) for all options.
+These scripts can then be run using the command `npm run {script name}`. 
+
+### The build process with `wp-scripts`
+
+The two scripts you will use most often are `start` and `build` since they handle the build step. See the [package documentation](https://developer.wordpress.org/block-editor/packages/packages-scripts/) for all options.
 
 When working on your project, use the `npm run start` command. This will start a development server and automatically rebuild the project whenever any change is detected. Note that the compiled code in `build/index.js` will not be optimized.
 
 When you are ready to deploy your project, use the `npm run build` command. This optimizes your code and makes it production-ready.
 
-After the build finishes, you will see the compiled JavaScript file created at `build/index.js`. A `build/index.asset.php` file will also be created, which contains an array of dependencies and a version number (for cache busting). 
+After the build finishes, you will see the compiled JavaScript file created at `build/index.js`. 
 
-Enqueue the file in the Editor using PHP as you would any other JavaScript file. You can refer to the [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) guide for more information, but here's a typical implementation. 
+A `build/index.asset.php` file will also be created in the build process, which contains an array of dependencies and a version number (for cache busting). Please, note that to register a block without this `wp-scripts` build process you'll need to manually create `*.asset.php` dependencies files (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-no-build-e621a6)).
+
+### Enqueuing assets
+
+If you register a block via `register_block_type` the scripts defined in `block.json` will be automatically enqueued (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/minimal-block-ca6eda))
+
+To manually enqueue files in the editor, in any other context, you can refer to the [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) guide for more information, but here's a typical implementation. 
 
 ```php
 /**
@@ -90,6 +100,8 @@ function example_project_enqueue_editor_assets() {
 }
 add_action( 'enqueue_block_editor_assets', 'example_project_enqueue_editor_assets' );
 ```
+
+Here's [an example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) of manually enqueuing files in the editor.
 
 ## Next steps
 
@@ -111,7 +123,7 @@ To help developers improve the quality of their code, `wp-scripts` comes pre-con
 
 Regularly linting and formatting your code ensures it's functional, clear, and maintainable for yourself and other developers.
 
-### Running Tests
+### Running tests
 
 Beyond just writing code, verifying its functionality is crucial. `wp-scripts` includes [Jest](https://jestjs.io/), a JavaScript testing framework, and both end-to-end and unit testing scripts:
 

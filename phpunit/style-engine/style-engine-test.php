@@ -23,7 +23,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests generating block styles and classnames based on various manifestations of the $block_styles argument.
 	 *
-	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers ::wp_style_engine_get_styles
 	 * @covers WP_Style_Engine_Gutenberg::parse_block_styles
 	 * @covers WP_Style_Engine_Gutenberg::compile_css
 	 *
@@ -238,19 +238,26 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 			'elements_with_css_var_value'                  => array(
 				'block_styles'    => array(
-					'color' => array(
+					'color'      => array(
 						'text' => 'var:preset|color|my-little-pony',
+					),
+					'typography' => array(
+						'fontSize'   => 'var:preset|font-size|cabbage-patch',
+						'fontFamily' => 'var:preset|font-family|transformers',
 					),
 				),
 				'options'         => array(
 					'selector' => '.wp-selector',
 				),
 				'expected_output' => array(
-					'css'          => '.wp-selector{color:var(--wp--preset--color--my-little-pony);}',
+					'css'          => '.wp-selector{color:var(--wp--preset--color--my-little-pony);font-size:var(--wp--preset--font-size--cabbage-patch);font-family:var(--wp--preset--font-family--transformers);}',
 					'declarations' => array(
-						'color' => 'var(--wp--preset--color--my-little-pony)',
+						'color'       => 'var(--wp--preset--color--my-little-pony)',
+						'font-size'   => 'var(--wp--preset--font-size--cabbage-patch)',
+						'font-family' => 'var(--wp--preset--font-family--transformers)',
+
 					),
-					'classnames'   => 'has-text-color has-my-little-pony-color',
+					'classnames'   => 'has-text-color has-my-little-pony-color has-cabbage-patch-font-size has-transformers-font-family',
 				),
 			),
 
@@ -499,18 +506,24 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			'inline_background_image_url_with_background_size' => array(
 				'block_styles'    => array(
 					'background' => array(
-						'backgroundImage' => array(
+						'backgroundImage'      => array(
 							'url' => 'https://example.com/image.jpg',
 						),
-						'backgroundSize'  => 'cover',
+						'backgroundPosition'   => 'center',
+						'backgroundRepeat'     => 'no-repeat',
+						'backgroundSize'       => 'cover',
+						'backgroundAttachment' => 'fixed',
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+					'css'          => "background-image:url('https://example.com/image.jpg');background-position:center;background-repeat:no-repeat;background-size:cover;background-attachment:fixed;",
 					'declarations' => array(
-						'background-image' => "url('https://example.com/image.jpg')",
-						'background-size'  => 'cover',
+						'background-image'      => "url('https://example.com/image.jpg')",
+						'background-position'   => 'center',
+						'background-repeat'     => 'no-repeat',
+						'background-size'       => 'cover',
+						'background-attachment' => 'fixed',
 					),
 				),
 			),
@@ -520,7 +533,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	/**
 	 * Tests adding rules to a store and retrieving a generated stylesheet.
 	 *
-	 * @covers ::gutenberg_style_engine_get_styles
+	 * @covers ::wp_style_engine_get_styles
 	 * @covers WP_Style_Engine_Gutenberg::store_css_rule
 	 */
 	public function test_should_store_block_styles_using_context() {
@@ -655,7 +668,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * @ticket 58811
 	 *
-	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_dedupe_and_merge_css_rules() {
@@ -705,7 +718,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	 *
 	 * This is testing this fix: https://github.com/WordPress/gutenberg/pull/49004
 	 *
-	 * @covers ::gutenberg_style_engine_get_stylesheet_from_css_rules
+	 * @covers ::wp_style_engine_get_stylesheet_from_css_rules
 	 * @covers WP_Style_Engine_Gutenberg::compile_stylesheet_from_css_rules
 	 */
 	public function test_should_return_stylesheet_from_duotone_css_rules() {
@@ -724,5 +737,61 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 
 		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
 		$this->assertSame( ".wp-duotone-ffffff-000000-1{filter:url('#wp-duotone-ffffff-000000-1') !important;}", $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet from a set of nested rules and merging their declarations.
+	 */
+	public function test_should_merge_declarations_for_rules_groups() {
+		$css_rules = array(
+			array(
+				'selector'     => '.saruman',
+				'rules_group'  => '@container (min-width: 700px)',
+				'declarations' => array(
+					'color'        => 'white',
+					'height'       => '100px',
+					'border-style' => 'solid',
+					'align-self'   => 'stretch',
+				),
+			),
+			array(
+				'selector'     => '.saruman',
+				'rules_group'  => '@container (min-width: 700px)',
+				'declarations' => array(
+					'color'       => 'black',
+					'font-family' => 'The-Great-Eye',
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
+		$this->assertSame( '@container (min-width: 700px){.saruman{color:black;height:100px;border-style:solid;align-self:stretch;font-family:The-Great-Eye;}}', $compiled_stylesheet );
+	}
+
+	/**
+	 * Tests returning a generated stylesheet from a set of nested rules.
+	 */
+	public function test_should_return_stylesheet_with_nested_rules() {
+		$css_rules = array(
+			array(
+				'rules_group'  => '.foo',
+				'selector'     => '@media (orientation: landscape)',
+				'declarations' => array(
+					'background-color' => 'blue',
+				),
+			),
+			array(
+				'rules_group'  => '.foo',
+				'selector'     => '@media (min-width > 1024px)',
+				'declarations' => array(
+					'background-color' => 'cotton-blue',
+				),
+			),
+		);
+
+		$compiled_stylesheet = gutenberg_style_engine_get_stylesheet_from_css_rules( $css_rules, array( 'prettify' => false ) );
+
+		$this->assertSame( '.foo{@media (orientation: landscape){background-color:blue;}}.foo{@media (min-width > 1024px){background-color:cotton-blue;}}', $compiled_stylesheet );
 	}
 }

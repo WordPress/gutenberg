@@ -2,17 +2,19 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
-	GlobalStylesContext,
-	getMergedGlobalStyles,
-	useMobileGlobalStylesColors,
-	useGlobalStyles,
-} from '@wordpress/components';
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	memo,
+} from '@wordpress/element';
+import { withFilters } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 	getBlockType,
@@ -27,7 +29,7 @@ import {
 	withDispatch,
 	withSelect,
 } from '@wordpress/data';
-import { compose, ifCondition, pure } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,24 +40,50 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockOutline from './block-outline';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
+import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
+import { unlock } from '../../lock-unlock';
+import BlockCrashBoundary from './block-crash-boundary';
+import BlockCrashWarning from './block-crash-warning';
+import {
+	getMergedGlobalStyles,
+	GlobalStylesContext,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
+} from '../global-styles/use-global-styles-context';
 
 const EMPTY_ARRAY = [];
 
-// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference.
-const wrapperPropsCache = new WeakMap();
-const emptyObj = {};
-function getWrapperProps( value, getWrapperPropsFunction ) {
-	if ( ! getWrapperPropsFunction ) {
-		return emptyObj;
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	// May be set to undefined, so check if the property is set!
+	if (
+		propsA?.hasOwnProperty( 'className' ) &&
+		propsB?.hasOwnProperty( 'className' )
+	) {
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
-	const cachedValue = wrapperPropsCache.get( value );
-	if ( ! cachedValue ) {
-		const wrapperProps = getWrapperPropsFunction( value );
-		wrapperPropsCache.set( value, wrapperProps );
-		return wrapperProps;
+
+	if (
+		propsA?.hasOwnProperty( 'style' ) &&
+		propsB?.hasOwnProperty( 'style' )
+	) {
+		newProps.style = { ...propsA.style, ...propsB.style };
 	}
-	return cachedValue;
+
+	return newProps;
 }
 
 function BlockWrapper( {
@@ -67,7 +95,6 @@ function BlockWrapper( {
 	draggingEnabled,
 	hasInnerBlocks,
 	isDescendentBlockSelected,
-	isRootList,
 	isSelected,
 	isTouchable,
 	marginHorizontal,
@@ -85,6 +112,18 @@ function BlockWrapper( {
 	];
 	const accessible = ! ( isSelected || isDescendentBlockSelected );
 
+	const ref = useRef();
+	const [ isLayoutCalculated, setIsLayoutCalculated ] = useState();
+	useScrollUponInsertion( {
+		clientId,
+		isSelected,
+		isLayoutCalculated,
+		elementRef: ref,
+	} );
+	const onLayout = useCallback( () => {
+		setIsLayoutCalculated( true );
+	}, [] );
+
 	return (
 		<Pressable
 			accessibilityLabel={ accessibilityLabel }
@@ -93,22 +132,28 @@ function BlockWrapper( {
 			disabled={ ! isTouchable }
 			onPress={ onFocus }
 			style={ blockWrapperStyle }
+			ref={ ref }
+			onLayout={ onLayout }
 		>
 			<BlockOutline
 				blockCategory={ blockCategory }
 				hasInnerBlocks={ hasInnerBlocks }
-				isRootList={ isRootList }
 				isSelected={ isSelected }
 				name={ name }
 			/>
-			<BlockDraggable
-				clientId={ clientId }
-				draggingClientId={ draggingClientId }
-				enabled={ draggingEnabled }
-				testID="draggable-trigger-content"
+			<BlockCrashBoundary
+				blockName={ name }
+				fallback={ <BlockCrashWarning /> }
 			>
-				{ children }
-			</BlockDraggable>
+				<BlockDraggable
+					clientId={ clientId }
+					draggingClientId={ draggingClientId }
+					enabled={ draggingEnabled }
+					testID="draggable-trigger-content"
+				>
+					{ children }
+				</BlockDraggable>
+			</BlockCrashBoundary>
 		</Pressable>
 	);
 }
@@ -136,6 +181,7 @@ function BlockListBlock( {
 	rootClientId,
 	setAttributes,
 	toggleSelection,
+	wrapperProps,
 } ) {
 	const {
 		baseGlobalStyles,
@@ -148,6 +194,8 @@ function BlockListBlock( {
 		isDescendentBlockSelected,
 		isParentSelected,
 		order,
+		mayDisplayControls,
+		blockEditingMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -158,6 +206,10 @@ function BlockListBlock( {
 				getSelectedBlockClientId,
 				getSettings,
 				hasSelectedInnerBlock,
+				getBlockName,
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const currentBlockType = getBlockType( name || 'core/missing' );
 			const currentBlockCategory = currentBlockType?.category;
@@ -205,6 +257,13 @@ function BlockListBlock( {
 				isDescendentBlockSelected: descendentBlockSelected,
 				isParentSelected: parentSelected,
 				order: blockOrder,
+				mayDisplayControls:
+					isSelected ||
+					( isFirstMultiSelectedBlock( clientId ) &&
+						getMultiSelectedBlockClientIds().every(
+							( id ) => getBlockName( id ) === name
+						) ),
+				blockEditingMode: getBlockEditingMode( clientId ),
 			};
 		},
 		[ clientId, isSelected, name, rootClientId ]
@@ -242,18 +301,20 @@ function BlockListBlock( {
 		[ blockWidth, setBlockWidth ]
 	);
 
-	// Block level styles.
-	const wrapperProps = getWrapperProps(
-		attributes,
-		blockType.getEditWrapperProps
-	);
+	// Determine whether the block has props to apply to the wrapper.
+	if ( blockType?.getEditWrapperProps ) {
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
+	}
 
 	// Inherited styles merged with block level styles.
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
 			baseGlobalStyles,
 			globalStyle,
-			wrapperProps.style,
+			wrapperProps?.style,
 			attributes,
 			defaultColors,
 			name,
@@ -271,7 +332,7 @@ function BlockListBlock( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify( globalStyle ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		JSON.stringify( wrapperProps.style ),
+		JSON.stringify( wrapperProps?.style ),
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		JSON.stringify(
 			Object.fromEntries(
@@ -305,7 +366,6 @@ function BlockListBlock( {
 			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
 			isFocused={ isFocused }
-			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
@@ -346,6 +406,8 @@ function BlockListBlock( {
 									: undefined
 							}
 							wrapperProps={ wrapperProps }
+							mayDisplayControls={ mayDisplayControls }
+							blockEditingMode={ blockEditingMode }
 						/>
 						<View onLayout={ onLayout } />
 					</GlobalStylesContext.Provider>
@@ -361,21 +423,23 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 		getBlockMode,
 		isSelectionEnabled,
 		getTemplateLock,
-		__unstableGetBlockWithoutInnerBlocks,
+		getBlockWithoutAttributes,
+		getBlockAttributes,
 		canRemoveBlock,
 		canMoveBlock,
-	} = select( blockEditorStore );
-	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+	} = unlock( select( blockEditorStore ) );
+	const block = getBlockWithoutAttributes( clientId );
+	const attributes = getBlockAttributes( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const canRemove = canRemoveBlock( clientId, rootClientId );
-	const canMove = canMoveBlock( clientId, rootClientId );
+	const canRemove = canRemoveBlock( clientId );
+	const canMove = canMoveBlock( clientId );
 
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
-	const { name, attributes, isValid } = block || {};
+	const { name, isValid } = block || {};
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
@@ -605,10 +669,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
+				} else if (
+					getBlockName( clientId ) !== getDefaultBlockName()
+				) {
+					const replacement = switchToBlockType(
+						getBlock( clientId ),
+						getDefaultBlockName()
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( clientId, replacement );
+					}
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect, initialPosition ) {
+		onReplace( blocks, indexToSelect, initialPosition, meta ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
@@ -619,7 +693,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				[ ownProps.clientId ],
 				blocks,
 				indexToSelect,
-				initialPosition
+				initialPosition,
+				meta
 			);
 		},
 		toggleSelection( selectionEnabled ) {
@@ -629,11 +704,12 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 } );
 
 export default compose(
-	pure,
+	memo,
 	applyWithSelect,
 	applyWithDispatch,
 	// Block is sometimes not mounted at the right time, causing it be undefined
 	// see issue for more info
 	// https://github.com/WordPress/gutenberg/issues/17013
-	ifCondition( ( { block } ) => !! block )
+	ifCondition( ( { block } ) => !! block ),
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

@@ -15,10 +15,6 @@ UnitControl component allows the user to set a value as well as a unit (e.g. `px
 }
 ```
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-
 ## Developer guidelines
 
 ### Usage

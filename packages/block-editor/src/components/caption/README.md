@@ -4,11 +4,6 @@ The `Caption` component renders the [caption part](https://wordpress.org/documen
 
 This component encapsulates the "caption" behaviour and styles over a `<RichText>` so it can be used in other components such as the `BlockCaption` component.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

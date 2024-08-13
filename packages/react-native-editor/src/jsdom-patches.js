@@ -172,6 +172,18 @@ Element.prototype.closest = function ( selector ) {
 };
 
 /**
+ * Implementation of Element.prototype.remove based on polyfills:
+ * - https://github.com/chenzhenxi/element-remove/blob/master/index.js
+ * (referenced in https://developer.mozilla.org/en-US/docs/Web/API/Element/remove#see_also)
+ * - https://github.com/JakeChampion/polyfill-library/blob/master/polyfills/Element/prototype/remove/polyfill.js
+ */
+Element.prototype.remove = function () {
+	if ( this.parentNode ) {
+		this.parentNode.removeChild( this );
+	}
+};
+
+/**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
  *
@@ -244,6 +256,37 @@ Object.defineProperties( Node.prototype, {
 
 			return sibling;
 		},
+	},
+	dataset: {
+		get() {
+			const node = this;
+
+			// Helper function to convert property name to data-* attribute name
+			function toDataAttributeName( property ) {
+				return (
+					'data-' +
+					property.replace(
+						/[A-Z]/g,
+						( match ) => '-' + match.toLowerCase()
+					)
+				);
+			}
+			return new Proxy(
+				{},
+				{
+					set( _target, property, value ) {
+						const attributeName = toDataAttributeName( property );
+						node.setAttribute( attributeName, value );
+						return true;
+					},
+					get( _target, property ) {
+						const attributeName = toDataAttributeName( property );
+						return node.getAttribute( attributeName );
+					},
+				}
+			);
+		},
+		set() {},
 	},
 } );
 

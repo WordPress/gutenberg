@@ -13,8 +13,8 @@ function FooterMessageCell( { textAlign = 'left', ...props } ) {
 		<Cell
 			{ ...props }
 			editable={ false }
-			value={ '' }
-			accessibilityRole={ 'text' }
+			value=""
+			accessibilityRole="text"
 			labelStyle={ [ styles.footerMessageCell, { textAlign } ] }
 		/>
 	);

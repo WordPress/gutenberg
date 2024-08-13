@@ -24,8 +24,6 @@
 	.components-toolbar-group,
 	.components-toolbar {
 		background: none;
-		// IE11 has thick paddings without this.
-		line-height: 0;
 
 		// These margins make the buttons themselves overlap the chrome of the toolbar.
 		// This helps make them square, and maximize the hit area.
@@ -39,13 +37,16 @@
 		border-right: $border-width solid $gray-300;
 	}
 
-	&.is-synced .block-editor-block-switcher .components-button .block-editor-block-icon {
-		color: var(--wp-block-synced-color);
-	}
-
-	&.is-synced .components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
-		&:disabled .block-editor-block-icon.has-colors {
+	&.is-synced,
+	&.is-connected {
+		.block-editor-block-switcher .components-button .block-editor-block-icon {
 			color: var(--wp-block-synced-color);
+		}
+
+		.components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
+			&:disabled .block-editor-block-icon.has-colors {
+				color: var(--wp-block-synced-color);
+			}
 		}
 	}
 
@@ -56,48 +57,68 @@
 	}
 }
 
-// on desktop browsers the fixed toolbar has tweaked borders
-@include break-medium() {
-	.block-editor-block-contextual-toolbar.is-fixed {
-		.block-editor-block-toolbar {
-			.components-toolbar-group,
-			.components-toolbar {
-				border-right: none;
+.block-editor-block-contextual-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: z-index(".block-editor-block-popover");
+	display: block;
+	width: 100%;
+	// Block UI appearance.
+	background-color: $white;
+	flex-shrink: 3;
 
-				&::after {
-					content: "";
-					width: $border-width;
-					margin-top: $grid-unit + $grid-unit-05;
-					margin-bottom: $grid-unit + $grid-unit-05;
-					background-color: $gray-300;
-					margin-left: $grid-unit;
-				}
+	// Raise the specificity.
+	&.components-accessible-toolbar {
+		border: none;
+		border-bottom: $border-width solid $gray-200;
+		border-radius: 0;
+	}
 
-				& .components-toolbar-group.components-toolbar-group {
-					&::after {
-						display: none;
-					}
-				}
+	.block-editor-block-toolbar {
+		overflow: auto;
+		overflow-y: hidden;
+		@include custom-scrollbars-on-hover($gray-200, $gray-600);
+
+		// Prevents padding from being applied to the left and right sides of the element.
+		scrollbar-gutter: auto;
+
+		> :last-child,
+		> :last-child .components-toolbar-group,
+		> :last-child .components-toolbar {
+			&::after {
+				display: none;
 			}
+		}
+	}
 
-			> :last-child,
-			> :last-child .components-toolbar-group,
-			> :last-child .components-toolbar {
-				&::after {
-					display: none;
-				}
-			}
+	& > .block-editor-block-toolbar {
+		flex-grow: initial;
+		width: initial;
+	}
+
+	.block-editor-block-parent-selector {
+		position: relative;
+		// Must use the same negative margins of the .components-toolbar-group
+		// https://github.com/WordPress/gutenberg/blob/73a4716f429b5dce0190638049f5bd30f0b242f6/packages/block-editor/src/components/block-toolbar/style.scss#L32-L33
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// Parent selector dot divider
+		&::after {
+			align-items: center;
+			background-color: $gray-900;
+			border-radius: 100%;
+			content: "";
+			display: inline-flex;
+			height: 2px;
+			position: absolute;
+			right: 0;
+			top: $grid-unit-20 - $border-width;
+			width: 2px;
 		}
 	}
 }
 
-.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
-	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
-
-	.show-icon-labels & {
-		margin-left: 0;
-	}
-}
 
 // Block controls.
 .block-editor-block-toolbar__block-controls {
@@ -110,7 +131,7 @@
 		}
 	}
 
-	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	.components-toolbar-group {
 		padding: 0;
@@ -128,15 +149,7 @@
 }
 
 .block-editor-block-toolbar__slot {
-	// Required for IE11.
-	display: inline-block;
-	// Fix for toolbar button misalignment on IE11
-	line-height: 0;
-
-	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-	@supports (position: sticky) {
-		display: inline-flex;
-	}
+	display: inline-flex;
 }
 
 .show-icon-labels {
@@ -157,7 +170,6 @@
 	}
 
 	// Padding overrides.
-
 	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
 		padding-left: 6px;
 		padding-right: 6px;
@@ -173,18 +185,43 @@
 	}
 
 	// Parent selector overrides
-
-	.block-editor-block-parent-selector__button {
+	.block-editor-block-parent-selector .block-editor-block-parent-selector__button {
 		border-top-right-radius: 0;
 		border-bottom-right-radius: 0;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+		text-wrap: nowrap;
 
 		.block-editor-block-icon {
 			width: 0;
 		}
 	}
 
-	.block-editor-block-mover .block-editor-block-mover__move-button-container {
-		width: auto;
+	.block-editor-block-mover {
+		.block-editor-block-mover__move-button-container {
+			width: auto;
+			position: relative;
+		}
+
+		&:not(.is-horizontal) .block-editor-block-mover__move-button-container::before {
+			@include break-small() {
+				content: "";
+				height: $border-width;
+				width: 100%;
+				background: $gray-200;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
+			}
+		}
 	}
 
 	.block-editor-block-mover.is-horizontal {
@@ -202,44 +239,15 @@
 
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		border-left: 1px solid $gray-900;
+		border-left: 1px solid $gray-300;
 		margin-left: 6px;
 		margin-right: -6px;
 		white-space: nowrap;
 	}
 
-	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		border-left-color: $gray-200;
-	}
-
 	.block-editor-block-mover .block-editor-block-mover__drag-handle.has-icon {
 		padding-left: $grid-unit-15;
 		padding-right: $grid-unit-15;
-	}
-
-	.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container {
-		border-width: 0;
-	}
-
-	@include break-small() {
-		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
-		.is-up-button.is-up-button.is-up-button {
-			margin-right: 0;
-			border-radius: 0;
-			order: 1;
-		}
-
-		.block-editor-block-mover__move-button-container {
-			border-left: 1px solid $gray-900;
-		}
-
-		.is-down-button.is-down-button.is-down-button {
-			order: 2;
-		}
-
-		.block-editor-block-contextual-toolbar.is-fixed .block-editor-block-mover__move-button-container::before {
-			background: $gray-300;
-		}
 	}
 
 	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
@@ -251,16 +259,6 @@
 	.components-toolbar-group {
 		flex-shrink: 1;
 	}
-
-	@include break-medium() {
-		.block-editor-block-contextual-toolbar.is-fixed {
-			.components-toolbar,
-			.components-toolbar-group {
-				flex-shrink: 0;
-			}
-		}
-	}
-
 
 	.block-editor-rich-text__inline-format-toolbar-group {
 		.components-button + .components-button {

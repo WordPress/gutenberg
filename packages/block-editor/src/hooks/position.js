@@ -1,58 +1,40 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { BaseControl, CustomSelectControl } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import {
-	useContext,
-	useMemo,
-	createPortal,
-	Platform,
-} from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
+import { useMemo, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
-import { cleanEmptyObject } from './utils';
-import { unlock } from '../lock-unlock';
+import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
-const { CustomSelectControl } = unlock( componentsPrivateApis );
-
 const POSITION_SUPPORT_KEY = 'position';
-
-const OPTION_CLASSNAME =
-	'block-editor-hooks__position-selection__select-control__option';
 
 const DEFAULT_OPTION = {
 	key: 'default',
 	value: '',
 	name: __( 'Default' ),
-	className: OPTION_CLASSNAME,
 };
 
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
 	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	className: OPTION_CLASSNAME,
-	__experimentalHint: __(
+	hint: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
@@ -61,10 +43,7 @@ const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
 	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	className: OPTION_CLASSNAME,
-	__experimentalHint: __(
-		'The block will not move when the page is scrolled.'
-	),
+	hint: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -159,7 +138,7 @@ export function hasPositionValue( props ) {
  * @return {boolean} Whether or not the block is set to a sticky or fixed position.
  */
 export function hasStickyOrFixedPositionValue( attributes ) {
-	const positionType = attributes.style?.position?.type;
+	const positionType = attributes?.style?.position?.type;
 	return positionType === 'sticky' || positionType === 'fixed';
 }
 
@@ -213,14 +192,12 @@ export function useIsPositionDisabled( { name: blockName } = {} ) {
  *
  * @return {Element} Position panel.
  */
-export function PositionPanel( props ) {
-	const {
-		attributes: { style = {} },
-		clientId,
-		name: blockName,
-		setAttributes,
-	} = props;
-
+export function PositionPanelPure( {
+	style = {},
+	clientId,
+	name: blockName,
+	setAttributes,
+} ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 	const value = style?.position?.type;
@@ -292,14 +269,11 @@ export function PositionPanel( props ) {
 			options.length > 1 ? (
 				<InspectorControls group="position">
 					<BaseControl
-						className="block-editor-hooks__position-selection"
 						__nextHasNoMarginBottom
 						help={ stickyHelpText }
 					>
 						<CustomSelectControl
-							__nextUnconstrainedWidth
 							__next40pxDefaultSize
-							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision
 							describedBy={ sprintf(
@@ -309,11 +283,10 @@ export function PositionPanel( props ) {
 							) }
 							options={ options }
 							value={ selectedOption }
-							__experimentalShowSelectedHint
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
-							size={ '__unstable-large' }
+							size="__unstable-large"
 						/>
 					</BaseControl>
 				</InspectorControls>
@@ -322,96 +295,52 @@ export function PositionPanel( props ) {
 	} );
 }
 
-/**
- * Override the default edit UI to include position controls.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-		const positionSupport = hasBlockSupport(
-			blockName,
-			POSITION_SUPPORT_KEY
-		);
+export default {
+	edit: function Edit( props ) {
 		const isPositionDisabled = useIsPositionDisabled( props );
-		const showPositionControls = positionSupport && ! isPositionDisabled;
-
-		return [
-			showPositionControls && (
-				<PositionPanel key="position" { ...props } />
-			),
-			<BlockEdit key="edit" { ...props } />,
-		];
-	},
-	'withPositionControls'
-);
-
-/**
- * Override the default block element to add the position styles.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withPositionStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { name, attributes } = props;
-		const hasPositionBlockSupport = hasBlockSupport(
-			name,
-			POSITION_SUPPORT_KEY
-		);
-		const isPositionDisabled = useIsPositionDisabled( props );
-		const allowPositionStyles =
-			hasPositionBlockSupport && ! isPositionDisabled;
-
-		const id = useInstanceId( BlockListBlock );
-		const element = useContext( BlockList.__unstableElementContext );
-
-		// Higher specificity to override defaults in editor UI.
-		const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
-
-		// Get CSS string for the current position values.
-		let css;
-		if ( allowPositionStyles ) {
-			css =
-				getPositionCSS( {
-					selector: positionSelector,
-					style: attributes?.style,
-				} ) || '';
+		if ( isPositionDisabled ) {
+			return null;
 		}
-
-		// Attach a `wp-container-` id-based class name.
-		const className = classnames( props?.className, {
-			[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
-			[ `is-position-${ attributes?.style?.position?.type }` ]:
-				allowPositionStyles &&
-				!! css &&
-				!! attributes?.style?.position?.type,
-		} );
-
-		return (
-			<>
-				{ allowPositionStyles &&
-					element &&
-					!! css &&
-					createPortal( <style>{ css }</style>, element ) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
+		return <PositionPanelPure { ...props } />;
 	},
-	'withPositionStyles'
-);
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
+	},
+};
 
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/position/with-position-styles',
-	withPositionStyles
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/position/with-inspector-controls',
-	withPositionControls
-);
+function useBlockProps( { name, style } ) {
+	const hasPositionBlockSupport = hasBlockSupport(
+		name,
+		POSITION_SUPPORT_KEY
+	);
+	const isPositionDisabled = useIsPositionDisabled( { name } );
+	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
+
+	const id = useInstanceId( useBlockProps );
+
+	// Higher specificity to override defaults in editor UI.
+	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
+
+	// Get CSS string for the current position values.
+	let css;
+	if ( allowPositionStyles ) {
+		css =
+			getPositionCSS( {
+				selector: positionSelector,
+				style,
+			} ) || '';
+	}
+
+	// Attach a `wp-container-` id-based class name.
+	const className = clsx( {
+		[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
+		[ `is-position-${ style?.position?.type }` ]:
+			allowPositionStyles && !! css && !! style?.position?.type,
+	} );
+
+	useStyleOverride( { css } );
+
+	return { className };
+}

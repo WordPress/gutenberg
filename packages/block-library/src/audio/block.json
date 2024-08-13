@@ -8,6 +8,10 @@
 	"keywords": [ "music", "sound", "podcast", "recording" ],
 	"textdomain": "default",
 	"attributes": {
+		"blob": {
+			"type": "string",
+			"__experimentalRole": "local"
+		},
 		"src": {
 			"type": "string",
 			"source": "attribute",
@@ -16,8 +20,8 @@
 			"__experimentalRole": "content"
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "figcaption",
 			"__experimentalRole": "content"
 		},
@@ -54,6 +58,9 @@
 				"margin": false,
 				"padding": false
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-audio-editor",

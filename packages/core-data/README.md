@@ -123,7 +123,7 @@ The package provides general methods to interact with the entities (`getEntityRe
 
 ```js
 // Get the record collection for the user entity.
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 
 // Get a single record for the user entity.
 wp.data.select( 'core' ).getEntityRecord( 'root', 'user', recordId );
@@ -138,7 +138,7 @@ In addition to the general utilities (`getEntityRecords`, `getEntityRecord`, etc
 
 ```js
 // Collection
-wp.data.select( 'core' ).getEntityRecords( 'root' 'user' );
+wp.data.select( 'core' ).getEntityRecords( 'root', 'user' );
 wp.data.select( 'core' ).getUsers();
 
 // Single record
@@ -205,6 +205,19 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveDefaultTemplateId
+
+Returns an action object used to set the template for a given query.
+
+_Parameters_
+
+-   _query_ `Object`: The lookup query.
+-   _templateId_ `string`: The resolved template id.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### receiveEntityRecords
 
 Returns an action object used in signalling that entity records have been received.
@@ -235,9 +248,23 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveRevisions
+
+Action triggered to receive revision items.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the received entity record revisions.
+-   _name_ `string`: Name of the received entity record revisions.
+-   _recordKey_ `number|string`: The key of the entity record whose revisions you want to fetch.
+-   _records_ `Array|Object`: Revisions received.
+-   _query_ `?Object`: Query Object.
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _meta_ `?Object`: Meta information about pagination.
+
 ### receiveThemeSupports
 
-> **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
+> **Deprecated** since WP 5.9, this is not useful anymore, use the selector directly.
 
 Returns an action object used in signalling that the index has been received.
 
@@ -272,7 +299,7 @@ _Parameters_
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `Object`: ID of the record.
--   _options_ `Object`: Saving options.
+-   _options_ `Object=`: Saving options.
 
 ### saveEntityRecord
 
@@ -312,7 +339,7 @@ _Parameters_
 
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
 -   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
@@ -422,6 +449,8 @@ _Returns_
 
 ### getCurrentThemeGlobalStylesRevisions
 
+> **Deprecated** since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+
 Returns the revisions of the current global styles theme.
 
 _Parameters_
@@ -442,7 +471,20 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >`: Current user object.
+-   `ET.User< 'edit' >`: Current user object.
+
+### getDefaultTemplateId
+
+Returns the default template use to render a given query.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _query_ `TemplateQuery`: Query.
+
+_Returns_
+
+-   `string`: The default template id for the given query.
 
 ### getEditedEntityRecord
 
@@ -457,7 +499,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
+-   `ET.Updatable< EntityRecord > | false`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -701,6 +743,39 @@ _Returns_
 
 -   A value whose reference will change only when an edit occurs.
 
+### getRevision
+
+Returns a single, specific revision of a parent entity.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _revisionKey_ `EntityRecordKey`: The revision's key.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+
+_Returns_
+
+-   `RevisionRecord | Record< PropertyKey, never > | undefined`: Record.
+
+### getRevisions
+
+Returns an entity's revisions.
+
+_Parameters_
+
+-   _state_ `State`: State tree
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _recordKey_ `EntityRecordKey`: The key of the entity record whose revisions you want to fetch.
+-   _query_ `GetRecordsHttpQuery`: Optional query. If requesting specific fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+
+_Returns_
+
+-   `RevisionRecord[] | null`: Record.
+
 ### getThemeSupports
 
 Return theme supports data in the index.
@@ -750,7 +825,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >[]`: Users list.
+-   `ET.User< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
@@ -900,6 +975,47 @@ _Returns_
 The following set of react hooks available to import from the `@wordpress/core-data` package:
 
 <!-- START TOKEN(Autogenerated hooks|src/hooks/index.ts) -->
+
+### useEntityBlockEditor
+
+Hook that returns block content getters and setters for the nearest provided entity of the specified type.
+
+The return value has the shape `[ blocks, onInput, onChange ]`. `onInput` is for block changes that don't create undo levels or dirty the post, non-persistent changes, and `onChange` is for persistent changes. They map directly to the props of a `BlockEditorProvider` and are intended to be used with it, or similar components or hooks.
+
+_Parameters_
+
+-   _kind_ `string`: The entity kind.
+-   _name_ `string`: The entity name.
+-   _options_ `Object`:
+-   _options.id_ `[string]`: An entity ID to use instead of the context-provided one.
+
+_Returns_
+
+-   `[unknown[], Function, Function]`: The block array and setters.
+
+### useEntityId
+
+Hook that returns the ID for the nearest provided entity of the specified type.
+
+_Parameters_
+
+-   _kind_ `string`: The entity kind.
+-   _name_ `string`: The entity name.
+
+### useEntityProp
+
+Hook that returns the value and a setter for the specified property of the nearest provided entity of the specified type.
+
+_Parameters_
+
+-   _kind_ `string`: The entity kind.
+-   _name_ `string`: The entity name.
+-   _prop_ `string`: The property name.
+-   _\_id_ `[string]`: An entity ID to use instead of the context-provided one.
+
+_Returns_
+
+-   `[*, Function, *]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 
@@ -1057,7 +1173,10 @@ _Usage_
 import { useResourcePermissions } from '@wordpress/core-data';
 
 function PagesList() {
-	const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+	const { canCreate, isResolving } = useResourcePermissions( {
+		kind: 'postType',
+		name: 'page',
+	} );
 
 	if ( isResolving ) {
 		return 'Loading ...';
@@ -1080,7 +1199,11 @@ import { useResourcePermissions } from '@wordpress/core-data';
 
 function Page( { pageId } ) {
 	const { canCreate, canUpdate, canDelete, isResolving } =
-		useResourcePermissions( 'pages', pageId );
+		useResourcePermissions( {
+			kind: 'postType',
+			name: 'page',
+			id: pageId,
+		} );
 
 	if ( isResolving ) {
 		return 'Loading ...';
@@ -1106,8 +1229,8 @@ the store state using `canUser()`, or resolved if missing.
 
 _Parameters_
 
--   _resource_ `string`: The resource in question, e.g. media.
--   _id_ `IdType`: ID of a specific resource entry, if needed, e.g. 10.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
+-   _id_ `IdType`: Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged when using an entity object as a resource to check permissions and will be ignored.
 
 _Returns_
 

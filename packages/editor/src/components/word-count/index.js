@@ -10,6 +10,11 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the word count of the post content.
+ *
+ * @return {JSX.Element|null} The rendered WordCount component.
+ */
 export default function WordCount() {
 	const content = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),

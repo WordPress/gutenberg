@@ -17,19 +17,43 @@
 			"__experimentalRole": "content"
 		},
 		"citation": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "cite",
-			"default": "",
 			"__experimentalRole": "content"
 		},
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": false
+			}
+		},
 		"__experimentalOnEnter": true,
 		"__experimentalOnMerge": true,
 		"typography": {
@@ -42,8 +66,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true
+				"fontSize": true
 			}
 		},
 		"color": {
@@ -54,6 +77,17 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"layout": {
+			"allowEditing": false
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

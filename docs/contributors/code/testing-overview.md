@@ -17,7 +17,7 @@ When writing tests consider the following:
 -   Does the test test what we think it is testing? Or are we introducing false positives/negatives?
 -   Is it readable? Will other contributors be able to understand how our code behaves by looking at its corresponding test?
 
-## JavaScript Testing
+## JavaScript testing
 
 Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its API for [globals](https://jestjs.io/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](https://jestjs.io/docs/en/expect.html), [mocks](https://jestjs.io/docs/en/mock-functions.html), [spies](https://jestjs.io/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://jestjs.io/docs/en/mock-function-api.html). If needed, you can also use [React Testing Library](https://testing-library.com/docs/react-testing-library/intro) for React component testing.
 
@@ -90,7 +90,7 @@ describe( 'CheckboxWithLabel', () => {
 } );
 ```
 
-### Setup and Teardown methods
+### Setup and teardown methods
 
 The Jest API includes some nifty [setup and teardown methods](https://jestjs.io/docs/en/setup-teardown.html) that allow you to perform tasks _before_ and _after_ each or all of your tests, or tests within a specific `describe` block.
 
@@ -327,10 +327,7 @@ However, if the change was intentional, follow these steps to update the snapsho
 npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
 
 # Update snapshot for e2e tests
-npm run test:e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
-
-# Update snapshot for Playwright
-npm run test:e2e:playwright -- --update-snapshots path/to/spec
+npm run test:e2e -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -507,7 +504,7 @@ Contributors to Gutenberg will note that PRs include continuous integration E2E 
 
 There is an ongoing effort to add integration tests to the native mobile project using the [`react-native-testing-library`](https://testing-library.com/docs/react-native-testing-library/intro/) library. A guide to writing integration tests can be found [here](/docs/contributors/code/react-native/integration-test-guide.md).
 
-## End-to-end Testing
+## End-to-end testing
 
 Most existing End-to-end tests currently use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver to run the tests in `packages/e2e-tests`, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
@@ -559,7 +556,7 @@ Then to run the tests, specify the base URL, username, and passwords for your si
 WP_BASE_URL=http://wp.test npm run test:e2e -- --wordpress-username=admin --wordpress-password=password
 ```
 
-### Scenario Testing
+### Scenario testing
 
 If you find that end-to-end tests pass when run locally, but fail in GitHub Actions, you may be able to isolate a CPU- or network-bound race condition by simulating a slow CPU or network:
 
@@ -587,15 +584,15 @@ OFFLINE=true npm run test:e2e
 
 See [Chrome docs: emulateNetworkConditions](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions)
 
-### Core Block Testing
+### Core block testing
 
 Every core block is required to have at least one set of fixture files for its main save function and one for each deprecation. These fixtures test the parsing and serialization of the block. See [the integration tests fixtures readme](https://github.com/wordpress/gutenberg/blob/HEAD/test/integration/fixtures/blocks/README.md) for more information and instructions.
 
-### Flaky Tests
+### Flaky tests
 
 A test is considered to be **flaky** when it can pass and fail across multiple retry attempts without any code changes. We auto retry failed tests at most **twice** on CI to detect and report them to GitHub issues automatically under the [`[Type] Flaky Test`](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3A%22%5BType%5D+Flaky+Test%22) label via [`report-flaky-tests`](https://github.com/WordPress/gutenberg/tree/trunk/packages/report-flaky-tests) GitHub action. Note that a test that failed three times in a row is not counted as a flaky test and will not be reported to an issue.
 
-## PHP Testing
+## PHP testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
 
@@ -620,9 +617,9 @@ To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 [snapshot testing]: https://jestjs.io/docs/en/snapshot-testing.html
 [update snapshots]: https://jestjs.io/docs/en/snapshot-testing.html#updating-snapshots
 
-## Performance Testing
+## Performance testing
 
-To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics including:
 
 -   The time it takes to load the editor.
 -   The time it takes for the browser to respond when typing.

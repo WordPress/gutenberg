@@ -2,12 +2,6 @@
 
 `ComboboxControl` is an enhanced version of a [`SelectControl`](/packages/components/src/select-control/README.md), with the addition of being able to search for options using a search input.
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/README.md#design-guidelines), but this component is better suited for when there are too many items to scroll through or load at once so you need to filter them based on user input.
@@ -40,6 +34,7 @@ function MyComboboxControl() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
 	return (
 		<ComboboxControl
+			__nextHasNoMarginBottom
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
@@ -47,9 +42,7 @@ function MyComboboxControl() {
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
 					options.filter( ( option ) =>
-						option.label
-							.toLowerCase()
-							.startsWith( inputValue.toLowerCase() )
+						option.value === inputValue
 					)
 				)
 			}
@@ -85,7 +78,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
+-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
 -   Required: Yes
 
 #### onFilterValueChange
@@ -109,6 +102,15 @@ The current value of the control.
 -   Type: `string | null`
 -   Required: No
 
+#### expandOnFocus
+
+Automatically expand the dropdown when the control is focused.
+If the control is clicked, the dropdown will expand regardless of this prop.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
@@ -116,10 +118,18 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
+#### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ## Related components
 
--   Like this component, but without a search input, the `CustomSelectControl` component.
+-   Like this component, but without a search input, the [`CustomSelectControl`](https://developer.wordpress.org/block-editor/reference-guides/components/custom-select-control/) component.
 
--   To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
--   To select one or more items from a set, use the `CheckboxControl` component.
--   To toggle a single setting on or off, use the `ToggleControl` component.
+-   To select one option from a set, when you want to show all the available options at once, use the [`RadioControl`](https://developer.wordpress.org/block-editor/reference-guides/components/radio-control/) component.
+-   To select one or more items from a set, use the [`CheckboxControl`](https://developer.wordpress.org/block-editor/reference-guides/components/checkbox-control/) component.
+-   To toggle a single setting on or off, use the [`ToggleControl`](https://developer.wordpress.org/block-editor/reference-guides/components/toggle-control/) component.

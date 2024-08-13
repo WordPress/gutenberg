@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ const noop = () => {};
 
 describe( 'ColorPaletteControl', () => {
 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"
@@ -43,7 +44,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the two tab buttons.
 		expect(
-			screen.getByRole( 'tab', { name: 'Solid' } )
+			screen.getByRole( 'tab', { name: 'Color' } )
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'tab', { name: 'Gradient' } )
@@ -64,7 +65,7 @@ describe( 'ColorPaletteControl', () => {
 				] }
 				gradients={ [] }
 				disableCustomColors={ false }
-				disableCustomGradients={ true }
+				disableCustomGradients
 				onColorChange={ noop }
 				onGradientChange={ noop }
 			/>
@@ -72,7 +73,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is not showing the two tab buttons.
 		expect(
-			screen.queryByRole( 'tab', { name: 'Solid' } )
+			screen.queryByRole( 'tab', { name: 'Color' } )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'tab', { name: 'Gradient' } )
@@ -102,7 +103,7 @@ describe( 'ColorPaletteControl', () => {
 						slug: 'light-green-cyan-to-vivid-green-cyan',
 					},
 				] }
-				disableCustomColors={ true }
+				disableCustomColors
 				disableCustomGradients={ false }
 				onColorChange={ noop }
 				onGradientChange={ noop }
@@ -111,7 +112,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is not showing the two tab buttons.
 		expect(
-			screen.queryByRole( 'tab', { name: 'Solid' } )
+			screen.queryByRole( 'tab', { name: 'Color' } )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'tab', { name: 'Gradient' } )

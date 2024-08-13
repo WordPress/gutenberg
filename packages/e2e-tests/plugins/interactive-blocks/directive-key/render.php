@@ -4,10 +4,12 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
 
-<div data-wp-interactive data-wp-navigation-id="some-id">
+<div
+	data-wp-interactive="directive-key"
+	data-wp-router-region="some-id"
+>
 	<ul>
 		<li data-wp-key="id-2" data-testid="first-item">2</li>
 		<li data-wp-key="id-3">3</li>

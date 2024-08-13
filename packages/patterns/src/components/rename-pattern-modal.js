@@ -88,11 +88,18 @@ export default function RenamePatternModal( {
 	};
 
 	return (
-		<Modal title={ __( 'Rename' ) } { ...props } onRequestClose={ onClose }>
+		<Modal
+			title={ __( 'Rename' ) }
+			{ ...props }
+			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
+		>
 			<form onSubmit={ onRename }>
 				<VStack spacing="5">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ name }
 						onChange={ setName }
@@ -100,11 +107,19 @@ export default function RenamePatternModal( {
 					/>
 
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ onRequestClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onRequestClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 
-						<Button variant="primary" type="submit">
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
 							{ __( 'Save' ) }
 						</Button>
 					</HStack>

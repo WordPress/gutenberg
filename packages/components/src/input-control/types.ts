@@ -23,7 +23,7 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
 
 export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
 
-export type Size = 'default' | 'small' | '__unstable-large';
+export type Size = 'default' | 'small' | 'compact' | '__unstable-large';
 
 interface BaseProps {
 	/**
@@ -46,14 +46,6 @@ interface BaseProps {
 	 * @default false
 	 */
 	hideLabelFromVision?: boolean;
-	/**
-	 * Whether the component should be in a focused state.
-	 * Used to coordinate focus states when the actual focused element and the component handling
-	 * visual focus are separate.
-	 *
-	 * @default false
-	 */
-	isFocused: boolean;
 	/**
 	 * The position of the label.
 	 *
@@ -111,7 +103,6 @@ export interface InputFieldProps
 	) => void;
 	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
-	setIsFocused: ( isFocused: boolean ) => void;
 	stateReducer?: StateReducer;
 	/**
 	 * The current value of the input.
@@ -176,10 +167,19 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 * If this property is added, a label will be generated using label property as the content.
 	 */
 	label?: ReactNode;
+	/**
+	 * Whether to hide the border when not focused.
+	 *
+	 * @default false
+	 */
+	isBorderless?: boolean;
 }
 
 export interface InputControlProps
-	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
+	extends Omit<
+			InputBaseProps,
+			'children' | 'isBorderless' | keyof FlexProps
+		>,
 		Pick< BaseControlProps, 'help' >,
 		/**
 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
@@ -188,15 +188,13 @@ export interface InputControlProps
 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
 		 * with an unresolvable type.
 		 *
-		 * `isFocused`, `setIsFocused`, `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
+		 * `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
 		 * the InputControl, but the rest of the props for InputField are passed through.
 		 */
 		Omit<
 			WordPressComponentProps< InputFieldProps, 'input', false >,
 			| 'stateReducer'
 			| 'prefix'
-			| 'isFocused'
-			| 'setIsFocused'
 			| 'paddingInlineStart'
 			| 'paddingInlineEnd'
 		> {

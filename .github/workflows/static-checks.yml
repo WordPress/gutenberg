@@ -22,14 +22,15 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+              uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
               with:
                   node-version-file: '.nvmrc'
+                  check-latest: true
                   cache: npm
 
             - name: Npm install

@@ -23,6 +23,14 @@ const meta: Meta< typeof Divider > = {
 		marginEnd: {
 			control: { type: 'text' },
 		},
+		wrapElement: {
+			control: { type: null },
+		},
+		ref: {
+			table: {
+				disable: true,
+			},
+		},
 	},
 	parameters: {
 		controls: { expanded: true },

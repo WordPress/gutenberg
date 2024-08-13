@@ -34,10 +34,6 @@
 		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
 	}
-
-	.block-editor-block-card {
-		padding: $grid-unit-20;
-	}
 }
 
 .block-editor-block-inspector__no-blocks,

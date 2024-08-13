@@ -14,6 +14,7 @@ const TEMPLATE = [
 				{
 					text: __( 'Submit' ),
 					tagName: 'button',
+					type: 'submit',
 				},
 			],
 		],
@@ -22,7 +23,6 @@ const TEMPLATE = [
 const Edit = () => {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: TEMPLATE,
 		template: TEMPLATE,
 		templateLock: 'all',
 	} );

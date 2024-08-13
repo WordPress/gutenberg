@@ -39,13 +39,13 @@ Components may be assigned with class names that indicate states (for example, a
 
 **Example:**
 
-Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`classnames` package](https://www.npmjs.com/package/classnames) can be a helpful utility for conditionally applying modifier class names.
+Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
 
 ```jsx
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 export default function Notice( { children, onRemove, isDismissible } ) {
-	const classes = classnames( 'components-notice', {
+	const classes = clsx( 'components-notice', {
 		'is-dismissible': isDismissible,
 	} );
 
@@ -55,7 +55,7 @@ export default function Notice( { children, onRemove, isDismissible } ) {
 
 A component's class name should **never** be used outside its own folder (with rare exceptions such as [`_z-index.scss`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/base-styles/_z-index.scss)). If you need to inherit styles of another component in your own components, you should render an instance of that other component. At worst, you should duplicate the styles within your own component's stylesheet. This is intended to improve maintainability by isolating shared components as a reusable interface, reducing the surface area of similar UI elements by adapting a limited set of common components to support a varied set of use-cases.
 
-#### SCSS File Naming Conventions for Blocks
+#### SCSS file naming conventions for blocks
 
 The build process will split SCSS from within the blocks library directory into two separate CSS files when Webpack runs.
 
@@ -65,7 +65,7 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
-JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://reactjs.org/docs/introducing-jsx.html). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
+JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
 While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
 
@@ -75,7 +75,7 @@ In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mo
 
 These separations are identified by multi-line comments at the top of a file which imports code from another file or source.
 
-#### External Dependencies
+#### External dependencies
 
 An external dependency is third-party code that is not maintained by WordPress contributors, but instead [included in WordPress as a default script](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress) or referenced from an outside package manager like [npm](https://www.npmjs.com/).
 
@@ -88,7 +88,7 @@ Example:
 import moment from 'moment';
 ```
 
-#### WordPress Dependencies
+#### WordPress dependencies
 
 To encourage reusability between features, our JavaScript is split into domain-specific modules which [`export`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) one or more functions or objects. In the Gutenberg project, we've distinguished these modules under top-level directories. Each module serve an independent purpose, and often code is shared between them. For example, in order to localize its text, editor code will need to include functions from the `i18n` module.
 
@@ -101,7 +101,7 @@ Example:
 import { __ } from '@wordpress/i18n';
 ```
 
-#### Internal Dependencies
+#### Internal dependencies
 
 Within a specific feature, code is organized into separate files and folders. As is the case with external and WordPress dependencies, you can bring this code into scope by using the `import` keyword. The main distinction here is that when importing internal files, you should use relative paths specific to top-level directory you're working in.
 
@@ -114,9 +114,9 @@ Example:
 import VisualEditor from '../visual-editor';
 ```
 
-### Legacy Experimental APIs, Plugin-only APIs, and Private APIs
+### Legacy experimental APIs, plugin-only APIs, and private APIs
 
-#### Legacy Experimental APIs
+#### Legacy experimental APIs
 
 Historically, Gutenberg has used the `__experimental` and `__unstable` prefixes to indicate that a given API is not yet stable and may be subject to change. This is a legacy convention which should be avoided in favor of the plugin-only API pattern or a private API pattern described below.
 
@@ -141,9 +141,9 @@ An **plugin-only API** is one which is planned for eventual public availability,
 Plugin-only APIs are excluded from WordPress Core and only available in the Gutenberg Plugin:
 
 ```js
-// Using process.env.IS_GUTENBERG_PLUGIN allows Webpack to exclude this
+// Using globalThis.IS_GUTENBERG_PLUGIN allows Webpack to exclude this
 // export from WordPress core:
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	export { doSomethingExciting } from './api';
 }
 ```
@@ -162,7 +162,7 @@ do so by opting-in to `@wordpress/private-apis`:
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
+		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
 		// (not the name of the package whose APIs you want to access)
 	);
@@ -352,7 +352,7 @@ const { privateValidateBlocks } = unlock( package1PrivateApis );
 privateValidateBlocks( blocks, true );
 ```
 
-#### Private React Component properties
+#### Private React component properties
 
 To add an private argument to a stable component you'll need
 to prepare a stable and an private version of that component.
@@ -448,8 +448,8 @@ lock( privateApis, { privateEverywhere, privateInCorePublicInPlugin } );
 
 // The privateInCorePublicInPlugin function is explicitly exported,
 // but this export will not be merged into WordPress core thanks to
-// the process.env.IS_GUTENBERG_PLUGIN check.
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+// the globalThis.IS_GUTENBERG_PLUGIN check.
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	export const privateInCorePublicInPlugin =
 		unlock( privateApis ).privateInCorePublicInPlugin;
 }
@@ -517,7 +517,7 @@ alert( 'My name is ' + name + '.' );
 alert( `My name is ${ name }.` );
 ```
 
-### Optional Chaining
+### Optional chaining
 
 [Optional chaining](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining) is a new language feature introduced in version 2020 of the ECMAScript specification. While the feature can be very convenient for property access on objects which are potentially null-ish (`null` or `undefined`), there are a number of common pitfalls to be aware of when using optional chaining. These may be issues that linting and/or type-checking can help protect against at some point in the future. In the meantime, you will want to be cautious of the following items:
 
@@ -529,11 +529,11 @@ alert( `My name is ${ name }.` );
     -   Example: `document.body.classList.toggle( 'has-focus', nodeRef.current?.contains( document.activeElement ) );` may wrongly _add_ the class, since [the second argument is optional](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle). If `undefined` is passed, it would not unset the class as it would when `false` is passed.
     -   Example: `<input value={ state.selected?.value.trim() } />` may inadvertently cause warnings in React by toggling between [controlled and uncontrolled inputs](https://reactjs.org/docs/uncontrolled-components.html). This is an easy trap to fall into when eagerly assuming that a result of `trim()` will always return a string value, overlooking the fact the optional chaining may have caused evaluation to abort earlier with a value of `undefined`.
 
-### React Components
+### React components
 
-It is preferred to implement all components as [function components](https://reactjs.org/docs/components-and-props.html), using [hooks](https://reactjs.org/docs/hooks-reference.html) to manage component state and lifecycle. With the exception of [error boundaries](https://reactjs.org/docs/error-boundaries.html), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
+It is preferred to implement all components as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) to manage component state and lifecycle. With the exception of [error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
 
-## JavaScript Documentation using JSDoc
+## JavaScript documentation using JSDoc
 
 Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/code/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
 
@@ -542,7 +542,7 @@ For additional guidance, consult the following resources:
 -   [JSDoc Official Documentation](https://jsdoc.app/index.html)
 -   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
 
-### Custom Types
+### Custom types
 
 Define custom types using the [JSDoc `@typedef` tag](https://jsdoc.app/tags-typedef.html).
 
@@ -577,7 +577,7 @@ Custom types can also be used to describe a set of predefined options. While the
 
 Note the use of quotes when defining a set of string literals. As in the [JavaScript Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/), single quotes should be used when assigning a string literal either as the type or as a [default function parameter](#nullable-undefined-and-void-types), or when [specifying the path](#importing-and-exporting-types) of an imported type.
 
-### Importing and Exporting Types
+### Importing and exporting types
 
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#import-types) to import type declarations from other files or third-party dependencies.
 
@@ -599,7 +599,7 @@ When considering which types should be made available from a WordPress package, 
 
 In this snippet, the `@typedef` will support the usage of the previous example's `import('@wordpress/data')`.
 
-#### External Dependencies
+#### External dependencies
 
 Many third-party dependencies will distribute their own TypeScript typings. For these, the `import` semantics should "just work".
 
@@ -609,7 +609,7 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](http://definitelytyped.org/) community-maintained types definitions, if one exists.
 
-### Generic Types
+### Generic types
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
@@ -659,7 +659,7 @@ Similar to the "Custom Types" advice concerning type unions and with literal val
 const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
 
-### Nullable, Undefined, and Void Types
+### Nullable, undefined, and void types
 
 You can express a nullable type using a leading `?`. Use the nullable form of a type only if you're describing either the type or an explicit `null` value. Do not use the nullable form as an indicator of an optional parameter.
 
@@ -720,7 +720,7 @@ function getConfigurationValue( key ) {
 }
 ```
 
-When documenting a [function type](https://github.com/WordPress/gutenberg/blob/add/typescript-jsdoc-guidelines/docs/contributors/coding-guidelines.md#record-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
+When documenting a [function type](#generic-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
 
 ```js
 /**
@@ -731,7 +731,7 @@ When documenting a [function type](https://github.com/WordPress/gutenberg/blob/a
  */
 ```
 
-### Documenting Examples
+### Documenting examples
 
 Because the documentation generated using the `@wordpress/docgen` tool will include `@example` tags if they are defined, it is considered a best practice to include usage examples for functions and components. This is especially important for documented members of a package's public API.
 
@@ -756,9 +756,9 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
  */
 ````
 
-### Documenting React Components
+### Documenting React components
 
-When possible, all components should be implemented as [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components), using [hooks](https://reactjs.org/docs/hooks-intro.html) for managing component lifecycle and state.
+When possible, all components should be implemented as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) for managing component lifecycle and state.
 
 Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
 

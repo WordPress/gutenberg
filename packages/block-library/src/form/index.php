@@ -96,7 +96,7 @@ function block_core_form_send_email() {
 		'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
 	);
 
-	$skip_fields = array( 'formAction', '_ajax_nonce', 'action' );
+	$skip_fields = array( 'formAction', '_ajax_nonce', 'action', '_wp_http_referer' );
 	foreach ( $params as $key => $value ) {
 		if ( in_array( $key, $skip_fields, true ) ) {
 			continue;
@@ -109,7 +109,7 @@ function block_core_form_send_email() {
 
 	// Send the email.
 	$result = wp_mail(
-		str_replace( 'mailto:', '', $params['wp-email-address'] ),
+		str_replace( 'mailto:', '', $params['formAction'] ),
 		__( 'Form submission', 'gutenberg' ),
 		$content
 	);

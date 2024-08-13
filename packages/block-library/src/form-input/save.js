@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import removeAccents from 'remove-accents';
 
 /**
@@ -9,9 +9,11 @@ import removeAccents from 'remove-accents';
  */
 import {
 	RichText,
+	useBlockProps,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Get the name attribute from a content string.
@@ -21,11 +23,8 @@ import {
  * @return {string} Returns the slug.
  */
 const getNameFromLabel = ( content ) => {
-	const dummyElement = document.createElement( 'div' );
-	dummyElement.innerHTML = content;
-	// Get the slug.
 	return (
-		removeAccents( dummyElement.innerText )
+		removeAccents( stripHTML( content ) )
 			// Convert anything that's not a letter or number to a hyphen.
 			.replace( /[^\p{L}\p{N}]+/gu, '-' )
 			// Convert to lowercase
@@ -47,37 +46,41 @@ export default function save( { attributes } ) {
 		...colorProps.style,
 	};
 
-	const inputClasses = classNames(
+	const inputClasses = clsx(
 		'wp-block-form-input__input',
 		colorProps.className,
 		borderProps.className
 	);
 	const TagName = type === 'textarea' ? 'textarea' : 'input';
 
+	const blockProps = useBlockProps.save();
+
 	if ( 'hidden' === type ) {
 		return <input type={ type } name={ name } value={ value } />;
 	}
 
-	/* eslint-disable jsx-a11y/label-has-associated-control */
 	return (
-		<label
-			className={ classNames( 'wp-block-form-input__label', {
-				'is-label-inline': inlineLabel,
-			} ) }
-		>
-			<span className="wp-block-form-input__label-content">
-				<RichText.Content value={ label } />
-			</span>
-			<TagName
-				className={ inputClasses }
-				type={ 'textarea' === type ? undefined : type }
-				name={ name || getNameFromLabel( label ) }
-				required={ required }
-				aria-required={ required }
-				placeholder={ placeholder || undefined }
-				style={ inputStyle }
-			/>
-		</label>
+		<div { ...blockProps }>
+			{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
+			<label
+				className={ clsx( 'wp-block-form-input__label', {
+					'is-label-inline': inlineLabel,
+				} ) }
+			>
+				<span className="wp-block-form-input__label-content">
+					<RichText.Content value={ label } />
+				</span>
+				<TagName
+					className={ inputClasses }
+					type={ 'textarea' === type ? undefined : type }
+					name={ name || getNameFromLabel( label ) }
+					required={ required }
+					aria-required={ required }
+					placeholder={ placeholder || undefined }
+					style={ inputStyle }
+				/>
+			</label>
+			{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
+		</div>
 	);
-	/* eslint-enable jsx-a11y/label-has-associated-control */
 }

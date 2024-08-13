@@ -34,7 +34,7 @@ function ScreenCSS() {
 					<>
 						{ description }
 						<ExternalLink
-							href="https://wordpress.org/documentation/article/css/"
+							href="https://developer.wordpress.org/advanced-administration/wordpress/css/"
 							className="edit-site-global-styles-screen-css-help-link"
 						>
 							{ __( 'Learn more about CSS' ) }

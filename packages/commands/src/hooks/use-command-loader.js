@@ -82,6 +82,9 @@ export default function useCommandLoader( loader ) {
 	const { registerCommandLoader, unregisterCommandLoader } =
 		useDispatch( commandsStore );
 	useEffect( () => {
+		if ( loader.disabled ) {
+			return;
+		}
 		registerCommandLoader( {
 			name: loader.name,
 			hook: loader.hook,
@@ -94,6 +97,7 @@ export default function useCommandLoader( loader ) {
 		loader.name,
 		loader.hook,
 		loader.context,
+		loader.disabled,
 		registerCommandLoader,
 		unregisterCommandLoader,
 	] );

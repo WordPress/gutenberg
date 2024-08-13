@@ -4,13 +4,9 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
-import {
-	NavigableToolbar,
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { NavigableToolbar } from '@wordpress/block-editor';
 import { listView, plus } from '@wordpress/icons';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -18,79 +14,52 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import UndoButton from '../undo-redo/undo';
 import RedoButton from '../undo-redo/redo';
-import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShouldContextualToolbarShow } = unlock( blockEditorPrivateApis );
-
-function DocumentTools( { setListViewToggleElement } ) {
+function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
-	const inserterButton = useRef();
-	const widgetAreaClientId = useLastSelectedWidgetArea();
-	const isLastSelectedWidgetAreaOpen = useSelect(
-		( select ) =>
-			select( editWidgetsStore ).getIsWidgetAreaOpen(
-				widgetAreaClientId
-			),
-		[ widgetAreaClientId ]
-	);
-	const { isInserterOpen, isListViewOpen } = useSelect( ( select ) => {
-		const { isInserterOpened, isListViewOpened } =
-			select( editWidgetsStore );
+
+	const {
+		isInserterOpen,
+		isListViewOpen,
+		inserterSidebarToggleRef,
+		listViewToggleRef,
+	} = useSelect( ( select ) => {
+		const {
+			isInserterOpened,
+			getInserterSidebarToggleRef,
+			isListViewOpened,
+			getListViewToggleRef,
+		} = unlock( select( editWidgetsStore ) );
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
+			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
+			listViewToggleRef: getListViewToggleRef(),
 		};
 	}, [] );
-	const { setIsWidgetAreaOpen, setIsInserterOpened, setIsListViewOpened } =
+	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editWidgetsStore );
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const handleClick = () => {
-		if ( isInserterOpen ) {
-			// Focusing the inserter button closes the inserter popover.
-			setIsInserterOpened( false );
-		} else {
-			if ( ! isLastSelectedWidgetAreaOpen ) {
-				// Select the last selected block if hasn't already.
-				selectBlock( widgetAreaClientId );
-				// Open the last selected widget area when opening the inserter.
-				setIsWidgetAreaOpen( widgetAreaClientId, true );
-			}
-			// The DOM updates resulting from selectBlock() and setIsInserterOpened() calls are applied the
-			// same tick and pretty much in a random order. The inserter is closed if any other part of the
-			// app receives focus. If selectBlock() happens to take effect after setIsInserterOpened() then
-			// the inserter is visible for a brief moment and then gets auto-closed due to focus moving to
-			// the selected block.
-			window.requestAnimationFrame( () => setIsInserterOpened( true ) );
-		}
-	};
 
 	const toggleListView = useCallback(
 		() => setIsListViewOpened( ! isListViewOpen ),
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const {
-		shouldShowContextualToolbar,
-		canFocusHiddenToolbar,
-		fixedToolbarCanBeFocused,
-	} = useShouldContextualToolbarShow();
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	// There's a fixed block toolbar when the fixed toolbar option is enabled or when the browser width is less than the large viewport.
-	const blockToolbarCanBeFocused =
-		shouldShowContextualToolbar ||
-		canFocusHiddenToolbar ||
-		fixedToolbarCanBeFocused;
+	const toggleInserterSidebar = useCallback(
+		() => setIsInserterOpened( ! isInserterOpen ),
+		[ setIsInserterOpened, isInserterOpen ]
+	);
 
 	return (
 		<NavigableToolbar
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
-			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<ToolbarItem
-				ref={ inserterButton }
+				ref={ inserterSidebarToggleRef }
 				as={ Button }
 				className="edit-widgets-header-toolbar__inserter-toggle"
 				variant="primary"
@@ -98,7 +67,7 @@ function DocumentTools( { setListViewToggleElement } ) {
 				onMouseDown={ ( event ) => {
 					event.preventDefault();
 				} }
-				onClick={ handleClick }
+				onClick={ toggleInserterSidebar }
 				icon={ plus }
 				/* translators: button label text should, if possible, be under 16
 					characters. */
@@ -106,11 +75,12 @@ function DocumentTools( { setListViewToggleElement } ) {
 					'Toggle block inserter',
 					'Generic label for block inserter button'
 				) }
+				size="compact"
 			/>
 			{ isMediumViewport && (
 				<>
-					<UndoButton />
-					<RedoButton />
+					<ToolbarItem as={ UndoButton } />
+					<ToolbarItem as={ RedoButton } />
 					<ToolbarItem
 						as={ Button }
 						className="edit-widgets-header-toolbar__list-view-toggle"
@@ -119,7 +89,8 @@ function DocumentTools( { setListViewToggleElement } ) {
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'List View' ) }
 						onClick={ toggleListView }
-						ref={ setListViewToggleElement }
+						ref={ listViewToggleRef }
+						size="compact"
 					/>
 				</>
 			) }

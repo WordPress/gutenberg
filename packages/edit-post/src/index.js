@@ -7,22 +7,29 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import './plugins';
-import Editor from './editor';
-import { store as editPostStore } from './store';
+import Layout from './components/layout';
+import { unlock } from './lock-unlock';
+
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -42,93 +49,53 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
-		editorMode: 'visual',
-		fixedToolbar: false,
 		fullscreenMode: true,
-		hiddenBlockTypes: [],
-		inactivePanels: [],
-		isPublishSidebarEnabled: true,
-		openPanels: [ 'post-status' ],
-		preferredStyleVariations: {},
-		showBlockBreadcrumbs: true,
-		showIconLabels: false,
-		showListViewByDefault: false,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		editorMode: 'visual',
+		fixedToolbar: false,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
+		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
 	// If `distractionFree` mode is enabled, the block list view should not be open.
+	// This behavior is disabled for small viewports.
 	if (
-		select( editPostStore ).isFeatureActive( 'showListViewByDefault' ) &&
-		! select( editPostStore ).isFeatureActive( 'distractionFree' )
+		isMediumOrBigger &&
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
+		! select( preferencesStore ).get( 'core', 'distractionFree' )
 	) {
-		dispatch( editPostStore ).setIsListViewOpened( true );
+		dispatch( editorStore ).setIsListViewOpened( true );
 	}
 
 	registerCoreBlocks();
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
-
-	/*
-	 * Prevent adding template part in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removeTemplatePartsFromInserter',
-		( canInsert, blockType ) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/template-part'
-			) {
-				return false;
-			}
-			return canInsert;
-		}
-	);
-
-	/*
-	 * Prevent adding post content block (except in query block) in the post editor.
-	 * Only add the filter when the post editor is initialized, not imported.
-	 * Also only add the filter(s) after registerCoreBlocks()
-	 * so that common filters in the block library are not overwritten.
-	 */
-	addFilter(
-		'blockEditor.__unstableCanInsertBlockType',
-		'removePostContentFromInserter',
-		(
-			canInsert,
-			blockType,
-			rootClientId,
-			{ getBlockParentsByBlockName }
-		) => {
-			if (
-				! select( editPostStore ).isEditingTemplate() &&
-				blockType.name === 'core/post-content'
-			) {
-				return (
-					getBlockParentsByBlockName( rootClientId, 'core/query' )
-						.length > 0
-				);
-			}
-			return canInsert;
-		}
-	);
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =
@@ -175,12 +142,14 @@ export function initializeEditor(
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
 	root.render(
-		<Editor
-			settings={ settings }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-		/>
+		<StrictMode>
+			<Layout
+				settings={ settings }
+				postId={ postId }
+				postType={ postType }
+				initialEdits={ initialEdits }
+			/>
+		</StrictMode>
 	);
 
 	return root;
@@ -196,15 +165,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
-export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
-export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
-export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-export { default as __experimentalPluginPostExcerpt } from './components/sidebar/plugin-post-excerpt';
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
 export { store } from './store';
+export * from './deprecated';

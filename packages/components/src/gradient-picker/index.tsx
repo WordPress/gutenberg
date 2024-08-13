@@ -4,7 +4,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -13,7 +12,6 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
-import { Spacer } from '../spacer';
 import type {
 	GradientPickerComponentProps,
 	PickerProps,
@@ -44,9 +42,9 @@ function SingleOrigin( {
 	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
-		return gradients.map( ( { gradient, name }, index ) => (
+		return gradients.map( ( { gradient, name, slug }, index ) => (
 			<CircularOptionPicker.Option
-				key={ gradient }
+				key={ slug }
 				value={ gradient }
 				isSelected={ value === gradient }
 				tooltipText={
@@ -181,7 +179,6 @@ function Component( props: PickerProps< any > ) {
  *
  *	return (
  *		<GradientPicker
- *			__nextHasNoMargin
  *			value={ gradient }
  *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
  *			gradients={ [
@@ -211,8 +208,6 @@ function Component( props: PickerProps< any > ) {
  *
  */
 export function GradientPicker( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMargin = false,
 	className,
 	gradients = [],
 	onChange,
@@ -228,58 +223,39 @@ export function GradientPicker( {
 		[ onChange ]
 	);
 
-	if ( ! __nextHasNoMargin ) {
-		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
-			since: '6.1',
-			version: '6.4',
-			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
-		} );
-	}
-
-	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
-		? {
-				marginTop: ! gradients.length ? 3 : undefined,
-				marginBottom: ! clearable ? 6 : 0,
-		  }
-		: {};
-
 	return (
-		// Outmost Spacer wrapper can be removed when deprecation period is over
-		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
-			<VStack spacing={ gradients.length ? 4 : 0 }>
-				{ ! disableCustomGradients && (
-					<CustomGradientPicker
-						__nextHasNoMargin
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ value }
-						onChange={ onChange }
-					/>
-				) }
-				{ ( gradients.length > 0 || clearable ) && (
-					<Component
-						{ ...additionalProps }
-						className={ className }
-						clearGradient={ clearGradient }
-						gradients={ gradients }
-						onChange={ onChange }
-						value={ value }
-						actions={
-							clearable &&
-							! disableCustomGradients && (
-								<CircularOptionPicker.ButtonAction
-									onClick={ clearGradient }
-								>
-									{ __( 'Clear' ) }
-								</CircularOptionPicker.ButtonAction>
-							)
-						}
-						headingLevel={ headingLevel }
-					/>
-				) }
-			</VStack>
-		</Spacer>
+		<VStack spacing={ gradients.length ? 4 : 0 }>
+			{ ! disableCustomGradients && (
+				<CustomGradientPicker
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					value={ value }
+					onChange={ onChange }
+				/>
+			) }
+			{ ( gradients.length > 0 || clearable ) && (
+				<Component
+					{ ...additionalProps }
+					className={ className }
+					clearGradient={ clearGradient }
+					gradients={ gradients }
+					onChange={ onChange }
+					value={ value }
+					actions={
+						clearable &&
+						! disableCustomGradients && (
+							<CircularOptionPicker.ButtonAction
+								onClick={ clearGradient }
+							>
+								{ __( 'Clear' ) }
+							</CircularOptionPicker.ButtonAction>
+						)
+					}
+					headingLevel={ headingLevel }
+				/>
+			) }
+		</VStack>
 	);
 }
 

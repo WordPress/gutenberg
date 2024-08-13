@@ -15,12 +15,6 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
-.block-editor-color-gradient-control__tabs {
-	.block-editor-color-gradient-control__panel {
-		padding: $grid-unit-20;
-	}
-}
-
 .block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
 	&,
 	& > div:not(:first-of-type) {
@@ -33,7 +27,6 @@ $swatch-gap: 12px;
 		.components-circular-option-picker__swatches {
 			display: grid;
 			grid-template-columns: repeat(6, $swatch-size);
-			justify-content: space-between;
 		}
 	}
 

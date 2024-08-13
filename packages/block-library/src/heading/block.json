@@ -12,15 +12,17 @@
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "h1,h2,h3,h4,h5,h6",
-			"default": "",
 			"__experimentalRole": "content"
 		},
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		},
 		"placeholder": {
 			"type": "string"
@@ -30,6 +32,19 @@
 		"align": [ "wide", "full" ],
 		"anchor": true,
 		"className": true,
+		"splitting": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -57,13 +72,14 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true,
-				"textTransform": true
+				"fontSize": true
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSlashInserter": true
+		"__experimentalSlashInserter": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"

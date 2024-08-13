@@ -9,7 +9,6 @@ import namesPlugin from 'colord/plugins/names';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { Icon, check, close } from '@wordpress/icons';
 /**
@@ -17,6 +16,7 @@ import { Icon, check, close } from '@wordpress/icons';
  */
 import styles from './style.scss';
 import HsvColorPicker from './hsv-color-picker.native.js';
+import BottomSheet from '../mobile/bottom-sheet';
 
 extend( [ namesPlugin ] );
 
@@ -82,9 +82,15 @@ function ColorPicker( {
 	const currentColor = combineToHex();
 
 	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
-		if ( h !== undefined ) setHue( h );
-		if ( s !== undefined ) setSaturation( s );
-		if ( v !== undefined ) setValue( v );
+		if ( h !== undefined ) {
+			setHue( h );
+		}
+		if ( s !== undefined ) {
+			setSaturation( s );
+		}
+		if ( v !== undefined ) {
+			setValue( v );
+		}
 		setColor( combineToHex( h, s, v ) );
 	};
 

@@ -105,12 +105,13 @@ export default function ScaleTool( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				label={ __( 'Scale' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				size={ '__unstable-large' }
+				size="__unstable-large"
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

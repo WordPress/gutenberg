@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,6 +60,7 @@ function isMultipleCategorySelection(
  * ```
  */
 export function QueryControls( {
+	__next40pxDefaultSize = false,
 	authorList,
 	selectedAuthorId,
 	numberOfItems,
@@ -81,9 +82,14 @@ export function QueryControls( {
 				onOrderChange && onOrderByChange && (
 					<SelectControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
-						value={ `${ orderBy }/${ order }` }
+						value={
+							orderBy === undefined || order === undefined
+								? undefined
+								: `${ orderBy }/${ order }`
+						}
 						options={ [
 							{
 								label: __( 'Newest to oldest' ),
@@ -94,12 +100,12 @@ export function QueryControls( {
 								value: 'date/asc',
 							},
 							{
-								/* translators: label for ordering posts by title in ascending order */
+								/* translators: Label for ordering posts by title in ascending order. */
 								label: __( 'A → Z' ),
 								value: 'title/asc',
 							},
 							{
-								/* translators: label for ordering posts by title in descending order */
+								/* translators: Label for ordering posts by title in descending order. */
 								label: __( 'Z → A' ),
 								value: 'title/desc',
 							},
@@ -131,10 +137,11 @@ export function QueryControls( {
 					props.categoriesList &&
 					props.onCategoryChange && (
 						<CategorySelect
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
-							noOptionLabel={ __( 'All' ) }
+							noOptionLabel={ _x( 'All', 'categories' ) }
 							selectedCategoryId={ props.selectedCategoryId }
 							onChange={ props.onCategoryChange }
 						/>
@@ -143,6 +150,7 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							__nextHasNoMarginBottom
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
@@ -166,10 +174,11 @@ export function QueryControls( {
 					),
 				onAuthorChange && (
 					<AuthorSelect
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
-						noOptionLabel={ __( 'All' ) }
+						noOptionLabel={ _x( 'All', 'authors' ) }
 						selectedAuthorId={ selectedAuthorId }
 						onChange={ onAuthorChange }
 					/>
@@ -177,7 +186,7 @@ export function QueryControls( {
 				onNumberOfItemsChange && (
 					<RangeControl
 						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }

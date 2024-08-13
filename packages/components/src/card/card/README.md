@@ -99,14 +99,14 @@ const Example = () => (
 		<CardMedia>
 			<img src="..." />
 		</CardMedia>
-		<CardHeader>...</CardHeader>
+		<CardFooter>...</CardFooter>
 	</Card>
 );
 ```
 
 ### Context
 
-`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
+`<Card />`'s sub-components are connected to `<Card />` using [Context](https://react.dev/learn/passing-data-deeply-with-context). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
 
 In the following example, the `<CardBody />` will render with a size of `small`:
 

@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,7 +23,11 @@ import {
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
-import { ContextSystemProvider } from '../context';
+import {
+	ContextSystemProvider,
+	contextConnect,
+	useContextSystem,
+} from '../context';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
@@ -60,7 +64,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 	return props;
 }
 
-export function InputBase(
+function InputBase(
 	props: WordPressComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
@@ -73,16 +77,14 @@ export function InputBase(
 		hideLabelFromVision = false,
 		labelPosition,
 		id: idProp,
-		isFocused = false,
+		isBorderless = false,
 		label,
 		prefix,
 		size = 'default',
 		suffix,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.InputBase',
-		'6.4'
+		useContextSystem( props, 'InputBase' )
 	);
 
 	const id = useUniqueId( idProp );
@@ -106,8 +108,6 @@ export function InputBase(
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ className }
 			gap={ 2 }
-			isFocused={ isFocused }
-			labelPosition={ labelPosition }
 			ref={ ref }
 		>
 			<Label
@@ -138,10 +138,14 @@ export function InputBase(
 						</Suffix>
 					) }
 				</ContextSystemProvider>
-				<Backdrop disabled={ disabled } isFocused={ isFocused } />
+				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
 			</Container>
 		</Root>
 	);
 }
 
-export default forwardRef( InputBase );
+/**
+ * `InputBase` is an internal component used to style the standard borders for an input,
+ * as well as handle the layout for prefix/suffix elements.
+ */
+export default contextConnect( InputBase, 'InputBase' );

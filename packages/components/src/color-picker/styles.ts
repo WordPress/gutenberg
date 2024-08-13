@@ -14,29 +14,15 @@ import { boxSizingReset } from '../utils';
 import Button from '../button';
 import { Flex } from '../flex';
 import { HStack } from '../h-stack';
-import {
-	BackdropUI,
-	Container as InputControlContainer,
-} from '../input-control/styles/input-control-styles';
 import CONFIG from '../utils/config-values';
 
 export const NumberControlWrapper = styled( NumberControl )`
-	${ InputControlContainer } {
-		width: ${ space( 24 ) };
-	}
+	width: ${ space( 24 ) };
 `;
 
 export const SelectControl = styled( InnerSelectControl )`
 	margin-left: ${ space( -2 ) };
 	width: 5em;
-	/*
-	 * Remove border, but preserve focus styles
-	 * TODO: this override should be removed,
-	 * see https://github.com/WordPress/gutenberg/pull/50609
-	 */
-	select:not( :focus ) ~ ${ BackdropUI }${ BackdropUI }${ BackdropUI } {
-		border-color: transparent;
-	}
 `;
 
 export const RangeControl = styled( InnerRangeControl )`

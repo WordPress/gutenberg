@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { ref as valRef } from 'valtio';
-import { proxyMap } from 'valtio/utils';
-
-/**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { observableMap } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,8 +15,8 @@ import type {
 } from '../types';
 
 function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
-	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = proxyMap();
-	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = proxyMap();
+	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = observableMap();
+	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = observableMap();
 
 	const registerSlot: SlotFillBubblesVirtuallyContext[ 'registerSlot' ] = (
 		name,
@@ -30,14 +25,11 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 	) => {
 		const slot = slots.get( name );
 
-		slots.set(
-			name,
-			valRef( {
-				...slot,
-				ref: ref || slot?.ref,
-				fillProps: fillProps || slot?.fillProps || {},
-			} )
-		);
+		slots.set( name, {
+			...slot,
+			ref: ref || slot?.ref,
+			fillProps: fillProps || slot?.fillProps || {},
+		} );
 	};
 
 	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
@@ -74,7 +66,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 		name,
 		ref
 	) => {
-		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
+		fills.set( name, [ ...( fills.get( name ) || [] ), ref ] );
 	};
 
 	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
@@ -88,7 +80,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 
 		fills.set(
 			name,
-			valRef( fillsForName.filter( ( fillRef ) => fillRef !== ref ) )
+			fillsForName.filter( ( fillRef ) => fillRef !== ref )
 		);
 	};
 
@@ -106,7 +98,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 export default function SlotFillProvider( {
 	children,
 }: SlotFillProviderProps ) {
-	const registry = useMemo( createSlotRegistry, [] );
+	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>
 			{ children }

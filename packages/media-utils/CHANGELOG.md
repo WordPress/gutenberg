@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.49.0 (2024-05-16)
+
+## 4.48.0 (2024-05-02)
+
+## 4.47.0 (2024-04-19)
+
+## 4.46.0 (2024-04-03)
+
+## 4.45.0 (2024-03-21)
+
+## 4.44.0 (2024-03-06)
+
+## 4.43.0 (2024-02-21)
+
+## 4.42.0 (2024-02-09)
+
+## 4.41.0 (2024-01-24)
+
+## 4.40.0 (2024-01-10)
+
+## 4.39.0 (2023-12-13)
+
+## 4.38.0 (2023-11-29)
+
+## 4.37.0 (2023-11-16)
+
 ## 4.36.0 (2023-11-02)
 
 ## 4.35.0 (2023-10-18)
@@ -76,7 +118,7 @@
 
 ## 4.0.0 (2022-05-18)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `onError` now always receives the `message` as a string ([#39448](https://github.com/WordPress/gutenberg/pull/39448)).
 
@@ -94,7 +136,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 

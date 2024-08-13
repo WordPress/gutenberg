@@ -3,6 +3,7 @@
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Action that switches the canvas mode.
@@ -11,28 +12,71 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 export const setCanvasMode =
 	( mode ) =>
-	( { registry, dispatch, select } ) => {
-		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
-		dispatch( {
-			type: 'SET_CANVAS_MODE',
-			mode,
-		} );
-		// Check if the block list view should be open by default.
-		// If `distractionFree` mode is enabled, the block list view should not be open.
-		if (
-			mode === 'edit' &&
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-site', 'showListViewByDefault' ) &&
-			! registry
-				.select( preferencesStore )
-				.get( 'core/edit-site', 'distractionFree' )
-		) {
-			dispatch.setIsListViewOpened( true );
-		}
-		// Switch focus away from editing the template when switching to view mode.
-		if ( mode === 'view' && select.isPage() ) {
-			dispatch.setHasPageContentFocus( true );
+	( { registry, dispatch } ) => {
+		const isMediumOrBigger =
+			window.matchMedia( '(min-width: 782px)' ).matches;
+		const switchCanvasMode = () => {
+			registry.batch( () => {
+				registry.dispatch( blockEditorStore ).clearSelectedBlock();
+				registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableSetEditorMode( 'edit' );
+				const isPublishSidebarOpened = registry
+					.select( editorStore )
+					.isPublishSidebarOpened();
+				dispatch( {
+					type: 'SET_CANVAS_MODE',
+					mode,
+				} );
+				const isEditMode = mode === 'edit';
+				if ( isPublishSidebarOpened && ! isEditMode ) {
+					registry.dispatch( editorStore ).closePublishSidebar();
+				}
+
+				// Check if the block list view should be open by default.
+				// If `distractionFree` mode is enabled, the block list view should not be open.
+				// This behavior is disabled for small viewports.
+				if (
+					isMediumOrBigger &&
+					isEditMode &&
+					registry
+						.select( preferencesStore )
+						.get( 'core', 'showListViewByDefault' ) &&
+					! registry
+						.select( preferencesStore )
+						.get( 'core', 'distractionFree' )
+				) {
+					registry
+						.dispatch( editorStore )
+						.setIsListViewOpened( true );
+				} else {
+					registry
+						.dispatch( editorStore )
+						.setIsListViewOpened( false );
+				}
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+			} );
+		};
+
+		/*
+		 * Skip transition in mobile, otherwise it crashes the browser.
+		 * See: https://github.com/WordPress/gutenberg/pull/63002.
+		 */
+		if ( ! isMediumOrBigger || ! document.startViewTransition ) {
+			switchCanvasMode();
+		} else {
+			document.documentElement.classList.add(
+				`canvas-mode-${ mode }-transition`
+			);
+			const transition = document.startViewTransition( () =>
+				switchCanvasMode()
+			);
+			transition.finished.finally( () => {
+				document.documentElement.classList.remove(
+					`canvas-mode-${ mode }-transition`
+				);
+			} );
 		}
 	};
 
@@ -47,24 +91,5 @@ export const setEditorCanvasContainerView =
 		dispatch( {
 			type: 'SET_EDITOR_CANVAS_CONTAINER_VIEW',
 			view,
-		} );
-	};
-
-/**
- * Sets the type of page content focus. Can be one of:
- *
- * - `'disableTemplate'`: Disable the blocks belonging to the page's template.
- * - `'hideTemplate'`: Hide the blocks belonging to the page's template.
- *
- * @param {'disableTemplate'|'hideTemplate'} pageContentFocusType The type of page content focus.
- *
- * @return {Object} Action object.
- */
-export const setPageContentFocusType =
-	( pageContentFocusType ) =>
-	( { dispatch } ) => {
-		dispatch( {
-			type: 'SET_PAGE_CONTENT_FOCUS_TYPE',
-			pageContentFocusType,
 		} );
 	};

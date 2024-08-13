@@ -1,6 +1,7 @@
 export * from './amazon';
 export * from './bandcamp';
 export * from './behance';
+export * from './bluesky';
 export * from './chain';
 export * from './codepen';
 export * from './deviantart';
@@ -15,6 +16,7 @@ export * from './foursquare';
 export * from './goodreads';
 export * from './google';
 export * from './github';
+export * from './gravatar';
 export * from './instagram';
 export * from './lastfm';
 export * from './linkedin';

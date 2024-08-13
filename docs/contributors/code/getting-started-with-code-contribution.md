@@ -5,7 +5,7 @@ The following guide is for setting up your local environment to contribute to th
 ## Prerequisites
 
 -   Node.js
-    Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using Node.js v16, and npm v8. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
+    Gutenberg is a JavaScript project that requires [Node.js](https://nodejs.org/). The project is currently built using Node.js v20 and npm v10. Though best efforts are made to always use the Active LTS version of Node.js, this will not always be the case. For more details, please refer to the [Node.js release schedule](https://github.com/nodejs/Release#release-schedule).
 
 We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/getting-started/devenv/README.md#development-tools) or the Nodejs site for additional installation instructions.
 
@@ -16,7 +16,7 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
     We recommend using the [wp-env package](/packages/env/README.md) for setting WordPress environment locally. You'll need to install Docker to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/devenv/README.md).
     > Note: To install Docker on Windows 10 Home Edition, follow the [install instructions from Docker for Windows with WSL2](https://docs.docker.com/docker-for-windows/wsl/).
 
-As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/), or even use a remote server.
+As an alternative to Docker setup, you can use [Local](https://localwp.com/), [WampServer](https://wampserver.aviatechno.net/), or [MAMP](https://www.mamp.info/), or even use a remote server.
 
 -   GitHub CLI
     Although not a requirement, the [GitHub CLI](https://cli.github.com/) can be very useful in helping you checkout pull requests locally. Both from the Gutenberg repo and forked repos. This can be a major time saver while code reviewing and testing pull requests.
@@ -126,7 +126,7 @@ Port: {MYSQL_PORT_NUMBER}
 
 **Please note**: the MySQL port number will change each time `wp-env` restarts. If you find you can no longer access your database, simply repeat the steps above to find the new port number and restore your connection.
 
-**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://wordpress.org/documentation/article/creating-database-for-wordpress/).
+**Tip**: [Sequel Ace](https://sequel-ace.com/) is a useful GUI tool for accessing a MySQL database. Other tools are available and documented in this [article on accessing the WordPress database](https://developer.wordpress.org/advanced-administration/before-install/creating-database/).
 
 #### Troubleshooting
 
@@ -134,7 +134,7 @@ If you run into an issue, check the [troubleshooting section in `wp-env` documen
 
 ### Using Local or MAMP
 
-As an alternative to Docker and `wp-env`, you can also use [Local](https://localwp.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
+As an alternative to Docker and `wp-env`, you can also use [Local](https://localwp.com/), [WampServer](https://wampserver.aviatechno.net/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
 
 You will also need some extra configuration to be able to run the e2e tests.
 
@@ -183,7 +183,7 @@ If so, you need to instruct Apache to allow following such links:
 
 Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
 
-### On A Remote Server
+### On a remote server
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
@@ -203,7 +203,7 @@ You can launch Storybook by running `npm run storybook:dev` locally. It will ope
 
 You can also test Storybook for the current `trunk` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
-## Developer Tools
+## Developer tools
 
 We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
 

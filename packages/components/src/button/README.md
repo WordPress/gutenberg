@@ -4,12 +4,6 @@ Buttons let users take actions and make choices with a single click or tap.
 
 ![Button components](https://make.wordpress.org/design/files/2019/03/button.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -121,6 +115,17 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
+#### `accessibleWhenDisabled`: `boolean`
+
+Whether to keep the button focusable when disabled.
+
+In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or by preventing focus from returning to a trigger element.
+
+Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols) in the WAI-ARIA Authoring Practices Guide.
+
+-   Required: No
+-   Default: `false`
+
 #### `children`: `ReactNode`
 
 The button's children.
@@ -133,7 +138,7 @@ An optional additional class name to apply to the rendered button.
 
 -   Required: No
 
-#### `describedBy`: `string`
+#### `description`: `string`
 
 An accessible description for the button.
 
@@ -141,7 +146,9 @@ An accessible description for the button.
 
 #### `disabled`: `boolean`
 
-Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
+Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
+
+In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
 
 -   Required: No
 
@@ -182,6 +189,14 @@ Renders a red text-based button style to indicate destructive behavior.
 
 -   Required: No
 
+#### `isLink`: `boolean`
+
+Deprecated: Renders a button with an anchor style.
+Use `variant` prop with `link` value instead.
+
+-   Required: No
+-   Default: `false`
+
 #### `isPressed`: `boolean`
 
 Renders a pressed button style.
@@ -190,6 +205,22 @@ If the native `aria-pressed` attribute is also set, it will take precedence.
 
 -   Required: No
 
+#### `isPrimary`: `boolean`
+
+Deprecated: Renders a primary button style.
+Use `variant` prop with `primary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `isSecondary`: `boolean`
+
+Deprecated: Renders a default button style.
+Use `variant` prop with `secondary` value instead.
+
+-   Required: No
+-   Default: `false`
+
 #### `isSmall`: `boolean`
 
 Decreases the size of the button.
@@ -197,6 +228,14 @@ Decreases the size of the button.
 Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
 
 -   Required: No
+
+#### `isTertiary`: `boolean`
+
+Deprecated: Renders a text-based button style.
+Use `variant` prop with `tertiary` value instead.
+
+-   Required: No
+-   Default: `false`
 
 #### `label`: `string`
 

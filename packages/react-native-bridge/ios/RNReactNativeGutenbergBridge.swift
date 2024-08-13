@@ -306,43 +306,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 	}
 
     @objc
-    func requestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)
-        }
-    }
-
-    @objc
-    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles)
-        }
-    }
-
-    @objc
-    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
-        }
-    }
-
-    @objc
-    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
-        }
-    }
-
-    @objc
-    func mediaSaveSync() {
-        DispatchQueue.main.async {
-            if self.hasObservers {
-                self.delegate?.gutenbergDidRequestMediaSaveSync()
-            }
-        }
-	}
-
-    @objc
     func requestFocalPointPickerTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
         callback([self.delegate?.gutenbergDidRequestFocalPointPickerTooltipShown() ?? false])
     }
@@ -350,15 +313,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func setFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
         self.delegate?.gutenbergDidRequestSetFocalPointPickerTooltipShown(tooltipShown)
-    }
-
-    @objc
-    func mediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
-        DispatchQueue.main.async {
-            if self.hasObservers {
-                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync(mediaFiles, clientId: clientId)
-            }
-        }
     }
 
     @objc
@@ -421,6 +375,23 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func toggleRedoButton(_ isDisabled: Bool) {
         self.delegate?.gutenbergDidRequestToggleRedoButton(isDisabled)
     }
+    
+    @objc
+    func requestConnectionStatus(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestConnectionStatus() ?? true])
+    }
+
+    @objc
+    func logException(_ rawException: [AnyHashable: Any], callback: @escaping RCTResponseSenderBlock) {
+        guard let exception = GutenbergJSException(from: rawException) else {
+            callback([false])
+            return
+        }
+    
+        self.delegate?.gutenbergDidRequestLogException(exception) {
+            callback([true])
+        }
+    }
 }
 
 // MARK: - RCTBridgeModule delegate
@@ -450,6 +421,8 @@ extension RNReactNativeGutenbergBridge {
         case showEditorHelp
         case onUndoPressed
         case onRedoPressed
+        case connectionStatusChange
+        case onContentUpdate
     }
 
     public override func supportedEvents() -> [String]! {

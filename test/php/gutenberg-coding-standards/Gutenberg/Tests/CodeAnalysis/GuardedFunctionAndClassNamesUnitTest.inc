@@ -24,3 +24,19 @@ if ( ! function_exists( 'quux' ) ) {
 
 function blarg() {
 }
+
+class Gutenberg_Class {
+
+}
+
+class Class_Gutenberg {
+}
+
+class Class_Gutenberg_With_Some_Postifx {
+}
+
+function gutenberg_function() {
+}
+
+function _gutenberg_function() {
+}

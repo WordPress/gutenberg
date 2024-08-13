@@ -53,7 +53,8 @@ async function isGlobalInserterOpen() {
 				'.edit-site-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Add block"].is-pressed,' +
-				'.edit-site-header-edit-mode__inserter-toggle.is-pressed'
+				'.edit-site-header-edit-mode__inserter-toggle.is-pressed,' +
+				'.editor-header [aria-label="Toggle block inserter"].is-pressed'
 		);
 	} );
 }
@@ -64,7 +65,8 @@ export async function toggleGlobalBlockInserter() {
 	// "Add block" selector is required to make sure performance comparison
 	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"],' +
+		'.editor-document-tools__inserter-toggle,' +
+			'.edit-post-header [aria-label="Add block"],' +
 			'.edit-site-header [aria-label="Add block"],' +
 			'.edit-post-header [aria-label="Toggle block inserter"],' +
 			'.edit-site-header [aria-label="Toggle block inserter"],' +
@@ -86,7 +88,10 @@ export async function selectGlobalInserterTab( label ) {
 	}
 
 	const activeTab = await page.waitForSelector(
-		'.block-editor-inserter__tabs button.is-active'
+		// Targeting a class name is necessary here, because there are likely
+		// two implementations of the `Tabs` component visible to this test, and
+		// we want to confirm that it's waiting for the correct one.
+		'.block-editor-inserter__tabs [role="tab"][aria-selected="true"]'
 	);
 
 	const activeTabLabel = await page.evaluate(

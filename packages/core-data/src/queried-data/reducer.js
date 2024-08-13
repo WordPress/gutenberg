@@ -56,10 +56,10 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 
 	for ( let i = 0; i < size; i++ ) {
 		// Preserve existing item ID except for subset of range of next items.
+		// We need to check against the possible maximum upper boundary because
+		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
-			i >= nextItemIdsStartIndex &&
-			i < nextItemIdsStartIndex + nextItemIds.length;
-
+			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
 		mergedItemIds[ i ] = isInNextItemsRange
 			? nextItemIds[ i - nextItemIdsStartIndex ]
 			: itemIds?.[ i ];
@@ -110,7 +110,8 @@ export function items( state = {}, action ) {
 				[ context ]: {
 					...state[ context ],
 					...action.items.reduce( ( accumulator, value ) => {
-						const itemId = value[ key ];
+						const itemId = value?.[ key ];
+
 						accumulator[ itemId ] = conservativeMapItem(
 							state?.[ context ]?.[ itemId ],
 							value
@@ -164,7 +165,7 @@ export function itemIsComplete( state = {}, action ) {
 				[ context ]: {
 					...state[ context ],
 					...action.items.reduce( ( result, item ) => {
-						const itemId = item[ key ];
+						const itemId = item?.[ key ];
 
 						// Defer to completeness if already assigned. Technically the
 						// data may be outdated if receiving items for a field subset.
@@ -232,7 +233,7 @@ const receiveQueries = compose( [
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
-			action.items.map( ( item ) => item[ key ] ),
+			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
 			page,
 			perPage
 		),

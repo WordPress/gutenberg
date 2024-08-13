@@ -172,7 +172,7 @@ Note that instead of using an `input` tag, we took advantage of the [SearchContr
 
 ![](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/how-to-guides/data-basics/media/list-of-pages/filter-field.jpg)
 
-The field starts empty, and the contents are stored in the `searchTerm` state value. If you aren’t familiar with the [useState](https://reactjs.org/docs/hooks-state.html) hook, you can learn more in [React’s documentation](https://reactjs.org/docs/hooks-state.html).
+The field starts empty, and the contents are stored in the `searchTerm` state value. If you aren’t familiar with the [useState](https://react.dev/reference/react/useState) hook, you can learn more in [React’s documentation](https://react.dev/reference/react/useState).
 
 We can now request only the pages matching the `searchTerm`.
 
@@ -446,4 +446,4 @@ All that’s left is to refresh the page and enjoy the brand new status indicato
 
 * **Previous part:** [Setup](/docs/how-to-guides/data-basics/1-data-basics-setup.md)
 * **Next part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

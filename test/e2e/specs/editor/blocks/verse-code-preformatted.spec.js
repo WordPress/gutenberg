@@ -43,7 +43,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 				{
 					name: blockName,
 					attributes: {
-						content: 'a\n\nb',
+						content: 'a<br><br>b',
 					},
 				},
 			] );

@@ -1,0 +1,31 @@
+.thanks {
+	padding: 8rem 0;
+	background: rgb(236, 246, 250);
+	color: #000;
+}
+
+[data-theme="dark"] .thanks a {
+	color: var(--ifm-color-secondary);
+}
+
+.container {
+	max-width: 1000px;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.title {
+	font-weight: 400;
+	font-size: 60px;
+}
+
+.description {
+	font-size: 20px;
+}
+
+.columns {
+	display: grid;
+	gap: 4rem;
+	grid-template-columns: 1fr 1fr;
+}

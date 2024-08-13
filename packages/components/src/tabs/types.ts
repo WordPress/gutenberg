@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
-
-/**
- * Internal dependencies
- */
-import type { IconType } from '../icon';
 
 export type TabsContextProps =
 	| {
@@ -48,7 +42,7 @@ export type TabsProps = {
 	 * Note: this prop will be overridden by the `selectedTabId` prop if it is
 	 * provided. (Controlled Mode)
 	 */
-	initialTabId?: string;
+	defaultTabId?: string;
 	/**
 	 * The function called when a tab has been selected.
 	 * It is passed the id of the newly selected tab as an argument.
@@ -78,37 +72,19 @@ export type TabListProps = {
 	 * The children elements, which should be a series of `Tabs.TabPanel` components.
 	 */
 	children?: React.ReactNode;
-	/**
-	 * The class name to apply to the tablist.
-	 */
-	className?: string;
-	/**
-	 * Custom CSS styles for the rendered tablist.
-	 */
-	style?: React.CSSProperties;
 };
 
 export type TabProps = {
 	/**
 	 * The id of the tab, which is prepended with the `Tabs` instanceId.
+	 * The value of this prop should match with the value of the `tabId` prop on
+	 * the corresponding `Tabs.TabPanel` component.
 	 */
-	id: string;
-	/**
-	 * Custom CSS styles for the tab.
-	 */
-	style?: React.CSSProperties;
+	tabId: string;
 	/**
 	 * The children elements, generally the text to display on the tab.
 	 */
 	children?: React.ReactNode;
-	/**
-	 * The class name to apply to the tab button.
-	 */
-	className?: string;
-	/**
-	 * The icon used for the tab button.
-	 */
-	icon?: IconType;
 	/**
 	 * Determines if the tab button should be disabled.
 	 *
@@ -128,15 +104,18 @@ export type TabPanelProps = {
 	 */
 	children?: React.ReactNode;
 	/**
-	 * A unique identifier for the TabPanel, which is used to generate a unique `id` for the underlying element.
+	 * A unique identifier for the tabpanel, which is used to generate an
+	 * instanced id for the underlying element.
+	 * The value of this prop should match with the value of the `tabId` prop on
+	 * the corresponding `Tabs.Tab` component.
 	 */
-	id: string;
+	tabId: string;
 	/**
-	 * The class name to apply to the tabpanel.
+	 * Determines whether or not the tabpanel element should be focusable.
+	 * If `false`, pressing the tab key will skip over the tabpanel, and instead
+	 * focus on the first focusable element in the panel (if there is one).
+	 *
+	 * @default true
 	 */
-	className?: string;
-	/**
-	 * Custom CSS styles for the rendered `TabPanel` component.
-	 */
-	style?: React.CSSProperties;
+	focusable?: boolean;
 };

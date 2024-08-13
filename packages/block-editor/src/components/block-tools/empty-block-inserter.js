@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
-import BlockPopover from '../block-popover';
+import BlockPopoverCover from '../block-popover/cover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import Inserter from '../inserter';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
@@ -28,19 +28,16 @@ export default function EmptyBlockInserter( {
 	} );
 
 	return (
-		<BlockPopover
+		<BlockPopoverCover
 			clientId={ capturingClientId || clientId }
-			__unstableCoverTarget
 			bottomClientId={ lastClientId }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-block-list__block-side-inserter-popover',
 				{
 					'is-insertion-point-visible': isInsertionPointVisible,
 				}
 			) }
 			__unstableContentRef={ __unstableContentRef }
-			resize={ false }
-			shift={ false }
 			{ ...popoverProps }
 		>
 			<div className="block-editor-block-list__empty-block-inserter">
@@ -51,6 +48,6 @@ export default function EmptyBlockInserter( {
 					__experimentalIsQuick
 				/>
 			</div>
-		</BlockPopover>
+		</BlockPopoverCover>
 	);
 }

@@ -1,36 +1,18 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { Flex } from '../../flex';
 import { COLORS } from '../../utils';
 import { space } from '../../utils/space';
 import { Text } from '../../text';
 import CONFIG from '../../utils/config-values';
 
-import type { AnglePickerControlProps } from '../types';
-
 const CIRCLE_SIZE = 32;
 const INNER_CIRCLE_SIZE = 6;
-
-const deprecatedBottomMargin = ( {
-	__nextHasNoMarginBottom,
-}: Pick< AnglePickerControlProps, '__nextHasNoMarginBottom' > ) => {
-	return ! __nextHasNoMarginBottom
-		? css`
-				margin-bottom: ${ space( 2 ) };
-		  `
-		: '';
-};
-
-export const Root = styled( Flex )`
-	${ deprecatedBottomMargin }
-`;
 
 export const CircleRoot = styled.div`
 	border-radius: 50%;

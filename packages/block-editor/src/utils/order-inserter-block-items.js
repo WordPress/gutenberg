@@ -17,8 +17,12 @@ export const orderInserterBlockItems = ( items, priority ) => {
 		let aIndex = priority.indexOf( aName );
 		let bIndex = priority.indexOf( bName );
 		// All other block items should come after that.
-		if ( aIndex < 0 ) aIndex = priority.length;
-		if ( bIndex < 0 ) bIndex = priority.length;
+		if ( aIndex < 0 ) {
+			aIndex = priority.length;
+		}
+		if ( bIndex < 0 ) {
+			bIndex = priority.length;
+		}
 		return aIndex - bIndex;
 	} );
 

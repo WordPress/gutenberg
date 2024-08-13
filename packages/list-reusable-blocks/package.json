@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/list-reusable-blocks",
-	"version": "4.22.0",
+	"version": "5.5.0",
 	"description": "Adding Export/Import support to the reusable blocks listing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,13 +20,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",

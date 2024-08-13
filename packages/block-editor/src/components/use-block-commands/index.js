@@ -26,41 +26,56 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
 export const useTransformCommands = () => {
-	const { clientIds } = useSelect( ( select ) => {
-		const { getSelectedBlockClientIds } = select( blockEditorStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
+	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
+	const {
+		blocks,
+		clientIds,
+		canRemove,
+		possibleBlockTransformations,
+		invalidSelection,
+	} = useSelect( ( select ) => {
+		const {
+			getBlockRootClientId,
+			getBlockTransformItems,
+			getSelectedBlockClientIds,
+			getBlocksByClientId,
+			canRemoveBlocks,
+		} = select( blockEditorStore );
 
+		const selectedBlockClientIds = getSelectedBlockClientIds();
+		const selectedBlocks = getBlocksByClientId( selectedBlockClientIds );
+
+		// selectedBlocks can have `null`s when something tries to call `selectBlock` with an inexistent clientId.
+		// These nulls will cause fatal errors down the line.
+		// In order to prevent discrepancies between selectedBlockClientIds and selectedBlocks, we effectively treat the entire selection as invalid.
+		// @see https://github.com/WordPress/gutenberg/pull/59410#issuecomment-2006304536
+		if ( selectedBlocks.filter( ( block ) => ! block ).length > 0 ) {
+			return {
+				invalidSelection: true,
+			};
+		}
+
+		const rootClientId = getBlockRootClientId(
+			selectedBlockClientIds[ 0 ]
+		);
 		return {
+			blocks: selectedBlocks,
 			clientIds: selectedBlockClientIds,
+			possibleBlockTransformations: getBlockTransformItems(
+				selectedBlocks,
+				rootClientId
+			),
+			canRemove: canRemoveBlocks( selectedBlockClientIds ),
+			invalidSelection: false,
 		};
 	}, [] );
-	const blocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlocksByClientId( clientIds ),
-		[ clientIds ]
-	);
-	const { replaceBlocks, multiSelect } = useDispatch( blockEditorStore );
-	const { possibleBlockTransformations, canRemove } = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockTransformItems,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
-			const rootClientId = getBlockRootClientId(
-				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
-			);
-			return {
-				possibleBlockTransformations: getBlockTransformItems(
-					blocks,
-					rootClientId
-				),
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
-			};
-		},
-		[ clientIds, blocks ]
-	);
 
+	if ( invalidSelection ) {
+		return {
+			isLoading: false,
+			commands: [],
+		};
+	}
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
 	function selectForMultipleBlocks( insertedBlocks ) {
@@ -135,8 +150,7 @@ const useActionsCommands = () => {
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 
 	const canMove =
-		canMoveBlocks( clientIds, rootClientId ) &&
-		getBlockCount( rootClientId ) !== 1;
+		canMoveBlocks( clientIds ) && getBlockCount( rootClientId ) !== 1;
 
 	const commands = [];
 
@@ -245,7 +259,7 @@ const useQuickActionsCommands = () => {
 			canInsertBlockType( block.name, rootClientId )
 		);
 	} );
-	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+	const canRemove = canRemoveBlocks( clientIds );
 
 	const commands = [];
 

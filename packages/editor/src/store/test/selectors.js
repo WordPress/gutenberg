@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -122,6 +127,10 @@ selectorNames.forEach( ( name ) => {
 					},
 				};
 			},
+
+			getBlocks() {
+				return state.getBlocks && state.getBlocks();
+			},
 		} );
 
 		selectorNames.forEach( ( otherName ) => {
@@ -183,6 +192,9 @@ const {
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
 	__experimentalGetDefaultTemplatePartAreas,
+	isEditorPanelRemoved,
+	isInserterOpened,
+	isListViewOpened,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -2155,16 +2167,9 @@ describe( 'selectors', () => {
 	describe( 'getSuggestedPostFormat', () => {
 		it( 'returns null if cannot be determined', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [],
-						},
-						edits: {},
-					},
+				getBlocks() {
+					return [];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2172,77 +2177,56 @@ describe( 'selectors', () => {
 
 		it( 'return null if only one block of type `core/embed` and provider not matched', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'instagram',
-									},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'instagram',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'return null if only one block of type `core/embed` and provider not exists', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
 		} );
 
 		it( 'returns null if there is more than one block in the post', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 123,
-									name: 'core/image',
-									attributes: {},
-									innerBlocks: [],
-								},
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 123,
+							name: 'core/image',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
+						},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2250,23 +2234,16 @@ describe( 'selectors', () => {
 
 		it( 'returns Image if the first block is of type `core/image`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 123,
-									name: 'core/image',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 123,
+							name: 'core/image',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'image' );
@@ -2274,23 +2251,16 @@ describe( 'selectors', () => {
 
 		it( 'returns Quote if the first block is of type `core/quote`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2298,25 +2268,18 @@ describe( 'selectors', () => {
 
 		it( 'returns Video if the first block is of type `core/embed from youtube`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'youtube',
-									},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'youtube',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
@@ -2324,25 +2287,18 @@ describe( 'selectors', () => {
 
 		it( 'returns Audio if the first block is of type `core/embed from soundcloud`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 567,
-									name: 'core/embed',
-									attributes: {
-										providerNameSlug: 'soundcloud',
-									},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 567,
+							name: 'core/embed',
+							attributes: {
+								providerNameSlug: 'soundcloud',
+							},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'audio' );
@@ -2350,29 +2306,22 @@ describe( 'selectors', () => {
 
 		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
 			const state = {
-				editor: {
-					present: {
-						blocks: {
-							value: [
-								{
-									clientId: 456,
-									name: 'core/quote',
-									attributes: {},
-									innerBlocks: [],
-								},
-								{
-									clientId: 789,
-									name: 'core/paragraph',
-									attributes: {},
-									innerBlocks: [],
-								},
-							],
+				getBlocks() {
+					return [
+						{
+							clientId: 456,
+							name: 'core/quote',
+							attributes: {},
+							innerBlocks: [],
 						},
-						edits: {},
-					},
+						{
+							clientId: 789,
+							name: 'core/paragraph',
+							attributes: {},
+							innerBlocks: [],
+						},
+					];
 				},
-				initialEdits: {},
-				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -3067,6 +3016,47 @@ describe( 'selectors', () => {
 			postTypes.forEach( ( state ) =>
 				expect( getPostTypeLabel( state ) ).toBeUndefined()
 			);
+		} );
+	} );
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				removedPanels: [],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				removedPanels: [ 'post-status' ],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

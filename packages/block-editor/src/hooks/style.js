@@ -1,27 +1,21 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useContext, useMemo, createPortal } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
  */
-import BlockList from '../components/block-list';
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
-import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
+import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
 	TypographyPanel,
@@ -33,8 +27,11 @@ import {
 	SPACING_SUPPORT_KEY,
 	DimensionsPanel,
 } from './dimensions';
-import useDisplayBlockControls from '../components/use-display-block-controls';
-import { shouldSkipSerialization } from './utils';
+import {
+	shouldSkipSerialization,
+	useStyleOverride,
+	useBlockSettings,
+} from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -45,6 +42,7 @@ const styleSupportKeys = [
 	DIMENSIONS_SUPPORT_KEY,
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
+	SHADOW_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType ) =>
@@ -113,6 +111,9 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
+	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		SHADOW_SUPPORT_KEY,
+	],
 };
 
 /**
@@ -129,10 +130,14 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: [
+		`${ DIMENSIONS_SUPPORT_KEY }.aspectRatio`,
+	], // Skip serialization of aspect ratio in save mode.
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
 const skipSerializationPathsSaveChecks = {
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
 
@@ -272,20 +277,20 @@ export function omitStyle( style, paths, preserveReference = false ) {
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object}                    props      Additional props applied to save element.
- * @param {Object}                    blockType  Block type.
- * @param {Object}                    attributes Block attributes.
- * @param {?Record<string, string[]>} skipPaths  An object of keys and paths to skip serialization.
+ * @param {Object}                    props           Additional props applied to save element.
+ * @param {Object|string}             blockNameOrType Block type.
+ * @param {Object}                    attributes      Block attributes.
+ * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
  *
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
 	props,
-	blockType,
+	blockNameOrType,
 	attributes,
 	skipPaths = skipSerializationPathsSave
 ) {
-	if ( ! hasStyleSupport( blockType ) ) {
+	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
 	}
 
@@ -293,7 +298,7 @@ export function addSaveProps(
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
 		const skipSerialization =
 			skipSerializationPathsSaveChecks[ indicator ] ||
-			getBlockSupport( blockType, indicator );
+			getBlockSupport( blockNameOrType, indicator );
 
 		if ( skipSerialization === true ) {
 			style = omitStyle( style, path );
@@ -315,71 +320,49 @@ export function addSaveProps(
 	return props;
 }
 
-/**
- * Filters registered block settings to extend the block edit wrapper
- * to apply the desired styles and classnames properly.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object}.Filtered block settings.
- */
-export function addEditProps( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-
-		return addSaveProps(
-			props,
-			settings,
-			attributes,
-			skipSerializationPathsEdit
-		);
+function BlockStyleControls( {
+	clientId,
+	name,
+	setAttributes,
+	__unstableParentLayout,
+} ) {
+	const settings = useBlockSettings( name, __unstableParentLayout );
+	const blockEditingMode = useBlockEditingMode();
+	const passedProps = {
+		clientId,
+		name,
+		setAttributes,
+		settings: {
+			...settings,
+			typography: {
+				...settings.typography,
+				// The text alignment UI for individual blocks is rendered in
+				// the block toolbar, so disable it here.
+				textAlign: false,
+			},
+		},
 	};
-
-	return settings;
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+	return (
+		<>
+			<ColorEdit { ...passedProps } />
+			<BackgroundImagePanel { ...passedProps } />
+			<TypographyPanel { ...passedProps } />
+			<BorderPanel { ...passedProps } />
+			<DimensionsPanel { ...passedProps } />
+		</>
+	);
 }
 
-/**
- * Override the default edit UI to include new inspector controls for
- * all the custom styles configs.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-export const withBlockStyleControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		if ( ! hasStyleSupport( props.name ) ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-
-		const shouldDisplayControls = useDisplayBlockControls();
-		const blockEditingMode = useBlockEditingMode();
-
-		return (
-			<>
-				{ shouldDisplayControls && blockEditingMode === 'default' && (
-					<>
-						<ColorEdit { ...props } />
-						<BackgroundImagePanel { ...props } />
-						<TypographyPanel { ...props } />
-						<BorderPanel { ...props } />
-						<DimensionsPanel { ...props } />
-					</>
-				) }
-				<BlockEdit key="edit" { ...props } />
-			</>
-		);
-	},
-	'withBlockStyleControls'
-);
+export default {
+	edit: BlockStyleControls,
+	hasSupport: hasStyleSupport,
+	addSaveProps,
+	attributeKeys: [ 'style' ],
+	useBlockProps,
+};
 
 // Defines which element types are supported, including their hover styles or
 // any other elements that have been included under a single element type
@@ -393,155 +376,99 @@ const elementTypes = [
 	},
 ];
 
-/**
- * Override the default block element to include elements styles.
- *
- * @param {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
- */
-const withElementsStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
-			BlockListBlock
-		) }`;
+function useBlockProps( { name, style } ) {
+	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
+		useBlockProps
+	) }`;
 
-		// The .editor-styles-wrapper selector is required on elements styles. As it is
-		// added to all other editor styles, not providing it causes reset and global
-		// styles to override element styles because of higher specificity.
-		const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
-		const blockElementStyles = props.attributes.style?.elements;
+	// The .editor-styles-wrapper selector is required on elements styles. As it is
+	// added to all other editor styles, not providing it causes reset and global
+	// styles to override element styles because of higher specificity.
+	const baseElementSelector = `.editor-styles-wrapper .${ blockElementsContainerIdentifier }`;
+	const blockElementStyles = style?.elements;
 
-		const styles = useMemo( () => {
-			if ( ! blockElementStyles ) {
+	const styles = useMemo( () => {
+		if ( ! blockElementStyles ) {
+			return;
+		}
+
+		const elementCSSRules = [];
+
+		elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+			const skipSerialization = shouldSkipSerialization(
+				name,
+				COLOR_SUPPORT_KEY,
+				elementType
+			);
+
+			if ( skipSerialization ) {
 				return;
 			}
 
-			const elementCSSRules = [];
+			const elementStyles = blockElementStyles?.[ elementType ];
 
-			elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
-				const skipSerialization = shouldSkipSerialization(
-					props.name,
-					COLOR_SUPPORT_KEY,
-					elementType
+			// Process primary element type styles.
+			if ( elementStyles ) {
+				const selector = scopeSelector(
+					baseElementSelector,
+					ELEMENTS[ elementType ]
 				);
 
-				if ( skipSerialization ) {
-					return;
-				}
+				elementCSSRules.push(
+					compileCSS( elementStyles, { selector } )
+				);
 
-				const elementStyles = blockElementStyles?.[ elementType ];
-
-				// Process primary element type styles.
-				if ( elementStyles ) {
-					const selector = scopeSelector(
-						baseElementSelector,
-						ELEMENTS[ elementType ]
-					);
-
-					elementCSSRules.push(
-						compileCSS( elementStyles, { selector } )
-					);
-
-					// Process any interactive states for the element type.
-					if ( pseudo ) {
-						pseudo.forEach( ( pseudoSelector ) => {
-							if ( elementStyles[ pseudoSelector ] ) {
-								elementCSSRules.push(
-									compileCSS(
-										elementStyles[ pseudoSelector ],
-										{
-											selector: scopeSelector(
-												baseElementSelector,
-												`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
-											),
-										}
-									)
-								);
-							}
-						} );
-					}
-				}
-
-				// Process related elements e.g. h1-h6 for headings
-				if ( elements ) {
-					elements.forEach( ( element ) => {
-						if ( blockElementStyles[ element ] ) {
+				// Process any interactive states for the element type.
+				if ( pseudo ) {
+					pseudo.forEach( ( pseudoSelector ) => {
+						if ( elementStyles[ pseudoSelector ] ) {
 							elementCSSRules.push(
-								compileCSS( blockElementStyles[ element ], {
+								compileCSS( elementStyles[ pseudoSelector ], {
 									selector: scopeSelector(
 										baseElementSelector,
-										ELEMENTS[ element ]
+										`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
 									),
 								} )
 							);
 						}
 					} );
 				}
-			} );
+			}
 
-			return elementCSSRules.length > 0
-				? elementCSSRules.join( '' )
-				: undefined;
-		}, [ baseElementSelector, blockElementStyles, props.name ] );
-
-		const element = useContext( BlockList.__unstableElementContext );
-
-		return (
-			<>
-				{ styles &&
-					element &&
-					createPortal(
-						<style
-							dangerouslySetInnerHTML={ {
-								__html: styles,
-							} }
-						/>,
-						element
-					) }
-
-				<BlockListBlock
-					{ ...props }
-					className={
-						props.attributes.style?.elements
-							? classnames(
-									props.className,
-									blockElementsContainerIdentifier
-							  )
-							: props.className
+			// Process related elements e.g. h1-h6 for headings
+			if ( elements ) {
+				elements.forEach( ( element ) => {
+					if ( blockElementStyles[ element ] ) {
+						elementCSSRules.push(
+							compileCSS( blockElementStyles[ element ], {
+								selector: scopeSelector(
+									baseElementSelector,
+									ELEMENTS[ element ]
+								),
+							} )
+						);
 					}
-				/>
-			</>
-		);
-	},
-	'withElementsStyles'
-);
+				} );
+			}
+		} );
+
+		return elementCSSRules.length > 0
+			? elementCSSRules.join( '' )
+			: undefined;
+	}, [ baseElementSelector, blockElementStyles, name ] );
+
+	useStyleOverride( { css: styles } );
+
+	return addSaveProps(
+		{ className: blockElementsContainerIdentifier },
+		name,
+		{ style },
+		skipSerializationPathsEdit
+	);
+}
 
 addFilter(
 	'blocks.registerBlockType',
 	'core/style/addAttribute',
 	addAttribute
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/style/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/style/addEditProps',
-	addEditProps
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/style/with-block-controls',
-	withBlockStyleControls
-);
-
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/with-elements-styles',
-	withElementsStyles
 );

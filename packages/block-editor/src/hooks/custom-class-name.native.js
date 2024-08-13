@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 		hasBlockSupport( blockType, 'customClassName', true ) &&
 		attributes.className
 	) {
-		extraProps.className = classnames(
+		extraProps.className = clsx(
 			extraProps.className,
 			attributes.className
 		);
@@ -60,8 +60,11 @@ addFilter(
 	'core/custom-class-name/attribute',
 	addAttribute
 );
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/custom-class-name/save-props',
-	addSaveProps
-);
+
+export default {
+	addSaveProps,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
+	},
+};

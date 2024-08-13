@@ -29,7 +29,9 @@ export function rgba( hexValue = '', alpha = 1 ) {
  * @return {HTMLDivElement | undefined} The HTML element for color computation.
  */
 function getColorComputationNode() {
-	if ( typeof document === 'undefined' ) return;
+	if ( typeof document === 'undefined' ) {
+		return;
+	}
 
 	if ( ! colorComputationNode ) {
 		// Create a temporary element for style computation.
@@ -49,7 +51,9 @@ function getColorComputationNode() {
  * @return {boolean} Whether the value is a valid color.
  */
 function isColor( value ) {
-	if ( typeof value !== 'string' ) return false;
+	if ( typeof value !== 'string' ) {
+		return false;
+	}
 	const test = colord( value );
 
 	return test.isValid();
@@ -64,16 +68,26 @@ function isColor( value ) {
  * @return {string} The computed background color.
  */
 function _getComputedBackgroundColor( backgroundColor ) {
-	if ( typeof backgroundColor !== 'string' ) return '';
+	if ( typeof backgroundColor !== 'string' ) {
+		return '';
+	}
 
-	if ( isColor( backgroundColor ) ) return backgroundColor;
+	if ( isColor( backgroundColor ) ) {
+		return backgroundColor;
+	}
 
-	if ( ! backgroundColor.includes( 'var(' ) ) return '';
-	if ( typeof document === 'undefined' ) return '';
+	if ( ! backgroundColor.includes( 'var(' ) ) {
+		return '';
+	}
+	if ( typeof document === 'undefined' ) {
+		return '';
+	}
 
 	// Attempts to gracefully handle CSS variables color values.
 	const el = getColorComputationNode();
-	if ( ! el ) return '';
+	if ( ! el ) {
+		return '';
+	}
 
 	el.style.background = backgroundColor;
 	// Grab the style.

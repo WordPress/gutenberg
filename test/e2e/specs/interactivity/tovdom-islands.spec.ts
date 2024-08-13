@@ -23,10 +23,17 @@ test.describe( 'toVdom - islands', () => {
 		await expect( el ).toBeVisible();
 	} );
 
-	test( 'directives that are inside islands should be hydrated', async ( {
+	test( 'directives that are inside islands with json objects should be hydrated', async ( {
 		page,
 	} ) => {
-		const el = page.getByTestId( 'inside an island' );
+		const el = page.getByTestId( 'inside an island with json object' );
+		await expect( el ).toBeHidden();
+	} );
+
+	test( 'directives that are inside islands with strings should be hydrated', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'inside an island with string' );
 		await expect( el ).toBeHidden();
 	} );
 
@@ -44,7 +51,7 @@ test.describe( 'toVdom - islands', () => {
 	} ) => {
 		const el = page.getByTestId( 'island inside another island' );
 		const templates = el.locator( 'template' );
-		expect( await templates.count() ).toEqual( 1 );
+		await expect( templates ).toHaveCount( 1 );
 	} );
 
 	test( 'islands inside inner blocks of isolated islands should be hydrated', async ( {
@@ -53,6 +60,13 @@ test.describe( 'toVdom - islands', () => {
 		const el = page.getByTestId(
 			'island inside inner block of isolated island'
 		);
+		await expect( el ).toBeHidden();
+	} );
+
+	test( 'islands should recover their namespace if an inner island has changed it', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'directive after different namespace' );
 		await expect( el ).toBeHidden();
 	} );
 } );

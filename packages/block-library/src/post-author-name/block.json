@@ -20,6 +20,9 @@
 		}
 	},
 	"usesContext": [ "postType", "postId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"spacing": {
@@ -47,6 +50,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

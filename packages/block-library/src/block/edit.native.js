@@ -27,8 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,
@@ -78,7 +78,7 @@ export default function ReusableBlockEdit( {
 		styles.spinnerDark
 	);
 
-	const { hasResolved, isEditing, isMissing, innerBlockCount } = useSelect(
+	const { hasResolved, isEditing, isMissing } = useSelect(
 		( select ) => {
 			const persistedBlock = select( coreStore ).getEntityRecord(
 				'postType',
@@ -176,20 +176,12 @@ export default function ReusableBlockEdit( {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ innerBlockCount > 1
-							? __(
-									'Alternatively, you can detach and edit these blocks separately by tapping “Detach patterns”.'
-							  )
-							: __(
-									'Alternatively, you can detach and edit this block separately by tapping “Detach pattern”.'
-							  ) }
+						{ __(
+							'Alternatively, you can detach and edit this block separately by tapping “Detach”.'
+						) }
 					</Text>
 					<TextControl
-						label={
-							innerBlockCount > 1
-								? __( 'Detach patterns' )
-								: __( 'Detach pattern' )
-						}
+						label={ __( 'Detach' ) }
 						separatorType="topFullWidth"
 						onPress={ onConvertToRegularBlocks }
 						labelStyle={ actionButtonStyle }
@@ -240,7 +232,7 @@ export default function ReusableBlockEdit( {
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 				onPress={ openSheet }
 			>

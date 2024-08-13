@@ -1,7 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { Platform } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { createBlock, findTransform } from '../factory';
+import parse from '../parser';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';
 
@@ -28,6 +34,13 @@ export function htmlToBlocks( html, handler ) {
 		);
 
 		if ( ! rawTransform ) {
+			// Until the HTML block is supported in the native version, we'll parse it
+			// instead of creating the block to generate it as an unsupported block.
+			if ( Platform.isNative ) {
+				return parse(
+					`<!-- wp:html -->${ node.outerHTML }<!-- /wp:html -->`
+				);
+			}
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
@@ -38,7 +51,11 @@ export function htmlToBlocks( html, handler ) {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
-			return transform( node, handler );
+			const block = transform( node, handler );
+			if ( node.hasAttribute( 'class' ) ) {
+				block.attributes.className = node.getAttribute( 'class' );
+			}
+			return block;
 		}
 
 		return createBlock(

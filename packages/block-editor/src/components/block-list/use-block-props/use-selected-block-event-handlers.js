@@ -19,14 +19,10 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( clientId ) {
-	const isSelected = useSelect(
-		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
-		[ clientId ]
-	);
+export function useEventHandlers( { clientId, isSelected } ) {
 	const { getBlockRootClientId, getBlockIndex } =
 		useSelect( blockEditorStore );
-	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
+	const { insertAfterBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -61,11 +57,7 @@ export function useEventHandlers( clientId ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					insertDefaultBlock(
-						{},
-						getBlockRootClientId( clientId ),
-						getBlockIndex( clientId ) + 1
-					);
+					insertAfterBlock( clientId );
 				} else {
 					removeBlock( clientId );
 				}
@@ -94,7 +86,7 @@ export function useEventHandlers( clientId ) {
 			isSelected,
 			getBlockRootClientId,
 			getBlockIndex,
-			insertDefaultBlock,
+			insertAfterBlock,
 			removeBlock,
 		]
 	);

@@ -2,15 +2,7 @@
 
 Checkboxes allow the user to select one or more items from a set.
 
-![](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
-
-Selected and unselected checkboxes
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![Selected and unselected checkboxes](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
 
 ## Design guidelines
 
@@ -63,6 +55,7 @@ const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label="Is author"
 			help="Is the user a author or not?"
 			checked={ isChecked }
@@ -109,6 +102,13 @@ A function that receives the checked state (boolean) as input.
 If indeterminate is true the state of the checkbox will be indeterminate.
 
 -   Required: No
+
+#### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

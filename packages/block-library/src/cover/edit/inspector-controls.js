@@ -24,6 +24,7 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -31,6 +32,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -75,7 +79,7 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
+			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>
@@ -163,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl
@@ -184,7 +188,8 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
+								__next40pxDefaultSize
+								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
 								onDragStart={ imperativeFocalPointPreview }
@@ -206,7 +211,14 @@ export default function CoverInspectorControls( {
 								}
 								help={
 									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
 											{ __(
 												'Describe the purpose of the image.'
 											) }
@@ -220,7 +232,7 @@ export default function CoverInspectorControls( {
 						<PanelRow>
 							<Button
 								variant="secondary"
-								isSmall
+								size="small"
 								className="block-library-cover__reset-button"
 								onClick={ onClearMedia }
 							>
@@ -248,6 +260,7 @@ export default function CoverInspectorControls( {
 									gradient: undefined,
 									customGradient: undefined,
 								} ),
+								clearable: true,
 							},
 						] }
 						panelId={ clientId }
@@ -299,14 +312,27 @@ export default function CoverInspectorControls( {
 						minHeight: undefined,
 						minHeightUnit: undefined,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+							setAttributes( {
+								minHeight: newMinHeight,
+								style: cleanEmptyObject( {
+									...attributes?.style,
+									dimensions: {
+										...attributes?.style?.dimensions,
+										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+									},
+								} ),
+							} )
 						}
 						onUnitChange={ ( nextUnit ) =>
 							setAttributes( {
@@ -319,6 +345,7 @@ export default function CoverInspectorControls( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },

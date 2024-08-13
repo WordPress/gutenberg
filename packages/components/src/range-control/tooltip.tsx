@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ export default function SimpleTooltip(
 		...restProps
 	} = props;
 	const position = useTooltipPosition( { inputRef, tooltipPosition } );
-	const classes = classnames( 'components-simple-tooltip', className );
+	const classes = clsx( 'components-simple-tooltip', className );
 	const styles = {
 		...style,
 		zIndex,

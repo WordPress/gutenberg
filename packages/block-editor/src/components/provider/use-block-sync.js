@@ -76,18 +76,11 @@ export default function useBlockSync( {
 		resetBlocks,
 		resetSelection,
 		replaceInnerBlocks,
-		selectBlock,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const {
-		hasSelectedBlock,
-		getBlockName,
-		getBlocks,
-		getSelectionStart,
-		getSelectionEnd,
-		getBlock,
-	} = registry.select( blockEditorStore );
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -180,9 +173,6 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
-			const hadSelection = hasSelectedBlock();
-			const selectionAnchor = getSelectionStart();
-			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
@@ -191,20 +181,19 @@ export default function useBlockSync( {
 					controlledSelection.selectionEnd,
 					controlledSelection.initialPosition
 				);
-			} else {
-				const selectionStillExists = getBlock(
-					selectionAnchor.clientId
-				);
-				if ( hadSelection && ! selectionStillExists ) {
-					selectBlock( clientId );
-				} else {
-					resetSelection( selectionAnchor, selectionFocus );
-				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
 
+	const isMounted = useRef( false );
+
 	useEffect( () => {
+		// On mount, controlled blocks are already set in the effect above.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+
 		// When the block becomes uncontrolled, it means its inner state has been reset
 		// we need to take the blocks again from the external value property.
 		if ( ! isControlled ) {
@@ -234,8 +223,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate

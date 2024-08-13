@@ -23,18 +23,17 @@ const {
 	hasProjectFile,
 	hasArgInCLI,
 	getArgsFromCLI,
+	getAsBooleanFromENV,
 } = require( '../utils' );
 
-const result = spawn(
-	'node',
-	[ require.resolve( 'playwright-core/cli' ), 'install' ],
-	{
+if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
+	const result = spawn( 'npx', [ 'playwright', 'install' ], {
 		stdio: 'inherit',
-	}
-);
+	} );
 
-if ( result.status > 0 ) {
-	process.exit( result.status );
+	if ( result.status > 0 ) {
+		process.exit( result.status );
+	}
 }
 
 const config =

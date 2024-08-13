@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,9 +12,9 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
-	__experimentalVStack as VStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
+	MenuGroup,
 	ColorIndicator,
 	DuotonePicker,
 	DuotoneSwatch,
@@ -28,7 +28,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
@@ -72,6 +72,7 @@ function FiltersToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -82,6 +83,7 @@ function FiltersToolsPanel( {
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -181,7 +183,7 @@ export default function FiltersPanel( {
 						renderToggle={ ( { onToggle, isOpen } ) => {
 							const toggleProps = {
 								onClick: onToggle,
-								className: classnames( { 'is-open': isOpen } ),
+								className: clsx( { 'is-open': isOpen } ),
 								'aria-expanded': isOpen,
 							};
 
@@ -197,8 +199,8 @@ export default function FiltersPanel( {
 							);
 						} }
 						renderContent={ () => (
-							<DropdownContentWrapper paddingSize="medium">
-								<VStack>
+							<DropdownContentWrapper paddingSize="small">
+								<MenuGroup label={ __( 'Duotone' ) }>
 									<p>
 										{ __(
 											'Create a two-tone color effect without losing your original image.'
@@ -213,7 +215,7 @@ export default function FiltersPanel( {
 										value={ duotone }
 										onChange={ setDuotone }
 									/>
-								</VStack>
+								</MenuGroup>
 							</DropdownContentWrapper>
 						) }
 					/>

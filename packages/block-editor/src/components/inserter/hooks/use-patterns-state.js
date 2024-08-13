@@ -11,16 +11,18 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 
 /**
  * Retrieves the block patterns inserter state.
  *
- * @param {Function} onInsert     function called when inserter a list of blocks.
- * @param {string=}  rootClientId Insertion's root client ID.
+ * @param {Function} onInsert         function called when inserter a list of blocks.
+ * @param {string=}  rootClientId     Insertion's root client ID.
  *
+ * @param {string}   selectedCategory The selected pattern category.
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert, rootClientId ) => {
+const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } =
@@ -57,11 +59,24 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 	const onClickPattern = useCallback(
 		( pattern, blocks ) => {
 			const patternBlocks =
-				pattern.id && pattern.syncStatus !== 'unsynced'
+				pattern.type === INSERTER_PATTERN_TYPES.user &&
+				pattern.syncStatus !== 'unsynced'
 					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
 					: blocks;
 			onInsert(
-				( patternBlocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
+				( patternBlocks ?? [] ).map( ( block ) => {
+					const clonedBlock = cloneBlock( block );
+					if (
+						clonedBlock.attributes.metadata?.categories?.includes(
+							selectedCategory
+						)
+					) {
+						clonedBlock.attributes.metadata.categories = [
+							selectedCategory,
+						];
+					}
+					return clonedBlock;
+				} ),
 				pattern.name
 			);
 			createSuccessNotice(
@@ -76,7 +91,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 				}
 			);
 		},
-		[ createSuccessNotice, onInsert ]
+		[ createSuccessNotice, onInsert, selectedCategory ]
 	);
 
 	return [ patterns, allCategories, onClickPattern ];

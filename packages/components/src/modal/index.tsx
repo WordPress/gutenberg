@@ -1,13 +1,8 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import type {
-	ForwardedRef,
-	KeyboardEvent,
-	MutableRefObject,
-	UIEvent,
-} from 'react';
+import clsx from 'clsx';
+import type { ForwardedRef, KeyboardEvent, RefObject, UIEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -41,14 +36,16 @@ import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
-const level0Dismissers: MutableRefObject<
-	ModalProps[ 'onRequestClose' ] | undefined
->[] = [];
-const ModalContext = createContext( level0Dismissers );
+type Dismissers = Set<
+	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+>;
+const ModalContext = createContext< Dismissers >( new Set() );
 
-let isBodyOpenClassActive = false;
+// Used to track body class names applied while modals are open.
+const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -146,36 +143,45 @@ function UnforwardedModal(
 	// one should remain open at a time and the list enables closing prior ones.
 	const dismissers = useContext( ModalContext );
 	// Used for the tracking and dismissing any nested modals.
-	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
+	const [ nestedDismissers ] = useState< Dismissers >( () => new Set() );
 
 	// Updates the stack tracking open modals at this level and calls
 	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
-		dismissers.push( refOnRequestClose );
-		const [ first, second ] = dismissers;
-		if ( second ) first?.current?.();
-
-		const nested = nestedDismissers.current;
-		return () => {
-			nested[ 0 ]?.current?.();
-			dismissers.shift();
-		};
-	}, [ dismissers ] );
-
-	const isLevel0 = dismissers === level0Dismissers;
-	// Adds/removes the value of bodyOpenClassName to body element.
-	useEffect( () => {
-		if ( ! isBodyOpenClassActive ) {
-			isBodyOpenClassActive = true;
-			document.body.classList.add( bodyOpenClassName );
+		// add this modal instance to the dismissers set
+		dismissers.add( refOnRequestClose );
+		// request that all the other modals close themselves
+		for ( const dismisser of dismissers ) {
+			if ( dismisser !== refOnRequestClose ) {
+				dismisser.current?.();
+			}
 		}
 		return () => {
-			if ( isLevel0 && dismissers.length === 0 ) {
-				document.body.classList.remove( bodyOpenClassName );
-				isBodyOpenClassActive = false;
+			// request that all the nested modals close themselves
+			for ( const dismisser of nestedDismissers ) {
+				dismisser.current?.();
+			}
+			// remove this modal instance from the dismissers set
+			dismissers.delete( refOnRequestClose );
+		};
+	}, [ dismissers, nestedDismissers ] );
+
+	// Adds/removes the value of bodyOpenClassName to body element.
+	useEffect( () => {
+		const theClass = bodyOpenClassName;
+		const oneMore = 1 + ( bodyOpenClasses.get( theClass ) ?? 0 );
+		bodyOpenClasses.set( theClass, oneMore );
+		document.body.classList.add( bodyOpenClassName );
+		return () => {
+			const oneLess = bodyOpenClasses.get( theClass )! - 1;
+			if ( oneLess === 0 ) {
+				document.body.classList.remove( theClass );
+				bodyOpenClasses.delete( theClass );
+			} else {
+				bodyOpenClasses.set( theClass, oneLess );
 			}
 		};
-	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
+	}, [ bodyOpenClassName ] );
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -195,19 +201,8 @@ function UnforwardedModal(
 
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
 		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
-
-		if (
 			shouldCloseOnEsc &&
-			event.code === 'Escape' &&
+			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
@@ -251,7 +246,9 @@ function UnforwardedModal(
 		onPointerUp: ( { target, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
-			if ( button === 0 && isSameTarget ) onRequestClose();
+			if ( button === 0 && isSameTarget ) {
+				onRequestClose();
+			}
 		},
 	};
 
@@ -259,16 +256,16 @@ function UnforwardedModal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-			className={ classnames(
+			className={ clsx(
 				'components-modal__screen-overlay',
 				overlayClassName
 			) }
-			onKeyDown={ handleEscapeKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'components-modal__frame',
 						sizeClass,
 						className
@@ -289,7 +286,7 @@ function UnforwardedModal(
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
+						className={ clsx( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,
@@ -354,7 +351,7 @@ function UnforwardedModal(
 	);
 
 	return createPortal(
-		<ModalContext.Provider value={ nestedDismissers.current }>
+		<ModalContext.Provider value={ nestedDismissers }>
 			{ modal }
 		</ModalContext.Provider>,
 		document.body

@@ -6,7 +6,11 @@ import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { cloneBlock, store as blocksStore } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	getBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -104,7 +108,9 @@ export const usePostTypes = () => {
 		return filteredPostTypes;
 	}, [] );
 	const postTypesTaxonomiesMap = useMemo( () => {
-		if ( ! postTypes?.length ) return;
+		if ( ! postTypes?.length ) {
+			return;
+		}
 		return postTypes.reduce( ( accumulator, type ) => {
 			accumulator[ type.slug ] = type.taxonomies;
 			return accumulator;
@@ -130,17 +136,23 @@ export const usePostTypes = () => {
 export const useTaxonomies = ( postType ) => {
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			const filteredTaxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-				context: 'view',
-			} );
-			return filteredTaxonomies;
+			const { getTaxonomies, getPostType } = select( coreStore );
+			// Does the post type have taxonomies?
+			if ( getPostType( postType )?.taxonomies?.length > 0 ) {
+				return getTaxonomies( {
+					type: postType,
+					per_page: -1,
+				} );
+			}
+			return [];
 		},
 		[ postType ]
 	);
-	return taxonomies;
+	return useMemo( () => {
+		return taxonomies?.filter(
+			( { visibility } ) => !! visibility?.publicly_queryable
+		);
+	}, [ taxonomies ] );
 };
 
 /**
@@ -205,6 +217,7 @@ export const getTransformedBlocksFromPattern = (
 ) => {
 	const {
 		query: { postType, inherit },
+		namespace,
 	} = queryBlockAttributes;
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 	const queryClientIds = [];
@@ -217,6 +230,9 @@ export const getTransformedBlocksFromPattern = (
 				postType,
 				inherit,
 			};
+			if ( namespace ) {
+				block.attributes.namespace = namespace;
+			}
 			queryClientIds.push( block.clientId );
 		}
 		block.innerBlocks?.forEach( ( innerBlock ) => {
@@ -373,7 +389,24 @@ export const useUnsupportedBlocks = ( clientId ) => {
 			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
-					if ( ! blockName.startsWith( 'core/' ) ) {
+					/*
+					 * Client side navigation can be true in two states:
+					 *  - supports.interactivity = true;
+					 *  - supports.interactivity.clientNavigation = true;
+					 */
+					const blockSupportsInteractivity = Object.is(
+						getBlockSupport( blockName, 'interactivity' ),
+						true
+					);
+					const blockSupportsInteractivityClientNavigation =
+						getBlockSupport(
+							blockName,
+							'interactivity.clientNavigation'
+						);
+					const blockInteractivity =
+						blockSupportsInteractivity ||
+						blockSupportsInteractivityClientNavigation;
+					if ( ! blockInteractivity ) {
 						blocks.hasBlocksFromPlugins = true;
 					} else if ( blockName === 'core/post-content' ) {
 						blocks.hasPostContentBlock = true;

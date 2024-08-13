@@ -37,6 +37,7 @@ function getSelectOptions(
  *
  * 	return (
  * 		<TreeSelect
+ * 			__nextHasNoMarginBottom
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -72,7 +73,6 @@ function getSelectOptions(
  * }
  * ```
  */
-
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
 		label,
@@ -81,11 +81,7 @@ export function TreeSelect( props: TreeSelectProps ) {
 		selectedId,
 		tree = [],
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.TreeSelect',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const options = useMemo( () => {
 		return [

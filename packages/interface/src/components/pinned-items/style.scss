@@ -10,8 +10,7 @@
 		&[aria-controls="edit-post:document"],
 		&[aria-controls="edit-post:block"],
 		&[aria-controls="edit-site:template"],
-		&[aria-controls="edit-site:block-inspector"],
-		&[aria-controls="edit-site:global-styles"] {
+		&[aria-controls="edit-site:block-inspector"] {
 			display: flex;
 		}
 
@@ -26,8 +25,5 @@
 	}
 
 	// Gap between pinned items.
-	gap: $grid-unit-05;
-
-	// Account for larger grid from parent container gap.
-	margin-right: -$grid-unit-05;
+	gap: $grid-unit-10;
 }

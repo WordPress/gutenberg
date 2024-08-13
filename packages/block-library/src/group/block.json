@@ -29,7 +29,11 @@
 		"ariaLabel": true,
 		"html": false,
 		"background": {
-			"backgroundImage": true
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
 		},
 		"color": {
 			"gradients": true,
@@ -41,6 +45,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
@@ -83,6 +88,9 @@
 		},
 		"layout": {
 			"allowSizingOnChildren": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",

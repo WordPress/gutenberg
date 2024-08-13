@@ -3,6 +3,11 @@
  */
 import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
+/**
+ * WordPress dependencies
+ */
+import type { ObservableMap } from '@wordpress/compose';
+
 export type DistributiveOmit< T, K extends keyof any > = T extends any
 	? Omit< T, K >
 	: never;
@@ -36,15 +41,21 @@ export type SlotComponentProps =
 
 			/**
 			 * A function that returns nodes to be rendered.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Supported only when `bubblesVirtually` is `false`.
 			 */
 			children?: never;
 
 			/**
-			 * className.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			className?: string;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: React.CSSProperties;
 	  } )
 	| ( SlotPropBase & {
 			/**
@@ -56,15 +67,21 @@ export type SlotComponentProps =
 
 			/**
 			 * A function that returns nodes to be rendered.
-			 * Not supported when `bubblesVirtually` is true.
+			 * Supported only when `bubblesVirtually` is `false`.
 			 */
 			children?: ( fills: ReactNode ) => ReactNode;
 
 			/**
-			 * className.
-			 * Not supported when `bubblesVirtually` is false.
+			 * Additional className for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
 			 */
 			className?: never;
+
+			/**
+			 * Additional styles for the `Slot` component.
+			 * Supported only when `bubblesVirtually` is `true`.
+			 */
+			style?: never;
 	  } );
 
 export type FillComponentProps = {
@@ -84,6 +101,11 @@ export type SlotFillProviderProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+
+	/**
+	 * Whether to pass slots to the parent provider if existent.
+	 */
+	passthrough?: boolean;
 };
 
 export type SlotFillBubblesVirtuallySlotRef = RefObject< HTMLElement >;
@@ -92,14 +114,14 @@ export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
 } >;
 
 export type SlotFillBubblesVirtuallyContext = {
-	slots: Map<
+	slots: ObservableMap<
 		SlotKey,
 		{
 			ref: SlotFillBubblesVirtuallySlotRef;
 			fillProps: FillProps;
 		}
 	>;
-	fills: Map< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
+	fills: ObservableMap< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
 	registerSlot: (
 		name: SlotKey,
 		ref: SlotFillBubblesVirtuallySlotRef,

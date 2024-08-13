@@ -21,13 +21,14 @@ export const TEMPLATE_ORIGINS = {
 	plugin: 'plugin',
 };
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
+export const TEMPLATE_PART_ALL_AREAS_CATEGORY = 'all-parts';
 
 // Patterns.
 export const {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
-	PATTERN_CORE_SOURCES,
+	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_SYNC_TYPES,
 } = unlock( patternPrivateApis );
 
@@ -38,19 +39,19 @@ export const FOCUSABLE_ENTITIES = [
 	PATTERN_TYPES.user,
 ];
 
-/**
- * Block types that are considered to be page content. These are the only blocks
- * editable when hasPageContentFocus() is true.
- */
-export const PAGE_CONTENT_BLOCK_TYPES = {
-	'core/post-title': true,
-	'core/post-featured-image': true,
-	'core/post-content': true,
-};
-
 export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
 	[ TEMPLATE_PART_POST_TYPE ]: __( 'Template part' ),
 	[ PATTERN_TYPES.user ]: __( 'Pattern' ),
 	[ NAVIGATION_POST_TYPE ]: __( 'Navigation' ),
 };
+
+// DataViews constants
+export const LAYOUT_GRID = 'grid';
+export const LAYOUT_TABLE = 'table';
+export const LAYOUT_LIST = 'list';
+
+export const OPERATOR_IS = 'is';
+export const OPERATOR_IS_NOT = 'isNot';
+export const OPERATOR_IS_ANY = 'isAny';
+export const OPERATOR_IS_NONE = 'isNone';

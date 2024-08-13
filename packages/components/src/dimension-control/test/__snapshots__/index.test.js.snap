@@ -21,7 +21,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   margin-bottom: inherit;
 }
 
-.emotion-5 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -41,13 +41,22 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: relative;
   border-radius: 2px;
   padding-top: 0;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  cursor: pointer;
 }
 
-.emotion-5>* {
+.emotion-6>* {
   min-height: 0;
 }
 
-.emotion-8 {
+.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -57,15 +66,17 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   max-width: calc( 100% - 10px );
 }
 
-.emotion-11 {
+.emotion-12 {
   color: #1e1e1e;
-  line-height: 1.2;
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
-.emotion-11.emotion-11.emotion-11 {
+.emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
   font-weight: 500;
   line-height: 1.4;
@@ -81,7 +92,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   white-space: nowrap;
 }
 
-.emotion-13 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -96,11 +107,11 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
-.emotion-15.emotion-15.emotion-15 {
+.emotion-16.emotion-16.emotion-16 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -109,13 +120,13 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
-  color: #1e1e1e;
+  color: currentColor;
+  cursor: inherit;
   display: block;
   font-family: inherit;
   margin: 0;
   width: 100%;
   max-width: none;
-  cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -129,12 +140,12 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 }
 
 @media ( min-width: 600px ) {
-  .emotion-15.emotion-15.emotion-15 {
+  .emotion-16.emotion-16.emotion-16 {
     font-size: 13px;
   }
 }
 
-.emotion-17 {
+.emotion-18 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -149,7 +160,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   display: flex;
 }
 
-.emotion-20 {
+.emotion-21 {
   margin-bottom: 0;
   padding-right: calc(4px * 2);
   position: absolute;
@@ -157,15 +168,22 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   right: 0;
 }
 
-.emotion-22 {
+.emotion-23 {
   -webkit-margin-end: calc(4px * -1);
   margin-inline-end: calc(4px * -1);
   line-height: 0;
 }
 
-.emotion-24.emotion-24.emotion-24 {
+.emotion-23 path {
+  fill: currentColor;
+}
+
+.emotion-25.emotion-25.emotion-25 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -174,9 +192,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -188,17 +203,17 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
-          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          class="components-flex-item emotion-8 emotion-9 emotion-7"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
           <label
-            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            class="components-truncate components-text components-input-control__label emotion-11 emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="Text"
             for="inspector-select-control-3"
@@ -207,10 +222,10 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
           </label>
         </div>
         <div
-          class="components-input-control__container emotion-13 emotion-14"
+          class="components-input-control__container emotion-14 emotion-15"
         >
           <select
-            class="components-select-control__input emotion-15 emotion-16"
+            class="components-select-control__input emotion-16 emotion-17"
             id="inspector-select-control-3"
           >
             <option
@@ -235,15 +250,15 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
             </option>
           </select>
           <span
-            class="components-input-control__suffix emotion-17 emotion-18"
+            class="components-input-control__suffix emotion-18 emotion-19"
           >
             <div
-              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
               data-wp-c16t="true"
               data-wp-component="InputControlSuffixWrapper"
             >
               <div
-                class="emotion-22 emotion-23"
+                class="emotion-23 emotion-24"
               >
                 <svg
                   aria-hidden="true"
@@ -262,7 +277,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
           </span>
           <div
             aria-hidden="true"
-            class="components-input-control__backdrop emotion-24 emotion-25"
+            class="components-input-control__backdrop emotion-25 emotion-26"
           />
         </div>
       </div>
@@ -292,7 +307,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   margin-bottom: inherit;
 }
 
-.emotion-5 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -312,13 +327,22 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: relative;
   border-radius: 2px;
   padding-top: 0;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  cursor: pointer;
 }
 
-.emotion-5>* {
+.emotion-6>* {
   min-height: 0;
 }
 
-.emotion-8 {
+.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -328,15 +352,17 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   max-width: calc( 100% - 10px );
 }
 
-.emotion-11 {
+.emotion-12 {
   color: #1e1e1e;
-  line-height: 1.2;
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
-.emotion-11.emotion-11.emotion-11 {
+.emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
   font-weight: 500;
   line-height: 1.4;
@@ -352,7 +378,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   white-space: nowrap;
 }
 
-.emotion-13 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -367,11 +393,11 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
-.emotion-15.emotion-15.emotion-15 {
+.emotion-16.emotion-16.emotion-16 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -380,13 +406,13 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
-  color: #1e1e1e;
+  color: currentColor;
+  cursor: inherit;
   display: block;
   font-family: inherit;
   margin: 0;
   width: 100%;
   max-width: none;
-  cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -400,12 +426,12 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 }
 
 @media ( min-width: 600px ) {
-  .emotion-15.emotion-15.emotion-15 {
+  .emotion-16.emotion-16.emotion-16 {
     font-size: 13px;
   }
 }
 
-.emotion-17 {
+.emotion-18 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -420,7 +446,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   display: flex;
 }
 
-.emotion-20 {
+.emotion-21 {
   margin-bottom: 0;
   padding-right: calc(4px * 2);
   position: absolute;
@@ -428,15 +454,22 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   right: 0;
 }
 
-.emotion-22 {
+.emotion-23 {
   -webkit-margin-end: calc(4px * -1);
   margin-inline-end: calc(4px * -1);
   line-height: 0;
 }
 
-.emotion-24.emotion-24.emotion-24 {
+.emotion-23 path {
+  fill: currentColor;
+}
+
+.emotion-25.emotion-25.emotion-25 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -445,9 +478,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -459,17 +489,17 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
-          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          class="components-flex-item emotion-8 emotion-9 emotion-7"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
           <label
-            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            class="components-truncate components-text components-input-control__label emotion-11 emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="Text"
             for="inspector-select-control-0"
@@ -478,10 +508,10 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
           </label>
         </div>
         <div
-          class="components-input-control__container emotion-13 emotion-14"
+          class="components-input-control__container emotion-14 emotion-15"
         >
           <select
-            class="components-select-control__input emotion-15 emotion-16"
+            class="components-select-control__input emotion-16 emotion-17"
             id="inspector-select-control-0"
           >
             <option
@@ -516,15 +546,15 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
             </option>
           </select>
           <span
-            class="components-input-control__suffix emotion-17 emotion-18"
+            class="components-input-control__suffix emotion-18 emotion-19"
           >
             <div
-              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
               data-wp-c16t="true"
               data-wp-component="InputControlSuffixWrapper"
             >
               <div
-                class="emotion-22 emotion-23"
+                class="emotion-23 emotion-24"
               >
                 <svg
                   aria-hidden="true"
@@ -543,7 +573,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
           </span>
           <div
             aria-hidden="true"
-            class="components-input-control__backdrop emotion-24 emotion-25"
+            class="components-input-control__backdrop emotion-25 emotion-26"
           />
         </div>
       </div>
@@ -573,7 +603,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   margin-bottom: inherit;
 }
 
-.emotion-5 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -593,13 +623,22 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: relative;
   border-radius: 2px;
   padding-top: 0;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  cursor: pointer;
 }
 
-.emotion-5>* {
+.emotion-6>* {
   min-height: 0;
 }
 
-.emotion-8 {
+.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -609,15 +648,17 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   max-width: calc( 100% - 10px );
 }
 
-.emotion-11 {
+.emotion-12 {
   color: #1e1e1e;
-  line-height: 1.2;
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
-.emotion-11.emotion-11.emotion-11 {
+.emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
   font-weight: 500;
   line-height: 1.4;
@@ -633,7 +674,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   white-space: nowrap;
 }
 
-.emotion-13 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -648,11 +689,11 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
-.emotion-15.emotion-15.emotion-15 {
+.emotion-16.emotion-16.emotion-16 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -661,13 +702,13 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
-  color: #1e1e1e;
+  color: currentColor;
+  cursor: inherit;
   display: block;
   font-family: inherit;
   margin: 0;
   width: 100%;
   max-width: none;
-  cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -681,12 +722,12 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 }
 
 @media ( min-width: 600px ) {
-  .emotion-15.emotion-15.emotion-15 {
+  .emotion-16.emotion-16.emotion-16 {
     font-size: 13px;
   }
 }
 
-.emotion-17 {
+.emotion-18 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -701,7 +742,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   display: flex;
 }
 
-.emotion-20 {
+.emotion-21 {
   margin-bottom: 0;
   padding-right: calc(4px * 2);
   position: absolute;
@@ -709,15 +750,22 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   right: 0;
 }
 
-.emotion-22 {
+.emotion-23 {
   -webkit-margin-end: calc(4px * -1);
   margin-inline-end: calc(4px * -1);
   line-height: 0;
 }
 
-.emotion-24.emotion-24.emotion-24 {
+.emotion-23 path {
+  fill: currentColor;
+}
+
+.emotion-25.emotion-25.emotion-25 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -726,9 +774,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -740,17 +785,17 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
-          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          class="components-flex-item emotion-8 emotion-9 emotion-7"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
           <label
-            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            class="components-truncate components-text components-input-control__label emotion-11 emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="Text"
             for="inspector-select-control-2"
@@ -764,17 +809,17 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+                d="M11 12.5V17.5H12.5V12.5H17.5V11H12.5V6H11V11H6V12.5H11Z"
               />
             </svg>
             Margin
           </label>
         </div>
         <div
-          class="components-input-control__container emotion-13 emotion-14"
+          class="components-input-control__container emotion-14 emotion-15"
         >
           <select
-            class="components-select-control__input emotion-15 emotion-16"
+            class="components-select-control__input emotion-16 emotion-17"
             id="inspector-select-control-2"
           >
             <option
@@ -809,15 +854,15 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
             </option>
           </select>
           <span
-            class="components-input-control__suffix emotion-17 emotion-18"
+            class="components-input-control__suffix emotion-18 emotion-19"
           >
             <div
-              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
               data-wp-c16t="true"
               data-wp-component="InputControlSuffixWrapper"
             >
               <div
-                class="emotion-22 emotion-23"
+                class="emotion-23 emotion-24"
               >
                 <svg
                   aria-hidden="true"
@@ -836,7 +881,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
           </span>
           <div
             aria-hidden="true"
-            class="components-input-control__backdrop emotion-24 emotion-25"
+            class="components-input-control__backdrop emotion-25 emotion-26"
           />
         </div>
       </div>
@@ -866,7 +911,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   margin-bottom: inherit;
 }
 
-.emotion-5 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -886,13 +931,22 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: relative;
   border-radius: 2px;
   padding-top: 0;
+  color: var(--wp-components-color-foreground, #1e1e1e);
+  cursor: pointer;
 }
 
-.emotion-5>* {
+.emotion-6>* {
   min-height: 0;
 }
 
-.emotion-8 {
+.emotion-6:focus-within:not( :has( :is( .em5sgkm7, .emotion-19 ):focus-within ) ) .emotion-26 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
+.emotion-9 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -902,15 +956,17 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   max-width: calc( 100% - 10px );
 }
 
-.emotion-11 {
+.emotion-12 {
   color: #1e1e1e;
-  line-height: 1.2;
+  line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
 }
 
-.emotion-11.emotion-11.emotion-11 {
+.emotion-12.emotion-12.emotion-12 {
   font-size: 11px;
   font-weight: 500;
   line-height: 1.4;
@@ -926,7 +982,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   white-space: nowrap;
 }
 
-.emotion-13 {
+.emotion-14 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -941,11 +997,11 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  background-color: #fff;
+  background-color: var(--wp-components-color-background, #fff);
   width: 100%;
 }
 
-.emotion-15.emotion-15.emotion-15 {
+.emotion-16.emotion-16.emotion-16 {
   -webkit-appearance: none;
   -moz-appearance: none;
   -ms-appearance: none;
@@ -954,13 +1010,13 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   box-sizing: border-box;
   border: none;
   box-shadow: none!important;
-  color: #1e1e1e;
+  color: currentColor;
+  cursor: inherit;
   display: block;
   font-family: inherit;
   margin: 0;
   width: 100%;
   max-width: none;
-  cursor: pointer;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: 16px;
@@ -974,12 +1030,12 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 }
 
 @media ( min-width: 600px ) {
-  .emotion-15.emotion-15.emotion-15 {
+  .emotion-16.emotion-16.emotion-16 {
     font-size: 13px;
   }
 }
 
-.emotion-17 {
+.emotion-18 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -994,7 +1050,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   display: flex;
 }
 
-.emotion-20 {
+.emotion-21 {
   margin-bottom: 0;
   padding-right: calc(4px * 2);
   position: absolute;
@@ -1002,15 +1058,22 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   right: 0;
 }
 
-.emotion-22 {
+.emotion-23 {
   -webkit-margin-end: calc(4px * -1);
   margin-inline-end: calc(4px * -1);
   line-height: 0;
 }
 
-.emotion-24.emotion-24.emotion-24 {
+.emotion-23 path {
+  fill: currentColor;
+}
+
+.emotion-25.emotion-25.emotion-25 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -1019,9 +1082,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: absolute;
   right: 0;
   top: 0;
-  border-color: #949494;
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -1033,17 +1093,17 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
       class="components-base-control__field emotion-2 emotion-3"
     >
       <div
-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
         data-wp-c16t="true"
-        data-wp-component="Flex"
+        data-wp-component="InputBase"
       >
         <div
-          class="components-flex-item emotion-7 emotion-8 emotion-6"
+          class="components-flex-item emotion-8 emotion-9 emotion-7"
           data-wp-c16t="true"
           data-wp-component="FlexItem"
         >
           <label
-            class="components-truncate components-text components-input-control__label emotion-10 emotion-11 emotion-6"
+            class="components-truncate components-text components-input-control__label emotion-11 emotion-12 emotion-7"
             data-wp-c16t="true"
             data-wp-component="Text"
             for="inspector-select-control-1"
@@ -1057,17 +1117,17 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"
+                d="M11 12.5V17.5H12.5V12.5H17.5V11H12.5V6H11V11H6V12.5H11Z"
               />
             </svg>
             Margin
           </label>
         </div>
         <div
-          class="components-input-control__container emotion-13 emotion-14"
+          class="components-input-control__container emotion-14 emotion-15"
         >
           <select
-            class="components-select-control__input emotion-15 emotion-16"
+            class="components-select-control__input emotion-16 emotion-17"
             id="inspector-select-control-1"
           >
             <option
@@ -1102,15 +1162,15 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
             </option>
           </select>
           <span
-            class="components-input-control__suffix emotion-17 emotion-18"
+            class="components-input-control__suffix emotion-18 emotion-19"
           >
             <div
-              class="components-spacer components-input-control-suffix-wrapper emotion-19 emotion-20 emotion-6"
+              class="components-spacer components-input-control-suffix-wrapper emotion-20 emotion-21 emotion-7"
               data-wp-c16t="true"
               data-wp-component="InputControlSuffixWrapper"
             >
               <div
-                class="emotion-22 emotion-23"
+                class="emotion-23 emotion-24"
               >
                 <svg
                   aria-hidden="true"
@@ -1129,7 +1189,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
           </span>
           <div
             aria-hidden="true"
-            class="components-input-control__backdrop emotion-24 emotion-25"
+            class="components-input-control__backdrop emotion-25 emotion-26"
           />
         </div>
       </div>

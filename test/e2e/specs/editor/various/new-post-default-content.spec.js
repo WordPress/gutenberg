@@ -23,8 +23,6 @@ test.describe( 'new editor filtered state', () => {
 
 	test( 'should respect default content', async ( { editor, page } ) => {
 		await editor.openDocumentSettingsSidebar();
-		await page.click( 'role=button[name="Excerpt"i]' );
-
 		// Assert they match what the plugin set.
 		await expect(
 			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
@@ -32,8 +30,9 @@ test.describe( 'new editor filtered state', () => {
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toBe( 'My default content' );
+		await page.getByRole( 'button', { name: 'Edit excerpt' } ).click();
 		await expect(
-			page.locator( 'role=textbox[name="Write an excerpt (optional)"i]' )
-		).toHaveText( 'My default excerpt' );
+			page.getByRole( 'textbox', { name: 'Write an excerpt (optional)' } )
+		).toHaveValue( 'My default excerpt' );
 	} );
 } );

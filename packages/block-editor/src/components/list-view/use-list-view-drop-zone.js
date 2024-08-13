@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
+	usePrevious,
 } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
 
@@ -61,7 +62,7 @@ import { store as blockEditorStore } from '../../store';
 
 // When the indentation level, the corresponding left margin in `style.scss`
 // must be updated as well to ensure the drop zone is aligned with the indentation.
-export const NESTING_LEVEL_INDENTATION = 28;
+export const NESTING_LEVEL_INDENTATION = 24;
 
 /**
  * Determines whether the user is positioning the dragged block to be
@@ -304,6 +305,7 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 
 		return {
 			rootClientId: candidateBlockData.clientId,
+			clientId: candidateBlockData.clientId,
 			blockIndex: newBlockIndex,
 			dropPosition: 'inside',
 		};
@@ -396,15 +398,30 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	};
 }
 
+// Throttle options need to be defined outside of the hook to avoid
+// re-creating the object on every render. This is due to a limitation
+// of the `useThrottle` hook, where the options object is included
+// in the dependency array for memoization.
+const EXPAND_THROTTLE_OPTIONS = {
+	leading: false, // Don't call the function immediately on the first call.
+	trailing: true, // Do call the function on the last call.
+};
+
 /**
  * A react hook for implementing a drop zone in list view.
  *
- * @param {Object}       props                   Named parameters.
- * @param {?HTMLElement} [props.dropZoneElement] Optional element to be used as the drop zone.
+ * @param {Object}       props                    Named parameters.
+ * @param {?HTMLElement} [props.dropZoneElement]  Optional element to be used as the drop zone.
+ * @param {Object}       [props.expandedState]    The expanded state of the blocks in the list view.
+ * @param {Function}     [props.setExpandedState] Function to set the expanded state of a list of block clientIds.
  *
  * @return {WPListViewDropZoneTarget} The drop target.
  */
-export default function useListViewDropZone( { dropZoneElement } ) {
+export default function useListViewDropZone( {
+	dropZoneElement,
+	expandedState,
+	setExpandedState,
+} ) {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -419,6 +436,55 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
 	const rtl = isRTL();
+
+	const previousRootClientId = usePrevious( targetRootClientId );
+
+	const maybeExpandBlock = useCallback(
+		( _expandedState, _target ) => {
+			// If the user is attempting to drop a block inside a collapsed block,
+			// that is, using a nesting gesture flagged by 'inside' dropPosition,
+			// expand the block within the list view, if it isn't already.
+			const { rootClientId } = _target || {};
+			if ( ! rootClientId ) {
+				return;
+			}
+			if (
+				_target?.dropPosition === 'inside' &&
+				! _expandedState[ rootClientId ]
+			) {
+				setExpandedState( {
+					type: 'expand',
+					clientIds: [ rootClientId ],
+				} );
+			}
+		},
+		[ setExpandedState ]
+	);
+
+	// Throttle the maybeExpandBlock function to avoid expanding the block
+	// too quickly when the user is dragging over the block. This is to
+	// avoid expanding the block when the user is just passing over it.
+	const throttledMaybeExpandBlock = useThrottle(
+		maybeExpandBlock,
+		500,
+		EXPAND_THROTTLE_OPTIONS
+	);
+
+	useEffect( () => {
+		if (
+			target?.dropPosition !== 'inside' ||
+			previousRootClientId !== target?.rootClientId
+		) {
+			throttledMaybeExpandBlock.cancel();
+			return;
+		}
+		throttledMaybeExpandBlock( expandedState, target );
+	}, [
+		expandedState,
+		previousRootClientId,
+		target,
+		throttledMaybeExpandBlock,
+	] );
 
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
@@ -484,18 +550,26 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 				rtl,
 			]
 		),
-		200
+		50
 	);
 
 	const ref = useDropZone( {
 		dropZoneElement,
 		onDrop( event ) {
+			throttled.cancel();
 			if ( target ) {
 				onBlockDrop( event );
 			}
+			// Use `undefined` value to indicate that the drag has concluded.
+			// This allows styling rules that are active only when a user is
+			// dragging to be removed.
+			setTarget( undefined );
 		},
 		onDragLeave() {
 			throttled.cancel();
+			// Use `null` value to indicate that the drop target is not valid,
+			// but that the drag is still active. This allows for styling rules
+			// that are active only when a user drags outside of the list view.
 			setTarget( null );
 		},
 		onDragOver( event ) {
@@ -506,7 +580,10 @@ export default function useListViewDropZone( { dropZoneElement } ) {
 		},
 		onDragEnd() {
 			throttled.cancel();
-			setTarget( null );
+			// Use `undefined` value to indicate that the drag has concluded.
+			// This allows styling rules that are active only when a user is
+			// dragging to be removed.
+			setTarget( undefined );
 		},
 	} );
 

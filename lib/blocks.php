@@ -26,9 +26,7 @@ function gutenberg_reregister_core_block_types() {
 				'form-submit-button',
 				'group',
 				'html',
-				'list',
 				'list-item',
-				'media-text',
 				'missing',
 				'more',
 				'nextpage',
@@ -50,6 +48,7 @@ function gutenberg_reregister_core_block_types() {
 				'archives.php'                     => 'core/archives',
 				'avatar.php'                       => 'core/avatar',
 				'block.php'                        => 'core/block',
+				'button.php'                       => 'core/button',
 				'calendar.php'                     => 'core/calendar',
 				'categories.php'                   => 'core/categories',
 				'cover.php'                        => 'core/cover',
@@ -77,7 +76,9 @@ function gutenberg_reregister_core_block_types() {
 				'heading.php'                      => 'core/heading',
 				'latest-comments.php'              => 'core/latest-comments',
 				'latest-posts.php'                 => 'core/latest-posts',
+				'list.php'                         => 'core/list',
 				'loginout.php'                     => 'core/loginout',
+				'media-text.php'                   => 'core/media-text',
 				'navigation.php'                   => 'core/navigation',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
@@ -269,22 +270,11 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
 
-	// If the current theme supports wp-block-styles, dequeue the full stylesheet
-	// and instead attach each block's theme-styles to their block styles stylesheet.
+	/*
+	 * If the current theme supports wp-block-styles, dequeue the core styles
+	 * and enqueue the plugin ones instead.
+	 */
 	if ( current_theme_supports( 'wp-block-styles' ) ) {
-
-		// Dequeue the full stylesheet.
-		// Make sure this only runs once, it doesn't need to run for every block.
-		static $stylesheet_removed;
-		if ( ! $stylesheet_removed ) {
-			add_action(
-				'wp_enqueue_scripts',
-				static function () {
-					wp_dequeue_style( 'wp-block-library-theme' );
-				}
-			);
-			$stylesheet_removed = true;
-		}
 
 		// Get the path to the block's stylesheet.
 		$theme_style_path = is_rtl()
@@ -293,23 +283,14 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
-
-			if ( file_exists( $stylesheet_path ) ) {
-				// If there is a main stylesheet for this block, append the theme styles to main styles.
-				wp_add_inline_style(
-					"wp-block-{$block_name}",
-					file_get_contents( gutenberg_dir_path() . $theme_style_path )
-				);
-			} else {
-				// If there is no main stylesheet for this block, register theme style.
-				wp_register_style(
-					"wp-block-{$block_name}",
-					gutenberg_url( $theme_style_path ),
-					array(),
-					$default_version
-				);
-				wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $theme_style_path );
-			}
+			wp_deregister_style( "wp-block-{$block_name}-theme" );
+			wp_register_style(
+				"wp-block-{$block_name}-theme",
+				gutenberg_url( $theme_style_path ),
+				array(),
+				$default_version
+			);
+			wp_style_add_data( "wp-block-{$block_name}-theme", 'path', gutenberg_dir_path() . $theme_style_path );
 		}
 	}
 
@@ -439,55 +420,7 @@ function gutenberg_legacy_wp_block_post_meta( $value, $object_id, $meta_key, $si
 
 add_filter( 'default_post_metadata', 'gutenberg_legacy_wp_block_post_meta', 10, 4 );
 
-/**
- * Complements the lightbox implementation for the 'core/image' block.
- *
- * This function is INTENTIONALLY left out of core as it only provides
- * backwards compatibility for the legacy lightbox syntax that was only
- * introduced in Gutenberg. The legacy syntax was using the `behaviors` key in
- * the block attrbutes and the `theme.json` file.
- *
- * @since 16.7.0
- *
- * @param array $block The block to check.
- * @return array The block with the legacyLightboxSettings set if available.
- */
-function gutenberg_should_render_lightbox( $block ) {
 
-	if ( 'core/image' !== $block['blockName'] ) {
-		return $block;
-	}
-
-	if ( isset( $block['attrs']['behaviors']['lightbox'] ) ) {
-		$block['legacyLightboxSettings'] = $block['attrs']['behaviors']['lightbox'];
-	}
-
-	return $block;
-}
-
-add_filter( 'render_block_data', 'gutenberg_should_render_lightbox', 15, 1 );
-
-/**
- * Registers the metadata block attribute for all block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
- */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
-	}
-
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
-
-	return $args;
-}
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );
 
 /**
  * Strips all HTML from the content of footnotes, and sanitizes the ID.

@@ -8,6 +8,10 @@
 /**
  * Renders the `core/block` block on server.
  *
+ * @since 5.0.0
+ *
+ * @global WP_Embed $wp_embed
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Rendered HTML of the referenced block.
@@ -46,13 +50,57 @@ function render_block_core_block( $attributes ) {
 	$content = $wp_embed->run_shortcode( $reusable_block->post_content );
 	$content = $wp_embed->autoembed( $content );
 
+	// Back compat.
+	// For blocks that have not been migrated in the editor, add some back compat
+	// so that front-end rendering continues to work.
+
+	// This matches the `v2` deprecation. Removes the inner `values` property
+	// from every item.
+	if ( isset( $attributes['content'] ) ) {
+		foreach ( $attributes['content'] as &$content_data ) {
+			if ( isset( $content_data['values'] ) ) {
+				$is_assoc_array = is_array( $content_data['values'] ) && ! wp_is_numeric_array( $content_data['values'] );
+
+				if ( $is_assoc_array ) {
+					$content_data = $content_data['values'];
+				}
+			}
+		}
+	}
+
+	// This matches the `v1` deprecation. Rename `overrides` to `content`.
+	if ( isset( $attributes['overrides'] ) && ! isset( $attributes['content'] ) ) {
+		$attributes['content'] = $attributes['overrides'];
+	}
+
+	/**
+	 * We set the `pattern/overrides` context through the `render_block_context`
+	 * filter so that it is available when a pattern's inner blocks are
+	 * rendering via do_blocks given it only receives the inner content.
+	 */
+	$has_pattern_overrides = isset( $attributes['content'] ) && null !== get_block_bindings_source( 'core/pattern-overrides' );
+	if ( $has_pattern_overrides ) {
+		$filter_block_context = static function ( $context ) use ( $attributes ) {
+			$context['pattern/overrides'] = $attributes['content'];
+			return $context;
+		};
+		add_filter( 'render_block_context', $filter_block_context, 1 );
+	}
+
 	$content = do_blocks( $content );
 	unset( $seen_refs[ $attributes['ref'] ] );
+
+	if ( $has_pattern_overrides ) {
+		remove_filter( 'render_block_context', $filter_block_context, 1 );
+	}
+
 	return $content;
 }
 
 /**
  * Registers the `core/block` block.
+ *
+ * @since 5.3.0
  */
 function register_block_core_block() {
 	register_block_type_from_metadata(

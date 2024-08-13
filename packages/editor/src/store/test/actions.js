@@ -90,7 +90,9 @@ describe( 'Post actions', () => {
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
-					return {};
+					return {
+						json: () => Promise.resolve( {} ),
+					};
 				}
 
 				throw {
@@ -178,7 +180,9 @@ describe( 'Post actions', () => {
 						path.startsWith( '/wp/v2/types/post' ) ||
 						path.startsWith( `/wp/v2/posts/${ postId }` )
 					) {
-						return {};
+						return {
+							json: () => Promise.resolve( {} ),
+						};
 					}
 				}
 
@@ -262,7 +266,9 @@ describe( 'Post actions', () => {
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
-					return {};
+					return {
+						json: () => Promise.resolve( {} ),
+					};
 				}
 
 				throw {
@@ -430,6 +436,144 @@ describe( 'Editor actions', () => {
 			expect(
 				registry.select( editorStore ).isPublishSidebarEnabled()
 			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const registry = createRegistryWithStores();
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( false );
+
+			// Switch it on again.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const registry = createRegistryWithStores();
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( true );
+
+			// Close it.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'switchEditorMode', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+		} );
+
+		it( 'to visual', () => {
+			// Switch to text first, since the default is visual.
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			registry.dispatch( editorStore ).switchEditorMode( 'visual' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'to text', () => {
+			// It defaults to visual.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+			// Add a selected client id and make sure it's there.
+			const clientId = 'clientId_1';
+			registry.dispatch( blockEditorStore ).selectionChange( clientId );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toEqual( clientId );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toBeNull();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', true );
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			// Initial state is falsy.
+			registry.dispatch( editorStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'fixedToolbar' )
+			).toBe( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( true );
 		} );
 	} );
 } );

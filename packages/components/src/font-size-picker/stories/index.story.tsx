@@ -66,7 +66,6 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
 export const Default: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	disableCustomFontSizes: false,
 	fontSizes: [
 		{
@@ -85,7 +84,6 @@ Default.args = {
 			size: 26,
 		},
 	],
-	units: [ 'px', 'em', 'rem' ],
 	value: 16,
 	withSlider: false,
 };

@@ -39,7 +39,11 @@ const sizeOptions = [
 const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
-			<SelectControl label={ labelComponent } options={ sizeOptions } />
+			<SelectControl
+				label={ labelComponent }
+				options={ sizeOptions }
+				__nextHasNoMarginBottom
+			/>
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.
@@ -81,7 +85,7 @@ describe( 'Basic rendering', () => {
 		} );
 
 		const toggleState = screen.getByRole( 'checkbox', {
-			name: 'Use the same padding on all screensizes.',
+			name: 'Use the same padding on all screen sizes.',
 			checked: true,
 		} );
 
@@ -177,7 +181,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ renderTestDefaultControlComponent }
 			/>
 		);
@@ -217,7 +221,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ mockRenderDefaultControl }
 				viewports={ customViewportSet }
 			/>
@@ -268,7 +272,7 @@ describe( 'Default and Responsive modes', () => {
 
 		// Select elements based on what the user can see.
 		const toggleInput = screen.getByRole( 'checkbox', {
-			name: 'Use the same padding on all screensizes.',
+			name: 'Use the same padding on all screen sizes.',
 			checked: true,
 		} );
 
@@ -319,7 +323,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ spyRenderDefaultControl }
 				renderResponsiveControls={ mockRenderResponsiveControls }
 			/>

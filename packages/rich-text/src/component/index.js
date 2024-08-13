@@ -8,25 +8,20 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { create } from '../create';
+import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { useCopyHandler } from './use-copy-handler';
-import { useFormatBoundaries } from './use-format-boundaries';
-import { useSelectObject } from './use-select-object';
-import { useInputAndSelection } from './use-input-and-selection';
-import { useSelectionChangeCompat } from './use-selection-change-compat';
-import { useDelete } from './use-delete';
+import { useEventListeners } from './event-listeners';
 
 export function useRichText( {
 	value = '',
 	selectionStart,
 	selectionEnd,
 	placeholder,
-	preserveWhiteSpace,
 	onSelectionChange,
+	preserveWhiteSpace,
 	onChange,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
@@ -51,7 +46,6 @@ export function useRichText( {
 			element: ref.current,
 			range,
 			__unstableIsEditableTree: true,
-			preserveWhiteSpace,
 		} );
 	}
 
@@ -71,10 +65,18 @@ export function useRichText( {
 
 	function setRecordFromProps() {
 		_value.current = value;
-		record.current = create( {
-			html: value,
-			preserveWhiteSpace,
-		} );
+		record.current = value;
+		if ( ! ( value instanceof RichTextData ) ) {
+			record.current = value
+				? RichTextData.fromHTMLString( value, { preserveWhiteSpace } )
+				: RichTextData.empty();
+		}
+		// To do: make rich text internally work with RichTextData.
+		record.current = {
+			text: record.current.text,
+			formats: record.current.formats,
+			replacements: record.current.replacements,
+		};
 		if ( disableFormats ) {
 			record.current.formats = Array( value.length );
 			record.current.replacements = Array( value.length );
@@ -91,21 +93,6 @@ export function useRichText( {
 	if ( ! record.current ) {
 		hadSelectionUpdate.current = isSelected;
 		setRecordFromProps();
-		// Sometimes formats are added programmatically and we need to make
-		// sure it's persisted to the block store / markup. If these formats
-		// are not applied, they could cause inconsistencies between the data
-		// in the visual editor and the frontend. Right now, it's only relevant
-		// to the `core/text-color` format, which is applied at runtime in
-		// certain circunstances. See the `__unstableFilterAttributeValue`
-		// function in `packages/format-library/src/text-color/index.js`.
-		// @todo find a less-hacky way of solving this.
-
-		const hasRelevantInitFormat =
-			record.current?.formats[ 0 ]?.[ 0 ]?.type === 'core/text-color';
-
-		if ( hasRelevantInitFormat ) {
-			handleChangesUponInit( record.current );
-		}
 	} else if (
 		selectionStart !== record.current.start ||
 		selectionEnd !== record.current.end
@@ -132,48 +119,27 @@ export function useRichText( {
 		if ( disableFormats ) {
 			_value.current = newRecord.text;
 		} else {
-			_value.current = toHTMLString( {
-				value: __unstableBeforeSerialize
-					? {
-							...newRecord,
-							formats: __unstableBeforeSerialize( newRecord ),
-					  }
-					: newRecord,
-				preserveWhiteSpace,
-			} );
+			const newFormats = __unstableBeforeSerialize
+				? __unstableBeforeSerialize( newRecord )
+				: newRecord.formats;
+			newRecord = { ...newRecord, formats: newFormats };
+			if ( typeof value === 'string' ) {
+				_value.current = toHTMLString( {
+					value: newRecord,
+					preserveWhiteSpace,
+				} );
+			} else {
+				_value.current = new RichTextData( newRecord );
+			}
 		}
 
-		const { start, end, formats, text } = newRecord;
+		const { start, end, formats, text } = record.current;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
 			onSelectionChange( start, end );
-			onChange( _value.current, {
-				__unstableFormats: formats,
-				__unstableText: text,
-			} );
-		} );
-		forceRender();
-	}
-
-	function handleChangesUponInit( newRecord ) {
-		record.current = newRecord;
-
-		_value.current = toHTMLString( {
-			value: __unstableBeforeSerialize
-				? {
-						...newRecord,
-						formats: __unstableBeforeSerialize( newRecord ),
-				  }
-				: newRecord,
-			preserveWhiteSpace,
-		} );
-
-		const { formats, text } = newRecord;
-
-		registry.batch( () => {
 			onChange( _value.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
@@ -215,22 +181,15 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record, preserveWhiteSpace } ),
-		useSelectObject(),
-		useFormatBoundaries( { record, applyRecord } ),
-		useDelete( {
-			createRecord,
-			handleChange,
-		} ),
-		useInputAndSelection( {
+		useEventListeners( {
 			record,
+			handleChange,
 			applyRecord,
 			createRecord,
-			handleChange,
 			isSelected,
 			onSelectionChange,
+			forceRender,
 		} ),
-		useSelectionChangeCompat(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;
