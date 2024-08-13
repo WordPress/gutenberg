@@ -643,6 +643,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			),
 		);
 
+		/*
 		$schema['properties']['format'] = array(
 			'description' => __( 'The format for the post.' ),
 			'type'        => 'array',
@@ -661,6 +662,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 				),
 			),
 		);
+		*/
 
 		$taxonomies = wp_list_filter( get_object_taxonomies( $this->post_type, 'objects' ), array( 'show_in_rest' => true ) );
 
