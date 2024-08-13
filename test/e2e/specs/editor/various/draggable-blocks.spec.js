@@ -388,9 +388,10 @@ test.describe( 'Draggable block', () => {
 		);
 
 		// When columns are stacked vertically, the block appenders don't appear in the empty columns,
-		// but this is intentional. To ensure that we can drop blocks into the block appender, close
-		// the sidebar so that column blocks are stacked horizontally.
+		// but this is intentional. To ensure that we can drop blocks into the block appender, explicitly
+		// close the sidebar so that column blocks are stacked horizontally.
 		// See https://github.com/WordPress/gutenberg/pull/63962.
+		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Close Settings' } )
