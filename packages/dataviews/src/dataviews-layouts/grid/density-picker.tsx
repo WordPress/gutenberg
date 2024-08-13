@@ -76,12 +76,12 @@ export default function DensityPicker( {
 			showTooltip={ false }
 			className="dataviews-density-picker__range-control"
 			label={ __( 'Preview size' ) }
-			value={ densityToUse }
+			value={ breakValues.max + breakValues.min - densityToUse }
 			min={ breakValues.min }
 			max={ breakValues.max }
 			withInputField={ false }
 			onChange={ ( value = 0 ) => {
-				setDensity( value );
+				setDensity( breakValues.max + breakValues.min - value );
 			} }
 			step={ 1 }
 		/>
