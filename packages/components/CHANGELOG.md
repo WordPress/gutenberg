@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
+    -   `BaseControl`
+    -   `CheckboxControl`
+    -   `ComboboxControl`
+    -   `DimensionControl`
+    -   `FocalPointPicker`
+    -   `RangeControl`
+    -   `SearchControl`
+    -   `SelectControl`
+    -   `TextControl`
+    -   `TextareaControl`
+    -   `ToggleControl`
+    -   `ToggleGroupControl`
+    -   `TreeSelect`
+
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
