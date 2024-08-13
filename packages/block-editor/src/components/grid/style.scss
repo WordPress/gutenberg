@@ -1,7 +1,7 @@
-.block-editor-grid-visualizer {
+.block-editor-grid-visualizer-popover {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
-	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
-		z-index: z-index(".block-editor-grid-visualizer");
+	&.block-editor-grid-visualizer-popover.block-editor-grid-visualizer-popover {
+		z-index: z-index(".block-editor-grid-visualizer-popover");
 
 		.components-popover__content * {
 			pointer-events: none;
@@ -18,7 +18,7 @@
 	}
 }
 
-.block-editor-grid-visualizer__cell {
+.block-editor-grid-visualizer-popover__cell {
 	display: grid;
 	position: relative;
 
@@ -82,7 +82,7 @@
 .block-editor-grid-item-resizer {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
-		z-index: z-index(".block-editor-grid-visualizer");
+		z-index: z-index(".block-editor-grid-visualizer-popover");
 
 		.components-popover__content * {
 			pointer-events: none;

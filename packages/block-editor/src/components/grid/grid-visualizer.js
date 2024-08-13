@@ -147,16 +147,12 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 	return (
 		<BlockPopoverCover
 			__unstablePopoverSlot="__unstable-block-tools-after"
-			className={ clsx( 'block-editor-grid-visualizer', {
+			className={ clsx( 'block-editor-grid-visualizer-popover', {
 				'is-dropping-allowed': isDroppingAllowed,
 			} ) }
 			clientId={ gridClientId }
 		>
-			<div
-				ref={ ref }
-				className="block-editor-grid-visualizer__grid"
-				style={ gridInfo.style }
-			>
+			<div ref={ ref } style={ gridInfo.style }>
 				{ range( 1, gridInfo.numRows ).map( ( row ) =>
 					range( 1, gridInfo.numColumns ).map( ( column ) => {
 						const isCellOccupied = occupiedRects.some( ( rect ) =>
@@ -169,7 +165,7 @@ const GridPopover = forwardRef( ( { gridClientId, gridInfo }, ref ) => {
 							<div
 								key={ `${ row }-${ column }` }
 								className={ clsx(
-									'block-editor-grid-visualizer__cell',
+									'block-editor-grid-visualizer-popover__cell',
 									{
 										'is-highlighted': isHighlighted,
 									}
@@ -237,21 +233,13 @@ function GridPopunder( { gridClientId, gridInfo, isManualGrid } ) {
 	return (
 		<BlockPopoverCover
 			inline
-			className="block-editor-grid-visualizer"
 			clientId={ gridClientId }
 			// Override layout margin and popover's zIndex.
 			contentStyle={ { margin: 0, zIndex: 0 } }
 		>
-			<div
-				className="block-editor-grid-visualizer__grid"
-				style={ gridInfo.style }
-			>
+			<div style={ gridInfo.style }>
 				{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-					<div
-						key={ i }
-						className="block-editor-grid-visualizer__cell"
-						style={ cellStyle }
-					></div>
+					<div key={ i } style={ cellStyle } />
 				) ) }
 			</div>
 		</BlockPopoverCover>
