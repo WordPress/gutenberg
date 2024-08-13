@@ -74,7 +74,6 @@ const v2 = {
 		},
 	},
 	supports: {
-		className: false,
 		anchor: true,
 		reusable: false,
 		spacing: {
