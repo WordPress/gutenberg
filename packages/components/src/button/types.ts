@@ -118,6 +118,10 @@ type BaseButtonProps = {
 	 * 'link' (the link button styles)
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
+	/**
+	 *  If provided, renders the direction of the tooltip.
+	 */
+	tooltipDirection?: 'up' | 'down';
 };
 
 type _ButtonProps = {
