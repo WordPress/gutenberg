@@ -428,7 +428,7 @@ interface ActionBase< Item > {
 	supportsBulk?: boolean;
 
 	/**
-	 * The context is which the action is visible.
+	 * The context in which the action is visible.
 	 * This is only a "meta" information for now.
 	 */
 	context?: 'list' | 'single';
