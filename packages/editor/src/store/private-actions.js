@@ -269,7 +269,7 @@ export const revertTemplate =
 
 			const fileTemplatePath = addQueryArgs(
 				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
+				{ context: 'edit', source: template.origin }
 			);
 
 			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
