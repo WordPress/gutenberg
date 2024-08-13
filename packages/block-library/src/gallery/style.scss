@@ -44,7 +44,7 @@ figure.wp-block-gallery.has-nested-images {
 		}
 
 		// Position caption and scrim at the bottom.
-		&:has(figcaption)::after,
+		&:has(figcaption)::before,
 		figcaption {
 			position: absolute;
 			bottom: 0;
@@ -54,7 +54,7 @@ figure.wp-block-gallery.has-nested-images {
 		}
 
 		// Create a background blur layer.
-		&:has(figcaption)::after {
+		&:has(figcaption)::before {
 			content: "";
 			z-index: 0;
 			height: 100%;
