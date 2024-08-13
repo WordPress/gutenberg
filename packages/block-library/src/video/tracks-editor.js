@@ -132,6 +132,8 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</Grid>
 				<VStack spacing="8">
 					<SelectControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						className="block-library-video-tracks-editor__single-track-editor-kind-select"
 						options={ KIND_OPTIONS }

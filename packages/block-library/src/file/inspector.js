@@ -73,6 +73,8 @@ export default function FileBlockInspector( {
 				) }
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						label={ __( 'Link to' ) }
 						value={ textLinkHref }
