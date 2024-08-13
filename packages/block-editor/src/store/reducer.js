@@ -1624,6 +1624,8 @@ export function insertionPoint( state = null, action ) {
 		}
 
 		case 'HIDE_INSERTION_POINT':
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
 			return null;
 	}
 
@@ -2085,6 +2087,10 @@ export function hoveredBlockClientId( state = false, action ) {
 	return state;
 }
 
+export function inserterSearchInputRef( state = { current: null } ) {
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2118,6 +2124,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	hoveredBlockClientId,
+	inserterSearchInputRef,
 } );
 
 function withAutomaticChangeReset( reducer ) {

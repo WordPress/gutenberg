@@ -7,9 +7,9 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DataFormControlProps } from '../../types';
+import type { DataFormControlProps } from '../types';
 
-export default function Edit< Item >( {
+export default function Radio< Item >( {
 	data,
 	field,
 	onChange,
@@ -20,10 +20,9 @@ export default function Edit< Item >( {
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onChange( ( prevItem: Item ) => ( {
-				...prevItem,
+			onChange( {
 				[ id ]: newValue,
-			} ) ),
+			} ),
 		[ id, onChange ]
 	);
 

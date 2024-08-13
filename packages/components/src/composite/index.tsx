@@ -136,8 +136,10 @@ export const Composite = Object.assign(
 	forwardRef<
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
-	>( function CompositeRow( props, ref ) {
-		return <Ariakit.Composite { ...props } ref={ ref } />;
+	>( function Composite( { disabled = false, ...props }, ref ) {
+		return (
+			<Ariakit.Composite disabled={ disabled } { ...props } ref={ ref } />
+		);
 	} ),
 	{
 		displayName: 'Composite',
