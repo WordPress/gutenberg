@@ -113,6 +113,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		style: {
 			...attributes?.style,
 			border: undefined,
+			color: undefined,
 		},
 	};
 
