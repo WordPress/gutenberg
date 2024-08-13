@@ -22,6 +22,7 @@ import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import duplicatePost from '../actions/duplicate-post';
+import viewPostRevisions from '../actions/view-post-revisions';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -88,6 +89,9 @@ export const registerPostTypeActions =
 			.getCurrentTheme();
 
 		const actions = [
+			!! postTypeConfig?.supports?.revisions
+				? viewPostRevisions
+				: undefined,
 			// @ts-ignore
 			globalThis.IS_GUTENBERG_PLUGIN
 				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(

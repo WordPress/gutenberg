@@ -2,10 +2,9 @@
  * WordPress dependencies
  */
 import { external } from '@wordpress/icons';
-import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useMemo, useEffect } from '@wordpress/element';
 
 /**
@@ -31,40 +30,6 @@ const viewPostAction = {
 	},
 };
 
-const postRevisionsAction = {
-	id: 'view-post-revisions',
-	context: 'list',
-	label( items ) {
-		const revisionsCount =
-			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
-		return sprintf(
-			/* translators: %s: number of revisions */
-			__( 'View revisions (%s)' ),
-			revisionsCount
-		);
-	},
-	isEligible: ( post ) => {
-		if ( post.status === 'trash' ) {
-			return false;
-		}
-		const lastRevisionId =
-			post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
-		const revisionsCount =
-			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
-		return lastRevisionId && revisionsCount > 1;
-	},
-	callback( posts, { onActionPerformed } ) {
-		const post = posts[ 0 ];
-		const href = addQueryArgs( 'revision.php', {
-			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
-		} );
-		document.location.href = href;
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
-	},
-};
-
 export function usePostActions( { postType, onActionPerformed, context } ) {
 	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
@@ -84,7 +49,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	}, [ registerPostTypeActions, postType ] );
 
 	const isLoaded = !! postTypeObject;
-	const supportsRevisions = !! postTypeObject?.supports?.revisions;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -92,7 +56,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 
 		let actions = [
 			postTypeObject?.viewable && viewPostAction,
-			supportsRevisions && postRevisionsAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -161,7 +124,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		postTypeObject?.viewable,
 		onActionPerformed,
 		isLoaded,
-		supportsRevisions,
 		context,
 	] );
 }

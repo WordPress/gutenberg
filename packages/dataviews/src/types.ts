@@ -426,6 +426,12 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
 }
 
 export interface RenderModalProps< Item > {
