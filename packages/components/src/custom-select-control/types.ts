@@ -24,7 +24,7 @@ export type CustomSelectOption = {
 /**
  * The object returned from the onChange event.
  */
-export type CustomSelectChangeObject< T extends CustomSelectOption > = {
+type CustomSelectChangeObject< T extends CustomSelectOption > = {
 	highlightedIndex?: number;
 	inputValue?: string;
 	isOpen?: boolean;

@@ -14,7 +14,6 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UncontrolledCustomSelectControl from '..';
-import type { CustomSelectChangeObject, CustomSelectOption } from '../types';
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -715,16 +714,7 @@ describe( 'Type checking', () => {
 			},
 		] as const;
 
-		const onChange: (
-			changeObject: CustomSelectChangeObject< CustomSelectOption >
-		) => void = () => {};
-		const onChangeWithFoo: (
-			changeObject: CustomSelectChangeObject<
-				CustomSelectOption & {
-					foo: string;
-				}
-			>
-		) => void = () => {};
+		const onChange = (): void => {};
 
 		<UncontrolledCustomSelectControl
 			label="Label"
@@ -765,8 +755,13 @@ describe( 'Type checking', () => {
 				key: 'narrow',
 				name: 'Narrow',
 			} }
+			// To ensure the type inferring is working correctly, but this is not a common use case.
 			// @ts-expect-error: the option type should not be inferred from `onChange`
-			onChange={ onChangeWithFoo }
+			onChange={
+				onChange as ( obj: {
+					selectedItem: { key: string; name: string; foo: string };
+				} ) => void
+			}
 		/>;
 
 		<UncontrolledCustomSelectControl
@@ -809,8 +804,13 @@ describe( 'Type checking', () => {
 				key: 'narrow',
 				name: 'Narrow',
 			} }
+			// To ensure the type inferring is working correctly, but this is not a common use case.
 			// @ts-expect-error: the option type should not be inferred from `onChange`
-			onChange={ onChangeWithFoo }
+			onChange={
+				onChange as ( obj: {
+					selectedItem: { key: string; name: string; foo: string };
+				} ) => void
+			}
 		/>;
 	} );
 } );
