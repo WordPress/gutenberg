@@ -75,8 +75,16 @@ function useRedirectOldPaths() {
 
 export default function useLayoutAreas() {
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas, quickEdit } =
-		params;
+	const {
+		postType,
+		postId,
+		path,
+		layout,
+		isCustom,
+		canvas,
+		quickEdit,
+		activeView,
+	} = params;
 	const hasEditCanvasMode = canvas === 'edit';
 	const history = useHistory();
 	useRedirectOldPaths();
@@ -105,6 +113,7 @@ export default function useLayoutAreas() {
 								history.push( {
 									postId,
 									postType,
+									activeView,
 								} );
 							} }
 						/>

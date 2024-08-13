@@ -63,6 +63,8 @@ export const useQuickEditPostAction = () => {
 					postId: post.id,
 					postType: post.type,
 					quickEdit: true,
+					activeView:
+						history.getLocationWithParams().params.activeView,
 				} );
 			},
 		} ),
