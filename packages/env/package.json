@@ -45,7 +45,6 @@
 		"js-yaml": "^3.13.1",
 		"ora": "^4.0.2",
 		"rimraf": "^3.0.2",
-		"semver": "^7.3.5",
 		"simple-git": "^3.5.0",
 		"terminal-link": "^2.0.0",
 		"yargs": "^17.3.0"

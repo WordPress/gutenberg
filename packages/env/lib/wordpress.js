@@ -8,7 +8,6 @@ const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
 const dns = require( 'dns' ).promises;
-const semver = require( 'semver' );
 
 /**
  * Promisified dependencies
@@ -27,6 +26,43 @@ const { getCache, setCache } = require( './cache' );
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
+
+/**
+ * Utility function to check if a version is lower than another version, only considering the major and minor portions.
+ *
+ * This is a non-comprehensive check only intended for this usage, to avoid pulling in a full semver library.
+ *
+ * @param {string} version        The version to check.
+ * @param {string} compareVersion The compare version to check whether the version is lower than.
+ * @return {boolean} True if the version is lower than the compare version, false otherwise.
+ */
+function isMajorMinorVersionLower( version, compareVersion ) {
+	const versionParts = version.split( '.' ).map( Number );
+	const compareVersionParts = compareVersion.split( '.' ).map( Number );
+
+	// If the major version is lower, the version is lower.
+	if ( versionParts[ 0 ] < compareVersionParts[ 0 ] ) {
+		return true;
+	}
+
+	// If the major version is the same, we need to compare the minor version.
+	if ( versionParts[ 0 ] === compareVersionParts[ 0 ] ) {
+		if ( versionParts[ 1 ] !== undefined && compareVersionParts[ 1 ] === undefined ) {
+			return versionParts[ 1 ] < compareVersionParts[ 1 ];
+		}
+
+		// Here the version has no minor version, which is the same as having a minor version of 0.
+		if ( compareVersionParts[ 1 ] !== undefined ) {
+			return 0 < compareVersionParts[ 1 ];
+		}
+
+		// Here the compare version has no minor version (i.e. 0), and nothing is lower than 0.
+		return false;
+	}
+
+	// If the major version is higher, the version is higher.
+	return false;
+}
 
 /**
  * Checks a WordPress database connection. An error is thrown if the test is
@@ -65,7 +101,7 @@ async function configureWordPress( environment, config, spinner ) {
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
 
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
-	const configAnchor = wpVersion && semver.lt( wpVersion, '5.1' ) ? `"define('WP_DEBUG',"` : `"define( 'WP_DEBUG',"`;
+	const configAnchor = wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' ) ? `"define('WP_DEBUG',"` : `"define( 'WP_DEBUG',"`;
 
 	// Set wp-config.php values.
 	for ( let [ key, value ] of Object.entries(
@@ -112,9 +148,9 @@ async function configureWordPress( environment, config, spinner ) {
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
 	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
 	let abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
-	if ( wpVersion && semver.lt( wpVersion, '5.1' ) ) {
+	if ( wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' ) ) {
 		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
-	} else if ( wpVersion && semver.lt( wpVersion, '5.4' ) ) {
+	} else if ( wpVersion && isMajorMinorVersionLower( wpVersion, '5.4' ) ) {
 		abspathDef = `define( 'ABSPATH', dirname(__FILE__) . '\\/' );`;
 	}
 
