@@ -40,17 +40,15 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
+	// WordPress 6.7 compat.
+	require __DIR__ . '/compat/wordpress-6.7/rest-api.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
-	// Experimental.
-	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
-		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
-	}
 	require_once __DIR__ . '/experimental/rest-api.php';
-
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
@@ -105,6 +103,7 @@ require __DIR__ . '/compat/wordpress-6.6/post.php';
 // WordPress 6.7 compat.
 require __DIR__ . '/compat/wordpress-6.7/blocks.php';
 require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
+require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
