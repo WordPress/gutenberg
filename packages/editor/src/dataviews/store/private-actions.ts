@@ -103,9 +103,10 @@ export const registerPostTypeActions =
 				  duplicatePost
 				: undefined,
 			postTypeConfig.slug === 'wp_template_part' &&
-				canCreate &&
-				currentTheme?.is_block_theme &&
-				duplicateTemplatePart,
+			canCreate &&
+			currentTheme?.is_block_theme
+				? duplicateTemplatePart
+				: undefined,
 			canCreate && postTypeConfig.slug === 'wp_block'
 				? duplicatePattern
 				: undefined,
@@ -123,7 +124,7 @@ export const registerPostTypeActions =
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
-				if ( action === undefined ) {
+				if ( ! action ) {
 					return;
 				}
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
