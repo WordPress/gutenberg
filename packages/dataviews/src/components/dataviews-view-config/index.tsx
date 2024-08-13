@@ -24,7 +24,7 @@ import {
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
-import { arrowDown, arrowUp, cog, seen, unseen } from '@wordpress/icons';
+import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 
 /**
@@ -33,6 +33,7 @@ import warning from '@wordpress/warning';
 import {
 	SORTING_DIRECTIONS,
 	LAYOUT_GRID,
+	LAYOUT_TABLE,
 	sortIcons,
 	sortLabels,
 } from '../../constants';
@@ -238,29 +239,39 @@ function isFieldHidable(
 		field.enableHiding !== false && ! mandatoryFields.includes( field.id )
 	);
 }
-function isFieldSortable( field: NormalizedField< any > ) {
-	return field.enableSorting !== false;
-}
 
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const mandatoryFields = getMandatoryFields( view );
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
+	const fieldsOrdered = useMemo( () => {
+		if ( ! view.fields ) {
+			return fields.map( ( field ) => field.id );
+		}
+		const result = [ ...view.fields ];
+		fields.forEach( ( field ) => {
+			if ( result.includes( field.id ) ) {
+				return;
+			}
+			result.push( field.id );
+		} );
+		return result;
+	}, [ fields, view.fields ] );
 	if (
-		! fields?.some(
-			( field ) =>
-				isFieldHidable( field, mandatoryFields ) ||
-				isFieldSortable( field )
-		)
+		view.type !== LAYOUT_TABLE &&
+		! fields?.some( ( field ) => isFieldHidable( field, mandatoryFields ) )
 	) {
 		return null;
 	}
 	return (
 		<ItemGroup isBordered isSeparated>
-			{ fields?.map( ( field ) => {
+			{ fieldsOrdered?.map( ( fieldId ) => {
+				const field = fields.find(
+					( f ) => f.id === fieldId
+				) as NormalizedField< any >;
+				const index = view.fields?.indexOf( field.id ) as number;
 				const isHidable = isFieldHidable( field, mandatoryFields );
-				const isSortable = isFieldSortable( field );
-				if ( ! isHidable && ! isSortable ) {
+				if ( view.type !== LAYOUT_TABLE && ! isHidable ) {
 					return null;
 				}
 				const isVisible = viewFields.includes( field.id );
@@ -269,24 +280,39 @@ function FieldControl() {
 						<HStack expanded>
 							<span>{ field.label }</span>
 							<HStack justify="flex-end">
+								{ view.type === LAYOUT_TABLE && (
+									<>
 							<Button
-									isPressed={
-										view.sort?.field === field.id &&
-										view.sort?.direction === 'asc'
+											disabled={
+												! isVisible || index < 1
 									}
-									disabled={ ! isSortable }
 									accessibleWhenDisabled={ false }
 									size="compact"
-									onClick={ () =>
+											onClick={ () => {
+												if (
+													! view.fields ||
+													index < 1
+												) {
+													return;
+												}
 										onChangeView( {
 											...view,
-											sort: {
-												direction: 'asc',
-												field: field.id,
-											},
-										} )
-									}
-									icon={ arrowUp }
+													fields: [
+														...( view.fields.slice(
+															0,
+															index - 1
+														) ?? [] ),
+														field.id,
+														view.fields[
+															index - 1
+														],
+														...view.fields.slice(
+															index + 1
+														),
+													],
+												} );
+											} }
+											icon={ chevronUp }
 									label={ sprintf(
 										/* translators: %s: field label */
 										__( 'Sort ascending by: %s' ),
@@ -294,29 +320,47 @@ function FieldControl() {
 									) }
 								/>
 								<Button
-									isPressed={
-										view.sort?.field === field.id &&
-										view.sort?.direction === 'desc'
+											disabled={
+												! isVisible ||
+												! view.fields ||
+												index >= view.fields.length - 1
 									}
-									disabled={ ! isSortable }
 									accessibleWhenDisabled={ false }
 									size="compact"
-									onClick={ () =>
+											onClick={ () => {
+												if (
+													! view.fields ||
+													index >=
+														view.fields.length - 1
+												) {
+													return;
+												}
 										onChangeView( {
 											...view,
-											sort: {
-												direction: 'desc',
-												field: field.id,
-											},
-										} )
-									}
-									icon={ arrowDown }
+													fields: [
+														...( view.fields.slice(
+															0,
+															index
+														) ?? [] ),
+														view.fields[
+															index + 1
+														],
+														field.id,
+														...view.fields.slice(
+															index + 2
+														),
+													],
+												} );
+											} }
+											icon={ chevronDown }
 									label={ sprintf(
 										/* translators: %s: field label */
 										__( 'Sort descending by: %s' ),
 										field.label
 									) }
-								/>
+										/>{ ' ' }
+									</>
+								) }
 								<Button
 									disabled={ ! isHidable }
 									accessibleWhenDisabled={ false }
