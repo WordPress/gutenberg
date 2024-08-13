@@ -27,8 +27,6 @@ const getNameFromLabelV1 = ( content ) => {
 	);
 };
 
-const getNameFromLabelV2 = getNameFromLabelV1;
-
 const v2 = {
 	attributes: {
 		type: {
@@ -129,7 +127,7 @@ const v2 = {
 					<TagName
 						className={ inputClasses }
 						type={ 'textarea' === type ? undefined : type }
-						name={ name || getNameFromLabelV2( label ) }
+						name={ name || getNameFromLabelV1( label ) }
 						required={ required }
 						aria-required={ required }
 						placeholder={ placeholder || undefined }
