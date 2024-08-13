@@ -915,6 +915,10 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			);
 		}
 
+		/*
+		* I have temporarilly removed this because I believe it is incorrect,
+		* if I don't comment this out, then there are no results if
+		* the query loop block is not set to filter by format.
 		$query_params['format'] = array(
 			'default'     => 'standard',
 			'description' => __( 'Limit result set to posts assigned one or more formats.' ),
@@ -935,6 +939,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 				),
 			),
 		);
+		*/
 
 		/**
 		 * Filters collection parameters for the posts controller.
