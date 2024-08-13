@@ -5,14 +5,12 @@
 	background-color: $white;
 	padding: $grid-unit-15 $grid-unit-60;
 	border-top: $border-width solid $gray-100;
-	color: $gray-700;
 	flex-shrink: 0;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
 }
 
 .dataviews-pagination__page-select {
-	color: $gray-900;
 	font-size: 11px;
 	font-weight: 500;
 	text-transform: uppercase;
