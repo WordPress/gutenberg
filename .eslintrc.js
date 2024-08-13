@@ -309,7 +309,6 @@ module.exports = {
 							componentName +
 							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
 					} ) ),
-
 					// Temporary rules until we're ready to officially default to the new size.
 					...[
 						'BorderBoxControl',
