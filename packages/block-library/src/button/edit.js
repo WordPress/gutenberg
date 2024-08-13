@@ -266,6 +266,7 @@ function ButtonEdit( props ) {
 						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
+				draggable="true"
 			>
 				<RichText
 					ref={ mergedRef }
