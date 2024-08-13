@@ -14,6 +14,13 @@ export interface CommonPost {
 	type: string;
 	id: string | number;
 	blocks?: Object[];
+	_links?: Links;
+}
+
+interface Links {
+	'predecessor-version'?: { href: string; id: number }[];
+	'version-history'?: { href: string; count: number }[];
+	[ key: string ]: { href: string }[] | undefined;
 }
 
 export interface BasePost extends CommonPost {
@@ -27,7 +34,6 @@ export interface BasePost extends CommonPost {
 	featured_media?: number;
 	menu_order?: number;
 	ping_status?: 'open' | 'closed';
-	_links?: Record< string, { href: string }[] >;
 }
 
 export interface Template extends CommonPost {
@@ -66,6 +72,7 @@ export interface PostType {
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;
+		revisions?: boolean;
 	};
 }
 
