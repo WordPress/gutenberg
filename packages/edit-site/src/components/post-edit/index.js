@@ -65,12 +65,13 @@ function PostEditForm( { postType, postId } ) {
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
 			if (
-				edits.status === 'future' &&
+				edits.status !== 'future' &&
+				record.status === 'future' &&
 				new Date( record.date ) > new Date()
 			) {
 				edits.date = null;
 			}
-			if ( edits.status === 'private' ) {
+			if ( edits.status === 'private' && record.password ) {
 				edits.password = '';
 			}
 			editEntityRecord( 'postType', postType, id, edits );
