@@ -30,3 +30,9 @@
 .editor-post-url__panel-toggle {
 	word-break: break-word;
 }
+
+.components-external-link__wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}

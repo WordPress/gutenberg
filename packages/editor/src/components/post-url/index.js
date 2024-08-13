@@ -102,13 +102,6 @@ export default function PostURL( { onClose } ) {
 									/
 								</InputControlPrefixWrapper>
 							}
-							suffix={
-								<Button
-									icon={ copySmall }
-									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
-								/>
-							}
 							label={ __( 'Link' ) }
 							hideLabelFromVision
 							value={ forceEmptyField ? '' : postSlug }
@@ -145,6 +138,13 @@ export default function PostURL( { onClose } ) {
 									className="editor-post-url__link"
 									href={ postLink }
 									target="_blank"
+									suffix={
+										<Button
+											icon={ copySmall }
+											ref={ copyButtonRef }
+											label={ __( 'Copy' ) }
+										/>
+									}
 								>
 									<span className="editor-post-url__link-prefix">
 										{ permalinkPrefix }
