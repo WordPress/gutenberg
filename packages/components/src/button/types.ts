@@ -121,7 +121,7 @@ type BaseButtonProps = {
 	/**
 	 *  If provided, renders the direction of the tooltip.
 	 */
-	tooltipDirection?: 'up' | 'down';
+	tooltipDirection?: 'up' | 'down' | 'right' | 'left';
 };
 
 type _ButtonProps = {
