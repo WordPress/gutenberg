@@ -4,20 +4,20 @@ The Interactivity API offers a powerful framework for creating interactive block
 
 Let's start with a brief definition of global state, local context and derived state.
 
--   **Global state:** Global data that can be accessed and modified by any interactive block on the page, allowing different parts of your blocks to stay in sync.
+-   **Global state:** Global data that can be accessed and modified by any interactive block on the page, allowing different parts of your interactive blocks to stay in sync.
 -   **Local context:** Local data defined within a specific element in the HTML structure, accessible only to that element and its children, providing independent state for individual blocks.
 -   **Derived state:** Computed values based on global state or local context, dynamically calculated on-demand to ensure consistent data representation without storing redundant data.
 
-Let's now dive into each of these concepts to study them in more detail and provide some examples!
+Let's now dive into each of these concepts to study them in more detail and provide some examples.
 
 ## Global state
 
-**Global state** in the Interactivity API refers to global data that can be accessed and modified by any interactive block on the page. It serves as a shared information hub, allowing different parts of your blocks to communicate and stay in sync. Global state is the ideal mechanism for exchanging information between blocks, regardless of their position in the DOM tree.
+**Global state** in the Interactivity API refers to global data that can be accessed and modified by any interactive block on the page. It serves as a shared information hub, allowing different parts of your blocks to communicate and stay in sync. Global state is the ideal mechanism for exchanging information between interactive blocks, regardless of their position in the DOM tree.
 
 You should use global state when:
 
--   You need to share data between multiple blocks that are not directly related in the DOM hierarchy.
--   You want to maintain a single source of truth for certain data across all your blocks.
+-   You need to share data between multiple interactive blocks that are not directly related in the DOM hierarchy.
+-   You want to maintain a single source of truth for certain data across all your interactive blocks.
 -   You're dealing with data that affects multiple parts of your UI simultaneously.
 -   You want to implement features that are global for the page.
 
@@ -36,9 +36,9 @@ You should use global state when:
     ));
     ```
 
-    These initial global state values will be used during the rendering of the page in PHP so the HTML can be processed and populated with the correct values.
+    These initial global state values will be used during the rendering of the page in PHP to populate the HTML markup that is sent to the browser.
 
-    -   Original, as written in the PHP file by the developer:
+    -   HTML markup written in the PHP file by the developer:
 
         ```html
         <div
@@ -53,7 +53,7 @@ You should use global state when:
         </div>
         ```
 
-    -   After the directives have been processed and the HTML markup is ready to be sent to the browser:
+    -   HTML markup after the directives have been processed and it is ready to be sent to the browser:
 
         ```html
         <div
@@ -68,7 +68,7 @@ You should use global state when:
         </div>
         ```
 
-    Please refer to this [guide about server-side rendering](./server-side-rendering.md) for more information about how directives are processed on the server.
+    _Please, visit [the Server-side Rendering guide](./server-side-rendering.md) to learn more about how directives are processed on the server._
 
     In cases where the global state is not used during the rendering of the page in PHP, it can also be defined directly on the client.
 
@@ -90,7 +90,7 @@ You should use global state when:
 
 -   **Accessing the global state**
 
-    As shown, in the HTML, you can access the global state values directly by referencing `state` in the directive values:
+    In the HTML markup, you can access the global state values directly by referencing `state` in the directive attribute values:
 
     ```html
     <div data-wp-bind--hidden="!state.show">
@@ -129,7 +129,7 @@ You should use global state when:
     } );
     ```
 
-    The global state initialized on the server using the `wp_interactivity_state` function is also included in that object:
+    The global state initialized on the server using the `wp_interactivity_state` function is also included in that object because it is automatically serialized from the server to the client:
 
     ```php
     wp_interactivity_state( 'myPlugin', array(
@@ -165,8 +165,8 @@ You should use global state when:
     store( 'myPlugin', {
     	actions: {
     		readValues() {
-    			state.someValue; // Exists and its initial value is 1.
-    			state.otherValue; // Exists and its initial value is 2.
+    			state.someValue; // It exists and its initial value is 1.
+    			state.otherValue; // It exists and its initial value is 2.
     		},
     	},
     } );
@@ -187,11 +187,15 @@ You should use global state when:
     } );
     ```
 
-### Example: Two blocks using global state to communicate
+    Changes to the global state will automatically trigger updates in any directives that depend on the modified values.
 
-In this example, there are two independent blocks. One displays a counter, and the other a button to increment that counter. These blocks can be positioned anywhere on the page, regardless of the HTML structure. In other words, one does not need to be an inner block of the other.
+    _Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
 
--   **Count Block**
+### Example: Two interactive blocks using global state to communicate
+
+In this example, there are two independent interactive blocks. One displays a counter, and the other a button to increment that counter. These blocks can be positioned anywhere on the page, regardless of the HTML structure. In other words, one does not need to be an inner block of the other.
+
+-   **Counter Block**
 
     ```php
     <?php
@@ -204,7 +208,7 @@ In this example, there are two independent blocks. One displays a counter, and t
       data-wp-interactive="myCounterPlugin"
       <?php echo get_block_wrapper_attributes(); ?>
     >
-      Count: <span data-wp-text="state.counter"></span>
+      Counter: <span data-wp-text="state.counter"></span>
     </div>
     ```
 
@@ -234,22 +238,22 @@ In this example, there are two independent blocks. One displays a counter, and t
 In this example:
 
 1. The global state is initialized on the server using `wp_interactivity_state`, setting an initial `counter` of 0.
-2. The Count Block displays the current counter using `data-wp-text="state.counter"`, which reads from the global state.
+2. The Counter Block displays the current counter using `data-wp-text="state.counter"`, which reads from the global state.
 3. The Increment Block contains a button that triggers the `increment` action when clicked, using `data-wp-on-async--click="actions.increment"`.
 4. In JavaScript, the `increment` action directly modifies the global state by incrementing `state.counter`.
 
-Both blocks are independent and can be placed anywhere on the page. They don't need to be nested or directly related in the DOM structure. Multiple instances of these blocks can be added to the page, and they will all share and update the same global count value.
+Both blocks are independent and can be placed anywhere on the page. They don't need to be nested or directly related in the DOM structure. Multiple instances of these interactive blocks can be added to the page, and they will all share and update the same global counter value.
 
 ## Local context
 
 **Local context** in the Interactivity API refers to local data defined within a specific element in the HTML structure. Unlike global state, local context is only accessible to the element where it's defined and its child elements.
 
-The local context is particularly useful when you need independent state for individual blocks, ensuring that each instance of a block can maintain its own unique data without interfering with others.
+The local context is particularly useful when you need independent state for individual interactive blocks, ensuring that each instance of a block can maintain its own unique data without interfering with others.
 
 You should use local context when:
 
--   You need to maintain separate state for multiple instances of the same block.
--   You want to encapsulate data that's only relevant to a specific block and its children.
+-   You need to maintain separate state for multiple instances of the same interactive block.
+-   You want to encapsulate data that's only relevant to a specific interactive block and its children.
 -   You need to implement features that are isolated to a specific part of your UI.
 
 ### Working with local context
@@ -278,7 +282,7 @@ You should use local context when:
 
 -   **Accessing the local context**
 
-    In the HTML, you can access the local context values directly by referencing `context` in the directive values:
+    In the HTML markup, you can access the local context values directly by referencing `context` in the directive values:
 
     ```html
     <div data-wp-bind--hidden="!context.isOpen">
@@ -291,6 +295,12 @@ You should use local context when:
     ```js
     store( 'myPlugin', {
     	actions: {
+    		sendAnalyticsEvent() {
+    			const { counter } = getContext();
+    			myAnalyticsLibrary.sendEvent( 'updated counter', counter );
+    		},
+    	},
+    	callbacks: {
     		logCounter() {
     			const { counter } = getContext();
     			console.log( `Current counter: ${ counter }` );
@@ -310,7 +320,7 @@ You should use local context when:
     	actions: {
     		increment() {
     			const context = getContext();
-    			context.count += 1;
+    			context.counter += 1;
     		},
     		updateName( event ) {
     			const context = getContext();
@@ -321,6 +331,8 @@ You should use local context when:
     ```
 
     Changes to the local context will automatically trigger updates in any directives that depend on the modified values.
+
+    _Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
 
 -   **Nesting local contexts**
 
@@ -340,9 +352,9 @@ You should use local context when:
 
     In this example, the inner `div` will have a `theme` value of `"dark"`, but will inherit the `counter` value `0` from its parent context.
 
-### Example: One block using local context to have independent state
+### Example: One interactive block using local context to have independent state
 
-In this example, there is a single block that shows a counter and can increment it. By using local context, each instance of this block will have its own independent counter, even if multiple blocks are added to the page.
+In this example, there is a single interactive block that shows a counter and can increment it. By using local context, each instance of this block will have its own independent counter, even if multiple blocks are added to the page.
 
 ```php
 <div
@@ -373,15 +385,15 @@ In this example:
 3. The increment button uses `data-wp-on-async--click="actions.increment"` to trigger the increment action.
 4. In JavaScript, the `getContext` function is used to access and modify the local context for each block instance.
 
-A user will be able to add multiple instances of this block to a page, and each will maintain its own independent counter. Clicking the "Increment" button on one block will only affect that specific block's count and not the others.
+A user will be able to add multiple instances of this block to a page, and each will maintain its own independent counter. Clicking the "Increment" button on one block will only affect that specific block's counter and not the others.
 
 ## Derived state
 
-**Derived state** in the Interactivity API refers to a value that is computed from other parts of the global state or local context. It's calculated on demand rather than stored. It ensures consistency and reduces redundancies, while enhancing [the declarative nature of your code](./the-reactive-and-declarative-mindset.md).
+**Derived state** in the Interactivity API refers to a value that is computed from other parts of the global state or local context. It's calculated on demand rather than stored. It ensures consistency, reduces redundancies, and enhances the declarative nature of your code.
 
-_Derived state is a fundamental concept in modern state management, not unique to the Interactivity API. It's also used in other popular state management systems like Redux, where it's called `selectors`, or Preact Signals, where it's known as `computed` values._
+Derived state is a fundamental concept in modern state management, not unique to the Interactivity API. It's also used in other popular state management systems like Redux, where it's called `selectors`, or Preact Signals, where it's known as `computed` values.
 
-Here's why derived state is important:
+Derived state offers several key benefits that make it an essential part of a well-designed application state, including:
 
 1. **Single source of truth:** Derived state encourages you to store only the essential, raw data in your state. Any values that can be calculated from this core data become derived state. This approach reduces the risk of inconsistencies in your interactive blocks.
 
@@ -393,7 +405,9 @@ Here's why derived state is important:
 
 5. **Easier debugging:** With derived state, it's clearer where data originates and how it's transformed. This can make it easier to track down issues in your interactive blocks.
 
-In essence, derived state allows you to express relationships between different pieces of data in your blocks declaratively, instead of imperatively updating related values whenever something changes.
+In essence, derived state allows you to express relationships between different pieces of data in your interactive blocks declaratively, instead of imperatively updating related values whenever something changes.
+
+_Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how to leverage declarative coding in the Interactivity API._
 
 You should use derived state:
 
@@ -417,7 +431,7 @@ You should use derived state:
         ));
         ```
 
-    -   Or it can be defined by doing the necessary computations on the server:
+    -   Or it can be defined by doing the necessary computations:
 
         ```php
         $counter = 1;
@@ -429,7 +443,9 @@ You should use derived state:
         ));
         ```
 
-    Regardless of the approach, the initial derived state values will be used during the rendering of the page in PHP, and the HTML can be populated with the correct values. Please refer to this [guide about server-side rendering](./server-side-rendering.md) for more information about how directives are processed on the server.
+    Regardless of the approach, the initial derived state values will be used during the rendering of the page in PHP, and the HTML can be populated with the correct values.
+
+    _Please, visit [the Server-side Rendering guide](./server-side-rendering.md) to learn more about how directives are processed on the server._
 
     The same mechanism applies even when the derived state property depends on the local context.
 
@@ -437,9 +453,9 @@ You should use derived state:
     <?php
     $counter = 1;
 
-    $context = array(
-      'counter' => $counter, // This is local context.
-    );
+    // This is the local context.
+    $context = array( 'counter' => $counter );
+
     wp_interactivity_state( 'myCounterPlugin', array(
       'double' => $counter * 2, // This is derived state.
     ));
@@ -458,7 +474,7 @@ You should use derived state:
     </div>
     ```
 
-    In the client, the derived state is defined using getters:
+    In JavaScript, the derived state is defined using getters:
 
     ```js
     const { state } = store( 'myCounterPlugin', {
@@ -470,17 +486,19 @@ You should use derived state:
     } );
     ```
 
-    Derived state can also depend on local context, or local context and global state at the same time.
+    Derived state can depend on local context, or local context and global state at the same time.
 
     ```js
     const { state } = store( 'myCounterPlugin', {
     	state: {
     		get double() {
     			const { counter } = getContext();
+    			// Depends on local context.
     			return counter * 2;
     		},
     		get product() {
     			const { counter } = getContext();
+    			// Depends on local context and global state.
     			return counter * state.factor;
     		},
     	},
@@ -491,7 +509,7 @@ You should use derived state:
 
     ```php
     <?php
-    wp_interactivity_state( 'myCounterPlugin', array(
+    wp_interactivity_state( 'myProductPlugin', array(
       'list'    => array( 1, 2, 3 ),
       'factor'  => 3,
       'product' => function() {
@@ -503,8 +521,8 @@ You should use derived state:
     ?>
 
     <template
-      data-wp-interactive="myCounterPlugin"
-     data-wp-each="state.list"
+      data-wp-interactive="myProductPlugin"
+      data-wp-each="state.list"
     >
       <span data-wp-text="state.product"></span>
     </template>
@@ -520,15 +538,13 @@ You should use derived state:
 
 -   **Accessing the derived state**
 
-    In the HTML, the syntax for the derived state is the same as the one for the global state, just by referencing `state` in the directive values.
+    In the HTML markup, the syntax for the derived state is the same as the one for the global state, just by referencing `state` in the directive attribute values.
 
     ```html
     <span data-wp-text="state.double"></span>
     ```
 
-    Actually, there is no way to distinguish between derived state and global state when consuming it.
-
-    The same happens in Javascript.
+    The same happens in Javascript. Both global state and derived state can be consumed through the `state` property of the store:
 
     ```js
     const { state } = store( 'myCounterPlugin', {
@@ -541,6 +557,8 @@ You should use derived state:
     	},
     } );
     ```
+
+    This lack of distinction is intentional, allowing developers to consume both derived and global state uniformly, and making them interchangeable in practice.
 
     You can also access the derived state from another derived state and, thus, create multiple levels of computed values.
 
@@ -562,7 +580,7 @@ You should use derived state:
     The derived state cannot be updated directly. To update its values, you need to update the global state or local context on which that derived state depends.
 
     ```js
-    const { state } = store( 'myPlugin', {
+    const { state } = store( 'myCounterPlugin', {
     	// ...
     	actions: {
     		updateValues() {
@@ -585,7 +603,7 @@ Let's consider a scenario where there is a counter and the double value needs to
 -   **Not using derived state**
 
     ```js
-    const { state } = store( 'myPlugin', {
+    const { state } = store( 'myCounterPlugin', {
     	state: {
     		counter: 1,
     		double: 2,
@@ -608,7 +626,7 @@ Let's consider a scenario where there is a counter and the double value needs to
 -   **Using derived state**
 
     ```js
-    const { state } = store( 'myPlugin', {
+    const { state } = store( 'myCounterPlugin', {
     	state: {
     		counter: 1,
     		get double() {
@@ -634,7 +652,7 @@ Let's consider a scenario where there is a counter and the double value needs to
 Let's now consider a scenario where there is a local context that initializes a counter.
 
 ```js
-store( 'myPlugin', {
+store( 'myCounterPlugin', {
 	state: {
 		get double() {
 			const { counter } = getContext();
@@ -651,28 +669,22 @@ store( 'myPlugin', {
 ```
 
 ```html
-<!-- This will render "1 -> 2" -->
-<div data-wp-context='{ "counter": 1 }'>
-	<div>
-		<span data-wp-text="context.counter"></span>
-		->
-		<span data-wp-text="state.double"></span>
+<div data-wp-interactive="myCounterPlugin">
+	<!-- This will render "Double: 2" -->
+	<div data-wp-context='{ "counter": 1 }'>
+		Double: <span data-wp-text="state.double"></span>
+
+		<!-- This button will increment the local counter. -->
+		<button data-wp-on-async--click="actions.increment">Increment</button>
 	</div>
 
-	<!-- This button will increment the local counter. -->
-	<button data-wp-on-async--click="actions.increment">Increment</button>
-</div>
+	<!-- This will render "Double: 4" -->
+	<div data-wp-context='{ "counter": 2 }'>
+		Double: <span data-wp-text="state.double"></span>
 
-<!-- This will render "2 -> 4" -->
-<div data-wp-context='{ "counter": 2 }'>
-	<div>
-		<span data-wp-text="context.counter"></span>
-		->
-		<span data-wp-text="state.double"></span>
+		<!-- This button will increment the local counter. -->
+		<button data-wp-on-async--click="actions.increment">Increment</button>
 	</div>
-
-	<!-- This button will increment the local counter. -->
-	<button data-wp-on-async--click="actions.increment">Increment</button>
 </div>
 ```
 
@@ -683,19 +695,18 @@ In this example, the derived state `state.double` reads from the local context p
 Let's now consider a scenario where there are a global tax rate and local product prices and calculate the final price, including tax.
 
 ```html
-<div data-wp-context='{ "priceWithoutTax": 100 }'>
-	<div>
-		Product Price: $<span data-wp-text="context.priceWithoutTax"></span>
-	</div>
-	<div>Tax Rate: <span data-wp-text="state.taxRatePercentage"></span></div>
-	<div>
-		Price (inc. tax): $<span data-wp-text="state.priceWithTax"></span>
-	</div>
+<div
+	data-wp-interactive="myProductPlugin"
+	data-wp-context='{ "priceWithoutTax": 100 }'
+>
+	<p>Product Price: $<span data-wp-text="context.priceWithoutTax"></span></p>
+	<p>Tax Rate: <span data-wp-text="state.taxRatePercentage"></span></p>
+	<p>Price (inc. tax): $<span data-wp-text="state.priceWithTax"></span></p>
 </div>
 ```
 
 ```js
-const { state } = store( 'myPlugin', {
+const { state } = store( 'myProductPlugin', {
 	state: {
 		taxRate: 0.21,
 		get taxRatePercentage() {
@@ -720,12 +731,10 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-In this example, `priceWithTax` is derived from both the global `taxRate` and the local `priceWithoutTax`.
+In this example, `priceWithTax` is derived from both the global `taxRate` and the local `priceWithoutTax`. Every time you update the global state or local context through the `updateTaxRate` or `updatePrice` actions, the Interactivity API recomputes the derived state and updates the necessary parts of the DOM.
 
 By using derived state, you create a more maintainable and less error-prone codebase. It ensures that related state values are always in sync, reduces the complexity of your actions, and makes your code more declarative and easier to reason about.
 
 ## Conclusion
-
-Understanding and effectively utilizing global state, local context, and derived state is crucial for leveraging the full power of the Interactivity API. By following the guidelines and examples provided in this guide, you can make informed decisions on when and how to use these state management techniques to create efficient, scalable, and maintainable interactive blocks.
 
 Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, and choose between global state and local context based on the scope and requirements of your data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain.

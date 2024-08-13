@@ -16,9 +16,9 @@ To understand how the Server Directive Processing works, let's start with an exa
 
 The following are the necessary steps to ensure that the directives are correctly processed by the Server Directive Processing of the Interactivity API during the server-side rendering of WordPress.
 
--   **1. You mark the block as interactive**
+-   **1. Mark the block as interactive**
 
-    First, to enable the server processing of the block's directives, you need to add `supports.interactivity` to the `block.json`:
+    First, to enable the server processing of the interactive block's directives, you must add `supports.interactivity` to the `block.json`:
 
     ```json
     {
@@ -28,15 +28,15 @@ The following are the necessary steps to ensure that the directives are correctl
     }
     ```
 
--   **2. You initialize the global state or local context**
+-   **2. Initialize the global state or local context**
 
-    Then, you need to initialize either the global state or the local context that will be used during the server-side rendering of the page.
+    Then, you must initialize either the global state or the local context that will be used during the server-side rendering of the page.
 
     If you are using global state, you must use the `wp_interactivity_state` function:
 
     ```php
     wp_interactivity_state( 'myFruitPlugin', array(
-    		'fruits' => array( 'Apple', 'Banana', 'Cherry' )
+      'fruits' => array( 'Apple', 'Banana', 'Cherry' )
     ));
     ```
 
@@ -44,26 +44,25 @@ The following are the necessary steps to ensure that the directives are correctl
 
     -   Adding it directly to the HTML.
 
-    ```html
-    <ul data-wp-context='{ "fruits": ["Apple", "Banana", "Cherry"] }'>
-    	...
-    </ul>
-    ```
+        ```html
+        <ul data-wp-context='{ "fruits": ["Apple", "Banana", "Cherry"] }'>
+        	...
+        </ul>
+        ```
 
     -   Using the `wp_interactivity_data_wp_context` helper.
 
-    ```php
-    <?php
-    $context = array(
-    	'fruits' => array( 'Apple', 'Banana', 'Cherry' ),
-    );
-    ?>
-    <ul <?php echo wp_interactivity_data_wp_context( $context ); ?>>
-    	...
-    </ul>
-    ```
+        ```php
+        <?php
+        $context = array( 'fruits' => array( 'Apple', 'Banana', 'Cherry' ) );
+        ?>
 
--   **3. You define the interactive elements using directives**
+        <ul <?php echo wp_interactivity_data_wp_context( $context ); ?>>
+          ...
+        </ul>
+        ```
+
+-   **3. Define the interactive elements using directives**
 
     Next, you need to add the necessary directives to the HTML markup.
 
@@ -92,10 +91,9 @@ The following are the necessary steps to ensure that the directives are correctl
     		<li data-wp-text="context.item"></li>
     	</template>
     </ul>
-    ';
     ```
 
-That's it! Once you've set up your block with `supports.interactivity`, initialized your global state or local context, and added the directives to the HTML markup, WordPress will take care of the rest. There's no additional code required from the developer to process these directives on the server side.
+That's it! Once you've set up your interctive block with `supports.interactivity`, initialized your global state or local context, and added the directives to the HTML markup, the Interactivity API will take care of the rest. There's no additional code required from the developer to process these directives on the server side.
 
 Behind the scenes, WordPress uses the `wp_interactivity_process_directives` function to find and process the directives in the HTML markup of your block. This function uses the HTML API to make the necessary changes to the markup, based on the found directives and the initial global state and/or local context.
 
@@ -113,9 +111,9 @@ This is how the final HTML markup of the fruit list example would look like (dir
 
 As you can see, the `data-wp-each` directive has generated a `<li>` element for each fruit in the array, and the `data-wp-text` directive has been processed, populating each `<li>` with the correct fruit name.
 
-## Manipulating the state/context in the client
+## Manipulating the global state and local context in the client
 
-One of the key strengths of the Interactivity API is how it bridges the gap between server-side rendering and client-side interactivity. To do so, the global state and local context initialized on the server are also serialized and made available to the Interactivity API runtime in the client, allowing the application to continue functioning and manipulating the DOM dynamically.
+One of the key strengths of the Interactivity API is how it bridges the gap between server-side rendering and client-side interactivity. To do so, the global state and local context initialized on the server are also serialized and made available to the Interactivity API stores in the client, allowing the application to continue functioning and manipulating the DOM dynamically.
 
 Let's extend this example to include a button that the user can click to add a new fruit to the list:
 
@@ -135,7 +133,7 @@ const { state } = store( 'myFruitPlugin', {
 } );
 ```
 
-The same example would also work if you are using local context:
+The same example would also work if you were using local context:
 
 ```javascript
 store( 'myFruitPlugin', {
@@ -175,7 +173,11 @@ store( 'myFruitPlugin', {
 
 ## Initializing the derived state in the server
 
-[The derived state](./undestanding-global-state-local-context-and-derived-state.md), regardless of whether it derives from the global state, local context, or both, can also be processed on the server by the Server Directive Processing.
+The derived state, regardless of whether it derives from the global state, local context, or both, can also be processed on the server by the Server Directive Processing.
+
+_Please, visit the [Understanding global state, local context and derived state](./undestanding-global-state-local-context-and-derived-state.md) guide to learn more about how derived state works in the Interactivity API._
+
+### Derived state that can be defined statically
 
 Let's imagine adding a button that can delete all fruits:
 
@@ -235,7 +237,7 @@ To fix this, you must define the initial value of the derived state in the serve
     ));
     ```
 
--   Or it can be defined by doing the necessary computations on the server:
+-   Or it can be defined by doing the necessary computations:
 
     ```php
     $fruits    = array( 'Apple', 'Banana', 'Cherry' );
@@ -247,7 +249,9 @@ To fix this, you must define the initial value of the derived state in the serve
     ));
     ```
 
-Regardless of the approach, the key point is that the initial value of `state.hasFruits` now resides on the server. This allows the Server Directive Processing to handle the `data-wp-bind--hidden` directive and modify the HTML markup, adding the `hidden` attribute when needed.
+Regardless of the approach, the key point is that the initial value of `state.hasFruits` is now defined on the server. This allows the Server Directive Processing to handle the `data-wp-bind--hidden` directive and modify the HTML markup, adding the `hidden` attribute when needed.
+
+### Derived state that needs to be defined dynamically
 
 In most cases, the initial derived state can be defined statically, as in the previous example. But sometimes, the value depends on dynamic values that also change in the server, and the derived logic needs to be replicated in PHP.
 
@@ -257,8 +261,8 @@ First, let's add an array that represents the shopping list. _Remember that even
 
 ```php
 wp_interactivity_state( 'myFruitPlugin', array(
-	'fruits'        => array( 'Apple', 'Banana', 'Cherry' ),
-	'shoppingList'  => array( 'Apple', 'Cherry' ),
+  'fruits'        => array( 'Apple', 'Banana', 'Cherry' ),
+  'shoppingList'  => array( 'Apple', 'Cherry' ),
 ));
 ```
 
@@ -291,20 +295,20 @@ And let's use that derived state to show the appropriate emoji for each fruit.
 
 Again, up to this point, everything is fine on the client side and the visitor will see the correct emoji displayed for the fruits they have on their shopping list. However, since `state.onShoppingList` is not defined on the server, the emoji will not be part of the initial HTML, and it will not be shown until JavaScript loads.
 
-Let's fix that by adding the initial derived state using `wp_interactivity_state`. The problem is that this time, the value depends on `context.item`, which makes it dynamic. To achieve this, you must replicate the JavaScript logic in PHP:
+Let's fix that by adding the initial derived state using `wp_interactivity_state`. Remember that this time, the value depends on `context.item` that comes from the `data-wp-each` directive, which makes the derived value dynamic, so let's replicate the JavaScript logic in PHP:
 
 ```php
 wp_interactivity_state( 'myFruitPlugin', array(
-	// ...
-	'onShoppingList' => function() {
-		$state   = wp_interactivity_state();
-		$context = wp_interactivity_get_context();
-		return in_array( $context['item'], $state['shoppingList'] ) ? '🛒' : '';
-	}
+  // ...
+  'onShoppingList' => function() {
+    $state   = wp_interactivity_state();
+    $context = wp_interactivity_get_context();
+    return in_array( $context['item'], $state['shoppingList'] ) ? '🛒' : '';
+  }
 ));
 ```
 
-That's it! Now, our server can compute the derived state and know which fruits are on the shopping list and which are not. This allows it to populate the initial HTML with the correct values, ensuring that the user sees the correct information immediately, even before the JavaScript runtime loads.
+That's it! Now, our server can compute the derived state and know which fruits are on the shopping list and which are not. This allows the Server Directive Processing to populate the initial HTML with the correct values, ensuring that the user sees the correct information immediately, even before the JavaScript runtime loads.
 
 ## Serializing other processed values to be consumed on the client
 
@@ -316,28 +320,28 @@ Let's add translations to our example to see how this would work.
 <?php
 wp_interactivity_state( 'myFruitPlugin', array(
   'fruits'         => array( __( 'Apple' ), __( 'Banana' ), __( 'Cherry' ) ),
-	'shoppingList'   => array( __( 'Apple' ), __( 'Cherry' ) ),
-	// ...
+  'shoppingList'   => array( __( 'Apple' ), __( 'Cherry' ) ),
+  // ...
 ?>
 
 <div data-wp-interactive="myFruitPlugin">
-	<button data-wp-on-async--click="actions.deleteFruits">
-		<?php echo __( 'Delete all fruits' ); ?>
-	</button>
-	<button data-wp-on-async--click="actions.addMango">
-		<?php echo __( 'Add Mango' ); ?>
-	</button>
-	<ul data-wp-bind--hidden="!state.hasFruits">
-		<template data-wp-each="state.fruits">
-			<li>
-				<span data-wp-text="context.item"></span>
-				<span data-wp-text="state.onShoppingList"></span>
-			</li>
-		</template>
-	</ul>
-	<div data-wp-bind--hidden="state.hasFruits">
-		<?php echo __( 'No fruits, sorry!' ); ?>
-	</div>
+  <button data-wp-on-async--click="actions.deleteFruits">
+    <?php echo __( 'Delete all fruits' ); ?>
+  </button>
+  <button data-wp-on-async--click="actions.addMango">
+    <?php echo __( 'Add Mango' ); ?>
+  </button>
+  <ul data-wp-bind--hidden="!state.hasFruits">
+    <template data-wp-each="state.fruits">
+      <li>
+        <span data-wp-text="context.item"></span>
+        <span data-wp-text="state.onShoppingList"></span>
+      </li>
+    </template>
+  </ul>
+  <div data-wp-bind--hidden="state.hasFruits">
+    <?php echo __( 'No fruits, sorry!' ); ?>
+  </div>
 </div>
 ```
 
@@ -360,7 +364,7 @@ To fix this issue, you can use the `wp_interactivity_state` function to serializ
 ```php
 wp_interactivity_state( 'myFruitPlugin', array(
   'fruits' => array( __( 'Apple' ), __( 'Banana' ), __( 'Cherry' ) ),
-	'mango'  => __( 'Mango' ),
+  'mango'  => __( 'Mango' ),
 ));
 ```
 
@@ -368,7 +372,8 @@ wp_interactivity_state( 'myFruitPlugin', array(
 const { state } = store( 'myFruitPlugin', {
 	actions: {
 		addMango() {
-			state.fruits.push( state.mango ); // state.mango is 'Mango' translated!
+			// `state.mango` contains the 'Mango' string already translated.
+			state.fruits.push( state.mango );
 		},
 	},
 } );
@@ -378,51 +383,49 @@ Take into account that if your application is more dynamic, you could serialize 
 
 ```php
 wp_interactivity_state( 'myFruitPlugin', array(
-	'fruits'           => array( 'apple', 'banana', 'cherry' ),
+  'fruits'           => array( 'apple', 'banana', 'cherry' ),
   'translatedFruits' => array(
-		'apple'  => __( 'Apple' ),
-		'banana' => __( 'Banana' ),
-		'cherry' => __( 'Cherry' ),
-		'mango'  => __( 'Mango' ),
-	),
-	'translatedFruit'  => function() {
-		$state   = wp_interactivity_state();
-		$context = wp_interactivity_get_context();
-		return $state['translatedFruits'][ $context['item'] ];
-	}
+    'apple'  => __( 'Apple' ),
+    'banana' => __( 'Banana' ),
+    'cherry' => __( 'Cherry' ),
+    'mango'  => __( 'Mango' ),
+  ),
+  'translatedFruit'  => function() {
+    $state   = wp_interactivity_state();
+    $context = wp_interactivity_get_context();
+    return $state['translatedFruits'][ $context['item'] ];
+  }
 ));
 ```
 
 ```javascript
 const { state } = store( 'myFruitPlugin', {
-	state: {
-		get translatedFruit() {
-			const context = getContext();
-			return state.translatedFruits[ context.item ];
-		}
-	}
-	actions: {
-		addMango() {
-			state.fruits.push( 'mango' );
-		},
-	},
+  state: {
+    get translatedFruit() {
+      const context = getContext();
+      return state.translatedFruits[ context.item ];
+    }
+  }
+  actions: {
+    addMango() {
+      state.fruits.push( 'mango' );
+    },
+  },
 } );
 ```
 
 ```html
-<ul data-wp-interactive="myFruitPlugin">
-	<template data-wp-each="state.fruits">
-		<li data-wp-text="state.translatedFruit"></li>
-	</template>
-</ul>
+<template data-wp-each="state.fruits">
+	<li data-wp-text="state.translatedFruit"></li>
+</template>
 ```
 
 Serializing information from the server can also be useful in other scenarios, such as passing Ajax/REST-API URLs and nonces.
 
 ```php
 wp_interactivity_state( 'myPlugin', array(
-	'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-	'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
+  'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+  'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
 ));
 ```
 
@@ -473,7 +476,7 @@ ob_start();
 ?>
 
 <div data-wp-interactive="myClassicTheme">
-	...
+  ...
 </div>
 
 <?php
