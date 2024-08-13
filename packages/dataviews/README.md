@@ -30,8 +30,7 @@ const Example = () => {
 };
 ```
 
-> [!TIP]
-> At https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs there's an example implementation of the Dataviews component."
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a></div>
 
 ## Properties
 
