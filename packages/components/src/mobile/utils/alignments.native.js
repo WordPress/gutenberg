@@ -13,7 +13,6 @@ export const WIDE_ALIGNMENTS = {
 		'core/image',
 		'core/separator',
 		'core/media-text',
-		'core/quote',
 		'core/pullquote',
 	],
 };
