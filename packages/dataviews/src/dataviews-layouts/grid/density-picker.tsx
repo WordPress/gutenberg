@@ -39,20 +39,6 @@ function useViewPortBreakpoint() {
 	return null;
 }
 
-// Value is number from 0 to 100 representing how big an item is in the grid
-// 100 being the biggest and 0 being the smallest.
-// The size is relative to the viewport size, if one a given viewport the
-// number of allowed items in a grid is 3 to 6 a 0 ( the smallest ) will mean that the grid will
-// have 6 items in a row, a 100 ( the biggest ) will mean that the grid will have 3 items in a row.
-// A value of 75 will mean that the grid will have 4 items in a row.
-function getRangeValue(
-	density: number,
-	breakValues: { min: number; max: number; default: number }
-) {
-	const inverseDensity = breakValues.max - density;
-	const max = breakValues.max - breakValues.min;
-	return Math.round( ( inverseDensity * 100 ) / max );
-}
 
 export default function DensityPicker( {
 	density,
@@ -79,28 +65,24 @@ export default function DensityPicker( {
 	}, [ setDensity, viewport ] );
 	const breakValues = viewportBreaks[ viewport || 'mobile' ];
 	const densityToUse = density || breakValues.default;
-	const rangeValue = getRangeValue( densityToUse, breakValues );
 
-	const step = 100 / ( breakValues.max - breakValues.min + 1 );
 	const marks = useMemo(
 		() =>
 			Array.from(
 				{ length: breakValues.max - breakValues.min + 1 },
 				( _, i ) => {
-					const value = getRangeValue(
-						i + breakValues.min,
-						breakValues
-					);
 					return {
-						value,
+						value: breakValues.min + i,
 					};
 				}
 			),
 		[ breakValues ]
 	);
+
 	if ( ! viewport ) {
 		return null;
 	}
+
 	return (
 		<RangeControl
 			__nextHasNoMarginBottom
@@ -108,23 +90,15 @@ export default function DensityPicker( {
 			showTooltip={ false }
 			className="dataviews-density-picker__range-control"
 			label={ __( 'Preview size' ) }
-			value={ rangeValue }
-			min={ 0 }
-			max={ 100 }
+			value={ densityToUse }
+			min={ breakValues.min }
+			max={ breakValues.max }
 			marks={ marks }
 			withInputField={ false }
 			onChange={ ( value = 0 ) => {
-				const inverseValue = 100 - value;
-				setDensity(
-					Math.round(
-						( inverseValue *
-							( breakValues.max - breakValues.min ) ) /
-							100 +
-							breakValues.min
-					)
-				);
+				setDensity( value );
 			} }
-			step={ step }
+			step={ 1 }
 		/>
 	);
 }
