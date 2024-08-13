@@ -2385,8 +2385,8 @@ class WP_Theme_JSON_Gutenberg {
 			/*
 			 * Processes background image styles.
 			 * If the value is a URL, it will be converted to a CSS `url()` value.
-			 * For uploaded image (images with a database ID), apply size and position defaults,
-			 * equal to those applied in block supports in lib/background.php.
+			 * For an uploaded image (images with a database ID), apply size and position
+			 * defaults equal to those applied in block supports in lib/background.php.
 			 */
 			if ( 'background-image' === $css_property && ! empty( $value ) ) {
 				$background_styles = gutenberg_style_engine_get_styles(
