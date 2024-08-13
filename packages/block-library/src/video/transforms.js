@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -92,6 +92,10 @@ const transforms = {
 					poster: videoElement.getAttribute( 'poster' ) || undefined,
 					src: videoElement.getAttribute( 'src' ) || undefined,
 				};
+				if ( isBlobURL( attributes.url ) ) {
+					attributes.blob = attributes.url;
+					delete attributes.url;
+				}
 				return createBlock( 'core/video', attributes );
 			},
 		},
