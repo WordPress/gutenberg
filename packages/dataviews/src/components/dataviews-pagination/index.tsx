@@ -84,7 +84,7 @@ function DataViewsPagination() {
 											page: +newValue,
 										} );
 									} }
-									size="compact"
+									size="small"
 									__nextHasNoMarginBottom
 									variant="minimal"
 								/>
