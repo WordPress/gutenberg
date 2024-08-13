@@ -193,6 +193,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			defaultClassName
 		),
 		style: { ...wrapperProps.style, ...props.style, ...bindingsStyle },
+		draggable: true,
 	};
 }
 
