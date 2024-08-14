@@ -84,11 +84,6 @@ async function configureWordPress( environment, config, spinner ) {
 			spinner,
 			config.debug
 		);
-
-		// Sometimes wpVersion may not be a string, in this case, convert it to a string.
-		if ( typeof wpVersion !== 'string' ) {
-			wpVersion = `${ wpVersion }`;
-		}
 	} catch ( err ) {
 		// Ignore error.
 	}
