@@ -44,10 +44,12 @@ function block_core_accordion_item_render( $attributes, $content ) {
 
 		if ( $p->next_tag( array( 'class_name' => 'accordion-item__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
-			$p->set_attribute( 'aria-controls', $unique_id );
+			$p->set_attribute( 'id', $unique_id );
+			$p->set_attribute( 'aria-controls', $unique_id . '-content' );
 			$p->set_attribute( 'data-wp-bind--aria-expanded', 'state.isOpen' );
 
 			if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-content' ) ) ) {
+				$p->set_attribute( 'id', $unique_id . '-content' );
 				$p->set_attribute( 'aria-labelledby', $unique_id );
 				$p->set_attribute( 'data-wp-bind--aria-hidden', '!state.isOpen' );
 
