@@ -322,5 +322,20 @@ export const Composite = Object.assign(
 		 * ```
 		 */
 		Typeahead,
+		/**
+		 * The React context used by the composite components. It can be used by
+		 * to access the composite store, and to forward the context when composite
+		 * sub-components are rendered across portals (ie. `SlotFill` components)
+		 * that would not otherwise forward the context to the `Fill` children.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite } from '@wordpress/components';
+		 * import { useContext } from '@wordpress/element';
+		 *
+		 * const compositeContext = useContext( Composite.Context );
+		 * ```
+		 */
+		Context: CompositeContext,
 	}
 );
