@@ -44,7 +44,7 @@ export default function PostURLPanel() {
 
 	return (
 		<PostURLCheck>
-			<PostPanelRow label={ __( 'Link' ) } ref={ setPopoverAnchor }>
+			<PostPanelRow label={ __( 'Permalink' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
 					className="editor-post-url__panel-dropdown"
@@ -86,8 +86,8 @@ function PostURLToggle( { isOpen, onClick } ) {
 			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
-			// translators: %s: Current post link.
-			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
+			// translators: %s: Current post slug.
+			aria-label={ sprintf( __( 'Change slug: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
 			<Truncate numberOfLines={ 1 }>
