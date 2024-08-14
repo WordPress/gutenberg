@@ -135,11 +135,7 @@ export function getClosestTabbable(
 		}
 
 		// Skip focusable elements such as links within content editable nodes.
-		if (
-			node.isContentEditable &&
-			node.contentEditable !== 'true' &&
-			! node.getAttribute( 'tabindex' )
-		) {
+		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
 			return false;
 		}
 
@@ -283,6 +279,7 @@ export default function useArrowNav() {
 				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
+				node.contentEditable = false;
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverse,
@@ -291,7 +288,6 @@ export default function useArrowNav() {
 				);
 
 				if ( closestTabbable ) {
-					node.contentEditable = false;
 					placeCaretAtVerticalEdge(
 						closestTabbable,
 						// When Alt is pressed, place the caret at the furthest
@@ -307,12 +303,12 @@ export default function useArrowNav() {
 				isHorizontalEdge( target, isReverseDir ) &&
 				! keepCaretInsideBlock
 			) {
+				node.contentEditable = false;
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverseDir,
 					node
 				);
-				node.contentEditable = false;
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 				event.preventDefault();
 			}
