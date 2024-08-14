@@ -44,8 +44,29 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			return array();
 		}
 
+		/**
+		 * Checks the permissions for retrieving items.
+		 *
+		 * @param WP_REST_Request $request The REST request object.
+		 *
+		 * @return bool|WP_Error True if the request has permission, WP_Error object otherwise.
+		 */
 		public function get_items_permissions_check($request) {
-			return true;
+			if ( current_user_can( 'edit_posts' ) ) {
+				return true;
+			}
+
+			foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+				if ( current_user_can( $post_type->cap->edit_posts ) ) {
+					return true;
+				}
+			}
+
+			return new WP_Error(
+				'rest_cannot_read_block_editor_assets',
+				__( 'Sorry, you are not allowed to read the block editor assets.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
 		}
 	}
 }
