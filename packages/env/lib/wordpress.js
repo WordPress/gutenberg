@@ -145,7 +145,7 @@ async function configureWordPress( environment, config, spinner ) {
 	if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' ) ) {
 		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
 	} else if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.4' ) ) {
-		abspathDef = `define( 'ABSPATH', dirname(__FILE__) . '\\/' );`;
+		abspathDef = `define( 'ABSPATH', dirname( __FILE__ ) . '\\/' );`;
 	}
 
 	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
