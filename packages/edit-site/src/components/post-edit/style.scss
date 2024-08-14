@@ -1,9 +1,9 @@
-.edit-site-post-edit {
-	padding: $grid-unit-30;
+.edit-site-post-edit.is-empty .edit-site-page-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
-	&.is-empty .edit-site-page-content {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
+.edit-site-post-edit__content {
+	padding: $grid-unit-30;
 }

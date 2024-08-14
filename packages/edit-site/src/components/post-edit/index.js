@@ -6,19 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-	FlexBlock,
-	Button,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,9 +21,9 @@ import Page from '../page';
 import usePostFields from '../post-fields';
 import { unlock } from '../../lock-unlock';
 
-const { PostCardPanel } = unlock( editorPrivateApis );
+const { PostTitle, PostActions, PostIcon } = unlock( editorPrivateApis );
 
-function PostEditForm( { postType, postId, onBack } ) {
+function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
 	const { record } = useSelect(
 		( select ) => {
@@ -95,23 +89,6 @@ function PostEditForm( { postType, postId, onBack } ) {
 
 	return (
 		<VStack spacing={ 4 }>
-			<HStack justify="flex-start">
-				{ onBack && (
-					<Button
-						icon={ isRTL() ? chevronRight : chevronLeft }
-						onClick={ onBack }
-						label={ __( 'Go back to post list' ) }
-					/>
-				) }
-				{ ids.length === 1 && (
-					<FlexBlock>
-						<PostCardPanel
-							postType={ postType }
-							postId={ ids[ 0 ] }
-						/>
-					</FlexBlock>
-				) }
-			</HStack>
 			<DataForm
 				data={ ids.length === 1 ? record : multiEdits }
 				fields={ fields }
@@ -123,20 +100,36 @@ function PostEditForm( { postType, postId, onBack } ) {
 }
 
 export function PostEdit( { postType, postId, onBack } ) {
+	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
+
 	return (
 		<Page
 			className={ clsx( 'edit-site-post-edit', {
 				'is-empty': ! postId,
 			} ) }
-			label={ __( 'Post Edit' ) }
+			title={
+				ids.length === 1 && (
+					<PostTitle postId={ ids[ 0 ] } postType={ postType } />
+				)
+			}
+			actions={
+				ids.length === 1 && (
+					<PostActions postId={ ids[ 0 ] } postType={ postType } />
+				)
+			}
+			icon={
+				ids.length === 1 && (
+					<PostIcon postId={ ids[ 0 ] } postType={ postType } />
+				)
+			}
+			onBack={ onBack }
+			backLabel={ __( 'Go back to all pages' ) }
 		>
-			{ postId && (
-				<PostEditForm
-					postType={ postType }
-					postId={ postId }
-					onBack={ onBack }
-				/>
-			) }
+			<div className="edit-site-post-edit__content">
+				{ postId && (
+					<PostEditForm postType={ postType } postId={ postId } />
+				) }
+			</div>
 			{ ! postId && <p>{ __( 'Select a page to edit' ) }</p> }
 		</Page>
 	);

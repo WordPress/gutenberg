@@ -1,0 +1,85 @@
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
+ * WordPress dependencies
+ */
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	GLOBAL_POST_TYPES,
+} from '../../store/constants';
+
+export default function PostTitle( { postType, postId } ) {
+	const { isFrontPage, isPostsPage, title, isSync } = useSelect(
+		( select ) => {
+			const { __experimentalGetTemplateInfo } = select( editorStore );
+			const { canUser, getEditedEntityRecord } = select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
+			const _record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			const _templateInfo =
+				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+					postType
+				) && __experimentalGetTemplateInfo( _record );
+			let _isSync = false;
+			if ( GLOBAL_POST_TYPES.includes( postType ) ) {
+				if ( PATTERN_POST_TYPE === postType ) {
+					// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
+					const currentSyncStatus =
+						_record?.meta?.wp_pattern_sync_status === 'unsynced'
+							? 'unsynced'
+							: _record?.wp_pattern_sync_status;
+					_isSync = currentSyncStatus !== 'unsynced';
+				} else {
+					_isSync = true;
+				}
+			}
+			return {
+				title: _templateInfo?.title || _record?.title,
+				isSync: _isSync,
+				isFrontPage: siteSettings?.page_on_front === postId,
+				isPostsPage: siteSettings?.page_for_posts === postId,
+			};
+		},
+		[ postId, postType ]
+	);
+	return (
+		<span
+			className={ clsx( 'editor-post-title-inline', {
+				'is-sync': isSync,
+			} ) }
+		>
+			{ title ? decodeEntities( title ) : __( 'No title' ) }
+			{ isFrontPage && (
+				<span className="editor-post-title-inline__title-badge">
+					{ __( 'Homepage' ) }
+				</span>
+			) }
+			{ isPostsPage && (
+				<span className="editor-post-title-inline__title-badge">
+					{ __( 'Posts Page' ) }
+				</span>
+			) }
+		</span>
+	);
+}

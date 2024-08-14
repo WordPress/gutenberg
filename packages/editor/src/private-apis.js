@@ -14,7 +14,9 @@ import BackButton from './components/header/back-button';
 import CreateTemplatePartModal from './components/create-template-part-modal';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
-import PostCardPanel from './components/post-card-panel';
+import PostActions from './components/post-actions';
+import PostIcon from './components/post-icon';
+import PostTitle from './components/post-title-inline';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
@@ -41,7 +43,9 @@ lock( privateApis, {
 	GlobalStylesProvider,
 	mergeBaseAndUserConfigs,
 	PluginPostExcerpt,
-	PostCardPanel,
+	PostActions,
+	PostIcon,
+	PostTitle,
 	PreferencesModal,
 	usePostActions,
 	ToolsMoreMenuGroup,

@@ -23,6 +23,9 @@ export default function Page( {
 	children,
 	className,
 	hideTitleFromUI = false,
+	icon,
+	onBack,
+	backLabel,
 } ) {
 	const classes = clsx( 'edit-site-page', className );
 
@@ -34,6 +37,9 @@ export default function Page( {
 						title={ title }
 						subTitle={ subTitle }
 						actions={ actions }
+						icon={ icon }
+						onBack={ onBack }
+						backLabel={ backLabel }
 					/>
 				) }
 				{ children }

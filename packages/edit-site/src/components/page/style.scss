@@ -51,3 +51,7 @@
 	position: relative;
 	z-index: z-index(".edit-site-page-content");
 }
+
+.edit-site-page-header__actions {
+	display: flex !important;
+}

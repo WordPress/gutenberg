@@ -1,0 +1,15 @@
+.editor-post-title-inline.is-sync {
+	color: var(--wp-block-synced-color);
+}
+
+.editor-post-title-inline__title-badge {
+	background: $gray-100;
+	color: $gray-700;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-block-ui;
+	font-size: 12px;
+	font-weight: 400;
+	flex-shrink: 0;
+	line-height: $grid-unit-05 * 5;
+	display: inline-block;
+}

@@ -7,16 +7,34 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
+	Button,
 } from '@wordpress/components';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 
-export default function Header( { title, subTitle, actions } ) {
+export default function Header( {
+	title,
+	subTitle,
+	icon,
+	onBack,
+	backLabel,
+	actions,
+} ) {
 	return (
 		<VStack className="edit-site-page-header" as="header" spacing={ 0 }>
 			<HStack className="edit-site-page-header__page-title">
+				{ onBack && (
+					<Button
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						onClick={ onBack }
+						label={ backLabel }
+					/>
+				) }
+				{ icon }
 				<Heading
 					as="h2"
 					level={ 3 }
