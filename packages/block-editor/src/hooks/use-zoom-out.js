@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
-
+import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
@@ -19,16 +18,15 @@ export function useZoomOut( zoomOut = true ) {
 	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 
 	const originalEditingMode = useRef( null );
-	const mode = __unstableGetEditorMode();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
 		if ( ! originalEditingMode.current ) {
-			originalEditingMode.current = mode;
+			originalEditingMode.current = __unstableGetEditorMode();
 		}
 
 		return () => {
-			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
+			// Restore the original mode on unmount if it was changed to 'zoom-out'
 			if (
 				__unstableGetEditorMode() === 'zoom-out' &&
 				__unstableGetEditorMode() !== originalEditingMode.current
@@ -36,18 +34,17 @@ export function useZoomOut( zoomOut = true ) {
 				__unstableSetEditorMode( originalEditingMode.current );
 			}
 		};
-	}, [] );
+	}, [ __unstableGetEditorMode, __unstableSetEditorMode ] );
 
-	// The effect opens the zoom-out view if we want it open and it's not currently in zoom-out mode.
 	useEffect( () => {
-		if ( zoomOut && mode !== 'zoom-out' ) {
+		if ( zoomOut && __unstableGetEditorMode() !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
 		} else if (
 			! zoomOut &&
 			__unstableGetEditorMode() === 'zoom-out' &&
-			originalEditingMode.current !== mode
+			originalEditingMode.current !== __unstableGetEditorMode()
 		) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
-	}, [ __unstableSetEditorMode, zoomOut ] );
+	}, [ zoomOut, __unstableGetEditorMode, __unstableSetEditorMode ] );
 }
