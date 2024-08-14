@@ -44,15 +44,8 @@ export default function useSpacingSizes() {
 			...defaultSizes,
 		];
 
-		// Only sort if more than one origin has presets defined in order to
-		// preserve order for themes that don't include default presets and
-		// want a custom order.
-		if (
-			( customSizes.length && 1 ) +
-				( themeSizes.length && 1 ) +
-				( defaultSizes.length && 1 ) >
-			1
-		) {
+		// Using numeric slugs opts-in to sorting by slug.
+		if ( sizes.every( ( { slug } ) => /^[0-9]/.test( slug ) ) ) {
 			sizes.sort( ( a, b ) => compare( a.slug, b.slug ) );
 		}
 

@@ -74,9 +74,22 @@ const backgroundSize = {
 	},
 };
 
+const backgroundAttachment = {
+	name: 'backgroundAttachment',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundAttachment' ],
+			'backgroundAttachment'
+		);
+	},
+};
+
 export default [
 	backgroundImage,
 	backgroundPosition,
 	backgroundRepeat,
 	backgroundSize,
+	backgroundAttachment,
 ];

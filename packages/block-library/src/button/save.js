@@ -31,10 +31,6 @@ export default function save( { attributes, className } ) {
 		width,
 	} = attributes;
 
-	if ( RichText.isEmpty( text ) ) {
-		return null;
-	}
-
 	const TagName = tagName || 'a';
 	const isButtonTag = 'button' === TagName;
 	const buttonType = type || 'button';

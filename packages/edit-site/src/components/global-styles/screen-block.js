@@ -25,6 +25,12 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 
+// Initial control values.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
+};
+
 function applyFallbackStyle( border ) {
 	if ( ! border ) {
 		return border;
@@ -70,6 +76,8 @@ const {
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useGlobalStyle,
+	useHasBackgroundPanel,
+	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
@@ -77,6 +85,7 @@ const {
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	useGlobalStyleLinks,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -96,6 +105,7 @@ function ScreenBlock( { name, variation } ) {
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
+	const _links = useGlobalStyleLinks();
 
 	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
 	if (
@@ -121,6 +131,7 @@ function ScreenBlock( { name, variation } ) {
 	}
 
 	const blockVariations = useBlockVariations( name );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
@@ -252,6 +263,16 @@ function ScreenBlock( { name, variation } ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+				/>
+			) }
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 				/>
 			) }
 			{ hasTypographyPanel && (

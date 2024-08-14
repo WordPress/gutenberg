@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 3.5.0 (2024-08-07)
+
+## 3.4.0 (2024-07-24)
+
+## 3.3.0 (2024-07-10)
+
+## 3.2.0 (2024-06-26)
+
+## 3.1.0 (2024-06-15)
+
 ## 3.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -135,7 +145,7 @@
 
 ## 1.24.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the annotations namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 

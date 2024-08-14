@@ -24,6 +24,8 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
+	compileStyleValue,
+	getResolvedValue,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -31,11 +33,17 @@ import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
+import { setBackgroundStyleDefaults } from '../../hooks/background';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { setThemeFileUris } from './theme-file-uri-utils';
+
+// Elements that rely on class names in their selectors.
+const ELEMENT_CLASS_NAMES = {
+	button: 'wp-element-button',
+	caption: 'wp-element-caption',
+};
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -46,21 +54,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 const { kebabCase } = unlock( componentsPrivateApis );
-
-function compileStyleValue( uncompiledValue ) {
-	const VARIABLE_REFERENCE_PREFIX = 'var:';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
 
 /**
  * Transform given preset tree into a set of style declarations.
@@ -387,8 +380,41 @@ export function getStylesDeclarations(
 		[]
 	);
 
-	// The goal is to move everything to server side generated engine styles
-	// This is temporary as we absorb more and more styles into the engine.
+	/*
+	 * Preprocess background image values.
+	 *
+	 * Note: As we absorb more and more styles into the engine, we could simplify this function.
+	 * A refactor is for the style engine to handle ref resolution (and possibly defaults)
+	 * via a public util used internally and externally. Theme.json tree and defaults could be passed
+	 * as options.
+	 */
+	if ( !! blockStyles.background ) {
+		/*
+		 * Resolve dynamic values before they are compiled by the style engine,
+		 * which doesn't (yet) resolve dynamic values.
+		 */
+		if ( blockStyles.background?.backgroundImage ) {
+			blockStyles.background.backgroundImage = getResolvedValue(
+				blockStyles.background.backgroundImage,
+				tree
+			);
+		}
+
+		/*
+		 * Set default values for block background styles.
+		 * Top-level styles are an exception as they are applied to the body.
+		 */
+		if ( ! isRoot && !! blockStyles.background?.backgroundImage?.id ) {
+			blockStyles = {
+				...blockStyles,
+				background: {
+					...blockStyles.background,
+					...setBackgroundStyleDefaults( blockStyles.background ),
+				},
+			};
+		}
+	}
+
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
@@ -403,18 +429,7 @@ export function getStylesDeclarations(
 			? rule.key
 			: kebabCase( rule.key );
 
-		let ruleValue = rule.value;
-		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
-			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = compileStyleValue(
-				getValueFromObjectPath( tree, refPath )
-			);
-			// Presence of another ref indicates a reference to another dynamic value.
-			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || ruleValue?.ref ) {
-				return;
-			}
-		}
+		let ruleValue = getResolvedValue( rule.value, tree, null );
 
 		// Calculate fluid typography rules where available.
 		if ( cssProperty === 'font-size' ) {
@@ -523,10 +538,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `.${ className }${
+										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -628,6 +643,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
+			// Root selector (body) styles should not be wrapped in `:root where()` to keep
+			// specificity at (0,0,1) and maintain backwards compatibility.
+			skipSelectorWrapper: true,
 		} );
 	}
 
@@ -636,6 +654,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
+				// Top level elements that don't use a class name should not receive the
+				// `:root :where()` wrapper to maintain backwards compatibility.
+				skipSelectorWrapper: ! ELEMENT_CLASS_NAMES[ name ],
 			} );
 		}
 	} );
@@ -651,10 +672,12 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					( [ variationName, variation ] ) => {
 						variations[ variationName ] =
 							pickStyleKeys( variation );
-
+						if ( variation?.css ) {
+							variations[ variationName ].css = variation.css;
+						}
 						const variationSelector =
 							blockSelectors[ blockName ]
-								.styleVariationSelectors?.[ variationName ];
+								?.styleVariationSelectors?.[ variationName ];
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
@@ -683,19 +706,27 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								const variationBlockSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.selector
+										?.selector
 								);
 								const variationDuotoneSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.duotoneSelector
+										?.duotoneSelector
 								);
 								const variationFeatureSelectors =
 									scopeFeatureSelectors(
 										variationSelector,
 										blockSelectors[ variationBlockName ]
-											.featureSelectors
+											?.featureSelectors
 									);
+
+								const variationBlockStyleNodes =
+									pickStyleKeys( variationBlockStyles );
+
+								if ( variationBlockStyles?.css ) {
+									variationBlockStyleNodes.css =
+										variationBlockStyles.css;
+								}
 
 								nodes.push( {
 									selector: variationBlockSelector,
@@ -703,13 +734,11 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
 										blockSelectors[ variationBlockName ]
-											.fallbackGapValue,
+											?.fallbackGapValue,
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
-											.hasLayoutSupport,
-									styles: pickStyleKeys(
-										variationBlockStyles
-									),
+											?.hasLayoutSupport,
+									styles: variationBlockStyleNodes,
 								} );
 
 								// Process element styles for the inner blocks
@@ -873,6 +902,7 @@ export const toStyles = (
 		marginReset: true,
 		presets: true,
 		rootPadding: true,
+		variationStyles: false,
 		...styleOptions,
 	};
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
@@ -915,8 +945,8 @@ export const toStyles = (
 			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0;
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) > .alignfull { margin-left: 0; margin-right: 0;
 				`;
 		}
 
@@ -933,6 +963,7 @@ export const toStyles = (
 				hasLayoutSupport,
 				featureSelectors,
 				styleVariationSelectors,
+				skipSelectorWrapper,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
@@ -991,12 +1022,21 @@ export const toStyles = (
 					disableRootPadding
 				);
 				if ( styleDeclarations?.length ) {
-					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
+					const generalSelector = skipSelectorWrapper
+						? selector
+						: `:root :where(${ selector })`;
+					ruleset += `${ generalSelector }{${ styleDeclarations.join(
 						';'
 					) };}`;
 				}
+				if ( styles?.css ) {
+					ruleset += processCSSNesting(
+						styles.css,
+						`:root :where(${ selector })`
+					);
+				}
 
-				if ( styleVariationSelectors ) {
+				if ( options.variationStyles && styleVariationSelectors ) {
 					Object.entries( styleVariationSelectors ).forEach(
 						( [ styleVariationName, styleVariationSelector ] ) => {
 							const styleVariations =
@@ -1041,6 +1081,12 @@ export const toStyles = (
 										';'
 									) };}`;
 								}
+								if ( styleVariations?.css ) {
+									ruleset += processCSSNesting(
+										styleVariations.css,
+										`:root :where(${ styleVariationSelector })`
+									);
+								}
 							}
 						}
 					);
@@ -1073,7 +1119,11 @@ export const toStyles = (
 								.map( ( sel ) => sel + pseudoKey )
 								.join( ',' );
 
-							const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+							// As pseudo classes such as :hover, :focus etc. have class-level
+							// specificity, they must use the `:root :where()` wrapper. This.
+							// caps the specificity at `0-1-0` to allow proper nesting of variations
+							// and block type element styles.
+							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
 								';'
 							) };}`;
 
@@ -1271,9 +1321,17 @@ function updateConfigWithSeparator( config ) {
 export function processCSSNesting( css, blockSelector ) {
 	let processedCSS = '';
 
+	if ( ! css || css.trim() === '' ) {
+		return processedCSS;
+	}
+
 	// Split CSS nested rules.
 	const parts = css.split( '&' );
 	parts.forEach( ( part ) => {
+		if ( ! part || part.trim() === '' ) {
+			return;
+		}
+
 		const isRootCss = ! part.includes( '{' );
 		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
@@ -1286,11 +1344,32 @@ export function processCSSNesting( css, blockSelector ) {
 			}
 
 			const [ nestedSelector, cssValue ] = splittedPart;
-			const combinedSelector = nestedSelector.startsWith( ' ' )
-				? scopeSelector( blockSelector, nestedSelector )
-				: appendToSelector( blockSelector, nestedSelector );
 
-			processedCSS += `:root :where(${ combinedSelector }){${ cssValue.trim() }}`;
+			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
+			// capture any leading combinator such as >, +, or ~, as well as spaces.
+			// This allows pseudo elements as descendants e.g. `.parent ::before`.
+			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
+			const pseudoPart = matches ? matches[ 1 ] : '';
+			const withoutPseudoElement = matches
+				? nestedSelector.replace( pseudoPart, '' ).trim()
+				: nestedSelector.trim();
+
+			let combinedSelector;
+			if ( withoutPseudoElement === '' ) {
+				// Only contained a pseudo element to use the block selector to form
+				// the final `:root :where()` selector.
+				combinedSelector = blockSelector;
+			} else {
+				// If the nested selector is a descendant of the block scope it with the
+				// block selector. Otherwise append it to the block selector.
+				combinedSelector = nestedSelector.startsWith( ' ' )
+					? scopeSelector( blockSelector, withoutPseudoElement )
+					: appendToSelector( blockSelector, withoutPseudoElement );
+			}
+
+			// Build final rule, re-adding any pseudo element outside the `:where()`
+			// to maintain valid CSS selector.
+			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
 		}
 	} );
 	return processedCSS;
@@ -1313,10 +1392,6 @@ export function useGlobalStylesOutputWithConfig(
 	disableRootPadding
 ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
-	mergedConfig = setThemeFileUris(
-		mergedConfig,
-		mergedConfig?._links?.[ 'wp:theme-file' ]
-	);
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {

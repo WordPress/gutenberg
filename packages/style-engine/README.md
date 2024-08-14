@@ -17,7 +17,7 @@ Upcoming tasks on the roadmap include, but are not limited to, the following:
 -   Propose a way to control hierarchy and specificity, and make the style hierarchy cascade accessible and predictable. This might include preparing for CSS cascade layers until they become more widely supported, and allowing for opt-in support in Gutenberg via theme.json.
 -   Refactor all blocks to consistently use the "style" attribute for all customizations, that is, deprecate preset-specific attributes such as `attributes.fontSize`.
 
-For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [Github project board](https://github.com/orgs/WordPress/projects/19).
+For more information about the roadmap, please refer to [Block editor styles: initiatives and goals](https://make.wordpress.org/core/2022/06/24/block-editor-styles-initiatives-and-goals/) and the [GitHub project board](https://github.com/orgs/WordPress/projects/19).
 
 If you're making changes or additions to the Style Engine, please take a moment to read the [notes on contributing](https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-engine/CONTRIBUTING.md).
 

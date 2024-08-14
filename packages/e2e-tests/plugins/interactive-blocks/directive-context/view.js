@@ -21,7 +21,7 @@ store( 'directive-context', {
 		get isProxyPreservedOnCopy() {
 			const { obj, obj2 } = getContext();
 			return obj === obj2;
-		}
+		},
 	},
 	actions: {
 		updateContext( event ) {
@@ -47,7 +47,7 @@ store( 'directive-context', {
 		copyObj() {
 			const ctx = getContext();
 			ctx.obj2 = ctx.obj;
-		}
+		},
 	},
 } );
 
@@ -92,7 +92,6 @@ const { actions } = store( 'directive-context-navigate', {
 					return routerActions.navigate( url, { force: true, html } );
 				}
 			);
-
 		},
 		*asyncNavigate() {
 			yield actions.navigate();
@@ -118,4 +117,4 @@ store( 'directive-context-watch', {
 			ctx.changes = ctx.changes + 1;
 		},
 	},
-});
+} );

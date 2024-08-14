@@ -32,6 +32,7 @@ export function Caption( {
 	placeholder = __( 'Add caption' ),
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
+	excludeElementClassName,
 	className,
 	readOnly,
 	tagName = 'figcaption',
@@ -70,6 +71,7 @@ export function Caption( {
 		},
 		[ isCaptionEmpty ]
 	);
+
 	return (
 		<>
 			{ showToolbarButton && (
@@ -96,7 +98,9 @@ export function Caption( {
 						tagName={ tagName }
 						className={ clsx(
 							className,
-							__experimentalGetElementClassName( 'caption' )
+							excludeElementClassName
+								? ''
+								: __experimentalGetElementClassName( 'caption' )
 						) }
 						ref={ ref }
 						aria-label={ label }

@@ -102,7 +102,7 @@
 		"parent": "fundamentals"
 	},
 	{
-		"title": "Working with Javascript for the Block Editor",
+		"title": "Working with JavaScript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
 		"parent": "fundamentals"
@@ -765,6 +765,12 @@
 		"title": "ComboboxControl",
 		"slug": "combobox-control",
 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Composite",
+		"slug": "composite",
+		"markdown_source": "../packages/components/src/composite/README.md",
 		"parent": "components"
 	},
 	{

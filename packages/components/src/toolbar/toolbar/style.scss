@@ -20,6 +20,13 @@
 
 .components-accessible-toolbar,
 .components-toolbar {
+
+	&[aria-orientation="vertical"] {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
 	.components-button {
 		position: relative;
 		height: $block-toolbar-height;

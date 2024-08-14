@@ -38,7 +38,13 @@ export function deprecatedGetPhrasingContentSchema( context ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parse( HTML );
+		const parseResult = parse( HTML );
+		const isSingleFreeFormBlock =
+			parseResult.length === 1 &&
+			parseResult[ 0 ].name === 'core/freeform';
+		if ( ! isSingleFreeFormBlock ) {
+			return parseResult;
+		}
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched

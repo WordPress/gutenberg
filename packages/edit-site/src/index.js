@@ -10,7 +10,10 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -22,7 +25,13 @@ import {
  */
 import './hooks';
 import { store as editSiteStore } from './store';
+import { unlock } from './lock-unlock';
 import App from './components/app';
+
+const {
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -39,6 +48,8 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
@@ -104,3 +115,7 @@ export function reinitializeEditor() {
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
 export * from './deprecated';
+
+// Temporary: While the posts dashboard is being iterated on
+// it's being built in the same package as the site editor.
+export { initializePostsDashboard } from './posts';

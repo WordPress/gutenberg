@@ -65,7 +65,7 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
-JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://reactjs.org/docs/introducing-jsx.html). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
+JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
 While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
 
@@ -162,7 +162,7 @@ do so by opting-in to `@wordpress/private-apis`:
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 export const { lock, unlock } =
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
+		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
 		'@wordpress/block-editor' // Name of the package calling __dangerousOptInToUnstableAPIsOnlyForCoreModules,
 		// (not the name of the package whose APIs you want to access)
 	);
@@ -531,7 +531,7 @@ alert( `My name is ${ name }.` );
 
 ### React components
 
-It is preferred to implement all components as [function components](https://reactjs.org/docs/components-and-props.html), using [hooks](https://reactjs.org/docs/hooks-reference.html) to manage component state and lifecycle. With the exception of [error boundaries](https://reactjs.org/docs/error-boundaries.html), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
+It is preferred to implement all components as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) to manage component state and lifecycle. With the exception of [error boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary), you should never encounter a situation where you must use a class component. Note that the [WordPress guidance on Code Refactoring](https://make.wordpress.org/core/handbook/contribute/code-refactoring/) applies here: There needn't be a concentrated effort to update class components in bulk. Instead, consider it as a good refactoring opportunity in combination with some other change.
 
 ## JavaScript documentation using JSDoc
 
@@ -758,7 +758,7 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
 
 ### Documenting React components
 
-When possible, all components should be implemented as [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components), using [hooks](https://reactjs.org/docs/hooks-intro.html) for managing component lifecycle and state.
+When possible, all components should be implemented as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) for managing component lifecycle and state.
 
 Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
 

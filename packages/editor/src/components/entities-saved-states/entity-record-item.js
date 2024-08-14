@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Icon, CheckboxControl, Flex, PanelRow } from '@wordpress/components';
+import { CheckboxControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { connection } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -60,18 +59,9 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 				/>
 			</PanelRow>
 			{ hasPostMetaChanges && (
-				<PanelRow>
-					<Flex className="entities-saved-states__post-meta">
-						<Icon
-							className="entities-saved-states__connections-icon"
-							icon={ connection }
-							size={ 24 }
-						/>
-						<span className="entities-saved-states__bindings-text">
-							{ __( 'Post Meta.' ) }
-						</span>
-					</Flex>
-				</PanelRow>
+				<ul className="entities-saved-states__changes">
+					<li>{ __( 'Post Meta.' ) }</li>
+				</ul>
 			) }
 		</>
 	);

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -129,11 +139,11 @@
 
 ## 4.0.0 (2022-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/a11y`, `@wordpress/server-side-render`, `rememo` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -141,13 +151,13 @@
 
 ## 3.1.0 (2021-11-07)
 
-### Enhancement
+### Enhancements
 
 -   Enable persistent List View in the widget editor [#35706](https://github.com/WordPress/gutenberg/pull/35706).
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 

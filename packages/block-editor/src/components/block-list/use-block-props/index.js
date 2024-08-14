@@ -49,13 +49,13 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
  *
  * export default function Edit() {
  *
- *   const blockProps = useBlockProps(
+ *   const blockProps = useBlockProps( {
  *     className: 'my-custom-class',
  *     style: {
  *       color: '#222222',
  *       backgroundColor: '#eeeeee'
  *     }
- *   )
+ *   } )
  *
  *   return (
  *	    <div { ...blockProps }>
@@ -115,7 +115,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered(),
+		useIsHovered( { clientId } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),

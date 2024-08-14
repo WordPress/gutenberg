@@ -26,7 +26,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
-import cloneDeep from '../../utils/clone-deep';
 import setNestedValue from '../../utils/set-nested-value';
 
 const { cleanEmptyObject, GlobalStylesContext } = unlock(
@@ -259,8 +258,8 @@ function PushChangesToGlobalStylesControl( {
 		if ( changes.length > 0 ) {
 			const { style: blockStyles } = attributes;
 
-			const newBlockStyles = cloneDeep( blockStyles );
-			const newUserConfig = cloneDeep( userConfig );
+			const newBlockStyles = structuredClone( blockStyles );
+			const newUserConfig = structuredClone( userConfig );
 
 			for ( const { path, value } of changes ) {
 				setNestedValue( newBlockStyles, path, undefined );
@@ -287,7 +286,7 @@ function PushChangesToGlobalStylesControl( {
 			// notification.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
-			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			setUserConfig( newUserConfig, { undoIgnore: true } );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -302,7 +301,7 @@ function PushChangesToGlobalStylesControl( {
 							onClick() {
 								__unstableMarkNextChangeAsNotPersistent();
 								setAttributes( attributes );
-								setUserConfig( () => userConfig, {
+								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
 							},
@@ -324,6 +323,7 @@ function PushChangesToGlobalStylesControl( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className="edit-site-push-changes-to-global-styles-control"
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
@@ -339,7 +339,7 @@ function PushChangesToGlobalStylesControl( {
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
-				__experimentalIsFocusable
+				accessibleWhenDisabled
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
@@ -375,7 +375,7 @@ function PushChangesToGlobalStyles( props ) {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => (
 		<>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
 		</>
 	)

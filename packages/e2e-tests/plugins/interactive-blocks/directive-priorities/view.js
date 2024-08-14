@@ -5,10 +5,10 @@ import {
 	store,
 	getContext,
 	useEffect,
-	privateApis
+	privateApis,
 } from '@wordpress/interactivity';
 
-const { directive, deepSignal, h } = privateApis(
+const { directive, proxifyState, h } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
@@ -24,8 +24,11 @@ const namespace = 'directive-priorities';
  */
 const executionProof = ( n ) => {
 	const el = document.querySelector( '[data-testid="execution order"]' );
-	if ( ! el.textContent ) {el.textContent = n;}
-	else {el.textContent += `, ${ n }`;}
+	if ( ! el.textContent ) {
+		el.textContent = n;
+	} else {
+		el.textContent += `, ${ n }`;
+	}
 };
 
 /**
@@ -38,12 +41,12 @@ directive(
 	'test-context',
 	( { context: { Provider }, props: { children } } ) => {
 		executionProof( 'context' );
-		const value = deepSignal( {
-			[ namespace ]: {
+		const value = {
+			[ namespace ]: proxifyState( namespace, {
 				attribute: 'from context',
 				text: 'from context',
-			},
-		} );
+			} ),
+		};
 		return h( Provider, { value }, children );
 	},
 	{ priority: 8 }

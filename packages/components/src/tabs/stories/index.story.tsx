@@ -16,6 +16,8 @@ import Tabs from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
+import Tooltip from '../../tooltip';
+import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
 	title: 'Components (Experimental)/Tabs',
@@ -110,24 +112,29 @@ const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab
-					tabId="tab1"
-					render={
-						<Button icon={ wordpress } label="Tab 1" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab2"
-					render={
-						<Button icon={ link } label="Tab 2" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab3"
-					render={
-						<Button icon={ more } label="Tab 3" showTooltip />
-					}
-				/>
+				{ [
+					{
+						id: 'tab1',
+						label: 'Tab one',
+						icon: wordpress,
+					},
+					{
+						id: 'tab2',
+						label: 'Tab two',
+						icon: link,
+					},
+					{
+						id: 'tab3',
+						label: 'Tab three',
+						icon: more,
+					},
+				].map( ( { id, label, icon } ) => (
+					<Tooltip text={ label } key={ id }>
+						<Tabs.Tab tabId={ id } aria-label={ label }>
+							<Icon icon={ icon } />
+						</Tabs.Tab>
+					</Tooltip>
+				) ) }
 			</Tabs.TabList>
 			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>

@@ -22,12 +22,15 @@ const Example = () => {
 			fields={ fields }
 			view={ view }
 			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
 			actions={ actions }
 			paginationInfo={ paginationInfo }
 		/>
 	);
 };
 ```
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a></div>
 
 ## Properties
 
@@ -71,60 +74,57 @@ const STATUSES = [
 const fields = [
 	{
 		id: 'title',
-		header: 'Title',
+		label: 'Title',
 		enableHiding: false,
 	},
 	{
 		id: 'date',
-		header: 'Date',
+		label: 'Date',
 		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		}
+			return <time>{ getFormattedDate( item.date ) }</time>;
+		},
 	},
 	{
 		id: 'author',
-		header: __( 'Author' ),
+		label: __( 'Author' ),
 		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
+			return <a href="...">{ item.author }</a>;
 		},
 		elements: [
-			{ value: 1, label: 'Admin' }
-			{ value: 2, label: 'User' }
+			{ value: 1, label: 'Admin' },
+			{ value: 2, label: 'User' },
 		],
 		filterBy: {
-			operators: [ 'is', 'isNot' ]
+			operators: [ 'is', 'isNot' ],
 		},
-		enableSorting: false
+		enableSorting: false,
 	},
 	{
-		header: __( 'Status' ),
+		label: __( 'Status' ),
 		id: 'status',
 		getValue: ( { item } ) =>
-			STATUSES.find( ( { value } ) => value === item.status )
-				?.label ?? item.status,
+			STATUSES.find( ( { value } ) => value === item.status )?.label ??
+			item.status,
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
 		},
 		enableSorting: false,
 	},
-]
+];
 ```
 
 Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
--   `header`: the field's name to be shown in the UI.
+-   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
 -   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
+-   `enableGlobalSearch`: whether the field is searchable. False by default.
 -   `filterBy`: configuration for the filters.
     -   `operators`: the list of operators supported by the field.
     -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
@@ -149,7 +149,7 @@ const view = {
 		field: 'date',
 		direction: 'desc',
 	},
-	hiddenFields: [ 'date', 'featured-image' ],
+	fields: [ 'author', 'status' ],
 	layout: {},
 };
 ```
@@ -167,10 +167,12 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `hiddenFields`: the `id` of the fields that are hidden in the UI.
+-   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
-    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
+    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item. This field is not hiddable.
+    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
+    -   `badgeFields`: used by the `grid` layout. It renders these fields without a label and styled as badges.
+    -   `columnFields`: used by the `grid` layout. It renders the label and the field data vertically stacked instead of horizontally (the default).
 
 ### `onChangeView`: `function`
 
@@ -199,7 +201,7 @@ function MyCustomPageTable() {
 				value: [ 'publish', 'draft' ],
 			},
 		],
-		hiddenFields: [ 'date', 'featured-image' ],
+		fields: [ 'author', 'status' ],
 		layout: {},
 	} );
 
@@ -252,6 +254,8 @@ Each action is an object with the following properties:
 -   `callback`: function, required unless `RenderModal` is provided. Callback function that takes the record as input and performs the required action.
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
+-   `supportsBulk`: Whether the action can be used as a bulk action. False by default.
+-   `disabled`: Whether the action is disabled. False by default.
 
 ### `paginationInfo`: `Object`
 
@@ -274,11 +278,23 @@ Function that receives an item and returns an unique identifier for it. By defau
 
 Whether the data is loading. `false` by default.
 
-### `supportedLayouts`: `String[]`
+### `defaultLayouts`: `Record< string, view >`
 
-Array of layouts supported. By default, all are: `table`, `grid`, `list`.
+This property provides layout information about the view types that are active. If empty, enables all layout types (see "Layout Types") with empty layout data.
 
-### `onSelectionChange`: `function`
+For example, this is how you'd enable only the table view type:
+
+```js
+const defaultLayouts = {
+	table: {
+		layout: {
+			primaryKey: 'my-key',
+		},
+	},
+};
+```
+
+### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 

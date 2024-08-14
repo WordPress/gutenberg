@@ -623,8 +623,8 @@ function BlockListBlockProvider( props ) {
 			}
 
 			const _isSelected = isBlockSelected( clientId );
-			const canRemove = canRemoveBlock( clientId, rootClientId );
-			const canMove = canMoveBlock( clientId, rootClientId );
+			const canRemove = canRemoveBlock( clientId );
+			const canMove = canMoveBlock( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;

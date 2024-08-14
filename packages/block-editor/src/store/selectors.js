@@ -334,8 +334,8 @@ export const getGlobalBlockCount = createSelector(
 /**
  * Returns all blocks that match a blockName. Results include nested blocks.
  *
- * @param {Object}  state     Global application state.
- * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ * @param {Object}   state     Global application state.
+ * @param {string[]} blockName Block name(s) for which clientIds are to be returned.
  *
  * @return {Array} Array of clientIds of blocks with name equal to blockName.
  */
@@ -362,8 +362,8 @@ export const getBlocksByName = createSelector(
  *
  * @deprecated
  *
- * @param {Object}  state     Global application state.
- * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ * @param {Object}   state     Global application state.
+ * @param {string[]} blockName Block name(s) for which clientIds are to be returned.
  *
  * @return {Array} Array of clientIds of blocks with name equal to blockName.
  */
@@ -1712,13 +1712,12 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 /**
  * Determines if the given block is allowed to be deleted.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean} Whether the given block is allowed to be removed.
  */
-export function canRemoveBlock( state, clientId, rootClientId = null ) {
+export function canRemoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1726,6 +1725,8 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.remove !== undefined ) {
 		return ! attributes.lock.remove;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
@@ -1736,28 +1737,24 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 /**
  * Determines if the given blocks are allowed to be removed.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be removed.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be removed.
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
-export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canRemoveBlock( state, clientId, rootClientId )
-	);
+export function canRemoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canRemoveBlock( state, clientId ) );
 }
 
 /**
  * Determines if the given block is allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
-export function canMoveBlock( state, clientId, rootClientId = null ) {
+export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1765,6 +1762,8 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
@@ -1774,16 +1773,13 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 /**
  * Determines if the given blocks are allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be moved.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be moved.
  *
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
-export function canMoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canMoveBlock( state, clientId, rootClientId )
-	);
+export function canMoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) );
 }
 
 /**
@@ -2814,6 +2810,16 @@ export function isBlockVisible( state, clientId ) {
 }
 
 /**
+ * Returns the currently hovered block.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Client Id of the hovered block.
+ */
+export function getHoveredBlockClientId( state ) {
+	return state.hoveredBlockClientId;
+}
+
+/**
  * Returns the list of all hidden blocks.
  *
  * @param {Object} state Global application state.
@@ -3041,10 +3047,7 @@ export const isGroupable = createRegistrySelector(
 				rootClientId
 			);
 			const _isGroupable = groupingBlockAvailable && _clientIds.length;
-			return (
-				_isGroupable &&
-				canRemoveBlocks( state, _clientIds, rootClientId )
-			);
+			return _isGroupable && canRemoveBlocks( state, _clientIds );
 		}
 );
 

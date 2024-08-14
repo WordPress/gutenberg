@@ -48,6 +48,7 @@ function gutenberg_reregister_core_block_types() {
 				'archives.php'                     => 'core/archives',
 				'avatar.php'                       => 'core/avatar',
 				'block.php'                        => 'core/block',
+				'button.php'                       => 'core/button',
 				'calendar.php'                     => 'core/calendar',
 				'categories.php'                   => 'core/categories',
 				'cover.php'                        => 'core/cover',

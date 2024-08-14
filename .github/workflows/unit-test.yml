@@ -21,25 +21,29 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+        name: JavaScript (Node.js ${{ matrix.node.name }}) ${{ matrix.shard }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22']
+                node:
+                    - name: 20
+                      version: 20
+                    - name: 22
+                      version: 22.4
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version: ${{ matrix.node.version }}
 
             - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
@@ -60,24 +64,28 @@ jobs:
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
-        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        name: JavaScript Date Tests (Node.js ${{ matrix.node.name }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '22']
+                node:
+                    - name: 20
+                      version: 20
+                    - name: 22
+                      version: 22.4
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
-                  node-version: ${{ matrix.node }}
+                  node-version: ${{ matrix.node.version }}
 
             - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
@@ -140,7 +148,7 @@ jobs:
         name: Build JavaScript assets for PHP unit tests
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -177,19 +185,19 @@ jobs:
                 include:
                     # Test with the previous WP version.
                     - php: '7.2'
-                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                      wordpress: 'previous major version'
                     - php: '7.4'
-                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                      wordpress: 'previous major version'
                     - php: '8.2'
-                      wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
+                      wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
-            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -204,7 +212,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@fc14643b0a99ee9db10a3c025a33d76544fa3761 # v2.30.5
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -228,7 +236,7 @@ jobs:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Download built JavaScript assets
-              uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
               with:
                   name: build-assets
                   path: ./build
@@ -259,6 +267,7 @@ jobs:
                   npm run wp-env run tests-wordpress php -i
                   npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
                   npm run wp-env run tests-wordpress locale -a
+                  npm run wp-env run tests-cli wp core version
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}
@@ -300,12 +309,12 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@fc14643b0a99ee9db10a3c025a33d76544fa3761 # v2.30.5
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
               with:
                   php-version: '7.4'
                   coverage: none
@@ -370,7 +379,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 

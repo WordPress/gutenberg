@@ -30,12 +30,6 @@ test.describe( 'Block bindings', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.use( {
-		BlockBindingsUtils: async ( { editor, page, pageUtils }, use ) => {
-			await use( new BlockBindingsUtils( { editor, page, pageUtils } ) );
-		},
-	} );
-
 	test.describe( 'Template context', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
@@ -1170,7 +1164,6 @@ test.describe( 'Block bindings', () => {
 		test.describe( 'Paragraph', () => {
 			test( 'should show the value of the custom field when exists', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
@@ -1195,19 +1188,14 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
+				const previewPage = await editor.openPreviewPage();
 				await expect(
-					page.locator( '#paragraph-binding' )
-				).toBeVisible();
-				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'Value of the text_custom_field'
-				);
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'Value of the text_custom_field' );
 			} );
 
 			test( "should show the value of the key when custom field doesn't exist", async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
@@ -1237,16 +1225,14 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend doesn't show the content.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'fallback value'
-				);
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'fallback value' );
 			} );
 
 			test( 'should not show the value of a protected meta field', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
@@ -1268,16 +1254,14 @@ test.describe( 'Block bindings', () => {
 				} );
 				await expect( paragraphBlock ).toHaveText( '_protected_field' );
 				// Check the frontend doesn't show the content.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'fallback value'
-				);
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'fallback value' );
 			} );
 
 			test( 'should not show the value of a meta field with `show_in_rest` false', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
@@ -1301,11 +1285,10 @@ test.describe( 'Block bindings', () => {
 					'show_in_rest_false_field'
 				);
 				// Check the frontend doesn't show the content.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				await expect( page.locator( '#paragraph-binding' ) ).toHaveText(
-					'fallback value'
-				);
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'fallback value' );
 			} );
 
 			test( 'should add empty paragraph block when pressing enter', async ( {
@@ -1407,12 +1390,75 @@ test.describe( 'Block bindings', () => {
 					'false'
 				);
 			} );
+			test( 'should show a selector for content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} );
+				await expect( contentAttribute ).toBeVisible();
+			} );
+			test( 'should use a selector to update the content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'undefined_field' },
+								},
+							},
+						},
+					},
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByRole( 'button', { name: 'content' } )
+					.click();
+
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'text_custom_field' } )
+					.click();
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
 		} );
 
 		test.describe( 'Heading', () => {
 			test( 'should show the value of the custom field', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/heading',
@@ -1437,14 +1483,10 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
+				const previewPage = await editor.openPreviewPage();
 				await expect(
-					page.locator( '#heading-binding' )
-				).toBeVisible();
-				await expect( page.locator( '#heading-binding' ) ).toHaveText(
-					'Value of the text_custom_field'
-				);
+					previewPage.locator( '#heading-binding' )
+				).toHaveText( 'Value of the text_custom_field' );
 			} );
 
 			test( 'should add empty paragraph block when pressing enter', async ( {
@@ -1493,12 +1535,34 @@ test.describe( 'Block bindings', () => {
 				await expect( newEmptyParagraph ).toHaveText( '' );
 				await expect( newEmptyParagraph ).toBeEditable();
 			} );
+			test( 'should show a selector for content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/heading',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} );
+				await expect( contentAttribute ).toBeVisible();
+			} );
 		} );
 
 		test.describe( 'Button', () => {
 			test( 'should show the value of the custom field when text is bound', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -1533,10 +1597,10 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend shows the value of the custom field.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				const buttonDom = page.locator( '#button-text-binding a' );
-				await expect( buttonDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const buttonDom = previewPage.locator(
+					'#button-text-binding a'
+				);
 				await expect( buttonDom ).toHaveText(
 					'Value of the text_custom_field'
 				);
@@ -1548,7 +1612,6 @@ test.describe( 'Block bindings', () => {
 
 			test( 'should use the value of the custom field when url is bound', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -1573,10 +1636,10 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend shows the original value of the custom field.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				const buttonDom = page.locator( '#button-url-binding a' );
-				await expect( buttonDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const buttonDom = previewPage.locator(
+					'#button-url-binding a'
+				);
 				await expect( buttonDom ).toHaveText( 'button default text' );
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
@@ -1586,7 +1649,6 @@ test.describe( 'Block bindings', () => {
 
 			test( 'should use the values of the custom fields when text and url are bound', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -1615,10 +1677,10 @@ test.describe( 'Block bindings', () => {
 				} );
 
 				// Check the frontend uses the values of the custom fields.
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-				const buttonDom = page.locator( '#button-multiple-bindings a' );
-				await expect( buttonDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const buttonDom = previewPage.locator(
+					'#button-multiple-bindings a'
+				);
 				await expect( buttonDom ).toHaveText(
 					'Value of the text_custom_field'
 				);
@@ -1673,6 +1735,56 @@ test.describe( 'Block bindings', () => {
 				await expect( newEmptyButton ).toHaveText( '' );
 				await expect( newEmptyButton ).toBeEditable();
 			} );
+			test( 'should show a selector for url, text, linkTarget and rel', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+						},
+					],
+				} );
+				await editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' )
+					.click();
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show url',
+				} );
+				await expect( urlAttribute ).toBeVisible();
+				const textAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show text',
+				} );
+				await expect( textAttribute ).toBeVisible();
+				const linkTargetAttribute = page.getByRole(
+					'menuitemcheckbox',
+					{
+						name: 'Show linkTarget',
+					}
+				);
+				await expect( linkTargetAttribute ).toBeVisible();
+				const relAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show rel',
+				} );
+				await expect( relAttribute ).toBeVisible();
+			} );
 		} );
 
 		test.describe( 'Image', () => {
@@ -1701,8 +1813,6 @@ test.describe( 'Block bindings', () => {
 			} );
 			test( 'should show the value of the custom field when url is bound', async ( {
 				editor,
-				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -1732,10 +1842,10 @@ test.describe( 'Block bindings', () => {
 				);
 
 				// Check the frontend uses the value of the custom field.
-				const postId = await BlockBindingsUtils.updatePost();
-				await page.goto( `/?p=${ postId }` );
-				const imageDom = page.locator( '#image-url-binding img' );
-				await expect( imageDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const imageDom = previewPage.locator(
+					'#image-url-binding img'
+				);
 				await expect( imageDom ).toHaveAttribute(
 					'src',
 					imageCustomFieldSrc
@@ -1753,7 +1863,6 @@ test.describe( 'Block bindings', () => {
 			test( 'should show value of the custom field in the alt textarea when alt is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -1793,10 +1902,10 @@ test.describe( 'Block bindings', () => {
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				const postId = await BlockBindingsUtils.updatePost();
-				await page.goto( `/?p=${ postId }` );
-				const imageDom = page.locator( '#image-alt-binding img' );
-				await expect( imageDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const imageDom = previewPage.locator(
+					'#image-alt-binding img'
+				);
 				await expect( imageDom ).toHaveAttribute(
 					'src',
 					imagePlaceholderSrc
@@ -1814,7 +1923,6 @@ test.describe( 'Block bindings', () => {
 			test( 'should show value of the custom field in the title input when title is bound', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -1864,10 +1972,10 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'Value of the text_custom_field' );
 
 				// Check the frontend uses the value of the custom field.
-				const postId = await BlockBindingsUtils.updatePost();
-				await page.goto( `/?p=${ postId }` );
-				const imageDom = page.locator( '#image-title-binding img' );
-				await expect( imageDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const imageDom = previewPage.locator(
+					'#image-title-binding img'
+				);
 				await expect( imageDom ).toHaveAttribute(
 					'src',
 					imagePlaceholderSrc
@@ -1885,7 +1993,6 @@ test.describe( 'Block bindings', () => {
 			test( 'Multiple bindings should show the value of the custom fields', async ( {
 				editor,
 				page,
-				BlockBindingsUtils,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
@@ -1946,10 +2053,10 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 
 				// Check the frontend uses the values of the custom fields.
-				const postId = await BlockBindingsUtils.updatePost();
-				await page.goto( `/?p=${ postId }` );
-				const imageDom = page.locator( '#image-multiple-bindings img' );
-				await expect( imageDom ).toBeVisible();
+				const previewPage = await editor.openPreviewPage();
+				const imageDom = previewPage.locator(
+					'#image-multiple-bindings img'
+				);
 				await expect( imageDom ).toHaveAttribute(
 					'src',
 					imageCustomFieldSrc
@@ -1962,6 +2069,41 @@ test.describe( 'Block bindings', () => {
 					'title',
 					'default title value'
 				);
+			} );
+			test( 'should show a selector for url, id, title and alt', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/image',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show url',
+				} );
+				await expect( urlAttribute ).toBeVisible();
+				const idAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show id',
+				} );
+				await expect( idAttribute ).toBeVisible();
+				const titleAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show title',
+				} );
+				await expect( titleAttribute ).toBeVisible();
+				const altAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show alt',
+				} );
+				await expect( altAttribute ).toBeVisible();
 			} );
 		} );
 
@@ -2003,6 +2145,41 @@ test.describe( 'Block bindings', () => {
 				await expect(
 					previewPage.locator( '#paragraph-binding' )
 				).toHaveText( 'new value' );
+			} );
+
+			// Related issue: https://github.com/WordPress/gutenberg/issues/62347
+			test( 'should be possible to use symbols and numbers as the custom field value', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
+				await paragraphBlock.fill( '$10.00' );
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( '$10.00' );
 			} );
 
 			test( 'should be possible to edit the value of the url custom field from the button', async ( {
@@ -2167,25 +2344,35 @@ test.describe( 'Block bindings', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Sources registration', () => {
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost( { title: 'Test bindings' } );
+		} );
+
+		test( 'should show the label of a source only registered in the server', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/server-source',
+							},
+						},
+					},
+				},
+			} );
+
+			const bindingsPanel = page
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.locator( '.block-editor-bindings__panel' );
+			await expect( bindingsPanel ).toContainText( 'Server Source' );
+		} );
+	} );
 } );
-
-class BlockBindingsUtils {
-	constructor( { page } ) {
-		this.page = page;
-	}
-
-	// Helper to update the post.
-	async updatePost() {
-		await this.page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
-		await this.page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'updated' } )
-			.waitFor();
-		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
-
-		return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
-	}
-}

@@ -6,7 +6,7 @@ import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
  * Internal dependencies
  */
 import { toVdom, hydratedIslands } from './vdom';
-import { createRootFragment, yieldToMain } from './utils';
+import { createRootFragment, splitTask } from './utils';
 import { directivePrefix } from './constants';
 
 // Keep the same root fragment for each interactive region node.
@@ -35,11 +35,11 @@ export const init = async () => {
 
 	for ( const node of nodes ) {
 		if ( ! hydratedIslands.has( node ) ) {
-			await yieldToMain();
+			await splitTask();
 			const fragment = getRegionRootFragment( node );
 			const vdom = toVdom( node );
 			initialVdom.set( node, vdom );
-			await yieldToMain();
+			await splitTask();
 			hydrate( vdom, fragment );
 		}
 	}

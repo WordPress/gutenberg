@@ -39,6 +39,42 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 }
 
 /**
+ * Recursively resolves any `ref` values within a block style variation's data.
+ *
+ * @since 6.6.0
+ *
+ * @param array $variation_data Reference to the variation data being processed.
+ * @param array $theme_json     Theme.json data to retrieve referenced values from.
+ */
+function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $theme_json ) {
+	foreach ( $variation_data as $key => &$value ) {
+		// Only need to potentially process arrays.
+		if ( is_array( $value ) ) {
+			// If ref value is set, attempt to find its matching value and update it.
+			if ( array_key_exists( 'ref', $value ) ) {
+				// Clean up any invalid ref value.
+				if ( empty( $value['ref'] ) || ! is_string( $value['ref'] ) ) {
+					unset( $variation_data[ $key ] );
+				}
+
+				$value_path = explode( '.', $value['ref'] ?? '' );
+				$ref_value  = _wp_array_get( $theme_json, $value_path );
+
+				// Only update the current value if the referenced path matched a value.
+				if ( null === $ref_value ) {
+					unset( $variation_data[ $key ] );
+				} else {
+					$value = $ref_value;
+				}
+			} else {
+				// Recursively look for ref instances.
+				gutenberg_resolve_block_style_variation_ref_values( $value, $theme_json );
+			}
+		}
+	}
+}
+
+/**
  * Render the block style variation's styles.
  *
  * In the case of nested blocks with variations applied, we want the parent
@@ -78,6 +114,10 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	if ( empty( $variation_data ) ) {
 		return $parsed_block;
 	}
+
+	// Recursively resolve any ref values with the appropriate value within the
+	// theme_json data.
+	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
 
 	$variation_instance = gutenberg_create_block_style_variation_instance_name( $parsed_block, $variation );
 	$class_name         = "is-style-$variation_instance";
@@ -133,8 +173,9 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		array( 'styles' ),
 		array( 'custom' ),
 		array(
-			'skip_root_layout_styles' => true,
-			'scope'                   => ".$class_name",
+			'include_block_style_variations' => true,
+			'skip_root_layout_styles'        => true,
+			'scope'                          => ".$class_name",
 		)
 	);
 
@@ -150,7 +191,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	wp_register_style( 'block-style-variation-styles', false, array( 'global-styles', 'wp-block-library' ) );
+	wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
 
 	/*
@@ -208,188 +249,6 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 }
 
 /**
- * Collects block style variation data for merging with theme.json data.
- * As each block style variation is processed it is registered if it hasn't
- * been already. This registration is required for later sanitization of
- * theme.json data.
- *
- * @since 6.6.0
- *
- * @param array $variations Shared block style variations.
- *
- * @return array Block variations data to be merged under `styles.blocks`.
- */
-function gutenberg_resolve_and_register_block_style_variations( $variations ) {
-	$variations_data = array();
-
-	if ( empty( $variations ) ) {
-		return $variations_data;
-	}
-
-	$registry              = WP_Block_Styles_Registry::get_instance();
-	$have_named_variations = ! wp_is_numeric_array( $variations );
-
-	foreach ( $variations as $key => $variation ) {
-		$supported_blocks = $variation['blockTypes'] ?? array();
-
-		/*
-		 * Standalone theme.json partial files for block style variations
-		 * will have their styles under a top-level property by the same name.
-		 * Variations defined within an existing theme.json or theme style
-		 * variation will themselves already be the required styles data.
-		 */
-		$variation_data = $variation['styles'] ?? $variation;
-
-		if ( empty( $variation_data ) ) {
-			continue;
-		}
-
-		/*
-		 * Block style variations read in via standalone theme.json partials
-		 * need to have their name set to the kebab case version of their title.
-		 */
-		$variation_name  = $have_named_variations ? $key : _wp_to_kebab_case( $variation['title'] );
-		$variation_label = $variation['title'] ?? $variation_name;
-
-		foreach ( $supported_blocks as $block_type ) {
-			$registered_styles = $registry->get_registered_styles_for_block( $block_type );
-
-			// Register block style variation if it hasn't already been registered.
-			if ( ! array_key_exists( $variation_name, $registered_styles ) ) {
-				gutenberg_register_block_style(
-					$block_type,
-					array(
-						'name'  => $variation_name,
-						'label' => $variation_label,
-					)
-				);
-			}
-
-			// Add block style variation data under current block type.
-			$path = array( $block_type, 'variations', $variation_name );
-			_wp_array_set( $variations_data, $path, $variation_data );
-		}
-	}
-
-	return $variations_data;
-}
-
-/**
- * Merges variations data with existing theme.json data ensuring that the
- * current theme.json data values take precedence.
- *
- * @since 6.6.0
- *
- * @param array                        $variations_data Block style variations data keyed by block type.
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json      Current theme.json data.
- * @param string                       $origin          Origin for the theme.json data.
- *
- * @return WP_Theme_JSON_Gutenberg The merged theme.json data.
- */
-function gutenberg_merge_block_style_variations_data( $variations_data, $theme_json, $origin = 'theme' ) {
-	if ( empty( $variations_data ) ) {
-		return $theme_json;
-	}
-
-	$variations_theme_json_data = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => array( 'blocks' => $variations_data ),
-	);
-
-	$variations_theme_json = new WP_Theme_JSON_Data_Gutenberg( $variations_theme_json_data, $origin );
-
-	/*
-	 * Merge the current theme.json data over shared variation data so that
-	 * any explicit per block variation values take precedence.
-	 */
-	return $variations_theme_json->update_with( $theme_json->get_data() );
-}
-
-/**
- * Merges any shared block style variation definitions from a theme style
- * variation into their appropriate block type within theme json styles. Any
- * custom user selections already made will take precedence over the shared
- * style variation value.
- *
- * @since 6.6.0
- *
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
- *
- * @return WP_Theme_JSON_Data_Gutenberg
- */
-function gutenberg_resolve_block_style_variations_from_theme_style_variation( $theme_json ) {
-	$theme_json_data   = $theme_json->get_data();
-	$shared_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
-	$variations_data   = gutenberg_resolve_and_register_block_style_variations( $shared_variations );
-
-	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json, 'user' );
-}
-
-/**
- * Merges block style variation data sourced from standalone partial
- * theme.json files.
- *
- * @since 6.6.0
- *
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
- *
- * @return WP_Theme_JSON_Data_Gutenberg
- */
-function gutenberg_resolve_block_style_variations_from_theme_json_partials( $theme_json ) {
-	$block_style_variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
-	$variations_data        = gutenberg_resolve_and_register_block_style_variations( $block_style_variations );
-
-	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json );
-}
-
-/**
- * Merges shared block style variations registered within the
- * `styles.blocks.variations` property of the primary theme.json file.
- *
- * @since 6.6.0
- *
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
- *
- * @return WP_Theme_JSON_Data_Gutenberg
- */
-function gutenberg_resolve_block_style_variations_from_primary_theme_json( $theme_json ) {
-	$theme_json_data        = $theme_json->get_data();
-	$block_style_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
-	$variations_data        = gutenberg_resolve_and_register_block_style_variations( $block_style_variations );
-
-	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json );
-}
-
-/**
- * Merges block style variations registered via the block styles registry with a
- * style object, under their appropriate block types within theme.json styles.
- * Any variation values defined within the theme.json specific to a block type
- * will take precedence over these shared definitions.
- *
- * @since 6.6.0
- *
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
- *
- * @return WP_Theme_JSON_Data_Gutenberg
- */
-function gutenberg_resolve_block_style_variations_from_styles_registry( $theme_json ) {
-	$registry        = WP_Block_Styles_Registry::get_instance();
-	$styles          = $registry->get_all_registered();
-	$variations_data = array();
-
-	foreach ( $styles as $block_type => $variations ) {
-		foreach ( $variations as $variation_name => $variation ) {
-			if ( ! empty( $variation['style_data'] ) ) {
-				$path = array( $block_type, 'variations', $variation_name );
-				_wp_array_set( $variations_data, $path, $variation['style_data'] );
-			}
-		}
-	}
-
-	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json );
-}
-
-/**
  * Enqueues styles for block style variations.
  *
  * @since 6.6.0
@@ -401,13 +260,57 @@ function gutenberg_enqueue_block_style_variation_styles() {
 // Register the block support.
 WP_Block_Supports::get_instance()->register( 'block-style-variation', array() );
 
+// Remove core filters and action.
+if ( function_exists( 'wp_render_block_style_variation_support_styles' ) ) {
+	remove_filter( 'render_block_data', 'wp_render_block_style_variation_support_styles' );
+}
+if ( function_exists( 'wp_render_block_style_variation_class_name' ) ) {
+	remove_filter( 'render_block', 'wp_render_block_style_variation_class_name' );
+}
+if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
+	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_block_style_variation_styles' );
+}
+
+// Add Gutenberg filters and action.
 add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 
-// Resolve block style variations from all their potential sources. The order here is deliberate.
-add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_primary_theme_json', 10, 1 );
-add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_theme_json_partials', 10, 1 );
-add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_styles_registry', 10, 1 );
+/**
+ * Registers block style variations read in from theme.json partials.
+ *
+ * @access private
+ *
+ * @param array $variations Shared block style variations.
+ */
+function gutenberg_register_block_style_variations_from_theme_json_partials( $variations ) {
+	if ( empty( $variations ) ) {
+		return;
+	}
 
-add_filter( 'wp_theme_json_data_user', 'gutenberg_resolve_block_style_variations_from_theme_style_variation', 10, 1 );
+	$registry = WP_Block_Styles_Registry::get_instance();
+
+	foreach ( $variations as $variation ) {
+		if ( empty( $variation['blockTypes'] ) || empty( $variation['styles'] ) ) {
+			continue;
+		}
+
+		$variation_name  = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
+		$variation_label = $variation['title'] ?? $variation_name;
+
+		foreach ( $variation['blockTypes'] as $block_type ) {
+			$registered_styles = $registry->get_registered_styles_for_block( $block_type );
+
+			// Register block style variation if it hasn't already been registered.
+			if ( ! array_key_exists( $variation_name, $registered_styles ) ) {
+				register_block_style(
+					$block_type,
+					array(
+						'name'  => $variation_name,
+						'label' => $variation_label,
+					)
+				);
+			}
+		}
+	}
+}

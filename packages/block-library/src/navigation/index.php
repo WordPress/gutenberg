@@ -483,7 +483,7 @@ class WP_Navigation_Block_Renderer {
 			}
 		}
 		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
-		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
 		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
@@ -519,9 +519,11 @@ class WP_Navigation_Block_Renderer {
 			';
 		}
 
+		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" style="%7$s" id="%1$s" %11$s>
+				<div class="%5$s" %7$s id="%1$s" %11$s>
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
 							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
@@ -537,7 +539,7 @@ class WP_Navigation_Block_Renderer {
 			$toggle_aria_label_close,
 			esc_attr( implode( ' ', $responsive_container_classes ) ),
 			esc_attr( implode( ' ', $open_button_classes ) ),
-			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+			( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '',
 			$toggle_button_content,
 			$toggle_close_button_content,
 			$open_button_directives,
@@ -826,7 +828,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
 		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu" }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
-		$tags->set_attribute( 'data-wp-on-async--focusout', 'actions.handleMenuFocusout' );
+		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
 
 		// This is a fix for Safari. Without it, Safari doesn't change the active

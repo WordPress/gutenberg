@@ -1,3 +1,14 @@
+/**
+ * Internal dependencies
+ */
+import { lock } from '../lock-unlock';
+import {
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
+	getBlockBindingsSource,
+	getBlockBindingsSources,
+} from './registration';
+
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
 // and `save`. The transforms specification allows converting one blocktype to
@@ -164,3 +175,11 @@ export {
 	__EXPERIMENTAL_ELEMENTS,
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
+
+export const privateApis = {};
+lock( privateApis, {
+	registerBlockBindingsSource,
+	unregisterBlockBindingsSource,
+	getBlockBindingsSource,
+	getBlockBindingsSources,
+} );

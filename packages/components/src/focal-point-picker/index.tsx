@@ -70,6 +70,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 	return (
  * 		<>
  * 			<FocalPointPicker
+ *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
@@ -250,6 +251,7 @@ export function FocalPointPicker( {
 		<BaseControl
 			{ ...restProps }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="FocalPointPicker"
 			label={ label }
 			id={ id }
 			help={ help }

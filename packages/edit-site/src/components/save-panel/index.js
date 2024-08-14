@@ -155,7 +155,7 @@ export default function SavePanel() {
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup="dialog"
 					disabled={ disabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>

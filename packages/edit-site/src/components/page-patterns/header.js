@@ -58,12 +58,18 @@ export default function PatternsHeader( {
 	}
 
 	return (
-		<VStack className="edit-site-patterns__section-header" spacing={ 0 }>
+		<VStack className="edit-site-patterns__section-header" spacing={ 1 }>
 			<HStack
 				justify="space-between"
 				className="edit-site-patterns__title"
 			>
-				<Heading as="h2" level={ 3 } id={ titleId } weight={ 500 }>
+				<Heading
+					as="h2"
+					level={ 3 }
+					id={ titleId }
+					weight={ 500 }
+					truncate
+				>
 					{ title }
 				</Heading>
 				<HStack expanded={ false }>
@@ -74,7 +80,7 @@ export default function PatternsHeader( {
 							label={ __( 'Actions' ) }
 							toggleProps={ {
 								className: 'edit-site-patterns__button',
-								describedBy: sprintf(
+								description: sprintf(
 									/* translators: %s: pattern category name */
 									__( 'Action menu for %s pattern category' ),
 									title

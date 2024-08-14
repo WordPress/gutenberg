@@ -34,8 +34,10 @@ import {
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -126,7 +128,7 @@ function useEditorStyles() {
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a constant padding for the typewritter effect. When typing at the
+		// Add a constant padding for the typewriter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
@@ -134,9 +136,14 @@ function useEditorStyles() {
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {
-			baseStyles.push( {
-				css: 'body{padding-bottom: 40vh}',
-			} );
+			return [
+				...baseStyles,
+				{
+					// Should override global styles padding, so ensure 0-1-0
+					// specificity.
+					css: ':root :where(body){padding-bottom: 40vh}',
+				},
+			];
 		}
 
 		return baseStyles;
@@ -145,6 +152,7 @@ function useEditorStyles() {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
+		postType,
 	] );
 }
 
@@ -191,7 +199,10 @@ function Layout( {
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canViewTemplate = canUser( 'read', 'templates' );
+			const canViewTemplate = canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 
 			return {
 				mode: select( editorStore ).getEditorMode(),
@@ -284,7 +295,7 @@ function Layout( {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								title
+								decodeEntities( title )
 							),
 							{
 								type: 'snackbar',
@@ -317,6 +328,12 @@ function Layout( {
 			id: initialPostId,
 		};
 	}, [ initialPostType, initialPostId ] );
+
+	const backButton =
+		useViewportMatch( 'medium' ) && isFullscreenActive ? (
+			<BackButton initialPost={ initialPost } />
+		) : null;
+
 	return (
 		<SlotFillProvider>
 			<ErrorBoundary>
@@ -363,7 +380,7 @@ function Layout( {
 					<InitPatternModal />
 					<PluginArea onError={ onPluginAreaError } />
 					<PostEditorMoreMenu />
-					<BackButton initialPost={ initialPost } />
+					{ backButton }
 					<EditorSnackbars />
 				</Editor>
 			</ErrorBoundary>

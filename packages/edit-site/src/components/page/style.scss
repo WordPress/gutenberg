@@ -24,6 +24,12 @@
 
 	.edit-site-page-header__page-title {
 		min-height: $grid-unit-50;
+
+		.components-heading {
+			flex-grow: 1;
+			flex-basis: 0;
+			white-space: nowrap;
+		}
 	}
 
 	.edit-site-page-header__sub-title {

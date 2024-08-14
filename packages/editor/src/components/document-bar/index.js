@@ -52,10 +52,15 @@ const MotionButton = motion( Button );
  * ```jsx
  * <DocumentBar />
  * ```
+ * @param {Object}                                   props       The component props.
+ * @param {string}                                   props.title A title for the document, defaulting to the document or
+ *                                                               template title currently being edited.
+ * @param {import("@wordpress/components").IconType} props.icon  An icon for the document, defaulting to an icon for document
+ *                                                               or template currently being edited.
  *
  * @return {JSX.Element} The rendered DocumentBar component.
  */
-export default function DocumentBar() {
+export default function DocumentBar( props ) {
 	const {
 		postType,
 		documentTitle,
@@ -111,7 +116,9 @@ export default function DocumentBar() {
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const title = isTemplate ? templateTitle : documentTitle;
+	const entityTitle = isTemplate ? templateTitle : documentTitle;
+	const title = props.title || entityTitle;
+	const icon = props.icon || templateIcon;
 
 	const mounted = useRef( false );
 	useEffect( () => {
@@ -180,12 +187,12 @@ export default function DocumentBar() {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ templateIcon } />
+						<BlockIcon icon={ icon } />
 						<Text
 							size="body"
 							as="h1"
 							aria-label={
-								TYPE_LABELS[ postType ]
+								! props.title && TYPE_LABELS[ postType ]
 									? // eslint-disable-next-line @wordpress/valid-sprintf
 									  sprintf( TYPE_LABELS[ postType ], title )
 									: undefined
@@ -193,7 +200,7 @@ export default function DocumentBar() {
 						>
 							{ title
 								? decodeEntities( title )
-								: __( 'No Title' ) }
+								: __( 'No title' ) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">

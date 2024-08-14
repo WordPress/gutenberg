@@ -24,6 +24,8 @@ function PostSlugControl() {
 
 	return (
 		<TextControl
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			__nextHasNoMarginBottom
 			label={ __( 'Slug' ) }
 			autoComplete="off"
@@ -58,6 +60,11 @@ function PostSlugControl() {
 	);
 }
 
+/**
+ * Renders the PostSlug component. It provide a control for editing the post slug.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSlug() {
 	return (
 		<PostSlugCheck>

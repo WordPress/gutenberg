@@ -424,6 +424,7 @@ describe( 'Blocks raw handling', () => {
 			'shortcode-matching',
 			'slack-quote',
 			'slack-paragraphs',
+			'mixed-content',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {

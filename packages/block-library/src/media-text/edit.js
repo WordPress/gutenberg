@@ -46,7 +46,7 @@ import {
 	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -276,6 +276,7 @@ function MediaTextEdit( {
 			mediaSizeSlug: newMediaSizeSlug,
 		} );
 	};
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
@@ -290,7 +291,7 @@ function MediaTextEdit( {
 					mediaSizeSlug: undefined,
 				} );
 			} }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<ToolsPanelItem
 				label={ __( 'Media width' ) }

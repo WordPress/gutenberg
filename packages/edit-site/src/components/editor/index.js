@@ -7,8 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
@@ -21,6 +21,8 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { decodeEntities } from '@wordpress/html-entities';
+import { Icon, homeButton } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,40 +32,69 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
-import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitle,
+	getEditorCanvasContainerTitleAndIcon,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
+import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
+import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-export default function EditSiteEditor( { isLoading } ) {
+const toggleHomeIconVariants = {
+	edit: {
+		opacity: 0,
+		scale: 0.2,
+	},
+	hover: {
+		opacity: 1,
+		scale: 1,
+		clipPath: 'inset( 22% round 2px )',
+	},
+};
+
+const siteIconVariants = {
+	edit: {
+		clipPath: 'inset(0% round 0)',
+	},
+	hover: {
+		clipPath: 'inset( 22% round 2px )',
+	},
+	tap: {
+		clipPath: 'inset(0% round 0)',
+	},
+};
+
+export default function EditSiteEditor( { isPostsList = false } ) {
+	const disableMotion = useReducedMotion();
+	const { params } = useLocation();
+	const isLoading = useIsSiteEditorLoading();
 	const {
 		editedPostType,
 		editedPostId,
 		contextPostType,
 		contextPostId,
-		editorMode,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
 		editorCanvasView,
 		currentPostIsTrashed,
+		hasSiteIcon,
 	} = useSelect( ( select ) => {
 		const {
+			getEditorCanvasContainerView,
 			getEditedPostContext,
 			getCanvasMode,
 			isPage,
@@ -71,9 +102,9 @@ export default function EditSiteEditor( { isLoading } ) {
 			getEditedPostId,
 		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
-		const { getCurrentTheme } = select( coreDataStore );
-		const { getEditorMode } = select( editorStore );
+		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const _context = getEditedPostContext();
+		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
@@ -82,26 +113,22 @@ export default function EditSiteEditor( { isLoading } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
+			editorCanvasView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
+			hasSiteIcon: !! siteData?.site_icon_url,
 		};
 	}, [] );
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
-	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
@@ -115,14 +142,12 @@ export default function EditSiteEditor( { isLoading } ) {
 			{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-
-				css: `body{${
+				css:
 					canvasMode === 'view'
-						? `min-height: 100vh; ${
+						? `body{min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }`
-						: ''
-				}}}`,
+						  }}`
+						: undefined,
 			},
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
@@ -152,7 +177,7 @@ export default function EditSiteEditor( { isLoading } ) {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								_title
+								decodeEntities( _title )
 							),
 							{
 								type: 'snackbar',
@@ -178,14 +203,20 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
+	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
+	const { title, icon } =
+		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+
 	const isReady = ! isLoading;
+	const transition = {
+		duration: disableMotion ? 0 : 0.2,
+	};
 
 	return (
 		<>
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
@@ -204,12 +235,10 @@ export default function EditSiteEditor( { isLoading } ) {
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
+					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={
-						! hasDefaultEditorCanvasView
-							? getEditorCanvasContainerTitle( editorCanvasView )
-							: undefined
-					}
+					title={ title }
+					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -220,15 +249,52 @@ export default function EditSiteEditor( { isLoading } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<Button
-										label={ __( 'Open Navigation' ) }
-										className="edit-site-layout__view-mode-toggle"
-										onClick={ () =>
-											setCanvasMode( 'view' )
-										}
+									<motion.div
+										className="edit-site-editor__view-mode-toggle"
+										transition={ transition }
+										animate="edit"
+										initial="edit"
+										whileHover="hover"
+										whileTap="tap"
 									>
-										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-									</Button>
+										<Button
+											label={ __( 'Open Navigation' ) }
+											showTooltip
+											tooltipPosition="middle right"
+											onClick={ () => {
+												setCanvasMode( 'view' );
+												// TODO: this is a temporary solution to navigate to the posts list if we are
+												// come here through `posts list` and are in focus mode editing a template, template part etc..
+												if (
+													isPostsList &&
+													params?.focusMode
+												) {
+													history.push( {
+														page: 'gutenberg-posts-dashboard',
+														postType: 'post',
+													} );
+												}
+											} }
+										>
+											<motion.div
+												variants={ siteIconVariants }
+											>
+												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+											</motion.div>
+										</Button>
+										<motion.div
+											className={ clsx(
+												'edit-site-editor__back-icon',
+												{
+													'has-site-icon':
+														hasSiteIcon,
+												}
+											) }
+											variants={ toggleHomeIconVariants }
+										>
+											<Icon icon={ homeButton } />
+										</motion.div>
+									</motion.div>
 								)
 							}
 						</BackButton>

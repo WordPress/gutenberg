@@ -262,6 +262,12 @@ _Usage_
 <DocumentBar />
 ```
 
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.title_ `string`: A title for the document, defaulting to the document or template title currently being edited.
+-   _props.icon_ `import("@wordpress/components").IconType`: An icon for the document, defaulting to an icon for document or template currently being edited.
+
 _Returns_
 
 -   `JSX.Element`: The rendered DocumentBar component.
@@ -322,7 +328,7 @@ _Returns_
 
 ### EditorKeyboardShortcuts
 
-Component handles the keyboard shortcuts for the editor.
+Handles the keyboard shortcuts for the editor.
 
 It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
@@ -390,7 +396,17 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Undocumented declaration.
+Renders the component for managing saved states of entities.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.close_ `Function`: The function to close the dialog.
+-   _props.renderDialog_ `Function`: The function to render the dialog.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### ErrorBoundary
 
@@ -516,7 +532,7 @@ _Returns_
 
 ### PageAttributesOrder
 
-Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page. The component is now not used in core but was kept for backward compatibility.
 
 _Returns_
 
@@ -1183,15 +1199,19 @@ _Returns_
 
 ### PostPublishButton
 
-Undocumented declaration.
+Renders the publish button.
 
 ### PostPublishButtonLabel
 
-Undocumented declaration.
+Renders the label for the publish button.
+
+_Returns_
+
+-   `string`: The label for the publish button.
 
 ### PostPublishPanel
 
-Undocumented declaration.
+Renders a panel for publishing a post.
 
 ### PostSavedState
 
@@ -1254,39 +1274,101 @@ _Returns_
 
 ### PostSlug
 
-Undocumented declaration.
+Renders the PostSlug component. It provide a control for editing the post slug.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlugCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the slug.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSticky
 
-Undocumented declaration.
+Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostStickyCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a sticky action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
 
 ### PostSwitchToDraftButton
 
-Undocumented declaration.
+Renders a button component that allows the user to switch a post to draft status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostSyncStatus
 
-Undocumented declaration.
+Renders the sync status of a post.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered sync status component.
 
 ### PostTaxonomies
 
-Undocumented declaration.
+Renders the taxonomies associated with a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomyWrapper_ `Function`: The wrapper function for each taxonomy component.
+
+_Returns_
+
+-   `Array`: An array of JSX elements representing the visible taxonomies.
 
 ### PostTaxonomiesCheck
 
-Undocumented declaration.
+Renders the children components only if the current post type has taxonomies.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
-Undocumented declaration.
+Renders a flat term selector component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.slug_ `string`: The slug of the taxonomy.
+-   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+
+_Returns_
+
+-   `JSX.Element`: The rendered flat term selector component.
 
 ### PostTaxonomiesHierarchicalTermSelector
 
@@ -1303,7 +1385,17 @@ _Returns_
 
 ### PostTaxonomiesPanel
 
-Undocumented declaration.
+Renders a panel for a specific taxonomy.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomy_ `Object`: The taxonomy object.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component`: The rendered taxonomy panel.
 
 ### PostTemplatePanel
 
@@ -1340,11 +1432,24 @@ Undocumented declaration.
 
 ### PostTrash
 
-Undocumented declaration.
+Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTrash component.
 
 ### PostTrashCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post can trashed.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if the post can not trashed.
 
 ### PostTypeSupportCheck
 
@@ -1445,6 +1550,18 @@ _Returns_
 
 Undocumented declaration.
 
+### registerEntityAction
+
+Registers a new DataViews action.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _config_ `Action`: Action configuration.
+
 ### RichText
 
 > **Deprecated** since 5.3, use `wp.blockEditor.RichText` instead.
@@ -1491,23 +1608,62 @@ _Type_
 
 ### TableOfContents
 
-Undocumented declaration.
+Renders a table of contents component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Whether outline items are disabled.
+-   _props.repositionDropdown_ `boolean`: Whether to reposition the dropdown.
+-   _ref_ `Element.ref`: The component's ref.
+
+_Returns_
+
+-   `JSX.Element`: The rendered table of contents component.
 
 ### TextEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### ThemeSupportCheck
 
-Undocumented declaration.
+Checks if the current theme supports specific features and renders the children if supported.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children to render if the theme supports the specified features.
+-   _props.supportKeys_ `string|string[]`: The key(s) of the theme support(s) to check.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered children if the theme supports the specified features, otherwise null.
 
 ### TimeToRead
 
-Undocumented declaration.
+Component for showing Time To Read in Content.
+
+_Returns_
+
+-   `JSX.Element`: The rendered TimeToRead component.
 
 ### transformStyles
 
 Undocumented declaration.
+
+### unregisterEntityAction
+
+Unregisters a DataViews action.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _actionId_ `string`: Action ID.
 
 ### UnsavedChangesWarning
 
@@ -1531,7 +1687,11 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Undocumented declaration.
+Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
+
+_Returns_
+
+-   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
 
 ### usePostScheduleLabel
 
@@ -1572,7 +1732,9 @@ _Type_
 
 ### VisualEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### Warning
 
