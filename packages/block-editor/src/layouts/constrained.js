@@ -125,6 +125,7 @@ export default {
 				) }
 				{ allowJustification && (
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Justification' ) }
 						value={ justifyContent }
