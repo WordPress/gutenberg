@@ -2294,7 +2294,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
-	public function test_merge_incoming_styles() {
+	public function test_merge_incoming_background_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -2304,9 +2304,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'url' => 'http://example.org/quote.png',
 						),
 						'backgroundSize'  => 'cover',
-					),
-					'typography' => array(
-						'fontSize' => '10px',
 					),
 					'blocks'     => array(
 						'core/group' => array(
@@ -2327,11 +2324,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'core/verse' => array(
-							'background' => array(
-								'backgroundImage' => "url('http://example.org/verse.png')",
-							),
-						),
 					),
 				),
 			)
@@ -2343,15 +2335,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'background' => array(
 					'backgroundSize' => 'contain',
 				),
-				'typography' => array(
-					'fontSize' => '12px',
-				),
 				'blocks'     => array(
 					'core/group' => array(
 						'background' => array(
 							'backgroundImage' => array(
 								'url' => 'http://example.org/group.png',
 							),
+						),
+					),
+					'core/quote' => array(
+						'background' => array(
+							'backgroundAttachment' => 'fixed',
 						),
 					),
 					'core/verse' => array(
@@ -2373,9 +2367,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 					'backgroundSize'  => 'contain',
 				),
-				'typography' => array(
-					'fontSize' => '12px',
-				),
 				'blocks'     => array(
 					'core/group' => array(
 						'background' => array(
@@ -2390,9 +2381,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							'backgroundImage'      => array(
 								'url' => 'http://example.org/quote.png',
 							),
-							'backgroundAttachment' => array(
-								'ref' => 'styles.blocks.core/group.background.backgroundAttachment',
-							),
+							'backgroundAttachment' => 'fixed',
 						),
 					),
 					'core/verse' => array(
