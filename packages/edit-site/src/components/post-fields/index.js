@@ -33,11 +33,12 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
-	LAYOUT_LIST,
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 import { default as Link, useLink } from '../routes/link';
 import Media from '../media';
+import { isBlobURL } from '@wordpress/blob';
+import { PostFeaturedImage } from '@wordpress/editor';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -88,19 +89,13 @@ function FeaturedImage( { item, viewType } ) {
 		postType: item.type,
 		canvas: 'edit',
 	} );
-	const hasMedia = !! item.featured_media;
+
 	const size =
 		viewType === LAYOUT_GRID
 			? [ 'large', 'full', 'medium', 'thumbnail' ]
 			: [ 'thumbnail', 'medium', 'large', 'full' ];
-	const media = hasMedia ? (
-		<Media
-			className="edit-site-post-list__featured-image"
-			id={ item.featured_media }
-			size={ size }
-		/>
-	) : null;
-	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
+
+	const renderButton = viewType === LAYOUT_GRID && ! isDisabled;
 	return (
 		<div
 			className={ `edit-site-post-list__featured-image-wrapper is-layout-${ viewType }` }
@@ -112,10 +107,18 @@ function FeaturedImage( { item, viewType } ) {
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || __( '(no title)' ) }
 				>
-					{ media }
+					<Media
+						className="edit-site-post-list__featured-image"
+						id={ item.featured_media }
+						size={ size }
+					/>
+					;
 				</button>
 			) : (
-				media
+				<PostFeaturedImage
+					media={ item.featured_media }
+					id={ item.id }
+				/>
 			) }
 		</div>
 	);
@@ -179,24 +182,38 @@ function usePostFields( viewType ) {
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
-	const { frontPageId, postsPageId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		return {
-			frontPageId: siteSettings?.page_on_front,
-			postsPageId: siteSettings?.page_for_posts,
-		};
-	}, [] );
+	const { frontPageId, postsPageId, getFeaturedMediaUrl } = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			return {
+				frontPageId: siteSettings?.page_on_front,
+				postsPageId: siteSettings?.page_for_posts,
+				getFeaturedMediaUrl: ( id ) =>
+					getEntityRecord( 'root', 'media', id ),
+			};
+		},
+		[]
+	);
 
 	const fields = useMemo(
 		() => [
 			{
-				id: 'featured-image',
+				id: 'featured_media',
 				label: __( 'Featured Image' ),
-				getValue: ( { item } ) => item.featured_media,
-				render: ( { item } ) => (
-					<FeaturedImage item={ item } viewType={ viewType } />
-				),
+				type: 'image',
+				getValue: ( { item } ) => {
+					const mediaUrl = isBlobURL( item.featured_media )
+						? item.featured_media
+						: getFeaturedMediaUrl( item.featured_media )
+								?.source_url;
+					return mediaUrl;
+				},
+				render: ( { item } ) => {
+					return (
+						<FeaturedImage item={ item } viewType={ viewType } />
+					);
+				},
 				enableSorting: false,
 			},
 			{
@@ -396,7 +413,7 @@ function usePostFields( viewType ) {
 				],
 			},
 		],
-		[ authors, viewType, frontPageId, postsPageId ]
+		[ authors, getFeaturedMediaUrl, viewType, frontPageId, postsPageId ]
 	);
 
 	return {

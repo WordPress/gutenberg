@@ -76,6 +76,11 @@ const fields = [
 			{ value: 'published', label: 'Published' },
 		],
 	},
+	{
+		id: 'image',
+		label: 'Image',
+		type: 'image' as const,
+	},
 ];
 
 export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
@@ -87,6 +92,7 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 		reviewer: 'fulano',
 		date: '2021-01-01T12:00:00',
 		birthdate: '1950-02-23T12:00:00',
+		image: 'https://picsum.photos/200',
 	} );
 
 	const form = {
@@ -98,6 +104,7 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 			'status',
 			'date',
 			'birthdate',
+			'image',
 		],
 	};
 

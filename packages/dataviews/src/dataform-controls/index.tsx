@@ -16,6 +16,7 @@ import integer from './integer';
 import radio from './radio';
 import select from './select';
 import text from './text';
+import image from './image';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -27,6 +28,7 @@ const FORM_CONTROLS: FormControls = {
 	radio,
 	select,
 	text,
+	image,
 };
 
 export function getControl< Item >(
