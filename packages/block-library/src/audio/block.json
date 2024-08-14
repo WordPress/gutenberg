@@ -59,9 +59,18 @@
 				"padding": false
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-audio audio, .wp-block-audio .components-placeholder"
 	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"
