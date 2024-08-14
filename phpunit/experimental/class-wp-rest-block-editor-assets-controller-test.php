@@ -82,6 +82,17 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 		$this->assertErrorResponse( 'rest_cannot_read_block_editor_assets', $response, 403 );
 	}
 
+	public function test_get_items() {
+		wp_set_current_user( self::$admin_id );
+
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/editor-assets' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayHasKey('styles', $data, 'Editor assets should include styles.');
+		$this->assertArrayHasKey('scripts', $data, 'Editor assets should include scripts.');
+	}
+
 	/**
 	 * @doesNotPerformAssertions
 	 */
@@ -96,11 +107,6 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	 * @doesNotPerformAssertions
 	 */
 	public function test_get_item() {}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_get_items() {}
 
 	/**
 	 * @doesNotPerformAssertions
