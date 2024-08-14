@@ -18,7 +18,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
-			$this->namespace = 'wp-block-editor/v1';
+			$this->namespace = '__experimental/wp-block-editor/v1';
 			$this->rest_base = 'editor-assets';
 		}
 

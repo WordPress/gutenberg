@@ -59,7 +59,7 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey(
-			'/wp-block-editor/v1/editor-assets',
+			'/__experimental/wp-block-editor/v1/editor-assets',
 			$routes
 		);
 	}
@@ -67,7 +67,7 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	public function test_get_items_without_user() {
 		wp_set_current_user( 0 );
 
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/editor-assets' );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/wp-block-editor/v1/editor-assets' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_read_block_editor_assets', $response, 401 );
@@ -76,7 +76,7 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	public function test_get_items_without_permissions() {
 		wp_set_current_user( self::$subscriber_id );
 
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/editor-assets' );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/wp-block-editor/v1/editor-assets' );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_read_block_editor_assets', $response, 403 );
@@ -85,7 +85,7 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
 
-		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/editor-assets' );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/wp-block-editor/v1/editor-assets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -94,7 +94,7 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	}
 
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/editor-assets' );
+		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/wp-block-editor/v1/editor-assets' );
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
