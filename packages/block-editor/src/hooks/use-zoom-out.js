@@ -25,18 +25,6 @@ export function useZoomOut( zoomOut = true ) {
 			originalEditingMode.current = __unstableGetEditorMode();
 		}
 
-		return () => {
-			// Restore the original mode on unmount if it was changed to 'zoom-out'
-			if (
-				__unstableGetEditorMode() === 'zoom-out' &&
-				__unstableGetEditorMode() !== originalEditingMode.current
-			) {
-				__unstableSetEditorMode( originalEditingMode.current );
-			}
-		};
-	}, [ __unstableGetEditorMode, __unstableSetEditorMode ] );
-
-	useEffect( () => {
 		if ( zoomOut && __unstableGetEditorMode() !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
 		} else if (
@@ -46,5 +34,15 @@ export function useZoomOut( zoomOut = true ) {
 		) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
+
+		return () => {
+			// Restore the original mode on unmount if it was changed to 'zoom-out'
+			if (
+				__unstableGetEditorMode() === 'zoom-out' &&
+				__unstableGetEditorMode() !== originalEditingMode.current
+			) {
+				__unstableSetEditorMode( originalEditingMode.current );
+			}
+		};
 	}, [ zoomOut, __unstableGetEditorMode, __unstableSetEditorMode ] );
 }
