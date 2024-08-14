@@ -192,7 +192,7 @@ export const getPostTitle = createRegistrySelector(
 		const documentTitle =
 			typeof _document?.title === 'string'
 				? _document.title
-				: title?.rendered;
+				: _document.title?.rendered;
 		const title =
 			isTemplate &&
 			( ! documentTitle || documentTitle === _document?.slug )
