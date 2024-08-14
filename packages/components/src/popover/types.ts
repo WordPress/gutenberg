@@ -166,7 +166,6 @@ export type PopoverProps = {
 	 * @default undefined
 	 */
 	style?: React.CSSProperties;
-
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
