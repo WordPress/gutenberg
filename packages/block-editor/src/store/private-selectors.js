@@ -511,3 +511,7 @@ export function getTemporarilyEditingAsBlocks( state ) {
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
+
+export function getInserterSearchInputRef( state ) {
+	return state.inserterSearchInputRef;
+}
