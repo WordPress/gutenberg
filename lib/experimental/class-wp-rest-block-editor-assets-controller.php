@@ -47,7 +47,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		 *
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
-		public function get_items( $request ) {
+		public function get_items() {
 			global $wp_styles, $wp_scripts;
 
 			$current_wp_styles  = $wp_styles;
@@ -141,7 +141,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		 *
 		 * @return bool|WP_Error True if the request has permission, WP_Error object otherwise.
 		 */
-		public function get_items_permissions_check( $request ) {
+		public function get_items_permissions_check() {
 			if ( current_user_can( 'edit_posts' ) ) {
 				return true;
 			}
