@@ -127,7 +127,12 @@ export function generateBoxRules(
 }
 
 /**
- * Returns a CSS var value from incoming style value following the pattern `var:description|context|slug`.
+ * Returns a WordPress CSS custom var value from incoming style preset value.
+ * The preset value follows the pattern `var:description|context|slug`.
+ *
+ * Example:
+ *
+ * `getCSSVarFromStyleValue( 'var:preset|color|heavenlyBlue' )` // returns 'var(--wp--preset--color--heavenly-blue)'
  *
  * @param styleValue A raw style value.
  *

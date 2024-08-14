@@ -1,11 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	camelCaseJoin,
-	getCSSVarFromStyleValue,
-	upperFirst,
-} from '../styles/utils';
+import { camelCaseJoin, getCSSVarFromStyleValue, upperFirst } from '../utils';
 
 describe( 'utils', () => {
 	describe( 'upperFirst()', () => {
@@ -57,6 +53,15 @@ describe( 'utils', () => {
 					'var:preset|background|dark_Secrets_100'
 				)
 			).toEqual( 'var(--wp--preset--background--dark-secrets-100)' );
+		} );
+		it( 'should handle null gracefully', () => {
+			expect( getCSSVarFromStyleValue( null ) ).toEqual( null );
+		} );
+		it( 'should handle boolean gracefully', () => {
+			expect( getCSSVarFromStyleValue( false ) ).toEqual( false );
+		} );
+		it( 'should handle integers gracefully', () => {
+			expect( getCSSVarFromStyleValue( 1000 ) ).toEqual( 1000 );
 		} );
 	} );
 } );
