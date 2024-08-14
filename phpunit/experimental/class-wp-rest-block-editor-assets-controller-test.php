@@ -93,6 +93,17 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 		$this->assertArrayHasKey('scripts', $data, 'Editor assets should include scripts.');
 	}
 
+	public function test_get_item_schema() {
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp-block-editor/v1/editor-assets' );
+		$response   = rest_get_server()->dispatch( $request );
+		$data       = $response->get_data();
+		$properties = $data['schema']['properties'];
+
+		$this->assertCount( 2, $properties, 'Schema properties array does not have exactly 2 elements' );
+		$this->assertArrayHasKey( 'styles', $properties, 'Schema properties array does not have "id" key' );
+		$this->assertArrayHasKey( 'scripts', $properties, 'Schema properties array does not have "styles" key' );
+	}
+
 	/**
 	 * @doesNotPerformAssertions
 	 */
@@ -107,11 +118,6 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 	 * @doesNotPerformAssertions
 	 */
 	public function test_get_item() {}
-
-	/**
-	 * @doesNotPerformAssertions
-	 */
-	public function test_get_item_schema() {}
 
 	/**
 	 * @doesNotPerformAssertions

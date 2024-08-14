@@ -164,5 +164,34 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
+
+		/**
+		 * Retrieves the block editor assets schema, conforming to JSON Schema.
+		 *
+		 * @return array Item schema data.
+		 */
+		public function get_item_schema() {
+			if ( $this->schema ) {
+				return $this->add_additional_fields_schema( $this->schema );
+			}
+
+			$schema = array(
+				'type'       => 'object',
+				'properties' => array(
+					'styles'  => array(
+						'description' => esc_html__( 'Style link tags for the block editor.', 'gutenberg' ),
+						'type' => 'string',
+					),
+					'scripts' => array(
+						'description' => esc_html__( 'Script tags for the block editor.', 'gutenberg' ),
+						'type' => 'string',
+					),
+				),
+			);
+
+			$this->schema = $schema;
+
+			return $this->add_additional_fields_schema( $this->schema );
+		}
 	}
 }
