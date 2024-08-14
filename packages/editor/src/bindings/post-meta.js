@@ -92,7 +92,7 @@ export default {
 			registry.select( coreDataStore );
 
 		// If it is a template, use the default values.
-		if ( type === 'wp_template' ) {
+		if ( ! context?.postType && type === 'wp_template' ) {
 			let postType;
 			let isGlobalTemplate = false;
 			// Get the 'kind' from the start of the slug.
