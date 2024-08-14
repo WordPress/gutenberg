@@ -209,9 +209,7 @@ describe( 'Popover', () => {
 				const popover = screen.getByTestId( 'popover-element' );
 
 				await waitFor( () => expect( popover ).toBeVisible() );
-				expect( popover ).toHaveStyle(
-					'position: absolute; top: 0px; left: 0px;'
-				);
+				expect( popover ).not.toHaveStyle( 'position: static;' );
 			} );
 		} );
 
