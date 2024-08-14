@@ -13,10 +13,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -297,10 +293,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 .emotion-0 *::before,
 .emotion-0 *::after {
   box-sizing: inherit;
-}
-
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-2 {
@@ -593,10 +585,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 .emotion-0 *::before,
 .emotion-0 *::after {
   box-sizing: inherit;
-}
-
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-2 {
@@ -901,10 +889,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 .emotion-0 *::before,
 .emotion-0 *::after {
   box-sizing: inherit;
-}
-
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
 }
 
 .components-panel__row .emotion-2 {
