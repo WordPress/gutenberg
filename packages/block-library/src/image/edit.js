@@ -111,6 +111,7 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
+
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
 	const [ resizeListener, sizes ] = useResizeObserver();
@@ -118,10 +119,7 @@ export function ImageEdit( {
 	const parsedWidth = width && parseInt( width.replace( /px$/, '' ), 10 );
 
 	const isSmallLayout =
-		( parentWidth && parentWidth < 140 ) || parsedWidth < 140;
-
-	const isExtraSmallLayout =
-		( parentWidth && parentWidth < 60 ) || parsedWidth < 60;
+		( parentWidth && parentWidth < 160 ) || parsedWidth < 160;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -343,12 +341,13 @@ export function ImageEdit( {
 			<Placeholder
 				className={ clsx( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
-						!! borderProps.className && ! isSingleSelected,
+						!! borderProps.className &&
+						! isSingleSelected &&
+						! isSmallLayout,
 				} ) }
 				withIllustration
 				icon={
-					! isExtraSmallLayout &&
-					( lockUrlControls ? pluginsIcon : icon )
+					! isSmallLayout && ( lockUrlControls ? pluginsIcon : icon )
 				}
 				label={ ! isSmallLayout && __( 'Image' ) }
 				instructions={
@@ -382,8 +381,8 @@ export function ImageEdit( {
 
 	return (
 		<>
-			{ resizeListener }
 			<figure { ...blockProps }>
+				{ resizeListener }
 				{ ! ( temporaryURL || url ) && (
 					<BlockControls group="other">
 						<MediaReplaceFlow
@@ -391,7 +390,7 @@ export function ImageEdit( {
 							mediaURL={ url }
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							accept="image/*"
-							name={ __( 'Choose Image' ) }
+							name={ __( 'Add image' ) }
 							onSelect={ onSelectImage }
 							onError={ onUploadError }
 						>

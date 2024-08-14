@@ -1,9 +1,8 @@
 // Provide special styling for the placeholder.
 // @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
-
 	// Show Placeholder style on-select.
-	&.is-selected .block-editor-media-placeholder {
+	&.is-selected .block-editor-media-placeholder:not(.is-small) {
 		// Block UI appearance.
 		color: $gray-900;
 		background-color: $white;
