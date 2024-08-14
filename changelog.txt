@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 19.0.0-rc.1 =
-
+= 19.0.0 =
 
 ## Changelog
 
@@ -366,6 +365,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @adamsilverstein @afercia @akasunil @Aljullu @amitraj2203 @andrewserong @carolinan @cbravobernal @Chrico @ciampo @creativecoder @DaniGuardiola @DAreRodz @djcowan @ellatrix @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @kebbet @kmanijak @Mamaduka @matiasbenedetto @meteorlxy @mikachan @mirka @mtias @ndiego @noisysocks @oandregal @ramonjd @richtabor @Rishit30G @ryanwelcher @SantosGuillamot @scruffian @shail-mehta @simison @stokesman @t-hamano @talldan @tomdevisser @tomjn @tyxla @up1512001 @wzieba @youknowriad
+
+
 
 
 = 18.9.0 =
