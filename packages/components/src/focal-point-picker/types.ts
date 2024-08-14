@@ -64,6 +64,12 @@ export type FocalPointPickerProps = Pick<
 	 * The focal point. Should be an object containing `x` and `y` params.
 	 */
 	value: FocalPoint;
+	/**
+	 * If `true`, the input controls will be hidden.
+	 *
+	 * @default false
+	 */
+	hideControls?: boolean;
 };
 
 export type FocalPointPickerControlsProps = {

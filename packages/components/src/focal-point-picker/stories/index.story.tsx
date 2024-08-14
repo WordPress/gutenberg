@@ -94,3 +94,9 @@ Snapping.args = {
 		return { x, y };
 	},
 };
+
+export const WithInputControlsHidden = Template.bind( {} );
+WithInputControlsHidden.args = {
+	...Default.args,
+	hideControls: true,
+};

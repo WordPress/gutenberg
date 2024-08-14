@@ -100,6 +100,7 @@ export function FocalPointPicker( {
 		x: 0.5,
 		y: 0.5,
 	},
+	hideControls = false,
 	...restProps
 }: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
 	const [ point, setPoint ] = useState( valueProp );
@@ -284,15 +285,17 @@ export function FocalPointPicker( {
 					/>
 				</MediaContainer>
 			</MediaWrapper>
-			<Controls
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
-				hasHelpText={ !! help }
-				point={ { x, y } }
-				onChange={ ( value ) => {
-					onChange?.( getFinalValue( value ) );
-				} }
-			/>
+			{ ! hideControls && (
+				<Controls
+					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
+					hasHelpText={ !! help }
+					point={ { x, y } }
+					onChange={ ( value ) => {
+						onChange?.( getFinalValue( value ) );
+					} }
+				/>
+			) }
 		</BaseControl>
 	);
 }
