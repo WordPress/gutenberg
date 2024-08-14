@@ -11,7 +11,8 @@
 	// Show full-width when not aligned.
 	audio {
 		width: 100%;
-
+		// This block has customizable border, border-box makes that more predictable.
+		box-sizing: border-box;
 		// The browser natively applies a 300px width to the audio block.
 		// We restore this as a min-width instead, for alignments.
 		min-width: 300px;
