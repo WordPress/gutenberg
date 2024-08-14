@@ -46,11 +46,6 @@ const getDirection = ( direction, orientation ) => {
 			return isRTL() ? 'right' : 'left';
 		}
 		return 'up';
-	} else if ( direction === 'down' ) {
-		if ( orientation === 'horizontal' ) {
-			return isRTL() ? 'left' : 'right';
-		}
-		return 'down';
 	}
 	return null;
 };
@@ -154,7 +149,7 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
-					tooltipDirection={ getDirection( direction, orientation ) }
+					tooltipPosition={ getDirection( direction, orientation ) }
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }

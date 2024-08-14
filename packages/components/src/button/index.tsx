@@ -110,7 +110,6 @@ export function UnforwardedButton(
 		children,
 		size = 'default',
 		text,
-		tooltipDirection,
 		variant,
 		description,
 		...buttonOrAnchorProps
@@ -273,7 +272,7 @@ export function UnforwardedButton(
 					tooltipPosition &&
 					// Convert legacy `position` values to be used with the new `placement` prop
 					positionToPlacement( tooltipPosition ),
-				direction: tooltipDirection,
+				direction: tooltipPosition,
 		  }
 		: {};
 
