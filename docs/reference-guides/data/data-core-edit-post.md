@@ -438,6 +438,10 @@ _Returns_
 
 Update a metabox.
 
+_Parameters_
+
+-   _originalPost_ `Object[]`: Values of the original post without modifications.
+
 ### setAvailableMetaBoxesPerLocation
 
 Stores info about which Meta boxes are available in which location.

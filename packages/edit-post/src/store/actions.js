@@ -277,9 +277,11 @@ export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 /**
  * Update a metabox.
+ *
+ * @param {Object[]} originalPost Values of the original post without modifications.
  */
 export const requestMetaBoxUpdates =
-	() =>
+	( originalPost ) =>
 	async ( { registry, select, dispatch } ) => {
 		dispatch( {
 			type: 'REQUEST_META_BOX_UPDATES',
@@ -312,7 +314,6 @@ export const requestMetaBoxUpdates =
 			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
 			post.sticky ? [ 'sticky', post.sticky ] : false,
 			post.author ? [ 'post_author', post.author ] : false,
-			post.meta ? [ 'meta', post.meta ] : false,
 		].filter( Boolean );
 
 		// We gather all the metaboxes locations.
@@ -335,6 +336,32 @@ export const requestMetaBoxUpdates =
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);
+
+		// Get the list of custom fields that have been modified in the store.
+		const modifiedFields = [];
+		Object.entries( post.meta ).forEach( ( [ key, value ] ) => {
+			if ( value !== originalPost?.meta[ key ] ) {
+				modifiedFields.push( key );
+			}
+		} );
+
+		/*
+		 * Override the fields included in metaboxes with the values modified in the store.
+		 *
+		 * Meta fields used in meta box include two properties in the request form:
+		 *
+		 * meta[1234][key]: my_custom_field
+		 * meta[1234][value]: Custom field value
+		 */
+		for ( const [ formKey, metaFieldKey ] of formData.entries() ) {
+			if ( modifiedFields.includes( metaFieldKey ) ) {
+				formData.set(
+					// Override the value, not the key.
+					formKey.replace( '[key]', '[value]' ),
+					post.meta[ metaFieldKey ]
+				);
+			}
+		}
 
 		try {
 			// Save the metaboxes.
@@ -471,7 +498,9 @@ export const initializeMetaBoxes =
 		if ( metaBoxesInitialized ) {
 			return;
 		}
-		const postType = registry.select( editorStore ).getCurrentPostType();
+		const { id: postId, type: postType } = registry
+			.select( editorStore )
+			.getCurrentPost();
 		if ( window.postboxes.page !== postType ) {
 			window.postboxes.add_postbox_toggles( postType );
 		}
@@ -479,6 +508,9 @@ export const initializeMetaBoxes =
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.
+		const originalPost = registry
+			.select( coreStore )
+			.getEntityRecord( 'postType', postType, postId );
 		addFilter(
 			'editor.__unstableSavePost',
 			'core/edit-post/save-metaboxes',
@@ -492,7 +524,7 @@ export const initializeMetaBoxes =
 						return;
 					}
 
-					return dispatch.requestMetaBoxUpdates();
+					return dispatch.requestMetaBoxUpdates( originalPost );
 				} )
 		);
 
