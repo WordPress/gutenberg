@@ -195,7 +195,8 @@ export const getPostTitle = createRegistrySelector(
 				: _document.title?.rendered;
 		const title =
 			isTemplate &&
-			( ! documentTitle || documentTitle === _document?.slug )
+			( ! documentTitle || documentTitle === _document?.slug ) &&
+			defaultTitle
 				? defaultTitle
 				: documentTitle;
 
