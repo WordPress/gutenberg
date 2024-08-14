@@ -47,7 +47,7 @@ export const useQuickEditPostAction = () => {
 	return useMemo(
 		() => ( {
 			id: 'quick-edit-post',
-			label: __( 'Quick Edit' ),
+			label: __( 'Edit details' ),
 			isPrimary: true,
 			icon: settings,
 			isEligible( post ) {
