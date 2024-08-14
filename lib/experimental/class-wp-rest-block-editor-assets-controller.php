@@ -50,11 +50,9 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		public function get_items($request) {
 			global $wp_styles, $wp_scripts;
 
-			// Keep track of the styles and scripts instance to restore later.
 			$current_wp_styles  = $wp_styles;
 			$current_wp_scripts = $wp_scripts;
 
-			// Create new instances to collect the assets.
 			$wp_styles  = new WP_Styles();
 			$wp_scripts = new WP_Scripts();
 
@@ -63,10 +61,10 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			$wp_styles->registered  = isset($current_wp_styles->registered) ? $current_wp_styles->registered : array();
 			$wp_scripts->registered = isset($current_wp_scripts->registered) ? $current_wp_scripts->registered : array();
 
-			// We generally do not need reset styles for the iframed editor.
-			// However, if it's a classic theme, margins will be added to every block,
-			// which is reset specifically for list items, so classic themes rely on
-			// these reset styles.
+			// We generally do not need reset styles for the block editor. However, if
+			// it's a classic theme, margins will be added to every block, which is
+			// reset specifically for list items, so classic themes rely on these
+			// reset styles.
 			$wp_styles->done =
 				wp_theme_has_theme_json() ? array( 'wp-reset-editor-styles' ) : array();
 
@@ -78,14 +76,13 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 				wp_enqueue_style( 'wp-block-library-theme' );
 			}
 
-			// Enqueue frequent dependent, admin-only `dashicon` asset
+			// Enqueue frequent dependent, admin-only `dashicon` asset.
 			wp_enqueue_style( 'dashicons' );
 
-			// Enqueue frequent dependent, admin-only `postbox` asset
+			// Enqueue frequent dependent, admin-only `postbox` asset.
 			$suffix = wp_scripts_get_suffix();
 			wp_enqueue_script( 'postbox', "/wp-admin/js/postbox$suffix.js", array( 'jquery-ui-sortable', 'wp-a11y' ), false, 1 );
 
-			// Enqueue both block and block editor assets.
 			add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
 			do_action( 'enqueue_block_assets' );
 			do_action( 'enqueue_block_editor_assets' );
@@ -108,10 +105,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 				}
 			}
 
-			/**
-			 * Remove the deprecated `print_emoji_styles` handler.
-			 * It avoids breaking style generation with a deprecation message.
-			 */
+			// Remove the deprecated `print_emoji_styles` handler. It avoids breaking
+			// style generation with a deprecation message.
 			$has_emoji_styles = has_action( 'wp_print_styles', 'print_emoji_styles' );
 			if ( $has_emoji_styles ) {
 				remove_action( 'wp_print_styles', 'print_emoji_styles' );
@@ -130,7 +125,6 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			wp_print_footer_scripts();
 			$scripts = ob_get_clean();
 
-			// Restore the original instances.
 			$wp_styles  = $current_wp_styles;
 			$wp_scripts = $current_wp_scripts;
 
