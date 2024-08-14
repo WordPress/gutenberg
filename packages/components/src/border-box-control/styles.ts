@@ -60,12 +60,8 @@ export const borderBoxControlVisualizer = (
 		left: ${ size === '__unstable-large' ? '39px' : '29px' };
 		border-top: ${ borderBoxStyleWithFallback( borders?.top ) };
 		border-bottom: ${ borderBoxStyleWithFallback( borders?.bottom ) };
-		${ rtl( {
-			borderLeft: borderBoxStyleWithFallback( borders?.left ),
-		} )() }
-		${ rtl( {
-			borderRight: borderBoxStyleWithFallback( borders?.right ),
-		} )() }
+		border-left: ${ borderBoxStyleWithFallback( borders?.left ) };
+		border-right: ${ borderBoxStyleWithFallback( borders?.right ) };
 	`;
 };
 
@@ -75,6 +71,7 @@ export const borderBoxControlSplitControls = (
 	position: relative;
 	flex: 1;
 	width: ${ size === '__unstable-large' ? undefined : '80%' };
+	${ rtl( { direction: 'ltr' } )() }
 `;
 
 export const centeredBorderControl = css`
