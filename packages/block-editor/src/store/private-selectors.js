@@ -536,3 +536,14 @@ export const getBlockStyles = createSelector(
 		),
 	]
 );
+
+/**
+ * Returns whether zoom out mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Is zoom out mode enabled.
+ */
+export function isZoomOutMode( state ) {
+	return state.editorMode === 'zoom-out';
+}
