@@ -37,7 +37,7 @@ export const ToolsPanel = ( columns: number ) => css`
 
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
 	margin-top: -1px;
-	padding: ${ space( 4 ) };
+	padding: ${ space( 4 ) } ${ space( 4 ) } ${ space( 5 ) } ${ space( 4 ) };
 `;
 
 /**

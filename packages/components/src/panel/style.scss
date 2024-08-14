@@ -26,7 +26,7 @@
 	}
 
 	&.is-opened {
-		padding: $grid-unit-20;
+		padding: $grid-unit-20 $grid-unit-20 #{$grid-unit-20 + $grid-unit-05} $grid-unit-20;
 	}
 }
 
