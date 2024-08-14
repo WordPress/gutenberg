@@ -19,12 +19,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	GLOBAL_POST_TYPES,
-} from '../../store/constants';
+import { PATTERN_POST_TYPE, GLOBAL_POST_TYPES } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import PostActions from '../post-actions';
 
@@ -35,7 +30,9 @@ export default function PostCardPanel( {
 } ) {
 	const { isFrontPage, isPostsPage, title, icon, isSync } = useSelect(
 		( select ) => {
-			const { __experimentalGetTemplateInfo } = select( editorStore );
+			const { getPostIcon, getPostTitle } = unlock(
+				select( editorStore )
+			);
 			const { canUser, getEditedEntityRecord } = select( coreStore );
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
@@ -48,10 +45,6 @@ export default function PostCardPanel( {
 				postType,
 				postId
 			);
-			const _templateInfo =
-				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-					postType
-				) && __experimentalGetTemplateInfo( _record );
 			let _isSync = false;
 			if ( GLOBAL_POST_TYPES.includes( postType ) ) {
 				if ( PATTERN_POST_TYPE === postType ) {
@@ -66,10 +59,8 @@ export default function PostCardPanel( {
 				}
 			}
 			return {
-				title: _templateInfo?.title || _record?.title,
-				icon: unlock( select( editorStore ) ).getPostIcon( postType, {
-					area: _record?.area,
-				} ),
+				title: getPostTitle( postType, postId ),
+				icon: getPostIcon( postType, postId ),
 				isSync: _isSync,
 				isFrontPage: siteSettings?.page_on_front === postId,
 				isPostsPage: siteSettings?.page_for_posts === postId,

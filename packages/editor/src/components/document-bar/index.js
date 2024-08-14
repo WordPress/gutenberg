@@ -26,7 +26,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
+import { GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -63,19 +63,19 @@ const MotionButton = motion( Button );
 export default function DocumentBar( props ) {
 	const {
 		postType,
-		documentTitle,
+		entityTitle,
+		entityIcon,
 		isNotFound,
 		isUnsyncedPattern,
-		templateIcon,
-		templateTitle,
 		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
 			getCurrentPostId,
 			getEditorSettings,
-			__experimentalGetTemplateInfo: getTemplateInfo,
-		} = select( editorStore );
+			getPostTitle,
+			getPostIcon,
+		} = unlock( select( editorStore ) );
 		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
 			select( coreStore );
 		const _postType = getCurrentPostType();
@@ -85,10 +85,10 @@ export default function DocumentBar( props ) {
 			_postType,
 			_postId
 		);
-		const _templateInfo = getTemplateInfo( _document );
 		return {
 			postType: _postType,
-			documentTitle: _document.title,
+			entityTitle: getPostTitle( _postType, _postId ),
+			entityIcon: getPostIcon( _postType, _postId ),
 			isNotFound:
 				! _document &&
 				! isResolvingSelector(
@@ -98,13 +98,6 @@ export default function DocumentBar( props ) {
 					_postId
 				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
-			templateIcon: unlock( select( editorStore ) ).getPostIcon(
-				_postType,
-				{
-					area: _document?.area,
-				}
-			),
-			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
@@ -113,12 +106,10 @@ export default function DocumentBar( props ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const entityTitle = isTemplate ? templateTitle : documentTitle;
 	const title = props.title || entityTitle;
-	const icon = props.icon || templateIcon;
+	const icon = props.icon || entityIcon;
 
 	const mounted = useRef( false );
 	useEffect( () => {

@@ -1737,6 +1737,10 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  */
 export const __experimentalGetTemplateInfo = createSelector(
 	( state, template ) => {
+		deprecated( "select('core/editor').__experimentalGetTemplateInfo", {
+			since: '6.7',
+		} );
+
 		if ( ! template ) {
 			return EMPTY_OBJECT;
 		}

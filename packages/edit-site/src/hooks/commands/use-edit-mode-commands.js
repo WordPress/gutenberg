@@ -5,15 +5,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { trash, rotateLeft, rotateRight, layout, page } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
-import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { unlock } from '../../lock-unlock';
@@ -23,23 +22,27 @@ import { useLink } from '../../components/routes/link';
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
-	const { record: template } = useEditedEntityRecord();
-	const { isPage, canvasMode, templateId, currentPostType } = useSelect(
-		( select ) => {
+	const { isPage, canvasMode, templateId, currentPostType, title } =
+		useSelect( ( select ) => {
 			const { isPage: _isPage, getCanvasMode } = unlock(
 				select( editSiteStore )
 			);
-			const { getCurrentPostType, getCurrentTemplateId } =
-				select( editorStore );
+			const {
+				getCurrentPostType,
+				getCurrentPostId,
+				getCurrentTemplateId,
+				getPostTitle,
+			} = unlock( select( editorStore ) );
+			const postType = getCurrentPostType();
+			const postId = getCurrentPostId();
 			return {
 				isPage: _isPage(),
 				canvasMode: getCanvasMode(),
 				templateId: getCurrentTemplateId(),
 				currentPostType: getCurrentPostType(),
+				title: getPostTitle( postType, postId ),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const { onClick: editTemplate } = useLink( {
 		postType: 'wp_template',
@@ -60,7 +63,7 @@ function usePageContentFocusCommands() {
 			label: sprintf(
 				/* translators: %s: template title */
 				__( 'Edit template: %s' ),
-				decodeEntities( template.title )
+				title
 			),
 			icon: layout,
 			callback: ( { close } ) => {
@@ -84,68 +87,75 @@ function usePageContentFocusCommands() {
 }
 
 function useManipulateDocumentCommands() {
-	const { isLoaded, record: template } = useEditedEntityRecord();
 	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
 	const history = useHistory();
-	const isEditingPage = useSelect(
-		( select ) =>
-			select( editSiteStore ).isPage() &&
-			select( editorStore ).getCurrentPostType() !== 'wp_template',
-		[]
-	);
+	const { isEditingPage, record, title } = useSelect( ( select ) => {
+		const { getPostTitle, getCurrentPostType, getCurrentPostId } = unlock(
+			select( editorStore )
+		);
+		const { isPage } = unlock( select( editSiteStore ) );
+		const { getEditedEntityRecord } = select( coreStore );
+		const postType = getCurrentPostType();
+		const postId = getCurrentPostId();
+		return {
+			isEditingPage: isPage() && postType !== 'wp_template',
+			record: getEditedEntityRecord( 'postType', postType, postId ),
+			title: getPostTitle( postType, postId ),
+		};
+	}, [] );
 
-	if ( ! isLoaded ) {
+	if ( ! record ) {
 		return { isLoading: true, commands: [] };
 	}
 
 	const commands = [];
 
-	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
+	if ( isTemplateRevertable( record ) && ! isEditingPage ) {
 		const label =
-			template.type === TEMPLATE_POST_TYPE
+			record.type === TEMPLATE_POST_TYPE
 				? sprintf(
 						/* translators: %s: template title */
 						__( 'Reset template: %s' ),
-						decodeEntities( template.title )
+						title
 				  )
 				: sprintf(
 						/* translators: %s: template part title */
 						__( 'Reset template part: %s' ),
-						decodeEntities( template.title )
+						title
 				  );
 		commands.push( {
 			name: 'core/reset-template',
 			label,
 			icon: isRTL() ? rotateRight : rotateLeft,
 			callback: ( { close } ) => {
-				revertTemplate( template );
+				revertTemplate( record );
 				close();
 			},
 		} );
 	}
 
-	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
+	if ( isTemplateRemovable( record ) && ! isEditingPage ) {
 		const label =
-			template.type === TEMPLATE_POST_TYPE
+			record.type === TEMPLATE_POST_TYPE
 				? sprintf(
 						/* translators: %s: template title */
 						__( 'Delete template: %s' ),
-						decodeEntities( template.title )
+						title
 				  )
 				: sprintf(
 						/* translators: %s: template part title */
 						__( 'Delete template part: %s' ),
-						decodeEntities( template.title )
+						title
 				  );
 		commands.push( {
 			name: 'core/remove-template',
 			label,
 			icon: trash,
 			callback: ( { close } ) => {
-				removeTemplate( template );
+				removeTemplate( record );
 				// Navigate to the template list
 				history.push( {
-					postType: template.type,
+					postType: record.type,
 				} );
 				close();
 			},
@@ -153,7 +163,7 @@ function useManipulateDocumentCommands() {
 	}
 
 	return {
-		isLoading: ! isLoaded,
+		isLoading: ! record,
 		commands,
 	};
 }

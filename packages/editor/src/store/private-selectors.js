@@ -16,6 +16,8 @@ import {
 	verse,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,11 +26,13 @@ import {
 	getRenderingMode,
 	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
+	__experimentalGetDefaultTemplateType,
 } from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
+import { TEMPLATE_POST_TYPES } from './constants';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -92,37 +96,6 @@ const CARD_ICONS = {
 	page: pageIcon,
 	post: verse,
 };
-
-export const getPostIcon = createRegistrySelector(
-	( select ) => ( state, postType, options ) => {
-		{
-			if (
-				postType === 'wp_template_part' ||
-				postType === 'wp_template'
-			) {
-				return (
-					__experimentalGetDefaultTemplatePartAreas( state ).find(
-						( item ) => options.area === item.area
-					)?.icon || layout
-				);
-			}
-			if ( CARD_ICONS[ postType ] ) {
-				return CARD_ICONS[ postType ];
-			}
-			const postTypeEntity = select( coreStore ).getPostType( postType );
-			// `icon` is the `menu_icon` property of a post type. We
-			// only handle `dashicons` for now, even if the `menu_icon`
-			// also supports urls and svg as values.
-			if (
-				typeof postTypeEntity?.icon === 'string' &&
-				postTypeEntity.icon.startsWith( 'dashicons-' )
-			) {
-				return postTypeEntity.icon.slice( 10 );
-			}
-			return pageIcon;
-		}
-	}
-);
 
 /**
  * Returns true if there are unsaved changes to the
@@ -202,4 +175,62 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 		},
 		() => [ select( blockEditorStore ).getBlocks() ]
 	)
+);
+
+export const getPostTitle = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		const _document = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
+		const { title: defaultTitle } =
+			isTemplate && _document?.slug
+				? __experimentalGetDefaultTemplateType( state, _document?.slug )
+				: {};
+		const documentTitle =
+			typeof _document?.title === 'string'
+				? _document.title
+				: title?.rendered;
+		const title =
+			isTemplate &&
+			( ! documentTitle || documentTitle === _document?.slug )
+				? defaultTitle
+				: documentTitle;
+
+		return title ? decodeEntities( title ) : __( 'No title' );
+	}
+);
+
+export const getPostIcon = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
+		if ( isTemplate ) {
+			const _document = select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			return (
+				__experimentalGetDefaultTemplatePartAreas( state ).find(
+					( item ) => _document?.area === item.area
+				)?.icon || layout
+			);
+		}
+		if ( CARD_ICONS[ postType ] ) {
+			return CARD_ICONS[ postType ];
+		}
+		const postTypeEntity = select( coreStore ).getPostType( postType );
+		// `icon` is the `menu_icon` property of a post type. We
+		// only handle `dashicons` for now, even if the `menu_icon`
+		// also supports urls and svg as values.
+		if (
+			typeof postTypeEntity?.icon === 'string' &&
+			postTypeEntity.icon.startsWith( 'dashicons-' )
+		) {
+			return postTypeEntity.icon.slice( 10 );
+		}
+		return pageIcon;
+	}
 );
