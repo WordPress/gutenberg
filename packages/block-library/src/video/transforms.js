@@ -92,9 +92,9 @@ const transforms = {
 					poster: videoElement.getAttribute( 'poster' ) || undefined,
 					src: videoElement.getAttribute( 'src' ) || undefined,
 				};
-				if ( isBlobURL( attributes.url ) ) {
-					attributes.blob = attributes.url;
-					delete attributes.url;
+				if ( isBlobURL( attributes.src ) ) {
+					attributes.blob = attributes.src;
+					delete attributes.src;
 				}
 				return createBlock( 'core/video', attributes );
 			},
