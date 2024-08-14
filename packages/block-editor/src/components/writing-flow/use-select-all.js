@@ -28,13 +28,7 @@ export default function useSelectAll() {
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			// Abort if there is selection, but it is not within a block.
-			if (
-				selectionRoot &&
-				! selectionRoot.closest(
-					`[data-block="${ selectedClientIds[ 0 ] }"]`
-				) &&
-				selectedClientIds.length < 2
-			) {
+			if ( selectionRoot && ! selectedClientIds.length ) {
 				return;
 			}
 
