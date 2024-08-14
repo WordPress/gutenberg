@@ -51,7 +51,7 @@ Accordion item trigger. ([Source](https://github.com/WordPress/gutenberg/tree/tr
 -	**Category:** design
 -	**Parent:** core/accordion-item
 -	**Supports:** anchor, border, color (background, gradient, text), interactivity, layout, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~
--	**Attributes:** icon, iconPosition, level, openByDefault, textAlignment, title
+-	**Attributes:** icon, iconPosition, level, levelOptions, openByDefault, textAlignment, title
 
 ## Archives
 

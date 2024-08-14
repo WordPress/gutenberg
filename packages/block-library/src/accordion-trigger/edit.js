@@ -44,7 +44,8 @@ const ICONS = {
 };
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { level, title, textAlign, icon, iconPosition } = attributes;
+	const { level, title, textAlign, icon, iconPosition, levelOptions } =
+		attributes;
 	const TagName = 'h' + level;
 
 	const blockProps = useBlockProps();
@@ -61,6 +62,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				<ToolbarGroup>
 					<HeadingLevelDropdown
 						value={ level }
+						options={ levelOptions }
 						onChange={ ( newLevel ) =>
 							setAttributes( { level: newLevel } )
 						}
