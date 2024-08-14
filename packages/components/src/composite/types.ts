@@ -6,7 +6,7 @@ import type * as Ariakit from '@ariakit/react';
 export type CompositeContextProps =
 	| {
 			/**
-			 * Object returned by the `useCompositeStore` hook..
+			 * Object returned by the `useCompositeStore` hook.
 			 */
 			store: Ariakit.CompositeStore;
 	  }
