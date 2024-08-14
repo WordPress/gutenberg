@@ -312,6 +312,7 @@ export const requestMetaBoxUpdates =
 			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
 			post.sticky ? [ 'sticky', post.sticky ] : false,
 			post.author ? [ 'post_author', post.author ] : false,
+			post.meta ? [ 'meta', post.meta ] : false,
 		].filter( Boolean );
 
 		// We gather all the metaboxes locations.
