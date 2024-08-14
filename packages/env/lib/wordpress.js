@@ -79,7 +79,7 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
 async function configureWordPress( environment, config, spinner ) {
 	let wpVersion = '';
 	try {
-		wpVersion = readWordPressVersion(
+		wpVersion = await readWordPressVersion(
 			config.env[ environment ].coreSource,
 			spinner,
 			config.debug
