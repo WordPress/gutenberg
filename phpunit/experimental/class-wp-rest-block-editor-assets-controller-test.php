@@ -89,8 +89,8 @@ class WP_REST_Block_Editor_Assets_Controller_Test extends WP_Test_REST_Controlle
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertArrayHasKey('styles', $data, 'Editor assets should include styles.');
-		$this->assertArrayHasKey('scripts', $data, 'Editor assets should include scripts.');
+		$this->assertArrayHasKey( 'styles', $data, 'Editor assets should include styles.' );
+		$this->assertArrayHasKey( 'scripts', $data, 'Editor assets should include scripts.' );
 	}
 
 	public function test_get_item_schema() {

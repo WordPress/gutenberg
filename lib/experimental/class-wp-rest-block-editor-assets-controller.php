@@ -47,7 +47,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		 *
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
-		public function get_items($request) {
+		public function get_items( $request ) {
 			global $wp_styles, $wp_scripts;
 
 			$current_wp_styles  = $wp_styles;
@@ -58,8 +58,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 
 			// Register all currently registered styles and scripts. The actions that
 			// follow enqueue assets, but don't necessarily register them.
-			$wp_styles->registered  = isset($current_wp_styles->registered) ? $current_wp_styles->registered : array();
-			$wp_scripts->registered = isset($current_wp_scripts->registered) ? $current_wp_scripts->registered : array();
+			$wp_styles->registered  = isset( $current_wp_styles->registered ) ? $current_wp_styles->registered : array();
+			$wp_scripts->registered = isset( $current_wp_scripts->registered ) ? $current_wp_scripts->registered : array();
 
 			// We generally do not need reset styles for the block editor. However, if
 			// it's a classic theme, margins will be added to every block, which is
@@ -141,7 +141,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 		 *
 		 * @return bool|WP_Error True if the request has permission, WP_Error object otherwise.
 		 */
-		public function get_items_permissions_check($request) {
+		public function get_items_permissions_check( $request ) {
 			if ( current_user_can( 'edit_posts' ) ) {
 				return true;
 			}
@@ -174,11 +174,11 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 				'properties' => array(
 					'styles'  => array(
 						'description' => esc_html__( 'Style link tags for the block editor.', 'gutenberg' ),
-						'type' => 'string',
+						'type'        => 'string',
 					),
 					'scripts' => array(
 						'description' => esc_html__( 'Script tags for the block editor.', 'gutenberg' ),
-						'type' => 'string',
+						'type'        => 'string',
 					),
 				),
 			);
