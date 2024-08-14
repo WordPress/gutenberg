@@ -28,43 +28,27 @@ const { getCache, setCache } = require( './cache' );
  */
 
 /**
- * Utility function to check if a version is lower than another version, only considering the major and minor portions.
+ * Utility function to check if a WordPress version is lower than another version.
  *
  * This is a non-comprehensive check only intended for this usage, to avoid pulling in a full semver library.
+ * It only considers the major and minor portions of the version and ignores the rest. Additionally, it assumes that
+ * the minor version is always a single digit (i.e. 0-9).
+ *
+ * Do not use this function for general version comparison, as it will not work for all cases.
  *
  * @param {string} version        The version to check.
  * @param {string} compareVersion The compare version to check whether the version is lower than.
  * @return {boolean} True if the version is lower than the compare version, false otherwise.
  */
-function isMajorMinorVersionLower( version, compareVersion ) {
-	const versionParts = version.split( '.' ).map( Number );
-	const compareVersionParts = compareVersion.split( '.' ).map( Number );
+function isWPMajorMinorVersionLower( version, compareVersion ) {
+	const versionNumber = Number.parseFloat(
+		version.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
+	);
+	const compareVersionNumber = Number.parseFloat(
+		compareVersion.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
+	);
 
-	// If the major version is lower, the version is lower.
-	if ( versionParts[ 0 ] < compareVersionParts[ 0 ] ) {
-		return true;
-	}
-
-	// If the major version is the same, we need to compare the minor version.
-	if ( versionParts[ 0 ] === compareVersionParts[ 0 ] ) {
-		if (
-			versionParts[ 1 ] !== undefined &&
-			compareVersionParts[ 1 ] === undefined
-		) {
-			return versionParts[ 1 ] < compareVersionParts[ 1 ];
-		}
-
-		// Here the version has no minor version, which is the same as having a minor version of 0.
-		if ( compareVersionParts[ 1 ] !== undefined ) {
-			return 0 < compareVersionParts[ 1 ];
-		}
-
-		// Here the compare version has no minor version (i.e. 0), and nothing is lower than 0.
-		return false;
-	}
-
-	// If the major version is higher, the version is higher.
-	return false;
+	return versionNumber < compareVersionNumber;
 }
 
 /**
@@ -101,7 +85,7 @@ async function configureWordPress( environment, config, spinner ) {
 
 		// Sometimes wpVersion may not be a string, in this case, convert it to a string.
 		if ( typeof wpVersion !== 'string' ) {
-			wpVersion = '' + wpVersion;
+			wpVersion = `${ wpVersion }`;
 		}
 	} catch ( err ) {
 		// Ignore error.
@@ -114,7 +98,7 @@ async function configureWordPress( environment, config, spinner ) {
 
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
 	const configAnchor =
-		wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' )
+		wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' )
 			? `"define('WP_DEBUG',"`
 			: `"define( 'WP_DEBUG',"`;
 
@@ -163,9 +147,9 @@ async function configureWordPress( environment, config, spinner ) {
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
 	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
 	let abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
-	if ( wpVersion && isMajorMinorVersionLower( wpVersion, '5.1' ) ) {
+	if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' ) ) {
 		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
-	} else if ( wpVersion && isMajorMinorVersionLower( wpVersion, '5.4' ) ) {
+	} else if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.4' ) ) {
 		abspathDef = `define( 'ABSPATH', dirname(__FILE__) . '\\/' );`;
 	}
 
