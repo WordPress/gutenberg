@@ -316,6 +316,7 @@ module.exports = {
 						'DimensionControl',
 						'FontSizePicker',
 						'ToggleGroupControl',
+						'UnitControl',
 					].map( ( componentName ) => ( {
 						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
