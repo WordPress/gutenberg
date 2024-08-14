@@ -174,8 +174,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
