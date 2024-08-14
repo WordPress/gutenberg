@@ -41,8 +41,6 @@ const { getCache, setCache } = require( './cache' );
  * @return {boolean} True if the version is lower than the compare version, false otherwise.
  */
 function isWPMajorMinorVersionLower( version, compareVersion ) {
-	console.log( version, typeof version ); // eslint-disable-line no-console
-
 	const versionNumber = Number.parseFloat(
 		version.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
 	);
