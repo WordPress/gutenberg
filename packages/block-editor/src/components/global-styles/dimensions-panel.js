@@ -476,6 +476,8 @@ export default function DimensionsPanel( {
 				>
 					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							label={ __( 'Content' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -504,6 +506,8 @@ export default function DimensionsPanel( {
 				>
 					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							label={ __( 'Wide' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -628,6 +632,8 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								label={ __( 'Block spacing' ) }
 								__unstableInputWidth="80px"
 								min={ 0 }
