@@ -1,3 +1,9 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+/**
+ * Internal dependencies
+ */
 import { store } from '../store';
 
 describe( 'Interactivity API', () => {
@@ -6,7 +12,7 @@ describe( 'Interactivity API', () => {
 	} );
 
 	describe( 'static typing', () => {
-		async () => {
+		( async () => {
 			const { actions } = store( 'test', {
 				actions: {
 					sync: () => 123,
@@ -34,6 +40,6 @@ describe( 'Interactivity API', () => {
 				// @ts-expect-error
 				const var3: string = await actions.async();
 			}
-		};
+		} )();
 	} );
 } );
