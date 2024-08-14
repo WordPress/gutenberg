@@ -371,9 +371,9 @@ const UnforwardedPopover = (
 	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
 		? {
 				style: {
+					...contentStyle,
 					...motionInlineStyles,
 					...style,
-					...contentStyle,
 				},
 				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
@@ -381,8 +381,8 @@ const UnforwardedPopover = (
 		: {
 				animate: false,
 				style: {
-					...style,
 					...contentStyle,
+					...style,
 				},
 		  };
 
