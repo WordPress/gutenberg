@@ -180,7 +180,7 @@ describe( 'Popover', () => {
 		} );
 
 		describe( 'style', () => {
-			it( 'should output inline styles added through the style prop in addition to built-in popover positioning styles', async () => {
+			it( 'outputs inline styles added through the style prop in addition to built-in popover positioning styles', async () => {
 				render(
 					<Popover
 						style={ { zIndex: 0 } }
@@ -197,7 +197,7 @@ describe( 'Popover', () => {
 				);
 			} );
 
-			it( 'should not be possible to override built-in popover positioning styles via the style prop', async () => {
+			it( 'is not possible to override built-in popover positioning styles via the style prop', async () => {
 				render(
 					<Popover
 						style={ { position: 'static' } }
