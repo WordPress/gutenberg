@@ -139,6 +139,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
+		style: contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -372,7 +373,7 @@ const UnforwardedPopover = (
 				style: {
 					...motionInlineStyles,
 					...style,
-					...contentProps.style,
+					...contentStyle,
 				},
 				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
@@ -381,7 +382,7 @@ const UnforwardedPopover = (
 				animate: false,
 				style: {
 					...style,
-					...contentProps.style,
+					...contentStyle,
 				},
 		  };
 
