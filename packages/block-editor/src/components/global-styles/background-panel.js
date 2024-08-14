@@ -585,7 +585,6 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }

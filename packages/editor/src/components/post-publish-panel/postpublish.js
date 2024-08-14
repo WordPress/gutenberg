@@ -122,6 +122,8 @@ class PostPublishPanelPostpublish extends Component {
 					</p>
 					<div className="post-publish-panel__postpublish-post-address-container">
 						<TextControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							__nextHasNoMarginBottom
 							className="post-publish-panel__postpublish-post-address"
 							readOnly

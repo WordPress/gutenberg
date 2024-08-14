@@ -99,6 +99,8 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</span>
 				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus
@@ -114,6 +116,8 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						help={ __( 'Title of track' ) }
 					/>
 					<TextControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						onChange={ ( newSrcLang ) =>
 							onChange( {
