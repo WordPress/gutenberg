@@ -19,6 +19,15 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+/**
+ * Registers the block editor assets REST API route.
+ */
+function gutenberg_register_block_editor_assets() {
+	$editor_assets = new WP_REST_Block_Editor_Assets_Controller();
+	$editor_assets->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_block_editor_assets' );
+
 
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
