@@ -18,38 +18,22 @@ import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { Resizable, Draggable, Container, Img } from './styles';
+import { Resizable, Draggable, Container, Img, ReferenceFrame } from './styles';
 import { ImageCropperContext } from './context';
 import { useImageCropper } from './hook';
 import type { Position } from './types';
+import { matrixCSSToString, stateToMatrixCSS } from './math';
 
 const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
-const MIN_PADDING = 20; // 20px;
 
 function CropWindow() {
 	const {
-		state: {
-			transforms: { scale },
-			cropper,
-			isResizing,
-			isAspectRatioLocked,
-		},
+		state,
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const [ resizableScope, animate ] = useAnimate();
+	const { cropper, isResizing, isAspectRatioLocked } = state;
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
-
-	useEffect( () => {
-		if ( resizableScope.current ) {
-			animate( [ resizableScope.current ], {
-				'--wp-cropper-window-x': '0px',
-				'--wp-cropper-window-y': '0px',
-				width: `${ cropper.width }px`,
-				height: `${ cropper.height }px`,
-			} );
-		}
-	}, [ resizableScope, animate, cropper.width, cropper.height ] );
 
 	return (
 		<Resizable
@@ -57,8 +41,6 @@ function CropWindow() {
 				width: cropper.width,
 				height: cropper.height,
 			} }
-			// maxWidth={ isAxisSwapped ? image.height : image.width }
-			// maxHeight={ isAxisSwapped ? image.width : image.height }
 			showHandle
 			lockAspectRatio={ isAspectRatioLocked }
 			// Emulate the resizing thresholds.
@@ -79,27 +61,6 @@ function CropWindow() {
 				}
 			} }
 			onResize={ ( _event, direction, _element, delta ) => {
-				if ( delta.width === 0 && delta.height === 0 ) {
-					if ( Math.abs( scale.x ) === 1 ) {
-						return;
-					}
-					// let x = 0;
-					// let y = 0;
-					// if ( event.type === 'mousemove' ) {
-					// 	const mouseEvent = event as unknown as MouseEvent;
-					// 	x =
-					// 		mouseEvent.clientX -
-					// 		initialMousePositionRef.current.x;
-					// 	y =
-					// 		mouseEvent.clientY -
-					// 		initialMousePositionRef.current.y;
-					// } else if ( event.type === 'touchmove' ) {
-					// 	const touch = ( event as unknown as TouchEvent )
-					// 		.touches[ 0 ];
-					// 	x = touch.clientX - initialMousePositionRef.current.x;
-					// 	y = touch.clientY - initialMousePositionRef.current.y;
-					// }
-				}
 				if ( ! isResizing ) {
 					if (
 						Math.abs( delta.width ) >= RESIZING_THRESHOLDS[ 0 ] ||
@@ -107,29 +68,11 @@ function CropWindow() {
 					) {
 						dispatch( { type: 'RESIZE_START' } );
 					}
-				} else {
-					const x =
-						( [ 'left', 'topLeft', 'bottomLeft' ].includes(
-							direction
-						)
-							? -delta.width
-							: delta.width ) / 2;
-					const y =
-						( [ 'top', 'topLeft', 'topRight' ].includes( direction )
-							? -delta.height
-							: delta.height ) / 2;
-					animate( [ resizableScope.current ], {
-						'--wp-cropper-window-x': `${ x }px`,
-						'--wp-cropper-window-y': `${ y }px`,
-						width: `${ cropper.width + delta.width }px`,
-						height: `${ cropper.height + delta.height }px`,
-					} ).complete();
 				}
 			} }
 			onResizeStop={ ( _event, direction, _element, delta ) => {
 				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
 			} }
-			ref={ resizableScope }
 		>
 			<Draggable
 				ref={ cropperWindowRef as RefObject< HTMLDivElement > }
@@ -140,24 +83,18 @@ function CropWindow() {
 
 const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
-		state: {
-			image,
-			transforms: { rotate, scale, translate },
-			isAxisSwapped,
-			isDragging,
-			isZooming,
-		},
+		state,
 		src,
 		originalWidth,
 		originalHeight,
 		refs: { imageRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
+	const { image, isAxisSwapped } = state;
 	const aspectRatio = useMemo(
 		() => originalWidth / originalHeight,
 		[ originalWidth, originalHeight ]
 	);
-	const largerDimension = Math.max( image.width, image.height );
 
 	const containerRef = useRef< HTMLDivElement >( null! );
 	useEffect( () => {
@@ -191,43 +128,36 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		isAxisSwapped,
 	] );
 
+	const transformCSS = matrixCSSToString( stateToMatrixCSS( state ) );
+
 	return (
 		<Container
-			animate={ {
-				'--wp-cropper-angle': `${ rotate }rad`,
-				...( isZooming
-					? {}
-					: {
-							'--wp-cropper-scale-x': scale.x,
-							'--wp-cropper-scale-y': scale.y,
-					  } ),
-				...( isDragging || isZooming
-					? {}
-					: {
-							'--wp-cropper-image-x': `${ translate.x }px`,
-							'--wp-cropper-image-y': `${ translate.y }px`,
-					  } ),
-			} }
+			animate={
+				{
+					// '--wp-cropper-transform': transformCSS,
+				}
+			}
 			style={ {
-				width: `${ largerDimension + MIN_PADDING * 2 }px`,
-				aspectRatio: '1 / 1',
-				'--wp-cropper-image-x': `${ translate.x }px`,
-				'--wp-cropper-image-y': `${ translate.y }px`,
-				'--wp-cropper-scale-x': scale.x,
-				'--wp-cropper-scale-y': scale.y,
-				padding: `${ MIN_PADDING }px`,
+				'--wp-cropper-transform': transformCSS,
 			} }
 			ref={ useMergeRefs( [ containerRef, ref ] ) }
 		>
-			<Img
-				width={ image.width }
-				height={ image.height }
-				src={ src }
-				alt=""
-				crossOrigin="anonymous"
-				ref={ imageRef }
-			/>
-			<CropWindow />
+			<ReferenceFrame
+				style={ {
+					width: `${ image.width }px`,
+					height: `${ image.height }px`,
+				} }
+			>
+				<Img
+					width={ image.width }
+					height={ image.height }
+					src={ src }
+					alt=""
+					crossOrigin="anonymous"
+					ref={ imageRef }
+				/>
+				<CropWindow />
+			</ReferenceFrame>
 		</Container>
 	);
 } );

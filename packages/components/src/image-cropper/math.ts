@@ -131,3 +131,229 @@ export const getMinScale = memize(
 	},
 	{ maxSize: 1 }
 );
+
+/**
+ * Row-major 3x3 matrix for 2D transformations.
+ */
+// prettier-ignore
+export type Matrix3x3 = [
+	number, number, number,
+	number, number, number,
+	number, number, number,
+];
+
+/**
+ * Generate an identity matrix.
+ * @return Identity matrix
+ */
+export function identity3x3(): Matrix3x3 {
+	// prettier-ignore
+	return [
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1,
+	];
+}
+
+/**
+ * Generate a rotation matrix.
+ * @param angle Angle in radians
+ * @return Rotation matrix
+ */
+export function rotate3x3( angle: number ): Matrix3x3 {
+	const cos = Math.cos( angle );
+	const sin = Math.sin( angle );
+	// prettier-ignore
+	return [
+		cos, -sin, 0,
+		sin, cos,  0,
+		0,   0,    1,
+	];
+}
+
+/**
+ * Generate a translation matrix.
+ * @param x Horizontal translation
+ * @param y Vertical translation
+ * @return Translation matrix
+ */
+export function translate3x3( x: number, y: number ): Matrix3x3 {
+	// prettier-ignore
+	return [
+		1, 0, x,
+		0, 1, y,
+		0, 0, 1,
+	];
+}
+
+/**
+ * Generate a scale matrix.
+ * @param x Horizontal scale
+ * @param y Vertical scale
+ * @return Scale matrix
+ */
+export function scale3x3( x: number, y: number ): Matrix3x3 {
+	// prettier-ignore
+	return [
+		x, 0, 0,
+		0, y, 0,
+		0, 0, 1,
+	];
+}
+
+/**
+ * Multiply 3x3 matrices.
+ * @param first First matrix
+ * @param rest  Additional matrices to multiply in order
+ * @return Resulting matrix
+ */
+export function multiply3x3(
+	first: Matrix3x3,
+	...rest: Matrix3x3[]
+): Matrix3x3 {
+	let a = first;
+	for ( const b of rest ) {
+		a = [
+			a[ 0 ] * b[ 0 ] + a[ 1 ] * b[ 3 ] + a[ 2 ] * b[ 6 ],
+			a[ 0 ] * b[ 1 ] + a[ 1 ] * b[ 4 ] + a[ 2 ] * b[ 7 ],
+			a[ 0 ] * b[ 2 ] + a[ 1 ] * b[ 5 ] + a[ 2 ] * b[ 8 ],
+			a[ 3 ] * b[ 0 ] + a[ 4 ] * b[ 3 ] + a[ 5 ] * b[ 6 ],
+			a[ 3 ] * b[ 1 ] + a[ 4 ] * b[ 4 ] + a[ 5 ] * b[ 7 ],
+			a[ 3 ] * b[ 2 ] + a[ 4 ] * b[ 5 ] + a[ 5 ] * b[ 8 ],
+			a[ 6 ] * b[ 0 ] + a[ 7 ] * b[ 3 ] + a[ 8 ] * b[ 6 ],
+			a[ 6 ] * b[ 1 ] + a[ 7 ] * b[ 4 ] + a[ 8 ] * b[ 7 ],
+			a[ 6 ] * b[ 2 ] + a[ 7 ] * b[ 5 ] + a[ 8 ] * b[ 8 ],
+		];
+	}
+	return a;
+}
+
+/**
+ * Convert transforms state into a 3x3 matrix.
+ * @param state State
+ * @return 3x3 matrix
+ */
+export function state3x3( state: any ): Matrix3x3 {
+	const {
+		transforms: { scale, rotate, translate },
+	} = state;
+	// prettier-ignore
+	return [
+		scale.x * Math.cos( rotate ), scale.y * Math.sin( rotate ), translate.x,
+		scale.x * -Math.sin( rotate ), scale.y * Math.cos( rotate ), translate.y,
+		0, 0, 1,
+	];
+}
+
+// Column-major versions of the above functions for CSS matrix. Harder to read, but more performant.
+
+/**
+ * Column-major 3x3 matrix for 2D transformations without the final [0,0,1] row. Same as CSS matrix order.
+ *
+ * [ a, b, c, d, e, f ] is equivalent to: | a c e |
+ *                                        | b d f |
+ *                                        | 0 0 1 |
+ */
+export type MatrixCSS = [ number, number, number, number, number, number ];
+
+/**
+ * Convert a 3x3 matrix to a CSS matrix.
+ * @param matrix 3x3 matrix
+ * @return CSS matrix
+ */
+export function matrix3x3ToCSS( matrix: Matrix3x3 ): MatrixCSS {
+	// prettier-ignore
+	return [
+		matrix[ 0 ], matrix[ 3 ],
+		matrix[ 1 ], matrix[ 4 ],
+		matrix[ 2 ], matrix[ 5 ],
+	];
+}
+
+/**
+ * Generate an identity CSS matrix.
+ * @return Identity CSS matrix
+ */
+export function identityCSS(): MatrixCSS {
+	return [ 1, 0, 0, 1, 0, 0 ];
+}
+
+/**
+ * Generate a rotation CSS matrix.
+ * @param angle Angle in radians
+ * @return Rotation CSS matrix
+ */
+export function rotateCSS( angle: number ): MatrixCSS {
+	const cos = Math.cos( angle );
+	const sin = Math.sin( angle );
+	return [ cos, sin, -sin, cos, 0, 0 ];
+}
+
+/**
+ * Generate a translation CSS matrix.
+ * @param x Horizontal translation
+ * @param y Vertical translation
+ * @return Translation CSS matrix
+ */
+export function translateCSS( x: number, y: number ): MatrixCSS {
+	return [ 1, 0, 0, 1, x, y ];
+}
+
+/**
+ * Generate a scale CSS matrix.
+ * @param x Horizontal scale
+ * @param y Vertical scale
+ * @return Scale CSS matrix
+ */
+export function scaleCSS( x: number, y: number ): MatrixCSS {
+	return [ x, 0, 0, y, 0, 0 ];
+}
+
+/**
+ * Multiply CSS matrices.
+ * @param first First matrix
+ * @param rest  Additional matrices to multiply in order
+ * @return Resulting matrix
+ */
+export function multiplyCSS(
+	first: MatrixCSS,
+	...rest: MatrixCSS[]
+): MatrixCSS {
+	let a = first;
+	for ( const b of rest ) {
+		a = [
+			a[ 0 ] * b[ 0 ] + a[ 2 ] * b[ 1 ],
+			a[ 1 ] * b[ 0 ] + a[ 3 ] * b[ 1 ],
+			a[ 0 ] * b[ 2 ] + a[ 2 ] * b[ 3 ],
+			a[ 1 ] * b[ 2 ] + a[ 3 ] * b[ 3 ],
+			a[ 0 ] * b[ 4 ] + a[ 2 ] * b[ 5 ] + a[ 4 ],
+			a[ 1 ] * b[ 4 ] + a[ 3 ] * b[ 5 ] + a[ 5 ],
+		];
+	}
+	return a;
+}
+
+/**
+ * Convert transforms state into a CSS matrix.
+ * @param state State
+ * @return CSS matrix
+ */
+export function stateToMatrixCSS( state: any ): MatrixCSS {
+	const {
+		transforms: { scale, rotate, translate },
+	} = state;
+	return multiplyCSS(
+		translateCSS( translate.x, translate.y ),
+		scaleCSS( scale.x, scale.y ),
+		rotateCSS( rotate )
+	);
+}
+
+/**
+ * Convert a CSS matrix to a string.
+ * @param matrix CSS matrix
+ * @return CSS matrix string
+ */
+export function matrixCSSToString( matrix: MatrixCSS ): string {
+	return `matrix(${ matrix.join( ',' ) })`;
+}

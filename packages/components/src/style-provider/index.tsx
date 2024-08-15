@@ -28,7 +28,7 @@ const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
 	}
 	uuidCache.add( key );
 
-	const cache = createCache( { container, key } );
+	const cache = createCache( { container, key, stylisPlugins: [] } );
 	containerCacheMap.set( container, cache );
 	return cache;
 };

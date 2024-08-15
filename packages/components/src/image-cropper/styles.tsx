@@ -97,23 +97,30 @@ export const Resizable = styled( MotionResizable )`
 
 export const Container = styled( motion.div )`
 	position: relative;
-	display: flex;
 	overflow: hidden;
-	contain: strict;
-	max-width: 100%;
-	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+`;
+
+export const ReferenceFrame = styled.div`
+	position: relative;
 `;
 
 export const Img = styled( motion.img )`
 	position: absolute;
 	pointer-events: none;
-	top: 50%;
-	left: 50%;
 	transform-origin: center center;
-	rotate: var( --wp-cropper-angle );
-	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
-	translate: calc( var( --wp-cropper-image-x ) - 50% )
-		calc( var( --wp-cropper-image-y ) - 50% );
-	will-change: rotate, scale, translate;
+	transform: var( --wp-cropper-transform );
 	contain: strict;
 `;
+// top: 50%;
+// left: 50%;
+
+// rotate: var( --wp-cropper-angle );
+// scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
+// translate: calc( var( --wp-cropper-image-x ) - 50% )
+// 	calc( var( --wp-cropper-image-y ) - 50% );
+// will-change: rotate, scale, translate;

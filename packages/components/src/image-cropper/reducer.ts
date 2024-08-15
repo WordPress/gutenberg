@@ -2,11 +2,17 @@
  * Internal dependencies
  */
 import type { ResizeDirection, Position } from './types';
+import type { MatrixCSS } from './math';
 import {
 	rotatePoint,
 	degreeToRadian,
 	calculateRotatedBounds,
 	getMinScale,
+	identityCSS,
+	translateCSS,
+	rotateCSS,
+	scaleCSS,
+	multiplyCSS,
 	PI_OVER_TWO,
 } from './math';
 
@@ -18,6 +24,7 @@ export type State = {
 		/** The height of the image. */
 		height: number;
 	};
+	transform: MatrixCSS;
 	/** The image transforms. */
 	transforms: {
 		/** The rotation angle of the image in radians. */
@@ -179,6 +186,7 @@ function createInitialState( {
 			width,
 			height,
 		},
+		transform: identityCSS(),
 		transforms: {
 			rotate: 0,
 			scale: { x: 1, y: 1 },
@@ -237,6 +245,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 		case 'FLIP': {
 			return {
 				...state,
+				transform: multiplyCSS( state.transform, scaleCSS( -1, 1 ) ),
 				transforms: {
 					...state.transforms,
 					rotate: transforms.rotate + Math.PI,
@@ -252,9 +261,8 @@ function imageCropperReducer( state: State, action: Action ): State {
 			};
 		}
 		case 'SET_TILT': {
-			const radian = degreeToRadian( state.tilt );
-			const nextRadian = degreeToRadian( action.tilt );
-			const nextRotate = transforms.rotate - radian + nextRadian;
+			const delta = degreeToRadian( action.tilt - state.tilt );
+			const nextRotate = transforms.rotate + delta;
 			const absScale = Math.abs( transforms.scale.x );
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
@@ -283,6 +291,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			return {
 				...state,
+				transform: multiplyCSS( state.transform, rotateCSS( delta ) ),
 				transforms: {
 					...state.transforms,
 					rotate: nextRotate,
@@ -302,6 +311,7 @@ function imageCropperReducer( state: State, action: Action ): State {
 			const rotatedPosition = rotatePoint( transforms.translate, angle );
 			return {
 				...state,
+				transform: multiplyCSS( state.transform, rotateCSS( angle ) ),
 				transforms: {
 					...state.transforms,
 					translate: rotatedPosition,
@@ -343,9 +353,15 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			// Rotate the constrained point back to the original coordinate system.
 			const nextPosition = rotatePoint( boundPoint, transforms.rotate );
+			const deltaX = nextPosition.x - transforms.translate.x;
+			const deltaY = nextPosition.y - transforms.translate.y;
 
 			return {
 				...state,
+				transform: multiplyCSS(
+					state.transform,
+					translateCSS( deltaX, deltaY )
+				),
 				transforms: {
 					...state.transforms,
 					translate: nextPosition,
@@ -404,28 +420,29 @@ function imageCropperReducer( state: State, action: Action ): State {
 			}
 
 			// Calculate the delta for the image in each direction.
-			const deltaX = [ 'left', 'bottomLeft', 'topLeft' ].includes(
-				direction
-			)
-				? delta.width
-				: -delta.width;
-			const deltaY = [ 'top', 'topLeft', 'topRight' ].includes(
-				direction
-			)
-				? delta.height
-				: -delta.height;
+			// prettier-ignore
+			const deltaXSign = [ 'left', 'bottomLeft', 'topLeft' ].includes( direction) ? 1 : -1;
+			// prettier-ignore
+			const deltaYSign = [ 'top', 'topLeft', 'topRight' ].includes( direction) ? 1 : -1;
+
+			const deltaX = windowScale * deltaXSign * ( delta.width / 2 );
+			const deltaY = windowScale * deltaYSign * ( delta.height / 2 );
 
 			return {
 				...state,
+				transform: multiplyCSS(
+					state.transform,
+					translateCSS( deltaX, deltaY ),
+					scaleCSS(
+						nextScale / transforms.scale.x,
+						nextScale / transforms.scale.y
+					)
+				),
 				transforms: {
 					...state.transforms,
 					translate: {
-						x:
-							( transforms.translate.x + deltaX / 2 ) *
-							windowScale,
-						y:
-							( transforms.translate.y + deltaY / 2 ) *
-							windowScale,
+						x: transforms.translate.x * windowScale + deltaX,
+						y: transforms.translate.y * windowScale + deltaY,
 					},
 					scale: {
 						x: nextScale * Math.sign( transforms.scale.x ),
@@ -468,6 +485,13 @@ function imageCropperReducer( state: State, action: Action ): State {
 
 			return {
 				...state,
+				transform: multiplyCSS(
+					state.transform,
+					scaleCSS(
+						nextScale / transforms.scale.x,
+						nextScale / transforms.scale.y
+					)
+				),
 				transforms: {
 					...state.transforms,
 					scale: {
@@ -508,6 +532,13 @@ function imageCropperReducer( state: State, action: Action ): State {
 					width: cropper.width * ratio,
 					height: cropper.height * ratio,
 				},
+				transform: multiplyCSS(
+					state.transform,
+					translateCSS(
+						transforms.translate.x * ratio - transforms.translate.x,
+						transforms.translate.y * ratio - transforms.translate.y
+					)
+				),
 				transforms: {
 					...state.transforms,
 					translate: {

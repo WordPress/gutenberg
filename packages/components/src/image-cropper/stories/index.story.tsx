@@ -12,6 +12,7 @@ import { aspectRatio } from '@wordpress/icons';
  */
 import { ImageCropper, ImageCropperContext } from '../';
 import { Button, RangeControl, Flex, FlexItem, DropdownMenu } from '../../';
+import { matrixCSSToString, stateToMatrixCSS } from '../math';
 
 const meta: Meta< typeof ImageCropper.Provider > = {
 	component: ImageCropper.Provider,
@@ -29,7 +30,14 @@ export default meta;
 
 function StateLogger() {
 	const { state } = useContext( ImageCropperContext );
-	return <pre>{ JSON.stringify( state, null, 2 ) }</pre>;
+	return (
+		<pre>
+			{ JSON.stringify( state, null, 2 ) }
+			{ `\n{\ntransform: ${ matrixCSSToString(
+				stateToMatrixCSS( state )
+			) }\n}\n` }
+		</pre>
+	);
 }
 
 function TemplateControls() {
