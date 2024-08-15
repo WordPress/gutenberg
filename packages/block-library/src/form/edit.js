@@ -130,6 +130,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			{ submissionMethod !== 'email' && (
 				<InspectorControls group="advanced">
 					<SelectControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						label={ __( 'Method' ) }
 						options={ [
