@@ -26,7 +26,7 @@ exports[`transformStyles URL rewrite should rewrite relative paths 1`] = `
 
 exports[`transformStyles error handling should handle multiple instances of \`:root :where(body)\` 1`] = `
 [
-  ".my-namespace { color: pink; } .my-namespace { color: orange; }",
+  ":root :where(body) .my-namespace { color: pink; } :root :where(body) .my-namespace { color: orange; }",
 ]
 `;
 
@@ -60,15 +60,15 @@ exports[`transformStyles selector wrap should ignore keyframes 1`] = `
 exports[`transformStyles selector wrap should replace :root selectors 1`] = `
 [
   "
-			.my-namespace {
+			:root .my-namespace {
 				--my-color: #ff0000;
 			}",
 ]
 `;
 
-exports[`transformStyles selector wrap should replace root selectors 1`] = `
+exports[`transformStyles selector wrap should replace body selectors 1`] = `
 [
-  ".my-namespace, .my-namespace h1 { color: red; }",
+  "body .my-namespace, .my-namespace h1 { color: red; }",
 ]
 `;
 

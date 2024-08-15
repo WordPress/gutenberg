@@ -111,7 +111,7 @@ describe( 'transformStyles', () => {
 			expect( output ).toMatchSnapshot();
 		} );
 
-		it( 'should replace root selectors', () => {
+		it( 'should replace body selectors', () => {
 			const input = `body, h1 { color: red; }`;
 			const output = transformStyles(
 				[
@@ -239,7 +239,7 @@ describe( 'transformStyles', () => {
 			);
 
 			expect( output ).toEqual( [
-				'.my-namespace h1  { color: goldenrod; }',
+				'body .my-namespace h1  { color: goldenrod; }',
 			] );
 		} );
 

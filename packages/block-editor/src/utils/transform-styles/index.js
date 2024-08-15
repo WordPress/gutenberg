@@ -18,7 +18,7 @@ const ROOT_SELECTORS = [
 function replaceDoublePrefix( selector, prefix ) {
 	// Avoid prefixing an already prefixed selector.
 	const doublePrefix = `${ prefix } ${ prefix }`;
-	if ( selector.startsWith( doublePrefix ) ) {
+	if ( selector.includes( doublePrefix ) ) {
 		return selector.replace( doublePrefix, prefix );
 	}
 	return selector;
@@ -55,8 +55,9 @@ function transformStyle(
 							// Reorganize root selectors such that the root part comes before the prefix,
 							// but the prefix still becomes any other part of the selector.
 							if ( rootSelector ) {
-								const selectorWithoutRootPart =
-									selector.replace( rootSelector, '' );
+								const selectorWithoutRootPart = selector
+									.replace( rootSelector, '' )
+									.trim();
 								const updatedRootSelector =
 									`${ rootSelector } ${ prefix } ${ selectorWithoutRootPart }`.trim();
 
