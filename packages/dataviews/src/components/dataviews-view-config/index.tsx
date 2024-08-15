@@ -140,7 +140,7 @@ function SortFieldControl() {
 }
 
 function SortDirectionControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
@@ -149,17 +149,19 @@ function SortDirectionControl() {
 			isBlock
 			label={ __( 'Order' ) }
 			value={ view.sort?.direction || 'desc' }
-			disabled={ ! view?.sort?.field }
 			onChange={ ( newDirection ) => {
-				if ( ! view?.sort?.field ) {
-					return;
-				}
 				if ( newDirection === 'asc' || newDirection === 'desc' ) {
 					onChangeView( {
 						...view,
 						sort: {
 							direction: newDirection,
-							field: view.sort.field,
+							field:
+								view.sort?.field ||
+								// If there is no field assigned as the sorting field assign the first sortable field.
+								fields.find(
+									( field ) => field.enableSorting !== false
+								)?.id ||
+								'',
 						},
 					} );
 					return;

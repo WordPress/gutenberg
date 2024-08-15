@@ -16,12 +16,13 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
+import { CompositeContext, useCompositeContext } from './context';
 import type {
 	CompositeStoreProps,
 	CompositeProps,
@@ -72,7 +73,14 @@ const Group = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeGroupProps, 'div', false >
 >( function CompositeGroup( props, ref ) {
-	return <Ariakit.CompositeGroup { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeGroup
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 Group.displayName = 'Composite.Group';
 
@@ -80,7 +88,14 @@ const GroupLabel = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
 >( function CompositeGroupLabel( props, ref ) {
-	return <Ariakit.CompositeGroupLabel { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeGroupLabel
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 GroupLabel.displayName = 'Composite.GroupLabel';
 
@@ -88,7 +103,14 @@ const Item = forwardRef<
 	HTMLButtonElement,
 	WordPressComponentProps< CompositeItemProps, 'button', false >
 >( function CompositeItem( props, ref ) {
-	return <Ariakit.CompositeItem { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeItem
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 Item.displayName = 'Composite.Item';
 
@@ -96,7 +118,14 @@ const Row = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeRowProps, 'div', false >
 >( function CompositeRow( props, ref ) {
-	return <Ariakit.CompositeRow { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeRow
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 Row.displayName = 'Composite.Row';
 
@@ -104,7 +133,14 @@ const Hover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeHoverProps, 'div', false >
 >( function CompositeHover( props, ref ) {
-	return <Ariakit.CompositeHover { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeHover
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 Hover.displayName = 'Composite.Hover';
 
@@ -112,7 +148,14 @@ const Typeahead = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
 >( function CompositeTypeahead( props, ref ) {
-	return <Ariakit.CompositeTypeahead { ...props } ref={ ref } />;
+	const context = useCompositeContext();
+	return (
+		<Ariakit.CompositeTypeahead
+			store={ context?.store }
+			{ ...props }
+			ref={ ref }
+		/>
+	);
 } );
 Typeahead.displayName = 'Composite.Typeahead';
 
@@ -136,9 +179,28 @@ export const Composite = Object.assign(
 	forwardRef<
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
-	>( function Composite( { disabled = false, ...props }, ref ) {
+	>( function Composite(
+		{ children, store, disabled = false, ...props },
+		ref
+	) {
+		const contextValue = useMemo(
+			() => ( {
+				store,
+			} ),
+			[ store ]
+		);
+
 		return (
-			<Ariakit.Composite disabled={ disabled } { ...props } ref={ ref } />
+			<Ariakit.Composite
+				disabled={ disabled }
+				store={ store }
+				{ ...props }
+				ref={ ref }
+			>
+				<CompositeContext.Provider value={ contextValue }>
+					{ children }
+				</CompositeContext.Provider>
+			</Ariakit.Composite>
 		);
 	} ),
 	{
@@ -260,5 +322,20 @@ export const Composite = Object.assign(
 		 * ```
 		 */
 		Typeahead,
+		/**
+		 * The React context used by the composite components. It can be used by
+		 * to access the composite store, and to forward the context when composite
+		 * sub-components are rendered across portals (ie. `SlotFill` components)
+		 * that would not otherwise forward the context to the `Fill` children.
+		 *
+		 * @example
+		 * ```jsx
+		 * import { Composite } from '@wordpress/components';
+		 * import { useContext } from '@wordpress/element';
+		 *
+		 * const compositeContext = useContext( Composite.Context );
+		 * ```
+		 */
+		Context: CompositeContext,
 	}
 );

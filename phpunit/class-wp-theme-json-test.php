@@ -2294,6 +2294,112 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
+	public function test_merge_incoming_background_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'http://example.org/quote.png',
+						),
+						'backgroundSize'  => 'cover',
+					),
+					'blocks'     => array(
+						'core/group' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'ref' => 'styles.blocks.core/verse.background.backgroundImage',
+								),
+								'backgroundAttachment' => 'fixed',
+							),
+						),
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'url' => 'http://example.org/quote.png',
+								),
+								'backgroundAttachment' => array(
+									'ref' => 'styles.blocks.core/group.background.backgroundAttachment',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$update_background_image_styles = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'backgroundSize' => 'contain',
+				),
+				'blocks'     => array(
+					'core/group' => array(
+						'background' => array(
+							'backgroundImage' => array(
+								'url' => 'http://example.org/group.png',
+							),
+						),
+					),
+					'core/quote' => array(
+						'background' => array(
+							'backgroundAttachment' => 'fixed',
+						),
+					),
+					'core/verse' => array(
+						'background' => array(
+							'backgroundImage' => array(
+								'ref' => 'styles.blocks.core/group.background.backgroundImage',
+							),
+						),
+					),
+				),
+			),
+		);
+		$expected                       = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'backgroundImage' => array(
+						'url' => 'http://example.org/quote.png',
+					),
+					'backgroundSize'  => 'contain',
+				),
+				'blocks'     => array(
+					'core/group' => array(
+						'background' => array(
+							'backgroundImage'      => array(
+								'url' => 'http://example.org/group.png',
+							),
+							'backgroundAttachment' => 'fixed',
+						),
+					),
+					'core/quote' => array(
+						'background' => array(
+							'backgroundImage'      => array(
+								'url' => 'http://example.org/quote.png',
+							),
+							'backgroundAttachment' => 'fixed',
+						),
+					),
+					'core/verse' => array(
+						'background' => array(
+							'backgroundImage' => array(
+								'ref' => 'styles.blocks.core/group.background.backgroundImage',
+							),
+						),
+					),
+				),
+			),
+		);
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $update_background_image_styles ) );
+		$actual = $theme_json->get_raw_data();
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_remove_insecure_properties_removes_unsafe_styles() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
@@ -4913,6 +5019,60 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$verse_styles = ":root :where(.wp-block-verse){background-image: url('http://example.org/verse.png');background-size: cover;}";
 		$this->assertSameCSS( $verse_styles, $theme_json->get_styles_for_block( $verse_node ), 'Styles returned from "::get_styles_for_block()" with default core/verse background styles as string type do not match expectations' );
+	}
+
+	/**
+	 * Testing background dynamic properties in theme.json.
+	 */
+	public function test_get_resolved_background_image_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage'      => array(
+							'url' => 'http://example.org/top.png',
+						),
+						'backgroundSize'       => 'contain',
+						'backgroundRepeat'     => 'repeat',
+						'backgroundPosition'   => '10% 20%',
+						'backgroundAttachment' => 'scroll',
+					),
+					'blocks'     => array(
+						'core/group'        => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'id'  => 123,
+									'url' => 'http://example.org/group.png',
+								),
+							),
+						),
+						'core/post-content' => array(
+							'background' => array(
+								'backgroundImage'      => array(
+									'ref' => 'styles.background.backgroundImage',
+								),
+								'backgroundSize'       => array(
+									'ref' => 'styles.background.backgroundSize',
+								),
+								'backgroundRepeat'     => array(
+									'ref' => 'styles.background.backgroundRepeat',
+								),
+								'backgroundPosition'   => array(
+									'ref' => 'styles.background.backgroundPosition',
+								),
+								'backgroundAttachment' => array(
+									'ref' => 'styles.background.backgroundAttachment',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}:root :where(.wp-block-group){background-image: url('http://example.org/group.png');background-size: cover;}:root :where(.wp-block-post-content){background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}";
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
 	/**

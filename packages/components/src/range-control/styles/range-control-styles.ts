@@ -154,7 +154,7 @@ export const Mark = styled.span`
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
-	top: -4px;
+	top: 9px;
 	width: 1px;
 
 	${ markFill };
@@ -170,7 +170,7 @@ export const MarkLabel = styled.span`
 	color: ${ COLORS.gray[ 300 ] };
 	font-size: 11px;
 	position: absolute;
-	top: 12px;
+	top: 22px;
 	white-space: nowrap;
 
 	${ rtl( { left: 0 } ) };
