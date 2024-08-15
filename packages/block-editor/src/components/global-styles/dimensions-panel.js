@@ -610,6 +610,9 @@ export default function DimensionsPanel( {
 					}
 					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
+						'single-column':
+							// If UnitControl is used, should be single-column.
+							! showSpacingPresetsControl && ! isAxialGap,
 					} ) }
 					panelId={ panelId }
 				>
@@ -627,10 +630,8 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
-								__unstableInputWidth="80px"
 								min={ 0 }
 								onChange={ setGapValue }
 								units={ units }
