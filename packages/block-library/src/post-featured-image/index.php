@@ -38,10 +38,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		}
 	}
 
+	// Get the aspect Ratio from the block supports.
+	$aspect_ratio = $attributes['style']['dimensions']['aspectRatio'] ?? '';
+
 	$extra_styles = '';
 
 	// Aspect ratio with a height set needs to override the default width/height.
-	if ( ! empty( $attributes['aspectRatio'] ) ) {
+	if ( ! empty( $aspect_ratio ) ) {
 		$extra_styles .= 'width:100%;height:100%;';
 	} elseif ( ! empty( $attributes['height'] ) ) {
 		$extra_styles .= "height:{$attributes['height']};";
@@ -114,8 +117,8 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = $featured_image . $overlay_markup;
 	}
 
-	$aspect_ratio = ! empty( $attributes['aspectRatio'] )
-		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $attributes['aspectRatio'] ) ) . ';'
+	$aspect_ratio = ! empty( $aspect_ratio )
+		? esc_attr( safecss_filter_attr( 'aspect-ratio:' . $aspect_ratio ) ) . ';'
 		: '';
 	$width        = ! empty( $attributes['width'] )
 		? esc_attr( safecss_filter_attr( 'width:' . $attributes['width'] ) ) . ';'

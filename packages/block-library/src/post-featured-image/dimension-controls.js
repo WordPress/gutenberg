@@ -53,17 +53,12 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { aspectRatio, width, height, scale, sizeSlug },
+	attributes,
+	attributes: { width, height, scale, sizeSlug },
 	setAttributes,
 	media,
 } ) => {
-	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
-		useSettings(
-			'spacing.units',
-			'dimensions.aspectRatios.default',
-			'dimensions.aspectRatios.theme',
-			'dimensions.defaultAspectRatios'
-		);
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
@@ -79,6 +74,9 @@ const DimensionControls = ( {
 			value: slug,
 			label: name,
 		} ) );
+
+	// Get the block Supports aspect ratio.
+	const aspectRatio = attributes?.style?.dimensions?.aspectRatio;
 
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
@@ -99,50 +97,8 @@ const DimensionControls = ( {
 	const showScaleControl =
 		height || ( aspectRatio && aspectRatio !== 'auto' );
 
-	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-
-	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-
-	const aspectRatioOptions = [
-		{
-			label: _x(
-				'Original',
-				'Aspect ratio option for dimensions control'
-			),
-			value: 'auto',
-		},
-		...( showDefaultRatios ? defaultOptions : [] ),
-		...( themeOptions ? themeOptions : [] ),
-	];
-
 	return (
 		<>
-			<ToolsPanelItem
-				hasValue={ () => !! aspectRatio }
-				label={ __( 'Aspect ratio' ) }
-				onDeselect={ () => setAttributes( { aspectRatio: undefined } ) }
-				resetAllFilter={ () => ( {
-					aspectRatio: undefined,
-				} ) }
-				isShownByDefault
-				panelId={ clientId }
-			>
-				<SelectControl
-					__nextHasNoMarginBottom
-					label={ __( 'Aspect ratio' ) }
-					value={ aspectRatio }
-					options={ aspectRatioOptions }
-					onChange={ ( nextAspectRatio ) =>
-						setAttributes( { aspectRatio: nextAspectRatio } )
-					}
-				/>
-			</ToolsPanelItem>
 			<ToolsPanelItem
 				className="single-column"
 				hasValue={ () => !! height }

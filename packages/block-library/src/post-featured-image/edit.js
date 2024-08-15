@@ -62,7 +62,6 @@ export default function PostFeaturedImageEdit( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const {
 		isLink,
-		aspectRatio,
 		height,
 		width,
 		scale,
@@ -71,6 +70,7 @@ export default function PostFeaturedImageEdit( {
 		linkTarget,
 		useFirstImageFromPost,
 	} = attributes;
+	const aspectRatio = attributes?.style?.dimensions?.aspectRatio;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
