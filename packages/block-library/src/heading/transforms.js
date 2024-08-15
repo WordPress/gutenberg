@@ -14,22 +14,19 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
-			transform: ( attributes ) =>
-				attributes.map(
-					( { content, anchor, align: textAlign, metadata } ) =>
-						createBlock( 'core/heading', {
-							content,
-							anchor,
-							textAlign,
-							metadata: getTransformedMetadata(
-								metadata,
-								'core/heading',
-								( { content: contentBinding } ) => ( {
-									content: contentBinding,
-								} )
-							),
+			transform: ( { content, anchor, align: textAlign, metadata } ) =>
+				createBlock( 'core/heading', {
+					content,
+					anchor,
+					textAlign,
+					metadata: getTransformedMetadata(
+						metadata,
+						'core/heading',
+						( { content: contentBinding } ) => ( {
+							content: contentBinding,
 						} )
-				),
+					),
+				} ),
 		},
 		{
 			type: 'raw',
