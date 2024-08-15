@@ -363,7 +363,7 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				// In Zoom Out mode, if the target is not the section root provided by settings) then do not allow dropping as
+				// In Zoom Out mode, if the target is not the section root provided by settings then do not allow dropping as
 				// the target is not within the root.
 				if (
 					isZoomOutMode &&
