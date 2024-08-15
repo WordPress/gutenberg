@@ -97,7 +97,7 @@ describe( 'getBlockGapCSS', () => {
 	} );
 
 	it( 'should treat a blockGap string containing 0 as a valid value', () => {
-		const expected = '.editor-styles-wrapper .my-container { gap: 0; }';
+		const expected = '.my-container { gap: 0; }';
 
 		const result = getBlockGapCSS(
 			'.my-container',
