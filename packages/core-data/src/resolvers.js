@@ -320,28 +320,33 @@ export const getEntityRecords =
 							),
 						} ) );
 
+					const canUserResolutionsArgs = [];
+					for ( const targetHint of targetHints ) {
+						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+							canUserResolutionsArgs.push( [
+								action,
+								{ kind, name, id: targetHint.id },
+							] );
+
+							dispatch.receiveUserPermission(
+								getUserPermissionCacheKey( action, {
+									kind,
+									name,
+									id: targetHint.id,
+								} ),
+								targetHint.permissions[ action ]
+							);
+						}
+					}
+
 					dispatch.finishResolutions(
 						'getEntityRecord',
 						resolutionsArgs
 					);
-
-					for ( const targetHint of targetHints ) {
-						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-							const permissionKey = getUserPermissionCacheKey(
-								action,
-								{ kind, name, id: targetHint.id }
-							);
-
-							dispatch.receiveUserPermission(
-								permissionKey,
-								targetHint.permissions[ action ]
-							);
-							dispatch.finishResolution( 'canUser', [
-								action,
-								{ kind, name, id: targetHint.id },
-							] );
-						}
-					}
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
