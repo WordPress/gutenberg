@@ -313,6 +313,7 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'ComboboxControl',
 						'DimensionControl',
 						'FontSizePicker',
 						'ToggleGroupControl',
