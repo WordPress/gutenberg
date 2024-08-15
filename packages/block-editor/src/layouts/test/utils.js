@@ -37,7 +37,7 @@ const layoutDefinitions = {
 describe( 'getBlockGapCSS', () => {
 	it( 'should output default blockGap rules', () => {
 		const expected =
-			'.my-container > * { margin-block-start: 0; margin-block-end: 0; } .my-container > * + * { margin-block-start: 3em; margin-block-end: 0; }';
+			'.my-container > * { margin-block-start: 0; margin-block-end: 0; }.my-container > * + * { margin-block-start: 3em; margin-block-end: 0; }';
 
 		const result = getBlockGapCSS(
 			'.my-container',
