@@ -11,9 +11,25 @@ import type { ButtonAsButtonProps } from '../button/types';
 export type MatchParams = Record< string, string | string[] >;
 
 export type NavigateOptions = {
+	/**
+	 * Specify the CSS selector used to restore focus on an given element when
+	 * navigating back. When not provided, the component will attempt to restore
+	 * focus on the element that originated the forward navigation.
+	 */
 	focusTargetSelector?: string;
+	/**
+	 * Whether the navigation is a backwards navigation. This enables focus
+	 * restoration (when possible), and causes the animation to be backwards.
+	 */
 	isBack?: boolean;
+	/**
+	 * Opt out of focus management. Useful when the consumer of the component
+	 * wants to manage focus themselves.
+	 */
 	skipFocus?: boolean;
+	/**
+	 * Whether the navigation should replace the current location in the stack.
+	 */
 	replace?: boolean;
 };
 
