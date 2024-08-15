@@ -19,7 +19,6 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
-	NavigatorToParentButton,
 	useNavigator,
 } from '..';
 import type { NavigateOptions } from '../types';
@@ -142,23 +141,6 @@ function CustomNavigatorBackButton( {
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );
-			} }
-			{ ...props }
-		/>
-	);
-}
-
-function CustomNavigatorToParentButton( {
-	onClick,
-	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
-	onClick?: CustomTestOnClickHandler;
-} ) {
-	return (
-		<NavigatorToParentButton
-			onClick={ () => {
-				// Used to spy on the values passed to `navigator.goBack`.
-				onClick?.( { type: 'goToParent' } );
 			} }
 			{ ...props }
 		/>
@@ -344,20 +326,20 @@ const MyHierarchicalNavigation = ( {
 					>
 						{ BUTTON_TEXT.toNestedScreen }
 					</CustomNavigatorButton>
-					<CustomNavigatorToParentButton
+					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton>
+					</CustomNavigatorBackButton>
 				</NavigatorScreen>
 
 				<NavigatorScreen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
-					<CustomNavigatorToParentButton
+					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton>
+					</CustomNavigatorBackButton>
 					<CustomNavigatorGoToBackButton
 						path={ PATHS.CHILD }
 						onClick={ onNavigatorButtonClick }
