@@ -47,6 +47,7 @@ export default function SegmentedTextControl( {
 			<div className="block-editor-segmented-text-control__buttons">
 				<ToggleGroupControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					isDeselectable
 					label={ label }
 					onChange={ ( newValue ) => {
