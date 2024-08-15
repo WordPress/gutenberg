@@ -3,6 +3,15 @@
  */
 import type * as Ariakit from '@ariakit/react';
 
+export type CompositeContextProps =
+	| {
+			/**
+			 * Object returned by the `useCompositeStore` hook.
+			 */
+			store: Ariakit.CompositeStore;
+	  }
+	| undefined;
+
 export type CompositeStoreProps = {
 	/**
 	 * The current active item `id`. The active item is the element within the

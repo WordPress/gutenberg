@@ -145,6 +145,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						) }
 					/>
 					<TextControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						autoComplete="off"
 						label={ __( 'Form action' ) }

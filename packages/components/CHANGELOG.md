@@ -2,16 +2,30 @@
 
 ## Unreleased
 
-### New Features
+### Deprecations
 
--   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
--   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
--   `Composite`: export `useCompositeStore, add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
+-   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
+    -   `BaseControl`
+    -   `CheckboxControl`
+    -   `ComboboxControl`
+    -   `DimensionControl`
+    -   `FocalPointPicker`
+    -   `RangeControl`
+    -   `SearchControl`
+    -   `SelectControl`
+    -   `TextControl`
+    -   `TextareaControl`
+    -   `ToggleControl`
+    -   `ToggleGroupControl`
+    -   `TreeSelect`
 
 ### Enhancements
 
 -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+-   `Composite`: use internal context to forward the composite store to sub-components ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+-   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+-   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
 -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
 -   `AlignmentMatrixControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 -   `AnglePickerControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
@@ -39,6 +53,18 @@
 -   `Toolbar`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 -   `Tooltip`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 -   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
+
+
+### Bug Fixes
+
+-   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
+
+### Internal
+
+-   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+-   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
+-   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
 
 ## 28.5.0 (2024-08-07)
 

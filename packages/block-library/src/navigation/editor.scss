@@ -628,3 +628,8 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 .wp-block-navigation__menu-inspector-controls__empty-message {
 	margin-left: 24px;
 }
+
+.wp-block-navigation__overlay-menu-icon-toggle-group {
+	// Counteract the margin added by the block inspector.
+	margin-bottom: $grid-unit-20;
+}

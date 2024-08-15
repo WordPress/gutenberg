@@ -64,7 +64,7 @@ add_filter( 'get_block_templates', '_gutenberg_add_block_templates_from_registry
  * Hooks into `get_block_template` to add the `plugin` property when necessary.
  *
  * @param [WP_Block_Template|null] $block_template The found block template, or null if there isn’t one.
- * @return [WP_Block_Template|null] The block template that was already found with the plugin property defined if it was reigstered by a plugin.
+ * @return [WP_Block_Template|null] The block template that was already found with the plugin property defined if it was registered by a plugin.
  */
 function _gutenberg_add_block_template_plugin_attribute( $block_template ) {
 	if ( $block_template ) {

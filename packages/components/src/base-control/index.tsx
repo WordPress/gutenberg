@@ -7,6 +7,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -31,6 +32,7 @@ const UnconnectedBaseControl = (
 ) => {
 	const {
 		__nextHasNoMarginBottom = false,
+		__associatedWPComponentName = 'BaseControl',
 		id,
 		label,
 		hideLabelFromVision = false,
@@ -38,6 +40,17 @@ const UnconnectedBaseControl = (
 		className,
 		children,
 	} = useContextSystem( props, 'BaseControl' );
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated(
+			`Bottom margin styles for wp.components.${ __associatedWPComponentName }`,
+			{
+				since: '6.7',
+				version: '7.0',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+			}
+		);
+	}
 
 	return (
 		<Wrapper className={ className }>

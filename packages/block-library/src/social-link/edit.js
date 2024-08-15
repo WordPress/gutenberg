@@ -139,6 +139,8 @@ const SocialLinkEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
@@ -155,6 +157,8 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
