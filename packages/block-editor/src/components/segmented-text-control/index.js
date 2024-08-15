@@ -6,7 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 /**
  * @typedef {Object} Option
@@ -41,22 +44,27 @@ export default function SegmentedTextControl( {
 				className
 			) }
 		>
-			<BaseControl.VisualLabel as="legend">
-				{ label }
-			</BaseControl.VisualLabel>
 			<div className="block-editor-segmented-text-control__buttons">
-				{ options.map( ( option ) => {
-					return (
-						<Button
-							size="compact"
-							key={ option.value }
-							icon={ option.icon }
-							label={ option.label }
-							isPressed={ option.value === value }
-							onClick={ () => onChange( option.value ) }
-						/>
-					);
-				} ) }
+				<ToggleGroupControl
+					__nextHasNoMarginBottom
+					isDeselectable
+					label={ label }
+					onChange={ ( newValue ) => {
+						onChange( newValue );
+					} }
+					value={ value }
+				>
+					{ options.map( ( option ) => {
+						return (
+							<ToggleGroupControlOptionIcon
+								key={ option.value }
+								value={ option.value }
+								icon={ option.icon }
+								label={ option.label }
+							/>
+						);
+					} ) }
+				</ToggleGroupControl>
 			</div>
 		</fieldset>
 	);
