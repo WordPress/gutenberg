@@ -1,16 +1,36 @@
 .edit-post-layout__metaboxes {
-	flex-shrink: 0;
 	clear: both;
 	overflow: auto;
+	background-color: $white;
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 
-	&:has(.postbox:not(.closed, .is-hidden)) {
-		flex: 1 1 50%;
+	&:not(details) {
+		max-height: 50%;
+	}
+
+	// The component renders as a details element in short viewports.
+	&:is(details) {
+		& > summary {
+			cursor: pointer;
+			color: $gray-900;
+			background-color: $white;
+			height: $button-size-compact;
+			line-height: $button-size-compact;
+			font-size: 13px;
+			padding-left: $grid-unit-30;
+		}
+
+		&[open] > summary {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			border-block-end: $border-width solid $gray-200;
+		}
 	}
 }
 
 .has-metaboxes .editor-visual-editor {
-	flex: 1 1 50%;
+	flex: 1;
 }
 
 // Adjust the position of the notices

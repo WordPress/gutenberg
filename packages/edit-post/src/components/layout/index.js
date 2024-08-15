@@ -37,7 +37,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -149,6 +149,25 @@ function useEditorStyles() {
 		hasThemeStyleSupport,
 		postType,
 	] );
+}
+
+function MetaBoxesWide() {
+	const isShort = useMediaQuery( '(max-height: 599px)' );
+	if ( isShort ) {
+		return (
+			<details className="edit-post-layout__metaboxes" open>
+				<summary>{ __( 'Meta Boxes' ) }</summary>
+				<MetaBoxes location="normal" />
+				<MetaBoxes location="advanced" />
+			</details>
+		);
+	}
+	return (
+		<div className="edit-post-layout__metaboxes">
+			<MetaBoxes location="normal" />
+			<MetaBoxes location="advanced" />
+		</div>
+	);
 }
 
 function Layout( {
@@ -354,12 +373,7 @@ function Layout( {
 					}
 					extraContent={
 						! isDistractionFree &&
-						showMetaBoxes && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
-						)
+						showMetaBoxes && <MetaBoxesWide />
 					}
 				>
 					<PostLockedModal />
