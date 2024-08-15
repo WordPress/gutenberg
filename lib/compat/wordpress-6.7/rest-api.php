@@ -114,3 +114,45 @@ function gutenberg_override_default_rest_server() {
 	return 'Gutenberg_REST_Server';
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
+
+/**
+ * Filters the REST API root index data, and adds the language direction of the site to the site settings.
+ *
+ * @param WP_REST_Response $response Response data.
+ * @param WP_REST_Request  $request  Request data.
+ *
+ * @return WP_REST_Response The API root index data.
+ */
+function gutenberg_add_language_direction_to_site_capabilities( $response, $request ) {
+	/*
+	* Locale settings.
+	*
+	* Add user and site locale settings to site index.
+	* Because the current value of is_rtl() refers to the current locale,
+	* we need to switch to the site locale to get the correct is_rtl() value for the site.
+	*
+	* Core backport notes:
+	* WordPress backport: `is_rtl` and `language` could be added to the response of WP_REST_Settings_Controller::get_item().
+	* Or, `is_rtl` could be added to WP_REST_Settings_Controller::get_item() as `language` already exists (?) in the response.
+	*/
+	// Current user locale in the block editor.
+	$current_user_locale = get_user_locale();
+	$current_user_is_rtl = is_rtl();
+
+	// Current site locale.
+	$current_site_locale = get_locale();
+	$current_site_is_rtl = $current_user_is_rtl;
+
+	if ( $current_user_locale !== $current_site_locale ) {
+		$switched_locale = switch_to_locale( $current_site_locale );
+		if ( $switched_locale ) {
+			$current_site_is_rtl = is_rtl();
+			restore_previous_locale();
+		}
+	}
+	$response->data['language'] = $current_site_locale;
+	$response->data['is_rtl']   = $current_site_is_rtl;
+	return $response;
+}
+
+add_filter( 'rest_index', 'gutenberg_add_language_direction_to_site_capabilities', 10, 2 );

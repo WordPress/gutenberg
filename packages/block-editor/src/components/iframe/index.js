@@ -110,20 +110,18 @@ function Iframe( {
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
+	lang,
+	dir,
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, siteLocale } = useSelect(
-		( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				resolvedAssets: settings.__unstableResolvedAssets,
-				isPreviewMode: settings.__unstableIsPreviewMode,
-				siteLocale: settings.siteLocale,
-			};
-		},
-		[]
-	);
+	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			resolvedAssets: settings.__unstableResolvedAssets,
+			isPreviewMode: settings.__unstableIsPreviewMode,
+		};
+	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ iframeOwnerDocument, setIframeOwnerDocument ] = useState();
@@ -268,12 +266,9 @@ function Iframe( {
 	let defaultLang = iframeOwnerDocument?.lang;
 	let defaultDir = iframeOwnerDocument?.dir;
 
-	if (
-		siteLocale?.hasOwnProperty( 'isRTL' ) &&
-		typeof siteLocale?.lang === 'string'
-	) {
-		defaultLang = siteLocale.lang;
-		defaultDir = siteLocale.isRTL ? 'rtl' : 'ltr';
+	if ( lang && dir ) {
+		defaultLang = lang;
+		defaultDir = dir;
 	}
 
 	// Correct doctype is required to enable rendering in standards
@@ -447,7 +442,7 @@ function Iframe( {
 								'editor-styles-wrapper',
 								...bodyClasses,
 								{
-									rtl: siteLocale?.isRTL,
+									rtl: 'rtl' === dir,
 								}
 							) }
 						>
