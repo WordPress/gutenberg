@@ -74,7 +74,6 @@ export default function DensityPicker( {
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			showTooltip={ false }
-			className="dataviews-density-picker__range-control"
 			label={ __( 'Preview size' ) }
 			value={ breakValues.max + breakValues.min - densityToUse }
 			min={ breakValues.min }
