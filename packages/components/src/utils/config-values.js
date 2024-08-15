@@ -48,7 +48,6 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	radiusLarge: '8px',
 	radiusFull: '9999px',
 	radiusRound: '50%',
-	radiusBlockUi: '2px',
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
