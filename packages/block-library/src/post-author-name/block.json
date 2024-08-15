@@ -27,7 +27,11 @@
 		"html": false,
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"color": {
 			"gradients": true,
@@ -53,6 +57,13 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
-	}
+	},
+	"style": "wp-block-post-author-name"
 }
