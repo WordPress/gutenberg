@@ -64,9 +64,11 @@ type ConvertGenerators< T > = {
 			? T[ K ]
 			: ConvertGenerator< T[ K ] >
 		: T[ K ] extends object
-		? ConvertGenerators< T[ K ] >
+		? Prettify<ConvertGenerators< T[ K ] >>
 		: T[ K ];
 };
+
+type Prettify<T> = { [ K in keyof T ]: T[ K ]; } & {};
 
 export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
@@ -120,13 +122,13 @@ export function store< S extends object = {} >(
 	namespace: string,
 	storePart?: S,
 	options?: StoreOptions
-): ConvertGenerators< S >;
+): Prettify<ConvertGenerators< S >>;
 
 export function store< T extends object >(
 	namespace: string,
 	storePart?: T,
 	options?: StoreOptions
-): ConvertGenerators< T >;
+): Prettify<ConvertGenerators< T >>;
 
 export function store(
 	namespace: string,
