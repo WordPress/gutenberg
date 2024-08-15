@@ -7,7 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { getCSSVarFromStyleValue } from '@wordpress/style-engine';
+import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -564,7 +564,7 @@ export function getResolvedRefValue( ruleValue, tree ) {
 
 	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 		const refPath = ruleValue.ref.split( '.' );
-		const resolvedRuleValue = getCSSVarFromStyleValue(
+		const resolvedRuleValue = getCSSValueFromRawStyle(
 			getValueFromObjectPath( tree, refPath )
 		);
 

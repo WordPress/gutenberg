@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { getCSSRules, getCSSVarFromStyleValue } from '@wordpress/style-engine';
+import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
@@ -356,7 +356,7 @@ export function getStylesDeclarations(
 						? name
 						: kebabCase( name );
 					declarations.push(
-						`${ cssProperty }: ${ getCSSVarFromStyleValue(
+						`${ cssProperty }: ${ getCSSValueFromRawStyle(
 							getValueFromObjectPath( styleValue, [ prop ] )
 						) }`
 					);
@@ -368,7 +368,7 @@ export function getStylesDeclarations(
 					? key
 					: kebabCase( key );
 				declarations.push(
-					`${ cssProperty }: ${ getCSSVarFromStyleValue(
+					`${ cssProperty }: ${ getCSSValueFromRawStyle(
 						getValueFromObjectPath( blockStyles, pathToValue )
 					) }`
 				);

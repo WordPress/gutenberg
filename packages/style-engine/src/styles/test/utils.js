@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { camelCaseJoin, getCSSVarFromStyleValue, upperFirst } from '../utils';
+import { camelCaseJoin, getCSSValueFromRawStyle, upperFirst } from '../utils';
 
 describe( 'utils', () => {
 	describe( 'upperFirst()', () => {
@@ -16,52 +16,39 @@ describe( 'utils', () => {
 		} );
 	} );
 
-	describe( 'getCSSVarFromStyleValue()', () => {
-		it( 'should return a compiled CSS var', () => {
-			expect(
-				getCSSVarFromStyleValue( 'var:preset|color|yellow-bun' )
-			).toEqual( 'var(--wp--preset--color--yellow-bun)' );
-		} );
-
-		it( 'should kebab case numbers', () => {
-			expect(
-				getCSSVarFromStyleValue( 'var:preset|font-size|h1' )
-			).toEqual( 'var(--wp--preset--font-size--h-1)' );
-		} );
-
-		it( 'should kebab case numbers as prefix', () => {
-			expect(
-				getCSSVarFromStyleValue( 'var:preset|font-size|1px' )
-			).toEqual( 'var(--wp--preset--font-size--1-px)' );
-		} );
-
-		it( 'should kebab case both sides of numbers', () => {
-			expect(
-				getCSSVarFromStyleValue( 'var:preset|color|orange11orange' )
-			).toEqual( 'var(--wp--preset--color--orange-11-orange)' );
-		} );
-
-		it( 'should kebab case camel case', () => {
-			expect(
-				getCSSVarFromStyleValue( 'var:preset|color|heavenlyBlue' )
-			).toEqual( 'var(--wp--preset--color--heavenly-blue)' );
-		} );
-
-		it( 'should kebab case underscores', () => {
-			expect(
-				getCSSVarFromStyleValue(
-					'var:preset|background|dark_Secrets_100'
-				)
-			).toEqual( 'var(--wp--preset--background--dark-secrets-100)' );
-		} );
-		it( 'should handle null gracefully', () => {
-			expect( getCSSVarFromStyleValue( null ) ).toEqual( null );
-		} );
-		it( 'should handle boolean gracefully', () => {
-			expect( getCSSVarFromStyleValue( false ) ).toEqual( false );
-		} );
-		it( 'should handle integers gracefully', () => {
-			expect( getCSSVarFromStyleValue( 1000 ) ).toEqual( 1000 );
-		} );
+	describe( 'getCSSValueFromRawStyle()', () => {
+		it.each( [
+			[ 'min(40%, 400px)', 'min(40%, 400px)' ],
+			[
+				'var(--wp--preset--color--yellow-bun)',
+				'var:preset|color|yellow-bun',
+			],
+			[ 'var(--wp--preset--font-size--h-1)', 'var:preset|font-size|h1' ],
+			[
+				'var(--wp--preset--font-size--1-px)',
+				'var:preset|font-size|1px',
+			],
+			[
+				'var(--wp--preset--color--orange-11-orange)',
+				'var:preset|color|orange11orange',
+			],
+			[
+				'var(--wp--preset--color--heavenly-blue)',
+				'var:preset|color|heavenlyBlue',
+			],
+			[
+				'var(--wp--preset--background--dark-secrets-100)',
+				'var:preset|background|dark_Secrets_100',
+			],
+			[ null, null ],
+			[ false, false ],
+			[ 1000, 1000 ],
+			[ undefined, undefined ],
+		] )(
+			'should return %s using an incoming value of %s',
+			( expected, value ) => {
+				expect( getCSSValueFromRawStyle( value ) ).toEqual( expected );
+			}
+		);
 	} );
 } );

@@ -61,7 +61,7 @@ export function generateRule(
 				{
 					selector: options?.selector,
 					key: ruleKey,
-					value: getCSSVarFromStyleValue( styleValue ),
+					value: getCSSValueFromRawStyle( styleValue ),
 				},
 		  ]
 		: [];
@@ -103,7 +103,7 @@ export function generateBoxRules(
 	} else {
 		const sideRules = individualProperties.reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
-				const value: string | undefined = getCSSVarFromStyleValue(
+				const value = getCSSValueFromRawStyle(
 					getStyleValueByPath( boxStyle, [ side ] )
 				);
 				if ( value ) {
@@ -132,13 +132,16 @@ export function generateBoxRules(
  *
  * Example:
  *
- * `getCSSVarFromStyleValue( 'var:preset|color|heavenlyBlue' )` // returns 'var(--wp--preset--color--heavenly-blue)'
+ * `getCSSValueFromRawStyle( 'var:preset|color|heavenlyBlue' )` // returns 'var(--wp--preset--color--heavenly-blue)'
  *
  * @param styleValue A raw style value.
  *
- * @return string A CSS var value.
+ * @return A CSS var value.
  */
-export function getCSSVarFromStyleValue( styleValue: string ): string {
+
+export function getCSSValueFromRawStyle(
+	styleValue: string | any
+): string | unknown {
 	if (
 		typeof styleValue === 'string' &&
 		styleValue.startsWith( VARIABLE_REFERENCE_PREFIX )

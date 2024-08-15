@@ -93,4 +93,4 @@ export function getCSSRules(
 }
 
 // Export style utils.
-export { getCSSVarFromStyleValue } from './styles/utils';
+export { getCSSValueFromRawStyle } from './styles/utils';
