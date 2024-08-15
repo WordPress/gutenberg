@@ -97,6 +97,12 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error|WP_REST_Response
 	 */
 	public function get_items( $request ) {
+		// Force editor assets enqueue.
+		add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+		do_action( 'enqueue_block_assets' );
+		do_action( 'enqueue_block_editor_assets' );
+		remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+
 		$data   = array();
 		$handle = $request['dependency'];
 		$filter = array();
@@ -267,6 +273,8 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	protected function check_read_permission( $handle ) {
+		// Circumvent the a handle requirement to allow querying all dependencies.
+		return true;
 		if ( ! $handle ) {
 			return new WP_Error( 'rest_handle_empty', __( 'Empty handle.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
