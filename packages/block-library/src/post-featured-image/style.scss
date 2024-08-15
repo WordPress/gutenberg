@@ -1,4 +1,10 @@
 :where(.wp-block-post-featured-image) {
+	img {
+		vertical-align: bottom;
+		width: 100%;
+	}
+}
+.wp-block-post-featured-image {
 	margin-left: 0;
 	margin-right: 0;
 	a {
@@ -7,9 +13,7 @@
 	}
 	img {
 		max-width: 100%;
-		width: 100%;
 		height: auto;
-		vertical-align: bottom;
 		box-sizing: border-box;
 	}
 
