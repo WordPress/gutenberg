@@ -383,3 +383,15 @@ export const modifyContentLockBlock =
 			focusModeToRevert
 		);
 	};
+
+/**
+ * Sets the sectionRootClientId of the block editor.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export function setSectionRootClientId( clientId ) {
+	return {
+		type: 'SET_SECTION_ROOT_CLIENT_ID',
+		clientId,
+	};
+}

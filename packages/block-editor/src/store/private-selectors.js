@@ -543,3 +543,17 @@ export const getBlockStyles = createSelector(
 export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
 }
+
+/**
+ * Returns the clientID of the element that is
+ * considered to be the root for inserting new
+ * "sections" into the editor. This can be thought
+ * of as the "content" of the current editor.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} The client ID of the section root.
+ */
+export function getSectionRootClientId( state = '' ) {
+	return state.sectionRootClientId;
+}
