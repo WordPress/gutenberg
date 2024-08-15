@@ -101,9 +101,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			isMatch: ( { mediaType, mediaUrl } ) => {
-				return ! mediaUrl || mediaType === 'image';
-			},
+			isMatch: ( { mediaType } ) => mediaType === 'image',
 			transform: ( { mediaAlt, mediaId, mediaUrl, anchor } ) => {
 				return createBlock( 'core/image', {
 					alt: mediaAlt,
@@ -116,9 +114,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			isMatch: ( { mediaType, mediaUrl } ) => {
-				return ! mediaUrl || mediaType === 'video';
-			},
+			isMatch: ( { mediaType } ) => mediaType === 'video',
 			transform: ( { mediaId, mediaUrl, anchor } ) => {
 				return createBlock( 'core/video', {
 					id: mediaId,
