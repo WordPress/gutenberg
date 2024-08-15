@@ -27,6 +27,7 @@ import type {
 	Screen,
 	NavigateToParentOptions,
 } from '../types';
+import deprecated from '@wordpress/deprecated';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 
@@ -226,8 +227,13 @@ function UnconnectedNavigatorProvider(
 				dispatch( { type: 'gotoparent', options } ),
 			goTo: ( path: string, options?: NavigateOptions ) =>
 				dispatch( { type: 'goto', path, options } ),
-			goToParent: ( options: NavigateToParentOptions | undefined ) =>
-				dispatch( { type: 'gotoparent', options } ),
+			goToParent: ( options: NavigateToParentOptions | undefined ) => {
+				deprecated( `wp.components.useNavigator().goToParent`, {
+					since: '6.7',
+					alternative: 'wp.components.useNavigator().goBack',
+				} );
+				dispatch( { type: 'gotoparent', options } );
+			},
 			addScreen: ( screen: Screen ) =>
 				dispatch( { type: 'add', screen } ),
 			removeScreen: ( screen: Screen ) =>
