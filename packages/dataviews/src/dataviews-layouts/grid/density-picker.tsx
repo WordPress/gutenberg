@@ -4,7 +4,7 @@
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 
 const viewportBreaks = {
 	xhuge: { min: 3, max: 6, default: 5 },
@@ -65,6 +65,19 @@ export default function DensityPicker( {
 	const breakValues = viewportBreaks[ viewport || 'mobile' ];
 	const densityToUse = density || breakValues.default;
 
+	const marks = useMemo(
+		() =>
+			Array.from(
+				{ length: breakValues.max - breakValues.min + 1 },
+				( _, i ) => {
+					return {
+						value: breakValues.min + i,
+					};
+				}
+			),
+		[ breakValues ]
+	);
+
 	if ( ! viewport ) {
 		return null;
 	}
@@ -76,6 +89,7 @@ export default function DensityPicker( {
 			showTooltip={ false }
 			label={ __( 'Preview size' ) }
 			value={ breakValues.max + breakValues.min - densityToUse }
+			marks={ marks }
 			min={ breakValues.min }
 			max={ breakValues.max }
 			withInputField={ false }
