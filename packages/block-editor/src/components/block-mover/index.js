@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, castArray } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,9 +9,7 @@ import classnames from 'classnames';
 
 import { dragHandle } from '@wordpress/icons';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -20,112 +17,114 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
 function BlockMover( {
-	isFirst,
-	isLast,
 	clientIds,
-	isLocked,
-	isHidden,
-	rootClientId,
-	orientation,
 	hideDragHandle,
+	isBlockMoverUpButtonDisabled,
+	isBlockMoverDownButtonDisabled,
 } ) {
-	const [ isFocused, setIsFocused ] = useState( false );
+	const {
+		canMove,
+		rootClientId,
+		isFirst,
+		isLast,
+		orientation,
+		isManualGrid,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockIndex,
+				getBlockListSettings,
+				canMoveBlocks,
+				getBlockOrder,
+				getBlockRootClientId,
+				getBlockAttributes,
+			} = select( blockEditorStore );
+			const normalizedClientIds = Array.isArray( clientIds )
+				? clientIds
+				: [ clientIds ];
+			const firstClientId = normalizedClientIds[ 0 ];
+			const _rootClientId = getBlockRootClientId( firstClientId );
+			const firstIndex = getBlockIndex( firstClientId );
+			const lastIndex = getBlockIndex(
+				normalizedClientIds[ normalizedClientIds.length - 1 ]
+			);
+			const blockOrder = getBlockOrder( _rootClientId );
+			const { layout = {} } = getBlockAttributes( _rootClientId ) ?? {};
 
-	const onFocus = () => setIsFocused( true );
-	const onBlur = () => setIsFocused( false );
+			return {
+				canMove: canMoveBlocks( clientIds ),
+				rootClientId: _rootClientId,
+				isFirst: firstIndex === 0,
+				isLast: lastIndex === blockOrder.length - 1,
+				orientation: getBlockListSettings( _rootClientId )?.orientation,
+				isManualGrid:
+					layout.type === 'grid' &&
+					layout.isManualPlacement &&
+					window.__experimentalEnableGridInteractivity,
+			};
+		},
+		[ clientIds ]
+	);
 
-	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+	if (
+		! canMove ||
+		( isFirst && isLast && ! rootClientId ) ||
+		( hideDragHandle && isManualGrid )
+	) {
 		return null;
 	}
 
-	const dragHandleLabel =
-		clientIds.length === 1 ? __( 'Drag block' ) : __( 'Drag blocks' );
-
-	// We emulate a disabled state because forcefully applying the `disabled`
-	// attribute on the buttons while it has focus causes the screen to change
-	// to an unfocused state (body as active element) without firing blur on,
-	// the rendering parent, leaving it unable to react to focus out.
 	return (
-		<div
-			className={ classnames( 'block-editor-block-mover', {
-				'is-visible': isFocused || ! isHidden,
+		<ToolbarGroup
+			className={ clsx( 'block-editor-block-mover', {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
 			{ ! hideDragHandle && (
-				<BlockDraggable
-					clientIds={ clientIds }
-					cloneClassname="block-editor-block-mover__drag-clone"
-				>
-					{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) => (
+				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
+					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
-							aria-hidden="true"
-							label={ dragHandleLabel }
+							label={ __( 'Drag' ) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
-							onDragStart={ onDraggableStart }
-							onDragEnd={ onDraggableEnd }
-							draggable={ isDraggable }
+							{ ...draggableProps }
 						/>
 					) }
 				</BlockDraggable>
 			) }
-			<ToolbarGroup className="block-editor-block-mover__move-button-container">
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
-						<BlockMoverUpButton
-							clientIds={ clientIds }
-							{ ...itemProps }
-						/>
-					) }
-				</ToolbarItem>
-				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
-					{ ( itemProps ) => (
-						<BlockMoverDownButton
-							clientIds={ clientIds }
-							{ ...itemProps }
-						/>
-					) }
-				</ToolbarItem>
-			</ToolbarGroup>
-		</div>
+			{ ! isManualGrid && (
+				<div className="block-editor-block-mover__move-button-container">
+					<ToolbarItem>
+						{ ( itemProps ) => (
+							<BlockMoverUpButton
+								disabled={ isBlockMoverUpButtonDisabled }
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+					<ToolbarItem>
+						{ ( itemProps ) => (
+							<BlockMoverDownButton
+								disabled={ isBlockMoverDownButtonDisabled }
+								clientIds={ clientIds }
+								{ ...itemProps }
+							/>
+						) }
+					</ToolbarItem>
+				</div>
+			) }
+		</ToolbarGroup>
 	);
 }
 
-export default withSelect( ( select, { clientIds } ) => {
-	const {
-		getBlock,
-		getBlockIndex,
-		getBlockListSettings,
-		getTemplateLock,
-		getBlockOrder,
-		getBlockRootClientId,
-	} = select( 'core/block-editor' );
-	const normalizedClientIds = castArray( clientIds );
-	const firstClientId = first( normalizedClientIds );
-	const block = getBlock( firstClientId );
-	const rootClientId = getBlockRootClientId( first( normalizedClientIds ) );
-	const firstIndex = getBlockIndex( firstClientId, rootClientId );
-	const lastIndex = getBlockIndex(
-		last( normalizedClientIds ),
-		rootClientId
-	);
-	const blockOrder = getBlockOrder( rootClientId );
-	const isFirst = firstIndex === 0;
-	const isLast = lastIndex === blockOrder.length - 1;
-
-	return {
-		blockType: block ? getBlockType( block.name ) : null,
-		isLocked: getTemplateLock( rootClientId ) === 'all',
-		rootClientId,
-		firstIndex,
-		isFirst,
-		isLast,
-		orientation: getBlockListSettings( rootClientId )?.orientation,
-	};
-} )( BlockMover );
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-mover/README.md
+ */
+export default BlockMover;

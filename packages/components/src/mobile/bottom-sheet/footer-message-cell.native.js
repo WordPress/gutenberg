@@ -8,13 +8,13 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './styles.scss';
 
-function FooterMessageCell( { textAlign = 'center', ...props } ) {
+function FooterMessageCell( { textAlign = 'left', ...props } ) {
 	return (
 		<Cell
 			{ ...props }
 			editable={ false }
-			value={ '' }
-			accessibilityRole={ 'text' }
+			value=""
+			accessibilityRole="text"
 			labelStyle={ [ styles.footerMessageCell, { textAlign } ] }
 		/>
 	);

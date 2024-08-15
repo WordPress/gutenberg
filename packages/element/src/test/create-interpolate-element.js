@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -80,7 +80,7 @@ describe( 'createInterpolateElement', () => {
 		);
 		const component = createInterpolateElement( testString, {
 			// eslint-disable-next-line jsx-a11y/anchor-has-content
-			a: <a href={ 'https://github.com' } className={ 'some_class' } />,
+			a: <a href="https://github.com" className="some_class" />,
 		} );
 		expect( JSON.stringify( component ) ).toEqual(
 			JSON.stringify( expectedElement )
@@ -207,19 +207,15 @@ describe( 'createInterpolateElement', () => {
 				</div>
 			);
 		};
-		let renderer;
-		act( () => {
-			renderer = TestRenderer.create(
-				<TestComponent switchKey={ true } />
-			);
-		} );
-		expect( () => renderer.root.findByType( 'em' ) ).not.toThrow();
-		expect( () => renderer.root.findByType( 'strong' ) ).toThrow();
-		act( () => {
-			renderer.update( <TestComponent switchKey={ false } /> );
-		} );
-		expect( () => renderer.root.findByType( 'strong' ) ).not.toThrow();
-		expect( () => renderer.root.findByType( 'em' ) ).toThrow();
+		const { container, rerender } = render( <TestComponent switchKey /> );
+
+		expect( container ).toContainHTML( '<em>string!</em>' );
+		expect( container ).not.toContainHTML( '<strong>' );
+
+		rerender( <TestComponent switchKey={ false } /> );
+
+		expect( container ).toContainHTML( '<strong>string!</strong>' );
+		expect( container ).not.toContainHTML( '<em>' );
 	} );
 	it( 'handles parsing emojii correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';

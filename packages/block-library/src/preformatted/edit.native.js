@@ -5,32 +5,44 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-function PreformattedEdit( props ) {
-	const { getStylesFromColorScheme } = props;
-	const richTextStyle = getStylesFromColorScheme(
+export default function PreformattedEdit( props ) {
+	const { style } = props;
+
+	const textBaseStyle = usePreferredColorSchemeStyle(
 		styles.wpRichTextLight,
 		styles.wpRichTextDark
 	);
-	const wpBlockPreformatted = getStylesFromColorScheme(
+	const wpBlockPreformatted = usePreferredColorSchemeStyle(
 		styles.wpBlockPreformattedLight,
 		styles.wpBlockPreformattedDark
 	);
+	const richTextStyle = {
+		...( ! style?.baseColors && textBaseStyle ),
+		...( style?.fontSize && { fontSize: style.fontSize } ),
+		...( style?.color && { color: style.color } ),
+	};
+	const containerStyles = [
+		wpBlockPreformatted,
+		style?.backgroundColor && { backgroundColor: style.backgroundColor },
+		style?.baseColors?.color &&
+			! style?.backgroundColor &&
+			styles[ 'wp-block-preformatted__no-background' ],
+	];
+
 	const propsWithStyle = {
 		...props,
 		style: richTextStyle,
 	};
 	return (
-		<View style={ wpBlockPreformatted }>
+		<View style={ containerStyles }>
 			<WebPreformattedEdit { ...propsWithStyle } />
 		</View>
 	);
 }
-
-export default withPreferredColorScheme( PreformattedEdit );

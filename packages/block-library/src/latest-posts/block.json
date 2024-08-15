@@ -1,7 +1,12 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/latest-posts",
+	"title": "Latest Posts",
 	"category": "widgets",
+	"description": "Display a list of your most recent posts.",
+	"keywords": [ "recent posts" ],
+	"textdomain": "default",
 	"attributes": {
 		"categories": {
 			"type": "array",
@@ -58,11 +63,7 @@
 		},
 		"featuredImageAlign": {
 			"type": "string",
-			"enum": [
-				"left",
-				"center",
-				"right"
-			]
+			"enum": [ "left", "center", "right" ]
 		},
 		"featuredImageSizeSlug": {
 			"type": "string",
@@ -83,6 +84,37 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false
-	}
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "wp-block-latest-posts-editor",
+	"style": "wp-block-latest-posts"
 }

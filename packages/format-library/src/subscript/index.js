@@ -16,7 +16,7 @@ export const subscript = {
 	className: null,
 	edit( { isActive, value, onChange, onFocus } ) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
@@ -30,6 +30,7 @@ export const subscript = {
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }
+				role="menuitemcheckbox"
 			/>
 		);
 	},

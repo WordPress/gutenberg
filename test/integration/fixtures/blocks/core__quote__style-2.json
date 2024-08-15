@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/quote",
+		"isValid": true,
+		"attributes": {
+			"value": "",
+			"citation": "Maya Angelou",
+			"className": "is-style-large"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "There is no greater agony than bearing an untold story inside you.",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

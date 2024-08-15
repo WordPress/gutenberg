@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -13,6 +13,6 @@ jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 
 describe( 'MediaPlaceholder', () => {
 	it( 'renders successfully when allowedTypes property is not specified', () => {
-		expect( () => mount( <MediaPlaceholder /> ) ).not.toThrow();
+		expect( () => render( <MediaPlaceholder multiple /> ) ).not.toThrow();
 	} );
 } );

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { castArray } from 'lodash';
+import clsx from 'clsx';
 // diff doesn't tree-shake correctly, so we import from the individual
 // module here, to avoid including too much of the library
 import { diffChars } from 'diff/lib/diff/character';
@@ -11,7 +10,7 @@ import { diffChars } from 'diff/lib/diff/character';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getSaveContent, getSaveElement } from '@wordpress/blocks';
+import { getSaveContent } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,7 +28,7 @@ function BlockCompare( {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
-			const classes = classnames( {
+			const classes = clsx( {
 				'block-editor-block-compare__added': item.added,
 				'block-editor-block-compare__removed': item.removed,
 			} );
@@ -43,32 +42,21 @@ function BlockCompare( {
 	}
 
 	function getConvertedContent( convertedBlock ) {
-		// The convertor may return an array of items or a single item
-		const newBlocks = castArray( convertedBlock );
+		// The convertor may return an array of items or a single item.
+		const newBlocks = Array.isArray( convertedBlock )
+			? convertedBlock
+			: [ convertedBlock ];
 
-		// Get converted block details
+		// Get converted block details.
 		const newContent = newBlocks.map( ( item ) =>
 			getSaveContent( item.name, item.attributes, item.innerBlocks )
 		);
-		const renderedContent = newBlocks.map( ( item ) =>
-			getSaveElement( item.name, item.attributes, item.innerBlocks )
-		);
 
-		return {
-			rawContent: newContent.join( '' ),
-			renderedContent,
-		};
+		return newContent.join( '' );
 	}
 
-	const original = {
-		rawContent: block.originalContent,
-		renderedContent: getSaveElement( block.name, block.attributes ),
-	};
 	const converted = getConvertedContent( convertor( block ) );
-	const difference = getDifference(
-		original.rawContent,
-		converted.rawContent
-	);
+	const difference = getDifference( block.originalContent, converted );
 
 	return (
 		<div className="block-editor-block-compare__wrapper">
@@ -77,8 +65,8 @@ function BlockCompare( {
 				className="block-editor-block-compare__current"
 				action={ onKeep }
 				actionText={ __( 'Convert to HTML' ) }
-				rawContent={ original.rawContent }
-				renderedContent={ original.renderedContent }
+				rawContent={ block.originalContent }
+				renderedContent={ block.originalContent }
 			/>
 
 			<BlockView
@@ -87,7 +75,7 @@ function BlockCompare( {
 				action={ onConvert }
 				actionText={ convertButtonText }
 				rawContent={ difference }
-				renderedContent={ converted.renderedContent }
+				renderedContent={ converted }
 			/>
 		</div>
 	);

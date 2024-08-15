@@ -10,7 +10,8 @@ const { createHash } = require( 'crypto' );
 /**
  * @typedef WPLazyImportOptions
  *
- * @property {()=>void} onInstall Callback to invoke when install starts.
+ * @property {string}   [localPath] Path to the local directory or file.
+ * @property {()=>void} [onInstall] Callback to invoke when install starts.
  */
 
 /**
@@ -63,6 +64,7 @@ async function install( arg, alias ) {
  * @return {Promise<NodeRequire>} Promise resolving to required module.
  */
 async function lazyImport( arg, options = {} ) {
+	const { localPath = '' } = options;
 	const { rawSpec, name } = npmPackageArg( arg );
 
 	if ( ! name ) {
@@ -77,7 +79,9 @@ async function lazyImport( arg, options = {} ) {
 	// need to verify both availability and version. Version isn't necessary to
 	// account for in this first attempt.
 	try {
-		return require( localModule );
+		if ( require.resolve( localModule ) ) {
+			return require( join( localModule, localPath ) );
+		}
 	} catch ( error ) {
 		if ( error.code !== 'MODULE_NOT_FOUND' ) {
 			throw error;
@@ -85,13 +89,11 @@ async function lazyImport( arg, options = {} ) {
 	}
 
 	try {
-		const resolved = require( name );
-
 		const { version } = require( join( name, 'package.json' ) );
 		if ( semver.satisfies( version, rawSpec ) ) {
 			// Only return with the resolved module if the version is valid per
 			// the parsed arg. Otherwise, fall through to install stage.
-			return resolved;
+			return require( join( name, localPath ) );
 		}
 	} catch ( error ) {
 		if ( error.code !== 'MODULE_NOT_FOUND' ) {
@@ -133,7 +135,7 @@ async function lazyImport( arg, options = {} ) {
 	//
 	// See: https://github.com/WordPress/gutenberg/pull/22684#discussion_r434583858
 
-	return require( localModule );
+	return require( join( localModule, localPath ) );
 }
 
 module.exports = lazyImport;

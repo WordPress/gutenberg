@@ -2,31 +2,44 @@
 	text-align: center;
 
 	th,
-	tbody td {
+	td {
 		padding: 0.25em;
-		border: 1px solid $gray-300;
+		border: 1px solid;
 	}
 
-	tfoot td {
-		border: none;
+	th {
+		font-weight: 400;
+	}
+
+	caption {
+		background-color: inherit;
 	}
 
 	table {
 		width: 100%;
 		border-collapse: collapse;
-	}
 
-	table th {
-		font-weight: 400;
-		background: $gray-300;
-	}
+		&:where(:not(.has-text-color)) {
+			color: #40464d;
 
-	a {
-		text-decoration: underline;
-	}
+			// Keep the hard-coded border color for backward compatibility.
+			th,
+			td {
+				border-color: $gray-300;
+			}
+		}
 
-	table tbody,
-	table caption {
-		color: #40464d;
+		&.has-background th {
+			background-color: inherit;
+		}
+
+		&.has-text-color th {
+			color: inherit;
+		}
 	}
+}
+
+// Keep the hard-coded header background color for backward compatibility.
+:where(.wp-block-calendar table:not(.has-background) th) {
+	background: $gray-300;
 }

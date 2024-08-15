@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
+/* eslint-disable testing-library/render-result-naming-convention */
 
 /**
  * Internal dependencies
@@ -23,6 +20,8 @@ import serialize, {
 	renderAttributes,
 	renderStyle,
 } from '../serialize';
+
+const noop = () => {};
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {
@@ -181,6 +180,42 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'hello<div></div>' );
 	} );
 
+	it( 'SVG attributes with dashes should be rendered as such - even with wrong casing', () => {
+		const result = renderElement(
+			<svg>
+				<rect x="0" y="0" strokeWidth="5" STROKELinejoin="miter"></rect>
+			</svg>
+		);
+
+		expect( result ).toBe(
+			'<svg><rect x="0" y="0" stroke-width="5" stroke-linejoin="miter"></rect></svg>'
+		);
+	} );
+
+	it( 'Case sensitive attributes should have the right casing - even with wrong casing', () => {
+		const result = renderElement(
+			<svg ViEWBOx="0 0 1 1" preserveAsPECTRatio="slice"></svg>
+		);
+
+		expect( result ).toBe(
+			'<svg viewBox="0 0 1 1" preserveAspectRatio="slice"></svg>'
+		);
+	} );
+
+	it( 'SVG attributes with colons should be rendered as such - even with wrong casing', () => {
+		const result = renderElement(
+			<svg
+				viewBox="0 0 1 1"
+				XLINKROLE="some-role"
+				xlinkShow="hello"
+			></svg>
+		);
+
+		expect( result ).toBe(
+			'<svg viewBox="0 0 1 1" xlink:role="some-role" xlink:show="hello"></svg>'
+		);
+	} );
+
 	it( 'renders escaped string element', () => {
 		const result = renderElement( 'hello & world &amp; friends <img/>' );
 
@@ -287,12 +322,11 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: '1st provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
+				|
 				<Provider value={ { value: '2nd provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Fragment>
 		);
 
@@ -309,8 +343,7 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: 'inner provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 
@@ -684,3 +717,5 @@ describe( 'renderStyle()', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

@@ -1,81 +1,39 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import clsx from 'clsx';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { defaultColumnsNumber } from './shared';
 import {
-	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA,
-} from './constants';
+	RichText,
+	useBlockProps,
+	useInnerBlocksProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const {
-		images,
-		columns = defaultColumnsNumber( attributes ),
-		imageCrop,
-		caption,
-		linkTo,
-	} = attributes;
+export default function saveWithInnerBlocks( { attributes } ) {
+	const { caption, columns, imageCrop } = attributes;
+
+	const className = clsx( 'has-nested-images', {
+		[ `columns-${ columns }` ]: columns !== undefined,
+		[ `columns-default` ]: columns === undefined,
+		'is-cropped': imageCrop,
+	} );
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
 	return (
-		<figure
-			className={ `columns-${ columns } ${
-				imageCrop ? 'is-cropped' : ''
-			}` }
-		>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( image ) => {
-					let href;
-
-					switch ( linkTo ) {
-						case LINK_DESTINATION_MEDIA:
-							href = image.fullUrl || image.url;
-							break;
-						case LINK_DESTINATION_ATTACHMENT:
-							href = image.link;
-							break;
-					}
-
-					const img = (
-						<img
-							src={ image.url }
-							alt={ image.alt !== '' ? image.alt : image.caption }
-							data-id={ image.id }
-							data-full-url={ image.fullUrl }
-							data-link={ image.link }
-							className={
-								image.id ? `wp-image-${ image.id }` : null
-							}
-						/>
-					);
-
-					return (
-						<li
-							key={ image.id || image.url }
-							className="blocks-gallery-item"
-						>
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
-								{ ! RichText.isEmpty( image.caption ) && (
-									<RichText.Content
-										tagName="figcaption"
-										className="blocks-gallery-item__caption"
-										value={ image.caption }
-									/>
-								) }
-							</figure>
-						</li>
-					);
-				} ) }
-			</ul>
+		<figure { ...innerBlocksProps }>
+			{ innerBlocksProps.children }
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
-					className="blocks-gallery-caption"
+					className={ clsx(
+						'blocks-gallery-caption',
+						__experimentalGetElementClassName( 'caption' )
+					) }
 					value={ caption }
 				/>
 			) }

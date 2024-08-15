@@ -1,40 +1,53 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { PostSlug } from '../';
+import PostSlug from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
+	jest.fn()
+);
 
 describe( 'PostSlug', () => {
-	describe( '#render()', () => {
-		it( 'should update internal slug', () => {
-			const wrapper = shallow( <PostSlug postSlug="index" /> );
+	it( 'should update slug with sanitized input', async () => {
+		const user = userEvent.setup();
+		const editPost = jest.fn();
 
-			wrapper.find( 'input' ).simulate( 'change', {
-				target: {
-					value: 'single-post',
-				},
-			} );
+		useSelect.mockImplementation( ( mapSelect ) =>
+			mapSelect( () => ( {
+				getPostType: () => ( {
+					supports: {
+						slug: true,
+					},
+				} ),
+				getEditedPostAttribute: () => 'post',
+				getEditedPostSlug: () => '1',
+			} ) )
+		);
+		useDispatch.mockImplementation( () => ( {
+			editPost,
+		} ) );
 
-			expect( wrapper.state().editedSlug ).toEqual( 'single-post' );
+		render( <PostSlug /> );
+
+		const input = screen.getByRole( 'textbox', { name: 'Slug' } );
+		await user.type( input, '2', {
+			initialSelectionStart: 0,
+			initialSelectionEnd: 1,
 		} );
+		act( () => input.blur() );
 
-		it( 'should update slug', () => {
-			const onUpdateSlug = jest.fn();
-			const wrapper = shallow(
-				<PostSlug postSlug="index" onUpdateSlug={ onUpdateSlug } />
-			);
-
-			wrapper.find( 'input' ).simulate( 'blur', {
-				target: {
-					value: 'single-post',
-				},
-			} );
-
-			expect( onUpdateSlug ).toHaveBeenCalledWith( 'single-post' );
-		} );
+		expect( editPost ).toHaveBeenCalledWith( { slug: '2' } );
 	} );
 } );

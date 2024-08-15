@@ -1,96 +1,77 @@
-// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#start-resizable-editor-section {
-	display: none;
-}
-
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
-@import "./block/editor.scss";
+@import "./avatar/editor.scss";
 @import "./button/editor.scss";
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
 @import "./code/editor.scss";
 @import "./columns/editor.scss";
+@import "./comments/editor.scss";
+@import "./comment-author-avatar/editor.scss";
+@import "./comments-pagination/editor.scss";
+@import "./comments-pagination-numbers/editor.scss";
+@import "./comments-title/editor.scss";
 @import "./cover/editor.scss";
+@import "./details/editor.scss";
 @import "./embed/editor.scss";
 @import "./file/editor.scss";
-@import "./classic/editor.scss";
+@import "./form-input/editor.scss";
+@import "./form-submission-notification/editor.scss";
+@import "./freeform/editor.scss";
 @import "./gallery/editor.scss";
 @import "./group/editor.scss";
-@import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
-@import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./list/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
+@import "./navigation-submenu/editor.scss";
 @import "./nextpage/editor.scss";
+@import "./page-list/editor.scss";
 @import "./paragraph/editor.scss";
-@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
-@import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
-@import "./quote/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
 @import "./site-logo/editor.scss";
+@import "./site-tagline/editor.scss";
+@import "./site-title/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
-@import "./subhead/editor.scss";
 @import "./table/editor.scss";
 @import "./tag-cloud/editor.scss";
 @import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
-@import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./query-loop/editor.scss";
+@import "./post-template/editor.scss";
 @import "./query/editor.scss";
+@import "./query-pagination/editor.scss";
+@import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
-
-/**
- * Import styles from internal editor components used by the blocks.
- */
-@import "./block/edit-panel/editor.scss";
+@import "./post-comments-form/editor.scss";
+@import "./post-content/editor.scss";
+@import "./editor-elements.scss";
 
 :root .editor-styles-wrapper {
-	// Background colors.
-	@include background-colors();
-
-	// Foreground colors.
-	@include foreground-colors();
-
-	// Gradients
-	@include gradient-colors();
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
 }
 
-// Font sizes.
+// Font sizes (not used now, kept because of backward compatibility).
+//
 // The reason we add the editor class wrapper here is
 // to avoid enqueing the classes twice: here and in ./editor.scss
-.editor-styles-wrapper .has-small-font-size {
-	font-size: 13px;
-}
-
-.editor-styles-wrapper .has-regular-font-size, // Not used now, kept because of backward compatibility.
-.editor-styles-wrapper .has-normal-font-size {
+:where(.editor-styles-wrapper) .has-regular-font-size {
 	font-size: 16px;
 }
 
-.editor-styles-wrapper .has-medium-font-size {
-	font-size: 20px;
-}
-
-.editor-styles-wrapper .has-large-font-size {
-	font-size: 36px;
-}
-
-.editor-styles-wrapper .has-larger-font-size, // Not used now, kept because of backward compatibility.
-.editor-styles-wrapper .has-huge-font-size {
+:where(.editor-styles-wrapper) .has-larger-font-size {
 	font-size: 42px;
 }
 
@@ -101,14 +82,7 @@
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
 
-// Provide every block with a default base margin. This margin provides a consistent spacing
-// between blocks in the editor.
-.block-editor-block-list__block {
-	margin-top: $default-block-margin;
-	margin-bottom: $default-block-margin;
-}
-
-// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
-#end-resizable-editor-section {
-	display: none;
+// Remove the browser default border for iframe in Custom HTML block, Embed block, etc.
+:where(.editor-styles-wrapper) iframe:not([frameborder]) {
+	border: 0;
 }

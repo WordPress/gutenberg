@@ -1,7 +1,8 @@
 /**
- * Browser dependencies
+ * Internal dependencies
  */
-const { parseInt } = window;
+import { deepFilterHTML } from './utils';
+import msListIgnore from './ms-list-ignore';
 
 function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
@@ -14,22 +15,9 @@ export default function msListConverter( node, doc ) {
 
 	const style = node.getAttribute( 'style' );
 
-	if ( ! style ) {
+	if ( ! style || ! style.includes( 'mso-list' ) ) {
 		return;
 	}
-
-	// Quick check.
-	if ( style.indexOf( 'mso-list' ) === -1 ) {
-		return;
-	}
-
-	const matches = /mso-list\s*:[^;]+level([0-9]+)/i.exec( style );
-
-	if ( ! matches ) {
-		return;
-	}
-
-	let level = parseInt( matches[ 1 ], 10 ) - 1 || 0;
 
 	const prevNode = node.previousElementSibling;
 
@@ -53,21 +41,19 @@ export default function msListConverter( node, doc ) {
 
 	let receivingNode = listNode;
 
-	// Remove the first span with list info.
-	node.removeChild( node.firstElementChild );
-
 	// Add content.
-	while ( node.firstChild ) {
-		listItem.appendChild( node.firstChild );
-	}
+	listItem.innerHTML = deepFilterHTML( node.innerHTML, [ msListIgnore ] );
+
+	const matches = /mso-list\s*:[^;]+level([0-9]+)/i.exec( style );
+	let level = matches ? parseInt( matches[ 1 ], 10 ) - 1 || 0 : 0;
 
 	// Change pointer depending on indentation level.
 	while ( level-- ) {
-		receivingNode = receivingNode.lastElementChild || receivingNode;
+		receivingNode = receivingNode.lastChild || receivingNode;
 
 		// If it's a list, move pointer to the last item.
 		if ( isList( receivingNode ) ) {
-			receivingNode = receivingNode.lastElementChild || receivingNode;
+			receivingNode = receivingNode.lastChild || receivingNode;
 		}
 	}
 

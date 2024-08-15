@@ -1,30 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useEffect, useContext, useRef } from '@wordpress/element';
 
-export class __unstableRichTextInputEvent extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Internal dependencies
+ */
+import { inputEventContext } from './';
 
-		this.onInput = this.onInput.bind( this );
-	}
+export function __unstableRichTextInputEvent( { inputType, onInput } ) {
+	const callbacks = useContext( inputEventContext );
+	const onInputRef = useRef();
+	onInputRef.current = onInput;
 
-	onInput( event ) {
-		if ( event.inputType === this.props.inputType ) {
-			this.props.onInput();
+	useEffect( () => {
+		function callback( event ) {
+			if ( event.inputType === inputType ) {
+				onInputRef.current();
+				event.preventDefault();
+			}
 		}
-	}
 
-	componentDidMount() {
-		document.addEventListener( 'input', this.onInput, true );
-	}
+		callbacks.current.add( callback );
+		return () => {
+			callbacks.current.delete( callback );
+		};
+	}, [ inputType ] );
 
-	componentWillUnmount() {
-		document.removeEventListener( 'input', this.onInput, true );
-	}
-
-	render() {
-		return null;
-	}
+	return null;
 }

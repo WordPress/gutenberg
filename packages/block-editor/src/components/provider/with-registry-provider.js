@@ -1,57 +1,50 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
-import {
-	withRegistry,
-	createRegistry,
-	RegistryProvider,
-} from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { useRegistry, createRegistry, RegistryProvider } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { storeConfig } from '../../store';
-import applyMiddlewares from '../../store/middlewares';
+import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+
+function getSubRegistry( subRegistries, registry, useSubRegistry ) {
+	if ( ! useSubRegistry ) {
+		return registry;
+	}
+	let subRegistry = subRegistries.get( registry );
+	if ( ! subRegistry ) {
+		subRegistry = createRegistry( {}, registry );
+		subRegistry.registerStore( blockEditorStoreName, storeConfig );
+		subRegistries.set( registry, subRegistry );
+	}
+	return subRegistry;
+}
 
 const withRegistryProvider = createHigherOrderComponent(
-	( WrappedComponent ) => {
-		return withRegistry(
-			( { useSubRegistry = true, registry, ...props } ) => {
-				if ( ! useSubRegistry ) {
-					return (
-						<WrappedComponent registry={ registry } { ...props } />
-					);
-				}
+	( WrappedComponent ) =>
+		( { useSubRegistry = true, ...props } ) => {
+			const registry = useRegistry();
+			const [ subRegistries ] = useState( () => new WeakMap() );
+			const subRegistry = getSubRegistry(
+				subRegistries,
+				registry,
+				useSubRegistry
+			);
 
-				const [ subRegistry, setSubRegistry ] = useState( null );
-				useEffect( () => {
-					const newRegistry = createRegistry( {}, registry );
-					const store = newRegistry.registerStore(
-						'core/block-editor',
-						storeConfig
-					);
-					// This should be removed after the refactoring of the effects to controls.
-					applyMiddlewares( store );
-					setSubRegistry( newRegistry );
-				}, [ registry ] );
-
-				if ( ! subRegistry ) {
-					return null;
-				}
-
-				return (
-					<RegistryProvider value={ subRegistry }>
-						<WrappedComponent
-							registry={ subRegistry }
-							{ ...props }
-						/>
-					</RegistryProvider>
-				);
+			if ( subRegistry === registry ) {
+				return <WrappedComponent registry={ registry } { ...props } />;
 			}
-		);
-	},
+
+			return (
+				<RegistryProvider value={ subRegistry }>
+					<WrappedComponent registry={ subRegistry } { ...props } />
+				</RegistryProvider>
+			);
+		},
 	'withRegistryProvider'
 );
 

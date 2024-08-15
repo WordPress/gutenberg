@@ -1,11 +1,11 @@
-( function() {
+( function () {
 	const { wp } = window;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
 	const { InnerBlocks } = wp.blockEditor;
 	const { useSelect } = wp.data;
 
-	var allowedBlocks = [ 'core/quote', 'core/video' ];
+	const allowedBlocks = [ 'core/quote', 'core/video' ];
 
 	function myCustomAppender() {
 		return el(
@@ -64,7 +64,7 @@
 				'div',
 				{ style: { outline: '1px solid gray', padding: 5 } },
 				el( InnerBlocks, {
-					allowedBlocks: allowedBlocks,
+					allowedBlocks,
 					renderAppender: myCustomAppender,
 				} )
 			);
@@ -85,6 +85,9 @@
 		category: 'text',
 
 		edit( props ) {
+			// Disable reason: this is a react component, but the rule of hook
+			// fails because the block's edit function has a lowercase 'e'.
+			// eslint-disable-next-line react-hooks/rules-of-hooks
 			const numberOfChildren = useSelect(
 				( select ) => {
 					const { getBlockOrder } = select( 'core/block-editor' );
@@ -92,6 +95,7 @@
 				},
 				[ props.clientId ]
 			);
+			let renderAppender;
 			switch ( numberOfChildren ) {
 				case 0:
 					renderAppender = emptyBlockAppender;

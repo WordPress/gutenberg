@@ -2,14 +2,26 @@
 .components-menu-item__button.components-button {
 	width: 100%;
 
-	.components-menu-items__item-icon {
-		margin-right: -2px; // This optically balances the icon.
-		margin-left: auto;
-		display: inline-block;
-		flex: 0 0 auto;
+	&[role="menuitemradio"],
+	&[role="menuitemcheckbox"] {
+		.components-menu-item__item:only-child {
+			// Ensure unchecked items have clearance for consistency
+			// with checked items containing an icon or shortcut.
+			padding-right: $grid-unit-60;
+			box-sizing: initial;
+		}
 	}
 
-	.components-menu-item__shortcut + .components-menu-items__item-icon {
+	.components-menu-items__item-icon {
+		display: inline-block;
+		flex: 0 0 auto;
+		&.has-icon-right {
+			margin-right: -2px; // This optically balances the icon.
+			margin-left: $grid-unit-30;
+		}
+	}
+
+	.components-menu-item__shortcut + .components-menu-items__item-icon.has-icon-right {
 		margin-left: $grid-unit-10;
 	}
 
@@ -18,24 +30,55 @@
 		margin-left: -2px; // This optically balances the icon.
 		margin-right: $grid-unit-10;
 	}
+
+	&.is-primary {
+		justify-content: center;
+
+		.components-menu-item__item {
+			// Override the default right margin.
+			margin-right: 0;
+		}
+	}
+
+	&:disabled,
+	&[aria-disabled="true"] {
+		// Override the button component's tertiary background and color.
+		&.is-tertiary {
+			background: none;
+			color: $components-color-accent-darker-10;
+			opacity: 0.3;
+		}
+	}
 }
 
 .components-menu-item__info-wrapper {
 	display: flex;
 	flex-direction: column;
+	margin-right: auto;
 }
 
 .components-menu-item__info {
 	margin-top: $grid-unit-05;
 	font-size: $helptext-font-size;
 	color: $gray-700;
+	white-space: normal;
+}
+
+.components-menu-item__item {
+	// Provide a minimum width for text items in menus.
+	white-space: nowrap;
+	min-width: 160px;
+
+	margin-right: auto;
+	display: inline-flex;
+	align-items: center;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: $grid-unit-15;
+	padding-left: $grid-unit-30;
 	color: currentColor;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful

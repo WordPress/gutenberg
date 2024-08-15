@@ -1,0 +1,11 @@
+[
+	{
+		"name": "core/page-list-item",
+		"isValid": true,
+		"attributes": {
+			"label": "Page",
+			"link": "https://example.com"
+		},
+		"innerBlocks": []
+	}
+]

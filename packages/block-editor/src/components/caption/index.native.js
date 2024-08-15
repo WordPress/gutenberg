@@ -18,7 +18,7 @@ const Caption = ( {
 	onBlur,
 	onChange,
 	onFocus,
-	placeholder = __( 'Write caption…' ),
+	placeholder = __( 'Add caption' ),
 	placeholderTextColor,
 	shouldDisplay = true,
 	style,
@@ -44,7 +44,6 @@ const Caption = ( {
 			onChange={ onChange }
 			placeholder={ placeholder }
 			placeholderTextColor={ placeholderTextColor }
-			rootTagsToEliminate={ [ 'p' ] }
 			style={ style }
 			tagName="p"
 			textAlign="center"
@@ -54,7 +53,7 @@ const Caption = ( {
 			__unstableOnSplitAtEnd={ () =>
 				insertBlocksAfter( createBlock( 'core/paragraph' ) )
 			}
-			deleteEnter={ true }
+			deleteEnter
 		/>
 	</View>
 );

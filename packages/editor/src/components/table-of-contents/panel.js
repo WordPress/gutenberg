@@ -3,18 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import WordCount from '../word-count';
+import TimeToRead from '../time-to-read';
 import DocumentOutline from '../document-outline';
 import CharacterCount from '../character-count';
 
 function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount } = select( 'core/block-editor' );
+			const { getGlobalBlockCount } = select( blockEditorStore );
 			return {
 				headingCount: getGlobalBlockCount( 'core/heading' ),
 				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
@@ -38,14 +40,18 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 			>
 				<ul role="list" className="table-of-contents__counts">
 					<li className="table-of-contents__count">
+						{ __( 'Words' ) }
+						<WordCount />
+					</li>
+					<li className="table-of-contents__count">
 						{ __( 'Characters' ) }
 						<span className="table-of-contents__number">
 							<CharacterCount />
 						</span>
 					</li>
 					<li className="table-of-contents__count">
-						{ __( 'Words' ) }
-						<WordCount />
+						{ __( 'Time to read' ) }
+						<TimeToRead />
 					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Headings' ) }

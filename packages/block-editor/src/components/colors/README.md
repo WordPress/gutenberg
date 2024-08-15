@@ -35,42 +35,6 @@ export default compose(
 	MyColorfulComponent
 );
 ```
-
-## `useColors` hook
-
-Provides the functionality of `withColors` as a React hook, see [React's hook overview](https://reactjs.org/docs/hooks-overview.html) for additional details on using hooks.
-
-It takes an array of color configuration objects for its first parameter. The second parameter is an optional hooks dependency array for cases where you have closures in your configuration objects, and the third is an optional string to overwrite the default panel title, `__( 'Color Settings' )`.
-
-### Usage
-
-```jsx
-import { __experimentalUseColors } from '@wordpress/block-editor';
-
-function MyColorfulComponent() {
-	const { TextColor } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-		{
-			contrastCheckers: [
-				{
-					textColor: true,
-				},
-			],
-		}
-	);
-
-	return (
-		<>
-			<TextColor>{ /* Colorful content */ }</TextColor>
-		</>
-	);
-}
-```
-
-### Note on sunsetting.
-
-The functionality provided by the `useColors` hook is also available in the form of a—[also currently experimental](https://github.com/WordPress/gutenberg/pull/21021)—support key, `__experimentalColor`. It's expected that the support key version of this feature sunsets the hook.
-
 ## Related components.
 
 -   [`PanelColorSettings`](https://github.com/WordPress/gutenberg/blob/bb00ad891db9937862b16867dcebd2a4d830ea86/packages/block-editor/src/components/panel-color-settings/index.js).

@@ -28,14 +28,8 @@
 /**
  * External dependencies
  */
-import {
-	isEmpty,
-	castArray,
-	omit,
-	startsWith,
-	kebabCase,
-	isPlainObject,
-} from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import { paramCase as kebabCase } from 'change-case';
 
 /**
  * WordPress dependencies
@@ -52,7 +46,7 @@ import {
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
-/** @typedef {import('./react').WPElement} WPElement */
+/** @typedef {import('react').ReactElement} ReactElement */
 
 const { Provider, Consumer } = createContext( undefined );
 const ForwardRef = forwardRef( () => {
@@ -281,6 +275,190 @@ function getNormalAttributeValue( attribute, value ) {
 
 	return value;
 }
+/**
+ * This is a map of all SVG attributes that have dashes. Map(lower case prop => dashed lower case attribute).
+ * We need this to render e.g strokeWidth as stroke-width.
+ *
+ * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
+ */
+const SVG_ATTRIBUTE_WITH_DASHES_LIST = [
+	'accentHeight',
+	'alignmentBaseline',
+	'arabicForm',
+	'baselineShift',
+	'capHeight',
+	'clipPath',
+	'clipRule',
+	'colorInterpolation',
+	'colorInterpolationFilters',
+	'colorProfile',
+	'colorRendering',
+	'dominantBaseline',
+	'enableBackground',
+	'fillOpacity',
+	'fillRule',
+	'floodColor',
+	'floodOpacity',
+	'fontFamily',
+	'fontSize',
+	'fontSizeAdjust',
+	'fontStretch',
+	'fontStyle',
+	'fontVariant',
+	'fontWeight',
+	'glyphName',
+	'glyphOrientationHorizontal',
+	'glyphOrientationVertical',
+	'horizAdvX',
+	'horizOriginX',
+	'imageRendering',
+	'letterSpacing',
+	'lightingColor',
+	'markerEnd',
+	'markerMid',
+	'markerStart',
+	'overlinePosition',
+	'overlineThickness',
+	'paintOrder',
+	'panose1',
+	'pointerEvents',
+	'renderingIntent',
+	'shapeRendering',
+	'stopColor',
+	'stopOpacity',
+	'strikethroughPosition',
+	'strikethroughThickness',
+	'strokeDasharray',
+	'strokeDashoffset',
+	'strokeLinecap',
+	'strokeLinejoin',
+	'strokeMiterlimit',
+	'strokeOpacity',
+	'strokeWidth',
+	'textAnchor',
+	'textDecoration',
+	'textRendering',
+	'underlinePosition',
+	'underlineThickness',
+	'unicodeBidi',
+	'unicodeRange',
+	'unitsPerEm',
+	'vAlphabetic',
+	'vHanging',
+	'vIdeographic',
+	'vMathematical',
+	'vectorEffect',
+	'vertAdvY',
+	'vertOriginX',
+	'vertOriginY',
+	'wordSpacing',
+	'writingMode',
+	'xmlnsXlink',
+	'xHeight',
+].reduce( ( map, attribute ) => {
+	// The keys are lower-cased for more robust lookup.
+	map[ attribute.toLowerCase() ] = attribute;
+	return map;
+}, {} );
+
+/**
+ * This is a map of all case-sensitive SVG attributes. Map(lowercase key => proper case attribute).
+ * The keys are lower-cased for more robust lookup.
+ * Note that this list only contains attributes that contain at least one capital letter.
+ * Lowercase attributes don't need mapping, since we lowercase all attributes by default.
+ */
+const CASE_SENSITIVE_SVG_ATTRIBUTES = [
+	'allowReorder',
+	'attributeName',
+	'attributeType',
+	'autoReverse',
+	'baseFrequency',
+	'baseProfile',
+	'calcMode',
+	'clipPathUnits',
+	'contentScriptType',
+	'contentStyleType',
+	'diffuseConstant',
+	'edgeMode',
+	'externalResourcesRequired',
+	'filterRes',
+	'filterUnits',
+	'glyphRef',
+	'gradientTransform',
+	'gradientUnits',
+	'kernelMatrix',
+	'kernelUnitLength',
+	'keyPoints',
+	'keySplines',
+	'keyTimes',
+	'lengthAdjust',
+	'limitingConeAngle',
+	'markerHeight',
+	'markerUnits',
+	'markerWidth',
+	'maskContentUnits',
+	'maskUnits',
+	'numOctaves',
+	'pathLength',
+	'patternContentUnits',
+	'patternTransform',
+	'patternUnits',
+	'pointsAtX',
+	'pointsAtY',
+	'pointsAtZ',
+	'preserveAlpha',
+	'preserveAspectRatio',
+	'primitiveUnits',
+	'refX',
+	'refY',
+	'repeatCount',
+	'repeatDur',
+	'requiredExtensions',
+	'requiredFeatures',
+	'specularConstant',
+	'specularExponent',
+	'spreadMethod',
+	'startOffset',
+	'stdDeviation',
+	'stitchTiles',
+	'suppressContentEditableWarning',
+	'suppressHydrationWarning',
+	'surfaceScale',
+	'systemLanguage',
+	'tableValues',
+	'targetX',
+	'targetY',
+	'textLength',
+	'viewBox',
+	'viewTarget',
+	'xChannelSelector',
+	'yChannelSelector',
+].reduce( ( map, attribute ) => {
+	// The keys are lower-cased for more robust lookup.
+	map[ attribute.toLowerCase() ] = attribute;
+	return map;
+}, {} );
+
+/**
+ * This is a map of all SVG attributes that have colons.
+ * Keys are lower-cased and stripped of their colons for more robust lookup.
+ */
+const SVG_ATTRIBUTES_WITH_COLONS = [
+	'xlink:actuate',
+	'xlink:arcrole',
+	'xlink:href',
+	'xlink:role',
+	'xlink:show',
+	'xlink:title',
+	'xlink:type',
+	'xml:base',
+	'xml:lang',
+	'xml:space',
+	'xmlns:xlink',
+].reduce( ( map, attribute ) => {
+	map[ attribute.replace( ':', '' ).toLowerCase() ] = attribute;
+	return map;
+}, {} );
 
 /**
  * Returns the normal form of the element's attribute name for HTML.
@@ -297,8 +475,19 @@ function getNormalAttributeName( attribute ) {
 		case 'className':
 			return 'class';
 	}
+	const attributeLowerCase = attribute.toLowerCase();
 
-	return attribute.toLowerCase();
+	if ( CASE_SENSITIVE_SVG_ATTRIBUTES[ attributeLowerCase ] ) {
+		return CASE_SENSITIVE_SVG_ATTRIBUTES[ attributeLowerCase ];
+	} else if ( SVG_ATTRIBUTE_WITH_DASHES_LIST[ attributeLowerCase ] ) {
+		return kebabCase(
+			SVG_ATTRIBUTE_WITH_DASHES_LIST[ attributeLowerCase ]
+		);
+	} else if ( SVG_ATTRIBUTES_WITH_COLONS[ attributeLowerCase ] ) {
+		return SVG_ATTRIBUTES_WITH_COLONS[ attributeLowerCase ];
+	}
+
+	return attributeLowerCase;
 }
 
 /**
@@ -313,7 +502,7 @@ function getNormalAttributeName( attribute ) {
  * @return {string} Normalized property name.
  */
 function getNormalStylePropertyName( property ) {
-	if ( startsWith( property, '--' ) ) {
+	if ( property.startsWith( '--' ) ) {
 		return property;
 	}
 
@@ -371,10 +560,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 			return element.toString();
 	}
 
-	const {
-		type,
-		props,
-	} = /** @type {{type?: any, props?: any}} */ ( element );
+	const { type, props } = /** @type {{type?: any, props?: any}} */ (
+		element
+	);
 
 	switch ( type ) {
 		case StrictMode:
@@ -385,7 +573,7 @@ export function renderElement( element, context, legacyContext = {} ) {
 			const { children, ...wrapperProps } = props;
 
 			return renderNativeComponent(
-				isEmpty( wrapperProps ) ? null : 'div',
+				! Object.keys( wrapperProps ).length ? null : 'div',
 				{
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
@@ -459,7 +647,8 @@ export function renderNativeComponent(
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
 		content = renderChildren( props.value, context, legacyContext );
-		props = omit( props, 'value' );
+		const { value, ...restProps } = props;
+		props = restProps;
 	} else if (
 		props.dangerouslySetInnerHTML &&
 		typeof props.dangerouslySetInnerHTML.__html === 'string'
@@ -483,15 +672,15 @@ export function renderNativeComponent(
 	return '<' + type + attributes + '>' + content + '</' + type + '>';
 }
 
-/** @typedef {import('./react').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * Serializes a non-native component type to string.
  *
- * @param {WPComponent} Component       Component type to serialize.
- * @param {Object}      props           Props object.
- * @param {Object}      [context]       Context object.
- * @param {Object}      [legacyContext] Legacy context object.
+ * @param {ComponentType} Component       Component type to serialize.
+ * @param {Object}        props           Props object.
+ * @param {Object}        [context]       Context object.
+ * @param {Object}        [legacyContext] Legacy context object.
  *
  * @return {string} Serialized element
  */
@@ -501,10 +690,9 @@ export function renderComponent(
 	context,
 	legacyContext = {}
 ) {
-	const instance = new /** @type {import('react').ComponentClass} */ ( Component )(
-		props,
-		legacyContext
-	);
+	const instance = new /** @type {import('react').ComponentClass} */ (
+		Component
+	)( props, legacyContext );
 
 	if (
 		typeof (
@@ -515,7 +703,9 @@ export function renderComponent(
 	) {
 		Object.assign(
 			legacyContext,
-			/** @type {{getChildContext?: () => unknown}} */ ( instance ).getChildContext()
+			/** @type {{getChildContext?: () => unknown}} */ (
+				instance
+			).getChildContext()
 		);
 	}
 
@@ -536,7 +726,7 @@ export function renderComponent(
 function renderChildren( children, context, legacyContext = {} ) {
 	let result = '';
 
-	children = castArray( children );
+	children = Array.isArray( children ) ? children : [ children ];
 
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];
@@ -565,7 +755,7 @@ export function renderAttributes( props ) {
 
 		let value = getNormalAttributeValue( key, props[ key ] );
 
-		// If value is not of serializeable type, skip.
+		// If value is not of serializable type, skip.
 		if ( ! ATTRIBUTES_TYPES.has( typeof value ) ) {
 			continue;
 		}

@@ -1,0 +1,51 @@
+.edit-site-welcome-guide {
+	width: 312px;
+
+	&.guide-editor .edit-site-welcome-guide__image,
+	&.guide-styles .edit-site-welcome-guide__image {
+		background: #00a0d2;
+	}
+
+	&.guide-page .edit-site-welcome-guide__video {
+		border-right: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
+	&.guide-template .edit-site-welcome-guide__video {
+		border-left: #3858e9 $grid-unit-20 solid;
+		border-top: #3858e9 $grid-unit-20 solid;
+	}
+
+	&__image {
+		margin: 0 0 $grid-unit-20;
+		> img {
+			display: block;
+			max-width: 100%;
+			object-fit: cover;
+		}
+	}
+
+	&__heading {
+		font-family: $default-font;
+		font-size: 24px;
+		line-height: 1.4;
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+	}
+
+	&__text {
+		font-size: $default-font-size;
+		line-height: 1.4;
+		margin: 0 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
+
+		img {
+			vertical-align: bottom;
+		}
+	}
+
+	&__inserter-icon {
+		margin: 0 4px;
+		vertical-align: text-top;
+	}
+}

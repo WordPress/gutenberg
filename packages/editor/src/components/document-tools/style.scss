@@ -1,0 +1,91 @@
+.editor-document-tools {
+	display: inline-flex;
+	align-items: center;
+
+	// Hide all action buttons except the inserter on mobile.
+	.editor-document-tools__left > .editor-history__redo,
+	.editor-document-tools__left > .editor-history__undo {
+		display: none;
+
+		@include break-medium() {
+			display: inline-flex;
+		}
+	}
+
+	.editor-document-tools__left > .editor-document-tools__inserter-toggle {
+		display: inline-flex;
+
+		svg {
+			transition: transform cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+			@include reduce-motion("transition");
+		}
+
+		&.is-pressed {
+			svg {
+				transform: rotate(45deg);
+			}
+		}
+	}
+
+	// Hide table of contents and list view on mobile.
+	.block-editor-list-view {
+		display: none;
+
+		@include break-small() {
+			display: flex;
+		}
+	}
+
+	// The Toolbar component adds different styles to buttons, so we reset them
+	// here to the original button styles
+	.editor-document-tools__left > .components-button.has-icon,
+	.editor-document-tools__left > .components-dropdown > .components-button.has-icon {
+		// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
+		// This is best fixed by making the mover control area a proper single toolbar group.
+		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
+		height: $button-size-compact;
+		min-width: $button-size-compact;
+		padding: 4px;
+
+		&.is-pressed {
+			background: $gray-900;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 $border-width $white;
+			outline: $border-width solid transparent;
+		}
+
+		&::before {
+			display: none;
+		}
+	}
+}
+
+.editor-document-tools__left {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-10;
+
+	// Some plugins add buttons here despite best practices — accommodate them with a gap.
+	&:not(:last-child) {
+		margin-inline-end: $grid-unit-10;
+	}
+}
+
+.editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
+	min-width: $button-size-compact;
+	width: $button-size-compact;
+	height: $button-size-compact;
+	padding: 0;
+
+	.show-icon-labels & {
+		width: auto;
+		height: $button-size-compact;
+		padding: 0 $grid-unit-10;
+	}
+}
+
+.show-icon-labels .editor-document-tools__left > * + * {
+	margin-left: $grid-unit-10;
+}

@@ -1,33 +1,37 @@
 /**
- * External dependencies
- */
-import { some, castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * A component which renders its own children only if the current editor post
  * type supports one of the given `supportKeys` prop.
  *
- * @param {Object}    props             Props.
- * @param {string}    [props.postType]  Current post type.
- * @param {WPElement} props.children    Children to be rendered if post
- *                                                                   type supports.
- * @param {(string|string[])}                      props.supportKeys String or string array of keys
- *                                                                   to test.
+ * @param {Object}            props             Props.
+ * @param {Element}           props.children    Children to be rendered if post
+ *                                              type supports.
+ * @param {(string|string[])} props.supportKeys String or string array of keys
+ *                                              to test.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
-export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
-	let isSupported = true;
+function PostTypeSupportCheck( { children, supportKeys } ) {
+	const postType = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		return getPostType( getEditedPostAttribute( 'type' ) );
+	}, [] );
+	let isSupported = !! postType;
 	if ( postType ) {
-		isSupported = some(
-			castArray( supportKeys ),
-			( key ) => !! postType.supports[ key ]
-		);
+		isSupported = (
+			Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
+		).some( ( key ) => !! postType.supports[ key ] );
 	}
 
 	if ( ! isSupported ) {
@@ -37,10 +41,4 @@ export function PostTypeSupportCheck( { postType, children, supportKeys } ) {
 	return children;
 }
 
-export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
-	return {
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-	};
-} )( PostTypeSupportCheck );
+export default PostTypeSupportCheck;

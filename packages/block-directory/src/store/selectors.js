@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,13 +18,7 @@ import hasBlockType from './utils/has-block-type';
  * @return {boolean} Whether a request is in progress for the blocks list.
  */
 export function isRequestingDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].isRequesting
-	) {
-		return false;
-	}
-	return state.downloadableBlocks[ filterValue ].isRequesting;
+	return state.downloadableBlocks[ filterValue ]?.isRequesting ?? false;
 }
 
 /**
@@ -35,13 +30,7 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
  * @return {Array} Downloadable blocks.
  */
 export function getDownloadableBlocks( state, filterValue ) {
-	if (
-		! state.downloadableBlocks[ filterValue ] ||
-		! state.downloadableBlocks[ filterValue ].results
-	) {
-		return [];
-	}
-	return state.downloadableBlocks[ filterValue ].results;
+	return state.downloadableBlocks[ filterValue ]?.results ?? [];
 }
 
 /**
@@ -64,15 +53,21 @@ export function getInstalledBlockTypes( state ) {
  *
  * @return {Array} Block type items.
  */
-export const getNewBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+export const getNewBlockTypes = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const usedBlockTree = select( blockEditorStore ).getBlocks();
+			const installedBlockTypes = getInstalledBlockTypes( state );
 
-		return installedBlockTypes.filter( ( blockType ) =>
-			hasBlockType( blockType, usedBlockTree )
-		);
-	}
+			return installedBlockTypes.filter( ( blockType ) =>
+				hasBlockType( blockType, usedBlockTree )
+			);
+		},
+		( state ) => [
+			getInstalledBlockTypes( state ),
+			select( blockEditorStore ).getBlocks(),
+		]
+	)
 );
 
 /**
@@ -83,15 +78,21 @@ export const getNewBlockTypes = createRegistrySelector(
  *
  * @return {Array} Block type items.
  */
-export const getUnusedBlockTypes = createRegistrySelector(
-	( select ) => ( state ) => {
-		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
-		const installedBlockTypes = getInstalledBlockTypes( state );
+export const getUnusedBlockTypes = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const usedBlockTree = select( blockEditorStore ).getBlocks();
+			const installedBlockTypes = getInstalledBlockTypes( state );
 
-		return installedBlockTypes.filter(
-			( blockType ) => ! hasBlockType( blockType, usedBlockTree )
-		);
-	}
+			return installedBlockTypes.filter(
+				( blockType ) => ! hasBlockType( blockType, usedBlockTree )
+			);
+		},
+		( state ) => [
+			getInstalledBlockTypes( state ),
+			select( blockEditorStore ).getBlocks(),
+		]
+	)
 );
 
 /**

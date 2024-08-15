@@ -41,7 +41,7 @@ export const defaultSettings = {
 	spaceRegExp: /&nbsp;|&#160;/gi,
 	HTMLEntityRegExp: /&\S+?;/g,
 
-	// \u2014 = em-dash
+	// \u2014 = em-dash.
 	connectorRegExp: /--|\u2014/g,
 
 	// Characters to be removed from input text.
@@ -50,7 +50,7 @@ export const defaultSettings = {
 			'[',
 
 			// Basic Latin (extract)
-			'\u0021-\u0040\u005B-\u0060\u007B-\u007E',
+			'\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E',
 
 			// Latin-1 Supplement (extract)
 			'\u0080-\u00BF\u00D7\u00F7',
@@ -84,7 +84,7 @@ export const defaultSettings = {
 			 */
 			'\u2000-\u2BFF',
 
-			// Supplemental Punctuation
+			// Supplemental Punctuation.
 			'\u2E00-\u2E7F',
 			']',
 		].join( '' ),

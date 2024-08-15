@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { render } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import exportReusableBlock from './utils/export';
 import ImportDropdown from './components/import-dropdown';
 
-// Setup Export Links
+// Setup Export Links.
 document.body.addEventListener( 'click', ( event ) => {
 	if (
 		! event.target.classList.contains( 'wp-list-reusable-blocks__export' )
@@ -21,7 +21,7 @@ document.body.addEventListener( 'click', ( event ) => {
 	exportReusableBlock( event.target.dataset.id );
 } );
 
-// Setup Import Form
+// Setup Import Form.
 document.addEventListener( 'DOMContentLoaded', () => {
 	const button = document.querySelector( '.page-title-action' );
 	if ( ! button ) {
@@ -31,9 +31,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const showNotice = () => {
 		const notice = document.createElement( 'div' );
 		notice.className = 'notice notice-success is-dismissible';
-		notice.innerHTML = `<p>${ __(
-			'Reusable block imported successfully!'
-		) }</p>`;
+		notice.innerHTML = `<p>${ __( 'Pattern imported successfully!' ) }</p>`;
 
 		const headerEnd = document.querySelector( '.wp-header-end' );
 		if ( ! headerEnd ) {
@@ -45,5 +43,9 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const container = document.createElement( 'div' );
 	container.className = 'list-reusable-blocks__container';
 	button.parentNode.insertBefore( container, button );
-	render( <ImportDropdown onUpload={ showNotice } />, container );
+	createRoot( container ).render(
+		<StrictMode>
+			<ImportDropdown onUpload={ showNotice } />
+		</StrictMode>
+	);
 } );

@@ -3,9 +3,15 @@
  */
 import { createRegistryControl } from './factory';
 
+/** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
+
 const SELECT = '@@data/SELECT';
 const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
 const DISPATCH = '@@data/DISPATCH';
+
+function isObject( object ) {
+	return object !== null && typeof object === 'object';
+}
 
 /**
  * Dispatches a control action for triggering a synchronous registry select.
@@ -13,9 +19,9 @@ const DISPATCH = '@@data/DISPATCH';
  * Note: This control synchronously returns the current selector value, triggering the
  * resolution, but not waiting for it.
  *
- * @param {string} storeKey     The key for the store the selector belongs to.
- * @param {string} selectorName The name of the selector.
- * @param {Array}  args         Arguments for the selector.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 selectorName          The name of the selector.
+ * @param {Array}                  args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -30,8 +36,15 @@ const DISPATCH = '@@data/DISPATCH';
  *
  * @return {Object} The control descriptor.
  */
-function select( storeKey, selectorName, ...args ) {
-	return { type: SELECT, storeKey, selectorName, args };
+function select( storeNameOrDescriptor, selectorName, ...args ) {
+	return {
+		type: SELECT,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
+		selectorName,
+		args,
+	};
 }
 
 /**
@@ -41,9 +54,9 @@ function select( storeKey, selectorName, ...args ) {
  * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
  * after the selector finishes resolving, with the final result value.
  *
- * @param {string} storeKey      The key for the store the selector belongs to
- * @param {string} selectorName  The name of the selector
- * @param {Array}  args          Arguments for the selector.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 selectorName          The name of the selector
+ * @param {Array}                  args                  Arguments for the selector.
  *
  * @example
  * ```js
@@ -58,16 +71,23 @@ function select( storeKey, selectorName, ...args ) {
  *
  * @return {Object} The control descriptor.
  */
-function resolveSelect( storeKey, selectorName, ...args ) {
-	return { type: RESOLVE_SELECT, storeKey, selectorName, args };
+function resolveSelect( storeNameOrDescriptor, selectorName, ...args ) {
+	return {
+		type: RESOLVE_SELECT,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
+		selectorName,
+		args,
+	};
 }
 
 /**
  * Dispatches a control action for triggering a registry dispatch.
  *
- * @param {string} storeKey    The key for the store the action belongs to
- * @param {string} actionName  The name of the action to dispatch
- * @param {Array}  args        Arguments for the dispatch action.
+ * @param {string|StoreDescriptor} storeNameOrDescriptor Unique namespace identifier for the store
+ * @param {string}                 actionName            The name of the action to dispatch
+ * @param {Array}                  args                  Arguments for the dispatch action.
  *
  * @example
  * ```js
@@ -75,35 +95,47 @@ function resolveSelect( storeKey, selectorName, ...args ) {
  *
  * // Action generator using dispatch
  * export function* myAction() {
- *   yield controls.dispatch( 'core/edit-post', 'togglePublishSidebar' );
+ *   yield controls.dispatch( 'core/editor', 'togglePublishSidebar' );
  *   // do some other things.
  * }
  * ```
  *
  * @return {Object}  The control descriptor.
  */
-function dispatch( storeKey, actionName, ...args ) {
-	return { type: DISPATCH, storeKey, actionName, args };
+function dispatch( storeNameOrDescriptor, actionName, ...args ) {
+	return {
+		type: DISPATCH,
+		storeKey: isObject( storeNameOrDescriptor )
+			? storeNameOrDescriptor.name
+			: storeNameOrDescriptor,
+		actionName,
+		args,
+	};
 }
 
 export const controls = { select, resolveSelect, dispatch };
 
 export const builtinControls = {
 	[ SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) =>
-			registry.select( storeKey )[ selectorName ]( ...args )
+		( registry ) =>
+			( { storeKey, selectorName, args } ) =>
+				registry.select( storeKey )[ selectorName ]( ...args )
 	),
 	[ RESOLVE_SELECT ]: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			const method = registry.select( storeKey )[ selectorName ]
-				.hasResolver
-				? '__experimentalResolveSelect'
-				: 'select';
-			return registry[ method ]( storeKey )[ selectorName ]( ...args );
-		}
+		( registry ) =>
+			( { storeKey, selectorName, args } ) => {
+				const method = registry.select( storeKey )[ selectorName ]
+					.hasResolver
+					? 'resolveSelect'
+					: 'select';
+				return registry[ method ]( storeKey )[ selectorName ](
+					...args
+				);
+			}
 	),
 	[ DISPATCH ]: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) =>
-			registry.dispatch( storeKey )[ actionName ]( ...args )
+		( registry ) =>
+			( { storeKey, actionName, args } ) =>
+				registry.dispatch( storeKey )[ actionName ]( ...args )
 	),
 };

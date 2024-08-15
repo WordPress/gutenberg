@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-import",
-	"version": "1.1.0",
+	"version": "2.5.0",
 	"description": "Lazily import a module, installing it automatically if missing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"import"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/lazy-import/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/lazy-import/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -19,14 +19,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"npm": ">=6.9.0"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "lib/index.js",
 	"types": "build-types",
 	"dependencies": {
 		"execa": "^4.0.2",
-		"npm-package-arg": "^8.0.1",
-		"semver": "^7.3.2"
+		"npm-package-arg": "^8.1.5",
+		"semver": "^7.3.5"
 	},
 	"publishConfig": {
 		"access": "public"

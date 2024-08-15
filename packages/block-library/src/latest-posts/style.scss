@@ -1,4 +1,7 @@
 .wp-block-latest-posts {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 2em;
@@ -12,12 +15,13 @@
 
 		li {
 			clear: both;
+			overflow-wrap: break-word;
 		}
 	}
+
 	&.is-grid {
 		display: flex;
 		flex-wrap: wrap;
-		padding: 0;
 
 		li {
 			margin: 0 1.25em 1.25em 0;
@@ -28,9 +32,9 @@
 	@include break-small {
 		@for $i from 2 through 6 {
 			&.columns-#{ $i } li {
-				width: calc((100% / #{ $i }) - 1.25em + (1.25em / #{ $i }));
+				width: calc((100% / #{$i}) - 1.25em + (1.25em / #{$i}));
 
-				&:nth-child( #{ $i }n ) {
+				&:nth-child(#{ $i }n) {
 					margin-right: 0;
 				}
 			}
@@ -38,10 +42,18 @@
 	}
 }
 
+:root {
+	:where(.wp-block-latest-posts.is-grid) {
+		padding: 0;
+	}
+	:where(.wp-block-latest-posts.wp-block-latest-posts__list) {
+		padding-left: 0;
+	}
+}
+
 .wp-block-latest-posts__post-date,
 .wp-block-latest-posts__post-author {
 	display: block;
-	color: #555;
 	font-size: 0.8125em;
 }
 
@@ -57,29 +69,22 @@
 	img {
 		height: auto;
 		width: auto;
+		max-width: 100%;
 	}
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 1em;
+		/*rtl:ignore*/
+		float: left;
 	}
 	&.alignright {
 		/*rtl:ignore*/
 		margin-left: 1em;
+		/*rtl:ignore*/
+		float: right;
 	}
 	&.aligncenter {
 		margin-bottom: 1em;
 		text-align: center;
-	}
-}
-
-.block-editor-image-alignment-control__row {
-	.components-base-control__field {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-
-		.components-base-control__label {
-			margin-bottom: 0;
-		}
 	}
 }

@@ -1,7 +1,12 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/latest-comments",
+	"title": "Latest Comments",
 	"category": "widgets",
+	"description": "Display a list of your most recent comments.",
+	"keywords": [ "recent comments" ],
+	"textdomain": "default",
 	"attributes": {
 		"commentsToShow": {
 			"type": "number",
@@ -24,6 +29,37 @@
 	},
 	"supports": {
 		"align": true,
-		"html": false
-	}
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"html": false,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "wp-block-latest-comments-editor",
+	"style": "wp-block-latest-comments"
 }

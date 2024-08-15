@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/categories",
+		"isValid": true,
+		"attributes": {
+			"displayAsDropdown": false,
+			"showHierarchy": false,
+			"showPostCounts": false,
+			"showOnlyTopLevel": false,
+			"showEmpty": false,
+			"showLabel": true
+		},
+		"innerBlocks": []
+	}
+]

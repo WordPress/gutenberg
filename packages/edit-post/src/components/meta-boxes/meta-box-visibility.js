@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 class MetaBoxVisibility extends Component {
 	componentDidMount() {
@@ -36,7 +37,5 @@ class MetaBoxVisibility extends Component {
 }
 
 export default withSelect( ( select, { id } ) => ( {
-	isVisible: select( 'core/edit-post' ).isEditorPanelEnabled(
-		`meta-box-${ id }`
-	),
+	isVisible: select( editorStore ).isEditorPanelEnabled( `meta-box-${ id }` ),
 } ) )( MetaBoxVisibility );

@@ -2,145 +2,79 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
+import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Group' ),
 	icon,
-	description: __( 'Combine blocks into a group.' ),
-	keywords: [
-		__( 'container' ),
-		__( 'wrapper' ),
-		__( 'row' ),
-		__( 'section' ),
-	],
 	example: {
 		attributes: {
+			layout: {
+				type: 'constrained',
+				justifyContent: 'center',
+			},
 			style: {
-				color: {
-					text: '#000000',
-					background: '#ffffff',
+				spacing: {
+					padding: {
+						top: '4em',
+						right: '3em',
+						bottom: '4em',
+						left: '3em',
+					},
 				},
 			},
 		},
 		innerBlocks: [
 			{
-				name: 'core/paragraph',
+				name: 'core/heading',
 				attributes: {
-					customTextColor: '#cf2e2e',
-					fontSize: 'large',
-					content: __( 'One.' ),
+					content: __( 'La Mancha' ),
+					textAlign: 'center',
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customTextColor: '#ff6900',
-					fontSize: 'large',
-					content: __( 'Two.' ),
+					align: 'center',
+					content: __(
+						'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
+					),
 				},
 			},
 			{
-				name: 'core/paragraph',
+				name: 'core/spacer',
 				attributes: {
-					customTextColor: '#fcb900',
-					fontSize: 'large',
-					content: __( 'Three.' ),
+					height: '10px',
 				},
 			},
 			{
-				name: 'core/paragraph',
+				name: 'core/button',
 				attributes: {
-					customTextColor: '#00d084',
-					fontSize: 'large',
-					content: __( 'Four.' ),
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					customTextColor: '#0693e3',
-					fontSize: 'large',
-					content: __( 'Five.' ),
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					customTextColor: '#9b51e0',
-					fontSize: 'large',
-					content: __( 'Six.' ),
+					text: __( 'Read more' ),
 				},
 			},
 		],
+		viewportWidth: 600,
 	},
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				isMultiBlock: true,
-				blocks: [ '*' ],
-				__experimentalConvert( blocks ) {
-					// Avoid transforming a single `core/group` Block
-					if (
-						blocks.length === 1 &&
-						blocks[ 0 ].name === 'core/group'
-					) {
-						return;
-					}
-
-					const alignments = [ 'wide', 'full' ];
-
-					// Determine the widest setting of all the blocks to be grouped
-					const widestAlignment = blocks.reduce(
-						( accumulator, block ) => {
-							const { align } = block.attributes;
-							return alignments.indexOf( align ) >
-								alignments.indexOf( accumulator )
-								? align
-								: accumulator;
-						},
-						undefined
-					);
-
-					// Clone the Blocks to be Grouped
-					// Failing to create new block references causes the original blocks
-					// to be replaced in the switchToBlockType call thereby meaning they
-					// are removed both from their original location and within the
-					// new group block.
-					const groupInnerBlocks = blocks.map( ( block ) => {
-						return createBlock(
-							block.name,
-							block.attributes,
-							block.innerBlocks
-						);
-					} );
-
-					return createBlock(
-						'core/group',
-						{
-							align: widestAlignment,
-						},
-						groupInnerBlocks
-					);
-				},
-			},
-		],
-	},
+	transforms,
 	edit,
 	save,
 	deprecated,
+	variations,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

@@ -1,77 +1,58 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { PostAuthorCheck } from '../check';
+import PostAuthorCheck from '../check';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
+
+function setupUseSelectMock( hasAssignAuthorAction, hasAuthors ) {
+	useSelect.mockImplementation( ( cb ) => {
+		return cb( () => ( {
+			getPostType: () => ( { supports: { author: true } } ),
+			getEditedPostAttribute: () => {},
+			getCurrentPost: () => ( {
+				_links: {
+					'wp:action-assign-author': hasAssignAuthorAction,
+				},
+			} ),
+			getUsers: () => Array( hasAuthors ? 1 : 0 ).fill( {} ),
+		} ) );
+	} );
+}
 
 describe( 'PostAuthorCheck', () => {
-	const users = {
-		data: [
-			{
-				id: 1,
-				name: 'admin',
-				capabilities: {
-					level_1: true,
-				},
-			},
-			{
-				id: 2,
-				name: 'subscriber',
-				capabilities: {
-					level_0: true,
-				},
-			},
-			{
-				id: 3,
-				name: 'andrew',
-				capabilities: {
-					level_1: true,
-				},
-			},
-		],
-	};
+	it( 'should not render anything if has no authors', () => {
+		setupUseSelectMock( false, true );
 
-	it( 'should not render anything if users unknown', () => {
-		const wrapper = shallow(
-			<PostAuthorCheck authors={ [] } hasAssignAuthorAction={ true }>
-				authors
-			</PostAuthorCheck>
-		);
-		expect( wrapper.type() ).toBe( null );
-	} );
-
-	it( 'should not render anything if single user', () => {
-		const wrapper = shallow(
-			<PostAuthorCheck
-				authors={ users.data.slice( 0, 1 ) }
-				hasAssignAuthorAction={ true }
-			>
-				authors
-			</PostAuthorCheck>
-		);
-		expect( wrapper.type() ).toBe( null );
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.queryByText( 'authors' ) ).not.toBeInTheDocument();
 	} );
 
 	it( "should not render anything if doesn't have author action", () => {
-		const wrapper = shallow(
-			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ false }>
-				authors
-			</PostAuthorCheck>
-		);
-		expect( wrapper.type() ).toBe( null );
+		setupUseSelectMock( true, false );
+
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.queryByText( 'authors' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render control', () => {
-		const wrapper = shallow(
-			<PostAuthorCheck authors={ users } hasAssignAuthorAction={ true }>
-				authors
-			</PostAuthorCheck>
-		);
+		setupUseSelectMock( true, true );
 
-		expect( wrapper.type() ).not.toBe( null );
+		render( <PostAuthorCheck>authors</PostAuthorCheck> );
+		expect( screen.getByText( 'authors' ) ).toBeVisible();
 	} );
 } );

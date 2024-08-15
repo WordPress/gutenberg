@@ -1,0 +1,18 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Pullquote custom color",
+			"className": "is-style-default",
+			"style": {
+				"border": {
+					"color": "#2207d0"
+				}
+			},
+			"citation": "my citation",
+			"textColor": "subtle-background"
+		},
+		"innerBlocks": []
+	}
+]

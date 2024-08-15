@@ -1,18 +1,17 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { castArray, first, last } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,31 +23,32 @@ import {
 	chevronDown,
 } from '@wordpress/icons';
 import { getBlockMoverDescription } from './mover-description';
+import { store as blockEditorStore } from '../../store';
 
-const getArrowIcon = ( direction, orientation, isRTL ) => {
+const getArrowIcon = ( direction, orientation ) => {
 	if ( direction === 'up' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? chevronRight : chevronLeft;
+			return isRTL() ? chevronRight : chevronLeft;
 		}
 		return chevronUp;
 	} else if ( direction === 'down' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? chevronLeft : chevronRight;
+			return isRTL() ? chevronLeft : chevronRight;
 		}
 		return chevronDown;
 	}
 	return null;
 };
 
-const getMovementDirectionLabel = ( moveDirection, orientation, isRTL ) => {
+const getMovementDirectionLabel = ( moveDirection, orientation ) => {
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? __( 'Move right' ) : __( 'Move left' );
+			return isRTL() ? __( 'Move right' ) : __( 'Move left' );
 		}
 		return __( 'Move up' );
 	} else if ( moveDirection === 'down' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? __( 'Move left' ) : __( 'Move right' );
+			return isRTL() ? __( 'Move left' ) : __( 'Move right' );
 		}
 		return __( 'Move down' );
 	}
@@ -61,7 +61,11 @@ const BlockMoverButton = forwardRef(
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
-		const blocksCount = castArray( clientIds ).length;
+		const normalizedClientIds = Array.isArray( clientIds )
+			? clientIds
+			: [ clientIds ];
+		const blocksCount = normalizedClientIds.length;
+		const { disabled } = props;
 
 		const {
 			blockType,
@@ -70,7 +74,6 @@ const BlockMoverButton = forwardRef(
 			isFirst,
 			isLast,
 			firstIndex,
-			isRTL,
 			orientation = 'vertical',
 		} = useSelect(
 			( select ) => {
@@ -79,19 +82,13 @@ const BlockMoverButton = forwardRef(
 					getBlockRootClientId,
 					getBlockOrder,
 					getBlock,
-					getSettings,
 					getBlockListSettings,
-				} = select( 'core/block-editor' );
-				const normalizedClientIds = castArray( clientIds );
-				const firstClientId = first( normalizedClientIds );
+				} = select( blockEditorStore );
+				const firstClientId = normalizedClientIds[ 0 ];
 				const blockRootClientId = getBlockRootClientId( firstClientId );
-				const firstBlockIndex = getBlockIndex(
-					firstClientId,
-					blockRootClientId
-				);
+				const firstBlockIndex = getBlockIndex( firstClientId );
 				const lastBlockIndex = getBlockIndex(
-					last( normalizedClientIds ),
-					blockRootClientId
+					normalizedClientIds[ normalizedClientIds.length - 1 ]
 				);
 				const blockOrder = getBlockOrder( blockRootClientId );
 				const block = getBlock( firstClientId );
@@ -102,21 +99,21 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
+					isDisabled:
+						disabled ||
+						( direction === 'up' ? isFirstBlock : isLastBlock ),
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
 					isLast: isLastBlock,
-					isRTL: getSettings().isRTL,
 					orientation: moverOrientation || blockListOrientation,
 				};
 			},
 			[ clientIds, direction ]
 		);
 
-		const { moveBlocksDown, moveBlocksUp } = useDispatch(
-			'core/block-editor'
-		);
+		const { moveBlocksDown, moveBlocksUp } =
+			useDispatch( blockEditorStore );
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
 
@@ -133,25 +130,22 @@ const BlockMoverButton = forwardRef(
 			<>
 				<Button
 					ref={ ref }
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
-					icon={ getArrowIcon( direction, orientation, isRTL ) }
+					icon={ getArrowIcon( direction, orientation ) }
 					label={ getMovementDirectionLabel(
 						direction,
-						orientation,
-						isRTL
+						orientation
 					) }
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
-					aria-disabled={ isDisabled }
+					disabled={ isDisabled }
+					accessibleWhenDisabled
 				/>
-				<span
-					id={ descriptionId }
-					className="block-editor-block-mover-button__description"
-				>
+				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(
 						blocksCount,
 						blockType && blockType.title,
@@ -159,10 +153,9 @@ const BlockMoverButton = forwardRef(
 						isFirst,
 						isLast,
 						direction === 'up' ? -1 : 1,
-						orientation,
-						isRTL
+						orientation
 					) }
-				</span>
+				</VisuallyHidden>
 			</>
 		);
 	}

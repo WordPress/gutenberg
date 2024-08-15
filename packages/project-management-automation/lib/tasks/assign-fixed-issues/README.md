@@ -1,5 +1,4 @@
-Assign Fixed Issues
-===
+# Assign Fixed Issues
 
 Adds assignee for issues which are marked to be "Fixed" by a pull request, and adds the "In Progress" label.
 

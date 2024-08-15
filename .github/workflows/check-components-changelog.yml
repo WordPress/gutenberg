@@ -1,0 +1,68 @@
+name: OPTIONAL - Verify @wordpress/components CHANGELOG update
+
+on:
+    pull_request:
+        types: [opened, synchronize]
+        branches:
+            - trunk
+        paths:
+            - 'packages/components/**'
+            - '!packages/components/src/**/stories/**'
+            - '!packages/components/src/**/test/**'
+            - '!packages/components/src/**/*.android.js'
+            - '!packages/components/src/**/*.ios.js'
+            - '!packages/components/src/**/*.native.js'
+            - '!packages/components/src/**/*.native.scss'
+            - '!packages/components/src/**/react-native-*'
+jobs:
+    check:
+        name: Check CHANGELOG diff
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Get PR commit count'
+              run: echo "PR_COMMIT_COUNT=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+            - name: 'Fetch relevant history from origin'
+              run: git fetch origin ${{ github.event.pull_request.base.ref }}
+            - name: Check CHANGELOG status
+              env:
+                  PR_NUMBER: ${{ github.event.number }}
+              run: |
+                  changelog_path="packages/components/CHANGELOG.md"
+                  optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
+
+                  # Fail if the PR doesn't touch the changelog
+                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
+                    echo "Please add a CHANGELOG entry to $changelog_path"
+                    echo
+                    echo "${optional_check_notice}"
+                    exit 1
+                  fi
+
+                  pr_link_pattern="\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)"
+                  pr_link_grep_pattern="\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER})"
+
+                  unreleased_section=$(sed -n '/^## Unreleased$/,/^## /p' "${changelog_path}")
+
+                  # Confirm that the CHANGELOG has an entry for the current PR
+                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
+                      echo "Please add a CHANGELOG entry to $changelog_path, and make sure your CHANGELOG entry has a link to the current PR."
+                      echo
+                        echo "${optional_check_notice}"
+                      exit 1
+                  fi
+
+                  # Confirm that there is an 'Unreleased' section and that the relevant entry is in that section
+                  if ! grep -nq -e '^## Unreleased' "${changelog_path}" || \
+                    ! [[ $unreleased_section = *${pr_link_pattern}* ]]; then
+                      echo "Please make sure your CHANGELOG entry is in the \`## Unreleased\` section"
+                      echo
+                      echo "${optional_check_notice}"
+                      exit 1
+                  fi

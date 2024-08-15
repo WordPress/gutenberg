@@ -1,23 +1,23 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { align, value, citation } = attributes;
+	const { textAlign, citation } = attributes;
 
-	const className = classnames( {
-		[ `has-text-align-${ align }` ]: align,
+	const className = clsx( {
+		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 
 	return (
 		<blockquote { ...useBlockProps.save( { className } ) }>
-			<RichText.Content multiline value={ value } />
+			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( citation ) && (
 				<RichText.Content tagName="cite" value={ citation } />
 			) }

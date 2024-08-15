@@ -1,22 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { close } from '@wordpress/icons';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import {
+	InterfaceSkeleton,
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
-import PopoverWrapper from './popover-wrapper';
-import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
+import { store as editWidgetsStore } from '../../store';
+import SecondarySidebar from '../secondary-sidebar';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the widgets screen top bar landmark region. */
@@ -25,83 +29,93 @@ const interfaceLabels = {
 	body: __( 'Widgets and blocks' ),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
 	sidebar: __( 'Widgets settings' ),
+	/* translators: accessibility text for the widgets screen footer landmark region. */
+	footer: __( 'Widgets footer' ),
 };
 
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
-	const { setIsInserterOpened, closeGeneralSidebar } = useDispatch(
-		'core/edit-widgets'
+	const { setIsInserterOpened, setIsListViewOpened, closeGeneralSidebar } =
+		useDispatch( editWidgetsStore );
+	const {
+		hasBlockBreadCrumbsEnabled,
+		hasSidebarEnabled,
+		isInserterOpened,
+		isListViewOpened,
+		previousShortcut,
+		nextShortcut,
+	} = useSelect(
+		( select ) => ( {
+			hasSidebarEnabled: !! select(
+				interfaceStore
+			).getActiveComplementaryArea( editWidgetsStore.name ),
+			isInserterOpened: !! select( editWidgetsStore ).isInserterOpened(),
+			isListViewOpened: !! select( editWidgetsStore ).isListViewOpened(),
+			hasBlockBreadCrumbsEnabled: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'showBlockBreadcrumbs'
+			),
+			previousShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations(
+				'core/edit-widgets/previous-region'
+			),
+			nextShortcut: select(
+				keyboardShortcutsStore
+			).getAllShortcutKeyCombinations( 'core/edit-widgets/next-region' ),
+		} ),
+		[]
 	);
-	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
-
-	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
-		hasSidebarEnabled: !! select(
-			'core/interface'
-		).getActiveComplementaryArea( 'core/edit-widgets' ),
-		isInserterOpened: !! select( 'core/edit-widgets' ).isInserterOpened(),
-	} ) );
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( hasSidebarEnabled && ! isHugeViewport ) {
 			setIsInserterOpened( false );
+			setIsListViewOpened( false );
 		}
 	}, [ hasSidebarEnabled, isHugeViewport ] );
 
 	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
+		if ( ( isInserterOpened || isListViewOpened ) && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpened, isHugeViewport ] );
+	}, [ isInserterOpened, isListViewOpened, isHugeViewport ] );
+
+	const secondarySidebarLabel = isListViewOpened
+		? __( 'List View' )
+		: __( 'Block Library' );
+
+	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 
 	return (
 		<InterfaceSkeleton
-			labels={ interfaceLabels }
+			labels={ {
+				...interfaceLabels,
+				secondarySidebar: secondarySidebarLabel,
+			} }
 			header={ <Header /> }
-			leftSidebar={
-				isInserterOpened && (
-					<PopoverWrapper
-						className="edit-widgets-layout__inserter-panel-popover-wrapper"
-						onClose={ () => setIsInserterOpened( false ) }
-					>
-						<div className="edit-widgets-layout__inserter-panel">
-							<div className="edit-widgets-layout__inserter-panel-header">
-								<Button
-									icon={ close }
-									onClick={ () =>
-										setIsInserterOpened( false )
-									}
-								/>
-							</div>
-							<div className="edit-widgets-layout__inserter-panel-content">
-								<Library
-									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
-									rootClientId={ rootClientId }
-									__experimentalInsertionIndex={
-										insertionIndex
-									}
-								/>
-							</div>
-						</div>
-					</PopoverWrapper>
-				)
-			}
-			sidebar={
-				hasSidebarEnabled && (
-					<ComplementaryArea.Slot scope="core/edit-widgets" />
-				)
-			}
+			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
+			sidebar={ <ComplementaryArea.Slot scope="core/edit-widgets" /> }
 			content={
-				<WidgetAreasBlockEditorContent
-					blockEditorSettings={ blockEditorSettings }
-				/>
+				<>
+					<WidgetAreasBlockEditorContent
+						blockEditorSettings={ blockEditorSettings }
+					/>
+				</>
 			}
+			footer={
+				hasBlockBreadCrumbsEnabled &&
+				! isMobileViewport && (
+					<div className="edit-widgets-layout__footer">
+						<BlockBreadcrumb rootLabelText={ __( 'Widgets' ) } />
+					</div>
+				)
+			}
+			shortcuts={ {
+				previous: previousShortcut,
+				next: nextShortcut,
+			} }
 		/>
 	);
 }

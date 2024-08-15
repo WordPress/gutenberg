@@ -1,8 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { TabPanel } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const blocksTab = {
 	name: 'blocks',
@@ -11,39 +23,56 @@ const blocksTab = {
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
-const reusableBlocksTab = {
-	name: 'reusable',
-	/* translators: Reusable blocks tab title in the block inserter. */
-	title: __( 'Reusable' ),
+
+const mediaTab = {
+	name: 'media',
+	/* translators: Media tab title in the block inserter. */
+	title: __( 'Media' ),
 };
 
-function InserterTabs( {
-	children,
-	showPatterns = false,
-	showReusableBlocks = false,
-	onSelect,
-} ) {
-	const tabs = [ blocksTab ];
-
-	if ( showPatterns ) {
-		tabs.push( patternsTab );
-	}
-	if ( showReusableBlocks ) {
-		tabs.push( reusableBlocksTab );
-	}
+function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
+	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
-		<TabPanel
-			className="block-editor-inserter__tabs"
-			tabs={ tabs }
-			onSelect={ onSelect }
-		>
-			{ children }
-		</TabPanel>
+		<div className="block-editor-inserter__tabs" ref={ ref }>
+			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
+				<div className="block-editor-inserter__tablist-and-close-button">
+					<Button
+						className="block-editor-inserter__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close block inserter' ) }
+						onClick={ () => onClose() }
+						size="small"
+					/>
+
+					<Tabs.TabList className="block-editor-inserter__tablist">
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab
+								key={ tab.name }
+								tabId={ tab.name }
+								className="block-editor-inserter__tab"
+							>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+				</div>
+				{ tabs.map( ( tab ) => (
+					<Tabs.TabPanel
+						key={ tab.name }
+						tabId={ tab.name }
+						focusable={ false }
+						className="block-editor-inserter__tabpanel"
+					>
+						{ children }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
+		</div>
 	);
 }
 
-export default InserterTabs;
+export default forwardRef( InserterTabs );

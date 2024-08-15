@@ -1,17 +1,6 @@
 # Element
 
-Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
-
-You may find yourself asking, "Why an abstraction layer?". For a few reasons:
-
--   In many applications, especially those extended by a rich plugin ecosystem as is the case with WordPress, it's wise to create interfaces to underlying third-party code. The thinking is that if ever a need arises to change or even replace the underlying implementation, it can be done without catastrophic rippling effects to dependent code, so long as the interface stays the same.
--   It provides a mechanism to shield implementers by omitting features with uncertain futures (`createClass`, `PropTypes`).
--   It helps avoid incompatibilities between versions by ensuring that every plugin operates on a single centralized version of the code.
-
-On the `wp.element` global object, you will find the following, ordered roughly by the likelihood you'll encounter it in your code:
-
--   [`createElement`](https://reactjs.org/docs/react-api.html#createelement)
--   [`render`](https://reactjs.org/docs/react-dom.html#render)
+Element is a package that builds on top of [React](https://reactjs.org/) and provide a set of utilities to work with React components and React elements.
 
 ## Installation
 
@@ -21,85 +10,45 @@ Install the module
 npm install @wordpress/element --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
-
-## Usage
-
-Let's render a customized greeting into an empty element:
-
-```html
-<div id="greeting"></div>
-<script>
-function Greeting( props ) {
-	return wp.element.createElement( 'span', null, 
-		'Hello ' + props.toWhom + '!'
-	);
-}
-
-wp.element.render(
-	wp.element.createElement( Greeting, { toWhom: 'World' } ),
-	document.getElementById( 'greeting' )
-);
-</script>
-```
-
-Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Why React?
 
-At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](/packages/blocks/README.md), we observe the following technical requirements:
+At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md), we observe the following technical requirements:
 
--   An understanding of a block in terms of its underlying values (in the [random image example](/packages/blocks/README.md#example), a category)
+-   An understanding of a block in terms of its underlying values (in the [random image example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md#example), a category)
 -   A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. **Given a set of inputs ("props"), a developer describes the output to be shown on the page.** This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
 
 The offerings of any framework necessarily become more complex as these requirements increase; many front-end frameworks prescribe ideas around page routing, retrieving and updating data, and managing layout. React is not immune to this, but the introduced complexity is rarely caused by React itself, but instead managing an arrangement of supporting tools. By moving these concerns out of sight to the internals of the system (WordPress core code), we can minimize the responsibilities of plugin authors to a small, clear set of touch points.
 
-## JSX
-
-While not at all a requirement to use React, [JSX](https://reactjs.org/docs/introducing-jsx.html) is a recommended syntax extension to compose elements more expressively. Through a build process, JSX is converted back to the `createElement` syntax you see earlier in this document.
-
-If you've configured [Babel](http://babeljs.io/) for your project, you can opt in to JSX syntax by specifying the `pragma` option of the [`transform-react-jsx` plugin](https://www.npmjs.com/package/babel-plugin-transform-react-jsx) in your [`.babelrc` configuration](http://babeljs.io/docs/usage/babelrc/).
-
-```json
-{
-	"plugins": [
-		[ "transform-react-jsx", {
-			"pragma": "createElement"
-		} ]
-	]
-}
-```
-
-This assumes that you will import the `createElement` function in any file where you use JSX. Alternatively, consider using the [`@wordpress/babel-plugin-import-jsx-pragma` Babel plugin](https://www.npmjs.com/package/@wordpress/babel-plugin-import-jsx-pragma) to automate the import of this function.
-
 ## API
 
 <!-- START TOKEN(Autogenerated API docs) -->
 
-<a name="Children" href="#Children">#</a> **Children**
+### Children
 
 Object that provides utilities for dealing with React children.
 
-<a name="cloneElement" href="#cloneElement">#</a> **cloneElement**
+### cloneElement
 
 Creates a copy of an element with extended props.
 
 _Parameters_
 
--   _element_ `WPElement`: Element
+-   _element_ `Element`: Element
 -   _props_ `?Object`: Props to apply to cloned element
 
 _Returns_
 
--   `WPElement`: Cloned element.
+-   `Element`: Cloned element.
 
-<a name="Component" href="#Component">#</a> **Component**
+### Component
 
 A base class to create WordPress Components (Refs, state and lifecycle hooks)
 
-<a name="concatChildren" href="#concatChildren">#</a> **concatChildren**
+### concatChildren
 
 Concatenate two or more React children objects.
 
@@ -111,7 +60,7 @@ _Returns_
 
 -   `Array`: The concatenated value.
 
-<a name="createContext" href="#createContext">#</a> **createContext**
+### createContext
 
 Creates a context object containing two components: a provider and consumer.
 
@@ -123,26 +72,23 @@ _Returns_
 
 -   `Object`: Context object.
 
-<a name="createElement" href="#createElement">#</a> **createElement**
+### createElement
 
-Returns a new element of given type. Type can be either a string tag name or
-another function which itself returns an element.
+Returns a new element of given type. Type can be either a string tag name or another function which itself returns an element.
 
 _Parameters_
 
 -   _type_ `?(string|Function)`: Tag name or element creator
 -   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   _children_ `...WPElement`: Descendant elements
+-   _children_ `...Element`: Descendant elements
 
 _Returns_
 
--   `WPElement`: Element.
+-   `Element`: Element.
 
-<a name="createInterpolateElement" href="#createInterpolateElement">#</a> **createInterpolateElement**
+### createInterpolateElement
 
-This function creates an interpolated element from a passed in string with
-specific tags matching how the string should be converted to an element via
-the conversion map value.
+This function creates an interpolated element from a passed in string with specific tags matching how the string should be converted to an element via the conversion map value.
 
 _Usage_
 
@@ -164,13 +110,13 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Object`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `WPElement`: A wp element.
+-   `Element`: A wp element.
 
-<a name="createPortal" href="#createPortal">#</a> **createPortal**
+### createPortal
 
 Creates a portal into which a component can be rendered.
 
@@ -180,33 +126,48 @@ _Related_
 
 _Parameters_
 
--   _child_ (unknown type): Any renderable child, such as an element, string, or fragment.
+-   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
-<a name="createRef" href="#createRef">#</a> **createRef**
+### createRef
 
-Returns an object tracking a reference to a rendered element via its
-`current` property as either a DOMElement or Element, dependent upon the
-type of element rendered with the ref attribute.
+Returns an object tracking a reference to a rendered element via its `current` property as either a DOMElement or Element, dependent upon the type of element rendered with the ref attribute.
 
 _Returns_
 
 -   `Object`: Ref object.
 
-<a name="findDOMNode" href="#findDOMNode">#</a> **findDOMNode**
+### createRoot
+
+Creates a new React root for the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/client/createRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
+
+### findDOMNode
 
 Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ (unknown type): Component's instance.
+-   _component_ `import('react').ComponentType`: Component's instance.
 
-<a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
+### flushSync
 
-Component enhancer used to enable passing a ref to its wrapped component.
-Pass a function argument which receives `props` and `ref` as its arguments,
-returning an element using the forwarded ref. The return value is a new
-component which forwards its ref.
+Forces React to flush any updates inside the provided callback synchronously.
+
+_Parameters_
+
+-   _callback_ `Function`: Callback to run synchronously.
+
+### forwardRef
+
+Component enhancer used to enable passing a ref to its wrapped component. Pass a function argument which receives `props` and `ref` as its arguments, returning an element using the forwarded ref. The return value is a new component which forwards its ref.
 
 _Parameters_
 
@@ -214,13 +175,35 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
-<a name="Fragment" href="#Fragment">#</a> **Fragment**
+### Fragment
 
 A component which renders its children without any wrapping element.
 
-<a name="isEmptyElement" href="#isEmptyElement">#</a> **isEmptyElement**
+### hydrate
+
+> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
+
+Hydrates a given element into the target DOM node.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/hydrate>
+
+### hydrateRoot
+
+Creates a new React root for the target DOM node and hydrates it with a pre-generated markup.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/client/hydrateRoot>
+
+_Changelog_
+
+`6.2.0` Introduced in WordPress core.
+
+### isEmptyElement
 
 Checks if the provided WP element is empty.
 
@@ -232,9 +215,9 @@ _Returns_
 
 -   `boolean`: True when an element is considered empty.
 
-<a name="isValidElement" href="#isValidElement">#</a> **isValidElement**
+### isValidElement
 
-Checks if an object is a valid WPElement.
+Checks if an object is a valid React Element.
 
 _Parameters_
 
@@ -242,32 +225,29 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: true if objectToTest is a valid WPElement and false otherwise.
+-   `boolean`: true if objectToTest is a valid React Element and false otherwise.
 
-<a name="lazy" href="#lazy">#</a> **lazy**
-
-_Related_
-
--   <https://reactjs.org/docs/react-api.html#reactlazy>
-
-<a name="memo" href="#memo">#</a> **memo**
+### lazy
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactmemo>
+-   <https://react.dev/reference/react/lazy>
 
-<a name="Platform" href="#Platform">#</a> **Platform**
+### memo
 
-Component used to detect the current Platform being used.
-Use Platform.OS === 'web' to detect if running on web enviroment.
+_Related_
+
+-   <https://react.dev/reference/react/memo>
+
+### Platform
+
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
 
 This is the same concept as the React Native implementation.
 
 _Related_
 
--   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
-
-Here is an example of how to use the select method:
+-   <https://reactnative.dev/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
 
 _Usage_
 
@@ -275,42 +255,48 @@ _Usage_
 import { Platform } from '@wordpress/element';
 
 const placeholderLabel = Platform.select( {
-  native: __( 'Add media' ),
-  web: __( 'Drag images, upload new ones or select files from your library.' ),
+	native: __( 'Add media' ),
+	web: __(
+		'Drag images, upload new ones or select files from your library.'
+	),
 } );
 ```
 
-<a name="RawHTML" href="#RawHTML">#</a> **RawHTML**
+### PureComponent
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where
-it is desirable to render dangerous HTML without needing a wrapper element.
-To preserve additional props, a `div` wrapper _will_ be created if any props
-aside from `children` are passed.
+_Related_
+
+-   <https://react.dev/reference/react/PureComponent>
+
+### RawHTML
+
+Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `RawHTMLProps`: Children should be a string of HTML. Other props will be passed through to div wrapper.
+-   _props_ `RawHTMLProps`: Children should be a string of HTML or an array of strings. Other props will be passed through to the div wrapper.
 
 _Returns_
 
 -   `JSX.Element`: Dangerously-rendering component.
 
-<a name="render" href="#render">#</a> **render**
+### render
+
+> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
 
 Renders a given element into the target DOM node.
 
-_Parameters_
+_Related_
 
--   _element_ (unknown type): Element to render.
--   _target_ `HTMLElement`: DOM node into which element should be rendered.
+-   <https://react.dev/reference/react-dom/render>
 
-<a name="renderToString" href="#renderToString">#</a> **renderToString**
+### renderToString
 
 Serializes a React element to string.
 
 _Parameters_
 
--   _element_ (unknown type): Element to serialize.
+-   _element_ `import('react').ReactNode`: Element to serialize.
 -   _context_ `[Object]`: Context object.
 -   _legacyContext_ `[Object]`: Legacy context object.
 
@@ -318,17 +304,23 @@ _Returns_
 
 -   `string`: Serialized element.
 
-<a name="StrictMode" href="#StrictMode">#</a> **StrictMode**
-
-Component that activates additional checks and warnings for its descendants.
-
-<a name="Suspense" href="#Suspense">#</a> **Suspense**
+### startTransition
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactsuspense>
+-   <https://react.dev/reference/react/startTransition>
 
-<a name="switchChildrenNodeName" href="#switchChildrenNodeName">#</a> **switchChildrenNodeName**
+### StrictMode
+
+Component that activates additional checks and warnings for its descendants.
+
+### Suspense
+
+_Related_
+
+-   <https://react.dev/reference/react/Suspense>
+
+### switchChildrenNodeName
 
 Switches the nodeName of all the elements in the children object.
 
@@ -341,75 +333,112 @@ _Returns_
 
 -   `?Object`: The updated children object.
 
-<a name="unmountComponentAtNode" href="#unmountComponentAtNode">#</a> **unmountComponentAtNode**
+### unmountComponentAtNode
+
+> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
 
 Removes any mounted element from the target DOM node.
 
-_Parameters_
+_Related_
 
--   _target_ `Element`: DOM node in which element is to be removed
+-   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
-<a name="useCallback" href="#useCallback">#</a> **useCallback**
+### useCallback
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usecallback>
+-   <https://react.dev/reference/react/useCallback>
 
-<a name="useContext" href="#useContext">#</a> **useContext**
-
-_Related_
-
--   <https://reactjs.org/docs/hooks-reference.html#usecontext>
-
-<a name="useDebugValue" href="#useDebugValue">#</a> **useDebugValue**
+### useContext
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usedebugvalue>
+-   <https://react.dev/reference/react/useContext>
 
-<a name="useEffect" href="#useEffect">#</a> **useEffect**
-
-_Related_
-
--   <https://reactjs.org/docs/hooks-reference.html#useeffect>
-
-<a name="useImperativeHandle" href="#useImperativeHandle">#</a> **useImperativeHandle**
+### useDebugValue
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useimperativehandle>
+-   <https://react.dev/reference/react/useDebugValue>
 
-<a name="useLayoutEffect" href="#useLayoutEffect">#</a> **useLayoutEffect**
-
-_Related_
-
--   <https://reactjs.org/docs/hooks-reference.html#uselayouteffect>
-
-<a name="useMemo" href="#useMemo">#</a> **useMemo**
+### useDeferredValue
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usememo>
+-   <https://react.dev/reference/react/useDeferredValue>
 
-<a name="useReducer" href="#useReducer">#</a> **useReducer**
-
-_Related_
-
--   <https://reactjs.org/docs/hooks-reference.html#usereducer>
-
-<a name="useRef" href="#useRef">#</a> **useRef**
+### useEffect
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useref>
+-   <https://react.dev/reference/react/useEffect>
 
-<a name="useState" href="#useState">#</a> **useState**
+### useId
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usestate>
+-   <https://react.dev/reference/react/useId>
 
+### useImperativeHandle
+
+_Related_
+
+-   <https://react.dev/reference/react/useImperativeHandle>
+
+### useInsertionEffect
+
+_Related_
+
+-   <https://react.dev/reference/react/useInsertionEffect>
+
+### useLayoutEffect
+
+_Related_
+
+-   <https://react.dev/reference/react/useLayoutEffect>
+
+### useMemo
+
+_Related_
+
+-   <https://react.dev/reference/react/useMemo>
+
+### useReducer
+
+_Related_
+
+-   <https://react.dev/reference/react/useReducer>
+
+### useRef
+
+_Related_
+
+-   <https://react.dev/reference/react/useRef>
+
+### useState
+
+_Related_
+
+-   <https://react.dev/reference/react/useState>
+
+### useSyncExternalStore
+
+_Related_
+
+-   <https://react.dev/reference/react/useSyncExternalStore>
+
+### useTransition
+
+_Related_
+
+-   <https://react.dev/reference/react/useTransition>
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

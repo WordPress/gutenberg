@@ -1,8 +1,9 @@
 .block-directory-downloadable-block-notice {
-	margin: 0 0 16px;
+	margin: $grid-unit-10 0 0;
+	color: $alert-red;
 }
 
 .block-directory-downloadable-block-notice__content {
-	padding-right: 12px;
-	margin-bottom: 8px;
+	padding-right: $grid-unit-15;
+	margin-bottom: $grid-unit-10;
 }

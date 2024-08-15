@@ -4,36 +4,12 @@
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Internal to edit-widgets package.
- *
- * Stores widgetId -> clientId mapping which is necessary for saving the navigation.
- *
- * @param {Object} state Redux state
- * @param {Object} action Redux action
- * @return {Object} Updated state
- */
-export function mapping( state, action ) {
-	const { type, ...rest } = action;
-	if ( type === 'SET_WIDGET_TO_CLIENT_ID_MAPPING' ) {
-		return rest.mapping;
-	}
-	if ( type === 'SET_WIDGET_ID_FOR_CLIENT_ID' ) {
-		const newMapping = {
-			...state,
-		};
-		newMapping[ action.widgetId ] = action.clientId;
-		return newMapping;
-	}
-
-	return state || {};
-}
-
-/**
  * Controls the open state of the widget areas.
  *
- * @param {Object} state   Redux state
- * @param {Object} action  Redux action
- * @return {Array}         Updated state
+ * @param {Object} state  Redux state.
+ * @param {Object} action Redux action.
+ *
+ * @return {Array} Updated state.
  */
 export function widgetAreasOpenState( state = {}, action ) {
 	const { type } = action;
@@ -55,21 +31,69 @@ export function widgetAreasOpenState( state = {}, action ) {
 }
 
 /**
- * Reducer tracking whether the inserter is open.
+ * Reducer to set the block inserter panel open or closed.
  *
- * @param {boolean} state
- * @param {Object}  action
+ * Note: this reducer interacts with the list view panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  */
-function isInserterOpened( state = false, action ) {
+export function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
 	}
 	return state;
 }
 
+/**
+ * Reducer to set the list view panel open or closed.
+ *
+ * Note: this reducer interacts with the inserter panel reducer
+ * to make sure that only one of the two panels is open at the same time.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function listViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
+			return action.isOpen;
+	}
+	return state;
+}
+
+/**
+ * This reducer does nothing aside initializing a ref to the list view toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the list view toggle button.
+ */
+export function listViewToggleRef( state = { current: null } ) {
+	return state;
+}
+
+/**
+ * This reducer does nothing aside initializing a ref to the inserter sidebar toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the inserter sidebar toggle button.
+ */
+export function inserterSidebarToggleRef( state = { current: null } ) {
+	return state;
+}
+
 export default combineReducers( {
-	mapping,
-	isInserterOpened,
+	blockInserterPanel,
+	inserterSidebarToggleRef,
+	listViewPanel,
+	listViewToggleRef,
 	widgetAreasOpenState,
 } );

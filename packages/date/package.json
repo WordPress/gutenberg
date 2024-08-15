@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.12.0",
+	"version": "5.5.0",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"date"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/date/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/date/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,13 +18,19 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
-		"moment": "^2.22.1",
-		"moment-timezone": "^0.5.31"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/deprecated": "file:../deprecated",
+		"moment": "^2.29.4",
+		"moment-timezone": "^0.5.40"
 	},
 	"publishConfig": {
 		"access": "public"

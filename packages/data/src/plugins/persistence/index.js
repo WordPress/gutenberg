@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { merge, isPlainObject, get, has } from 'lodash';
+import { isPlainObject } from 'is-plain-object';
+import deepmerge from 'deepmerge';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ import { combineReducers } from '../../';
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
- *
  */
 
 /**
@@ -63,10 +63,8 @@ export const withLazySameState = ( reducer ) => ( state, action ) => {
  * @return {Object} Persistence interface.
  */
 export function createPersistenceInterface( options ) {
-	const {
-		storage = DEFAULT_STORAGE,
-		storageKey = DEFAULT_STORAGE_KEY,
-	} = options;
+	const { storage = DEFAULT_STORAGE, storageKey = DEFAULT_STORAGE_KEY } =
+		options;
 
 	let data;
 
@@ -126,15 +124,15 @@ function persistencePlugin( registry, pluginOptions ) {
 
 	/**
 	 * Creates an enhanced store dispatch function, triggering the state of the
-	 * given reducer key to be persisted when changed.
+	 * given store name to be persisted when changed.
 	 *
-	 * @param {Function}       getState   Function which returns current state.
-	 * @param {string}         reducerKey Reducer key.
-	 * @param {?Array<string>} keys       Optional subset of keys to save.
+	 * @param {Function}       getState  Function which returns current state.
+	 * @param {string}         storeName Store name.
+	 * @param {?Array<string>} keys      Optional subset of keys to save.
 	 *
 	 * @return {Function} Enhanced dispatch function.
 	 */
-	function createPersistOnChange( getState, reducerKey, keys ) {
+	function createPersistOnChange( getState, storeName, keys ) {
 		let getPersistedState;
 		if ( Array.isArray( keys ) ) {
 			// Given keys, the persisted state should by produced as an object
@@ -166,20 +164,20 @@ function persistencePlugin( registry, pluginOptions ) {
 				nextState: getState(),
 			} );
 			if ( state !== lastState ) {
-				persistence.set( reducerKey, state );
+				persistence.set( storeName, state );
 				lastState = state;
 			}
 		};
 	}
 
 	return {
-		registerStore( reducerKey, options ) {
+		registerStore( storeName, options ) {
 			if ( ! options.persist ) {
-				return registry.registerStore( reducerKey, options );
+				return registry.registerStore( storeName, options );
 			}
 
 			// Load from persistence to use as initial state.
-			const persistedState = persistence.get()[ reducerKey ];
+			const persistedState = persistence.get()[ storeName ];
 			if ( persistedState !== undefined ) {
 				let initialState = options.reducer( options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
@@ -194,7 +192,9 @@ function persistencePlugin( registry, pluginOptions ) {
 					//   subset of keys.
 					// - New keys in what would otherwise be used as initial
 					//   state are deeply merged as base for persisted value.
-					initialState = merge( {}, initialState, persistedState );
+					initialState = deepmerge( initialState, persistedState, {
+						isMergeableObject: isPlainObject,
+					} );
 				} else {
 					// If there is a mismatch in object-likeness of default
 					// initial or persisted state, defer to persisted value.
@@ -207,12 +207,12 @@ function persistencePlugin( registry, pluginOptions ) {
 				};
 			}
 
-			const store = registry.registerStore( reducerKey, options );
+			const store = registry.registerStore( storeName, options );
 
 			store.subscribe(
 				createPersistOnChange(
 					store.getState,
-					reducerKey,
+					storeName,
 					options.persist
 				)
 			);
@@ -222,75 +222,6 @@ function persistencePlugin( registry, pluginOptions ) {
 	};
 }
 
-/**
- * Deprecated: Remove this function and the code in WordPress Core that calls
- * it once WordPress 5.4 is released.
- */
-
-persistencePlugin.__unstableMigrate = ( pluginOptions ) => {
-	const persistence = createPersistenceInterface( pluginOptions );
-
-	const state = persistence.get();
-
-	// Migrate 'insertUsage' from 'core/editor' to 'core/block-editor'
-	const insertUsage = get( state, [
-		'core/editor',
-		'preferences',
-		'insertUsage',
-	] );
-	if ( insertUsage ) {
-		persistence.set( 'core/block-editor', {
-			preferences: {
-				insertUsage,
-			},
-		} );
-	}
-
-	let editPostState = state[ 'core/edit-post' ];
-
-	// Default `fullscreenMode` to `false` if any persisted state had existed
-	// and the user hadn't made an explicit choice about fullscreen mode. This
-	// is needed since `fullscreenMode` previously did not have a default value
-	// and was implicitly false by its absence. It is now `true` by default, but
-	// this change is not intended to affect upgrades from earlier versions.
-	const hadPersistedState = Object.keys( state ).length > 0;
-	const hadFullscreenModePreference = has( state, [
-		'core/edit-post',
-		'preferences',
-		'features',
-		'fullscreenMode',
-	] );
-	if ( hadPersistedState && ! hadFullscreenModePreference ) {
-		editPostState = merge( {}, editPostState, {
-			preferences: { features: { fullscreenMode: false } },
-		} );
-	}
-
-	// Migrate 'areTipsEnabled' from 'core/nux' to 'showWelcomeGuide' in 'core/edit-post'
-	const areTipsEnabled = get( state, [
-		'core/nux',
-		'preferences',
-		'areTipsEnabled',
-	] );
-	const hasWelcomeGuide = has( state, [
-		'core/edit-post',
-		'preferences',
-		'features',
-		'welcomeGuide',
-	] );
-	if ( areTipsEnabled !== undefined && ! hasWelcomeGuide ) {
-		editPostState = merge( {}, editPostState, {
-			preferences: {
-				features: {
-					welcomeGuide: areTipsEnabled,
-				},
-			},
-		} );
-	}
-
-	if ( editPostState !== state[ 'core/edit-post' ] ) {
-		persistence.set( 'core/edit-post', editPostState );
-	}
-};
+persistencePlugin.__unstableMigrate = () => {};
 
 export default persistencePlugin;

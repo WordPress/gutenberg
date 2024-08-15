@@ -1,363 +1,369 @@
 /**
- * External dependencies
- */
-import { map, pick, defaultTo, flatten, partialRight } from 'lodash';
-import memize from 'memize';
-
-/**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
-	__unstableEditorStyles as EditorStyles,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { decodeEntities } from '@wordpress/html-entities';
-import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
+import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
-import { mediaUpload } from '../../utils';
-import ConvertToGroupButtons from '../convert-to-group-buttons';
+import { store as editorStore } from '../../store';
+import useBlockEditorSettings from './use-block-editor-settings';
+import { unlock } from '../../lock-unlock';
+import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
+import NavigationBlockEditingMode from './navigation-block-editing-mode';
+import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
+import useCommands from '../commands';
+import BlockRemovalWarnings from '../block-removal-warnings';
+import StartPageOptions from '../start-page-options';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
+import StartTemplateOptions from '../start-template-options';
+import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import PatternRenameModal from '../pattern-rename-modal';
+import PatternDuplicateModal from '../pattern-duplicate-modal';
+import TemplatePartMenuItems from '../template-part-menu-items';
+
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+
+const noop = () => {};
 
 /**
- * Fetches link suggestions from the API. This function is an exact copy of a function found at:
- *
- * packages/edit-navigation/src/index.js
- *
- * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
- * Until we refactor it, just copying the code is the simplest solution.
- *
- * @param {string} search
- * @param {Object} [searchArguments]
- * @param {number} [searchArguments.isInitialSuggestions]
- * @param {number} [searchArguments.type]
- * @param {number} [searchArguments.subtype]
- * @param {number} [searchArguments.page]
- * @param {Object} [editorSettings]
- * @param {boolean} [editorSettings.disablePostFormats=false]
- * @return {Promise<Object[]>} List of suggestions
+ * These are global entities that are only there to split blocks into logical units
+ * They don't provide a "context" for the current post/page being rendered.
+ * So we should not use their ids as post context. This is important to allow post blocks
+ * (post content, post title) to be used within them without issues.
  */
+const NON_CONTEXTUAL_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
 
-const fetchLinkSuggestions = async (
-	search,
-	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
-	{ disablePostFormats = false } = {}
-) => {
-	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
-
-	const queries = [];
-
-	if ( ! type || type === 'post' ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'post',
-					subtype,
-				} ),
-			} ).catch( () => [] ) // fail by returning no results
-		);
-	}
-
-	if ( ! type || type === 'term' ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'term',
-					subtype,
-				} ),
-			} ).catch( () => [] )
-		);
-	}
-
-	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
-		queries.push(
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/search', {
-					search,
-					page,
-					per_page: perPage,
-					type: 'post-format',
-					subtype,
-				} ),
-			} ).catch( () => [] )
-		);
-	}
-
-	return Promise.all( queries ).then( ( results ) => {
-		return map(
-			flatten( results )
-				.filter( ( result ) => !! result.id )
-				.slice( 0, perPage ),
-			( result ) => ( {
-				id: result.id,
-				url: result.url,
-				title: decodeEntities( result.title ) || __( '(no title)' ),
-				type: result.subtype || result.type,
-			} )
-		);
-	} );
-};
-
-class EditorProvider extends Component {
-	constructor( props ) {
-		super( ...arguments );
-
-		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
-			maxSize: 1,
+/**
+ * Depending on the post, template and template mode,
+ * returns the appropriate blocks and change handlers for the block editor provider.
+ *
+ * @param {Array}   post     Block list.
+ * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
+ * @param {string}  mode     Rendering mode.
+ *
+ * @example
+ * ```jsx
+ * const [ blocks, onInput, onChange ] = useBlockEditorProps( post, template, mode );
+ * ```
+ *
+ * @return {Array} Block editor props.
+ */
+function useBlockEditorProps( post, template, mode ) {
+	const rootLevelPost =
+		mode === 'post-only' || ! template ? 'post' : 'template';
+	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		post.type,
+		{ id: post.id }
+	);
+	const [ templateBlocks, onInputTemplate, onChangeTemplate ] =
+		useEntityBlockEditor( 'postType', template?.type, {
+			id: template?.id,
 		} );
+	const maybeNavigationBlocks = useMemo( () => {
+		if ( post.type === 'wp_navigation' ) {
+			return [
+				createBlock( 'core/navigation', {
+					ref: post.id,
+					// As the parent editor is locked with `templateLock`, the template locking
+					// must be explicitly "unset" on the block itself to allow the user to modify
+					// the block's content.
+					templateLock: false,
+				} ),
+			];
+		}
+	}, [ post.type, post.id ] );
 
-		this.getDefaultBlockContext = memize( this.getDefaultBlockContext, {
-			maxSize: 1,
-		} );
-
-		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( props.recovery ) {
-			return;
+	// It is important that we don't create a new instance of blocks on every change
+	// We should only create a new instance if the blocks them selves change, not a dependency of them.
+	const blocks = useMemo( () => {
+		if ( maybeNavigationBlocks ) {
+			return maybeNavigationBlocks;
 		}
 
-		props.updatePostLock( props.settings.postLock );
-		props.setupEditor(
-			props.post,
-			props.initialEdits,
-			props.settings.template
-		);
-
-		if ( props.settings.autosave ) {
-			props.createWarningNotice(
-				__(
-					'There is an autosave of this post that is more recent than the version below.'
-				),
-				{
-					id: 'autosave-exists',
-					actions: [
-						{
-							label: __( 'View the autosave' ),
-							url: props.settings.autosave.editLink,
-						},
-					],
-				}
-			);
+		if ( rootLevelPost === 'template' ) {
+			return templateBlocks;
 		}
+
+		return postBlocks;
+	}, [ maybeNavigationBlocks, rootLevelPost, templateBlocks, postBlocks ] );
+
+	// Handle fallback to postBlocks outside of the above useMemo, to ensure
+	// that constructed block templates that call `createBlock` are not generated
+	// too frequently. This ensures that clientIds are stable.
+	const disableRootLevelChanges =
+		( !! template && mode === 'template-locked' ) ||
+		post.type === 'wp_navigation';
+	if ( disableRootLevelChanges ) {
+		return [ blocks, noop, noop ];
 	}
 
-	getBlockEditorSettings(
+	return [
+		blocks,
+		rootLevelPost === 'post' ? onInput : onInputTemplate,
+		rootLevelPost === 'post' ? onChange : onChangeTemplate,
+	];
+}
+
+/**
+ * This component provides the editor context and manages the state of the block editor.
+ *
+ * @param {Object}  props                                The component props.
+ * @param {Object}  props.post                           The post object.
+ * @param {Object}  props.settings                       The editor settings.
+ * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
+ * @param {Array}   props.initialEdits                   The initial edits for the editor.
+ * @param {Object}  props.children                       The child components.
+ * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
+ * @param {Object}  [props.__unstableTemplate]           The template object.
+ *
+ * @example
+ * ```jsx
+ * <ExperimentalEditorProvider
+ *   post={ post }
+ *   settings={ settings }
+ *   recovery={ recovery }
+ *   initialEdits={ initialEdits }
+ *   __unstableTemplate={ template }
+ * >
+ *   { children }
+ * </ExperimentalEditorProvider>
+ *
+ * @return {Object} The rendered ExperimentalEditorProvider component.
+ */
+export const ExperimentalEditorProvider = withRegistryProvider(
+	( {
+		post,
 		settings,
-		reusableBlocks,
-		hasUploadPermissions,
-		canUserUseUnfilteredHTML,
-		undo,
-		shouldInsertAtTheTop
-	) {
-		return {
-			...pick( settings, [
-				'__experimentalBlockDirectory',
-				'__experimentalBlockPatterns',
-				'__experimentalBlockPatternCategories',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalFeatures',
-				'__experimentalGlobalStylesUserEntityId',
-				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesContexts',
-				'__experimentalPreferredStyleVariations',
-				'__experimentalSetIsInserterOpened',
-				'alignWide',
-				'allowedBlockTypes',
-				'availableLegacyWidgets',
-				'bodyPlaceholder',
-				'codeEditingEnabled',
-				'colors',
-				'disableCustomColors',
-				'disableCustomFontSizes',
-				'disableCustomGradients',
-				'enableCustomUnits',
-				'enableCustomLineHeight',
-				'focusMode',
-				'fontSizes',
-				'gradients',
-				'hasFixedToolbar',
-				'hasReducedUI',
-				'imageEditing',
-				'imageSizes',
-				'imageDimensions',
-				'isRTL',
-				'keepCaretInsideBlock',
-				'maxWidth',
-				'onUpdateDefaultBlockStyles',
-				'styles',
-				'template',
-				'templateLock',
-				'titlePlaceholder',
-			] ),
-			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchLinkSuggestions: partialRight(
-				fetchLinkSuggestions,
-				settings
-			),
-			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
-			__experimentalUndo: undo,
-			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
-		};
-	}
+		recovery,
+		initialEdits,
+		children,
+		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
+		__unstableTemplate: template,
+	} ) => {
+		const { editorSettings, selection, isReady, mode } = useSelect(
+			( select ) => {
+				const {
+					getEditorSettings,
+					getEditorSelection,
+					getRenderingMode,
+					__unstableIsEditorReady,
+				} = select( editorStore );
+				return {
+					editorSettings: getEditorSettings(),
+					isReady: __unstableIsEditorReady(),
+					mode: getRenderingMode(),
+					selection: getEditorSelection(),
+				};
+			},
+			[]
+		);
+		const shouldRenderTemplate = !! template && mode !== 'post-only';
+		const rootLevelPost = shouldRenderTemplate ? template : post;
+		const defaultBlockContext = useMemo( () => {
+			const postContext =
+				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
+				shouldRenderTemplate
+					? { postId: post.id, postType: post.type }
+					: {};
 
-	getDefaultBlockContext( postId, postType ) {
-		return { postId, postType };
-	}
-
-	componentDidMount() {
-		this.props.updateEditorSettings( this.props.settings );
-	}
-
-	componentDidUpdate( prevProps ) {
-		if ( this.props.settings !== prevProps.settings ) {
-			this.props.updateEditorSettings( this.props.settings );
-		}
-	}
-
-	componentWillUnmount() {
-		this.props.tearDownEditor();
-	}
-
-	render() {
-		const {
-			canUserUseUnfilteredHTML,
-			children,
+			return {
+				...postContext,
+				templateSlug:
+					rootLevelPost.type === 'wp_template'
+						? rootLevelPost.slug
+						: undefined,
+			};
+		}, [
+			shouldRenderTemplate,
+			post.id,
+			post.type,
+			rootLevelPost.type,
+			rootLevelPost.slug,
+		] );
+		const { id, type } = rootLevelPost;
+		const blockEditorSettings = useBlockEditorSettings(
+			editorSettings,
+			type,
+			id,
+			mode
+		);
+		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
-			blocks,
-			resetEditorBlocks,
-			selectionStart,
-			selectionEnd,
-			isReady,
-			settings,
-			reusableBlocks,
-			resetEditorBlocksWithoutUndoLevel,
-			hasUploadPermissions,
-			isPostTitleSelected,
-			undo,
-		} = this.props;
+			template,
+			mode
+		);
+
+		const {
+			updatePostLock,
+			setupEditor,
+			updateEditorSettings,
+			setCurrentTemplateId,
+			setEditedPost,
+			setRenderingMode,
+		} = unlock( useDispatch( editorStore ) );
+		const { createWarningNotice } = useDispatch( noticesStore );
+
+		// Ideally this should be synced on each change and not just something you do once.
+		useLayoutEffect( () => {
+			// Assume that we don't need to initialize in the case of an error recovery.
+			if ( recovery ) {
+				return;
+			}
+
+			updatePostLock( settings.postLock );
+			setupEditor( post, initialEdits, settings.template );
+			if ( settings.autosave ) {
+				createWarningNotice(
+					__(
+						'There is an autosave of this post that is more recent than the version below.'
+					),
+					{
+						id: 'autosave-exists',
+						actions: [
+							{
+								label: __( 'View the autosave' ),
+								url: settings.autosave.editLink,
+							},
+						],
+					}
+				);
+			}
+		}, [] );
+
+		// Synchronizes the active post with the state
+		useEffect( () => {
+			setEditedPost( post.type, post.id );
+		}, [ post.type, post.id, setEditedPost ] );
+
+		// Synchronize the editor settings as they change.
+		useEffect( () => {
+			updateEditorSettings( settings );
+		}, [ settings, updateEditorSettings ] );
+
+		// Synchronizes the active template with the state.
+		useEffect( () => {
+			setCurrentTemplateId( template?.id );
+		}, [ template?.id, setCurrentTemplateId ] );
+
+		// Sets the right rendering mode when loading the editor.
+		useEffect( () => {
+			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
+		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		useHideBlocksFromInserter( post.type, mode );
+
+		// Register the editor commands.
+		useCommands();
 
 		if ( ! isReady ) {
 			return null;
 		}
 
-		const editorSettings = this.getBlockEditorSettings(
-			settings,
-			reusableBlocks,
-			hasUploadPermissions,
-			canUserUseUnfilteredHTML,
-			undo,
-			isPostTitleSelected
-		);
-
-		const defaultBlockContext = this.getDefaultBlockContext(
-			post.id,
-			post.type
-		);
-
 		return (
-			<>
-				<EditorStyles styles={ settings.styles } />
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						<BlockContextProvider value={ defaultBlockContext }>
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ resetEditorBlocksWithoutUndoLevel }
-								onChange={ resetEditorBlocks }
-								selectionStart={ selectionStart }
-								selectionEnd={ selectionEnd }
-								settings={ editorSettings }
-								useSubRegistry={ false }
-							>
-								{ children }
-								<ReusableBlocksMenuItems />
-								<ConvertToGroupButtons />
-							</BlockEditorProvider>
-						</BlockContextProvider>
-					</EntityProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
+					<BlockContextProvider value={ defaultBlockContext }>
+						<BlockEditorProviderComponent
+							value={ blocks }
+							onChange={ onChange }
+							onInput={ onInput }
+							selection={ selection }
+							settings={ blockEditorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							{ ! settings.__unstableIsPreviewMode && (
+								<>
+									<PatternsMenuItems />
+									<TemplatePartMenuItems />
+									<ContentOnlySettingsMenu />
+									{ mode === 'template-locked' && (
+										<DisableNonPageContentBlocks />
+									) }
+									{ type === 'wp_navigation' && (
+										<NavigationBlockEditingMode />
+									) }
+									<EditorKeyboardShortcuts />
+									<KeyboardShortcutHelpModal />
+									<BlockRemovalWarnings />
+									<StartPageOptions />
+									<StartTemplateOptions />
+									<PatternRenameModal />
+									<PatternDuplicateModal />
+								</>
+							) }
+						</BlockEditorProviderComponent>
+					</BlockContextProvider>
 				</EntityProvider>
-			</>
+			</EntityProvider>
 		);
 	}
+);
+
+/**
+ * This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
+ *
+ * It supports a large number of post types, including post, page, templates,
+ * custom post types, patterns, template parts.
+ *
+ * All modification and changes are performed to the `@wordpress/core-data` store.
+ *
+ * @param {Object}  props                      The component props.
+ * @param {Object}  [props.post]               The post object to edit. This is required.
+ * @param {Object}  [props.__unstableTemplate] The template object wrapper the edited post.
+ *                                             This is optional and can only be used when the post type supports templates (like posts and pages).
+ * @param {Object}  [props.settings]           The settings object to use for the editor.
+ *                                             This is optional and can be used to override the default settings.
+ * @param {Element} [props.children]           Children elements for which the BlockEditorProvider context should apply.
+ *                                             This is optional.
+ *
+ * @example
+ * ```jsx
+ * <EditorProvider
+ *   post={ post }
+ *   settings={ settings }
+ *   __unstableTemplate={ template }
+ * >
+ *   { children }
+ * </EditorProvider>
+ * ```
+ *
+ * @return {JSX.Element} The rendered EditorProvider component.
+ */
+export function EditorProvider( props ) {
+	return (
+		<ExperimentalEditorProvider
+			{ ...props }
+			BlockEditorProviderComponent={ BlockEditorProvider }
+		>
+			{ props.children }
+		</ExperimentalEditorProvider>
+	);
 }
 
-export default compose( [
-	withRegistryProvider,
-	withSelect( ( select ) => {
-		const {
-			canUserUseUnfilteredHTML,
-			__unstableIsEditorReady: isEditorReady,
-			getEditorBlocks,
-			getEditorSelectionStart,
-			getEditorSelectionEnd,
-			isPostTitleSelected,
-		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
-
-		return {
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
-			selectionStart: getEditorSelectionStart(),
-			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: select( 'core' ).getEntityRecords(
-				'postType',
-				'wp_block',
-				{ per_page: -1 }
-			),
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-			// This selector is only defined on mobile.
-			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			setupEditor,
-			updatePostLock,
-			resetEditorBlocks,
-			updateEditorSettings,
-			__experimentalTearDownEditor,
-			undo,
-		} = dispatch( 'core/editor' );
-		const { createWarningNotice } = dispatch( 'core/notices' );
-
-		return {
-			setupEditor,
-			updatePostLock,
-			createWarningNotice,
-			resetEditorBlocks,
-			updateEditorSettings,
-			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
-				resetEditorBlocks( blocks, {
-					...options,
-					__unstableShouldCreateUndoLevel: false,
-				} );
-			},
-			tearDownEditor: __experimentalTearDownEditor,
-			undo,
-		};
-	} ),
-] )( EditorProvider );
+export default EditorProvider;

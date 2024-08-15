@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Button, Placeholder, ExternalLink } from '@wordpress/components';
+import {
+	Button,
+	Placeholder,
+	ExternalLink,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
 const EmbedPlaceholder = ( {
@@ -33,31 +39,37 @@ const EmbedPlaceholder = ( {
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
 				/>
-				<Button isPrimary type="submit">
+				<Button variant="primary" type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>
-			<div className="components-placeholder__learn-more">
+			<div className="wp-block-embed__learn-more">
 				<ExternalLink
 					href={ __(
-						'https://wordpress.org/support/article/embeds/'
+						'https://wordpress.org/documentation/article/embeds/'
 					) }
 				>
 					{ __( 'Learn more about embeds' ) }
 				</ExternalLink>
 			</div>
 			{ cannotEmbed && (
-				<div className="components-placeholder__error">
+				<VStack spacing={ 3 } className="components-placeholder__error">
 					<div className="components-placeholder__instructions">
 						{ __( 'Sorry, this content could not be embedded.' ) }
 					</div>
-					<Button isSecondary onClick={ tryAgain }>
-						{ _x( 'Try again', 'button label' ) }
-					</Button>{ ' ' }
-					<Button isSecondary onClick={ fallback }>
-						{ _x( 'Convert to link', 'button label' ) }
-					</Button>
-				</div>
+					<HStack
+						expanded={ false }
+						spacing={ 3 }
+						justify="flex-start"
+					>
+						<Button variant="secondary" onClick={ tryAgain }>
+							{ _x( 'Try again', 'button label' ) }
+						</Button>{ ' ' }
+						<Button variant="secondary" onClick={ fallback }>
+							{ _x( 'Convert to link', 'button label' ) }
+						</Button>
+					</HStack>
+				</VStack>
 			) }
 		</Placeholder>
 	);

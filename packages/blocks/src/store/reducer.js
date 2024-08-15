@@ -1,23 +1,18 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	find,
-	get,
-	isEmpty,
-	keyBy,
-	map,
-	mapValues,
-	omit,
-	uniqBy,
-} from 'lodash';
+import { camelCase } from 'change-case';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { omit } from '../api/utils';
 
 /**
  * @typedef {Object} WPBlockCategory
@@ -36,12 +31,125 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'media', title: __( 'Media' ) },
 	{ slug: 'design', title: __( 'Design' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
+	{ slug: 'theme', title: __( 'Theme' ) },
 	{ slug: 'embed', title: __( 'Embeds' ) },
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
+// Key block types by their name.
+function keyBlockTypesByName( types ) {
+	return types.reduce(
+		( newBlockTypes, block ) => ( {
+			...newBlockTypes,
+			[ block.name ]: block,
+		} ),
+		{}
+	);
+}
+
+// Filter items to ensure they're unique by their name.
+function getUniqueItemsByName( items ) {
+	return items.reduce( ( acc, currentItem ) => {
+		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
+			acc.push( currentItem );
+		}
+		return acc;
+	}, [] );
+}
+
+function bootstrappedBlockTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
+			const { name, blockType } = action;
+			const serverDefinition = state[ name ];
+			let newDefinition;
+			// Don't overwrite if already set. It covers the case when metadata
+			// was initialized from the server.
+			if ( serverDefinition ) {
+				// The `blockHooks` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.4.
+				if (
+					serverDefinition.blockHooks === undefined &&
+					blockType.blockHooks
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						blockHooks: blockType.blockHooks,
+					};
+				}
+
+				// The `allowedBlocks` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.5.
+				if (
+					serverDefinition.allowedBlocks === undefined &&
+					blockType.allowedBlocks
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						allowedBlocks: blockType.allowedBlocks,
+					};
+				}
+			} else {
+				newDefinition = Object.fromEntries(
+					Object.entries( blockType )
+						.filter(
+							( [ , value ] ) =>
+								value !== null && value !== undefined
+						)
+						.map( ( [ key, value ] ) => [
+							camelCase( key ),
+							value,
+						] )
+				);
+				newDefinition.name = name;
+			}
+
+			if ( newDefinition ) {
+				return {
+					...state,
+					[ name ]: newDefinition,
+				};
+			}
+
+			return state;
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
 /**
- * Reducer managing the block types
+ * Reducer managing the unprocessed block types in a form passed when registering the by block.
+ * It's for internal use only. It allows recomputing the processed block types on-demand after block type filters
+ * get added or removed.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function unprocessedBlockTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_UNPROCESSED_BLOCK_TYPE':
+			return {
+				...state,
+				[ action.name ]: action.blockType,
+			};
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the processed block types with all filters applied.
+ * The state is derived from the `unprocessedBlockTypes` reducer.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -53,12 +161,7 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy(
-					map( action.blockTypes, ( blockType ) =>
-						omit( blockType, 'styles ' )
-					),
-					'name'
-				),
+				...keyBlockTypesByName( action.blockTypes ),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
@@ -68,7 +171,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing the block style variations.
+ * Reducer managing the block styles.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -80,35 +183,38 @@ export function blockStyles( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'styles' ], [] ),
-								...get( state, [ blockType.name ], [] ),
-							],
-							( style ) => style.name
-						);
-					}
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => [
+						name,
+						getUniqueItemsByName( [
+							...( blockType.styles ?? [] ).map( ( style ) => ( {
+								...style,
+								source: 'block',
+							} ) ),
+							...( state[ blockType.name ] ?? [] ).filter(
+								( { source } ) => 'block' !== source
+							),
+						] ),
+					] )
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
-			return {
-				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.styles,
-					],
-					( style ) => style.name
-				),
-			};
+			const updatedStyles = {};
+			action.blockNames.forEach( ( blockName ) => {
+				updatedStyles[ blockName ] = getUniqueItemsByName( [
+					...( state[ blockName ] ?? [] ),
+					...action.styles,
+				] );
+			} );
+			return { ...state, ...updatedStyles };
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
+				).filter(
 					( style ) => action.styleNames.indexOf( style.name ) === -1
 				),
 			};
@@ -130,35 +236,41 @@ export function blockVariations( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...mapValues(
-					keyBy( action.blockTypes, 'name' ),
-					( blockType ) => {
-						return uniqBy(
-							[
-								...get( blockType, [ 'variations' ], [] ),
-								...get( state, [ blockType.name ], [] ),
-							],
-							( variation ) => variation.name
-						);
-					}
+				...Object.fromEntries(
+					Object.entries(
+						keyBlockTypesByName( action.blockTypes )
+					).map( ( [ name, blockType ] ) => {
+						return [
+							name,
+							getUniqueItemsByName( [
+								...( blockType.variations ?? [] ).map(
+									( variation ) => ( {
+										...variation,
+										source: 'block',
+									} )
+								),
+								...( state[ blockType.name ] ?? [] ).filter(
+									( { source } ) => 'block' !== source
+								),
+							] ),
+						];
+					} )
 				),
 			};
 		case 'ADD_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: uniqBy(
-					[
-						...get( state, [ action.blockName ], [] ),
-						...action.variations,
-					],
-					( variation ) => variation.name
-				),
+				[ action.blockName ]: getUniqueItemsByName( [
+					...( state[ action.blockName ] ?? [] ),
+					...action.variations,
+				] ),
 			};
 		case 'REMOVE_BLOCK_VARIATIONS':
 			return {
 				...state,
-				[ action.blockName ]: filter(
-					get( state, [ action.blockName ], [] ),
+				[ action.blockName ]: (
+					state[ action.blockName ] ?? []
+				).filter(
 					( variation ) =>
 						action.variationNames.indexOf( variation.name ) === -1
 				),
@@ -171,7 +283,7 @@ export function blockVariations( state = {}, action ) {
 /**
  * Higher-order Reducer creating a reducer keeping track of given block name.
  *
- * @param {string} setActionType  Action type.
+ * @param {string} setActionType Action type.
  *
  * @return {Function} Reducer.
  */
@@ -216,14 +328,24 @@ export const groupingBlockName = createBlockNameSetterReducer(
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
 		case 'SET_CATEGORIES':
-			return action.categories || [];
+			// Ensure, that categories are unique by slug.
+			const uniqueCategories = new Map();
+			( action.categories || [] ).forEach( ( category ) => {
+				uniqueCategories.set( category.slug, category );
+			} );
+			return [ ...uniqueCategories.values() ];
 		case 'UPDATE_CATEGORY': {
-			if ( ! action.category || isEmpty( action.category ) ) {
+			if (
+				! action.category ||
+				! Object.keys( action.category ).length
+			) {
 				return state;
 			}
-			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			const categoryToChange = state.find(
+				( { slug } ) => slug === action.slug
+			);
 			if ( categoryToChange ) {
-				return map( state, ( category ) => {
+				return state.map( ( category ) => {
 					if ( category.slug === action.slug ) {
 						return {
 							...category,
@@ -254,7 +376,64 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Merges usesContext with existing values, potentially defined in the server registration.
+ *
+ * @param {string[]} existingUsesContext Existing `usesContext`.
+ * @param {string[]} newUsesContext      Newly added `usesContext`.
+ * @return {string[]|undefined} Merged `usesContext`.
+ */
+function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
+	const mergedArrays = Array.from(
+		new Set( existingUsesContext.concat( newUsesContext ) )
+	);
+	return mergedArrays.length > 0 ? mergedArrays : undefined;
+}
+
+export function blockBindingsSources( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+					getValues: action.getValues,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue: action.canUserEditValue,
+					getFieldsList: action.getFieldsList,
+				},
+			};
+		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					/*
+					 * Keep the exisitng properties in case the source has been registered
+					 * in the client before bootstrapping.
+					 */
+					...state[ action.name ],
+					label: action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
+	}
+	return state;
+}
+
 export default combineReducers( {
+	bootstrappedBlockTypes,
+	unprocessedBlockTypes,
 	blockTypes,
 	blockStyles,
 	blockVariations,
@@ -264,4 +443,5 @@ export default combineReducers( {
 	groupingBlockName,
 	categories,
 	collections,
+	blockBindingsSources,
 } );

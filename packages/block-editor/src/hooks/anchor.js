@@ -1,21 +1,17 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { InspectorAdvancedControls } from '../components';
+import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -23,6 +19,13 @@ import { InspectorAdvancedControls } from '../components';
  * @type {RegExp}
  */
 const ANCHOR_REGEX = /[\s#]/g;
+
+const ANCHOR_SCHEMA = {
+	type: 'string',
+	source: 'attribute',
+	attribute: 'id',
+	selector: '*',
+};
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -33,84 +36,79 @@ const ANCHOR_REGEX = /[\s#]/g;
  * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
-	// allow blocks to specify their own attribute definition with default values if needed.
-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
+	// Allow blocks to specify their own attribute definition with default values if needed.
+	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
 	}
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
 			...settings.attributes,
-			anchor: {
-				type: 'string',
-				source: 'attribute',
-				attribute: 'id',
-				selector: '*',
-			},
+			anchor: ANCHOR_SCHEMA,
 		};
 	}
 
 	return settings;
 }
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning the anchor ID, if block supports anchor.
- *
- * @param {WPComponent} BlockEdit Original component.
- *
- * @return {WPComponent} Wrapped component.
- */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
 
-			if ( hasAnchor && props.isSelected ) {
-				return (
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const isWeb = Platform.OS === 'web';
+
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				className="html-anchor-control"
+				label={ __( 'HTML anchor' ) }
+				help={
 					<>
-						<BlockEdit { ...props } />
-						<InspectorAdvancedControls>
-							<TextControl
-								className="html-anchor-control"
-								label={ __( 'HTML anchor' ) }
-								help={
-									<>
-										{ __(
-											'Enter a word or two — without spaces — to make a unique web address just for this heading, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-										) }
-
-										<ExternalLink
-											href={
-												'https://wordpress.org/support/article/page-jumps/'
-											}
-										>
-											{ __( 'Learn more about anchors' ) }
-										</ExternalLink>
-									</>
-								}
-								value={ props.attributes.anchor || '' }
-								onChange={ ( nextValue ) => {
-									nextValue = nextValue.replace(
-										ANCHOR_REGEX,
-										'-'
-									);
-									props.setAttributes( {
-										anchor: nextValue,
-									} );
-								} }
-								autoComplete="off"
-							/>
-						</InspectorAdvancedControls>
+						{ __(
+							'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.'
+						) }
+						{ isWeb && (
+							<>
+								{ ' ' }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/documentation/article/page-jumps/'
+									) }
+								>
+									{ __( 'Learn more about anchors' ) }
+								</ExternalLink>
+							</>
+						) }
 					</>
-				);
-			}
+				}
+				value={ anchor || '' }
+				placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
+				onChange={ ( nextValue ) => {
+					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+					setAttributes( {
+						anchor: nextValue,
+					} );
+				} }
+				autoCapitalize="none"
+				autoComplete="off"
+			/>
+		</InspectorControls>
+	);
+}
 
-			return <BlockEdit { ...props } />;
-		};
+export default {
+	addSaveProps,
+	edit: BlockEditAnchorControlPure,
+	attributeKeys: [ 'anchor' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'anchor' );
 	},
-	'withInspectorControl'
-);
+};
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -132,13 +130,3 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/anchor/attribute', addAttribute );
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/anchor/with-inspector-control',
-	withInspectorControl
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/anchor/save-props',
-	addSaveProps
-);

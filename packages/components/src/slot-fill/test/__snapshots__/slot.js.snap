@@ -42,12 +42,16 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
   <div
     data-position="first"
   >
-    <div />
+    <div
+      class="emotion-0 emotion-1"
+    />
   </div>
   <div
     data-position="second"
   >
-    <div>
+    <div
+      class="emotion-0 emotion-1"
+    >
       Content
     </div>
   </div>
@@ -62,7 +66,9 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
   <div
     data-position="second"
   >
-    <div>
+    <div
+      class="emotion-0 emotion-1"
+    >
       Content
     </div>
   </div>
@@ -150,12 +156,31 @@ exports[`Slot should render empty Fills without HTML wrapper when render props u
 </div>
 `;
 
-exports[`Slot should render in expected order 1`] = `
+exports[`Slot should render in expected order when fills always mounted 1`] = `
 <div>
   <div>
-    first
+    first (rerendered)
     second
+    third
+    fourth (new)
   </div>
+</div>
+`;
+
+exports[`Slot should render in expected order when fills unmounted 1`] = `
+<div>
+  <div>
+    second
+    third
+    first (rerendered)
+    fourth (new)
+  </div>
+  <button
+    type="button"
+  />
+  <button
+    type="button"
+  />
   <button
     type="button"
   />
@@ -168,7 +193,9 @@ exports[`Slot should render in expected order 1`] = `
 exports[`Slot should warn without a Provider 1`] = `
 <div>
   <div>
-    <div />
+    <div
+      class="emotion-0 emotion-1"
+    />
   </div>
 </div>
 `;

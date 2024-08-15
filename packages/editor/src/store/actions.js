@@ -1,184 +1,151 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
+import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
-import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { applyFilters } from '@wordpress/hooks';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import {
-	STORE_KEY,
-	POST_UPDATE_TRANSACTION_ID,
-	TRASH_POST_NOTICE_ID,
-} from './constants';
+import { TRASH_POST_NOTICE_ID } from './constants';
+import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post      Post object.
- * @param {Object} edits     Initial edited attributes object.
- * @param {Array?} template  Block Template.
+ * @param {Object} post     Post object.
+ * @param {Object} edits    Initial edited attributes object.
+ * @param {Array?} template Block Template.
  */
-export function* setupEditor( post, edits, template ) {
-	// In order to ensure maximum of a single parse during setup, edits are
-	// included as part of editor setup action. Assume edited content as
-	// canonical if provided, falling back to post.
-	let content;
-	if ( has( edits, [ 'content' ] ) ) {
-		content = edits.content;
-	} else {
-		content = post.content.raw;
-	}
-
-	let blocks = parse( content );
-
-	// Apply a template for new posts only, if exists.
-	const isNewPost = post.status === 'auto-draft';
-	if ( isNewPost && template ) {
-		blocks = synchronizeBlocksWithTemplate( blocks, template );
-	}
-
-	yield resetPost( post );
-	yield {
-		type: 'SETUP_EDITOR',
-		post,
-		edits,
-		template,
+export const setupEditor =
+	( post, edits, template ) =>
+	( { dispatch } ) => {
+		dispatch.setEditedPost( post.type, post.id );
+		// Apply a template for new posts only, if exists.
+		const isNewPost = post.status === 'auto-draft';
+		if ( isNewPost && template ) {
+			// In order to ensure maximum of a single parse during setup, edits are
+			// included as part of editor setup action. Assume edited content as
+			// canonical if provided, falling back to post.
+			let content;
+			if ( 'content' in edits ) {
+				content = edits.content;
+			} else {
+				content = post.content.raw;
+			}
+			let blocks = parse( content );
+			blocks = synchronizeBlocksWithTemplate( blocks, template );
+			dispatch.resetEditorBlocks( blocks, {
+				__unstableShouldCreateUndoLevel: false,
+			} );
+		}
+		if (
+			edits &&
+			Object.values( edits ).some(
+				( [ key, edit ] ) =>
+					edit !== ( post[ key ]?.raw ?? post[ key ] )
+			)
+		) {
+			dispatch.editPost( edits );
+		}
 	};
-	yield resetEditorBlocks( blocks, {
-		__unstableShouldCreateUndoLevel: false,
-	} );
-	yield setupEditorState( post );
-	if (
-		edits &&
-		Object.keys( edits ).some(
-			( key ) =>
-				edits[ key ] !==
-				( has( post, [ key, 'raw' ] ) ? post[ key ].raw : post[ key ] )
-		)
-	) {
-		yield editPost( edits );
-	}
-}
 
 /**
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function __experimentalTearDownEditor() {
-	return { type: 'TEAR_DOWN_EDITOR' };
+	deprecated(
+		"wp.data.dispatch( 'core/editor' ).__experimentalTearDownEditor",
+		{
+			since: '6.5',
+		}
+	);
+	return { type: 'DO_NOTHING' };
 }
 
 /**
  * Returns an action object used in signalling that the latest version of the
  * post has been received, either by initialization or save.
  *
- * @param {Object} post Post object.
- *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0.
  */
-export function resetPost( post ) {
-	return {
-		type: 'RESET_POST',
-		post,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the latest autosave of the
- * post has been received, by initialization or autosave.
- *
- * @deprecated since 5.6. Callers should use the `receiveAutosaves( postId, autosave )`
- * 			   selector from the '@wordpress/core-data' package.
- *
- * @param {Object} newAutosave Autosave post object.
- *
- * @return {Object} Action object.
- */
-export function* resetAutosave( newAutosave ) {
-	deprecated( 'resetAutosave action (`core/editor` store)', {
-		alternative: 'receiveAutosaves action (`core` store)',
-		plugin: 'Gutenberg',
+export function resetPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).resetPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Initialize the editor with the setupEditorState action',
 	} );
-
-	const postId = yield controls.select( STORE_KEY, 'getCurrentPostId' );
-	yield controls.dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
-
-	return { type: '__INERT__' };
-}
-
-/**
- * Action for dispatching that a post update request has started.
- *
- * @param {Object} options
- *
- * @return {Object} An action object
- */
-export function __experimentalRequestPostUpdateStart( options = {} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_START',
-		options,
-	};
-}
-
-/**
- * Action for dispatching that a post update request has finished.
- *
- * @param {Object} options
- *
- * @return {Object} An action object
- */
-export function __experimentalRequestPostUpdateFinish( options = {} ) {
-	return {
-		type: 'REQUEST_POST_UPDATE_FINISH',
-		options,
-	};
+	return { type: 'DO_NOTHING' };
 }
 
 /**
  * Returns an action object used in signalling that a patch of updates for the
  * latest version of the post have been received.
  *
- * @param {Object} edits Updated post fields.
- *
  * @return {Object} Action object.
+ * @deprecated since Gutenberg 9.7.0.
  */
-export function updatePost( edits ) {
+export function updatePost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		since: '5.7',
+		alternative: 'Use the core entities store instead',
+	} );
 	return {
-		type: 'UPDATE_POST',
-		edits,
+		type: 'DO_NOTHING',
 	};
 }
 
 /**
- * Returns an action object used to setup the editor state when first opening
- * an editor.
+ * Setup the editor state.
  *
- * @param {Object} post   Post object.
+ * @deprecated
+ *
+ * @param {Object} post Post object.
+ */
+export function setupEditorState( post ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).setupEditorState", {
+		since: '6.5',
+		alternative: "wp.data.dispatch( 'core/editor' ).setEditedPost",
+	} );
+	return setEditedPost( post.type, post.id );
+}
+
+/**
+ * Returns an action that sets the current post Type and post ID.
+ *
+ * @param {string} postType Post Type.
+ * @param {string} postId   Post ID.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post ) {
+export function setEditedPost( postType, postId ) {
 	return {
-		type: 'SETUP_EDITOR_STATE',
-		post,
+		type: 'SET_EDITED_POST',
+		postType,
+		postId,
 	};
 }
 
@@ -188,267 +155,263 @@ export function setupEditorState( post ) {
  *
  * @param {Object} edits   Post attributes to edit.
  * @param {Object} options Options for the edit.
- *
- * @yield {Object} Action object or control.
  */
-export function* editPost( edits, options ) {
-	const { id, type } = yield controls.select( STORE_KEY, 'getCurrentPost' );
-	yield controls.dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		type,
-		id,
-		edits,
-		options
-	);
-}
-
-/**
- * Returns action object produced by the updatePost creator augmented by
- * an optimist option that signals optimistically applying updates.
- *
- * @param {Object} edits  Updated post fields.
- *
- * @return {Object} Action object.
- */
-export function __experimentalOptimisticUpdatePost( edits ) {
-	return {
-		...updatePost( edits ),
-		optimist: { id: POST_UPDATE_TRANSACTION_ID },
+export const editPost =
+	( edits, options ) =>
+	( { select, registry } ) => {
+		const { id, type } = select.getCurrentPost();
+		registry
+			.dispatch( coreStore )
+			.editEntityRecord( 'postType', type, id, edits, options );
 	};
-}
 
 /**
- * Action generator for saving the current post in the editor.
+ * Action for saving the current post in the editor.
  *
  * @param {Object} options
  */
-export function* savePost( options = {} ) {
-	if ( ! ( yield controls.select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
-		return;
-	}
-	let edits = {
-		content: yield controls.select( STORE_KEY, 'getEditedPostContent' ),
-	};
-	if ( ! options.isAutosave ) {
-		yield controls.dispatch( STORE_KEY, 'editPost', edits, {
-			undoIgnore: true,
-		} );
-	}
-
-	yield __experimentalRequestPostUpdateStart( options );
-	const previousRecord = yield controls.select( STORE_KEY, 'getCurrentPost' );
-	edits = {
-		id: previousRecord.id,
-		...( yield controls.select(
-			'core',
-			'getEntityRecordNonTransientEdits',
-			'postType',
-			previousRecord.type,
-			previousRecord.id
-		) ),
-		...edits,
-	};
-	yield controls.dispatch(
-		'core',
-		'saveEntityRecord',
-		'postType',
-		previousRecord.type,
-		edits,
-		options
-	);
-	yield __experimentalRequestPostUpdateFinish( options );
-
-	const error = yield controls.select(
-		'core',
-		'getLastEntitySaveError',
-		'postType',
-		previousRecord.type,
-		previousRecord.id
-	);
-	if ( error ) {
-		const args = getNotificationArgumentsForSaveFail( {
-			post: previousRecord,
-			edits,
-			error,
-		} );
-		if ( args.length ) {
-			yield controls.dispatch(
-				'core/notices',
-				'createErrorNotice',
-				...args
-			);
+export const savePost =
+	( options = {} ) =>
+	async ( { select, dispatch, registry } ) => {
+		if ( ! select.isEditedPostSaveable() ) {
+			return;
 		}
-	} else {
-		const updatedRecord = yield controls.select(
-			STORE_KEY,
-			'getCurrentPost'
-		);
-		const args = getNotificationArgumentsForSaveSuccess( {
-			previousPost: previousRecord,
-			post: updatedRecord,
-			postType: yield controls.resolveSelect(
-				'core',
-				'getPostType',
-				updatedRecord.type
-			),
-			options,
-		} );
-		if ( args.length ) {
-			yield controls.dispatch(
-				'core/notices',
-				'createSuccessNotice',
-				...args
-			);
-		}
-		// Make sure that any edits after saving create an undo level and are
-		// considered for change detection.
+
+		const content = select.getEditedPostContent();
+
 		if ( ! options.isAutosave ) {
-			yield controls.dispatch(
-				'core/block-editor',
-				'__unstableMarkLastChangeAsPersistent'
-			);
+			dispatch.editPost( { content }, { undoIgnore: true } );
 		}
-	}
-}
+
+		const previousRecord = select.getCurrentPost();
+		const edits = {
+			id: previousRecord.id,
+			...registry
+				.select( coreStore )
+				.getEntityRecordNonTransientEdits(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				),
+			content,
+		};
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
+
+		let error = false;
+		try {
+			error = await applyFilters(
+				'editor.__unstablePreSavePost',
+				Promise.resolve( false ),
+				options
+			);
+		} catch ( err ) {
+			error = err;
+		}
+
+		if ( ! error ) {
+			try {
+				await registry
+					.dispatch( coreStore )
+					.saveEntityRecord(
+						'postType',
+						previousRecord.type,
+						edits,
+						options
+					);
+			} catch ( err ) {
+				error =
+					err.message && err.code !== 'unknown_error'
+						? err.message
+						: __( 'An error occurred while updating.' );
+			}
+		}
+
+		if ( ! error ) {
+			error = registry
+				.select( coreStore )
+				.getLastEntitySaveError(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				);
+		}
+
+		if ( ! error ) {
+			await applyFilters(
+				'editor.__unstableSavePost',
+				Promise.resolve(),
+				options
+			).catch( ( err ) => {
+				error = err;
+			} );
+		}
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		if ( error ) {
+			const args = getNotificationArgumentsForSaveFail( {
+				post: previousRecord,
+				edits,
+				error,
+			} );
+			if ( args.length ) {
+				registry.dispatch( noticesStore ).createErrorNotice( ...args );
+			}
+		} else {
+			const updatedRecord = select.getCurrentPost();
+			const args = getNotificationArgumentsForSaveSuccess( {
+				previousPost: previousRecord,
+				post: updatedRecord,
+				postType: await registry
+					.resolveSelect( coreStore )
+					.getPostType( updatedRecord.type ),
+				options,
+			} );
+			if ( args.length ) {
+				registry
+					.dispatch( noticesStore )
+					.createSuccessNotice( ...args );
+			}
+			// Make sure that any edits after saving create an undo level and are
+			// considered for change detection.
+			if ( ! options.isAutosave ) {
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableMarkLastChangeAsPersistent();
+			}
+		}
+	};
 
 /**
- * Action generator for handling refreshing the current post.
+ * Action for refreshing the current post.
+ *
+ * @deprecated Since WordPress 6.0.
  */
-export function* refreshPost() {
-	const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
-	const postTypeSlug = yield controls.select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield controls.resolveSelect(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	const newPost = yield apiFetch( {
-		// Timestamp arg allows caller to bypass browser caching, which is
-		// expected for this specific function.
-		path:
-			`/wp/v2/${ postType.rest_base }/${ post.id }` +
-			`?context=edit&_timestamp=${ Date.now() }`,
+export function refreshPost() {
+	deprecated( "wp.data.dispatch( 'core/editor' ).refreshPost", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
 	} );
-	yield controls.dispatch( STORE_KEY, 'resetPost', newPost );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
- * Action generator for trashing the current post in the editor.
+ * Action for trashing the current post in the editor.
  */
-export function* trashPost() {
-	const postTypeSlug = yield controls.select(
-		STORE_KEY,
-		'getCurrentPostType'
-	);
-	const postType = yield controls.resolveSelect(
-		'core',
-		'getPostType',
-		postTypeSlug
-	);
-	yield controls.dispatch(
-		'core/notices',
-		'removeNotice',
-		TRASH_POST_NOTICE_ID
-	);
-	try {
-		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
-		yield apiFetch( {
-			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-			method: 'DELETE',
-		} );
+export const trashPost =
+	() =>
+	async ( { select, dispatch, registry } ) => {
+		const postTypeSlug = select.getCurrentPostType();
+		const postType = await registry
+			.resolveSelect( coreStore )
+			.getPostType( postTypeSlug );
+		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
+		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
+		try {
+			const post = select.getCurrentPost();
+			await apiFetch( {
+				path: `/${ restNamespace }/${ restBase }/${ post.id }`,
+				method: 'DELETE',
+			} );
 
-		yield controls.dispatch( STORE_KEY, 'savePost' );
-	} catch ( error ) {
-		yield controls.dispatch(
-			'core/notices',
-			'createErrorNotice',
-			...getNotificationArgumentsForTrashFail( { error } )
-		);
-	}
-}
+			await dispatch.savePost();
+		} catch ( error ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					...getNotificationArgumentsForTrashFail( { error } )
+				);
+		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
+	};
 
 /**
- * Action generator used in signalling that the post should autosave.  This
+ * Action that autosaves the current post.  This
  * includes server-side autosaving (default) and client-side (a.k.a. local)
  * autosaving (e.g. on the Web, the post might be committed to Session
  * Storage).
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export function* autosave( { local = false, ...options } = {} ) {
-	if ( local ) {
-		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
-		const isPostNew = yield controls.select( STORE_KEY, 'isEditedPostNew' );
-		const title = yield controls.select(
-			STORE_KEY,
-			'getEditedPostAttribute',
-			'title'
-		);
-		const content = yield controls.select(
-			STORE_KEY,
-			'getEditedPostAttribute',
-			'content'
-		);
-		const excerpt = yield controls.select(
-			STORE_KEY,
-			'getEditedPostAttribute',
-			'excerpt'
-		);
-		yield {
-			type: 'LOCAL_AUTOSAVE_SET',
-			postId: post.id,
-			isPostNew,
-			title,
-			content,
-			excerpt,
-		};
-	} else {
-		yield controls.dispatch( STORE_KEY, 'savePost', {
-			isAutosave: true,
-			...options,
-		} );
-	}
-}
+export const autosave =
+	( { local = false, ...options } = {} ) =>
+	async ( { select, dispatch } ) => {
+		const post = select.getCurrentPost();
+
+		// Currently template autosaving is not supported.
+		if ( post.type === 'wp_template' ) {
+			return;
+		}
+
+		if ( local ) {
+			const isPostNew = select.isEditedPostNew();
+			const title = select.getEditedPostAttribute( 'title' );
+			const content = select.getEditedPostAttribute( 'content' );
+			const excerpt = select.getEditedPostAttribute( 'excerpt' );
+			localAutosaveSet( post.id, isPostNew, title, content, excerpt );
+		} else {
+			await dispatch.savePost( { isAutosave: true, ...options } );
+		}
+	};
+
+export const __unstableSaveForPreview =
+	( { forceIsAutosaveable } = {} ) =>
+	async ( { select, dispatch } ) => {
+		if (
+			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
+			! select.isPostLocked()
+		) {
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				select.getEditedPostAttribute( 'status' )
+			);
+			if ( isDraft ) {
+				await dispatch.savePost( { isPreview: true } );
+			} else {
+				await dispatch.autosave( { isPreview: true } );
+			}
+		}
+
+		return select.getEditedPostPreviewLink();
+	};
 
 /**
- * Returns an action object used in signalling that undo history should
- * restore last popped state.
- *
- * @yield {Object} Action object.
+ * Action that restores last popped state in undo history.
  */
-export function* redo() {
-	yield controls.dispatch( 'core', 'redo' );
-}
+export const redo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).redo();
+	};
 
 /**
- * Returns an action object used in signalling that undo history should pop.
- *
- * @yield {Object} Action object.
+ * Action that pops a record from undo history and undoes the edit.
  */
-export function* undo() {
-	yield controls.dispatch( 'core', 'undo' );
-}
+export const undo =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( coreStore ).undo();
+	};
 
 /**
- * Returns an action object used in signalling that undo history record should
- * be created.
+ * Action that creates an undo history record.
  *
- * @return {Object} Action object.
+ * @deprecated Since WordPress 6.0
  */
 export function createUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
+	deprecated( "wp.data.dispatch( 'core/editor' ).createUndoLevel", {
+		since: '6.0',
+		version: '6.3',
+		alternative: 'Use the core entities store instead',
+	} );
+	return { type: 'DO_NOTHING' };
 }
 
 /**
- * Returns an action object used to lock the editor.
+ * Action that locks the editor.
  *
- * @param {Object}  lock Details about the post lock status, user, and nonce.
- *
+ * @param {Object} lock Details about the post lock status, user, and nonce.
  * @return {Object} Action object.
  */
 export function updatePostLock( lock ) {
@@ -459,33 +422,31 @@ export function updatePostLock( lock ) {
 }
 
 /**
- * Returns an action object used in signalling that the user has enabled the
- * publish sidebar.
- *
- * @return {Object} Action object
+ * Enable the publish sidebar.
  */
-export function enablePublishSidebar() {
-	return {
-		type: 'ENABLE_PUBLISH_SIDEBAR',
+export const enablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'isPublishSidebarEnabled', true );
 	};
-}
 
 /**
- * Returns an action object used in signalling that the user has disabled the
- * publish sidebar.
- *
- * @return {Object} Action object
+ * Disables the publish sidebar.
  */
-export function disablePublishSidebar() {
-	return {
-		type: 'DISABLE_PUBLISH_SIDEBAR',
+export const disablePublishSidebar =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'isPublishSidebarEnabled', false );
 	};
-}
 
 /**
- * Returns an action object used to signal that post saving is locked.
+ * Action that locks post saving.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -533,9 +494,9 @@ export function lockPostSaving( lockName ) {
 }
 
 /**
- * Returns an action object used to signal that post saving is unlocked.
+ * Action that unlocks post saving.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -553,9 +514,9 @@ export function unlockPostSaving( lockName ) {
 }
 
 /**
- * Returns an action object used to signal that post autosaving is locked.
+ * Action that locks post autosaving.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -573,9 +534,9 @@ export function lockPostAutosaving( lockName ) {
 }
 
 /**
- * Returns an action object used to signal that post autosaving is unlocked.
+ * Action that unlocks post autosaving.
  *
- * @param  {string} lockName The lock name.
+ * @param {string} lockName The lock name.
  *
  * @example
  * ```
@@ -597,48 +558,36 @@ export function unlockPostAutosaving( lockName ) {
  *
  * @param {Array}   blocks  Block Array.
  * @param {?Object} options Optional options.
- *
- * @yield {Object} Action object
  */
-export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableShouldCreateUndoLevel,
-		selectionStart,
-		selectionEnd,
-	} = options;
-	const edits = { blocks, selectionStart, selectionEnd };
+export const resetEditorBlocks =
+	( blocks, options = {} ) =>
+	( { select, dispatch, registry } ) => {
+		const { __unstableShouldCreateUndoLevel, selection } = options;
+		const edits = { blocks, selection };
 
-	if ( __unstableShouldCreateUndoLevel !== false ) {
-		const { id, type } = yield controls.select(
-			STORE_KEY,
-			'getCurrentPost'
-		);
-		const noChange =
-			( yield controls.select(
-				'core',
-				'getEditedEntityRecord',
-				'postType',
-				type,
-				id
-			) ).blocks === edits.blocks;
-		if ( noChange ) {
-			return yield controls.dispatch(
-				'core',
-				'__unstableCreateUndoLevel',
-				'postType',
-				type,
-				id
-			);
+		if ( __unstableShouldCreateUndoLevel !== false ) {
+			const { id, type } = select.getCurrentPost();
+			const noChange =
+				registry
+					.select( coreStore )
+					.getEditedEntityRecord( 'postType', type, id ).blocks ===
+				edits.blocks;
+			if ( noChange ) {
+				registry
+					.dispatch( coreStore )
+					.__unstableCreateUndoLevel( 'postType', type, id );
+				return;
+			}
+
+			// We create a new function here on every persistent edit
+			// to make sure the edit makes the post dirty and creates
+			// a new undo level.
+			edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+				__unstableSerializeAndClean( blocksForSerialization );
 		}
 
-		// We create a new function here on every persistent edit
-		// to make sure the edit makes the post dirty and creates
-		// a new undo level.
-		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			serializeBlocks( blocksForSerialization );
-	}
-	yield* editPost( edits );
-}
+		dispatch.editPost( edits );
+	};
 
 /*
  * Returns an action object used in signalling that the post editor settings have been updated.
@@ -655,16 +604,294 @@ export function updateEditorSettings( settings ) {
 }
 
 /**
+ * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+ *
+ * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+ * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+ *
+ * @param {string} mode Mode (one of 'post-only' or 'template-locked').
+ */
+export const setRenderingMode =
+	( mode ) =>
+	( { dispatch, registry, select } ) => {
+		if ( select.__unstableIsEditorReady() ) {
+			// We clear the block selection but we also need to clear the selection from the core store.
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
+		}
+
+		dispatch( {
+			type: 'SET_RENDERING_MODE',
+			mode,
+		} );
+	};
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
+	};
+}
+
+/**
+ * Returns an action object used to enable or disable a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to enable or disable.
+ *
+ * @return {Object} Action object.
+ */
+export const toggleEditorPanelEnabled =
+	( panelName ) =>
+	( { registry } ) => {
+		const inactivePanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'inactivePanels' ) ?? [];
+
+		const isPanelInactive = !! inactivePanels?.includes( panelName );
+
+		// If the panel is inactive, remove it to enable it, else add it to
+		// make it inactive.
+		let updatedInactivePanels;
+		if ( isPanelInactive ) {
+			updatedInactivePanels = inactivePanels.filter(
+				( invactivePanelName ) => invactivePanelName !== panelName
+			);
+		} else {
+			updatedInactivePanels = [ ...inactivePanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'inactivePanels', updatedInactivePanels );
+	};
+
+/**
+ * Opens a closed panel and closes an open panel.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ */
+export const toggleEditorPanelOpened =
+	( panelName ) =>
+	( { registry } ) => {
+		const openPanels =
+			registry.select( preferencesStore ).get( 'core', 'openPanels' ) ??
+			[];
+
+		const isPanelOpen = !! openPanels?.includes( panelName );
+
+		// If the panel is open, remove it to close it, else add it to
+		// make it open.
+		let updatedOpenPanels;
+		if ( isPanelOpen ) {
+			updatedOpenPanels = openPanels.filter(
+				( openPanelName ) => openPanelName !== panelName
+			);
+		} else {
+			updatedOpenPanels = [ ...openPanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'openPanels', updatedOpenPanels );
+	};
+
+/**
+ * Returns an action object used to remove a panel from the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeEditorPanel( panelName ) {
+	return {
+		type: 'REMOVE_PANEL',
+		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core', 'fixedToolbar', true );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', ! isDistractionFree );
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/editor/distraction-free-mode/notice',
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry.batch( () => {
+										registry
+											.dispatch( preferencesStore )
+											.set(
+												'core',
+												'fixedToolbar',
+												isDistractionFree ? true : false
+											);
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
+									} );
+								},
+							},
+						],
+					}
+				);
+		} );
+	};
+
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
+export const switchEditorMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
+			speak( __( 'Code editor selected' ), 'assertive' );
+		}
+	};
+
+/**
+ * Returns an action object used in signalling that the user opened the publish
+ * sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function openPublishSidebar() {
+	return {
+		type: 'OPEN_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user closed the
+ * publish sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closePublishSidebar() {
+	return {
+		type: 'CLOSE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function togglePublishSidebar() {
+	return {
+		type: 'TOGGLE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
  * Backward compatibility
  */
 
-const getBlockEditorAction = ( name ) =>
-	function* ( ...args ) {
+const getBlockEditorAction =
+	( name ) =>
+	( ...args ) =>
+	( { registry } ) => {
 		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
+			version: '6.2',
 		} );
-		yield controls.dispatch( 'core/block-editor', name, ...args );
+		registry.dispatch( blockEditorStore )[ name ]( ...args );
 	};
 
 /**

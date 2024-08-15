@@ -7,7 +7,7 @@ import traverse from '@babel/traverse';
 /**
  * Internal dependencies
  */
-import babelPlugin from '../src';
+import babelPlugin from '..';
 
 describe( 'babel-plugin', () => {
 	const {
@@ -46,11 +46,14 @@ describe( 'babel-plugin', () => {
 	describe( '.getExtractedComment()', () => {
 		function getCommentFromString( string ) {
 			let comment;
-			traverse( transformSync( string, { ast: true } ).ast, {
-				CallExpression( path ) {
-					comment = getExtractedComment( path );
-				},
-			} );
+			traverse(
+				transformSync( string, { ast: true, filename: 'test.js' } ).ast,
+				{
+					CallExpression( path ) {
+						comment = getExtractedComment( path );
+					},
+				}
+			);
 
 			return comment;
 		}
@@ -107,11 +110,14 @@ describe( 'babel-plugin', () => {
 	describe( '.getNodeAsString()', () => {
 		function getNodeAsStringFromArgument( source ) {
 			let string;
-			traverse( transformSync( source, { ast: true } ).ast, {
-				CallExpression( path ) {
-					string = getNodeAsString( path.node.arguments[ 0 ] );
-				},
-			} );
+			traverse(
+				transformSync( source, { ast: true, filename: 'test.js' } ).ast,
+				{
+					CallExpression( path ) {
+						string = getNodeAsString( path.node.arguments[ 0 ] );
+					},
+				}
+			);
 
 			return string;
 		}

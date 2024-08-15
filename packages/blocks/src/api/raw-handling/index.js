@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flatMap, filter, compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -12,8 +7,8 @@ import { getPhrasingContentSchema } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { htmlToBlocks } from './html-to-blocks';
+import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import listReducer from './list-reducer';
@@ -26,66 +21,10 @@ export { pasteHandler } from './paste-handler';
 
 export function deprecatedGetPhrasingContentSchema( context ) {
 	deprecated( 'wp.blocks.getPhrasingContentSchema', {
+		since: '5.6',
 		alternative: 'wp.dom.getPhrasingContentSchema',
 	} );
 	return getPhrasingContentSchema( context );
-}
-
-function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
-		( transform ) => {
-			return transform.isMatch
-				? transform
-				: {
-						...transform,
-						isMatch: ( node ) =>
-							transform.selector &&
-							node.matches( transform.selector ),
-				  };
-		}
-	);
-}
-
-/**
- * Converts HTML directly to blocks. Looks for a matching transform for each
- * top-level tag. The HTML should be filtered to not have any text between
- * top-level tags and formatted in a way that blocks can handle the HTML.
- *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
- *
- * @return {Array} An array of blocks.
- */
-function htmlToBlocks( { html, rawTransforms } ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	doc.body.innerHTML = html;
-
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
-			isMatch( node )
-		);
-
-		if ( ! rawTransform ) {
-			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
-			);
-		}
-
-		const { transform, blockName } = rawTransform;
-
-		if ( transform ) {
-			return transform( node );
-		}
-
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
-	} );
 }
 
 /**
@@ -99,21 +38,22 @@ function htmlToBlocks( { html, rawTransforms } ) {
 export function rawHandler( { HTML = '' } ) {
 	// If we detect block delimiters, parse entirely as blocks.
 	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
-		return parseWithGrammar( HTML );
+		const parseResult = parse( HTML );
+		const isSingleFreeFormBlock =
+			parseResult.length === 1 &&
+			parseResult[ 0 ].name === 'core/freeform';
+		if ( ! isSingleFreeFormBlock ) {
+			return parseResult;
+		}
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
-	const rawTransforms = getRawTransformations();
-	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema(
-		rawTransforms,
-		phrasingContentSchema
-	);
+	const blockContentSchema = getBlockContentSchema();
 
-	return compact(
-		flatMap( pieces, ( piece ) => {
+	return pieces
+		.map( ( piece ) => {
 			// Already a block from shortcode.
 			if ( typeof piece !== 'string' ) {
 				return piece;
@@ -131,13 +71,14 @@ export function rawHandler( { HTML = '' } ) {
 				figureContentReducer,
 				// Needed to create the quote block, which cannot handle text
 				// without wrapper paragraphs.
-				blockquoteNormaliser,
+				blockquoteNormaliser( { raw: true } ),
 			];
 
 			piece = deepFilterHTML( piece, filters, blockContentSchema );
-			piece = normaliseBlocks( piece );
+			piece = normaliseBlocks( piece, { raw: true } );
 
-			return htmlToBlocks( { html: piece, rawTransforms } );
+			return htmlToBlocks( piece, rawHandler );
 		} )
-	);
+		.flat()
+		.filter( Boolean );
 }

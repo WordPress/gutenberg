@@ -6,7 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import createHigherOrderComponent from '../';
+import { createHigherOrderComponent } from '../';
 
 describe( 'createHigherOrderComponent', () => {
 	it( 'should use default name for anonymous function', () => {
@@ -18,7 +18,7 @@ describe( 'createHigherOrderComponent', () => {
 		expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
 	} );
 
-	it( 'should use camel case starting with upper for wrapper prefix ', () => {
+	it( 'should use camel case starting with upper for wrapper prefix', () => {
 		const TestComponent = createHigherOrderComponent(
 			( OriginalComponent ) => OriginalComponent,
 			'with-one-two_threeFOUR'

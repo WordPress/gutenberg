@@ -1,78 +1,41 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/editor';
-import '@wordpress/keyboard-shortcuts';
-import '@wordpress/reusable-blocks';
-import '@wordpress/viewport';
-import '@wordpress/notices';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { render, unmountComponentAtNode } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { createRoot, StrictMode } from '@wordpress/element';
+import { dispatch, select } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	registerLegacyWidgetBlock,
+	registerWidgetGroupBlock,
+} from '@wordpress/widgets';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import './plugins';
-import './store';
-import Editor from './editor';
+import Layout from './components/layout';
+import { unlock } from './lock-unlock';
 
-/**
- * Reinitializes the editor after the user chooses to reboot the editor after
- * an unhandled error occurs, replacing previously mounted editor element using
- * an initial state from prior to the crash.
- *
- * @param {Object}  postType     Post type of the post to edit.
- * @param {Object}  postId       ID of the post to edit.
- * @param {Element} target       DOM node in which editor is rendered.
- * @param {?Object} settings     Editor settings object.
- * @param {Object}  initialEdits Programmatic edits to apply initially, to be
- *                               considered as non-user-initiated (bypass for
- *                               unsaved changes prompt).
- */
-export function reinitializeEditor(
-	postType,
-	postId,
-	target,
-	settings,
-	initialEdits
-) {
-	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind(
-		null,
-		postType,
-		postId,
-		target,
-		settings,
-		initialEdits
-	);
-
-	render(
-		<Editor
-			settings={ settings }
-			onError={ reboot }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-			recovery
-		/>,
-		target
-	);
-}
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
  *
- * The return value of this function is not necessary if we change where we
- * call initializeEditor(). This is due to metaBox timing.
- *
  * @param {string}  id           Unique identifier for editor instance.
- * @param {Object}  postType     Post type of the post to edit.
+ * @param {string}  postType     Post type of the post to edit.
  * @param {Object}  postId       ID of the post to edit.
  * @param {?Object} settings     Editor settings object.
  * @param {Object}  initialEdits Programmatic edits to apply initially, to be
@@ -86,18 +49,52 @@ export function initializeEditor(
 	settings,
 	initialEdits
 ) {
+	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind(
-		null,
-		postType,
-		postId,
-		target,
-		settings,
-		initialEdits
-	);
+	const root = createRoot( target );
+
+	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
+		fullscreenMode: true,
+		themeStyles: true,
+		welcomeGuide: true,
+		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		editorMode: 'visual',
+		fixedToolbar: false,
+		hiddenBlockTypes: [],
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
+		showBlockBreadcrumbs: true,
+		showIconLabels: false,
+		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
+	} );
+
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
+
+	// Check if the block list view should be open by default.
+	// If `distractionFree` mode is enabled, the block list view should not be open.
+	// This behavior is disabled for small viewports.
+	if (
+		isMediumOrBigger &&
+		select( preferencesStore ).get( 'core', 'showListViewByDefault' ) &&
+		! select( preferencesStore ).get( 'core', 'distractionFree' )
+	) {
+		dispatch( editorStore ).setIsListViewOpened( true );
+	}
+
 	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
+	registerLegacyWidgetBlock( { inserter: false } );
+	registerWidgetGroupBlock( { inserter: false } );
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
+		} );
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
@@ -140,24 +137,35 @@ export function initializeEditor(
 		} );
 	}
 
-	render(
-		<Editor
-			settings={ settings }
-			onError={ reboot }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-		/>,
-		target
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	root.render(
+		<StrictMode>
+			<Layout
+				settings={ settings }
+				postId={ postId }
+				postType={ postType }
+				initialEdits={ initialEdits }
+			/>
+		</StrictMode>
 	);
+
+	return root;
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
-export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
-export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
-export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+/**
+ * Used to reinitialize the editor after an error. Now it's a deprecated noop function.
+ */
+export function reinitializeEditor() {
+	deprecated( 'wp.editPost.reinitializeEditor', {
+		since: '6.2',
+		version: '6.3',
+	} );
+}
+
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
+export { store } from './store';
+export * from './deprecated';

@@ -20,11 +20,11 @@ export const bold = {
 	className: null,
 	edit( { isActive, value, onChange, onFocus } ) {
 		function onToggle() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 		}
 
 		function onClick() {
-			onToggle();
+			onChange( toggleFormat( value, { type: name } ) );
 			onFocus();
 		}
 

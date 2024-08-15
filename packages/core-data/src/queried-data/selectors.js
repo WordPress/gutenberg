@@ -1,14 +1,18 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
-import { get, set } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import getQueryParts from './get-query-parts';
+import { setNestedValue } from '../utils';
 
 /**
  * Cache of state keys to EquivalentKeyMap where the inner map tracks queries
@@ -28,20 +32,12 @@ const queriedItemsCacheByState = new WeakMap();
  * @return {?Array} Query items.
  */
 function getQueriedItemsUncached( state, query ) {
-	const { stableKey, page, perPage, include, fields } = getQueryParts(
-		query
-	);
+	const { stableKey, page, perPage, include, fields, context } =
+		getQueryParts( query );
 	let itemIds;
-	if ( Array.isArray( include ) && ! stableKey ) {
-		// If the parsed query yields a set of IDs, but otherwise no filtering,
-		// it's safe to consider targeted item IDs as the include set. This
-		// doesn't guarantee that those objects have been queried, which is
-		// accounted for below in the loop `null` return.
-		itemIds = include;
-		// TODO: Avoid storing the empty stable string in reducer, since it
-		// can be computed dynamically here always.
-	} else if ( state.queries[ stableKey ] ) {
-		itemIds = state.queries[ stableKey ];
+
+	if ( state.queries?.[ context ]?.[ stableKey ] ) {
+		itemIds = state.queries[ context ][ stableKey ].itemIds;
 	}
 
 	if ( ! itemIds ) {
@@ -60,12 +56,15 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
-		if ( ! state.items.hasOwnProperty( itemId ) ) {
+		if ( itemId === undefined ) {
+			continue;
+		}
+		// Having a target item ID doesn't guarantee that this object has been queried.
+		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
 		}
 
-		const item = state.items[ itemId ];
+		const item = state.items[ context ][ itemId ];
 
 		let filteredItem;
 		if ( Array.isArray( fields ) ) {
@@ -73,13 +72,17 @@ function getQueriedItemsUncached( state, query ) {
 
 			for ( let f = 0; f < fields.length; f++ ) {
 				const field = fields[ f ].split( '.' );
-				const value = get( item, field );
-				set( filteredItem, field, value );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value?.[ fieldName ];
+				} );
+
+				setNestedValue( filteredItem, field, value );
 			}
 		} else {
 			// If expecting a complete item, validate that completeness, or
 			// otherwise abort.
-			if ( ! state.itemIsComplete[ itemId ] ) {
+			if ( ! state.itemIsComplete[ context ]?.[ itemId ] ) {
 				return null;
 			}
 
@@ -121,3 +124,15 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 	queriedItemsCache.set( query, items );
 	return items;
 } );
+
+export function getQueriedTotalItems( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}
+
+export function getQueriedTotalPages( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;
+}

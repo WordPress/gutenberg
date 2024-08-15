@@ -8,26 +8,22 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
+import { useSettings } from '../components/use-settings';
 
-export const LINE_HEIGHT_SUPPORT_KEY = 'lineHeight';
+export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
 /**
  * Inspector control panel containing the line height related configuration
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {Element} Line height edit element.
  */
 export function LineHeightEdit( props ) {
 	const {
 		attributes: { style },
+		setAttributes,
 	} = props;
-	const isDisabled = useIsLineHeightDisabled( props );
-
-	if ( isDisabled ) {
-		return null;
-	}
 
 	const onChange = ( newLineHeightValue ) => {
 		const newStyle = {
@@ -37,14 +33,15 @@ export function LineHeightEdit( props ) {
 				lineHeight: newLineHeightValue,
 			},
 		};
-		props.setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
+
+		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 	return (
 		<LineHeightControl
+			__unstableInputWidth="100%"
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
+			size="__unstable-large"
 		/>
 	);
 }
@@ -56,9 +53,9 @@ export function LineHeightEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'typography.customLineHeight' );
+	const [ isEnabled ] = useSettings( 'typography.lineHeight' );
 
 	return (
-		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
+		! isEnabled || ! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY )
 	);
 }

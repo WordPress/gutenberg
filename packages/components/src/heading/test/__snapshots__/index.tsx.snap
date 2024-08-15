@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  color: #1e1e1e;
+  line-height: 1.4;
+  margin: 0;
+  text-wrap: balance;
+  text-wrap: pretty;
+  color: #1e1e1e;
+  font-size: calc(1.95 * 13px);
+  font-weight: 600;
+  display: block;
+}
+
+<h2
+  class="components-truncate components-text components-heading emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="Heading"
+>
+  Code is Poetry
+</h2>
+`;
+
+exports[`props should render level as a number 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -1,10 +1,10 @@
+  Array [
+    Object {
+      "color": "#1e1e1e",
+      "display": "block",
+-     "font-size": "calc(1.25 * 13px)",
++     "font-size": "calc(1.95 * 13px)",
+      "font-weight": "600",
+      "line-height": "1.4",
+      "margin": "0",
+      "text-wrap": "pretty",
+    },
+`;
+
+exports[`props should render level as a string 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -1,10 +1,10 @@
+  Array [
+    Object {
+      "color": "#1e1e1e",
+      "display": "block",
+-     "font-size": "calc(1.25 * 13px)",
++     "font-size": "calc(1.95 * 13px)",
+      "font-weight": "600",
+      "line-height": "1.4",
+      "margin": "0",
+      "text-wrap": "pretty",
+    },
+`;

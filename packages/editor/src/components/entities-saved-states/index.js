@@ -1,176 +1,200 @@
 /**
- * External dependencies
- */
-import { some, groupBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { __, sprintf, _n } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
-import { close as closeIcon } from '@wordpress/icons';
+import { Button, Flex, FlexItem } from '@wordpress/components';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	useCallback,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
+import {
+	__experimentalUseDialog as useDialog,
+	useInstanceId,
+} from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
+import { useIsDirty } from './hooks/use-is-dirty';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-const ENTITY_NAMES = {
-	wp_template_part: ( number ) =>
-		_n( 'template part', 'template parts', number ),
-	wp_template: ( number ) => _n( 'template', 'templates', number ),
-	post: ( number ) => _n( 'post', 'posts', number ),
-	page: ( number ) => _n( 'page', 'pages', number ),
-	site: ( number ) => _n( 'site', 'sites', number ),
-};
+function identity( values ) {
+	return values;
+}
 
-const PLACEHOLDER_PHRASES = {
-	// 0 is a back up, but should never be observed.
-	0: __( 'There are no changes.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	1: __( 'Changes have been made to your %s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	2: __( 'Changes have been made to your %1$s and %2$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	3: __( 'Changes have been made to your %1$s, %2$s, and %3$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	4: __( 'Changes have been made to your %1$s, %2$s, %3$s, and %4$s.' ),
-	/* translators: placeholders represent pre-translated singular/plural entity names (page, post, template, site, etc.) */
-	5: __( 'Changes have been made to your %1$s, %2$s, %3$s, %4$s, and %5$s.' ),
-};
-
-export default function EntitiesSavedStates( { isOpen, close } ) {
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		return {
-			dirtyEntityRecords: select(
-				'core'
-			).__experimentalGetDirtyEntityRecords(),
-		};
-	}, [] );
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
-
-	// To group entities by type.
-	const partitionedSavables = Object.values(
-		groupBy( dirtyEntityRecords, 'name' )
+/**
+ * Renders the component for managing saved states of entities.
+ *
+ * @param {Object}   props              The component props.
+ * @param {Function} props.close        The function to close the dialog.
+ * @param {Function} props.renderDialog The function to render the dialog.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
+export default function EntitiesSavedStates( {
+	close,
+	renderDialog = undefined,
+} ) {
+	const isDirtyProps = useIsDirty();
+	return (
+		<EntitiesSavedStatesExtensible
+			close={ close }
+			renderDialog={ renderDialog }
+			{ ...isDirtyProps }
+		/>
 	);
+}
 
-	// Get labels for text-prompt phrase.
-	const entityNamesForPrompt = [];
-	partitionedSavables.forEach( ( list ) => {
-		if ( ENTITY_NAMES[ list[ 0 ].name ] ) {
-			entityNamesForPrompt.push(
-				ENTITY_NAMES[ list[ 0 ].name ]( list.length )
-			);
+/**
+ * Renders a panel for saving entities with dirty records.
+ *
+ * @param {Object}   props                       The component props.
+ * @param {string}   props.additionalPrompt      Additional prompt to display.
+ * @param {Function} props.close                 Function to close the panel.
+ * @param {Function} props.onSave                Function to call when saving entities.
+ * @param {boolean}  props.saveEnabled           Flag indicating if save is enabled.
+ * @param {string}   props.saveLabel             Label for the save button.
+ * @param {Function} props.renderDialog          Function to render a custom dialog.
+ * @param {Array}    props.dirtyEntityRecords    Array of dirty entity records.
+ * @param {boolean}  props.isDirty               Flag indicating if there are dirty entities.
+ * @param {Function} props.setUnselectedEntities Function to set unselected entities.
+ * @param {Array}    props.unselectedEntities    Array of unselected entities.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
+export function EntitiesSavedStatesExtensible( {
+	additionalPrompt = undefined,
+	close,
+	onSave = identity,
+	saveEnabled: saveEnabledProp = undefined,
+	saveLabel = __( 'Save' ),
+	renderDialog = undefined,
+	dirtyEntityRecords,
+	isDirty,
+	setUnselectedEntities,
+	unselectedEntities,
+} ) {
+	const saveButtonRef = useRef();
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
+	// To group entities by type.
+	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+		const { name } = record;
+		if ( ! acc[ name ] ) {
+			acc[ name ] = [];
 		}
-	} );
-	// Get text-prompt phrase based on number of entity types changed.
-	const placeholderPhrase =
-		PLACEHOLDER_PHRASES[ entityNamesForPrompt.length ] ||
-		// Fallback for edge case that should not be observed (more than 5 entity types edited).
-		__( 'Changes have been made to multiple entity types.' );
-	// eslint-disable-next-line @wordpress/valid-sprintf
-	const promptPhrase = sprintf( placeholderPhrase, ...entityNamesForPrompt );
+		acc[ name ].push( record );
+		return acc;
+	}, {} );
 
-	// Unchecked entities to be ignored by save function.
-	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+	// Sort entity groups.
+	const {
+		site: siteSavables,
+		wp_template: templateSavables,
+		wp_template_part: templatePartSavables,
+		...contentSavables
+	} = partitionedSavables;
+	const sortedPartitionedSavables = [
+		siteSavables,
+		templateSavables,
+		templatePartSavables,
+		...Object.values( contentSavables ),
+	].filter( Array.isArray );
 
-	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
-		if ( checked ) {
-			_setUnselectedEntities(
-				unselectedEntities.filter(
-					( elt ) =>
-						elt.kind !== kind ||
-						elt.name !== name ||
-						elt.key !== key
-				)
-			);
-		} else {
-			_setUnselectedEntities( [
-				...unselectedEntities,
-				{ kind, name, key },
-			] );
-		}
-	};
-
-	const saveCheckedEntities = () => {
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key } ) => {
-				return ! some(
-					unselectedEntities,
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key
-				);
-			}
-		);
-
-		close( entitiesToSave );
-
-		entitiesToSave.forEach( ( { kind, name, key } ) => {
-			saveEditedEntityRecord( kind, name, key );
-		} );
-	};
-
-	const [ isReviewing, setIsReviewing ] = useState( false );
-	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
-
+	const saveEnabled = saveEnabledProp ?? isDirty;
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
 
-	return isOpen ? (
-		<div className="entities-saved-states__panel">
-			<div className="entities-saved-states__panel-header">
-				<Button
-					isPrimary
-					disabled={
-						dirtyEntityRecords.length -
-							unselectedEntities.length ===
-						0
+	const [ saveDialogRef, saveDialogProps ] = useDialog( {
+		onClose: () => dismissPanel(),
+	} );
+	const dialogLabel = useInstanceId( EntitiesSavedStatesExtensible, 'label' );
+	const dialogDescription = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'description'
+	);
+
+	return (
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+			role={ renderDialog ? 'dialog' : undefined }
+			aria-labelledby={ renderDialog ? dialogLabel : undefined }
+			aria-describedby={ renderDialog ? dialogDescription : undefined }
+		>
+			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
+				<FlexItem
+					isBlock
+					as={ Button }
+					ref={ saveButtonRef }
+					variant="primary"
+					disabled={ ! saveEnabled }
+					accessibleWhenDisabled
+					onClick={ () =>
+						saveDirtyEntities( {
+							onSave,
+							dirtyEntityRecords,
+							entitiesToSkip: unselectedEntities,
+							close,
+						} )
 					}
-					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
-					{ __( 'Save' ) }
-				</Button>
-				<Button
+					{ saveLabel }
+				</FlexItem>
+				<FlexItem
+					isBlock
+					as={ Button }
+					variant="secondary"
 					onClick={ dismissPanel }
-					icon={ closeIcon }
-					label={ __( 'Close panel' ) }
-				/>
-			</div>
+				>
+					{ __( 'Cancel' ) }
+				</FlexItem>
+			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				<p>{ promptPhrase }</p>
-				<p>
-					<Button
-						onClick={ toggleIsReviewing }
-						isLink
-						className="entities-saved-states__review-changes-button"
-					>
-						{ isReviewing
-							? __( 'Hide changes.' )
-							: __( 'Review changes.' ) }
-					</Button>
+				<div
+					className="entities-saved-states__text-prompt--header-wrapper"
+					id={ renderDialog ? dialogLabel : undefined }
+				>
+					<strong className="entities-saved-states__text-prompt--header">
+						{ __( 'Are you ready to save?' ) }
+					</strong>
+					{ additionalPrompt }
+				</div>
+				<p id={ renderDialog ? dialogDescription : undefined }>
+					{ isDirty
+						? createInterpolateElement(
+								sprintf(
+									/* translators: %d: number of site changes waiting to be saved. */
+									_n(
+										'There is <strong>%d site change</strong> waiting to be saved.',
+										'There are <strong>%d site changes</strong> waiting to be saved.',
+										sortedPartitionedSavables.length
+									),
+									sortedPartitionedSavables.length
+								),
+								{ strong: <strong /> }
+						  )
+						: __( 'Select the items you want to save.' ) }
 				</p>
 			</div>
 
-			{ isReviewing &&
-				partitionedSavables.map( ( list ) => {
-					return (
-						<EntityTypeList
-							key={ list[ 0 ].name }
-							list={ list }
-							closePanel={ dismissPanel }
-							unselectedEntities={ unselectedEntities }
-							setUnselectedEntities={ setUnselectedEntities }
-						/>
-					);
-				} ) }
+			{ sortedPartitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
 		</div>
-	) : null;
+	);
 }

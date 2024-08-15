@@ -1,13 +1,18 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { isEmpty } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -20,27 +25,47 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		id,
 		linkTarget,
 		sizeSlug,
 		title,
 	} = attributes;
 
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = ! rel ? undefined : rel;
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( {
-		[ `align${ align }` ]: align,
+	const classes = clsx( {
+		// All other align classes are handled by block supports.
+		// `{ align: 'none' }` is unique to transforms for the image block.
+		alignnone: 'none' === align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
+		'has-custom-border':
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
+	} );
+
+	const imageClasses = clsx( borderProps.className, {
+		[ `wp-image-${ id }` ]: !! id,
 	} );
 
 	const image = (
 		<img
 			src={ url }
 			alt={ alt }
-			className={ id ? `wp-image-${ id }` : null }
-			width={ width }
-			height={ height }
+			className={ imageClasses || undefined }
+			style={ {
+				...borderProps.style,
+				...shadowProps.style,
+				aspectRatio,
+				objectFit: scale,
+				width,
+				height,
+			} }
 			title={ title }
 		/>
 	);
@@ -60,18 +85,14 @@ export default function save( { attributes } ) {
 				image
 			) }
 			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
+				<RichText.Content
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					tagName="figcaption"
+					value={ caption }
+				/>
 			) }
 		</>
 	);
-
-	if ( 'left' === align || 'right' === align || 'center' === align ) {
-		return (
-			<div { ...useBlockProps.save() }>
-				<figure className={ classes }>{ figure }</figure>
-			</div>
-		);
-	}
 
 	return (
 		<figure { ...useBlockProps.save( { className: classes } ) }>

@@ -1,67 +1,57 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import {
-	BlockControls,
-	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-} from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as buttonBlockName } from '../button';
-import ContentJustificationDropdown from './content-justification-dropdown';
+const DEFAULT_BLOCK = {
+	name: 'core/button',
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
+};
 
-const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
-
-function ButtonsEdit( {
-	attributes: { contentJustification },
-	setAttributes,
-} ) {
+function ButtonsEdit( { attributes, className } ) {
+	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+		className: clsx( className, {
+			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
+	const { hasButtonVariations } = useSelect( ( select ) => {
+		const buttonVariations = select( blocksStore ).getBlockVariations(
+			'core/button',
+			'inserter'
+		);
+		return {
+			hasButtonVariations: buttonVariations.length > 0,
+		};
+	}, [] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		template: BUTTONS_TEMPLATE,
-		orientation: 'horizontal',
-		__experimentalLayout: {
-			type: 'default',
-			alignments: [],
-		},
+		defaultBlock: DEFAULT_BLOCK,
+		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
+		directInsert: ! hasButtonVariations,
+		template: [ [ 'core/button' ] ],
+		templateInsertUpdatesSelection: true,
+		orientation: layout?.orientation ?? 'horizontal',
 	} );
-	return (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<ContentJustificationDropdown
-								toggleProps={ toggleProps }
-								value={ contentJustification }
-								onChange={ ( updatedValue ) => {
-									setAttributes( {
-										contentJustification: updatedValue,
-									} );
-								} }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-			</BlockControls>
-			<div { ...innerBlocksProps } />
-		</>
-	);
+
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

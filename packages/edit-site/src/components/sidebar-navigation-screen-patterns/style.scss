@@ -1,0 +1,28 @@
+.edit-site-sidebar-navigation-screen-patterns__group {
+	margin-bottom: $grid-unit-30;
+
+	&:last-of-type {
+		border-bottom: 0;
+		padding-bottom: 0;
+		margin-bottom: 0;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-patterns__group-header {
+	margin-top: $grid-unit-20;
+
+	p {
+		color: $gray-600;
+	}
+
+	h2 {
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+	}
+}
+
+.edit-site-sidebar-navigation-screen-patterns__divider {
+	border-top: 1px solid $gray-800;
+	margin: $grid-unit-20 0;
+}

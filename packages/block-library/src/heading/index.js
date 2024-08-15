@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { heading as icon } from '@wordpress/icons';
@@ -12,6 +7,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -23,23 +19,28 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Heading' ),
-	description: __(
-		'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.'
-	),
 	icon,
-	keywords: [ __( 'title' ), __( 'subtitle' ) ],
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
+			textAlign: 'center',
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
-		if ( context === 'accessibility' ) {
-			const { content, level } = attributes;
+		const { content, level } = attributes;
 
-			return isEmpty( content )
+		const customName = attributes?.metadata?.name;
+		const hasContent = content?.trim().length > 0;
+
+		// In the list view, use the block's content as the label.
+		// If the content is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || content;
+		}
+
+		if ( context === 'accessibility' ) {
+			return ! hasContent
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
@@ -65,3 +66,5 @@ export const settings = {
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

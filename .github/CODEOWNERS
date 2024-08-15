@@ -1,78 +1,95 @@
 # Documentation
-/docs                                           @chrisvanpatten @ajitbohra
-/docs/designers-developers/developers           @chrisvanpatten @mkaz @ajitbohra
-/docs/designers-developers/designers            @chrisvanpatten @mkaz @ajitbohra
+/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy @ndiego
+/packages/interactivity/docs                    @juanmaguitar
+
+# Schemas
+/schemas/json
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
 /packages/core-data                             @nerrad
-/packages/data                                  @nerrad @coderkevin
+/packages/data                                  @nerrad
 /packages/redux-routine                         @nerrad
 /packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @Soean @ajitbohra @talldan
-/packages/block-library/src/gallery             @mkevins
-/packages/block-library/src/social-links        @mkaz
-/packages/block-library/src/social-link         @mkaz
-/packages/block-library/src/image               @ajlende
+/packages/block-library                         @ajitbohra
+/packages/block-library/src/gallery             @geriux
+/packages/block-library/src/comment-template    @michalczaplinski
+/packages/block-library/src/comments            @michalczaplinski
+/packages/block-library/src/table-of-contents   @ZebulanStanphill
+/packages/block-library/src/image               @artemiomorales
+
+# Duotone
+/lib/block-supports/duotone.php
+/packages/block-editor/src/components/duotone-control
+/packages/block-editor/src/hooks/duotone.js
+/packages/components/src/duotone-picker
 
 # Editor
-/packages/annotations                           @atimmer @ellatrix
+/packages/annotations                           @atimmer
 /packages/autop
 /packages/block-editor                          @ellatrix
+/packages/block-editor/src/hooks                @tellthemachines
+/packages/block-editor/src/layouts              @tellthemachines
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @ellatrix
+/packages/blocks
 /packages/edit-post
 /packages/editor
+/packages/editor/src/components/post-title @alexstine
 /packages/list-reusable-blocks
 /packages/shortcode
 /packages/block-directory
 /packages/interface
 /packages/media-utils
 /packages/server-side-render
+/packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
-/packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
-
-# Navigation
-/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/edit-widgets                          @draganescu @adamziel @kevin940726
+/packages/customize-widgets
+/packages/widgets
 
 # Full Site Editing
 /packages/edit-site
 
+# Interactivity API
+/packages/interactivity                         @luisherranz @darerodz
+
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
-/bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
-/packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
+/bin/api-docs                                   @ntwb @nerrad @ajitbohra
+/docs/tool                                      @ajitbohra @ndiego
+/packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
-/packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
-/packages/create-block                          @gziolo @mkaz
-/packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
-/packages/docgen                                @nosolosw
-/packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @ntwb @nerrad @ajitbohra @talldan
+/packages/browserslist-config                   @ntwb @nerrad @ajitbohra
+/packages/create-block                          @gziolo @ryanwelcher
+/packages/create-block-tutorial-template        @gziolo @ryanwelcher
+/packages/dependency-extraction-webpack-plugin  @gziolo
+/packages/docgen
+/packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils-playwright             @kevin940726
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
-/packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/prettier-config                       @ntwb @gziolo
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
+/packages/stylelint-config                      @ntwb
+/test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
-/packages/components                            @ajitbohra @jaymanpandya @chrisvanpatten
-/packages/compose                               @ajitbohra @jaymanpandya
-/packages/element                               @ajitbohra @jaymanpandya
-/packages/notices                               @ajitbohra @jaymanpandya
-/packages/nux                                   @ajitbohra @jaymanpandya
-/packages/viewport                              @ajitbohra @jaymanpandya
+/packages/components                            @ajitbohra
+/packages/compose                               @ajitbohra
+/packages/element                               @ajitbohra
+/packages/notices                               @ajitbohra
+/packages/nux                                   @ajitbohra @peterwilsoncc
+/packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons
 /packages/primitives
@@ -88,37 +105,48 @@
 /packages/html-entities
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
-/packages/keycodes                              @talldan @ellatrix
+/packages/keyboard-shortcuts
+/packages/keycodes
+/packages/preferences                           @talldan
 /packages/priority-queue
 /packages/token-list
-/packages/url                                   @talldan
+/packages/url
 /packages/wordcount
 /packages/warning
-/packages/keyboard-shortcuts
 
 # Extensibility
-/packages/hooks                                 @gziolo @adamsilverstein
+/packages/hooks                                 @adamsilverstein
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @etoledom @cameronvoell @guarani
-/packages/rich-text                             @ellatrix @etoledom @cameronvoell @guarani
-/packages/block-editor/src/components/rich-text @ellatrix @etoledom @cameronvoell @guarani
+/packages/format-library                        @ellatrix @dcalhoun
+/packages/rich-text                             @ellatrix @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @dcalhoun
 
 # Project Management
-/.github                                        @mapk @karmatosed
+/.github                                        @desrosj
 /packages/project-management-automation
+/packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @epiqueras @noahtallen
+/packages/env                                   @ObliviousHarmony @t-hamano
 
 # PHP
-/lib                                            @timothybjacobs @spacedmonkey
+/lib                                            @spacedmonkey
+/lib/block-supports/layout.php                  @tellthemachines
+/lib/class-wp-theme-json-gutenberg.php          @tellthemachines
+/lib/compat/*/html-api                          @dmsnell
+/lib/experimental/rest-api.php                  @timothybjacobs
+/lib/experimental/class-wp-rest-*               @timothybjacobs
+/lib/experimental/class-wp-rest-block-editor-settings-controller.php @timothybjacobs @spacedmonkey @geriux
+
+# Native
+/packages/components/src/mobile/global-styles-context                @geriux
 
 # Native (Unowned)
-*.native.js                                     @ghost
-*.android.js                                    @ghost
-*.ios.js                                        @ghost
-*.native.scss                                   @ghost
-*.android.scss                                  @ghost
-*.ios.scss                                      @ghost
+*.native.js
+*.android.js
+*.ios.js
+*.native.scss
+*.android.scss
+*.ios.scss

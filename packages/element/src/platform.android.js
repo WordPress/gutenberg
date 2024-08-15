@@ -14,6 +14,8 @@ const Platform = {
 		}
 		return spec.default;
 	},
+	isNative: true,
+	isAndroid: true,
 };
 
 export default Platform;

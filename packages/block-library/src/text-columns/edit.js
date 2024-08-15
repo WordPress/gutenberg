@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { get, times } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import {
 	BlockControls,
@@ -21,8 +16,8 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 	const { width, content, columns } = attributes;
 
 	deprecated( 'The Text Columns block', {
+		since: '5.3',
 		alternative: 'the Columns block',
-		plugin: 'Gutenberg',
 	} );
 
 	return (
@@ -39,6 +34,8 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -55,7 +52,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 					className: `align${ width } columns-${ columns }`,
 				} ) }
 			>
-				{ times( columns, ( index ) => {
+				{ Array.from( { length: columns } ).map( ( _, index ) => {
 					return (
 						<div
 							className="wp-block-column"
@@ -63,7 +60,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 						>
 							<RichText
 								tagName="p"
-								value={ get( content, [ index, 'children' ] ) }
+								value={ content?.[ index ]?.children }
 								onChange={ ( nextContent ) => {
 									setAttributes( {
 										content: [
@@ -73,6 +70,11 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
 										],
 									} );
 								} }
+								aria-label={ sprintf(
+									// translators: %d: column index (starting with 1)
+									__( 'Column %d text' ),
+									index + 1
+								) }
 								placeholder={ __( 'New Column' ) }
 							/>
 						</div>

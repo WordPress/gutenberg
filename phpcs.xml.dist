@@ -2,20 +2,27 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
-	<rule ref="PHPCompatibility"/>
-	<config name="testVersion" value="5.6-"/>
+	<!-- Check for cross-version support for PHP 7.2 and higher. -->
+	<config name="testVersion" value="7.2-"/>
+	<rule ref="PHPCompatibilityWP">
+		<include-pattern>*\.php$</include-pattern>
+	</rule>
 
 	<rule ref="WordPress-Core"/>
-	<rule ref="WordPress-Docs"/>
-	<rule ref="WordPress.WP.I18n"/>
-	<config name="text_domain" value="gutenberg,default"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="gutenberg"/>
+				<element value="default"/>
+			</property>
+		</properties>
+	</rule>
 
 	<rule ref="VariableAnalysis.CodeAnalysis.VariableAnalysis">
 		<properties>
 			<property name="allowUnusedParametersBeforeUsed" value="true"/>
 		</properties>
 	</rule>
-	<rule ref="WordPress.CodeAnalysis.EmptyStatement"/>
 
 	<rule ref="PEAR.Functions.FunctionCallSignature">
 		<properties>
@@ -24,11 +31,19 @@
 	</rule>
 
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
-		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>/lib/compat/*</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>/build/block-library/*</exclude-pattern>
 	</rule>
 
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
+
+	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
+	<arg name="cache" value=".cache/phpcs.json"/>
+
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
@@ -38,54 +53,133 @@
 	<file>./post-content.php</file>
 
 	<!-- Exclude generated files -->
-	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
+	<exclude-pattern>/packages/block-serialization-spec-parser/parser\.php$</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
 
-	<!-- These special comments are markers for the build process -->
-	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
-		<exclude-pattern>gutenberg.php</exclude-pattern>
-	</rule>
+	<!-- Exclude third party libraries -->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/test/php/gutenberg-coding-standards/*</exclude-pattern>
 
-	<!-- Do not require docblocks for unit tests -->
-	<rule ref="Squiz.Commenting.FunctionComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FileComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.ClassComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.ClassComment.SpacingAfter">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Generic.Commenting.DocComment.Empty">
-    	<exclude-pattern>phpunit/*</exclude-pattern>
-    </rule>
-	<rule ref="Generic.Commenting.DocComment.MissingShort">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.VariableComment.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
-	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
-		<exclude-pattern>phpunit/*</exclude-pattern>
-	</rule>
+	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg
+	     DO NOT REMOVE these rules; these files are "built" artifacts from Core
+	     and when they are removed it prevents keeping the repos in sync. -->
+	<exclude-pattern>/lib/compat/wordpress-*/html-api/*\.php$</exclude-pattern>
 
-	<!-- Ignore snake case error in parser -->
-	<rule ref="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
-	<rule ref="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
-	</rule>
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
-		<exclude-pattern>./packages/block-serialization-default-parser/parser.php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/navigation/index\.php$</exclude-pattern>
+	</rule>
+
+	<!-- Ignore empty files in tests/gutenberg-test-themes -->
+	<rule ref="Internal.NoCodeFound">
+		<exclude-pattern>/test/gutenberg-test-themes/*</exclude-pattern>
+	</rule>
+
+	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>*\.asset\.php$</exclude-pattern>
+	</rule>
+	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+	</rule>
+
+	<!-- Enforce checks against redeclaration for functions and classes. -->
+	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>/packages/*</exclude-pattern>
+		<exclude-pattern>/bin/generate-gutenberg-php\.php$</exclude-pattern>
+		<properties>
+			<property name="functionsWhiteList" type="array">
+				<element value="/^_?gutenberg.+/"/>
+			</property>
+			<property name="classesWhiteList" type="array">
+				<element value="/^Gutenberg.+/"/>
+				<element value="/^.+_Gutenberg$/"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName">
+		<include-pattern>/packages/block-library/src/*/*\.php$</include-pattern>
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="block_core_"/>
+				<element value="render_block_core_"/>
+				<element value="register_block_core_"/>
+			</property>
+			<!--
+				The following list of functions is final and must not be extended.
+				It includes functions that cannot be renamed due to backward compatibility concerns.
+			-->
+			<property name="allowed_functions" type="array">
+				<element value="_delete_custom_logo_on_remove_site_logo"/>
+				<element value="_delete_site_logo_on_remove_custom_logo"/>
+				<element value="_delete_site_logo_on_remove_custom_logo_on_setup_theme"/>
+				<element value="_delete_site_logo_on_remove_theme_mods"/>
+				<element value="_override_custom_logo_theme_mod"/>
+				<element value="_sync_custom_logo_to_site_logo"/>
+				<element value="_wp_rest_api_autosave_meta"/>
+				<element value="_wp_rest_api_force_autosave_difference"/>
+				<element value="apply_block_core_search_border_style"/>
+				<element value="apply_block_core_search_border_styles"/>
+				<element value="build_dropdown_script_block_core_categories"/>
+				<element value="build_template_part_block_area_variations"/>
+				<element value="build_template_part_block_instance_variations"/>
+				<element value="build_template_part_block_variations"/>
+				<element value="build_variation_for_navigation_link"/>
+				<element value="classnames_for_block_core_search"/>
+				<element value="comments_block_form_defaults"/>
+				<element value="enqueue_legacy_post_comments_block_styles"/>
+				<element value="get_block_core_avatar_border_attributes"/>
+				<element value="get_block_core_post_featured_image_border_attributes"/>
+				<element value="get_block_core_post_featured_image_overlay_element_markup"/>
+				<element value="get_border_color_classes_for_block_core_search"/>
+				<element value="get_color_classes_for_block_core_search"/>
+				<element value="get_typography_classes_for_block_core_search"/>
+				<element value="get_typography_styles_for_block_core_search"/>
+				<element value="gutenberg_block_core_file_update_interactive_view_script"/>
+				<element value="gutenberg_block_core_navigation_update_interactive_view_script"/>
+				<element value="post_comments_form_block_form_defaults"/>
+				<element value="register_block_core_site_icon_setting"/>
+				<element value="register_legacy_post_comments_block"/>
+				<element value="styles_for_block_core_search"/>
+				<element value="wp_add_footnotes_revisions_to_post_meta"/>
+				<element value="wp_add_footnotes_to_revision"/>
+				<element value="wp_get_footnotes_from_revision"/>
+				<element value="wp_keep_footnotes_revision_id"/>
+				<element value="wp_latest_comments_draft_or_post_title"/>
+				<element value="wp_restore_footnotes_from_revision"/>
+				<element value="wp_save_footnotes_meta"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses">
+		<include-pattern>/packages/block-library/src/.+/*\.php$</include-pattern>
+		<!--
+			Refactoring required: the functions and classes prefixed with 'Gutenberg_' in the files that are being excluded
+			through the 'exclude-pattern' statements below must be guarded, as they are available only in the Gutenberg context,
+			not in Core.
+		-->
+		<exclude-pattern>/packages/block-library/src/form-input/index\.php$</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/form-submission-notification/index\.php$</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/form/index\.php$</exclude-pattern>
+		<properties>
+			<property name="forbidden_functions" type="array">
+				<element value="[Gg]utenberg.*"/>
+			</property>
+			<property name="forbidden_classes" type="array">
+				<element value="[Gg]utenberg.*"/>
+			</property>
+		</properties>
+	</rule>
+	<rule ref="Gutenberg.Commenting.SinceTag">
+		<!-- The sniff ensures that functions have a valid @since tag but skips checking experimental blocks. -->
+		<include-pattern>/packages/block-library/src/.+/*\.php$</include-pattern>
+		<include-pattern>/packages/block-serialization-default-parser/.+/*\.php$</include-pattern>
+		<include-pattern>/packages/widgets/src/blocks/legacy-widget/index\.php$</include-pattern>
+		<include-pattern>/packages/widgets/src/blocks/widget-group/index\.php$</include-pattern>
 	</rule>
 </ruleset>

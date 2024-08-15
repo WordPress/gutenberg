@@ -1,66 +1,96 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
 
-export function DefaultBlockAppender( {
-	isLocked,
-	isVisible,
-	onAppend,
-	showPrompt,
-	placeholder,
-	rootClientId,
-} ) {
-	if ( isLocked || ! isVisible ) {
+/**
+ * Zero width non-breaking space, used as padding for the paragraph when it is
+ * empty.
+ */
+export const ZWNBSP = '\ufeff';
+
+export default function DefaultBlockAppender( { rootClientId } ) {
+	const { showPrompt, isLocked, placeholder, isManualGrid } = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				getSettings,
+				getTemplateLock,
+				getBlockAttributes,
+			} = select( blockEditorStore );
+
+			const isEmpty = ! getBlockCount( rootClientId );
+			const { bodyPlaceholder } = getSettings();
+
+			return {
+				showPrompt: isEmpty,
+				isLocked: !! getTemplateLock( rootClientId ),
+				placeholder: bodyPlaceholder,
+				isManualGrid:
+					getBlockAttributes( rootClientId )?.layout
+						?.isManualPlacement,
+			};
+		},
+		[ rootClientId ]
+	);
+
+	const { insertDefaultBlock, startTyping } = useDispatch( blockEditorStore );
+
+	if ( isLocked || isManualGrid ) {
 		return null;
 	}
 
 	const value =
-		decodeEntities( placeholder ) ||
-		__( 'Start writing or type / to choose a block' );
+		decodeEntities( placeholder ) || __( 'Type / to choose a block' );
 
-	// The appender "button" is in-fact a text field so as to support
-	// transitions by WritingFlow occurring by arrow key press. WritingFlow
-	// only supports tab transitions into text fields and to the block focus
-	// boundary.
-	//
-	// See: https://github.com/WordPress/gutenberg/issues/4829#issuecomment-374213658
-	//
-	// If it were ever to be made to be a proper `button` element, it is
-	// important to note that `onFocus` alone would not be sufficient to
-	// capture click events, notably in Firefox.
-	//
-	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
-
-	// The wp-block className is important for editor styles.
+	const onAppend = () => {
+		insertDefaultBlock( undefined, rootClientId );
+		startTyping();
+	};
 
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block block-editor-default-block-appender"
+			className={ clsx( 'block-editor-default-block-appender', {
+				'has-visible-prompt': showPrompt,
+			} ) }
 		>
-			<TextareaAutosize
+			<p
+				tabIndex="0"
+				// We want this element to be styled as a paragraph by themes.
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
-				aria-label={ __( 'Add block' ) }
+				aria-label={ __( 'Add default block' ) }
+				// A wrapping container for this one already has the wp-block className.
 				className="block-editor-default-block-appender__content"
-				readOnly
-				onFocus={ onAppend }
-				value={ showPrompt ? value : '' }
-			/>
+				onKeyDown={ ( event ) => {
+					if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+						onAppend();
+					}
+				} }
+				onClick={ () => onAppend() }
+				onFocus={ () => {
+					if ( showPrompt ) {
+						onAppend();
+					}
+				} }
+			>
+				{ showPrompt ? value : ZWNBSP }
+			</p>
 			<Inserter
 				rootClientId={ rootClientId }
 				position="bottom right"
@@ -70,43 +100,3 @@ export function DefaultBlockAppender( {
 		</div>
 	);
 }
-
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const {
-			getBlockCount,
-			getBlockName,
-			isBlockValid,
-			getSettings,
-			getTemplateLock,
-		} = select( 'core/block-editor' );
-
-		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const isLastBlockDefault =
-			getBlockName( ownProps.lastBlockClientId ) ===
-			getDefaultBlockName();
-		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
-		const { bodyPlaceholder } = getSettings();
-
-		return {
-			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
-			showPrompt: isEmpty,
-			isLocked: !! getTemplateLock( ownProps.rootClientId ),
-			placeholder: bodyPlaceholder,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } = dispatch(
-			'core/block-editor'
-		);
-
-		return {
-			onAppend() {
-				const { rootClientId } = ownProps;
-
-				insertDefaultBlock( undefined, rootClientId );
-				startTyping();
-			},
-		};
-	} )
-)( DefaultBlockAppender );

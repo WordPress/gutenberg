@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { some, castArray, find, mapValues, pickBy, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { regexp, next } from '@wordpress/shortcode';
@@ -13,7 +8,14 @@ import { regexp, next } from '@wordpress/shortcode';
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
-import { getBlockAttributes } from '../parser';
+import { getBlockAttributes } from '../parser/get-block-attributes';
+import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
+
+const castArray = ( maybeArray ) =>
+	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+const beforeLineRegexp = /(\n|<p>)\s*$/;
+const afterLineRegexp = /^\s*(\n|<\/p>)/;
 
 function segmentHTMLToShortcodeBlock(
 	HTML,
@@ -28,7 +30,7 @@ function segmentHTMLToShortcodeBlock(
 		( transform ) =>
 			excludedBlockNames.indexOf( transform.blockName ) === -1 &&
 			transform.type === 'shortcode' &&
-			some( castArray( transform.tag ), ( tag ) =>
+			castArray( transform.tag ).some( ( tag ) =>
 				regexp( tag ).test( HTML )
 			)
 	);
@@ -38,7 +40,7 @@ function segmentHTMLToShortcodeBlock(
 	}
 
 	const transformTags = castArray( transformation.tag );
-	const transformTag = find( transformTags, ( tag ) =>
+	const transformTag = transformTags.find( ( tag ) =>
 		regexp( tag ).test( HTML )
 	);
 
@@ -55,10 +57,10 @@ function segmentHTMLToShortcodeBlock(
 		// consider the shortcode as inline text, and thus skip conversion for
 		// this segment.
 		if (
-			! includes( match.shortcode.content || '', '<' ) &&
+			! match.shortcode.content?.includes( '<' ) &&
 			! (
-				/(\n|<p>)\s*$/.test( beforeHTML ) &&
-				/^\s*(\n|<\/p>)/.test( afterHTML )
+				beforeLineRegexp.test( beforeHTML ) &&
+				afterLineRegexp.test( afterHTML )
 			)
 		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
@@ -82,31 +84,75 @@ function segmentHTMLToShortcodeBlock(
 			] );
 		}
 
-		const attributes = mapValues(
-			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
+		let blocks = [];
+		if ( typeof transformation.transform === 'function' ) {
 			// Passing all of `match` as second argument is intentionally broad
 			// but shouldn't be too relied upon.
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-			( schema ) => schema.shortcode( match.shortcode.attrs, match )
-		);
+			blocks = [].concat(
+				transformation.transform( match.shortcode.attrs, match )
+			);
 
-		const block = createBlock(
-			transformation.blockName,
-			getBlockAttributes(
-				{
-					...getBlockType( transformation.blockName ),
-					attributes: transformation.attributes,
-				},
-				match.shortcode.content,
-				attributes
-			)
-		);
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			blocks = blocks.map( ( block ) => {
+				block.originalContent = match.shortcode.content;
+				return applyBuiltInValidationFixes(
+					block,
+					getBlockType( block.name )
+				);
+			} );
+		} else {
+			const attributes = Object.fromEntries(
+				Object.entries( transformation.attributes )
+					.filter( ( [ , schema ] ) => schema.shortcode )
+					// Passing all of `match` as second argument is intentionally broad
+					// but shouldn't be too relied upon.
+					//
+					// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+					.map( ( [ key, schema ] ) => [
+						key,
+						schema.shortcode( match.shortcode.attrs, match ),
+					] )
+			);
+
+			const blockType = getBlockType( transformation.blockName );
+			if ( ! blockType ) {
+				return [ HTML ];
+			}
+
+			const transformationBlockType = {
+				...blockType,
+				attributes: transformation.attributes,
+			};
+
+			let block = createBlock(
+				transformation.blockName,
+				getBlockAttributes(
+					transformationBlockType,
+					match.shortcode.content,
+					attributes
+				)
+			);
+
+			// Applying the built-in fixes can enhance the attributes with missing content like "className".
+			block.originalContent = match.shortcode.content;
+			block = applyBuiltInValidationFixes(
+				block,
+				transformationBlockType
+			);
+
+			blocks = [ block ];
+		}
 
 		return [
-			...segmentHTMLToShortcodeBlock( beforeHTML ),
-			block,
-			...segmentHTMLToShortcodeBlock( afterHTML ),
+			...segmentHTMLToShortcodeBlock(
+				beforeHTML.replace( beforeLineRegexp, '' )
+			),
+			...blocks,
+			...segmentHTMLToShortcodeBlock(
+				afterHTML.replace( afterLineRegexp, '' )
+			),
 		];
 	}
 

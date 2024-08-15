@@ -4,14 +4,22 @@
 		content: "";
 		display: block;
 		position: absolute;
+		z-index: 1;
+
+		// Horizontal spacer: span the full width, and provide a min-height for when it's 1px tall.
 		width: 100%;
-		height: $button-size-small;
-		transform: translateY(-#{$button-size-small / 2});
+		min-height: $grid-unit-10;
+
+		// Vertical spacer: span the height width, and provide a min-width for when it's 1px wide.
+		min-width: $grid-unit-10;
+		height: 100%;
 	}
 }
 
-.block-library-spacer__resize-container.has-show-handle {
-	background: $gray-100;
+.wp-block-spacer.is-hovered .block-library-spacer__resize-container,
+.block-library-spacer__resize-container.has-show-handle,
+.wp-block-spacer.is-selected.custom-sizes-disabled {
+	background: rgba($black, 0.1);
 
 	.is-dark-theme & {
 		background: rgba($white, 0.15);
@@ -20,10 +28,21 @@
 
 .block-library-spacer__resize-container {
 	clear: both;
-	margin-bottom: $default-block-margin;
+
+	&:not(.is-resizing) {
+		// Important is used to have higher specificity than the inline style set by re-resizable library.
+		height: 100% !important;
+		width: 100% !important;
+	}
 
 	// Don't show the horizontal indicator.
 	.components-resizable-box__handle::before {
 		content: none;
+	}
+
+	&.resize-horizontal {
+		margin-bottom: 0;
+		// Important is used to have higher specificity than the inline style set by re-resizable library.
+		height: 100% !important;
 	}
 }

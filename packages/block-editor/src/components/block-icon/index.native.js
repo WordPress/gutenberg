@@ -8,21 +8,40 @@ import { View } from 'react-native';
  */
 import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
-export default function BlockIcon( { icon, showColors = false } ) {
+/**
+ * Internal dependencies
+ */
+import styles from './style.scss';
+
+export function BlockIcon( { icon, fill, size, showColors = false } ) {
 	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};
 	}
 
-	const renderedIcon = <Icon icon={ icon && icon.src ? icon.src : icon } />;
+	const defaultFill = usePreferredColorSchemeStyle(
+		styles.iconPlaceholder,
+		styles.iconPlaceholderDark
+	)?.fill;
+	const iconForeground = showColors ? icon?.foreground : undefined;
+
+	const renderedIcon = (
+		<Icon
+			icon={ icon && icon.src ? icon.src : icon }
+			fill={ fill || iconForeground || defaultFill }
+			{ ...( size && { size } ) }
+		/>
+	);
 	const style = showColors
 		? {
 				backgroundColor: icon && icon.background,
-				color: icon && icon.foreground,
 		  }
 		: {};
 
 	return <View style={ style }>{ renderedIcon }</View>;
 }
+
+export default BlockIcon;

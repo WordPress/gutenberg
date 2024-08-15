@@ -9,22 +9,31 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const { hasSameCoreSource } = require( './wordpress' );
+const { dbEnv } = require( './config' );
+const getHostUser = require( './get-host-user' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**
  * Gets the volume mounts for an individual service.
  *
- * @param {WPServiceConfig} config The service config to get the mounts from.
- * @param {string} wordpressDefault The default internal path for the WordPress
- *                                  source code (such as tests-wordpress).
+ * @param {string}              workDirectoryPath The working directory for wp-env.
+ * @param {WPEnvironmentConfig} config            The service config to get the mounts from.
+ * @param {string}              hostUsername      The username of the host running wp-env.
+ * @param {string}              wordpressDefault  The default internal path for the WordPress
+ *                                                source code (such as tests-wordpress).
  *
  * @return {string[]} An array of volumes to mount in string format.
  */
-function getMounts( config, wordpressDefault = 'wordpress' ) {
+function getMounts(
+	workDirectoryPath,
+	config,
+	hostUsername,
+	wordpressDefault = 'wordpress'
+) {
 	// Top-level WordPress directory mounts (like wp-content/themes)
 	const directoryMounts = Object.entries( config.mappings ).map(
 		( [ wpDir, source ] ) => `${ source.path }:/var/www/html/${ wpDir }`
@@ -40,11 +49,34 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
 	);
 
+	const userHomeMount =
+		wordpressDefault === 'wordpress'
+			? `user-home:/home/${ hostUsername }`
+			: `tests-user-home:/home/${ hostUsername }`;
+
+	const corePHPUnitMount = `${ path.join(
+		workDirectoryPath,
+		wordpressDefault === 'wordpress'
+			? 'WordPress-PHPUnit'
+			: 'tests-WordPress-PHPUnit',
+		'tests',
+		'phpunit'
+	) }:/wordpress-phpunit`;
+
 	const coreMount = `${
 		config.coreSource ? config.coreSource.path : wordpressDefault
 	}:/var/www/html`;
 
-	return [ coreMount, ...directoryMounts, ...pluginMounts, ...themeMounts ];
+	return [
+		...new Set( [
+			coreMount, // Must be first because of some operations later that expect it to be!
+			corePHPUnitMount,
+			userHomeMount,
+			...directoryMounts,
+			...pluginMounts,
+			...themeMounts,
+		] ),
+	];
 }
 
 /**
@@ -56,8 +88,31 @@ function getMounts( config, wordpressDefault = 'wordpress' ) {
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
-	const developmentMounts = getMounts( config.env.development );
-	const testsMounts = getMounts( config.env.tests, 'tests-wordpress' );
+	// Since we are mounting files from the host operating system
+	// we want to create the host user in some of our containers.
+	// This ensures ownership parity and lets us access files
+	// and folders between the containers and the host.
+	const hostUser = getHostUser();
+
+	const developmentMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.development,
+		hostUser.name
+	);
+	const testsMounts = getMounts(
+		config.workDirectoryPath,
+		config.env.tests,
+		hostUser.name,
+		'tests-wordpress'
+	);
+
+	// We use a custom Dockerfile in order to make sure that
+	// the current host user exists inside the container.
+	const imageBuildArgs = {
+		HOST_USERNAME: hostUser.name,
+		HOST_UID: hostUser.uid,
+		HOST_GID: hostUser.gid,
+	};
 
 	// When both tests and development reference the same WP source, we need to
 	// ensure that tests pulls from a copy of the files so that it maintains
@@ -111,78 +166,114 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 	// Set the default ports based on the config values.
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
+	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
+		config.env.development.mysqlPort ?? ''
+	}}:3306`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
-
-	// The www-data user in wordpress:cli has a different UID (82) to the
-	// www-data user in wordpress (33). Ensure we use the wordpress www-data
-	// user for CLI commands.
-	// https://github.com/docker-library/wordpress/issues/256
-	const cliUser = '33:33';
+	const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
+		config.env.tests.mysqlPort ?? ''
+	}}:3306`;
 
 	return {
-		version: '3.7',
 		services: {
 			mysql: {
-				image: 'mariadb',
-				ports: [ '3306' ],
+				image: 'mariadb:lts',
+				ports: [ developmentMysqlPorts ],
 				environment: {
-					MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
+					MYSQL_ROOT_HOST: '%',
+					MYSQL_ROOT_PASSWORD:
+						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
+			'tests-mysql': {
+				image: 'mariadb:lts',
+				ports: [ testsMysqlPorts ],
+				environment: {
+					MYSQL_ROOT_HOST: '%',
+					MYSQL_ROOT_PASSWORD:
+						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
+				},
+				volumes: [ 'mysql-test:/var/lib/mysql' ],
+			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
-				image: 'wordpress',
+				build: {
+					context: '.',
+					dockerfile: 'WordPress.Dockerfile',
+					args: imageBuildArgs,
+				},
 				ports: [ developmentPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'wordpress',
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
+					...dbEnv.credentials,
+					...dbEnv.development,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: developmentMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [ 'mysql' ],
-				image: 'wordpress',
+				depends_on: [ 'tests-mysql' ],
+				build: {
+					context: '.',
+					dockerfile: 'Tests-WordPress.Dockerfile',
+					args: imageBuildArgs,
+				},
 				ports: [ testsPorts ],
 				environment: {
-					WORDPRESS_DB_NAME: 'tests-wordpress',
+					APACHE_RUN_USER: '#' + hostUser.uid,
+					APACHE_RUN_GROUP: '#' + hostUser.gid,
+					...dbEnv.credentials,
+					...dbEnv.tests,
+					WP_TESTS_DIR: '/wordpress-phpunit',
 				},
 				volumes: testsMounts,
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
-				image: 'wordpress:cli',
+				build: {
+					context: '.',
+					dockerfile: 'CLI.Dockerfile',
+					args: imageBuildArgs,
+				},
 				volumes: developmentMounts,
-				user: cliUser,
+				user: hostUser.fullUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.development,
+					WP_TESTS_DIR: '/wordpress-phpunit',
+				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: 'wordpress:cli',
-				volumes: testsMounts,
-				user: cliUser,
-			},
-			composer: {
-				image: 'composer',
-				volumes: [ `${ config.configDirectoryPath }:/app` ],
-			},
-			phpunit: {
-				image: 'wordpressdevelop/phpunit:${LOCAL_PHP-latest}',
-				depends_on: [ 'tests-wordpress' ],
-				volumes: [
-					...testsMounts,
-					'phpunit-uploads:/var/www/html/wp-content/uploads',
-				],
-				environment: {
-					LOCAL_DIR: 'html',
-					WP_PHPUNIT__TESTS_CONFIG:
-						'/var/www/html/phpunit-wp-config.php',
+				build: {
+					context: '.',
+					dockerfile: 'Tests-CLI.Dockerfile',
+					args: imageBuildArgs,
 				},
+				volumes: testsMounts,
+				user: hostUser.fullUser,
+				environment: {
+					...dbEnv.credentials,
+					...dbEnv.tests,
+					WP_TESTS_DIR: '/wordpress-phpunit',
+				},
+				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 		},
 		volumes: {
-			...( ! config.coreSource && { wordpress: {} } ),
-			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			...( ! config.env.development.coreSource && { wordpress: {} } ),
+			...( ! config.env.tests.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
-			'phpunit-uploads': {},
+			'mysql-test': {},
+			'user-home': {},
+			'tests-user-home': {},
 		},
 	};
 };

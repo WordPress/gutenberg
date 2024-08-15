@@ -7,6 +7,7 @@ import { navigation as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -17,33 +18,11 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Navigation' ),
-
 	icon,
-
-	description: __(
-		'A collection of blocks that allow visitors to get around your site.'
-	),
-
-	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
-
-	variations: [
-		{
-			name: 'horizontal',
-			isDefault: true,
-			title: __( 'Navigation (horizontal)' ),
-			description: __( 'Links shown in a row.' ),
-			attributes: { orientation: 'horizontal' },
-		},
-		{
-			name: 'vertical',
-			title: __( 'Navigation (vertical)' ),
-			description: __( 'Links shown in a column.' ),
-			attributes: { orientation: 'vertical' },
-		},
-	],
-
 	example: {
+		attributes: {
+			overlayMenu: 'never',
+		},
 		innerBlocks: [
 			{
 				name: 'core/navigation-link',
@@ -71,10 +50,9 @@ export const settings = {
 			},
 		],
 	},
-
 	edit,
-
 	save,
-
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

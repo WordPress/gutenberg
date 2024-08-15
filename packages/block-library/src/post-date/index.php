@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-date` block on the server.
  *
+ * @since 5.8.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -18,19 +20,67 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$post_ID = $block->context['postId'];
+
+	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+		$post_timestamp = get_post_timestamp( $post_ID );
+		if ( $post_timestamp > time() ) {
+			// translators: %s: human-readable time difference.
+			$formatted_date = sprintf( __( '%s from now', 'gutenberg' ), human_time_diff( $post_timestamp ) );
+		} else {
+			// translators: %s: human-readable time difference.
+			$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( $post_timestamp ) );
+		}
+	} else {
+		$formatted_date = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+	}
+	$unformatted_date = esc_attr( get_the_date( 'c', $post_ID ) );
+	$classes          = array();
+
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
+	}
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+
+	/*
+	 * If the "Display last modified date" setting is enabled,
+	 * only display the modified date if it is later than the publishing date.
+	 */
+	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
+		if ( get_the_modified_date( 'Ymdhi', $post_ID ) > get_the_date( 'Ymdhi', $post_ID ) ) {
+			if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+				// translators: %s: human-readable time difference.
+				$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID, 'modified' ) ) );
+			} else {
+				$formatted_date = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+			}
+			$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
+			$classes[]        = 'wp-block-post-date__modified-date';
+		} else {
+			return '';
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		$formatted_date = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $formatted_date );
+	}
 
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
 		$wrapper_attributes,
-		get_the_date( 'c', $block->context['postId'] ),
-		get_the_date( isset( $attributes['format'] ) ? $attributes['format'] : '', $block->context['postId'] )
+		$unformatted_date,
+		$formatted_date
 	);
 }
 
 /**
  * Registers the `core/post-date` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_date() {
 	register_block_type_from_metadata(

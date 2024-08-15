@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -8,7 +9,7 @@ const fs = require( 'fs' ).promises;
  * Options for cache parsing.
  *
  * @typedef WPEnvCacheOptions
- * @property {string}  workDirectoryPath Path to the work directory located in ~/.wp-env.
+ * @property {string} workDirectoryPath Path to the work directory located in ~/.wp-env.
  */
 
 const CACHE_FILE_NAME = 'wp-env-cache.json';
@@ -39,6 +40,9 @@ async function didCacheChange( key, value, options ) {
  * @param {WPEnvCacheOptions} options Parsing options
  */
 async function setCache( key, value, options ) {
+	// Make sure the cache directory exists.
+	await fs.mkdir( options.workDirectoryPath, { recursive: true } );
+
 	const existingCache = await getCacheFile( options );
 	existingCache[ key ] = value;
 

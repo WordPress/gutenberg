@@ -1,10 +1,13 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
+const got = require( 'got' );
+const dns = require( 'dns' ).promises;
 
 /**
  * Promisified dependencies
@@ -12,39 +15,40 @@ const path = require( 'path' );
 const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
+ * Internal dependencies
+ */
+const { getCache, setCache } = require( './cache' );
+
+/**
  * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPServiceConfig} WPServiceConfig
+ * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
+ * @typedef {import('./config').WPSource} WPSource
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
 
 /**
- * Makes the WordPress content directories (wp-content, wp-content/plugins,
- * wp-content/themes) owned by the www-data user. This ensures that WordPress
- * can write to these directories.
+ * Utility function to check if a WordPress version is lower than another version.
  *
- * This is necessary when running wp-env with `"core": null` because Docker
- * will automatically create these directories as the root user when binding
- * volumes during `docker-compose up`, and `docker-compose up` doesn't support
- * the `-u` option.
+ * This is a non-comprehensive check only intended for this usage, to avoid pulling in a full semver library.
+ * It only considers the major and minor portions of the version and ignores the rest. Additionally, it assumes that
+ * the minor version is always a single digit (i.e. 0-9).
  *
- * See https://github.com/docker-library/wordpress/issues/436.
+ * Do not use this function for general version comparison, as it will not work for all cases.
  *
- * @param {WPEnvironment} environment The environment to check. Either 'development' or 'tests'.
- * @param {WPConfig}      config      The wp-env config object.
+ * @param {string} version        The version to check.
+ * @param {string} compareVersion The compare version to check whether the version is lower than.
+ * @return {boolean} True if the version is lower than the compare version, false otherwise.
  */
-async function makeContentDirectoriesWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
+function isWPMajorMinorVersionLower( version, compareVersion ) {
+	const versionNumber = Number.parseFloat(
+		version.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
 	);
+	const compareVersionNumber = Number.parseFloat(
+		compareVersion.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
+	);
+
+	return versionNumber < compareVersionNumber;
 }
 
 /**
@@ -68,22 +72,44 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  *
  * @param {WPEnvironment} environment The environment to configure. Either 'development' or 'tests'.
  * @param {WPConfig}      config      The wp-env config object.
- * @param {Object} spinner A CLI spinner which indicates progress.
+ * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const installCommand = `wp core install --url="localhost:${ config.env[ environment ].port }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	let wpVersion = '';
+	try {
+		wpVersion = await readWordPressVersion(
+			config.env[ environment ].coreSource,
+			spinner,
+			config.debug
+		);
+	} catch ( err ) {
+		// Ignore error.
+	}
+
+	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
+
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	const configAnchor =
+		wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' )
+			? `"define('WP_DEBUG',"`
+			: `"define( 'WP_DEBUG',"`;
 
 	// Set wp-config.php values.
 	for ( let [ key, value ] of Object.entries(
 		config.env[ environment ].config
 	) ) {
+		// Allow the configuration to skip a default constant by specifying it as null.
+		if ( null === value ) {
+			continue;
+		}
+
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+			`wp config set ${ key } ${ value } --anchor=${ configAnchor }${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);
@@ -108,29 +134,29 @@ async function configureWordPress( environment, config, spinner ) {
 		[ 'bash', '-c', setupCommands.join( ' && ' ) ],
 		{
 			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--rm' ],
 			log: config.debug,
 		}
 	);
 
-	/**
-	 * Since wp-phpunit loads wp-settings.php at the end of its wp-config.php
-	 * file, we need to avoid loading it too early in our own wp-config.php. If
-	 * we load it too early, then some things (like MULTISITE) will be defined
-	 * before wp-phpunit has a chance to configure them. To avoid this, create a
-	 * copy of wp-config.php for phpunit which doesn't require wp-settings.php.
-	 *
-	 * Note that This needs to be executed using `exec` on the wordpress service
-	 * so that file permissions work properly.
-	 *
-	 * This will be removed in the future. @see https://github.com/WordPress/gutenberg/issues/23171
-	 *
-	 */
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
+	let abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
+	if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' ) ) {
+		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
+	} else if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.4' ) ) {
+		abspathDef = `define( 'ABSPATH', dirname( __FILE__ ) . '\\/' );`;
+	}
+
+	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
+	// the directory that the test suite is contained within.
+	// Make sure ABSPATH points to the WordPress install.
 	await dockerCompose.exec(
 		environment === 'development' ? 'wordpress' : 'tests-wordpress',
 		[
 			'sh',
 			'-c',
-			'sed "/^require.*wp-settings.php/d" /var/www/html/wp-config.php > /var/www/html/phpunit-wp-config.php && chmod 777 /var/www/html/phpunit-wp-config.php',
+			`sed -e "/^require.*wp-settings.php/d" -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
@@ -179,30 +205,13 @@ async function setupWordPressDirectories( config ) {
 			config.env.development.coreSource.path,
 			config.env.development.coreSource.testsPath
 		);
-		await createUploadsDir( config.env.development.coreSource.testsPath );
 	}
-
-	const checkedPaths = {};
-	for ( const { coreSource } of Object.values( config.env ) ) {
-		if ( coreSource && ! checkedPaths[ coreSource.path ] ) {
-			await createUploadsDir( coreSource.path );
-			checkedPaths[ coreSource.path ] = true;
-		}
-	}
-}
-
-async function createUploadsDir( corePath ) {
-	// Ensure the tests uploads folder is writeable for travis,
-	// creating the folder if necessary.
-	const uploadPath = path.join( corePath, 'wp-content/uploads' );
-	await fs.mkdir( uploadPath, { recursive: true } );
-	await fs.chmod( uploadPath, 0o0767 );
 }
 
 /**
  * Returns true if all given environment configs have the same core source.
  *
- * @param {WPServiceConfig[]} envs An array of environments to check.
+ * @param {WPEnvironmentConfig[]} envs An array of environments to check.
  *
  * @return {boolean} True if all the environments have the same core source.
  */
@@ -235,7 +244,7 @@ function areCoreSourcesDifferent( coreSource1, coreSource2 ) {
  * (.git, node_modules) and configuration files (wp-config.php).
  *
  * @param {string} fromPath Path to the WordPress directory to copy.
- * @param {string} toPath Destination path.
+ * @param {string} toPath   Destination path.
  */
 async function copyCoreFiles( fromPath, toPath ) {
 	await copyDir( fromPath, toPath, {
@@ -257,11 +266,107 @@ async function copyCoreFiles( fromPath, toPath ) {
 	} );
 }
 
+/**
+ * Scans through a WordPress source to find the version of WordPress it contains.
+ *
+ * @param {WPSource} coreSource The WordPress source.
+ * @param {Object}   spinner    A CLI spinner which indicates progress.
+ * @param {boolean}  debug      Indicates whether or not the CLI is in debug mode.
+ * @return {string} The version of WordPress the source is for.
+ */
+async function readWordPressVersion( coreSource, spinner, debug ) {
+	const versionFilePath = path.join(
+		coreSource.path,
+		'wp-includes',
+		'version.php'
+	);
+	const versionFile = await fs.readFile( versionFilePath, {
+		encoding: 'utf-8',
+	} );
+	const versionMatch = versionFile.match(
+		/\$wp_version = '([A-Za-z\-0-9.]+)'/
+	);
+	if ( ! versionMatch ) {
+		throw new Error( `Failed to find version in ${ versionFilePath }` );
+	}
+
+	if ( debug ) {
+		spinner.info(
+			`Found WordPress ${ versionMatch[ 1 ] } in ${ versionFilePath }.`
+		);
+	}
+
+	return versionMatch[ 1 ];
+}
+
+/**
+ * Basically a quick check to see if we can connect to the internet.
+ *
+ * @return {boolean} True if we can connect to WordPress.org, false otherwise.
+ */
+let IS_OFFLINE;
+async function canAccessWPORG() {
+	// Avoid situations where some parts of the code think we're offline and others don't.
+	if ( IS_OFFLINE !== undefined ) {
+		return IS_OFFLINE;
+	}
+	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+	return IS_OFFLINE;
+}
+
+/**
+ * Returns the latest stable version of WordPress by requesting the stable-check
+ * endpoint on WordPress.org.
+ *
+ * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
+ * @return {string} The latest stable version of WordPress, like "6.0.1"
+ */
+let CACHED_WP_VERSION;
+async function getLatestWordPressVersion( options ) {
+	// Avoid extra network requests.
+	if ( CACHED_WP_VERSION ) {
+		return CACHED_WP_VERSION;
+	}
+
+	const cacheOptions = {
+		workDirectoryPath: options.cacheDirectoryPath,
+	};
+
+	// When we can't connect to the internet, we don't want to break wp-env or
+	// wait for the stable-check result to timeout.
+	if ( ! ( await canAccessWPORG() ) ) {
+		const latestVersion = await getCache(
+			'latestWordPressVersion',
+			cacheOptions
+		);
+		if ( ! latestVersion ) {
+			throw new Error(
+				'Could not find the current WordPress version in the cache and the network is not available.'
+			);
+		}
+		return latestVersion;
+	}
+
+	const versions = await got(
+		'https://api.wordpress.org/core/stable-check/1.0/'
+	).json();
+
+	for ( const [ version, status ] of Object.entries( versions ) ) {
+		if ( status === 'latest' ) {
+			CACHED_WP_VERSION = version;
+			await setCache( 'latestWordPressVersion', version, cacheOptions );
+			return version;
+		}
+	}
+}
+
 module.exports = {
 	hasSameCoreSource,
-	makeContentDirectoriesWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
+	readWordPressVersion,
+	canAccessWPORG,
+	getLatestWordPressVersion,
 };

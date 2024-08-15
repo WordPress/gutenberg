@@ -1,0 +1,55 @@
+.editor-list-view-sidebar {
+	height: 100%;
+
+	@include break-medium {
+		width: $secondary-sidebar-width;
+	}
+}
+
+.editor-list-view-sidebar__list-view-panel-content,
+.editor-list-view-sidebar__list-view-container > .document-outline {
+	height: 100%;
+
+	// Include custom scrollbars, invisible until hovered.
+	@include custom-scrollbars-on-hover(transparent, $gray-600);
+	overflow: auto;
+
+	// Only reserve space for scrollbars when there is content to scroll.
+	// This allows items in the list view to have equidistant padding left and right
+	// right up until a scrollbar is present.
+	scrollbar-gutter: auto;
+
+	// The table cells use an extra pixels of space left and right. We compensate for that here.
+	padding: $grid-unit-05;
+}
+
+.editor-list-view-sidebar__list-view-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.editor-list-view-sidebar__tab-panel {
+	height: 100%;
+}
+
+.editor-list-view-sidebar__outline {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+	border-bottom: $border-width solid $gray-300;
+	padding: $grid-unit-20;
+
+	& > div > span:first-child {
+		// Width of the text information fields.
+		width: 90px;
+		display: inline-block;
+	}
+
+	& > div > span {
+		font-size: $helptext-font-size;
+		line-height: $default-line-height;
+		color: $gray-700;
+	}
+}
+

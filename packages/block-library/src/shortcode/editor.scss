@@ -1,29 +1,8 @@
-.wp-block-shortcode {
-	display: flex;
-	flex-direction: column;
-	padding: $block-padding;
-	font-size: $default-font-size;
-	font-family: $default-font;
-	margin-bottom: $default-block-margin;
-
-	label {
-		display: flex;
-		align-items: center;
-		white-space: nowrap;
-		font-weight: 600;
-		flex-shrink: 0;
-	}
-
-	.block-editor-plain-text {
-		max-height: 250px;
-	}
-
-	.dashicon {
-		margin-right: $grid-unit-10;
-	}
-}
-
-.block-editor .blocks-shortcode__textarea,
+// The editing view for the Shortcode block is equivalent to block UI.
+// Therefore we increase specificity to avoid theme styles bleeding in.
 .blocks-shortcode__textarea {
-	@include input-control;
+	box-sizing: border-box;
+	max-height: 250px;
+	resize: none;
+	@include editor-input-reset();
 }

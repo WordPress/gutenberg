@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { mount, shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -19,20 +20,25 @@ const mockSavePost = jest.fn();
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
 	return {
 		useDispatch: () => ( { savePost: mockSavePost } ),
+		useDispatchWithMap: jest.fn(),
 	};
 } );
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
 
 jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => {
-	// This allows us to tweak the returned value on each test
+	// This allows us to tweak the returned value on each test.
 	const mock = jest.fn();
 	return mock;
 } );
+
+jest.mock( '@wordpress/icons/src/icon', () => () => (
+	<div data-testid="test-icon" />
+) );
 
 describe( 'PostSavedState', () => {
 	it( 'should display saving while save in progress, even if not saveable', () => {
@@ -41,34 +47,28 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: true,
+			postStatus: 'draft',
 		} ) );
 
-		const wrapper = mount( <PostSavedState /> );
+		render( <PostSavedState /> );
 
-		expect( wrapper.text() ).toContain( 'Saving' );
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
-	it( 'returns null if the post is not saveable', () => {
+	it( 'returns a disabled button if the post is not saveable', () => {
 		useSelect.mockImplementation( () => ( {
 			isDirty: false,
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
-		const wrapper = shallow( <PostSavedState /> );
+		render( <PostSavedState /> );
 
-		expect( wrapper.type() ).toBeNull();
-	} );
-
-	it( 'returns a switch to draft link if the post is published', () => {
-		useSelect.mockImplementation( () => ( {
-			isPublished: true,
-		} ) );
-
-		const wrapper = shallow( <PostSavedState /> );
-
-		expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'button' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
@@ -77,30 +77,41 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
-		const wrapper = shallow( <PostSavedState /> );
+		render( <PostSavedState /> );
 
-		expect( wrapper.childAt( 0 ).name() ).toBe( 'Icon' );
-		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
+		const button = screen.getByRole( 'button' );
+
+		expect( within( button ).getByTestId( 'test-icon' ) ).toBeVisible();
+		expect( within( button ).getByText( 'Saved' ) ).toBeVisible();
 	} );
 
-	it( 'should return Save button if edits to be saved', () => {
+	it( 'should return Save button if edits to be saved', async () => {
+		const user = userEvent.setup();
+
 		useSelect.mockImplementation( () => ( {
 			isDirty: true,
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		// Simulate the viewport being considered large.
 		useViewportMatch.mockImplementation( () => true );
 
-		const wrapper = shallow( <PostSavedState /> );
+		render( <PostSavedState /> );
 
-		expect( wrapper ).toMatchSnapshot();
-		wrapper.simulate( 'click', {} );
+		const button = screen.getByRole( 'button' );
+
+		expect( button ).toMatchSnapshot();
+
+		await user.click( button );
+
 		expect( mockSavePost ).toHaveBeenCalled();
+
 		// Regression: Verify the event object is not passed to prop callback.
 		expect( mockSavePost.mock.calls[ 0 ] ).toEqual( [] );
 	} );

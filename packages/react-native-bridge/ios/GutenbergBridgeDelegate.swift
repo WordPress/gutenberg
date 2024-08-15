@@ -1,23 +1,49 @@
-public struct MediaInfo {
+import React
+
+public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
     public let type: String?
+    public let title: String?
     public let caption: String?
+    public let alt: String?
+    public let metadata: [String: Any]
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil) {
+    private enum CodingKeys: String, CodingKey {
+        case id, url, type, title, caption, alt
+    }
+
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil, metadata: [String: Any] = [:]) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
+        self.title = title
+        self.alt = alt
+        self.metadata = metadata
     }
 }
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case contactInfoBlock
+    case layoutGridBlock
+    case tiledGalleryBlock
+    case videoPressBlock
+    case videoPressV5Support
     case mentions
+    case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
-    case modalLayoutPicker
+    case isAudioBlockMediaUploadEnabled
+    case reusableBlock
+    case facebookEmbed
+    case instagramEmbed
+    case loomEmbed
+    case smartframeEmbed
+    case shouldUseFastImage
+    case supportSection
+    case onlyCoreBlocks
 }
 
 /// Wrapper for single block data
@@ -79,7 +105,7 @@ extension Gutenberg.MediaSource {
     }
 }
 
-/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+/// Ref. https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info
@@ -116,26 +142,57 @@ extension RCTLogLevel {
     }
 }
 
-public enum GutenbergUserEvent {
+// Definition of JavaScript exception, which will be used to
+// log exception to the Crash Logging service.
+public struct GutenbergJSException {
+    public let type: String
+    public let message: String
+    public let stacktrace: [StacktraceLine]
+    public let context: [String: Any]
+    public let tags: [String: String]
+    public let isHandled: Bool
+    public let handledBy: String
+
+    public struct StacktraceLine {
+        public let filename: String?
+        public let function: String
+        public let lineno: NSNumber?
+        public let colno: NSNumber?
+        
+        init?(from dict: [AnyHashable: Any]) {
+            guard let function = dict["function"] as? String else {
+                return nil
+            }
+            self.filename = dict["filename"] as? String
+            self.function = function
+            self.lineno = dict["lineno"] as? NSNumber
+            self.colno = dict["colno"] as? NSNumber
+        }
+    }
     
-    case editorSessionTemplateApply(_ template: String)
-    case editorSessionTemplatePreview(_ template: String)
-    
-    init?(event: String, properties:[AnyHashable: Any]?) {
-        switch event {
-        case "editor_session_template_apply":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplateApply(template)
-        case "editor_session_template_preview":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplatePreview(template)
-        default:
+    init?(from dict: [AnyHashable: Any]) {
+        guard let type = dict["type"] as? String,
+              let message = dict["message"] as? String,
+              let rawStacktrace = dict["stacktrace"] as? [[AnyHashable: Any]],
+              let context = dict["context"] as? [String: Any],
+              let tags = dict["tags"] as? [String: String],
+              let isHandled = dict["isHandled"] as? Bool,
+              let handledBy = dict["handledBy"] as? String
+        else {
             return nil
         }
+        
+        self.type = type
+        self.message = message
+        self.stacktrace = rawStacktrace.compactMap { StacktraceLine(from: $0) }
+        self.context = context
+        self.tags = tags
+        self.isHandled = isHandled
+        self.handledBy = handledBy
     }
 }
 
-public protocol GutenbergBridgeDelegate: class {
+public protocol GutenbergBridgeDelegate: AnyObject {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
@@ -174,6 +231,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadCancelation(for mediaID: Int32)
 
+    /// Tells the delegate that an image block requested for the featured image to be set.
+    ///
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
@@ -196,12 +257,19 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func editorDidAutosave()
 
-    /// Tells the delegate that the editor needs to perform a network request.
+    /// Tells the delegate that the editor needs to perform a GET request.
     /// The paths given to perform the request are from the WP ORG REST API.
     /// https://developer.wordpress.org/rest-api/reference/
     /// - Parameter path: The path to perform the request.
     /// - Parameter completion: Completion handler to be called with the result or an error.
-    func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    
+    /// Tells the delegate that the editor needs to perform a POST request.
+    /// The paths given to perform the request are from the WP ORG REST API.
+    /// https://developer.wordpress.org/rest-api/reference/
+    /// - Parameter path: The path to perform the request.
+    /// - Parameter completion: Completion handler to be called with the result or an error.
+    func gutenbergDidPostRequestFetch(path: String, data: [String: AnyObject]?, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
 
     /// Tells the delegate to display a fullscreen image from a given URL
     ///
@@ -210,10 +278,6 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
-    
-    /// Tells the delegate that the editor needs to log a custom event
-    /// - Parameter event: The event key to be logged
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
 
     /// Tells the delegate that the editor needs to render an unsupported block
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block)
@@ -222,14 +286,43 @@ public protocol GutenbergBridgeDelegate: class {
     /// - Parameter callback: Completion handler to be called with an user mention or an error
     func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
+	/// Tells the delegate that the editor requested a mention
+	/// - Parameter callback: Completion handler to be called with an xpost or an error
+	func gutenbergDidRequestXpost(callback: @escaping (Swift.Result<String, NSError>) -> Void)
+
     /// Tells the delegate that the editor requested to show the tooltip
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool
-    
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool
+
     /// Tells the delegate that the editor requested to set the tooltip's visibility
-    /// - Parameter tooltipShown: Tooltip's visibility value    
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
+    /// - Parameter tooltipShown: Tooltip's visibility value
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool)
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
+
+    func gutenbergDidRequestPreview()
+
+    /// Tells the delegate that the editor requested the block type impression counts
+    func gutenbergDidRequestBlockTypeImpressions() -> [String: Int]
+
+    /// Tells the delegate that the editor requested setting the impression counts
+    func gutenbergDidRequestSetBlockTypeImpressions(_ impressions: [String: Int])
+
+    /// Tells the delegate that the editor requested to show the "Contact Support" support view.
+    func gutenbergDidRequestContactCustomerSupport()
+
+    /// Tells the delegate that the editor requested to show the "My Tickets" support view.
+    func gutenbergDidRequestGotoCustomerSupportOptions()
+
+    /// Tells the delegate the editor requested sending an event
+    func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
+    
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
+    
+    func gutenbergDidRequestLogException(_ exception: GutenbergJSException, with callback: @escaping () -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

@@ -1,539 +1,366 @@
 /**
  * WordPress dependencies
  */
-import { apiFetch } from '@wordpress/data-controls';
-import { controls } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { createRegistry } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import * as actions from '../actions';
-import {
-	STORE_KEY,
-	TRASH_POST_NOTICE_ID,
-	POST_UPDATE_TRANSACTION_ID,
-} from '../constants';
 
-const postType = {
+import * as actions from '../actions';
+import { store as editorStore } from '..';
+
+const postId = 44;
+
+const postTypeConfig = {
+	kind: 'postType',
+	name: 'post',
+	baseURL: '/wp/v2/posts',
+	transientEdits: { blocks: true, selection: true },
+	mergedEdits: { meta: true },
+	rawAttributes: [ 'title', 'excerpt', 'content' ],
+};
+
+const postTypeEntity = {
+	slug: 'post',
 	rest_base: 'posts',
 	labels: {
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
+		item_reverted_to_draft: 'Post reverted to draft.',
+		item_trashed: 'Post trashed.',
 	},
 };
-const postId = 44;
-const postTypeSlug = 'post';
 
-describe( 'Post generator actions', () => {
+function createRegistryWithStores() {
+	// Create a registry.
+	const registry = createRegistry();
+
+	// Register stores.
+	registry.register( blockEditorStore );
+	registry.register( coreStore );
+	registry.register( editorStore );
+	registry.register( noticesStore );
+	registry.register( preferencesStore );
+
+	// Register post type entity.
+	registry.dispatch( coreStore ).addEntities( [ postTypeConfig ] );
+
+	// Store post type entity.
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( 'root', 'postType', [ postTypeEntity ] );
+
+	return registry;
+}
+
+const getMethod = ( options ) =>
+	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
+
+describe( 'Post actions', () => {
 	describe( 'savePost()', () => {
-		let fulfillment, currentPost, currentPostStatus, isAutosave;
-		beforeEach( () => {
-			currentPost = () => ( {
+		it( 'saves a modified post', async () => {
+			const post = {
 				id: postId,
-				type: postTypeSlug,
+				type: 'post',
 				title: 'bar',
 				content: 'bar',
 				excerpt: 'crackers',
-				status: currentPostStatus,
-			} );
-		} );
-		const reset = ( isAutosaving ) =>
-			( fulfillment = actions.savePost( { isAutosave: isAutosaving } ) );
-		const testConditions = [
-			[
-				'yields an action for checking if the post is saveable',
-				() => true,
-				() => {
-					reset( isAutosave );
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'isEditedPostSaveable' )
-					);
-				},
-			],
-			[
-				'yields an action for selecting the current edited post content',
-				() => true,
-				() => {
-					const { value } = fulfillment.next( true );
-					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getEditedPostContent' )
-					);
-				},
-			],
-			[
-				"yields an action for editing the post entity's content if not an autosave",
-				() => true,
-				() => {
-					if ( ! isAutosave ) {
-						const edits = { content: currentPost().content };
-						const { value } = fulfillment.next( edits.content );
-						expect( value ).toEqual(
-							controls.dispatch( STORE_KEY, 'editPost', edits, {
-								undoIgnore: true,
-							} )
-						);
-					}
-				},
-			],
-			[
-				'yields an action for signalling that an update to the post started',
-				() => true,
-				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual( {
-						type: 'REQUEST_POST_UPDATE_START',
-						options: { isAutosave },
-					} );
-				},
-			],
-			[
-				'yields an action for selecting the current post',
-				() => true,
-				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getCurrentPost' )
-					);
-				},
-			],
-			[
-				"yields an action for selecting the post entity's non transient edits",
-				() => true,
-				() => {
-					const post = currentPost();
-					const { value } = fulfillment.next( post );
-					expect( value ).toEqual(
-						controls.select(
-							'core',
-							'getEntityRecordNonTransientEdits',
-							'postType',
-							post.type,
-							post.id
-						)
-					);
-				},
-			],
-			[
-				'yields an action for dispatching an update to the post entity',
-				() => true,
-				() => {
-					const post = currentPost();
-					const { value } = fulfillment.next( post );
-					expect( value ).toEqual(
-						controls.dispatch(
-							'core',
-							'saveEntityRecord',
-							'postType',
-							post.type,
-							isAutosave ? { ...post, content: undefined } : post,
-							{
-								isAutosave,
-							}
-						)
-					);
-				},
-			],
-			[
-				'yields an action for signalling that an update to the post finished',
-				() => true,
-				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual( {
-						type: 'REQUEST_POST_UPDATE_FINISH',
-						options: { isAutosave },
-					} );
-				},
-			],
-			[
-				"yields an action for selecting the entity's save error",
-				() => true,
-				() => {
-					const post = currentPost();
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						controls.select(
-							'core',
-							'getLastEntitySaveError',
-							'postType',
-							post.type,
-							post.id
-						)
-					);
-				},
-			],
-			[
-				'yields an action for selecting the current post',
-				() => true,
-				() => {
-					const { value } = fulfillment.next();
-					expect( value ).toEqual(
-						controls.select( STORE_KEY, 'getCurrentPost' )
-					);
-				},
-			],
-			[
-				'yields an action for selecting the current post type config',
-				() => true,
-				() => {
-					const post = currentPost();
-					const { value } = fulfillment.next( post );
-					expect( value ).toEqual(
-						controls.resolveSelect(
-							'core',
-							'getPostType',
-							post.type
-						)
-					);
-				},
-			],
-			[
-				'yields an action for dispatching a success notice',
-				() => true,
-				() => {
-					if ( ! isAutosave && currentPostStatus === 'publish' ) {
-						const { value } = fulfillment.next( postType );
-						expect( value ).toEqual(
-							controls.dispatch(
-								'core/notices',
-								'createSuccessNotice',
-								'Updated Post',
-								{
-									actions: [],
-									id: 'SAVE_POST_NOTICE_ID',
-									type: 'snackbar',
-								}
-							)
-						);
-					}
-				},
-			],
-			[
-				'yields an action for marking the last change as persistent',
-				() => true,
-				() => {
-					if ( ! isAutosave ) {
-						const { value } = fulfillment.next();
-						expect( value ).toEqual(
-							controls.dispatch(
-								'core/block-editor',
-								'__unstableMarkLastChangeAsPersistent'
-							)
-						);
-					}
-				},
-			],
-			[
-				'implicitly returns undefined',
-				() => true,
-				() => {
-					expect( fulfillment.next() ).toEqual( {
-						done: true,
-						value: undefined,
-					} );
-				},
-			],
-		];
+				status: 'draft',
+			};
 
-		const conditionalRunTestRoutine = ( isAutosaving ) => ( [
-			testDescription,
-			shouldRun,
-			testRoutine,
-		] ) => {
-			if ( shouldRun( isAutosaving ) ) {
-				it( testDescription, () => {
-					testRoutine();
-				} );
-			}
-		};
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
 
-		describe( 'yields with expected responses for when not autosaving and edited post is new', () => {
-			beforeEach( () => {
-				isAutosave = false;
-				currentPostStatus = 'draft';
-			} );
-			testConditions.forEach( conditionalRunTestRoutine( false ) );
-		} );
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					return { ...post, ...data };
+				} else if (
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
 
-		describe( 'yields with expected responses for when not autosaving and edited post is not new', () => {
-			beforeEach( () => {
-				isAutosave = false;
-				currentPostStatus = 'publish';
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
 			} );
-			testConditions.forEach( conditionalRunTestRoutine( false ) );
-		} );
-		describe( 'yields with expected responses for when autosaving is true and edited post is not new', () => {
-			beforeEach( () => {
-				isAutosave = true;
-				currentPostStatus = 'autosave';
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post and initial edits.
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
 			} );
-			testConditions.forEach( conditionalRunTestRoutine( true ) );
+
+			// Check that the post is dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			// Save the post.
+			await registry.dispatch( editorStore ).savePost();
+
+			// Check the new content.
+			const content = registry
+				.select( editorStore )
+				.getEditedPostContent();
+			expect( content ).toBe( 'new bar' );
+
+			// Check that the post is no longer dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+
+			// Check that a success notice has been shown.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Draft saved.',
+				},
+			] );
 		} );
 	} );
+
 	describe( 'autosave()', () => {
-		it( 'dispatches savePost with the correct arguments', () => {
-			const fulfillment = actions.autosave();
-			const { value } = fulfillment.next();
-			expect( value.actionName ).toBe( 'savePost' );
-			expect( value.args ).toEqual( [ { isAutosave: true } ] );
+		it( 'autosaves a modified post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/users/me' )
+				) {
+					return { id: 1 };
+				} else if (
+					path.startsWith( `/wp/v2/posts/${ postId }/autosaves` )
+				) {
+					if ( method === 'POST' ) {
+						return { ...post, ...data };
+					} else if ( method === 'GET' ) {
+						return [];
+					}
+				} else if ( method === 'GET' ) {
+					// These URLs are requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					if (
+						path.startsWith( '/wp/v2/types/post' ) ||
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						return {
+							json: () => Promise.resolve( {} ),
+						};
+					}
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Set current user.
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 1 } );
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post and initial edits.
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			// Check that the post is dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			// Autosave the post.
+			await registry.dispatch( editorStore ).autosave();
+
+			// Check the new content.
+			const content = registry
+				.select( editorStore )
+				.getEditedPostContent();
+			expect( content ).toBe( 'new bar' );
+
+			// Check that the post is no longer dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+
+			// Check that no notice has been shown on autosave.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [] );
 		} );
 	} );
+
 	describe( 'trashPost()', () => {
-		let fulfillment;
-		const currentPost = { id: 10, content: 'foo', status: 'publish' };
-		const reset = () => ( fulfillment = actions.trashPost() );
-		const rewind = () => {
-			reset();
-			fulfillment.next();
-			fulfillment.next( postTypeSlug );
-			fulfillment.next( postType );
-			fulfillment.next();
-			fulfillment.next( currentPost );
-		};
-		it( 'yields expected action for selecting the current post type slug', () => {
-			reset();
-			const { value } = fulfillment.next();
-			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPostType' )
-			);
-		} );
-		it( 'yields expected action for selecting the post type object', () => {
-			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual(
-				controls.resolveSelect( 'core', 'getPostType', postTypeSlug )
-			);
-		} );
-		it(
-			'yields expected action for dispatching removing the trash notice ' +
-				'for the post',
-			() => {
-				const { value } = fulfillment.next( postType );
-				expect( value ).toEqual(
-					controls.dispatch(
-						'core/notices',
-						'removeNotice',
-						TRASH_POST_NOTICE_ID
-					)
-				);
-			}
-		);
-		it( 'yields expected action for selecting the currentPost', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPost' )
-			);
-		} );
-		it( 'yields expected action object for the api fetch', () => {
-			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual(
-				apiFetch( {
-					path: `/wp/v2/${ postType.rest_base }/${ currentPost.id }`,
-					method: 'DELETE',
-				} )
-			);
-		} );
-		describe( 'expected yields when fetch throws an error', () => {
-			it( 'yields expected action for dispatching an error notice', () => {
-				const error = { foo: 'bar', code: 'fail' };
-				const { value } = fulfillment.throw( error );
-				expect( value ).toEqual(
-					controls.dispatch(
-						'core/notices',
-						'createErrorNotice',
-						'Trashing failed',
-						{
-							id: TRASH_POST_NOTICE_ID,
-						}
-					)
-				);
+		it( 'trashes a post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			let gotTrashed = false;
+
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if ( path.startsWith( `/wp/v2/posts/${ postId }` ) ) {
+					if ( method === 'DELETE' ) {
+						gotTrashed = true;
+						return { ...post, status: 'trash' };
+					} else if ( method === 'PUT' ) {
+						return {
+							...post,
+							...( gotTrashed && { status: 'trash' } ),
+							...data,
+						};
+					}
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ path }`,
+				};
 			} );
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post.
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Trash the post.
+			await registry.dispatch( editorStore ).trashPost();
+
+			// Check that there are no notices.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Post trashed.',
+				},
+			] );
+
+			// Check the new status.
+			const { status } = registry.select( editorStore ).getCurrentPost();
+			expect( status ).toBe( 'trash' );
 		} );
-		describe( 'expected yields when fetch does not throw an error', () => {
-			it( 'yields expected dispatch action for saving the post', () => {
-				rewind();
-				const { value } = fulfillment.next();
-				expect( value ).toEqual(
-					controls.dispatch( STORE_KEY, 'savePost' )
-				);
+
+		it( 'sets deleting state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			const dispatch = Object.assign( jest.fn(), {
+				savePost: jest.fn(),
 			} );
-		} );
-	} );
-	describe( 'refreshPost()', () => {
-		let fulfillment;
-		const currentPost = { id: 10, content: 'foo' };
-		const reset = () => ( fulfillment = actions.refreshPost() );
-		it( 'yields expected action for selecting the currentPost', () => {
-			reset();
-			const { value } = fulfillment.next();
-			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPost' )
-			);
-		} );
-		it( 'yields expected action for selecting the current post type', () => {
-			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual(
-				controls.select( STORE_KEY, 'getCurrentPostType' )
-			);
-		} );
-		it( 'yields expected action for selecting the post type object', () => {
-			const { value } = fulfillment.next( postTypeSlug );
-			expect( value ).toEqual(
-				controls.resolveSelect( 'core', 'getPostType', postTypeSlug )
-			);
-		} );
-		it( 'yields expected action for the api fetch call', () => {
-			const { value } = fulfillment.next( postType );
-			// since the timestamp is a computed value we can't do a direct comparison.
-			// so we'll just see if the path has most of the value.
-			expect( value.request.path ).toEqual(
-				expect.stringContaining(
-					`/wp/v2/${ postType.rest_base }/${ currentPost.id }?context=edit&_timestamp=`
-				)
-			);
-		} );
-		it( 'yields expected action for dispatching the reset of the post', () => {
-			const { value } = fulfillment.next( currentPost );
-			expect( value ).toEqual(
-				controls.dispatch( STORE_KEY, 'resetPost', currentPost )
-			);
+			const select = {
+				getCurrentPostType: () => 'post',
+				getCurrentPost: () => post,
+			};
+			const registry = {
+				dispatch: () => ( {
+					removeNotice: jest.fn(),
+					createErrorNotice: jest.fn(),
+				} ),
+				resolveSelect: () => ( {
+					getPostType: () => ( {
+						rest_namespace: 'wp/v2',
+						rest_base: 'posts',
+					} ),
+				} ),
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				return { ...post, status: 'trash' };
+			} );
+
+			await actions.trashPost()( { select, dispatch, registry } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_START',
+			} );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_FINISH',
+			} );
 		} );
 	} );
 } );
 
 describe( 'Editor actions', () => {
 	describe( 'setupEditor()', () => {
-		const post = { content: { raw: '' }, status: 'publish' };
+		it( 'should setup the editor', () => {
+			// Create registry.
+			const registry = createRegistryWithStores();
 
-		let fulfillment;
-		const reset = ( edits, template ) =>
-			( fulfillment = actions.setupEditor( post, edits, template ) );
-		beforeAll( () => {
-			reset();
-		} );
-
-		it( 'should yield action object for resetPost', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual( actions.resetPost( post ) );
-		} );
-		it( 'should yield the SETUP_EDITOR action', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual( {
-				type: 'SETUP_EDITOR',
-				post: { content: { raw: '' }, status: 'publish' },
-			} );
-		} );
-		it( 'should yield action object for resetEditorBlocks', () => {
-			const { value } = fulfillment.next();
-			expect( Object.keys( value ) ).toEqual( [] );
-		} );
-		it( 'should yield action object for setupEditorState', () => {
-			const { value } = fulfillment.next();
-			expect( value ).toEqual(
-				actions.setupEditorState( {
-					content: { raw: '' },
-					status: 'publish',
-				} )
+			registry
+				.dispatch( editorStore )
+				.setupEditor( { id: 10, type: 'post' } );
+			expect( registry.select( editorStore ).getCurrentPostId() ).toBe(
+				10
 			);
-		} );
-	} );
-
-	describe( 'resetPost', () => {
-		it( 'should return the RESET_POST action', () => {
-			const post = {};
-			const result = actions.resetPost( post );
-			expect( result ).toEqual( {
-				type: 'RESET_POST',
-				post,
-			} );
-		} );
-	} );
-
-	describe( 'requestPostUpdateStart', () => {
-		it( 'should return the REQUEST_POST_UPDATE_START action', () => {
-			const result = actions.__experimentalRequestPostUpdateStart();
-			expect( result ).toEqual( {
-				type: 'REQUEST_POST_UPDATE_START',
-				options: {},
-			} );
-		} );
-	} );
-
-	describe( 'updatePost', () => {
-		it( 'should return the UPDATE_POST action', () => {
-			const edits = {};
-			const result = actions.updatePost( edits );
-			expect( result ).toEqual( {
-				type: 'UPDATE_POST',
-				edits,
-			} );
-		} );
-	} );
-
-	describe( 'editPost', () => {
-		it( 'should edit the relevant entity record', () => {
-			const edits = { format: 'sample' };
-			const fulfillment = actions.editPost( edits );
-			expect( fulfillment.next() ).toEqual( {
-				done: false,
-				value: controls.select( STORE_KEY, 'getCurrentPost' ),
-			} );
-			const post = { id: 1, type: 'post' };
-			expect( fulfillment.next( post ) ).toEqual( {
-				done: false,
-				value: controls.dispatch(
-					'core',
-					'editEntityRecord',
-					'postType',
-					post.type,
-					post.id,
-					edits,
-					undefined
-				),
-			} );
-			expect( fulfillment.next() ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
-		} );
-	} );
-
-	describe( 'optimisticUpdatePost', () => {
-		it( 'should return the UPDATE_POST action with optimist property', () => {
-			const edits = {};
-			const result = actions.__experimentalOptimisticUpdatePost( edits );
-			expect( result ).toEqual( {
-				type: 'UPDATE_POST',
-				edits,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
-	} );
-
-	describe( 'redo', () => {
-		it( 'should yield the REDO action', () => {
-			const fulfillment = actions.redo();
-			expect( fulfillment.next() ).toEqual( {
-				done: false,
-				value: controls.dispatch( 'core', 'redo' ),
-			} );
-			expect( fulfillment.next() ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
-		} );
-	} );
-
-	describe( 'undo', () => {
-		it( 'should yield the UNDO action', () => {
-			const fulfillment = actions.undo();
-			expect( fulfillment.next() ).toEqual( {
-				done: false,
-				value: controls.dispatch( 'core', 'undo' ),
-			} );
-			expect( fulfillment.next() ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
 		} );
 	} );
 
@@ -574,6 +401,179 @@ describe( 'Editor actions', () => {
 				type: 'UNLOCK_POST_AUTOSAVING',
 				lockName: 'test',
 			} );
+		} );
+	} );
+
+	describe( 'enablePublishSidebar', () => {
+		it( 'enables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Starts off as `undefined` as a default hasn't been set.
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+
+			registry.dispatch( editorStore ).enablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'disablePublishSidebar', () => {
+		it( 'disables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable it to start with so that can test it flipping from `true` to `false`.
+			registry.dispatch( editorStore ).enablePublishSidebar();
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+
+			registry.dispatch( editorStore ).disablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const registry = createRegistryWithStores();
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( false );
+
+			// Switch it on again.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const registry = createRegistryWithStores();
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( true );
+
+			// Close it.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'switchEditorMode', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+		} );
+
+		it( 'to visual', () => {
+			// Switch to text first, since the default is visual.
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			registry.dispatch( editorStore ).switchEditorMode( 'visual' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'to text', () => {
+			// It defaults to visual.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+			// Add a selected client id and make sure it's there.
+			const clientId = 'clientId_1';
+			registry.dispatch( blockEditorStore ).selectionChange( clientId );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toEqual( clientId );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toBeNull();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', true );
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			// Initial state is falsy.
+			registry.dispatch( editorStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'fixedToolbar' )
+			).toBe( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( true );
 		} );
 	} );
 } );

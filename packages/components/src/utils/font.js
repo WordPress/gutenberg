@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import FONT from './font-values';
@@ -14,5 +9,5 @@ import FONT from './font-values';
  * @return {string} Font rule value
  */
 export function font( value ) {
-	return get( FONT, value, '' );
+	return FONT[ value ] ?? '';
 }

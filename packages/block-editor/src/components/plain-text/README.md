@@ -6,47 +6,23 @@ Render an auto-growing textarea allow users to fill any textual content.
 
 ### `value: string`
 
-*Required.* String value of the textarea
+_Required._ String value of the textarea
 
 ### `onChange( value: string ): Function`
 
-*Required.* Called when the value changes.
+_Required._ Called when the value changes.
 
 You can also pass any extra prop to the textarea rendered by this component.
 
 ### `ref: Object`
 
-*Optional.* The component forwards the `ref` property to the `TextareaAutosize` component.
+_Optional._ The component forwards the `ref` property to the `TextareaAutosize` component.
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
 ```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			type: 'string',
-		},
-	},
-
-	edit: function( props ) {
-		return wp.element.createElement( wp.editor.PlainText, {
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			},
-		} );
-	},
-} );
-```
-{% ESNext %}
-```js
-const { registerBlockType } = wp.blocks;
-const { PlainText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -68,4 +44,4 @@ registerBlockType( /* ... */, {
 	},
 } );
 ```
-{% end %}
+

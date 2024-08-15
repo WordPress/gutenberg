@@ -2,27 +2,29 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
 import styles from './gallery-styles.scss';
-import Tiles from './tiles';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockCaption } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	RichText,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
-import { useSelect } from '@wordpress/data';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
+import { useResizeObserver } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
-const TILE_SPACING = 15;
+const TILE_SPACING = 8;
 
 // we must limit displayed columns since readable content max-width is 580px
 const MAX_DISPLAYED_COLUMNS = 4;
@@ -30,117 +32,80 @@ const MAX_DISPLAYED_COLUMNS_NARROW = 2;
 
 export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	useEffect( mediaUploadSync, [] );
 
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
 	const {
-		clientId,
-		selectedImage,
 		mediaPlaceholder,
-		onBlur,
-		onMoveBackward,
-		onMoveForward,
-		onRemoveImage,
-		onSelectImage,
-		onSetImageAttributes,
-		onFocusGalleryCaption,
 		attributes,
-		isSelected,
+		images,
 		isNarrow,
-		onFocus,
+		onBlur,
 		insertBlocksAfter,
+		clientId,
 	} = props;
 
-	const {
-		align,
-		columns = defaultColumnsNumber( attributes ),
-		imageCrop,
-		images,
-	} = attributes;
+	useEffect( () => {
+		const { width } = sizes || {};
+		if ( width ) {
+			setMaxWidth( width );
+		}
+	}, [ sizes ] );
 
-	// limit displayed columns when isNarrow is true (i.e. when viewport width is
-	// less than "small", where small = 600)
-	const displayedColumns = isNarrow
-		? Math.min( columns, MAX_DISPLAYED_COLUMNS_NARROW )
-		: Math.min( columns, MAX_DISPLAYED_COLUMNS );
+	const { align, columns = defaultColumnsNumber( images.length ) } =
+		attributes;
 
-	const selectImage = ( index ) => {
-		return () => {
-			if ( isCaptionSelected ) {
-				setIsCaptionSelected( false );
-			}
-			// we need to fully invoke the curried function here
-			onSelectImage( index )();
-		};
-	};
+	const displayedColumns = Math.min(
+		columns,
+		isNarrow ? MAX_DISPLAYED_COLUMNS_NARROW : MAX_DISPLAYED_COLUMNS
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			contentResizeMode: 'stretch',
+			orientation: 'horizontal',
+			renderAppender: false,
+			numColumns: displayedColumns,
+			marginHorizontal: TILE_SPACING,
+			marginVertical: TILE_SPACING,
+			layout: { type: 'default', alignments: [] },
+			gridProperties: {
+				numColumns: displayedColumns,
+			},
+			parentWidth: maxWidth + 2 * TILE_SPACING,
+		}
+	);
 
 	const focusGalleryCaption = () => {
 		if ( ! isCaptionSelected ) {
 			setIsCaptionSelected( true );
 		}
-		onFocusGalleryCaption();
 	};
 
 	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	return (
-		<View style={ { flex: 1 } }>
-			<Tiles
-				columns={ displayedColumns }
-				spacing={ TILE_SPACING }
-				style={
-					isSelected
-						? styles.galleryTilesContainerSelected
-						: undefined
-				}
+		<View style={ isFullWidth && styles.fullWidth }>
+			{ resizeObserver }
+			<View { ...innerBlocksProps } />
+			<View
+				style={ [
+					isFullWidth && styles.fullWidth,
+					styles.galleryAppender,
+				] }
 			>
-				{ images.map( ( img, index ) => {
-					const ariaLabel = sprintf(
-						/* translators: 1: the order number of the image. 2: the total number of images. */
-						__( 'image %1$d of %2$d in gallery' ),
-						index + 1,
-						images.length
-					);
-
-					return (
-						<GalleryImage
-							key={ img.id || img.url }
-							url={ img.url }
-							alt={ img.alt }
-							id={ parseInt( img.id, 10 ) } // make id an integer explicitly
-							isCropped={ imageCrop }
-							isFirstItem={ index === 0 }
-							isLastItem={ index + 1 === images.length }
-							isSelected={ isSelected && selectedImage === index }
-							isBlockSelected={ isSelected }
-							onMoveBackward={ onMoveBackward( index ) }
-							onMoveForward={ onMoveForward( index ) }
-							onRemove={ onRemoveImage( index ) }
-							onSelect={ selectImage( index ) }
-							onSelectBlock={ onFocus }
-							setAttributes={ ( attrs ) =>
-								onSetImageAttributes( index, attrs )
-							}
-							caption={ img.caption }
-							aria-label={ ariaLabel }
-							isRTL={ isRTL }
-						/>
-					);
-				} ) }
-			</Tiles>
-			<View style={ [ isFullWidth && styles.fullWidth ] }>
 				{ mediaPlaceholder }
 			</View>
 			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
-				accessible={ true }
+				accessible
 				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
+					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
+
 						  'Gallery caption. Empty'
 						: sprintf(
 								/* translators: accessibility text. %s: gallery caption. */
@@ -149,11 +114,11 @@ export const Gallery = ( props ) => {
 						  )
 				}
 				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
+				onBlur={ onBlur } // Always assign onBlur as props.
 				insertBlocksAfter={ insertBlocksAfter }
 			/>
 		</View>
 	);
 };
 
-export default Gallery;
+export default withViewportMatch( { isNarrow: '< small' } )( Gallery );

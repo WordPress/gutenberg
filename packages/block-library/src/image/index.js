@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -18,14 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Image' ),
-	description: __( 'Insert an image to make a visual statement.' ),
 	icon,
-	keywords: [
-		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
-		__( 'photo' ),
-		__( 'picture' ),
-	],
 	example: {
 		attributes: {
 			sizeSlug: 'large',
@@ -34,15 +28,13 @@ export const settings = {
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},
-	styles: [
-		{
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		},
-		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
-	],
 	__experimentalLabel( attributes, { context } ) {
+		const customName = attributes?.metadata?.name;
+
+		if ( context === 'list-view' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			const { caption, alt, url } = attributes;
 
@@ -69,3 +61,5 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

@@ -1,24 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
 import * as actions from './actions';
 import * as selectors from './selectors';
-import { STORE_KEY } from './constants';
+import * as privateSelectors from './private-selectors';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
-const store = registerStore( STORE_KEY, {
+/**
+ * Store definition for the edit post namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
-	persist: [ 'preferences' ],
 } );
-
-applyMiddlewares( store );
-
-export default store;
+register( store );
+unlock( store ).registerPrivateSelectors( privateSelectors );

@@ -1,14 +1,12 @@
 /**
  * External dependencies
  */
-import { last } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
@@ -16,70 +14,56 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+import { store as blockEditorStore } from '../../store';
 
-// A Context to store the map of the appender map.
-export const AppenderNodesContext = createContext();
+function DefaultAppender( { rootClientId } ) {
+	const canInsertDefaultBlock = useSelect( ( select ) =>
+		select( blockEditorStore ).canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		)
+	);
 
-function stopPropagation( event ) {
-	event.stopPropagation();
+	if ( canInsertDefaultBlock ) {
+		// Render the default block appender if the context supports use
+		// of the default appender.
+		return <DefaultBlockAppender rootClientId={ rootClientId } />;
+	}
+
+	// Fallback in case the default block can't be inserted.
+	return (
+		<ButtonBlockAppender
+			rootClientId={ rootClientId }
+			className="block-list-appender__toggle"
+		/>
+	);
 }
 
-function BlockListAppender( {
-	blockClientIds,
+export default function BlockListAppender( {
 	rootClientId,
-	canInsertDefaultBlock,
-	isLocked,
-	renderAppender: CustomAppender,
+	CustomAppender,
 	className,
-	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	const appenderNodesMap = useContext( AppenderNodesContext );
-
-	if ( isLocked || CustomAppender === false ) {
-		return null;
-	}
-
-	let appender;
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
-	} else {
-		const isDocumentAppender = ! rootClientId;
-		const isParentSelected = selectedBlockClientId === rootClientId;
-		const isAnotherDefaultAppenderAlreadyDisplayed =
-			selectedBlockClientId &&
-			! blockClientIds.includes( selectedBlockClientId );
-
-		if (
-			! isDocumentAppender &&
-			! isParentSelected &&
-			( ! selectedBlockClientId ||
-				isAnotherDefaultAppenderAlreadyDisplayed )
-		) {
-			return null;
-		}
-
-		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
-			// provided and the context supports use of the default appender.
-			appender = (
-				<DefaultBlockAppender
-					rootClientId={ rootClientId }
-					lastBlockClientId={ last( blockClientIds ) }
-				/>
+	const isDragOver = useSelect(
+		( select ) => {
+			const {
+				getBlockInsertionPoint,
+				isBlockInsertionPointVisible,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const insertionPoint = getBlockInsertionPoint();
+			// Ideally we should also check for `isDragging` but currently it
+			// requires a lot more setup. We can revisit this once we refactor
+			// the DnD utility hooks.
+			return (
+				isBlockInsertionPointVisible() &&
+				rootClientId === insertionPoint?.rootClientId &&
+				getBlockCount( rootClientId ) === 0
 			);
-		} else {
-			// Fallback in the case no renderAppender has been provided and the
-			// default block can't be inserted.
-			appender = (
-				<ButtonBlockAppender
-					rootClientId={ rootClientId }
-					className="block-list-appender__toggle"
-				/>
-			);
-		}
-	}
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<TagName
@@ -92,44 +76,28 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			// Prevent the block from being selected when the appender is
-			// clicked.
-			onFocus={ stopPropagation }
-			className={ classnames(
-				'block-list-appender',
-				'wp-block',
-				className
-			) }
-			ref={ ( ref ) => {
-				if ( ref ) {
-					// Set the reference of the "Appender" with `rootClientId` as key.
-					appenderNodesMap.set( rootClientId || '', ref );
-				} else {
-					// If it un-mounts, cleanup the map.
-					appenderNodesMap.delete( rootClientId || '' );
-				}
-			} }
+			className={ clsx( 'block-list-appender wp-block', className, {
+				'is-drag-over': isDragOver,
+			} ) }
+			// Needed in case the whole editor is content editable (for multi
+			// selection). It fixes an edge case where ArrowDown and ArrowRight
+			// should collapse the selection to the end of that selection and
+			// not into the appender.
+			contentEditable={ false }
+			// The appender exists to let you add the first Paragraph before
+			// any is inserted. To that end, this appender should visually be
+			// presented as a block. That means theme CSS should style it as if
+			// it were an empty paragraph block. That means a `wp-block` class to
+			// ensure the width is correct, and a [data-block] attribute to ensure
+			// the correct margin is applied, especially for classic themes which
+			// have commonly targeted that attribute for margins.
+			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default withSelect( ( select, { rootClientId } ) => {
-	const {
-		getBlockOrder,
-		canInsertBlockType,
-		getTemplateLock,
-		getSelectedBlockClientId,
-	} = select( 'core/block-editor' );
-
-	return {
-		isLocked: !! getTemplateLock( rootClientId ),
-		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType(
-			getDefaultBlockName(),
-			rootClientId
-		),
-		selectedBlockClientId: getSelectedBlockClientId(),
-	};
-} )( BlockListAppender );

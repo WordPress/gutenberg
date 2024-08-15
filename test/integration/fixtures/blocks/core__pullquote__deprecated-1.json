@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/pullquote",
+		"isValid": true,
+		"attributes": {
+			"value": "Testing deprecated pullquote block...",
+			"citation": "...with a caption",
+			"align": "none"
+		},
+		"innerBlocks": []
+	}
+]

@@ -1,0 +1,23 @@
+.components-toolbar__control.components-button {
+	position: relative;
+
+	// Subscript for numbered icon buttons, like headings
+	&[data-subscript] svg {
+		padding: 5px 10px 5px 0;
+	}
+
+	&[data-subscript]::after {
+		content: attr(data-subscript);
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		line-height: 12px;
+		position: absolute;
+		right: 8px;
+		bottom: 10px;
+	}
+
+	&:not(:disabled).is-pressed[data-subscript]::after {
+		color: $white;
+	}
+}

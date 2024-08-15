@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/preformatted",
+		"isValid": true,
+		"attributes": {
+			"content": "Some <em>preformatted</em> text...<br>And more!"
+		},
+		"innerBlocks": []
+	}
+]

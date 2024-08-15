@@ -1,33 +1,32 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Downloadable Block Icon icon rendering should render a <BlockIcon /> component 1`] = `
-<div
-  className="block-directory-downloadable-block-icon"
->
-  <BlockIcon
-    icon="default"
-    showColors={true}
-  />
+<div>
+  <span
+    class="block-editor-block-icon block-directory-downloadable-block-icon has-colors"
+  >
+    <span
+      class="dashicon dashicons dashicons-default"
+    />
+  </span>
 </div>
 `;
 
 exports[`Downloadable Block Icon icon rendering should render an <img> tag 1`] = `
-<div
-  className="block-directory-downloadable-block-icon"
->
+<div>
   <img
-    alt="Block Name block icon"
+    alt=""
+    class="block-directory-downloadable-block-icon"
     src="https://ps.w.org/listicles/assets/icon-128x128.png"
   />
 </div>
 `;
 
 exports[`Downloadable Block Icon icon rendering should render an <img> tag if icon URL has query string 1`] = `
-<div
-  className="block-directory-downloadable-block-icon"
->
+<div>
   <img
-    alt="Block Name block icon"
+    alt=""
+    class="block-directory-downloadable-block-icon"
     src="https://ps.w.org/listicles/assets/icon-128x128.png?rev=2011672&test=234234"
   />
 </div>

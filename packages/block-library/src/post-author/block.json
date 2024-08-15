@@ -1,7 +1,11 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/post-author",
-	"category": "design",
+	"title": "Author",
+	"category": "theme",
+	"description": "Display post author details such as name, avatar, and bio.",
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"
@@ -19,19 +23,48 @@
 		},
 		"byline": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
-	"usesContext": [
-		"postType",
-		"postId"
-	],
+	"usesContext": [ "postType", "postId", "queryId" ],
 	"supports": {
 		"html": false,
-		"fontSize": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
 		"color": {
 			"gradients": true,
-			"link": true
+			"link": true,
+			"__experimentalDuotone": ".wp-block-post-author__avatar img",
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
-		"lineHeight": true
-	}
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"style": "wp-block-post-author"
 }

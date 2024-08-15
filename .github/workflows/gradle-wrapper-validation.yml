@@ -1,0 +1,12 @@
+name: 'Validate Gradle Wrapper'
+on: [push, pull_request]
+
+jobs:
+    validation:
+        name: 'Validation'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+            - uses: gradle/wrapper-validation-action@v3

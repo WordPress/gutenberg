@@ -1,25 +1,26 @@
 /**
- * External dependencies
- */
-import { find, isEmpty, each, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
-	Button,
 	NavigableMenu,
+	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	SVG,
-	Path,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { link as linkIcon, close } from '@wordpress/icons';
+import {
+	Icon,
+	link as linkIcon,
+	image,
+	page,
+	fullscreen,
+	linkOff,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,14 +33,6 @@ const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
 
-const icon = (
-	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		<Path d="M0,0h24v24H0V0z" fill="none" />
-		<Path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" />
-		<Path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" />
-	</SVG>
-);
-
 const ImageURLInputUI = ( {
 	linkDestination,
 	onChangeUrl,
@@ -50,33 +43,36 @@ const ImageURLInputUI = ( {
 	linkTarget,
 	linkClass,
 	rel,
+	showLightboxSetting,
+	lightboxEnabled,
+	onSetLightbox,
+	resetLightbox,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const openLinkUI = useCallback( () => {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const openLinkUI = () => {
 		setIsOpen( true );
-	} );
+	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
 
-	const stopPropagation = ( event ) => {
-		event.stopPropagation();
-	};
-
-	const stopPropagationRelevantKeys = ( event ) => {
-		if (
-			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
-				event.keyCode
-			) > -1
-		) {
-			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-			event.stopPropagation();
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
 		}
-	};
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
-	const startEditLink = useCallback( () => {
+	const startEditLink = () => {
 		if (
 			linkDestination === LINK_DESTINATION_MEDIA ||
 			linkDestination === LINK_DESTINATION_ATTACHMENT
@@ -84,50 +80,37 @@ const ImageURLInputUI = ( {
 			setUrlInput( '' );
 		}
 		setIsEditingLink( true );
-	} );
+	};
 
-	const stopEditLink = useCallback( () => {
+	const stopEditLink = () => {
 		setIsEditingLink( false );
-	} );
+	};
 
-	const closeLinkUI = useCallback( () => {
+	const closeLinkUI = () => {
 		setUrlInput( null );
 		stopEditLink();
 		setIsOpen( false );
-	} );
-
-	const removeNewTabRel = ( currentRel ) => {
-		let newRel = currentRel;
-
-		if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
-			if ( ! isEmpty( newRel ) ) {
-				each( NEW_TAB_REL, ( relVal ) => {
-					const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
-					newRel = newRel.replace( regExp, '' );
-				} );
-
-				// Only trim if NEW_TAB_REL values was replaced.
-				if ( newRel !== currentRel ) {
-					newRel = newRel.trim();
-				}
-
-				if ( isEmpty( newRel ) ) {
-					newRel = undefined;
-				}
-			}
-		}
-
-		return newRel;
 	};
 
 	const getUpdatedLinkTargetSettings = ( value ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
-		if ( ! newLinkTarget && ! rel ) {
-			updatedRel = undefined;
+		if ( newLinkTarget ) {
+			const rels = ( rel ?? '' ).split( ' ' );
+			NEW_TAB_REL.forEach( ( relVal ) => {
+				if ( ! rels.includes( relVal ) ) {
+					rels.push( relVal );
+				}
+			} );
+			updatedRel = rels.join( ' ' );
 		} else {
-			updatedRel = removeNewTabRel( rel );
+			const rels = ( rel ?? '' )
+				.split( ' ' )
+				.filter(
+					( relVal ) => NEW_TAB_REL.includes( relVal ) === false
+				);
+			updatedRel = rels.length ? rels.join( ' ' ) : undefined;
 		}
 
 		return {
@@ -136,7 +119,7 @@ const ImageURLInputUI = ( {
 		};
 	};
 
-	const onFocusOutside = useCallback( () => {
+	const onFocusOutside = () => {
 		return ( event ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
 			// so onFocusOutside fails to detect that a click on a suggestion occurred in the
@@ -153,46 +136,52 @@ const ImageURLInputUI = ( {
 			setUrlInput( null );
 			stopEditLink();
 		};
-	} );
+	};
 
-	const onSubmitLinkChange = useCallback( () => {
+	const onSubmitLinkChange = () => {
 		return ( event ) => {
 			if ( urlInput ) {
-				onChangeUrl( { href: urlInput } );
+				// It is possible the entered URL actually matches a named link destination.
+				// This check will ensure our link destination is correct.
+				const selectedDestination =
+					getLinkDestinations().find(
+						( destination ) => destination.url === urlInput
+					)?.linkDestination || LINK_DESTINATION_CUSTOM;
+
+				onChangeUrl( {
+					href: urlInput,
+					linkDestination: selectedDestination,
+					lightbox: { enabled: false },
+				} );
 			}
 			stopEditLink();
 			setUrlInput( null );
 			event.preventDefault();
 		};
-	} );
+	};
 
-	const onLinkRemove = useCallback( () => {
+	const onLinkRemove = () => {
 		onChangeUrl( {
 			linkDestination: LINK_DESTINATION_NONE,
 			href: '',
 		} );
-	} );
+	};
 
 	const getLinkDestinations = () => {
 		const linkDestinations = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
-				title: __( 'Media File' ),
+				title: __( 'Link to image file' ),
 				url: mediaType === 'image' ? mediaUrl : undefined,
-				icon,
+				icon: image,
 			},
 		];
 		if ( mediaType === 'image' && mediaLink ) {
 			linkDestinations.push( {
 				linkDestination: LINK_DESTINATION_ATTACHMENT,
-				title: __( 'Attachment Page' ),
+				title: __( 'Link to attachment page' ),
 				url: mediaType === 'image' ? mediaLink : undefined,
-				icon: (
-					<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-						<Path d="M0 0h24v24H0V0z" fill="none" />
-						<Path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z" />
-					</SVG>
-				),
+				icon: page,
 			} );
 		}
 		return linkDestinations;
@@ -205,7 +194,7 @@ const ImageURLInputUI = ( {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
 			linkDestinationInput = (
-				find( linkDestinations, ( destination ) => {
+				linkDestinations.find( ( destination ) => {
 					return destination.url === value;
 				} ) || { linkDestination: LINK_DESTINATION_CUSTOM }
 			).linkDestination;
@@ -230,57 +219,132 @@ const ImageURLInputUI = ( {
 	};
 
 	const advancedOptions = (
-		<>
+		<VStack spacing="3">
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
-				label={ __( 'Link Rel' ) }
-				value={ removeNewTabRel( rel ) || '' }
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
+				__nextHasNoMarginBottom
+				label={ __( 'Link rel' ) }
+				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 			/>
 			<TextControl
-				label={ __( 'Link CSS Class' ) }
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
+				__nextHasNoMarginBottom
+				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
-				onKeyPress={ stopPropagation }
-				onKeyDown={ stopPropagationRelevantKeys }
 				onChange={ onSetLinkClass }
 			/>
-		</>
+		</VStack>
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
+	const hideLightboxPanel =
+		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
+	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
 	const urlLabel = (
-		find( getLinkDestinations(), [ 'linkDestination', linkDestination ] ) ||
-		{}
+		getLinkDestinations().find(
+			( destination ) => destination.linkDestination === linkDestination
+		) || {}
 	).title;
+
+	const PopoverChildren = () => {
+		if (
+			lightboxEnabled &&
+			showLightboxSetting &&
+			! url &&
+			! isEditingLink
+		) {
+			return (
+				<div className="block-editor-url-popover__expand-on-click">
+					<Icon icon={ fullscreen } />
+					<div className="text">
+						<p>{ __( 'Expand on click' ) }</p>
+						<p className="description">
+							{ __( 'Scales the image with a lightbox effect' ) }
+						</p>
+					</div>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Disable expand on click' ) }
+						onClick={ () => {
+							onSetLightbox?.( false );
+						} }
+						size="compact"
+					/>
+				</div>
+			);
+		} else if ( ! url || isEditingLink ) {
+			return (
+				<URLPopover.LinkEditor
+					className="block-editor-format-toolbar__link-container-content"
+					value={ linkEditorValue }
+					onChangeInputValue={ setUrlInput }
+					onSubmit={ onSubmitLinkChange() }
+					autocompleteRef={ autocompleteRef }
+				/>
+			);
+		} else if ( url && ! isEditingLink ) {
+			return (
+				<>
+					<URLPopover.LinkViewer
+						className="block-editor-format-toolbar__link-container-content"
+						url={ url }
+						onEditLinkClick={ startEditLink }
+						urlLabel={ urlLabel }
+					/>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Remove link' ) }
+						onClick={ () => {
+							onLinkRemove();
+							resetLightbox?.();
+						} }
+						size="compact"
+					/>
+				</>
+			);
+		}
+	};
 
 	return (
 		<>
 			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
+				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
+				ref={ setPopoverAnchor }
+				isActive={
+					!! url || ( lightboxEnabled && showLightboxSetting )
+				}
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
+					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
-					renderSettings={ () => advancedOptions }
+					renderSettings={
+						hideLightboxPanel ? () => advancedOptions : null
+					}
 					additionalControls={
-						! linkEditorValue && (
+						showLinkEditor && (
 							<NavigableMenu>
-								{ map( getLinkDestinations(), ( link ) => (
+								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
 										icon={ link.icon }
+										iconPosition="left"
 										onClick={ () => {
 											setUrlInput( null );
 											onSetHref( link.url );
@@ -290,37 +354,35 @@ const ImageURLInputUI = ( {
 										{ link.title }
 									</MenuItem>
 								) ) }
+								{ showLightboxSetting && (
+									<MenuItem
+										key="expand-on-click"
+										className="block-editor-url-popover__expand-on-click"
+										icon={ fullscreen }
+										info={ __(
+											'Scale the image with a lightbox effect.'
+										) }
+										iconPosition="left"
+										onClick={ () => {
+											setUrlInput( null );
+											onChangeUrl( {
+												linkDestination:
+													LINK_DESTINATION_NONE,
+												href: '',
+											} );
+											onSetLightbox?.( true );
+											stopEditLink();
+										} }
+									>
+										{ __( 'Expand on click' ) }
+									</MenuItem>
+								) }
 							</NavigableMenu>
 						)
 					}
+					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) && (
-						<URLPopover.LinkEditor
-							className="block-editor-format-toolbar__link-container-content"
-							value={ linkEditorValue }
-							onChangeInputValue={ setUrlInput }
-							onKeyDown={ stopPropagationRelevantKeys }
-							onKeyPress={ stopPropagation }
-							onSubmit={ onSubmitLinkChange() }
-							autocompleteRef={ autocompleteRef }
-						/>
-					) }
-					{ url && ! isEditingLink && (
-						<>
-							<URLPopover.LinkViewer
-								className="block-editor-format-toolbar__link-container-content"
-								onKeyPress={ stopPropagation }
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<Button
-								icon={ close }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-							/>
-						</>
-					) }
+					{ PopoverChildren() }
 				</URLPopover>
 			) }
 		</>

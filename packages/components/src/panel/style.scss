@@ -32,12 +32,15 @@
 
 .components-panel__header {
 	display: flex;
+	flex-shrink: 0;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 $grid-unit-20;
-	height: $grid-unit-60;
-	border-top: $border-width solid $gray-300;
 	border-bottom: $border-width solid $gray-300;
+
+	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
+	box-sizing: content-box;
+	height: $grid-unit-60 - $border-width;
 
 	h2 {
 		margin: 0;
@@ -50,7 +53,7 @@
 .components-panel__body + .components-panel__header,
 .components-panel__header + .components-panel__body,
 .components-panel__header + .components-panel__header {
-	margin-top: -1px;
+	margin-top: -$border-width;
 }
 
 .components-panel__body > .components-panel__body-title {
@@ -76,7 +79,7 @@
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
 	outline: none;
 	width: 100%;
 	font-weight: 500;
@@ -89,7 +92,7 @@
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		border-radius: 0;
 	}
 

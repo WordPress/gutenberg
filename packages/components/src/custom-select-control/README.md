@@ -2,12 +2,6 @@
 
 `CustomSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md), with the addition of being able to provide custom styles for each item in the menu. This means it does not use a native `<select>`, so should only be used if the custom styling is necessary.
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/readme.md#design-guidelines).
@@ -17,11 +11,8 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 ### Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
+import { useState } from 'react';
 import { CustomSelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
 
 const options = [
 	{
@@ -72,46 +63,83 @@ function MyControlledCustomSelectControl() {
 
 ### Props
 
-#### className
+#### `className`: `string`
 
-A custom class name to append to the outer `<div>`.
+Optional classname for the component.
 
--   Type: `String`
 -   Required: No
 
-#### hideLabelFromVision
+#### `hideLabelFromVision`: `boolean`
 
-Used to visually hide the label. It will always be visible to screen readers.
+Hide the label visually, while keeping available to assistive technology.
 
--   Type: `Boolean`
 -   Required: No
 
-#### label
+#### `describedBy`: `string`
 
-The label for the control.
+Description for the select trigger button used by assistive technology. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
 
--   Type: `String`
+-   Required: No
+
+#### `label`: `string`
+
+Label for the control.
+
 -   Required: Yes
 
-#### options
-
-The options that can be chosen from.
-
--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
--   Required: Yes
-
-#### onChange
+#### `onChange`: `( newValue: ChangeObject ) => void`
 
 Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
 
--   Type: `Function`
 -   Required: No
 
-#### value
+#### `options`: `Array< Option >`
+
+The list of options that can be chosen from.
+
+-   Required: Yes
+
+#### `size`: `'default' | 'small' | '\_\_unstable-large'`
+
+The size of the control.
+
+-   Default: `'default'`
+-   Required: No
+
+#### `showSelectedHint`: `boolean`
+
+Show the hint of the selected item in the trigger button.
+
+-   Required: No
+
+#### `value`: `Option`
 
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
 
--   Type: `Object`
+-   Required: No
+
+#### `onMouseOver`: `MouseEventHandler< HTMLButtonElement >`
+
+A handler for `mouseover` events on the trigger button.
+
+-   Required: No
+
+#### `onMouseOut`: `MouseEventHandler< HTMLButtonElement >`
+
+A handler for `mouseout` events on the trigger button.
+
+-   Required: No
+
+#### `onFocus`: `FocusEventHandler< HTMLButtonElement >`
+
+A handler for `focus` events on the trigger button.
+
+-   Required: No
+
+#### `onBlur`: `FocusEventHandler< HTMLButtonElement >`
+
+A handler for `blur` events on the trigger button.
+
 -   Required: No
 
 ## Related components

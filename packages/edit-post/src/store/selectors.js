@@ -1,13 +1,24 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-import { get, includes, some, flatten, values } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+import { getEditedPostTemplateId } from './private-selectors';
+
+const { interfaceStore } = unlock( editorPrivateApis );
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
 
 /**
  * Returns the current editing mode.
@@ -16,9 +27,10 @@ import { createRegistrySelector } from '@wordpress/data';
  *
  * @return {string} Editing mode.
  */
-export function getEditorMode( state ) {
-	return getPreference( state, 'editorMode', 'visual' );
-}
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
 
 /**
  * Returns true if the editor sidebar is opened.
@@ -29,11 +41,9 @@ export function getEditorMode( state ) {
  */
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			'core/interface'
-		).getActiveComplementaryArea( 'core/edit-post' );
-		return includes(
-			[ 'edit-post/document', 'edit-post/block' ],
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
 	}
@@ -42,18 +52,17 @@ export const isEditorSidebarOpened = createRegistrySelector(
 /**
  * Returns true if the plugin sidebar is opened.
  *
- * @param {Object} state Global application state
- * @return {boolean}     Whether the plugin sidebar is opened.
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the plugin sidebar is opened.
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
-		const activeGeneralSidebar = select(
-			'core/interface'
-		).getActiveComplementaryArea( 'core/edit-post' );
+		const activeGeneralSidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return (
 			!! activeGeneralSidebar &&
-			! includes(
-				[ 'edit-post/document', 'edit-post/block' ],
+			! [ 'edit-post/document', 'edit-post/block' ].includes(
 				activeGeneralSidebar
 			)
 		);
@@ -76,11 +85,61 @@ export const isPluginSidebarOpened = createRegistrySelector(
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
 	( select ) => () => {
-		return select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-post'
-		);
+		return select( interfaceStore ).getActiveComplementaryArea( 'core' );
 	}
 );
+
+/**
+ * Converts panels from the new preferences store format to the old format
+ * that the post editor previously used.
+ *
+ * The resultant converted data should look like this:
+ * {
+ *     panelName: {
+ *         enabled: false,
+ *         opened: true,
+ *     },
+ *     anotherPanelName: {
+ *         opened: true
+ *     },
+ * }
+ *
+ * @param {string[] | undefined} inactivePanels An array of inactive panel names.
+ * @param {string[] | undefined} openPanels     An array of open panel names.
+ *
+ * @return {Object} The converted panel data.
+ */
+function convertPanelsToOldFormat( inactivePanels, openPanels ) {
+	// First reduce the inactive panels.
+	const panelsWithEnabledState = inactivePanels?.reduce(
+		( accumulatedPanels, panelName ) => ( {
+			...accumulatedPanels,
+			[ panelName ]: {
+				enabled: false,
+			},
+		} ),
+		{}
+	);
+
+	// Then reduce the open panels, passing in the result of the previous
+	// reduction as the initial value so that both open and inactive
+	// panel state is combined.
+	const panels = openPanels?.reduce( ( accumulatedPanels, panelName ) => {
+		const currentPanelState = accumulatedPanels?.[ panelName ];
+		return {
+			...accumulatedPanels,
+			[ panelName ]: {
+				...currentPanelState,
+				opened: true,
+			},
+		};
+	}, panelsWithEnabledState ?? {} );
+
+	// The panels variable will only be set if openPanels wasn't `undefined`.
+	// If it isn't set just return `panelsWithEnabledState`, and if that isn't
+	// set return an empty object.
+	return panels ?? panelsWithEnabledState ?? EMPTY_OBJECT;
+}
 
 /**
  * Returns the preferences (these preferences are persisted locally).
@@ -89,9 +148,43 @@ export const getActiveGeneralSidebarName = createRegistrySelector(
  *
  * @return {Object} Preferences Object.
  */
-export function getPreferences( state ) {
-	return state.preferences;
-}
+export const getPreferences = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).getPreferences`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
+
+	const corePreferences = [ 'editorMode', 'hiddenBlockTypes' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core',
+				preferenceKey
+			);
+
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
+
+	// Panels were a preference, but the data structure changed when the state
+	// was migrated to the preferences store. They need to be converted from
+	// the new preferences store format to old format to ensure no breaking
+	// changes for plugins.
+	const inactivePanels = select( preferencesStore ).get(
+		'core',
+		'inactivePanels'
+	);
+	const openPanels = select( preferencesStore ).get( 'core', 'openPanels' );
+	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
+
+	return {
+		...corePreferences,
+		panels,
+	};
+} );
 
 /**
  *
@@ -102,81 +195,130 @@ export function getPreferences( state ) {
  * @return {*} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
+	deprecated( `select( 'core/edit-post' ).getPreference`, {
+		since: '6.0',
+		alternative: `select( 'core/preferences' ).get`,
+	} );
+
+	// Avoid using the `getPreferences` registry selector where possible.
 	const preferences = getPreferences( state );
 	const value = preferences[ preferenceKey ];
 	return value === undefined ? defaultValue : value;
 }
 
 /**
+ * Returns an array of blocks that are hidden.
+ *
+ * @return {Array} A list of the hidden block types
+ */
+export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
+	return (
+		select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
+		EMPTY_ARRAY
+	);
+} );
+
+/**
  * Returns true if the publish sidebar is opened.
+ *
+ * @deprecated
  *
  * @param {Object} state Global application state
  *
  * @return {boolean} Whether the publish sidebar is open.
  */
-export function isPublishSidebarOpened( state ) {
-	return state.publishSidebarActive;
-}
+export const isPublishSidebarOpened = createRegistrySelector(
+	( select ) => () => {
+		deprecated( `select( 'core/edit-post' ).isPublishSidebarOpened`, {
+			since: '6.6',
+			alternative: `select( 'core/editor' ).isPublishSidebarOpened`,
+		} );
+		return select( editorStore ).isPublishSidebarOpened();
+	}
+);
 
 /**
  * Returns true if the given panel was programmatically removed, or false otherwise.
  * All panels are not removed by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is removed.
  */
-export function isEditorPanelRemoved( state, panelName ) {
-	return includes( state.removedPanels, panelName );
-}
+export const isEditorPanelRemoved = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		deprecated( `select( 'core/edit-post' ).isEditorPanelRemoved`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelRemoved`,
+		} );
+		return select( editorStore ).isEditorPanelRemoved( panelName );
+	}
+);
 
 /**
  * Returns true if the given panel is enabled, or false otherwise. Panels are
  * enabled by default.
+ *
+ * @deprecated
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is enabled.
  */
-export function isEditorPanelEnabled( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
-
-	return (
-		! isEditorPanelRemoved( state, panelName ) &&
-		get( panels, [ panelName, 'enabled' ], true )
-	);
-}
+export const isEditorPanelEnabled = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		deprecated( `select( 'core/edit-post' ).isEditorPanelEnabled`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelEnabled`,
+		} );
+		return select( editorStore ).isEditorPanelEnabled( panelName );
+	}
+);
 
 /**
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
  *
- * @param  {Object}  state     Global application state.
- * @param  {string}  panelName A string that identifies the panel.
+ * @deprecated
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
  *
  * @return {boolean} Whether or not the panel is open.
  */
-export function isEditorPanelOpened( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
-	return (
-		get( panels, [ panelName ] ) === true ||
-		get( panels, [ panelName, 'opened' ] ) === true
-	);
-}
+export const isEditorPanelOpened = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		deprecated( `select( 'core/edit-post' ).isEditorPanelOpened`, {
+			since: '6.5',
+			alternative: `select( 'core/editor' ).isEditorPanelOpened`,
+		} );
+		return select( editorStore ).isEditorPanelOpened( panelName );
+	}
+);
 
 /**
  * Returns true if a modal is active, or false otherwise.
  *
- * @param  {Object}  state 	   Global application state.
- * @param  {string}  modalName A string that uniquely identifies the modal.
+ * @deprecated since WP 6.3 use `core/interface` store's selector with the same name instead.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} modalName A string that uniquely identifies the modal.
  *
  * @return {boolean} Whether the modal is active.
  */
-export function isModalActive( state, modalName ) {
-	return state.activeModal === modalName;
-}
+export const isModalActive = createRegistrySelector(
+	( select ) => ( state, modalName ) => {
+		deprecated( `select( 'core/edit-post' ).isModalActive`, {
+			since: '6.3',
+			alternative: `select( 'core/interface' ).isModalActive`,
+		} );
+		return !! select( interfaceStore ).isModalActive( modalName );
+	}
+);
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -186,25 +328,24 @@ export function isModalActive( state, modalName ) {
  *
  * @return {boolean} Is active.
  */
-export function isFeatureActive( state, feature ) {
-	return get( state.preferences.features, [ feature ], false );
-}
+export const isFeatureActive = createRegistrySelector(
+	( select ) => ( state, feature ) => {
+		return !! select( preferencesStore ).get( 'core/edit-post', feature );
+	}
+);
 
 /**
  * Returns true if the plugin item is pinned to the header.
  * When the value is not set it defaults to true.
  *
- * @param  {Object}  state      Global application state.
- * @param  {string}  pluginName Plugin item name.
+ * @param {Object} state      Global application state.
+ * @param {string} pluginName Plugin item name.
  *
  * @return {boolean} Whether the plugin item is pinned.
  */
 export const isPluginItemPinned = createRegistrySelector(
-	( select ) => ( pluginName ) => {
-		return select( 'core/interface' ).isItemPinned(
-			'core/edit-post',
-			pluginName
-		);
+	( select ) => ( state, pluginName ) => {
+		return select( interfaceStore ).isItemPinned( 'core', pluginName );
 	}
 );
 
@@ -232,14 +373,19 @@ export const getActiveMetaBoxLocations = createSelector(
  *
  * @return {boolean} Whether the meta box location is active and visible.
  */
-export function isMetaBoxLocationVisible( state, location ) {
-	return (
-		isMetaBoxLocationActive( state, location ) &&
-		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
-			return isEditorPanelEnabled( state, `meta-box-${ id }` );
-		} )
-	);
-}
+export const isMetaBoxLocationVisible = createRegistrySelector(
+	( select ) => ( state, location ) => {
+		return (
+			isMetaBoxLocationActive( state, location ) &&
+			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
+				return select( editorStore ).isEditorPanelEnabled(
+					state,
+					`meta-box-${ id }`
+				);
+			} )
+		);
+	}
+);
 
 /**
  * Returns true if there is an active meta box in the given location, or false
@@ -276,7 +422,7 @@ export function getMetaBoxesPerLocation( state, location ) {
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
-		return flatten( values( state.metaBoxes.locations ) );
+		return Object.values( state.metaBoxes.locations ).flat();
 	},
 	( state ) => [ state.metaBoxes.locations ]
 );
@@ -284,7 +430,7 @@ export const getAllMetaBoxes = createSelector(
 /**
  * Returns true if the post is using Meta Boxes
  *
- * @param  {Object} state Global application state
+ * @param {Object} state Global application state
  *
  * @return {boolean} Whether there are metaboxes or not.
  */
@@ -295,7 +441,7 @@ export function hasMetaBoxes( state ) {
 /**
  * Returns true if the Meta Boxes are being saved.
  *
- * @param   {Object}  state Global application state.
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the metaboxes are being saved.
  */
@@ -306,21 +452,119 @@ export function isSavingMetaBoxes( state ) {
 /**
  * Returns the current editing canvas device type.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} Device type.
  */
-export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
-}
+export const __experimentalGetPreviewDeviceType = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetPreviewDeviceType`,
+			{
+				since: '6.5',
+				version: '6.7',
+				alternative: `select( 'core/editor' ).getDeviceType`,
+			}
+		);
+		return select( editorStore ).getDeviceType();
+	}
+);
 
 /**
  * Returns true if the inserter is opened.
  *
- * @param  {Object}  state Global application state.
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
  *
  * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+export const isInserterOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isInserterOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isInserterOpened`,
+	} );
+	return select( editorStore ).isInserterOpened();
+} );
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID, index to insert at and starting filter value.
+ */
+export const __experimentalGetInsertionPoint = createRegistrySelector(
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-post' ).__experimentalGetInsertionPoint`,
+			{
+				since: '6.5',
+				version: '6.7',
+			}
+		);
+		return unlock( select( editorStore ) ).getInsertionPoint();
+	}
+);
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export const isListViewOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isListViewOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isListViewOpened`,
+	} );
+	return select( editorStore ).isListViewOpened();
+} );
+
+/**
+ * Returns true if the template editing mode is enabled.
+ *
+ * @deprecated
+ */
+export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-post' ).isEditingTemplate`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).getRenderingMode`,
+	} );
+	return select( editorStore ).getCurrentPostType() === 'wp_template';
+} );
+
+/**
+ * Returns true if meta boxes are initialized.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether meta boxes are initialized.
+ */
+export function areMetaBoxesInitialized( state ) {
+	return state.metaBoxes.initialized;
 }
+
+/**
+ * Retrieves the template of the currently edited post.
+ *
+ * @return {Object?} Post Template.
+ */
+export const getEditedPostTemplate = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateId = getEditedPostTemplateId( state );
+		if ( ! templateId ) {
+			return undefined;
+		}
+		return select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			templateId
+		);
+	}
+);

@@ -1,25 +1,64 @@
 .wp-block-image {
-	// The image block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
+
+	a {
+		display: inline-block;
+	}
 
 	img {
+		height: auto;
 		max-width: 100%;
+		vertical-align: bottom;
+		box-sizing: border-box;
+
+		@media (prefers-reduced-motion: no-preference) {
+			&.hide {
+				visibility: hidden;
+			}
+
+			&.show {
+				animation: show-content-image 0.4s;
+			}
+		}
+	}
+
+	// The following style maintains border radius application for deprecated
+	// image blocks that applied border radius to the outer `figure` element.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/47422
+	&[style*="border-radius"] {
+		> a,
+		img {
+			border-radius: inherit;
+		}
+	}
+
+	&.has-custom-border {
+		img {
+			box-sizing: border-box;
+		}
 	}
 
 	&.aligncenter {
 		text-align: center;
 	}
 
-	&.alignfull img,
-	&.alignwide img {
+	&.alignfull a,
+	&.alignwide a {
 		width: 100%;
 	}
 
+	&.alignfull img,
+	&.alignwide img {
+		height: auto;
+		width: 100%;
+	}
+
+	&.alignleft,
+	&.alignright,
+	&.aligncenter,
 	.alignleft,
 	.alignright,
-	.aligncenter,
-	&.is-resized {
+	.aligncenter {
 		display: table;
 
 		> figcaption {
@@ -33,6 +72,7 @@
 		float: left;
 		/*rtl:ignore*/
 		margin-left: 0;
+		/*rtl:ignore*/
 		margin-right: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;
@@ -43,11 +83,13 @@
 		float: right;
 		/*rtl:ignore*/
 		margin-right: 0;
+		/*rtl:ignore*/
 		margin-left: 1em;
 		margin-top: 0.5em;
 		margin-bottom: 0.5em;
 	}
 
+	// This is needed for classic themes where the align class is not on the container.
 	.aligncenter {
 		margin-left: auto;
 		margin-right: auto;
@@ -56,35 +98,292 @@
 	// Supply caption styles to images, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
-	figcaption {
+	:where(figcaption) {
 		@include caption-style();
+	}
+
+	// The following variation is deprecated.
+	// The CSS is kept here for the time being, to support blocks using the old variation.
+	// The selector is not scoped with `:root :where()` like global styles are to keep its
+	// specificity the same as it was when it was deprecated.
+	&.is-style-circle-mask img {
+		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+		// to rectangular images. A pill-shape is better than otherwise.
+		border-radius: 9999px;
+
+		// If a browser supports it, we will switch to using a circular SVG mask.
+		@supports (mask-image: none) or (-webkit-mask-image: none) {
+			/* stylelint-disable-next-line function-url-quotes -- We need quotes for the data URL to use the SVG inline. */
+			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
+			mask-mode: alpha;
+			mask-repeat: no-repeat;
+			mask-size: contain;
+			mask-position: center;
+			border-radius: 0;
+		}
 	}
 }
 
 // Variations
-.is-style-rounded img {
+:root :where(.wp-block-image.is-style-rounded img, .wp-block-image .is-style-rounded img) {
 	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 	// to rectangular images. A pill-shape is better than otherwise.
 	border-radius: 9999px;
 }
 
-// The following variation is deprecated.
-// The CSS is kept here for the time being, to support blocks using the old variation.
-.is-style-circle-mask img {
-	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
-	// to rectangular images. A pill-shape is better than otherwise.
-	border-radius: 9999px;
+.wp-block-image figure {
+	margin: 0;
+}
 
-	// If a browser supports it, we will switch to using a circular SVG mask.
-	// The stylelint override is necessary to use the SVG inline here.
-	@supports (mask-image: none) or (-webkit-mask-image: none) {
-		/* stylelint-disable */
-		mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
-		/* stylelint-enable */
-		mask-mode: alpha;
-		mask-repeat: no-repeat;
-		mask-size: contain;
-		mask-position: center;
-		border-radius: 0;
+.wp-lightbox-container {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	img {
+		cursor: zoom-in;
+	}
+
+	img:hover + button {
+		opacity: 1;
+	}
+
+	button {
+		opacity: 0;
+		border: none;
+		background-color: rgb(90 90 90 / 25%);
+		backdrop-filter: blur($grid-unit-20) saturate(180%);
+		cursor: zoom-in;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 20px;
+		height: 20px;
+		position: absolute;
+		z-index: 100;
+		top: 16px;
+		right: 16px;
+		text-align: center;
+		padding: 0;
+		border-radius: 4px;
+		transition: opacity 0.2s ease;
+
+		&:focus-visible {
+			outline: 3px auto rgb(90 90 90 / 25%);
+			outline: 3px auto -webkit-focus-ring-color;
+			outline-offset: 3px;
+		}
+
+		&:hover {
+			cursor: pointer;
+			opacity: 1;
+		}
+
+		&:focus {
+			opacity: 1;
+		}
+
+		&:hover,
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
+			background-color: rgb(90 90 90 / 25%);
+			border: none;
+		}
+	}
+}
+
+.wp-lightbox-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	overflow: hidden;
+	width: 100%;
+	height: 100vh;
+	box-sizing: border-box;
+	visibility: hidden;
+	cursor: zoom-out;
+
+	.close-button {
+		position: absolute;
+		top: calc(env(safe-area-inset-top) + 16px); // equivalent to $grid-unit-20
+		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
+		padding: 0;
+		cursor: pointer;
+		z-index: 5000000;
+		min-width: 40px; // equivalent to $button-size-next-default-40px
+		min-height: 40px; // equivalent to $button-size-next-default-40px
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&:hover,
+		&:focus,
+		&:not(:hover):not(:active):not(.has-background) {
+			background: none;
+			border: none;
+		}
+	}
+
+	.lightbox-image-container {
+		position: absolute;
+		overflow: hidden;
+		top: 50%;
+		left: 50%;
+		transform-origin: top left;
+		transform: translate(-50%, -50%);
+		width: var(--wp--lightbox-container-width);
+		height: var(--wp--lightbox-container-height);
+		z-index: 9999999999;
+	}
+
+	.wp-block-image {
+		position: relative;
+		transform-origin: 0 0;
+		display: flex;
+		width: 100%;
+		height: 100%;
+		justify-content: center;
+		align-items: center;
+		box-sizing: border-box;
+		z-index: 3000000;
+		margin: 0;
+
+		img {
+			min-width: var(--wp--lightbox-image-width);
+			min-height: var(--wp--lightbox-image-height);
+			width: var(--wp--lightbox-image-width);
+			height: var(--wp--lightbox-image-height);
+		}
+
+		figcaption {
+			display: none;
+		}
+	}
+
+	button {
+		border: none;
+		background: none;
+	}
+
+	.scrim {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		z-index: 2000000;
+		background-color: rgb(255, 255, 255);
+		opacity: 0.9;
+	}
+
+	// When fading, make the image come in slightly slower
+	// or faster than the scrim to give a sense of depth.
+	&.active {
+		visibility: visible;
+		animation: both turn-on-visibility 0.25s;
+		img {
+			animation: both turn-on-visibility 0.35s;
+		}
+	}
+	&.show-closing-animation {
+		&:not(.active) {
+			animation: both turn-off-visibility 0.35s;
+			img {
+				animation: both turn-off-visibility 0.25s;
+			}
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		&.zoom {
+			&.active {
+				opacity: 1;
+				visibility: visible;
+				animation: none;
+				.lightbox-image-container {
+					animation: lightbox-zoom-in 0.4s;
+					// Override fade animation for image
+					img {
+						animation: none;
+					}
+				}
+				.scrim {
+					animation: turn-on-visibility 0.4s forwards;
+				}
+			}
+			&.show-closing-animation {
+				&:not(.active) {
+					animation: none;
+					.lightbox-image-container {
+						animation: lightbox-zoom-out 0.4s;
+						// Override fade animation for image
+						img {
+							animation: none;
+						}
+					}
+					.scrim {
+						animation: turn-off-visibility 0.4s forwards;
+					}
+				}
+			}
+		}
+	}
+}
+
+@keyframes show-content-image {
+	0% {
+		visibility: hidden;
+	}
+	99% {
+		visibility: hidden;
+	}
+	100% {
+		visibility: visible;
+	}
+}
+
+@keyframes turn-on-visibility {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes turn-off-visibility {
+	0% {
+		opacity: 1;
+		visibility: visible;
+	}
+	99% {
+		opacity: 0;
+		visibility: visible;
+	}
+	100% {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
+@keyframes lightbox-zoom-in {
+	0% {
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+	}
+	100% {
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+}
+
+@keyframes lightbox-zoom-out {
+	0% {
+		visibility: visible;
+		transform: translate(-50%, -50%) scale(1, 1);
+	}
+	99% {
+		visibility: visible;
+	}
+	100% {
+		visibility: hidden;
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
 	}
 }

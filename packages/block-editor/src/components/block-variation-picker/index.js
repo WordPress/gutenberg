@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,12 +13,12 @@ import { layout } from '@wordpress/icons';
 function BlockVariationPicker( {
 	icon = layout,
 	label = __( 'Choose variation' ),
-	instructions = __( 'Select a variation to start with.' ),
+	instructions = __( 'Select a variation to start with:' ),
 	variations,
 	onSelect,
 	allowSkip,
 } ) {
-	const classes = classnames( 'block-editor-block-variation-picker', {
+	const classes = clsx( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
 	} );
 
@@ -42,17 +42,19 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							isSecondary
-							icon={ variation.icon }
+							__next40pxDefaultSize
+							variant="tertiary"
+							icon={
+								variation.icon && variation.icon.src
+									? variation.icon.src
+									: variation.icon
+							}
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
-						<span
-							className="block-editor-block-variation-picker__variation-label"
-							role="presentation"
-						>
+						<span className="block-editor-block-variation-picker__variation-label">
 							{ variation.title }
 						</span>
 					</li>
@@ -61,7 +63,7 @@ function BlockVariationPicker( {
 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			{ allowSkip && (
 				<div className="block-editor-block-variation-picker__skip">
-					<Button isLink onClick={ () => onSelect() }>
+					<Button variant="link" onClick={ () => onSelect() }>
 						{ __( 'Skip' ) }
 					</Button>
 				</div>

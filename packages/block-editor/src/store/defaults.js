@@ -11,28 +11,33 @@ export const PREFERENCES_DEFAULTS = {
  * The default editor settings
  *
  * @typedef {Object} SETTINGS_DEFAULT
- * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
- * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
- * @property {boolean} imageEditing Image Editing settings set to false to disable.
- * @property {Array} imageSizes Available image sizes
- * @property {number} maxWidth Max width to constraint resizing
- * @property {boolean|Array} allowedBlockTypes Allowed block types
- * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
- * @property {boolean} focusMode Whether the focus mode is enabled or not
- * @property {Array} styles Editor Styles
- * @property {boolean} isRTL Whether the editor is in RTL mode
- * @property {boolean} keepCaretInsideBlock Whether caret should move between blocks in edit mode
- * @property {string} bodyPlaceholder Empty post placeholder
- * @property {string} titlePlaceholder Empty title placeholder
- * @property {boolean} codeEditingEnabled Whether or not the user can switch to the code editor
- * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
- * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
- * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
- * @property {Array} __experimentalBlockPatterns Array of objects representing the block patterns
- * @property {Array} __experimentalBlockPatternCategories Array of objects representing the block pattern categories
+ * @property {boolean}       alignWide                              Enable/Disable Wide/Full Alignments
+ * @property {boolean}       supportsLayout                         Enable/disable layouts support in container blocks.
+ * @property {boolean}       imageEditing                           Image Editing settings set to false to disable.
+ * @property {Array}         imageSizes                             Available image sizes
+ * @property {number}        maxWidth                               Max width to constraint resizing
+ * @property {boolean|Array} allowedBlockTypes                      Allowed block types
+ * @property {boolean}       hasFixedToolbar                        Whether or not the editor toolbar is fixed
+ * @property {boolean}       distractionFree                        Whether or not the editor UI is distraction free
+ * @property {boolean}       focusMode                              Whether the focus mode is enabled or not
+ * @property {Array}         styles                                 Editor Styles
+ * @property {boolean}       keepCaretInsideBlock                   Whether caret should move between blocks in edit mode
+ * @property {string}        bodyPlaceholder                        Empty post placeholder
+ * @property {string}        titlePlaceholder                       Empty title placeholder
+ * @property {boolean}       canLockBlocks                          Whether the user can manage Block Lock state
+ * @property {boolean}       codeEditingEnabled                     Whether or not the user can switch to the code editor
+ * @property {boolean}       generateAnchors                        Enable/Disable auto anchor generation for Heading blocks
+ * @property {boolean}       enableOpenverseMediaCategory           Enable/Disable the Openverse media category in the inserter.
+ * @property {boolean}       clearBlockSelection                    Whether the block editor should clear selection on mousedown when a block is not clicked.
+ * @property {boolean}       __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
+ * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
+ * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
+ * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+	supportsLayout: true,
+
 	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	colors: [
@@ -123,6 +128,9 @@ export const SETTINGS_DEFAULTS = {
 		},
 	],
 
+	// Image default size slug.
+	imageDefaultSize: 'large',
+
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
 		{ slug: 'medium', name: __( 'Medium' ) },
@@ -130,7 +138,7 @@ export const SETTINGS_DEFAULTS = {
 		{ slug: 'full', name: __( 'Full Size' ) },
 	],
 
-	// Allow plugin to disable Image Editor if need be
+	// Allow plugin to disable Image Editor if need be.
 	imageEditing: true,
 
 	// This is current max width of the block inner area
@@ -146,15 +154,42 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
-	availableLegacyWidgets: {},
+	// Allows to disable block locking interface.
+	canLockBlocks: true,
+
+	// Allows to disable Openverse media category in the inserter.
+	enableOpenverseMediaCategory: true,
+
+	clearBlockSelection: true,
+
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
-	__experimentalEnableFullSiteEditing: false,
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__experimentalSpotlightEntityBlocks: [],
+	__unstableIsPreviewMode: false,
 
+	// These settings will be completely revamped in the future.
+	// The goal is to evolve this into an API which will instruct
+	// the block inspector to animate transitions between what it
+	// displays based on the relationship between the selected block
+	// and its parent, and only enable it if the parent is controlling
+	// its children blocks.
+	blockInspectorAnimation: {
+		animationParent: 'core/navigation',
+		'core/navigation': { enterDirection: 'leftToRight' },
+		'core/navigation-submenu': { enterDirection: 'rightToLeft' },
+		'core/navigation-link': { enterDirection: 'rightToLeft' },
+		'core/search': { enterDirection: 'rightToLeft' },
+		'core/social-links': { enterDirection: 'rightToLeft' },
+		'core/page-list': { enterDirection: 'rightToLeft' },
+		'core/spacer': { enterDirection: 'rightToLeft' },
+		'core/home-link': { enterDirection: 'rightToLeft' },
+		'core/site-title': { enterDirection: 'rightToLeft' },
+		'core/site-logo': { enterDirection: 'rightToLeft' },
+	},
+
+	generateAnchors: false,
 	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	gradients: [
@@ -231,4 +266,6 @@ export const SETTINGS_DEFAULTS = {
 			slug: 'midnight',
 		},
 	],
+
+	__unstableResolvedAssets: { styles: [], scripts: [] },
 };

@@ -1,19 +1,20 @@
 /**
- * External dependencies
- */
-import { filter, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import Section from './section';
-import { EnableCustomFieldsOption, EnablePanelOption } from './options';
+import EnableCustomFieldsOption from './enable-custom-fields';
+import EnablePanelOption from './enable-panel';
+import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { PreferencesModalSection } = unlock( preferencesPrivateApis );
 
 export function MetaBoxesSection( {
 	areCustomFieldsRegistered,
@@ -21,8 +22,7 @@ export function MetaBoxesSection( {
 	...sectionProps
 } ) {
 	// The 'Custom Fields' meta box is a special case that we handle separately.
-	const thirdPartyMetaBoxes = filter(
-		metaBoxes,
+	const thirdPartyMetaBoxes = metaBoxes.filter(
 		( { id } ) => id !== 'postcustom'
 	);
 
@@ -31,24 +31,24 @@ export function MetaBoxesSection( {
 	}
 
 	return (
-		<Section { ...sectionProps }>
+		<PreferencesModalSection { ...sectionProps }>
 			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom fields' ) } />
 			) }
-			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+			{ thirdPartyMetaBoxes.map( ( { id, title } ) => (
 				<EnablePanelOption
 					key={ id }
 					label={ title }
 					panelName={ `meta-box-${ id }` }
 				/>
 			) ) }
-		</Section>
+		</PreferencesModalSection>
 	);
 }
 
 export default withSelect( ( select ) => {
-	const { getEditorSettings } = select( 'core/editor' );
-	const { getAllMetaBoxes } = select( 'core/edit-post' );
+	const { getEditorSettings } = select( editorStore );
+	const { getAllMetaBoxes } = select( editPostStore );
 
 	return {
 		// This setting should not live in the block editor's store.

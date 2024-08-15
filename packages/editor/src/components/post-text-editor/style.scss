@@ -1,4 +1,4 @@
-.edit-post-text-editor__body textarea.editor-post-text-editor {
+textarea.editor-post-text-editor {
 	border: $border-width solid $gray-600;
 	border-radius: 0;
 	display: block;
@@ -27,7 +27,7 @@
 
 	&:focus {
 		border-color: var(--wp-admin-theme-color);
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Elevate the z-index on focus so the focus style is uncropped.
 		position: relative;

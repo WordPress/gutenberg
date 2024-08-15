@@ -1,14 +1,69 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/buttons",
+	"title": "Buttons",
 	"category": "design",
-	"attributes": {
-		"contentJustification": {
-			"type": "string"
-		}
-	},
+	"allowedBlocks": [ "core/button" ],
+	"description": "Prompt visitors to take action with a group of button-style links.",
+	"keywords": [ "link" ],
+	"textdomain": "default",
 	"supports": {
 		"anchor": true,
-		"align": [ "wide", "full" ]
-	}
+		"align": [ "wide", "full" ],
+		"html": false,
+		"__experimentalExposeControlsToChildren": true,
+		"color": {
+			"gradients": true,
+			"text": false,
+			"__experimentalDefaultControls": {
+				"background": true
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "wp-block-buttons-editor",
+	"style": "wp-block-buttons"
 }

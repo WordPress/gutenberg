@@ -13,6 +13,7 @@ import androidx.core.util.Consumer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -41,15 +42,16 @@ import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.text.ReactFontManager;
 import com.facebook.react.views.text.ReactTextUpdate;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
-import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.Constants;
 import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
+import org.wordpress.aztec.plugins.MarkPlugin;
 import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
@@ -60,6 +62,8 @@ import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutShadowNode> {
 
@@ -79,6 +83,9 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
     private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
+
+    private float mCurrentFontSize = 0;
+    private float mCurrentLineHeight = 0;
 
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
@@ -118,6 +125,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                         Color.parseColor("#016087"), true)
         ));
         aztecText.addPlugin(new CssUnderlinePlugin());
+        aztecText.addPlugin(new MarkPlugin());
         return aztecText;
     }
 
@@ -217,7 +225,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
 
-            if (view.mNativeEventCount < eventCount) {
+            if (view.getEventCounter() < eventCount) {
+                view.setEventCounterSyncFromJS(eventCount);
                 setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
             }
         }
@@ -264,6 +273,35 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
+    private boolean isHeadingBlock(ReactAztecText view) {
+        String tag = view.getTagName();
+        final String regex = "h([1-6])";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(tag);
+
+        return matcher.find();
+    }
+
+    private float getHeadingScale(String scale) {
+        // Values from https://github.com/wordpress-mobile/AztecEditor-Android/blob/trunk/aztec/src/main/kotlin/org/wordpress/aztec/spans/AztecHeadingSpan.kt#L94-L100
+        switch (scale) {
+            case "h1":
+                return 1.73f;
+            case "h2":
+                return 1.32f;
+            case "h3":
+                return 1.02f;
+            case "h4":
+                return 0.87f;
+            case "h5":
+                return 0.72f;
+            case "h6":
+                return 0.60f;
+        }
+
+        return 1.0f;
+    }
+
     @ReactProp(name = "activeFormats", defaultBoolean = false)
     public void setActiveFormats(final ReactAztecText view, @Nullable ReadableArray activeFormats) {
         if (activeFormats != null) {
@@ -282,9 +320,36 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
      */
     @ReactProp(name = ViewProps.FONT_SIZE, defaultFloat = ViewDefaults.FONT_SIZE_SP)
     public void setFontSize(ReactAztecText view, float fontSize) {
+        float scale = 1;
+        boolean isLineHeightSet = mCurrentLineHeight != 0;
+        mCurrentFontSize = fontSize;
+
+        // Since Aztec applies a scale to the heading's font size
+        // we subtract it before applying the new font size.
+        if (isHeadingBlock(view) && isLineHeightSet) {
+            scale = getHeadingScale(view.getTagName());
+        }
+
         view.setTextSize(
                 TypedValue.COMPLEX_UNIT_PX,
-                (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize)));
+                (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize / scale)));
+
+        if (isLineHeightSet) {
+            setLineHeight(view, mCurrentLineHeight);
+        }
+    }
+
+    @ReactProp(name = ViewProps.LINE_HEIGHT)
+    public void setLineHeight(ReactAztecText view, float lineHeight) {
+        mCurrentLineHeight = lineHeight;
+        float scale = 1;
+
+        if (isHeadingBlock(view)) {
+            scale = getHeadingScale(view.getTagName());
+        }
+
+        float textSize = view.getTextSize() * scale;
+        view.setLineSpacing(textSize * lineHeight, (float) (lineHeight / textSize));
     }
 
     @ReactProp(name = ViewProps.FONT_FAMILY)
@@ -450,6 +515,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     public void setBlockType(ReactAztecText view, ReadableMap inputMap) {
         if (inputMap.hasKey(BLOCK_TYPE_TAG_KEY)) {
             view.setTagName(inputMap.getString(BLOCK_TYPE_TAG_KEY));
+
+            // Check if it's a heading block, this is needed to set the
+            // right font size scale.
+            if (isHeadingBlock(view)) {
+                setFontSize(view, mCurrentFontSize);
+            }
         }
     }
 
@@ -549,6 +620,16 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         view.shouldDeleteEnter = shouldDeleteEnter;
     }
 
+    @ReactProp(name = "disableAutocorrection", defaultBoolean = false)
+    public void disableAutocorrection(final ReactAztecText view, boolean disable) {
+        if (disable) {
+            view.setInputType((view.getInputType() & ~InputType.TYPE_TEXT_FLAG_AUTO_CORRECT) | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        }
+        else {
+            view.setInputType((view.getInputType() & ~InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+        }
+    }
+
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
@@ -558,9 +639,9 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     }
 
     @Override
-    public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
+    public void receiveCommand(final ReactAztecText parent, String commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
-        if (commandType == mFocusTextInputCommandCode) {
+        if (commandType.equals("focus")) {
             // schedule a request to focus in the next layout, to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1870
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -569,8 +650,23 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 }
             });
             return;
-        } else if (commandType == mBlurTextInputCommandCode) {
+        } else if (commandType.equals("blur")) {
             parent.clearFocusFromJS();
+            return;
+        } else if (commandType.equals("onMarkFormatting")) {
+            String colorString;
+            Boolean resetColor;
+
+            if (args != null && args.getString(0) != null) {
+                colorString = args.getString(0);
+            } else {
+                colorString = "";
+            }
+
+            parent.onMarkFormatting(colorString);
+            return;
+        } else if (commandType.equals("onRemoveMarkFormatting")) {
+            // This is handled by setActiveFormats
             return;
         }
         super.receiveCommand(parent, commandType, args);
@@ -677,7 +773,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
 
             if (mPreviousText.length() == 0
-                    && !TextUtils.isEmpty(newText)
+                    && !isTextEmpty(newText)
                     && !TextUtils.isEmpty(mEditText.getTagName())
                     && mEditText.getSelectedStyles().isEmpty()) {
 
@@ -689,6 +785,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                     mEditText.toggleFormatting(reactAztecTextFormat.getAztecTextFormat());
                 }
             }
+        }
+
+        // This accounts for the END_OF_BUFFER_MARKER that is added to blocks to maintain the styling, if the only char
+        // is the zero width marker then it is considered "empty"
+        private boolean isTextEmpty(String text) {
+            return text.length() == 0 || (text.length() == 1 && text.charAt(0) == Constants.INSTANCE.getEND_OF_BUFFER_MARKER());
         }
 
         @Override

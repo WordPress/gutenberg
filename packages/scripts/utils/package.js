@@ -9,15 +9,19 @@ const { sync: readPkgUp } = require( 'read-pkg-up' );
  */
 const { getCurrentWorkingDirectory } = require( './process' );
 
-const { pkg, path: pkgPath } = readPkgUp( {
+const { packageJson, path: pkgPath } = readPkgUp( {
 	cwd: realpathSync( getCurrentWorkingDirectory() ),
 } );
 
 const getPackagePath = () => pkgPath;
 
-const hasPackageProp = ( prop ) => pkg && pkg.hasOwnProperty( prop );
+const getPackageProp = ( prop ) => packageJson && packageJson[ prop ];
+
+const hasPackageProp = ( prop ) =>
+	packageJson && packageJson.hasOwnProperty( prop );
 
 module.exports = {
 	getPackagePath,
+	getPackageProp,
 	hasPackageProp,
 };

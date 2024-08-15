@@ -1,81 +1,98 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const rimraf = require( 'rimraf' );
 const semver = require( 'semver' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Internal dependencies
  */
-const { log, formats } = require( '../lib/logger' );
-const { runStep, readJSONFile } = require( '../lib/utils' );
-const git = require( '../lib/git' );
-const config = require( '../config' );
+const { readJSONFile } = require( '../lib/utils' );
 
 /**
- * Clone the repository and returns the working directory.
+ * Finds the name of the current plugin release branch based on the version in
+ * the package.json file and the latest `trunk` branch in `git`.
  *
- * @param {string} abortMessage Abort message.
+ * @param {string} gitWorkingDirectoryPath Path to the project's working directory.
  *
- * @return {Promise<string>} Repository local path.
+ * @return {string} Name of the plugin release branch.
  */
-async function runGitRepositoryCloneStep( abortMessage ) {
-	// Cloning the repository
-	let gitWorkingDirectoryPath;
-	await runStep( 'Cloning the Git repository', abortMessage, async () => {
-		log( '>> Cloning the Git repository' );
-		gitWorkingDirectoryPath = await git.clone( config.gitRepositoryURL );
-		log(
-			'>> The Git repository has been successfully cloned in the following temporary folder: ' +
-				formats.success( gitWorkingDirectoryPath )
-		);
-	} );
+async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
+	await SimpleGit( gitWorkingDirectoryPath )
+		.fetch( 'origin', 'trunk' )
+		.checkout( 'trunk' );
 
-	return gitWorkingDirectoryPath;
+	const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+	const mainPackageJson = readJSONFile( packageJsonPath );
+	const mainParsedVersion = semver.parse( mainPackageJson.version );
+
+	return 'release/' + mainParsedVersion.major + '.' + mainParsedVersion.minor;
 }
 
 /**
- * Clean the working directories.
+ * Calculates version bump for the packages based on the content
+ * from the provided CHANGELOG file split into individual lines.
  *
- * @param {string[]} folders      Folders to clean.
- * @param {string}   abortMessage Abort message.
+ * @param {string[]}                  lines                Changelog content split into lines.
+ * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
+ *                                                         Defaults to `patch`.
+ *
+ * @return {string|null} Version bump when applicable, or null otherwise.
  */
-async function runCleanLocalFoldersStep( folders, abortMessage ) {
-	await runStep( 'Cleaning the temporary folders', abortMessage, async () => {
-		await Promise.all(
-			folders.map( async ( directoryPath ) => {
-				if ( fs.existsSync( directoryPath ) ) {
-					await rimraf( directoryPath, ( err ) => {
-						if ( err ) {
-							throw err;
-						}
-					} );
-				}
-			} )
-		);
-	} );
-}
+function calculateVersionBumpFromChangelog(
+	lines,
+	minimumVersionBump = 'patch'
+) {
+	let changesDetected = false;
+	let versionBump = null;
+	for ( const line of lines ) {
+		const lineNormalized = line.toLowerCase().trimStart();
+		// Detect unpublished changes first.
+		if ( lineNormalized.startsWith( '## unreleased' ) ) {
+			changesDetected = true;
+			continue;
+		}
 
-/**
- * Finds the name of the current release branch based on the version in
- * the package.json file.
- *
- * @param {string} packageJsonPath Path to the package.json file.
- *
- * @return {string} Name of the release branch.
- */
-function findReleaseBranchName( packageJsonPath ) {
-	const masterPackageJson = readJSONFile( packageJsonPath );
-	const masterParsedVersion = semver.parse( masterPackageJson.version );
+		// Skip all lines until unpublished changes found.
+		if ( ! changesDetected ) {
+			continue;
+		}
 
-	return (
-		'release/' + masterParsedVersion.major + '.' + masterParsedVersion.minor
-	);
+		// A previous published version detected. Stop processing.
+		if ( lineNormalized.startsWith( '## ' ) ) {
+			break;
+		}
+
+		// A major version bump required. Stop processing.
+		if ( lineNormalized.startsWith( '### breaking change' ) ) {
+			versionBump = 'major';
+			break;
+		}
+
+		// A minor version bump required. Proceed to the next line.
+		if (
+			lineNormalized.startsWith( '### deprecation' ) ||
+			lineNormalized.startsWith( '### enhancement' ) ||
+			lineNormalized.startsWith( '### new api' ) ||
+			lineNormalized.startsWith( '### new feature' )
+		) {
+			versionBump = 'minor';
+			continue;
+		}
+
+		// A version bump required. Found new changelog section.
+		if (
+			versionBump !== 'minor' &&
+			( lineNormalized.startsWith( '### ' ) ||
+				lineNormalized.includes( '- ' ) )
+		) {
+			versionBump = minimumVersionBump;
+		}
+	}
+	return versionBump;
 }
 
 module.exports = {
-	runGitRepositoryCloneStep,
-	runCleanLocalFoldersStep,
-	findReleaseBranchName,
+	calculateVersionBumpFromChangelog,
+	findPluginReleaseBranchName,
 };

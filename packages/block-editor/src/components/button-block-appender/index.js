@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,21 +18,15 @@ import { Icon, plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{
-		rootClientId,
-		className,
-		__experimentalSelectBlockOnInsert: selectBlockOnInsert,
-		onFocus,
-		tabIndex,
-	},
+	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
 	return (
 		<Inserter
 			position="bottom center"
 			rootClientId={ rootClientId }
-			__experimentalSelectBlockOnInsert={ selectBlockOnInsert }
 			__experimentalIsQuick
+			onSelectOrClose={ onSelect }
 			renderToggle={ ( {
 				onToggle,
 				disabled,
@@ -59,13 +54,15 @@ function ButtonBlockAppender(
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
-						className={ classnames(
+						className={ clsx(
 							className,
 							'block-editor-button-block-appender'
 						) }
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
+						// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
 					>
@@ -89,6 +86,20 @@ function ButtonBlockAppender(
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/button-block-appender/README.md
+ * Use `ButtonBlockAppender` instead.
+ *
+ * @deprecated
+ */
+export const ButtonBlockerAppender = forwardRef( ( props, ref ) => {
+	deprecated( `wp.blockEditor.ButtonBlockerAppender`, {
+		alternative: 'wp.blockEditor.ButtonBlockAppender',
+		since: '5.9',
+	} );
+
+	return ButtonBlockAppender( props, ref );
+} );
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/button-block-appender/README.md
  */
 export default forwardRef( ButtonBlockAppender );

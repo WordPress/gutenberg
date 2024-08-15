@@ -1,102 +1,264 @@
 /**
  * External dependencies
  */
-import { render, unmountComponentAtNode } from 'react-dom';
-import { act, Simulate } from 'react-dom/test-utils';
-import { queryByText, queryByRole } from '@testing-library/react';
-import { default as lodash, first, last, nth, uniqueId } from 'lodash';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import LinkControl from '../';
-import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
-
-// Mock debounce() so that it runs instantly.
-lodash.debounce = jest.fn( ( callback ) => {
-	callback.cancel = jest.fn();
-	return callback;
-} );
+import {
+	fauxEntitySuggestions,
+	fetchFauxEntitySuggestions,
+	uniqueId,
+} from './fixtures';
 
 const mockFetchSearchSuggestions = jest.fn();
 
-jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
+/**
+ * The call to the real method `fetchRichUrlData` is wrapped in a promise in order to make it cancellable.
+ * Therefore if we pass any value as the mock of `fetchRichUrlData` then ALL of the tests will require
+ * addition code to handle the async nature of `fetchRichUrlData`. This is unecessary. Instead we default
+ * to an undefined value which will ensure that the code under test does not call `fetchRichUrlData`. Only
+ * when we are testing the "rich previews" to we update this value with a true mock.
+ */
+let mockFetchRichUrlData;
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
+useSelect.mockImplementation( () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+	fetchRichUrlData: mockFetchRichUrlData,
 } ) );
 
 jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
-/**
- * Wait for next tick of event loop. This is required
- * because the `fetchSearchSuggestions` Promise will
- * resolve on the next tick of the event loop (this is
- * inline with the Promise spec). As a result we need to
- * wait on this loop to "tick" before we can expect the UI
- * to have updated.
- */
-function eventLoopTick() {
-	return new Promise( ( resolve ) => setImmediate( resolve ) );
-}
-
-let container = null;
+jest.mock( '@wordpress/compose', () => ( {
+	...jest.requireActual( '@wordpress/compose' ),
+	useReducedMotion: jest.fn( () => true ),
+} ) );
 
 beforeEach( () => {
-	// setup a DOM element as a render target
-	container = document.createElement( 'div' );
-	document.body.appendChild( container );
+	// Setup a DOM element as a render target.
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
 } );
 
 afterEach( () => {
-	// cleanup on exiting
-	unmountComponentAtNode( container );
-	container.remove();
-	container = null;
+	// Cleanup on exiting.
 	mockFetchSearchSuggestions.mockReset();
+	mockFetchRichUrlData?.mockReset(); // Conditionally reset as it may NOT be a mock.
 } );
 
-function getURLInput() {
-	return container.querySelector( 'input[aria-label="URL"]' );
+/**
+ * Workaround to trigger an arrow up keypress event.
+ *
+ * @todo Remove this workaround in favor of userEvent.keyboard() or userEvent.type().
+ *
+ * For some reason, this doesn't work:
+ *
+ * ```
+ * await user.keyboard( '[ArrowDown]' );
+ * ```
+ *
+ * because the event sent has a `keyCode` of `0`.
+ *
+ * @param {Element} element Element to trigger the event on.
+ */
+function triggerArrowUp( element ) {
+	fireEvent.keyDown( element, {
+		key: 'ArrowUp',
+		keyCode: 38,
+	} );
 }
 
-function getSearchResults() {
-	const input = getURLInput();
-	// The input has `aria-owns` to indicate that it owns (and is related to)
-	// the search results with `role="listbox"`.
-	const relatedSelector = input.getAttribute( 'aria-owns' );
-
-	// Select by relationship as well as role
-	return container.querySelectorAll(
-		`#${ relatedSelector }[role="listbox"] [role="option"]`
-	);
+/**
+ * Workaround to trigger an arrow down keypress event.
+ *
+ * @todo Remove this workaround in favor of userEvent.keyboard() or userEvent.type().
+ *
+ * For some reason, this doesn't work:
+ *
+ * ```
+ * await user.keyboard( '[ArrowDown]' );
+ * ```
+ *
+ * because the event sent has a `keyCode` of `0`.
+ *
+ * @param {Element} element Element to trigger the event on.
+ */
+function triggerArrowDown( element ) {
+	fireEvent.keyDown( element, {
+		key: 'ArrowDown',
+		keyCode: 40,
+	} );
 }
 
-function getCurrentLink() {
-	return container.querySelector(
-		'.block-editor-link-control__search-item.is-current'
-	);
+/**
+ * Workaround to trigger an Enter keypress event.
+ *
+ * @todo Remove this workaround in favor of userEvent.keyboard() or userEvent.type().
+ *
+ * For some reason, this doesn't work:
+ *
+ * ```
+ * await user.keyboard( '[Enter]' );
+ * ```
+ *
+ * because the event sent has a `keyCode` of `0`.
+ *
+ * @param {Element} element Element to trigger the event on.
+ */
+function triggerEnter( element ) {
+	fireEvent.keyDown( element, {
+		key: 'Enter',
+		keyCode: 13,
+	} );
 }
 
 describe( 'Basic rendering', () => {
 	it( 'should render', () => {
-		act( () => {
-			render( <LinkControl />, container );
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		expect( searchInput ).toBeVisible();
+	} );
+
+	it( 'should have aria-owns attribute to follow the ARIA 1.0 pattern', () => {
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		expect( searchInput ).toBeVisible();
+		// Make sure we use the ARIA 1.0 pattern with aria-owns.
+		// See https://github.com/WordPress/gutenberg/issues/47147
+		expect( searchInput ).not.toHaveAttribute( 'aria-controls' );
+		expect( searchInput ).toHaveAttribute( 'aria-owns' );
+	} );
+
+	it( 'should have aria-selected attribute only on the highlighted item', async () => {
+		const user = userEvent.setup();
+
+		let resolver;
+		mockFetchSearchSuggestions.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolver = resolve;
+				} )
+		);
+
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, 'Hello' );
+
+		// Wait for the spinner SVG icon to be rendered.
+		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+		// Check the suggestions list is not rendered yet.
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+		// Make the search suggestions fetch return a response.
+		resolver( fauxEntitySuggestions );
+
+		const resultsList = await screen.findByRole( 'listbox', {
+			name: 'Search results for "Hello"',
 		} );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+		// Check the suggestions list is rendered.
+		expect( resultsList ).toBeVisible();
+		// Check the spinner SVG icon is not rendered any longer.
+		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
 
-		expect( searchInput ).not.toBeNull();
-		expect( container.innerHTML ).toMatchSnapshot();
+		const searchResultElements =
+			within( resultsList ).getAllByRole( 'option' );
+
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
+
+		// Step down into the search results, highlighting the first result item.
+		triggerArrowDown( searchInput );
+
+		const firstSearchSuggestion = searchResultElements[ 0 ];
+		const secondSearchSuggestion = searchResultElements[ 1 ];
+
+		let selectedSearchResultElement = screen.getByRole( 'option', {
+			selected: true,
+		} );
+
+		// We should have highlighted the first item using the keyboard.
+		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+
+		// Check the aria-selected attribute is set only on the highlighted item.
+		expect( firstSearchSuggestion ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
+		// Check the aria-selected attribute is omitted on the non-highlighted items.
+		expect( secondSearchSuggestion ).not.toHaveAttribute( 'aria-selected' );
+
+		// Step down into the search results, highlighting the second result item.
+		triggerArrowDown( searchInput );
+
+		selectedSearchResultElement = screen.getByRole( 'option', {
+			selected: true,
+		} );
+
+		// We should have highlighted the first item using the keyboard.
+		expect( selectedSearchResultElement ).toEqual( secondSearchSuggestion );
+
+		// Check the aria-selected attribute is omitted on non-highlighted items.
+		expect( firstSearchSuggestion ).not.toHaveAttribute( 'aria-selected' );
+		// Check the aria-selected attribute is set only on the highlighted item.
+		expect( secondSearchSuggestion ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
+
+		// Step up into the search results, highlighting the first result item.
+		triggerArrowUp( searchInput );
+
+		selectedSearchResultElement = screen.getByRole( 'option', {
+			selected: true,
+		} );
+
+		// We should be back to highlighting the first search result again.
+		expect( selectedSearchResultElement ).toEqual( firstSearchSuggestion );
+
+		// Check the aria-selected attribute is set only on the highlighted item.
+		expect( firstSearchSuggestion ).toHaveAttribute(
+			'aria-selected',
+			'true'
+		);
+		// Check the aria-selected attribute is omitted on non-highlighted items.
+		expect( secondSearchSuggestion ).not.toHaveAttribute( 'aria-selected' );
 	} );
 
 	it( 'should not render protocol in links', async () => {
+		const user = userEvent.setup();
 		mockFetchSearchSuggestions.mockImplementation( () =>
 			Promise.resolve( [
 				{
@@ -118,312 +280,386 @@ describe( 'Basic rendering', () => {
 
 		const searchTerm = 'Hello';
 
-		act( () => {
-			render( <LinkControl />, container );
-		} );
+		render( <LinkControl /> );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		// Find all elements with link
-		// Filter out the element with the text 'ENTER' because it doesn't contain link
-		const linkElements = Array.from(
-			container.querySelectorAll(
-				'.block-editor-link-control__search-item-info'
-			)
-		).filter( ( elem ) => ! elem.innerHTML.includes( 'ENTER' ) );
-
-		linkElements.forEach( ( elem ) => {
-			expect( elem.innerHTML ).not.toContain( '://' );
-		} );
+		expect( screen.queryByText( '://' ) ).not.toBeInTheDocument();
 	} );
 
 	describe( 'forceIsEditingLink', () => {
-		const isEditing = () => !! getURLInput();
-
 		it( 'undefined', () => {
-			act( () => {
-				render(
-					<LinkControl value={ { url: 'https://example.com' } } />,
-					container
-				);
-			} );
+			render( <LinkControl value={ { url: 'https://example.com' } } /> );
 
-			expect( isEditing() ).toBe( false );
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Link' } )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'true', () => {
-			act( () => {
-				render(
-					<LinkControl
-						value={ { url: 'https://example.com' } }
-						forceIsEditingLink
-					/>,
-					container
-				);
-			} );
+			render(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					forceIsEditingLink
+				/>
+			);
 
-			expect( isEditing() ).toBe( true );
+			expect(
+				screen.getByRole( 'combobox', { name: 'Link' } )
+			).toBeVisible();
 		} );
 
-		it( 'false', () => {
-			act( () => {
-				render(
-					<LinkControl value={ { url: 'https://example.com' } } />,
-					container
-				);
-			} );
+		it( 'false', async () => {
+			const user = userEvent.setup();
+			const { rerender } = render(
+				<LinkControl value={ { url: 'https://example.com' } } />
+			);
 
 			// Click the "Edit" button to trigger into the editing mode.
-			const editButton = Array.from(
-				container.querySelectorAll( 'button' )
-			).find( ( button ) => button.innerHTML.includes( 'Edit' ) );
-
-			act( () => {
-				Simulate.click( editButton );
+			const editButton = screen.queryByRole( 'button', {
+				name: 'Edit link',
 			} );
 
-			expect( isEditing() ).toBe( true );
+			await user.click( editButton );
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Link' } )
+			).toBeVisible();
 
 			// If passed `forceIsEditingLink` of `false` while editing, should
 			// forcefully reset to the preview state.
-			act( () => {
-				render(
-					<LinkControl
-						value={ { url: 'https://example.com' } }
-						forceIsEditingLink={ false }
-					/>,
-					container
-				);
+			rerender(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					forceIsEditingLink={ false }
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Link' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should display human friendly error message if value URL prop is empty when component is forced into no-editing (preview) mode', async () => {
+			// Why do we need this test?
+			// Occasionally `forceIsEditingLink` is set explictly to `false` which causes the Link UI to render
+			// it's preview even if the `value` has no URL.
+			// for an example of this see the usage in the following file whereby forceIsEditingLink is used to start/stop editing mode:
+			// https://github.com/WordPress/gutenberg/blob/fa5728771df7cdc86369f7157d6aa763649937a7/packages/format-library/src/link/inline.js#L151.
+			// see also: https://github.com/WordPress/gutenberg/issues/17972.
+
+			const valueWithEmptyURL = {
+				url: '',
+				id: 123,
+				type: 'post',
+			};
+
+			render(
+				<LinkControl
+					value={ valueWithEmptyURL }
+					forceIsEditingLink={ false }
+				/>
+			);
+
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			const isPreviewError = linkPreview.classList.contains( 'is-error' );
+			expect( isPreviewError ).toBe( true );
+
+			expect( screen.queryByText( 'Link is empty' ) ).toBeVisible();
+		} );
+	} );
+
+	describe( 'Unlinking', () => {
+		it( 'should not show "Unlink" button if no onRemove handler is provided', () => {
+			render( <LinkControl value={ { url: 'https://example.com' } } /> );
+
+			const unLinkButton = screen.queryByRole( 'button', {
+				name: 'Remove link',
 			} );
 
-			expect( isEditing() ).toBe( false );
+			expect( unLinkButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should show "Unlink" button if a onRemove handler is provided', async () => {
+			const user = userEvent.setup();
+			const mockOnRemove = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					onRemove={ mockOnRemove }
+				/>
+			);
+
+			const unLinkButton = screen.queryByRole( 'button', {
+				name: 'Remove link',
+			} );
+			expect( unLinkButton ).toBeVisible();
+
+			await user.click( unLinkButton );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+		} );
+
+		it( 'should revert to "editing" mode when onRemove is triggered', async () => {
+			const user = userEvent.setup();
+			const mockOnRemove = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: 'https://example.com' } }
+					onRemove={ mockOnRemove }
+				/>
+			);
+
+			const unLinkButton = screen.queryByRole( 'button', {
+				name: 'Remove link',
+			} );
+			expect( unLinkButton ).toBeVisible();
+
+			await user.click( unLinkButton );
+
+			expect( mockOnRemove ).toHaveBeenCalled();
+
+			// Should revert back to editing mode.
+			expect(
+				screen.getByRole( 'combobox', { name: 'Link' } )
+			).toBeVisible();
 		} );
 	} );
 } );
 
 describe( 'Searching for a link', () => {
 	it( 'should display loading UI when input is valid but search results have yet to be returned', async () => {
+		const user = userEvent.setup();
 		const searchTerm = 'Hello';
 
 		let resolver;
+		mockFetchSearchSuggestions.mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolver = resolve;
+				} )
+		);
 
-		const fauxRequest = () =>
-			new Promise( ( resolve ) => {
-				resolver = resolve;
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
+
+		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+		// make the search suggestions fetch return a response
+		resolver( fauxEntitySuggestions );
+
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
+	} );
+
+	it.each( [ 'With spaces', 'Uppercase', 'lowercase' ] )(
+		'should display only search suggestions (and not URL result type) when current input value (e.g. %s) is not URL-like',
+		async ( searchTerm ) => {
+			const user = userEvent.setup();
+			const firstSuggestion = fauxEntitySuggestions[ 0 ];
+
+			render( <LinkControl /> );
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
 
-		mockFetchSearchSuggestions.mockImplementation( fauxRequest );
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-		act( () => {
-			render( <LinkControl />, container );
-		} );
+			const searchResultElements = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+			expect( searchResultElements ).toHaveLength(
+				fauxEntitySuggestions.length
+			);
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
+			expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
+			// Check that a search suggestion shows up corresponding to the data.
+			expect( searchResultElements[ 0 ] ).toHaveTextContent(
+				firstSuggestion.title
+			);
+			expect( searchResultElements[ 0 ] ).toHaveTextContent(
+				firstSuggestion.type
+			);
 
-		const searchResultElements = getSearchResults();
+			// The fallback URL suggestion should not be shown when input is not URL-like.
+			expect(
+				searchResultElements[ searchResultElements.length - 1 ]
+			).not.toHaveTextContent( 'Press ENTER to add this link' );
+		}
+	);
 
-		let loadingUI = container.querySelector( '.components-spinner' );
+	it.each( [
+		[ 'https://wordpress.org', 'link' ],
+		[ 'http://wordpress.org', 'link' ],
+		[ 'www.wordpress.org', 'link' ],
+		[ 'wordpress.org', 'link' ],
+		[ 'ftp://wordpress.org', 'link' ],
+		[ 'mailto:hello@wordpress.org', 'mailto' ],
+		[ 'tel:123456789', 'tel' ],
+		[ '#internal', 'internal' ],
+	] )(
+		'should display only URL result when current input value is URL-like (e.g. %s)',
+		async ( searchTerm, type ) => {
+			const user = userEvent.setup();
 
-		expect( searchResultElements ).toHaveLength( 0 );
+			render( <LinkControl /> );
 
-		expect( loadingUI ).not.toBeNull();
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
+			} );
 
-		act( () => {
-			resolver( fauxEntitySuggestions );
-		} );
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-		await eventLoopTick();
+			const searchResultElement = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getByRole( 'option' );
 
-		loadingUI = container.querySelector( '.components-spinner' );
+			expect( searchResultElement ).toBeInTheDocument();
 
-		expect( loadingUI ).toBeNull();
-	} );
+			// Should only be the `URL` suggestion.
+			expect( searchInput ).toHaveAttribute( 'aria-expanded', 'true' );
 
-	it( 'should display only search suggestions when current input value is not URL-like', async () => {
-		const searchTerm = 'Hello world';
-		const firstFauxSuggestion = first( fauxEntitySuggestions );
-
-		act( () => {
-			render( <LinkControl />, container );
-		} );
-
-		// Search Input UI
-		const searchInput = getURLInput();
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-
-		const searchResultElements = getSearchResults();
-
-		const firstSearchResultItemHTML = first( searchResultElements )
-			.innerHTML;
-		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
-
-		expect( searchResultElements ).toHaveLength(
-			fauxEntitySuggestions.length
-		);
-
-		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
-
-		// Sanity check that a search suggestion shows up corresponding to the data
-		expect( firstSearchResultItemHTML ).toEqual(
-			expect.stringContaining( firstFauxSuggestion.title )
-		);
-		expect( firstSearchResultItemHTML ).toEqual(
-			expect.stringContaining( firstFauxSuggestion.type )
-		);
-
-		// The fallback URL suggestion should not be shown when input is not URL-like
-		expect( lastSearchResultItemHTML ).not.toEqual(
-			expect.stringContaining( 'URL' )
-		);
-	} );
+			expect( searchResultElement ).toHaveTextContent( searchTerm );
+			expect( searchResultElement ).toHaveTextContent( type );
+			expect( searchResultElement ).toHaveTextContent(
+				'Press ENTER to add this link'
+			);
+		}
+	);
 
 	it( 'should trim search term', async () => {
+		const user = userEvent.setup();
 		const searchTerm = '   Hello    ';
 
-		act( () => {
-			render( <LinkControl />, container );
+		render( <LinkControl /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
 		} );
 
-		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		const searchResultTextHighlightElements = within( searchResults )
+			.getAllByRole( 'option' )
+			// TODO: Change to `getByRole( 'mark' )` when officially supported by
+			// WAI-ARIA 1.3 - see https://w3c.github.io/aria/#mark
+			// eslint-disable-next-line testing-library/no-node-access
+			.map( ( searchResult ) => searchResult.querySelector( 'mark' ) )
+			.flat()
+			.filter( Boolean );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
-
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		const searchResultTextHighlightElements = Array.from(
-			container.querySelectorAll(
-				'[role="listbox"] button[role="option"] mark'
-			)
-		);
-
-		const invalidResults = searchResultTextHighlightElements.find(
-			( mark ) => mark.innerHTML !== 'Hello'
-		);
-
-		// Grab the first argument that was passed to the fetchSuggestions
-		// handler (which is mocked out).
-		const mockFetchSuggestionsFirstArg =
-			mockFetchSearchSuggestions.mock.calls[ 0 ][ 0 ];
-
-		// Given we're mocking out the results we should always have 4 mark elements.
-		expect( searchResultTextHighlightElements ).toHaveLength( 4 );
+		expect( searchResultTextHighlightElements ).toHaveLength( 3 );
 
 		// Make sure there are no `mark` elements which contain anything other
 		// than the trimmed search term (ie: no whitespace).
-		expect( invalidResults ).toBeFalsy();
+		expect(
+			searchResultTextHighlightElements.every(
+				( mark ) => mark.innerHTML === 'Hello'
+			)
+		).toBe( true );
 
 		// Implementation detail test to ensure that the fetch handler is called
 		// with the trimmed search value. We do this because we are mocking out
 		// the fetch handler in our test so we need to assert it would be called
 		// correctly in a real world scenario.
-		expect( mockFetchSuggestionsFirstArg ).toEqual( 'Hello' );
+		expect( mockFetchSearchSuggestions ).toHaveBeenCalledWith(
+			'Hello',
+			expect.anything()
+		);
 	} );
 
-	it.each( [
-		[ 'couldbeurlorentitysearchterm' ],
-		[ 'ThisCouldAlsoBeAValidURL' ],
-	] )(
-		'should display a URL suggestion as a default fallback for the search term "%s" which could potentially be a valid url.',
-		async ( searchTerm ) => {
-			act( () => {
-				render( <LinkControl />, container );
-			} );
+	it( 'should not call search handler when showSuggestions is false', async () => {
+		const user = userEvent.setup();
+		render( <LinkControl showSuggestions={ false } /> );
 
-			// Search Input UI
-			const searchInput = getURLInput();
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-			// Simulate searching for a term
-			act( () => {
-				Simulate.change( searchInput, {
-					target: { value: searchTerm },
-				} );
-			} );
+		// Simulate searching for a term.
+		await user.type( searchInput, 'anything' );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-			await eventLoopTick();
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultsField = screen.queryByRole( 'listbox' );
 
-			const searchResultElements = getSearchResults();
+		expect( searchResultsField ).not.toBeInTheDocument();
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+	} );
 
-			const lastSearchResultItemHTML = last( searchResultElements )
-				.innerHTML;
-			const additionalDefaultFallbackURLSuggestionLength = 1;
+	it( 'should not display a URL suggestion when input is not likely to be a URL.', async () => {
+		const searchTerm = 'unlikelytobeaURL';
+		const user = userEvent.setup();
+		render( <LinkControl /> );
 
-			// We should see a search result for each of the expect search suggestions
-			// plus 1 additional one for the fallback URL suggestion
-			expect( searchResultElements ).toHaveLength(
-				fauxEntitySuggestions.length +
-					additionalDefaultFallbackURLSuggestionLength
-			);
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-			// The last item should be a URL search suggestion
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( searchTerm )
-			);
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'URL' )
-			);
-			expect( lastSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'Press ENTER to add this link' )
-			);
-		}
-	);
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
+
+		const searchResultElements = within(
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
+
+		const lastSearchResultItem =
+			searchResultElements[ searchResultElements.length - 1 ];
+
+		// We should see a search result for each of the expect search suggestions.
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
+
+		// The URL search suggestion should not exist.
+		expect( lastSearchResultItem ).not.toHaveTextContent(
+			'Press ENTER to add this link'
+		);
+	} );
 
 	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
-		act( () => {
-			render( <LinkControl noURLSuggestion />, container );
-		} );
+		const user = userEvent.setup();
+		render( <LinkControl noURLSuggestion /> );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: 'couldbeurlorentitysearchterm' },
-			} );
-		} );
+		// Simulate searching for a term.
+		await user.type( searchInput, 'couldbeurlorentitysearchterm' );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = within(
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
-		const searchResultElements = getSearchResults();
-
-		// We should see a search result for each of the expect search suggestions and nothing else
+		// We should see a search result for each of the expect search suggestions and nothing else.
 		expect( searchResultElements ).toHaveLength(
 			fauxEntitySuggestions.length
 		);
@@ -432,49 +668,237 @@ describe( 'Searching for a link', () => {
 
 describe( 'Manual link entry', () => {
 	it.each( [
-		[ 'https://make.wordpress.org' ], // explicit https
-		[ 'http://make.wordpress.org' ], // explicit http
-		[ 'www.wordpress.org' ], // usage of "www"
+		[ 'https://make.wordpress.org' ], // Explicit https.
+		[ 'http://make.wordpress.org' ], // Explicit http.
+		[ 'www.wordpress.org' ], // Usage of "www".
 	] )(
 		'should display a single suggestion result when the current input value is URL-like (eg: %s)',
 		async ( searchTerm ) => {
-			act( () => {
-				render( <LinkControl />, container );
+			const user = userEvent.setup();
+			render( <LinkControl /> );
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
 
-			// Search Input UI
-			const searchInput = getURLInput();
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-			// Simulate searching for a term
-			act( () => {
-				Simulate.change( searchInput, {
-					target: { value: searchTerm },
-				} );
-			} );
+			const searchResultElements = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getByRole( 'option' );
 
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-			await eventLoopTick();
-
-			const searchResultElements = getSearchResults();
-
-			const firstSearchResultItemHTML =
-				searchResultElements[ 0 ].innerHTML;
-			const expectedResultsLength = 1;
-
-			expect( searchResultElements ).toHaveLength(
-				expectedResultsLength
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( searchTerm )
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'URL' )
-			);
-			expect( firstSearchResultItemHTML ).toEqual(
-				expect.stringContaining( 'Press ENTER to add this link' )
+			expect( searchResultElements ).toBeVisible();
+			expect( searchResultElements ).toHaveTextContent( searchTerm );
+			expect( searchResultElements ).toHaveTextContent(
+				'Press ENTER to add this link'
 			);
 		}
 	);
+
+	describe( 'Handling of empty values', () => {
+		const testTable = [
+			[ 'containing only spaces', '        ' ],
+			[ 'containing only tabs', '[Tab]' ],
+			[ 'from strings with no length', '' ],
+		];
+
+		it.each( testTable )(
+			'should not allow creation of links %s when using the keyboard',
+			async ( _desc, searchString ) => {
+				const user = userEvent.setup();
+
+				render( <LinkControl /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+
+				if ( searchString.length ) {
+					// Simulate searching for a term.
+					await user.type( searchInput, searchString );
+				} else {
+					// Simulate clearing the search term.
+					await user.clear( searchInput );
+				}
+
+				// Attempt to submit the empty search value in the input.
+				await user.keyboard( '[Enter]' );
+
+				// Verify the UI hasn't allowed submission because
+				// the search input is still visible.
+				expect( searchInput ).toBeVisible();
+			}
+		);
+
+		it.each( testTable )(
+			'should not allow editing of links to a new link %s via the UI "submit" button',
+			async ( _desc, searchString ) => {
+				const user = userEvent.setup();
+
+				render(
+					<LinkControl
+						value={ fauxEntitySuggestions[ 0 ] }
+						forceIsEditingLink
+					/>
+				);
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
+				} );
+
+				// Remove the existing link.
+				await user.clear( searchInput );
+
+				if ( searchString.length ) {
+					await user.type( searchInput, searchString );
+				} else {
+					// Simulate clearing the search term.
+					await user.clear( searchInput );
+				}
+
+				const submitButton = screen.queryByRole( 'button', {
+					name: 'Save',
+				} );
+
+				// Verify the submission UI is disabled.
+				expect( submitButton ).toBeVisible();
+				expect( submitButton ).toHaveAttribute(
+					'aria-disabled',
+					'true'
+				);
+
+				// Attempt to submit the empty search value in the input.
+				await user.click( submitButton );
+
+				// Verify the UI hasn't allowed submission because
+				// the search input is still visible.
+				expect( searchInput ).toBeVisible();
+			}
+		);
+	} );
+
+	describe( 'Handling cancellation', () => {
+		it( 'should not show cancellation button during link creation', async () => {
+			const mockOnRemove = jest.fn();
+
+			render( <LinkControl onRemove={ mockOnRemove } /> );
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			expect( cancelButton ).not.toBeInTheDocument();
+		} );
+
+		it( 'should allow cancellation of the link editing process and reset any entered values', async () => {
+			const user = userEvent.setup();
+			const initialLink = fauxEntitySuggestions[ 0 ];
+
+			const LinkControlConsumer = () => {
+				const [ link, setLink ] = useState( initialLink );
+
+				return (
+					<LinkControl
+						value={ link }
+						onChange={ ( suggestion ) => {
+							setLink( suggestion );
+						} }
+						hasTextControl
+					/>
+				);
+			};
+
+			render( <LinkControlConsumer /> );
+
+			let linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			expect( linkPreview ).toBeInTheDocument();
+
+			// Click the "Edit" button to trigger into the editing mode.
+			let editButton = screen.queryByRole( 'button', {
+				name: 'Edit link',
+			} );
+
+			await user.click( editButton );
+
+			await toggleSettingsDrawer( user );
+
+			let searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
+			} );
+
+			let textInput = screen.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Make a change to the search input.
+			await user.type( searchInput, 'This URL value was changed!' );
+
+			// Make a change to the text input.
+			await user.type( textInput, 'This text value was changed!' );
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			// Cancel the editing process.
+			await user.click( cancelButton );
+
+			linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			expect( linkPreview ).toBeInTheDocument();
+
+			// Re-query the edit button as it's been replaced.
+			editButton = screen.queryByRole( 'button', {
+				name: 'Edit link',
+			} );
+
+			await user.click( editButton );
+
+			await toggleSettingsDrawer( user );
+
+			// Re-query the inputs as they have been replaced.
+			searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
+			} );
+
+			textInput = screen.getByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			// Expect to see the original link values and **not** the changed values.
+			expect( searchInput ).toHaveValue( initialLink.url );
+			expect( textInput ).toHaveValue( initialLink.text );
+		} );
+
+		it( 'should call onCancel callback when cancelling if provided', async () => {
+			const user = userEvent.setup();
+			const mockOnCancel = jest.fn();
+
+			render(
+				<LinkControl
+					value={ fauxEntitySuggestions[ 0 ] }
+					onCancel={ mockOnCancel }
+					forceIsEditingLink
+				/>
+			);
+
+			const cancelButton = screen.queryByRole( 'button', {
+				name: 'Cancel',
+			} );
+
+			await user.click( cancelButton );
+
+			// Verify the consumer can handle the cancellation.
+			expect( mockOnCancel ).toHaveBeenCalled();
+		} );
+	} );
 
 	describe( 'Alternative link protocols and formats', () => {
 		it.each( [
@@ -484,207 +908,231 @@ describe( 'Manual link entry', () => {
 		] )(
 			'should recognise "%s" as a %s link and handle as manual entry by displaying a single suggestion',
 			async ( searchTerm, searchType ) => {
-				act( () => {
-					render( <LinkControl />, container );
+				const user = userEvent.setup();
+				render( <LinkControl /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
 				} );
 
-				// Search Input UI
-				const searchInput = getURLInput();
+				// Simulate searching for a term.
+				await user.type( searchInput, searchTerm );
 
-				// Simulate searching for a term
-				act( () => {
-					Simulate.change( searchInput, {
-						target: { value: searchTerm },
-					} );
-				} );
+				const searchResultElements = within(
+					await screen.findByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getByRole( 'option' );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-				await eventLoopTick();
-
-				const searchResultElements = getSearchResults();
-
-				const firstSearchResultItemHTML =
-					searchResultElements[ 0 ].innerHTML;
-				const expectedResultsLength = 1;
-
-				expect( searchResultElements ).toHaveLength(
-					expectedResultsLength
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( searchTerm )
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( searchType )
-				);
-				expect( firstSearchResultItemHTML ).toEqual(
-					expect.stringContaining( 'Press ENTER to add this link' )
+				expect( searchResultElements ).toBeVisible();
+				expect( searchResultElements ).toHaveTextContent( searchTerm );
+				expect( searchResultElements ).toHaveTextContent( searchType );
+				expect( searchResultElements ).toHaveTextContent(
+					'Press ENTER to add this link'
 				);
 			}
 		);
 	} );
 } );
 
-describe( 'Default search suggestions', () => {
-	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
-		const expectedResultsLength = 3; // set within `LinkControl`
+describe( 'Link submission', () => {
+	it( 'should show a submit button when creating a link', async () => {
+		const user = userEvent.setup();
 
-		act( () => {
-			render( <LinkControl showInitialSuggestions />, container );
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( {} );
+
+			return <LinkControl value={ link } onChange={ setLink } />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
 		} );
 
-		await eventLoopTick();
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+		expect( submitButton ).toBeVisible();
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
 
-		const searchResultsWrapper = container.querySelector(
-			'[role="listbox"]'
-		);
-		const initialSearchResultElements = searchResultsWrapper.querySelectorAll(
-			'[role="option"]'
-		);
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( submitButton );
 
-		const searchResultsLabel = container.querySelector(
-			`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
-		);
+		expect( searchInput ).toBeVisible();
+		expect( submitButton ).toBeVisible();
+
+		await user.type( searchInput, 'https://wordpress.org' );
+
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
+	it( 'should show a submit button when editing a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+
+			return (
+				<LinkControl
+					forceIsEditingLink
+					value={ link }
+					onChange={ setLink }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const createSubmitButton = screen.queryByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		// Check the submit button for "creation" of links is not displayed.
+		expect( createSubmitButton ).not.toBeInTheDocument();
+
+		const editSubmitButton = screen.getByRole( 'button', {
+			name: 'Save',
+		} );
+
+		expect( editSubmitButton ).toBeVisible();
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( editSubmitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( editSubmitButton ).toBeVisible();
+
+		await user.type( searchInput, '#appendtolinktext' );
+
+		// As typing triggers the search handler, we need to wait for the
+		// search results to be returned. We can use the presence of the
+		// search results listbox as a proxy for this.
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+} );
+
+describe( 'Default search suggestions', () => {
+	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
+		render( <LinkControl showInitialSuggestions /> );
+
+		expect(
+			await screen.findByRole( 'listbox', {
+				name: 'Suggestions',
+			} )
+		).toBeVisible();
 
 		// Verify input has no value has default suggestions should only show
-		// when this does not have a value
-		expect( searchInput.value ).toBe( '' );
+		// when this does not have a value.
+		// Search Input UI.
+		expect( screen.getByRole( 'combobox', { name: 'Link' } ) ).toHaveValue(
+			''
+		);
 
 		// Ensure only called once as a guard against potential infinite
 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
 		// which has calls to `setState` within it.
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 
-		// Verify the search results already display the initial suggestions
-		expect( initialSearchResultElements ).toHaveLength(
-			expectedResultsLength
-		);
-
-		expect( searchResultsLabel.innerHTML ).toEqual( 'Recently updated' );
+		// Verify the search results already display the initial suggestions.
+		// `LinkControl` internally always limits the number of initial suggestions to 3.
+		expect( screen.queryAllByRole( 'option' ) ).toHaveLength( 3 );
 	} );
 
 	it( 'should not display initial suggestions when input value is present', async () => {
-		// Render with an initial value an ensure that no initial suggestions
-		// are shown.
-		//
-		act( () => {
-			render(
-				<LinkControl
-					showInitialSuggestions
-					value={ fauxEntitySuggestions[ 0 ] }
-				/>,
-				container
-			);
-		} );
+		const user = userEvent.setup();
 
-		await eventLoopTick();
+		// Render with an initial value an ensure that no initial suggestions are shown.
+		const initialValue = fauxEntitySuggestions[ 0 ];
+		render( <LinkControl showInitialSuggestions value={ initialValue } /> );
 
-		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
-
-		//
 		// Click the "Edit/Change" button and check initial suggestions are not
 		// shown.
-		//
-		const currentLinkUI = getCurrentLink();
-		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
-
-		act( () => {
-			Simulate.click( currentLinkBtn );
+		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
+		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
+			name: 'Edit link',
 		} );
+		await user.click( currentLinkBtn );
 
-		await eventLoopTick();
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-		const searchResultElements = getSearchResults();
+		// Search input is set to the URL value.
+		expect( searchInput ).toHaveValue( initialValue.url );
 
-		const searchInput = getURLInput();
+		// Ensure no initial suggestions are shown.
+		expect(
+			screen.queryByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).not.toBeInTheDocument();
 
-		// search input is set to the URL value
-		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
-
-		// it should match any url that's like ?p= and also include a URL option
-		expect( searchResultElements ).toHaveLength( 5 );
-
-		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
-
-		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should display initial suggestions when input value is manually deleted', async () => {
+		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
 
-		act( () => {
-			render( <LinkControl showInitialSuggestions />, container );
+		render( <LinkControl showInitialSuggestions /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
+
+		expect( searchInput ).toHaveValue( searchTerm );
+
+		const searchResultsList = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
 		} );
 
-		let searchResultElements;
-		let searchInput;
+		expect( searchResultsList ).toBeVisible();
 
-		// Search Input UI
-		searchInput = getURLInput();
+		expect(
+			within( searchResultsList ).getAllByRole( 'option' )
+		).toHaveLength( 4 );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		// Delete the text.
+		await userEvent.clear( searchInput );
+
+		// Check the input is empty now.
+		expect( searchInput ).toHaveValue( '' );
+
+		const initialResultsList = await screen.findByRole( 'listbox', {
+			name: 'Suggestions',
 		} );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		expect( searchInput.value ).toBe( searchTerm );
-
-		searchResultElements = getSearchResults();
-
-		// delete the text
-		act( () => {
-			Simulate.change( searchInput, { target: { value: '' } } );
-		} );
-
-		await eventLoopTick();
-
-		searchResultElements = getSearchResults();
-
-		searchInput = getURLInput();
-
-		// check the input is empty now
-		expect( searchInput.value ).toBe( '' );
-
-		const searchResultLabel = container.querySelector(
-			'.block-editor-link-control__search-results-label'
-		);
-
-		expect( searchResultLabel.innerHTML ).toBe( 'Recently updated' );
-
-		expect( searchResultElements ).toHaveLength( 3 );
+		expect(
+			within( initialResultsList ).getAllByRole( 'option' )
+		).toHaveLength( 3 );
 	} );
 
 	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
-		const noResults = [];
 		// Force API returning empty results for recently updated Pages.
-		mockFetchSearchSuggestions.mockImplementation( () =>
-			Promise.resolve( noResults )
-		);
+		mockFetchSearchSuggestions.mockImplementation( async () => [] );
 
-		act( () => {
-			render( <LinkControl showInitialSuggestions />, container );
+		render( <LinkControl showInitialSuggestions /> );
+
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		const searchResultsField = screen.queryByRole( 'listbox', {
+			name: 'Suggestions',
 		} );
 
-		await eventLoopTick();
+		expect( searchResultsField ).not.toBeInTheDocument();
 
-		const searchInput = getURLInput();
-
-		const searchResultElements = getSearchResults();
-
-		const searchResultLabel = container.querySelector(
-			'.block-editor-link-control__search-results-label'
-		);
-
-		expect( searchResultLabel ).toBeFalsy();
-
-		expect( searchResultElements ).toHaveLength( 0 );
-
-		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
+		expect( searchInput ).toHaveAttribute( 'aria-expanded', 'false' );
 	} );
 } );
 
@@ -704,20 +1152,17 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	] )(
 		'should allow creating a link for a valid Entity title "%s" (%s)',
 		async ( entityNameText ) => {
+			const user = userEvent.setup();
 			let resolver;
-			let resolvedEntity;
-
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = ( arg ) => {
-						resolve( arg );
-					};
-					resolvedEntity = {
-						title,
-						id: 123,
-						url: '/?p=123',
-						type: 'page',
-					};
+					resolver = () =>
+						resolve( {
+							title,
+							id: 123,
+							url: '/?p=123',
+							type: 'page',
+						} );
 				} );
 
 			const LinkControlConsumer = () => {
@@ -734,84 +1179,55 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 			};
 
-			act( () => {
-				render( <LinkControlConsumer />, container );
+			render( <LinkControlConsumer /> );
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
 
-			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			// Simulate searching for a term.
+			await user.type( searchInput, entityNameText );
 
-			// Simulate searching for a term
-			act( () => {
-				Simulate.change( searchInput, {
-					target: { value: entityNameText },
-				} );
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
 			} );
 
-			await eventLoopTick();
+			const createButton = within( searchResults ).getByRole( 'option', {
+				name: /^Create:/,
+			} );
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-
-			const createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
-				)
-			);
-
-			expect( createButton ).not.toBeNull();
-			expect( createButton.innerHTML ).toEqual(
-				expect.stringContaining( entityNameText )
-			);
+			expect( createButton ).toBeVisible();
+			expect( createButton ).toHaveTextContent( entityNameText );
 
 			// No need to wait in this test because we control the Promise
-			// resolution manually via the `resolver` reference
-			act( () => {
-				Simulate.click( createButton );
-			} );
+			// resolution manually via the `resolver` reference.
+			await user.click( createButton );
 
-			await eventLoopTick();
+			// Check for loading indicator.
+			const loadingIndicator = screen.getByText( 'Creating…' );
+			const currentLinkLabel =
+				screen.queryByLabelText( 'Currently selected' );
 
-			// Check for loading indicator
-			const loadingIndicator = container.querySelector(
-				'.block-editor-link-control__loading'
-			);
-			const currentLinkLabel = container.querySelector(
-				'[aria-label="Currently selected"]'
-			);
-
-			expect( currentLinkLabel ).toBeNull();
-			expect( loadingIndicator.innerHTML ).toEqual(
-				expect.stringContaining( 'Creating' )
+			expect( currentLinkLabel ).not.toBeInTheDocument();
+			expect( loadingIndicator ).toBeVisible();
+			expect( loadingIndicator ).toHaveClass(
+				'block-editor-link-control__loading'
 			);
 
-			// Resolve the `createSuggestion` promise
-			await act( async () => {
-				resolver( resolvedEntity );
-			} );
+			// Resolve the `createSuggestion` promise.
+			resolver();
 
-			await eventLoopTick();
+			const currentLink =
+				await screen.findByLabelText( 'Currently selected' );
 
-			const currentLink = container.querySelector(
-				'[aria-label="Currently selected"]'
-			);
-
-			const currentLinkHTML = currentLink.innerHTML;
-
-			expect( currentLinkHTML ).toEqual(
-				expect.stringContaining( entityNameText )
-			);
-			expect( currentLinkHTML ).toEqual(
-				expect.stringContaining( '/?p=123' )
-			);
+			expect( currentLink ).toHaveTextContent( entityNameText );
+			expect( currentLink ).toHaveTextContent( '/?p=123' );
 		}
 	);
 
 	it( 'should allow createSuggestion prop to return a non-Promise value', async () => {
+		const user = userEvent.setup();
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( null );
 
@@ -831,56 +1247,32 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, 'Some new page to create' );
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
 		} );
 
-		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: 'Some new page to create' },
-			} );
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /^Create:/,
 		} );
 
-		await eventLoopTick();
+		await user.click( createButton );
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
+		const currentLink = screen.getByLabelText( 'Currently selected' );
 
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
-			)
-		);
-
-		await act( async () => {
-			Simulate.click( createButton );
-		} );
-
-		await eventLoopTick();
-
-		const currentLink = container.querySelector(
-			'[aria-label="Currently selected"]'
-		);
-
-		const currentLinkHTML = currentLink.innerHTML;
-
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( 'Some new page to create' )
-		);
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( '/?p=123' )
-		);
+		expect( currentLink ).toHaveTextContent( 'Some new page to create' );
+		expect( currentLink ).toHaveTextContent( '/?p=123' );
 	} );
 
 	it( 'should allow creation of entities via the keyboard', async () => {
+		const user = userEvent.setup();
 		const entityNameText = 'A new page to be created';
 
 		const LinkControlConsumer = () => {
@@ -904,62 +1296,38 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, entityNameText );
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
 		} );
 
-		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
+		// Step down into the search results, selecting the first result item.
+		triggerArrowDown( searchInput );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: entityNameText },
-			} );
+		// Check that the create button is in the results and that it's selected
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /^Create:/,
+			selected: true,
 		} );
+		expect( createButton ).toBeVisible();
 
-		await eventLoopTick();
+		expect( searchInput ).toHaveFocus();
+		triggerEnter( searchInput );
 
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-		const form = container.querySelector( 'form' );
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Create:' )
-			)
-		);
-
-		// Step down into the search results, highlighting the first result item
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: DOWN } );
-		} );
-
-		act( () => {
-			Simulate.keyDown( createButton, { keyCode: ENTER } );
-		} );
-
-		await act( async () => {
-			Simulate.submit( form );
-		} );
-
-		await eventLoopTick();
-
-		const currentLink = container.querySelector(
-			'[aria-label="Currently selected"]'
-		);
-
-		const currentLinkHTML = currentLink.innerHTML;
-
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( entityNameText )
-		);
+		expect(
+			await screen.findByLabelText( 'Currently selected' )
+		).toHaveTextContent( entityNameText );
 	} );
 
 	it( 'should allow customisation of button text', async () => {
+		const user = userEvent.setup();
 		const entityNameText = 'A new page to be created';
 
 		const LinkControlConsumer = () => {
@@ -971,103 +1339,62 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+		// Simulate searching for a term.
+		await user.type( searchInput, entityNameText );
+
+		const searchResults = await screen.findByRole( 'listbox', {
+			name: /Search results for.*/,
 		} );
 
-		// Search Input UI
-		const searchInput = container.querySelector(
-			'input[aria-label="URL"]'
-		);
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: entityNameText },
-			} );
+		const createButton = within( searchResults ).getByRole( 'option', {
+			name: /Custom suggestion text/,
 		} );
 
-		await eventLoopTick();
-
-		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-		const searchResultElements = container.querySelectorAll(
-			'[role="listbox"] [role="option"]'
-		);
-
-		const createButton = first(
-			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'Custom suggestion text' )
-			)
-		);
-
-		expect( createButton ).not.toBeNull();
+		expect( createButton ).toBeVisible();
 	} );
 
 	describe( 'Do not show create option', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
 			async ( handler ) => {
-				act( () => {
-					render(
-						<LinkControl createSuggestion={ handler } />,
-						container
-					);
+				render( <LinkControl createSuggestion={ handler } /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
 				} );
-				// Await the initial suggestions to be fetched
-				await eventLoopTick();
 
-				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				const searchResultsField = screen.queryByRole( 'listbox' );
 
-				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
-				);
-				const createButton = first(
-					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'Create:' )
-					)
-				);
-
-				// Verify input has no value
-				expect( searchInput.value ).toBe( '' );
-				expect( createButton ).toBeFalsy(); // shouldn't exist!
+				// Verify input has no value.
+				expect( searchInput ).toHaveValue( '' );
+				expect( searchResultsField ).not.toBeInTheDocument(); // Shouldn't exist!
 			}
 		);
 
-		it( 'should not show not show an option to create an entity when input is empty', async () => {
-			act( () => {
-				render(
-					<LinkControl
-						showInitialSuggestions={ true } // should show even if we're not showing initial suggestions
-						createSuggestion={ jest.fn() }
-					/>,
-					container
-				);
+		it( 'should not show an option to create an entity when input is empty', async () => {
+			render(
+				<LinkControl
+					showInitialSuggestions // Should show even if we're not showing initial suggestions.
+					createSuggestion={ jest.fn() }
+				/>
+			);
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
-			// Await the initial suggestions to be fetched
-			await eventLoopTick();
 
-			// Search Input UI
-			const searchInput = container.querySelector(
-				'input[aria-label="URL"]'
-			);
+			const searchResultsField = screen.queryByRole( 'listbox' );
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-			const searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			const createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
-				)
-			);
-
-			// Verify input has no value
-			expect( searchInput.value ).toBe( '' );
-			expect( createButton ).toBeFalsy(); // shouldn't exist!
+			// Verify input has no value.
+			expect( searchInput ).toHaveValue( '' );
+			expect( searchResultsField ).not.toBeInTheDocument(); // Shouldn't exist!
 		} );
 
 		it.each( [
@@ -1079,130 +1406,86 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		] )(
 			'should not show option to "Create Page" when text is a form of direct entry (eg: %s)',
 			async ( inputText ) => {
-				act( () => {
-					render(
-						<LinkControl createSuggestion={ jest.fn() } />,
-						container
-					);
+				const user = userEvent.setup();
+				render( <LinkControl createSuggestion={ jest.fn() } /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
 				} );
 
-				// Search Input UI
-				const searchInput = container.querySelector(
-					'input[aria-label="URL"]'
-				);
+				// Simulate searching for a term.
+				await user.type( searchInput, inputText );
 
-				// Simulate searching for a term
-				act( () => {
-					Simulate.change( searchInput, {
-						target: { value: inputText },
-					} );
+				const searchResults = await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
 				} );
 
-				await eventLoopTick();
-
-				// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-				const searchResultElements = container.querySelectorAll(
-					'[role="listbox"] [role="option"]'
+				const createButton = within( searchResults ).queryByRole(
+					'option',
+					{ name: /New page/ }
 				);
-
-				const createButton = first(
-					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
-					)
-				);
-
-				expect( createButton ).toBeFalsy(); // shouldn't exist!
+				expect( createButton ).not.toBeInTheDocument(); // Shouldn't exist!
 			}
 		);
 	} );
 
 	describe( 'Error handling', () => {
 		it( 'should display human-friendly, perceivable error notice and re-show create button and search input if page creation request fails', async () => {
+			const user = userEvent.setup();
 			const searchText = 'This page to be created';
 			let searchInput;
 
 			const throwsError = () => {
-				throw new Error( 'API response returned invalid entity.' ); // this can be any error and msg
+				throw new Error( 'API response returned invalid entity.' ); // This can be any error and msg.
 			};
 
 			const createSuggestion = () => Promise.reject( throwsError() );
 
-			act( () => {
-				render(
-					<LinkControl createSuggestion={ createSuggestion } />,
-					container
-				);
+			render( <LinkControl createSuggestion={ createSuggestion } /> );
+
+			// Search Input UI.
+			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+
+			// Simulate searching for a term.
+			await user.type( searchInput, searchText );
+
+			const searchResults = await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
 			} );
 
-			// Search Input UI
-			searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-			// Simulate searching for a term
-			act( () => {
-				Simulate.change( searchInput, {
-					target: { value: searchText },
-				} );
+			const createButton = within( searchResults ).getByRole( 'option', {
+				name: /^Create:/,
 			} );
 
-			await eventLoopTick();
+			await user.click( createButton );
 
-			// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
-			let searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			let createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'Create:' )
-				)
-			);
+			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-			await act( async () => {
-				Simulate.click( createButton );
-			} );
+			const errorNotice = screen.getAllByText(
+				'API response returned invalid entity.'
+			)[ 1 ];
 
-			await eventLoopTick();
-
-			searchInput = container.querySelector( 'input[aria-label="URL"]' );
-
-			// This is a Notice component
-			// we allow selecting by className here as an edge case because the
-			// a11y is handled via `speak`.
-			// See: https://github.com/WordPress/gutenberg/tree/master/packages/a11y#speak.
-			const errorNotice = container.querySelector(
-				'.block-editor-link-control__search-error'
-			);
-
-			// Catch the error in the test to avoid test failures
+			// Catch the error in the test to avoid test failures.
 			expect( throwsError ).toThrow( Error );
 
-			// Check human readable error notice is perceivable
-			expect( errorNotice ).not.toBeFalsy();
-			expect( errorNotice.innerHTML ).toEqual(
-				expect.stringContaining(
-					'API response returned invalid entity'
-				)
+			// Check human readable error notice is perceivable.
+			expect( errorNotice ).toBeVisible();
+			// eslint-disable-next-line testing-library/no-node-access
+			expect( errorNotice.parentElement ).toHaveClass(
+				'block-editor-link-control__search-error'
 			);
 
-			// Verify input is repopulated with original search text
-			expect( searchInput ).not.toBeFalsy();
-			expect( searchInput.value ).toBe( searchText );
-
-			// Verify search results are re-shown and create button is available.
-			searchResultElements = container.querySelectorAll(
-				'[role="listbox"] [role="option"]'
-			);
-			createButton = first(
-				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
-				)
-			);
+			// Verify input is repopulated with original search text.
+			expect( searchInput ).toBeVisible();
+			expect( searchInput ).toHaveValue( searchText );
 		} );
 	} );
 } );
 
 describe( 'Selecting links', () => {
 	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -1210,28 +1493,23 @@ describe( 'Selecting links', () => {
 			return <LinkControl value={ link } />;
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		const currentLink = screen.getByLabelText( 'Currently selected' );
+		const currentLinkAnchor = screen.getByRole( 'link', {
+			name: `${ selectedLink.title } (opens in a new tab)`,
 		} );
 
-		// TODO: select by aria role or visible text
-		const currentLink = getCurrentLink();
-		const currentLinkHTML = currentLink.innerHTML;
-		const currentLinkAnchor = currentLink.querySelector(
-			`[href="${ selectedLink.url }"]`
-		);
-
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( selectedLink.title )
-		);
+		expect( currentLink ).toBeVisible();
 		expect(
-			queryByRole( currentLink, 'button', { name: 'Edit' } )
-		).toBeTruthy();
-		expect( currentLinkAnchor ).not.toBeNull();
+			screen.queryByRole( 'button', { name: 'Edit link' } )
+		).toBeVisible();
+		expect( currentLinkAnchor ).toBeVisible();
 	} );
 
-	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
-		const selectedLink = first( fauxEntitySuggestions );
+	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', async () => {
+		const user = userEvent.setup();
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link, setLink ] = useState( selectedLink );
@@ -1244,31 +1522,29 @@ describe( 'Selecting links', () => {
 			);
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		// Required in order to select the button below.
+		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
+		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
+			name: 'Edit link',
 		} );
 
-		// Required in order to select the button below
-		let currentLinkUI = getCurrentLink();
-		const currentLinkBtn = currentLinkUI.querySelector( 'button' );
+		// Simulate searching for a term.
+		await user.click( currentLinkBtn );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.click( currentLinkBtn );
-		} );
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
+		currentLinkUI = screen.queryByLabelText( 'Currently selected' );
 
-		const searchInput = getURLInput();
-		currentLinkUI = getCurrentLink();
-
-		// We should be back to showing the search input
-		expect( searchInput ).not.toBeNull();
-		expect( searchInput.value ).toBe( selectedLink.url ); // prepopulated with previous link's URL
-		expect( currentLinkUI ).toBeNull();
+		// We should be back to showing the search input.
+		expect( searchInput ).toBeVisible();
+		expect( searchInput ).toHaveValue( selectedLink.url ); // Prepopulated with previous link's URL.
+		expect( currentLinkUI ).not.toBeInTheDocument();
 	} );
 
 	describe( 'Selection using mouse click', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1278,10 +1554,11 @@ describe( 'Selecting links', () => {
 					url: 'https://www.wordpress.org',
 					type: 'URL',
 				},
-			], // url
+			], // Url.
 		] )(
 			'should display a current selected link UI when a %s suggestion for the search "%s" is clicked',
 			async ( type, searchTerm, selectedLink ) => {
+				const user = userEvent.setup();
 				const LinkControlConsumer = () => {
 					const [ link, setLink ] = useState();
 
@@ -1293,55 +1570,43 @@ describe( 'Selecting links', () => {
 					);
 				};
 
-				act( () => {
-					render( <LinkControlConsumer />, container );
+				render( <LinkControlConsumer /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
 				} );
 
-				// Search Input UI
-				const searchInput = getURLInput();
+				// Simulate searching for a term.
+				await user.type( searchInput, searchTerm );
 
-				// Simulate searching for a term
-				act( () => {
-					Simulate.change( searchInput, {
-						target: { value: searchTerm },
-					} );
+				const searchResultElements = within(
+					await screen.findByRole( 'listbox', {
+						name: /Search results for.*/,
+					} )
+				).getAllByRole( 'option' );
+
+				const firstSearchSuggestion = searchResultElements[ 0 ];
+
+				// Simulate selecting the first of the search suggestions.
+				await user.click( firstSearchSuggestion );
+
+				const currentLinkAnchor = screen.getByRole( 'link', {
+					name: `${ selectedLink.title } (opens in a new tab)`,
 				} );
 
-				// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-				await eventLoopTick();
-
-				const searchResultElements = getSearchResults();
-
-				const firstSearchSuggestion = first( searchResultElements );
-
-				// Simulate selecting the first of the search suggestions
-				act( () => {
-					Simulate.click( firstSearchSuggestion );
-				} );
-
-				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
-				);
-				const currentLinkHTML = currentLink.innerHTML;
-				const currentLinkAnchor = currentLink.querySelector(
-					`[href="${ selectedLink.url }"]`
-				);
-
-				// Check that this suggestion is now shown as selected
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( selectedLink.title )
-				);
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( 'Edit' )
-				);
-				expect( currentLinkAnchor ).not.toBeNull();
+				// Check that this suggestion is now shown as selected.
+				expect(
+					screen.getByRole( 'button', { name: 'Edit link' } )
+				).toBeVisible();
+				expect( currentLinkAnchor ).toBeVisible();
 			}
 		);
 	} );
 
 	describe( 'Selection using keyboard', () => {
 		it.each( [
-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // entity search
+			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
 			[
 				'url',
 				'https://www.wordpress.org',
@@ -1351,10 +1616,11 @@ describe( 'Selecting links', () => {
 					url: 'https://www.wordpress.org',
 					type: 'URL',
 				},
-			], // url
+			], // Url.
 		] )(
 			'should display a current selected link UI when an %s suggestion for the search "%s" is selected using the keyboard',
 			async ( type, searchTerm, selectedLink ) => {
+				const user = userEvent.setup();
 				const LinkControlConsumer = () => {
 					const [ link, setLink ] = useState();
 
@@ -1366,234 +1632,192 @@ describe( 'Selecting links', () => {
 					);
 				};
 
-				act( () => {
-					render( <LinkControlConsumer />, container );
+				const { container } = render( <LinkControlConsumer /> );
+
+				// Search Input UI.
+				const searchInput = screen.getByRole( 'combobox', {
+					name: 'Link',
 				} );
 
-				// Search Input UI
-				const searchInput = getURLInput();
-				const form = container.querySelector( 'form' );
+				// Simulate searching for a term.
+				await user.type( searchInput, searchTerm );
 
-				// Simulate searching for a term
-				act( () => {
-					Simulate.change( searchInput, {
-						target: { value: searchTerm },
-					} );
+				const searchResults = await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
 				} );
 
-				//fetchFauxEntitySuggestions resolves on next "tick" of event loop
-				await eventLoopTick();
+				// Step down into the search results, highlighting the first result item.
+				triggerArrowDown( searchInput );
 
-				// Step down into the search results, highlighting the first result item
-				act( () => {
-					Simulate.keyDown( searchInput, { keyCode: DOWN } );
+				const searchResultElements =
+					within( searchResults ).getAllByRole( 'option' );
+
+				const firstSearchSuggestion = searchResultElements[ 0 ];
+				const secondSearchSuggestion = searchResultElements[ 1 ];
+
+				let selectedSearchResultElement = screen.getByRole( 'option', {
+					selected: true,
 				} );
 
-				const searchResultElements = getSearchResults();
-
-				const firstSearchSuggestion = first( searchResultElements );
-				const secondSearchSuggestion = nth( searchResultElements, 1 );
-
-				let selectedSearchResultElement = container.querySelector(
-					'[role="option"][aria-selected="true"]'
-				);
-
-				// We should have highlighted the first item using the keyboard
-				expect( selectedSearchResultElement ).toEqual(
+				// We should have highlighted the first item using the keyboard.
+				expect( selectedSearchResultElement ).toBe(
 					firstSearchSuggestion
 				);
 
-				// Only entity searches contain more than 1 suggestion
+				// Only entity searches contain more than 1 suggestion.
 				if ( type === 'entity' ) {
-					// Check we can go down again using the down arrow
-					act( () => {
-						Simulate.keyDown( searchInput, { keyCode: DOWN } );
+					// Check we can go down again using the down arrow.
+					triggerArrowDown( searchInput );
+
+					selectedSearchResultElement = screen.getByRole( 'option', {
+						selected: true,
 					} );
 
-					selectedSearchResultElement = container.querySelector(
-						'[role="option"][aria-selected="true"]'
-					);
-
 					// We should have highlighted the first item using the keyboard
-					expect( selectedSearchResultElement ).toEqual(
+					// eslint-disable-next-line jest/no-conditional-expect
+					expect( selectedSearchResultElement ).toBe(
 						secondSearchSuggestion
 					);
 
-					// Check we can go back up via up arrow
-					act( () => {
-						Simulate.keyDown( searchInput, { keyCode: UP } );
+					// Check we can go back up via up arrow.
+					triggerArrowUp( searchInput );
+
+					selectedSearchResultElement = screen.getByRole( 'option', {
+						selected: true,
 					} );
 
-					selectedSearchResultElement = container.querySelector(
-						'[role="option"][aria-selected="true"]'
-					);
-
 					// We should be back to highlighting the first search result again
-					expect( selectedSearchResultElement ).toEqual(
+					// eslint-disable-next-line jest/no-conditional-expect
+					expect( selectedSearchResultElement ).toBe(
 						firstSearchSuggestion
 					);
 				}
 
-				// Commit the selected item as the current link
-				act( () => {
-					Simulate.keyDown( searchInput, { keyCode: ENTER } );
-				} );
-				act( () => {
-					Simulate.submit( form );
-				} );
+				// Submit the selected item as the current link.
+				triggerEnter( searchInput );
 
-				// Check that the suggestion selected via is now shown as selected
-				const currentLink = container.querySelector(
-					'.block-editor-link-control__search-item.is-current'
-				);
-				const currentLinkHTML = currentLink.innerHTML;
-				const currentLinkAnchor = currentLink.querySelector(
-					`[href="${ selectedLink.url }"]`
-				);
+				// Check that the suggestion selected via is now shown as selected.
+				const currentLink =
+					screen.getByLabelText( 'Currently selected' );
+				const currentLinkAnchor = screen.getByRole( 'link', {
+					name: `${ selectedLink.title } (opens in a new tab)`,
+				} );
 
 				// Make sure focus is retained after submission.
-				expect( container.contains( document.activeElement ) ).toBe(
-					true
-				);
+				// eslint-disable-next-line testing-library/no-node-access
+				expect( container.firstChild ).toHaveFocus();
 
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( selectedLink.title )
-				);
-				expect( currentLinkHTML ).toEqual(
-					expect.stringContaining( 'Edit' )
-				);
-				expect( currentLinkAnchor ).not.toBeNull();
+				expect( currentLink ).toBeVisible();
+				expect(
+					screen.getByRole( 'button', { name: 'Edit link' } )
+				).toBeVisible();
+				expect( currentLinkAnchor ).toBeVisible();
 			}
 		);
 
 		it( 'should allow selection of initial search results via the keyboard', async () => {
-			act( () => {
-				render( <LinkControl showInitialSuggestions />, container );
+			render( <LinkControl showInitialSuggestions /> );
+
+			expect(
+				await screen.findByRole( 'listbox', {
+					name: 'Suggestions',
+				} )
+			).toBeVisible();
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
 
-			await eventLoopTick();
+			// Step down into the search results, highlighting the first result item.
+			triggerArrowDown( searchInput );
 
-			const searchResultsWrapper = container.querySelector(
-				'[role="listbox"]'
-			);
+			const searchResultElements = within(
+				screen.getByRole( 'listbox', {
+					name: 'Suggestions',
+				} )
+			).getAllByRole( 'option' );
 
-			const searchResultsLabel = container.querySelector(
-				`#${ searchResultsWrapper.getAttribute( 'aria-labelledby' ) }`
-			);
+			const firstSearchSuggestion = searchResultElements[ 0 ];
+			const secondSearchSuggestion = searchResultElements[ 1 ];
 
-			expect( searchResultsLabel.innerHTML ).toEqual(
-				'Recently updated'
-			);
-
-			// Search Input UI
-			const searchInput = getURLInput();
-
-			// Step down into the search results, highlighting the first result item
-			act( () => {
-				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			let selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
 			} );
 
-			await eventLoopTick();
-
-			const searchResultElements = getSearchResults();
-
-			const firstSearchSuggestion = first( searchResultElements );
-			const secondSearchSuggestion = nth( searchResultElements, 1 );
-
-			let selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
-
-			// We should have highlighted the first item using the keyboard
+			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
 			);
 
-			// Check we can go down again using the down arrow
-			act( () => {
-				Simulate.keyDown( searchInput, { keyCode: DOWN } );
+			// Check we can go down again using the down arrow.
+			triggerArrowDown( searchInput );
+
+			selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
 			} );
 
-			selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
-
-			// We should have highlighted the first item using the keyboard
+			// We should have highlighted the first item using the keyboard.
 			expect( selectedSearchResultElement ).toEqual(
 				secondSearchSuggestion
 			);
 
-			// Check we can go back up via up arrow
-			act( () => {
-				Simulate.keyDown( searchInput, { keyCode: UP } );
+			// Check we can go back up via up arrow.
+			triggerArrowUp( searchInput );
+
+			selectedSearchResultElement = screen.getByRole( 'option', {
+				selected: true,
 			} );
 
-			selectedSearchResultElement = container.querySelector(
-				'[role="option"][aria-selected="true"]'
-			);
-
-			// We should be back to highlighting the first search result again
+			// We should be back to highlighting the first search result again.
 			expect( selectedSearchResultElement ).toEqual(
 				firstSearchSuggestion
 			);
 
 			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 		} );
-	} );
 
-	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
-		// Regression: Previously, there had been issues where if `onChange`
-		// would programmatically shift focus, LinkControl would try to force it
-		// back, based on its internal logic to determine whether it had focus
-		// when finishing an edit occuring _before_ `onChange` having been run.
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/19462
+		it( 'should not show search results on URL input focus when the URL has not changed', async () => {
+			const selectedLink = fauxEntitySuggestions[ 0 ];
 
-		const LinkControlConsumer = () => {
-			const focusTarget = useRef();
+			render( <LinkControl value={ selectedLink } forceIsEditingLink /> );
 
-			return (
-				<>
-					<div tabIndex={ -1 } data-expected ref={ focusTarget } />
-					<LinkControl
-						onChange={ () => focusTarget.current.focus() }
-					/>
-				</>
-			);
-		};
-
-		act( () => {
-			render( <LinkControlConsumer />, container );
-		} );
-
-		// Change value.
-		const form = container.querySelector( 'form' );
-		const searchInput = getURLInput();
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: 'https://example.com' },
+			// focus the search input
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
-		} );
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: ENTER } );
-		} );
-		act( () => {
-			Simulate.submit( form );
-		} );
 
-		const isExpectedFocusTarget = document.activeElement.hasAttribute(
-			'data-expected'
-		);
-		expect( isExpectedFocusTarget ).toBe( true );
+			fireEvent.focus( searchInput );
+
+			// check that the search results are not visible
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).not.toBeInTheDocument();
+
+			// check that the mock fetch function was not called
+			expect( mockFetchSearchSuggestions ).not.toHaveBeenCalled();
+
+			// check that typing in the search input to make the value dirty
+			// does trigger search results
+			fireEvent.change( searchInput, { target: { value: 'changes' } } );
+
+			expect(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).toBeVisible();
+
+			// check the mock fetch function was called
+			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
-		const selectedLink = first( fauxEntitySuggestions );
-		const expectedSettingText = 'Open in new tab';
+	it( 'should hide advanced link settings and toggle when not editing a link', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
@@ -1601,35 +1825,81 @@ describe( 'Addition Settings UI', () => {
 			return <LinkControl value={ link } />;
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		const settingsToggle = getSettingsDrawerToggle();
+
+		expect( settingsToggle ).not.toBeInTheDocument();
+	} );
+
+	it( 'should provides a means to toggle the advanced link settings when editing a link', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return <LinkControl value={ link } forceIsEditingLink />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		const settingsToggle = getSettingsDrawerToggle();
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		expect( settingsToggle ).toBeVisible();
+
+		await user.click( settingsToggle );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		const newTabSettingInput = screen.getByRole( 'checkbox', {
+			name: 'Open in new tab',
 		} );
 
-		const newTabSettingLabel = Array.from(
-			container.querySelectorAll( 'label' )
-		).find(
-			( label ) =>
-				label.innerHTML &&
-				label.innerHTML.includes( expectedSettingText )
-		);
-		expect( newTabSettingLabel ).not.toBeUndefined(); // find() returns "undefined" if not found
+		expect( newTabSettingInput ).toBeVisible();
 
-		const newTabSettingLabelForAttr = newTabSettingLabel.getAttribute(
-			'for'
-		);
-		const newTabSettingInput = container.querySelector(
-			`#${ newTabSettingLabelForAttr }`
-		);
-		expect( newTabSettingInput ).not.toBeNull();
-		expect( newTabSettingInput.checked ).toBe( false );
+		await user.click( settingsToggle );
+
+		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( newTabSettingInput ).not.toBeVisible();
+	} );
+
+	it( 'should display "New Tab" setting (in "off" mode) by default when a link is edited', async () => {
+		const selectedLink = fauxEntitySuggestions[ 0 ];
+		const expectedSettingText = 'Open in new tab';
+
+		const LinkControlConsumer = () => {
+			const [ link ] = useState( selectedLink );
+
+			return <LinkControl value={ link } forceIsEditingLink />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
+		const newTabSettingLabel = screen.getByText( expectedSettingText );
+		expect( newTabSettingLabel ).toBeVisible();
+
+		const newTabSettingInput = screen.getByRole( 'checkbox', {
+			name: expectedSettingText,
+			checked: false,
+		} );
+
+		expect( newTabSettingInput ).toBeVisible();
 	} );
 
 	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
-		const selectedLink = first( fauxEntitySuggestions );
+		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const customSettings = [
 			{
-				id: 'newTab',
+				id: 'opensInNewTab',
 				title: 'Open in new tab',
 			},
 			{
@@ -1638,10 +1908,6 @@ describe( 'Addition Settings UI', () => {
 			},
 		];
 
-		const customSettingsLabelsText = customSettings.map(
-			( setting ) => setting.title
-		);
-
 		const LinkControlConsumer = () => {
 			const [ link ] = useState( selectedLink );
 
@@ -1649,113 +1915,593 @@ describe( 'Addition Settings UI', () => {
 				<LinkControl
 					value={ { ...link, newTab: false, noFollow: true } }
 					settings={ customSettings }
+					forceIsEditingLink
 				/>
 			);
 		};
 
-		act( () => {
-			render( <LinkControlConsumer />, container );
+		render( <LinkControlConsumer /> );
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
+		expect( screen.queryAllByRole( 'checkbox' ) ).toHaveLength( 2 );
+
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: customSettings[ 0 ].title,
+			} )
+		).not.toBeChecked();
+		expect(
+			screen.getByRole( 'checkbox', {
+				name: customSettings[ 1 ].title,
+			} )
+		).toBeChecked();
+	} );
+
+	it( 'should require settings changes to be submitted/applied', async () => {
+		const user = userEvent.setup();
+
+		const mockOnChange = jest.fn();
+
+		const selectedLink = {
+			...fauxEntitySuggestions[ 0 ],
+			// Including a setting here helps to assert on a potential bug
+			// whereby settings on the suggestion override the current (internal)
+			// settings values set by the user in the UI.
+			opensInNewTab: false,
+		};
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		// check that the "Apply" button is disabled by default.
+		const submitButton = screen.queryByRole( 'button', {
+			name: 'Save',
 		} );
 
-		// Grab the elements using user perceivable DOM queries
-		const settingsLegend = Array.from(
-			container.querySelectorAll( 'legend' )
-		).find(
-			( legend ) =>
-				legend.innerHTML &&
-				legend.innerHTML.includes( 'Currently selected link settings' )
-		);
-		const settingsFieldset = settingsLegend.closest( 'fieldset' );
-		const settingControlsLabels = Array.from(
-			settingsFieldset.querySelectorAll( 'label' )
-		);
-		const settingControlsInputs = settingControlsLabels.map( ( label ) => {
-			return settingsFieldset.querySelector(
-				`#${ label.getAttribute( 'for' ) }`
-			);
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		await toggleSettingsDrawer( user );
+
+		const opensInNewTabToggle = screen.queryByRole( 'checkbox', {
+			name: 'Open in new tab',
 		} );
 
-		const settingControlLabelsText = Array.from(
-			settingControlsLabels
-		).map( ( label ) => label.innerHTML );
+		// toggle the checkbox
+		await user.click( opensInNewTabToggle );
 
-		// Check we have the correct number of controls
-		expect( settingControlsLabels ).toHaveLength( 2 );
+		// Check settings are **not** directly submitted
+		// which would trigger the onChange handler.
+		expect( mockOnChange ).not.toHaveBeenCalled();
 
-		// Check the labels match
-		expect( settingControlLabelsText ).toEqual(
-			expect.arrayContaining( customSettingsLabelsText )
+		// Check Apply button is now enabled because changes
+		// have been detected.
+		expect( submitButton ).toBeEnabled();
+
+		// Submit the changed setting value using the Apply button
+		await user.click( submitButton );
+
+		// Assert the value is updated.
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				opensInNewTab: true,
+			} )
 		);
-
-		// Assert the default "checked" states match the expected
-		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
-		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
 } );
 
 describe( 'Post types', () => {
 	it( 'should display post type in search results of link', async () => {
+		const user = userEvent.setup();
 		const searchTerm = 'Hello world';
 
-		act( () => {
-			render( <LinkControl />, container );
-		} );
+		render( <LinkControl /> );
 
-		// Search Input UI
-		const searchInput = getURLInput();
+		// Search Input UI.
+		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
 
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, { target: { value: searchTerm } } );
-		} );
+		// Simulate searching for a term.
+		await user.type( searchInput, searchTerm );
 
-		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-		await eventLoopTick();
-
-		const searchResultElements = getSearchResults();
+		const searchResultElements = within(
+			await screen.findByRole( 'listbox', {
+				name: /Search results for.*/,
+			} )
+		).getAllByRole( 'option' );
 
 		searchResultElements.forEach( ( resultItem, index ) => {
-			expect(
-				queryByText( resultItem, fauxEntitySuggestions[ index ].type )
-			).toBeTruthy();
+			expect( resultItem ).toHaveTextContent(
+				fauxEntitySuggestions[ index ].type
+			);
 		} );
 	} );
 
 	it.each( [ 'page', 'post', 'tag', 'post_tag', 'category' ] )(
 		'should NOT display post type in search results of %s',
 		async ( postType ) => {
+			const user = userEvent.setup();
 			const searchTerm = 'Hello world';
 
-			act( () => {
-				render(
-					<LinkControl suggestionsQuery={ { type: postType } } />,
-					container
-				);
+			render( <LinkControl suggestionsQuery={ { type: postType } } /> );
+
+			// Search Input UI.
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Link',
 			} );
 
-			// Search Input UI
-			const searchInput = getURLInput();
+			// Simulate searching for a term.
+			await user.type( searchInput, searchTerm );
 
-			// Simulate searching for a term
-			act( () => {
-				Simulate.change( searchInput, {
-					target: { value: searchTerm },
-				} );
-			} );
-
-			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
-			await eventLoopTick();
-
-			const searchResultElements = getSearchResults();
+			const searchResultElements = within(
+				await screen.findByRole( 'listbox', {
+					name: /Search results for.*/,
+				} )
+			).getAllByRole( 'option' );
 
 			searchResultElements.forEach( ( resultItem, index ) => {
 				expect(
-					queryByText(
+					screen.queryByText(
 						resultItem,
 						fauxEntitySuggestions[ index ].type
 					)
-				).toBeFalsy();
+				).not.toBeInTheDocument();
 			} );
 		}
 	);
 } );
+
+describe( 'Rich link previews', () => {
+	const selectedLink = {
+		id: '1',
+		title: 'WordPress.org', // Customize this for differentiation in assertions.
+		url: 'https://www.wordpress.org',
+		type: 'URL',
+	};
+
+	beforeAll( () => {
+		/**
+		 * These tests require that we exercise the `fetchRichUrlData` function.
+		 * We are therefore overwriting the mock "placeholder" with a true jest mock
+		 * which will cause the code under test to execute the code which fetches
+		 * rich previews.
+		 */
+		mockFetchRichUrlData = jest.fn();
+	} );
+
+	it( 'should not fetch or display rich previews by default', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		render( <LinkControl value={ selectedLink } /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		const isRichLinkPreview = linkPreview.classList.contains( 'is-rich' );
+
+		expect( mockFetchRichUrlData ).not.toHaveBeenCalled();
+		expect( isRichLinkPreview ).toBe( false );
+	} );
+
+	it( 'should display a rich preview when data is available', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
+	} );
+
+	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: '',
+				icon: 'https://s.w.org/favicon.ico?2',
+				description: '',
+				image: '',
+			} )
+		);
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
+
+		// Todo: refactor to use user-facing queries.
+		// eslint-disable-next-line testing-library/no-node-access
+		const hasRichImagePreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-image'
+		);
+
+		// Todo: refactor to use user-facing queries.
+		// eslint-disable-next-line testing-library/no-node-access
+		const hasRichDescriptionPreview = linkPreview.querySelector(
+			'.block-editor-link-control__search-item-description'
+		);
+
+		expect( hasRichImagePreview ).not.toBeInTheDocument();
+		expect( hasRichDescriptionPreview ).not.toBeInTheDocument();
+	} );
+
+	it( 'should display a fallback when title is missing from rich data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				icon: 'https://s.w.org/favicon.ico?2',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
+
+		const titlePreview = screen.getByText( selectedLink.title );
+
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( titlePreview.parentElement.parentElement ).toHaveClass(
+			'block-editor-link-control__search-item-title'
+		);
+	} );
+
+	it( 'should display a fallback when icon is missing from rich data', async () => {
+		mockFetchRichUrlData.mockImplementation( () =>
+			Promise.resolve( {
+				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+				description:
+					'Open source software which you can use to easily create a beautiful website, blog, or app.',
+				image: 'https://s.w.org/images/home/screen-themes.png?3',
+			} )
+		);
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		await waitFor( () => expect( linkPreview ).toHaveClass( 'is-rich' ) );
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const iconPreview = linkPreview.querySelector(
+			`.block-editor-link-control__search-item-icon`
+		);
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		// eslint-disable-next-line testing-library/no-node-access
+		const richIcon = iconPreview.querySelector( 'img' );
+
+		expect( fallBackIcon ).toBeVisible();
+		expect( richIcon ).not.toBeInTheDocument();
+	} );
+
+	it.each( [ 'image', 'description' ] )(
+		'should not display the rich %s when it is missing from the data',
+		async ( dataItem ) => {
+			mockFetchRichUrlData.mockImplementation( () => {
+				const data = {
+					title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
+					icon: 'https://s.w.org/favicon.ico?2',
+					description:
+						'Open source software which you can use to easily create a beautiful website, blog, or app.',
+					image: 'https://s.w.org/images/home/screen-themes.png?3',
+				};
+				delete data[ dataItem ];
+				return Promise.resolve( data );
+			} );
+
+			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			await waitFor( () =>
+				expect( linkPreview ).toHaveClass( 'is-rich' )
+			);
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const missingDataItem = linkPreview.querySelector(
+				`.block-editor-link-control__search-item-${ dataItem }`
+			);
+
+			expect( missingDataItem ).not.toBeInTheDocument();
+		}
+	);
+
+	it.each( [
+		[ 'empty', {} ],
+		[ 'null', null ],
+	] )(
+		'should not display a rich preview when data is %s',
+		async ( _descriptor, data ) => {
+			mockFetchRichUrlData.mockImplementation( async () => data );
+
+			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+			const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+			expect( linkPreview ).toHaveClass( 'is-fetching' );
+
+			await waitFor( () =>
+				expect( linkPreview ).not.toHaveClass( 'is-fetching' )
+			);
+
+			expect( linkPreview ).not.toHaveClass( 'is-rich' );
+		}
+	);
+
+	it( 'should display in loading state when rich data is being fetched', async () => {
+		const nonResolvingPromise = () => new Promise( () => {} );
+
+		mockFetchRichUrlData.mockImplementation( nonResolvingPromise );
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		expect( linkPreview ).toHaveClass( 'is-fetching' );
+		expect( linkPreview ).not.toHaveClass( 'is-rich' );
+	} );
+
+	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
+		const simulateFailedFetch = () => Promise.reject();
+
+		mockFetchRichUrlData.mockImplementation( simulateFailedFetch );
+
+		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
+
+		const linkPreview = screen.getByLabelText( 'Currently selected' );
+
+		expect( linkPreview ).toHaveClass( 'is-fetching' );
+
+		await waitFor( () =>
+			expect( linkPreview ).not.toHaveClass( 'is-fetching' )
+		);
+
+		expect( linkPreview ).not.toHaveClass( 'is-rich' );
+	} );
+
+	afterAll( () => {
+		// Remove the mock to avoid edge cases in other tests.
+		mockFetchRichUrlData = undefined;
+	} );
+} );
+
+describe( 'Controlling link title text', () => {
+	const selectedLink = fauxEntitySuggestions[ 0 ];
+
+	it( 'should not show a means to alter the link title text by default', async () => {
+		render( <LinkControl value={ selectedLink } forceIsEditingLink /> );
+
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Text' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it.each( [ null, undefined, '   ' ] )(
+		'should not show the link title text input when the URL is `%s`',
+		async ( urlValue ) => {
+			const selectedLinkWithoutURL = {
+				...fauxEntitySuggestions[ 0 ],
+				url: urlValue,
+			};
+
+			render(
+				<LinkControl
+					value={ selectedLinkWithoutURL }
+					forceIsEditingLink
+					hasTextControl
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'textbox', { name: 'Text' } )
+			).not.toBeInTheDocument();
+		}
+	);
+
+	it( 'should show a text input to alter the link title text when hasTextControl prop is truthy', async () => {
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+			/>
+		);
+
+		const user = userEvent.setup();
+
+		await toggleSettingsDrawer( user );
+
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Text' } )
+		).toBeVisible();
+	} );
+
+	it.each( [
+		[ '', 'Testing' ],
+		[ '(with leading and traling whitespace)', '    Testing    ' ],
+		[
+			// Note: link control should always preserve the original value.
+			// The consumer is responsible for filtering or otherwise handling the value.
+			'(when containing HTML)',
+			'<strong>Yes this</strong> <em>is</em> expected behaviour',
+		],
+	] )(
+		"should ensure text input reflects the current link value's `title` property %s",
+		async ( _unused, titleValue ) => {
+			const linkWithTitle = { ...selectedLink, title: titleValue };
+			render(
+				<LinkControl
+					value={ linkWithTitle }
+					forceIsEditingLink
+					hasTextControl
+				/>
+			);
+
+			const user = userEvent.setup();
+
+			await toggleSettingsDrawer( user );
+
+			const textInput = screen.queryByRole( 'textbox', {
+				name: 'Text',
+			} );
+
+			expect( textInput ).toHaveValue( titleValue );
+		}
+	);
+
+	it( "should ensure title value matching the text input's current value is included in onChange handler value on submit", async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+		const textValue = 'My new text value';
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
+
+		await user.clear( textInput );
+		await user.keyboard( textValue );
+
+		expect( textInput ).toHaveValue( textValue );
+
+		const submitButton = screen.queryByRole( 'button', {
+			name: 'Save',
+		} );
+
+		await user.click( submitButton );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: textValue,
+			} )
+		);
+	} );
+
+	it( 'should allow `ENTER` keypress within the text field to trigger submission of value', async () => {
+		const user = userEvent.setup();
+		const newTextValue = 'My new text value';
+		const mockOnChange = jest.fn();
+
+		render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
+
+		expect( textInput ).toBeVisible();
+
+		await user.clear( textInput );
+		await user.keyboard( newTextValue );
+
+		// Attempt to submit the empty search value in the input.
+		triggerEnter( textInput );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				title: newTextValue,
+				url: selectedLink.url,
+			} )
+		);
+
+		// The text input should not be showing as the form is submitted.
+		expect(
+			screen.queryByRole( 'textbox', { name: 'Text' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should reset state upon controlled value change', async () => {
+		const user = userEvent.setup();
+		const textValue = 'My new text value';
+		const mockOnChange = jest.fn();
+
+		const { rerender } = render(
+			<LinkControl
+				value={ selectedLink }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await toggleSettingsDrawer( user );
+
+		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
+
+		expect( textInput ).toBeVisible();
+
+		await user.clear( textInput );
+		await user.keyboard( textValue );
+
+		// Was originally title: 'Hello Page', but we've changed it.
+		rerender(
+			<LinkControl
+				value={ {
+					...selectedLink,
+					title: 'Something else',
+				} }
+				forceIsEditingLink
+				hasTextControl
+				onChange={ mockOnChange }
+			/>
+		);
+
+		// The text input should not be showing as the form is submitted.
+		expect( screen.queryByRole( 'textbox', { name: 'Text' } ) ).toHaveValue(
+			'Something else'
+		);
+	} );
+} );
+
+function getSettingsDrawerToggle() {
+	return screen.queryByRole( 'button', {
+		name: 'Advanced',
+	} );
+}
+
+async function toggleSettingsDrawer( user ) {
+	const settingsToggle = getSettingsDrawerToggle();
+
+	await user.click( settingsToggle );
+}

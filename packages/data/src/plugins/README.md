@@ -1,5 +1,4 @@
-Data Plugins
-============
+# Data Plugins
 
 Included here are a set of default plugin integrations for the WordPress data module.
 

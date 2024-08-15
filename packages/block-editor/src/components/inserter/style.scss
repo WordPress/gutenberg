@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -16,10 +16,53 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__main-area {
+	height: 100%;
+	gap: $grid-unit-20;
+	position: relative;
+
+	&.show-as-tabs {
+		gap: 0;
+	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
+	}
+}
+
+.block-editor-inserter__popover.is-quick {
+	.components-popover__content {
+		border: none;
+		outline: none;
+		box-shadow: $shadow-popover;
+
+		.block-editor-inserter__quick-inserter > * {
+			border-left: $border-width solid $gray-400;
+			border-right: $border-width solid $gray-400;
+
+			&:first-child {
+				border-top: $border-width solid $gray-400;
+				border-radius: $radius-block-ui $radius-block-ui 0 0;
+			}
+
+			&:last-child {
+				border-bottom: $border-width solid $gray-400;
+				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+			}
+
+			&.components-button {
+				border: $border-width solid $gray-900;
+			}
+		}
+	}
+}
+
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs .components-tab-panel__tabs {
+	.block-editor-inserter__tablist {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -48,14 +91,11 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
-}
 
-.block-editor-inserter__main-area {
-	width: auto;
-	overflow-y: auto;
-	height: 100%;
-	@include break-medium {
-		width: $block-inserter-width;
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
 	}
 }
 
@@ -72,83 +112,14 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__search {
-	padding: $grid-unit-20;
-	position: sticky;
-	top: 0;
-	background: $white;
-	z-index: 1;
-
-	input[type="search"].block-editor-inserter__search-input {
-		@include input-control;
-		display: block;
-		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
-		background: $gray-100;
-		border: none;
-		width: 100%;
-		height: $grid-unit-60;
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&:focus {
-			background: $white;
-			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-		}
-
-		&::placeholder {
-			color: $gray-700;
-		}
-
-		&::-webkit-search-decoration,
-		&::-webkit-search-cancel-button,
-		&::-webkit-search-results-button,
-		&::-webkit-search-results-decoration {
-			-webkit-appearance: none;
-		}
-	}
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
 }
 
-.block-editor-inserter__search-icon {
-	position: absolute;
-	top: 0;
-	right: $grid-unit-10 + ($grid-unit-60 - $icon-size) / 2;
-	bottom: 0;
-	display: flex;
-	align-items: center;
-
-	> svg {
-		margin: $grid-unit-10;
-	}
-}
-
-.block-editor-inserter__tabs {
-	display: flex;
-	flex-direction: column;
-	margin-top: -$grid-unit-10;
-
-	.components-tab-panel__tabs {
-		position: sticky;
-		// Computed based off the search input height and paddings
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
-		background: $white;
-		z-index: 1;
-		border-bottom: $border-width solid $gray-300;
-
-		.components-tab-panel__tabs-item {
-			flex-grow: 1;
-			margin-bottom: -$border-width;
-		}
-	}
-
-	.components-tab-panel__tab-content {
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		position: relative;
-	}
+.block-editor-inserter__no-tab-container {
+	overflow-y: auto;
+	flex-grow: 1;
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
 }
 
 .block-editor-inserter__panel-header {
@@ -157,17 +128,12 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
-.block-editor-inserter__panel-header-patterns {
-	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-10;
-}
-
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__panel-title,
-.block-editor-inserter__panel-title button,
-.components-custom-select-control__menu li {
+.block-editor-inserter__panel-title button {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
@@ -176,20 +142,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
-	line-height: 1.2;
+	height: 36px;
+	line-height: 36px;
 }
 
 .block-editor-inserter__panel-dropdown select {
 	border: none;
-}
-
-.block-editor-inserter__block-list {
-	flex-grow: 1;
-	position: relative;
-}
-
-.block-editor-inserter__popover .block-editor-block-types-list {
-	margin: -8px;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -197,14 +155,18 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
-.block-editor-inserter__manage-reusable-blocks {
-	display: inline-block;
-	margin: $grid-unit-20;
+.block-editor-inserter__manage-reusable-blocks-container {
+	margin: auto $grid-unit-20 $grid-unit-20;
 }
 
-.block-editor-inserter__no-results {
+.block-editor-inserter__manage-reusable-blocks {
+	justify-content: center;
+	width: 100%;
+}
+
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
-	margin-top: $grid-unit-40 * 2;
 	text-align: center;
 }
 
@@ -229,15 +191,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__preview-container__popover {
+	top: $grid-unit-20 !important;
+}
+
 .block-editor-inserter__preview-container {
 	display: none;
-	width: 300px;
-	background: $white;
-	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-300;
-	position: absolute;
-	top: $grid-unit-20;
-	left: calc(100% + #{$grid-unit-20});
+	width: $sidebar-width;
+	padding: $grid-unit-20;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
@@ -245,17 +206,145 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-block-card {
-		padding: $grid-unit-20;
+	.block-editor-inserter__media-list__list-item {
+		height: 100%;
 	}
 
-	.block-editor-block-card__title {
-		font-size: $default-font-size;
+	.block-editor-block-card {
+		padding-left: 0;
+		padding-right: 0;
+		padding-bottom: $grid-unit-05;
 	}
 }
 
+.block-editor-inserter__insertable-blocks-at-selection {
+	border-bottom: $border-width solid $gray-200;
+}
+
+.block-editor-inserter__media-tabs-container,
+.block-editor-inserter__block-patterns-tabs-container {
+	padding: $grid-unit-20;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.block-editor-inserter__category-tablist {
+	display: flex;
+	flex-direction: column;
+	border: none;
+	margin-bottom: $grid-unit-10;
+	// Push the listitem wrapping the "explore" button to the bottom of the panel.
+	div[role="listitem"]:last-child {
+		margin-top: auto;
+	}
+
+	// Temporarily disable the component's indicator animation.
+	// TODO: remove in favor of using the native component's styles and behavior,
+	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
+	&[aria-orientation="vertical"]::after {
+		content: none;
+	}
+
+	.block-editor-inserter__category-tab {
+		// Account for the icon on the right so that it's visually balanced.
+		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
+		text-align: left;
+		font-weight: inherit;
+		display: block;
+		position: relative;
+		height: auto;
+
+		&[aria-selected="true"] {
+			color: var(--wp-admin-theme-color);
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				display: block;
+				outline: none;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				height: 100%;
+			}
+		}
+
+		&:focus-visible,
+		&:focus:not(:disabled) {
+			border-radius: 2px;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+
+		&::before {
+			display: none;
+		}
+
+		&::after {
+			display: none;
+		}
+	}
+}
+
+.block-editor-inserter__category-panel {
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+	display: flex;
+	flex-direction: column;
+	padding: 0 $grid-unit-20;
+
+	@include break-medium {
+		border-left: $border-width solid $gray-200;
+		padding: 0;
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
+		position: absolute;
+		top: -$border-width;
+		height: calc(100% + #{$border-width});
+		background: $gray-100;
+		border-top: $border-width solid $gray-200;
+
+		.block-editor-inserter__media-list,
+		.block-editor-block-patterns-list {
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
+}
+
+.block-editor-inserter__patterns-category-panel-header {
+	padding: $grid-unit-10 0;
+	@include break-medium {
+		padding: $grid-unit-10 $grid-unit-30;
+	}
+}
+
+.block-editor-inserter__patterns-category-no-results {
+	margin-top: $grid-unit-30;
+}
+
+.block-editor-inserter__media-list,
+.block-editor-block-patterns-list {
+	overflow-y: auto;
+	flex-grow: 1;
+	height: 100%;
+}
+
 .block-editor-inserter__preview-content {
-	min-height: $grid-unit-60 * 3;
 	background: $gray-100;
 	display: grid;
 	flex-grow: 1;
@@ -270,6 +359,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-inserter__tips {
@@ -277,10 +367,6 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 	position: relative; // prevents overscroll when block library is open
-}
-
-.block-editor-inserter__manage-reusable-blocks-container {
-	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter {
@@ -291,7 +377,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
@@ -301,26 +387,30 @@ $block-inserter-tabs-height: 44px;
 	float: left;
 }
 
-.block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
-	padding: $grid-unit-10;
-}
-
 .block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
 .block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: $grid-unit-10;
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-10;
+		.block-editor-block-patterns-list__list-item {
+			margin-bottom: 0;
+		}
+		.block-editor-inserter__media-list__list-item {
+			min-height: 100px;
+		}
+	}
 }
 
 .block-editor-inserter__quick-inserter-separator {
 	border-top: $border-width solid $gray-300;
 }
 
-.block-editor-inserter__popover.is-quick > .components-popover__content > div {
+.block-editor-inserter__popover.is-quick > .components-popover__content {
 	padding: 0;
 }
 
@@ -340,7 +430,284 @@ $block-inserter-tabs-height: 44px;
 		color: $gray-400;
 	}
 
-	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color), inset 0 0 0 3px #fff;
+	// Specificity is needed for the border color.
+	&.components-button:focus:not(:disabled) {
+		box-shadow: none;
+		background: var(--wp-admin-theme-color);
+		border-color: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-block-patterns-explorer {
+	&__sidebar {
+		position: absolute;
+		top: $header-height + $grid-unit-15;
+		left: 0;
+		bottom: 0;
+		width: $sidebar-width;
+		padding: $grid-unit-30 $grid-unit-40 $grid-unit-40;
+		overflow-x: visible;
+		overflow-y: scroll;
+
+		&__categories-list__item {
+			display: block;
+			width: 100%;
+			height: 48px;
+			text-align: left;
+		}
+	}
+
+	&__search {
+		margin-bottom: $grid-unit-40;
+	}
+
+	&__search-results-count {
+		padding-bottom: $grid-unit-40;
+	}
+
+	&__list {
+		margin-left: $sidebar-width;
+		padding: $grid-unit-30 0 $grid-unit-40;
+		.block-editor-patterns__sync-status-filter {
+			.components-input-control__container {
+				width: 380px;
+			}
+		}
+	}
+
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-gap: $grid-unit-40;
+		grid-template-columns: repeat(1, 1fr);
+		margin-bottom: $grid-unit-20;
+
+		@include break-xlarge() {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@include break-huge() {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		.block-editor-block-patterns-list__list-item {
+			min-height: 240px;
+		}
+
+		.block-editor-inserter__media-list__list-item {
+			height: inherit;
+			min-height: 100px;
+			max-height: 800px;
+		}
+	}
+}
+
+.components-heading.block-editor-inserter__patterns-category-panel-title {
+	font-weight: 500;
+}
+
+.block-editor-inserter__patterns-explore-button,
+.block-editor-inserter__media-library-button {
+	&.components-button {
+		padding: $grid-unit-20;
+		justify-content: center;
+		margin-top: $grid-unit-20;
+		width: 100%;
+	}
+}
+
+.block-editor-inserter__media-panel {
+	min-height: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium {
+		padding: 0;
+	}
+
+	.block-editor-inserter__media-panel-spinner {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+	}
+
+	.block-editor-inserter__media-panel-search {
+		margin-bottom: $grid-unit-30;
+		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+		@include break-medium() {
+			margin-bottom: 0;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+
+			&:not(:focus-within) {
+				--wp-components-color-background: #{$white};
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list__list-item {
+	position: relative;
+	cursor: pointer;
+	margin-bottom: $grid-unit-30;
+
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] .block-editor-inserter__media-list__list-item {
+		cursor: grab;
+	}
+
+	&.is-hovered {
+		.block-editor-inserter__media-list__item-preview > * {
+			outline-color: rgba($black, 0.3);
+		}
+
+		.block-editor-inserter__media-list__item-preview-options > button {
+			display: block;
+		}
+	}
+
+	.block-editor-inserter__media-list__item-preview-options {
+		position: absolute;
+		right: $grid-unit-10;
+		top: $grid-unit-10;
+
+		> button {
+			background: $white;
+			border-radius: $radius-block-ui;
+			display: none;
+
+			// These styles are important so as focus isn't lost
+			// when the button is focused and we hover away.
+			&.is-opened,
+			&:focus {
+				display: block;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item {
+	height: 100%;
+
+	.block-editor-inserter__media-list__item-preview {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: 2px;
+
+		> * {
+			margin: 0 auto;
+			max-width: 100%;
+			outline: $border-width solid rgba($black, 0.1);
+			outline-offset: -$border-width;
+			border-radius: $radius-block-ui;
+		}
+
+		.block-editor-inserter__media-list__item-preview-spinner {
+			display: flex;
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			justify-content: center;
+			background: rgba($white, 0.7);
+			align-items: center;
+			pointer-events: none;
+		}
+	}
+
+	&:focus .block-editor-inserter__media-list__item-preview > * {
+		outline-color: var(--wp-admin-theme-color);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		transition: outline 0.1s linear;
+		@include reduce-motion("transition");
+	}
+}
+
+.block-editor-inserter__media-list__item-preview-options__popover {
+	.components-menu-item__button .components-menu-item__item {
+		min-width: auto;
+	}
+}
+
+
+.block-editor-inserter__mobile-tab-navigation {
+	padding: $grid-unit-20;
+	height: 100%;
+
+	> * {
+		height: 100%;
+	}
+}
+
+
+.block-editor-inserter-media-tab-media-preview-inserter-external-image-modal {
+	@include break-small() {
+		max-width: $break-mobile;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__hint {
+	margin: $grid-unit-20 $grid-unit-20 0;
+}
+
+.block-editor-patterns__sync-status-filter {
+	.components-input-control__container {
+		select.components-select-control__input {
+			height: 40px;
+		}
+	}
+}
+
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
+
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
+	}
+}
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
+		}
 	}
 }

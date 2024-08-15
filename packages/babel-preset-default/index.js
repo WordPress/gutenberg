@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+const browserslist = require( 'browserslist' );
+
 module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
@@ -16,7 +21,13 @@ module.exports = ( api ) => {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {};
+		const opts = {
+			bugfixes: true,
+			include: [
+				'proposal-nullish-coalescing-operator',
+				'proposal-logical-assignment-operators',
+			],
+		};
 
 		if ( isTestEnv ) {
 			opts.targets = {
@@ -24,8 +35,12 @@ module.exports = ( api ) => {
 			};
 		} else {
 			opts.modules = false;
+			const localBrowserslistConfig =
+				browserslist.findConfig( '.' ) || {};
 			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
+				browsers:
+					localBrowserslistConfig.defaults ||
+					require( '@wordpress/browserslist-config' ),
 			};
 		}
 
@@ -54,23 +69,16 @@ module.exports = ( api ) => {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			require.resolve( '@babel/preset-typescript' ),
+		],
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
-				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
-				{
-					scopeVariable: 'createElement',
-					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
-					isDefault: false,
-				},
-			],
-			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
 				{
-					pragma: 'createElement',
-					pragmaFrag: 'Fragment',
+					runtime: 'automatic',
 				},
 			],
 			maybeGetPluginTransformRuntime(),

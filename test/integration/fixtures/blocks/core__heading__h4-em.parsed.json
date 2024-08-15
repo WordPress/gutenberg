@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"level": 4
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h4 class=\"wp-block-heading\">The <em>Inserter</em> Tool</h4>\n",
+		"innerContent": [
+			"\n<h4 class=\"wp-block-heading\">The <em>Inserter</em> Tool</h4>\n"
+		]
+	}
+]

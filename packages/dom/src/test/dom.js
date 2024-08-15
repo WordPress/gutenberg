@@ -5,8 +5,6 @@ import {
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
-	__unstableStripHTML as stripHTML,
-	isNumberInput,
 	removeInvalidHTML,
 	isEmpty,
 } from '../dom';
@@ -84,6 +82,14 @@ describe( 'DOM', () => {
 			expect( isHorizontalEdge( div, true ) ).toBe( true );
 			expect( isHorizontalEdge( div, false ) ).toBe( true );
 		} );
+
+		it( 'should return true for input types that do not have selection ranges', () => {
+			const input = document.createElement( 'input' );
+			input.setAttribute( 'type', 'checkbox' );
+			parent.appendChild( input );
+			expect( isHorizontalEdge( input, true ) ).toBe( true );
+			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'placeCaretAtHorizontalEdge', () => {
@@ -118,6 +124,8 @@ describe( 'DOM', () => {
 			'range',
 			'reset',
 			'submit',
+			'email',
+			'time',
 		];
 
 		/**
@@ -125,13 +133,7 @@ describe( 'DOM', () => {
 		 *
 		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [
-			'text',
-			'password',
-			'search',
-			'url',
-			'email',
-		];
+		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
@@ -157,21 +159,6 @@ describe( 'DOM', () => {
 			);
 		} );
 
-		it( 'should return false for empty input element of type number', () => {
-			const input = document.createElement( 'input' );
-			input.type = 'number';
-
-			expect( isNumberInput( input ) ).toBe( false );
-		} );
-
-		it( 'should return true for an input element of type number', () => {
-			const input = document.createElement( 'input' );
-			input.type = 'number';
-			input.valueAsNumber = 23;
-
-			expect( isNumberInput( input ) ).toBe( true );
-		} );
-
 		it( 'should return true for a contenteditable element', () => {
 			const div = document.createElement( 'div' );
 
@@ -184,20 +171,6 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
 				false
 			);
-		} );
-	} );
-
-	describe( 'stripHTML', () => {
-		it( 'removes any HTML from a text string', () => {
-			expect( stripHTML( 'This is <em>emphasized</em>' ) ).toBe(
-				'This is emphasized'
-			);
-		} );
-
-		it( 'removes script tags, but does not execute them', () => {
-			const html = 'This will not <script>throw "Error"</script>';
-			expect( stripHTML( html ) ).toBe( 'This will not throw "Error"' );
-			expect( () => stripHTML( html ) ).not.toThrow();
 		} );
 	} );
 } );

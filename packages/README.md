@@ -1,6 +1,6 @@
 # Managing Packages
 
-This repository uses [lerna] to manage WordPress modules and publish them as packages to [npm].
+This repository uses [monorepo] to manage WordPress modules and publish them with [lerna] as packages to [npm].
 
 ## Creating a New Package
 
@@ -15,10 +15,11 @@ When creating a new package, you need to provide at least the following:
     	"author": "The WordPress Contributors",
     	"license": "GPL-2.0-or-later",
     	"keywords": [ "wordpress" ],
-    	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+    	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/package-name/README.md",
     	"repository": {
     		"type": "git",
-    		"url": "https://github.com/WordPress/gutenberg.git"
+    		"url": "https://github.com/WordPress/gutenberg.git",
+    		"directory": "packages/package-name"
     	},
     	"bugs": {
     		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -27,7 +28,7 @@ When creating a new package, you need to provide at least the following:
     	"module": "build-module/index.js",
     	"react-native": "src/index",
     	"dependencies": {
-    		"@babel/runtime": "^7.11.2"
+    		"@babel/runtime": "^7.16.0"
     	},
     	"publishConfig": {
     		"access": "public"
@@ -45,15 +46,19 @@ When creating a new package, you need to provide at least the following:
     - Installation details
     - Usage example
     - API documentation, if applicable ([more info](#maintaining-api-documentation))
+    - A link to the contributing guidelines ([here's an example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y/README.md#contributing-to-this-package) from the a11y package)
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 4. `CHANGELOG.md` file containing at least:
-    ```
-    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
-	## Unreleased
-
-	Initial release.
     ```
+    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+    ## Unreleased
+
+    Initial release.
+    ```
+
+To ensure your package is recognised, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
 
 ## Managing Dependencies
 
@@ -65,15 +70,15 @@ Production dependencies are stored in the `dependencies` section of the packageâ
 
 #### Adding New Dependencies
 
-The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/HEAD/commands/add#readme) command from the root of the project.
 
 _Example:_
 
 ```bash
-lerna add lodash packages/a11y
+lerna add change-case packages/a11y
 ```
 
-This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
+This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
 
 #### Removing Existing Dependencies
 
@@ -84,22 +89,22 @@ _Example:_
 ```diff
 +++ b/packages/scripts/package.json
 @@ -43,7 +43,6 @@
-                "check-node-version": "^3.1.1",
+                "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
--               "jest": "^25.3.0",
-                "jest-puppeteer": "^4.4.0",
+-               "jest": "^29.6.2",
                 "minimist": "^1.2.0",
-                "npm-package-json-lint": "^3.6.0",
+                "npm-package-json-lint": "^6.4.0",
 ```
 
 Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
 
 #### Updating Existing Dependencies
 
-This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
- 1. First, remove the existing dependency as described in the previous section.
- 2. Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+This is the most confusing part of working with [monorepo] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
+
+1.  First, remove the existing dependency as described in the previous section.
+2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
 
 ### Development Dependencies
 
@@ -141,6 +146,10 @@ Content within the HTML comment will be replaced by the generated documentation.
 <!-- END TOKEN(Autogenerated API docs|src/actions.js) -->`.
 ```
 
+## Maintaining a Public API
+
+It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and [ensure it is well documented](#maintaining-api-documentation).
+
 ## Maintaining Changelogs
 
 In maintaining dozens of npm packages, it can be tough to keep track of changes. To simplify the release process, each package includes a `CHANGELOG.md` file which details all published releases and the unreleased ("Unreleased") changes, if any exist.
@@ -150,7 +159,7 @@ For each pull request, you should always include relevant changes in a "Unreleas
 _Example:_
 
 ```md
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
@@ -161,71 +170,18 @@ _Example:_
 
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
--   "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
--   "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
--   "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
--   "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
+-   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+-   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
+-   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
+-   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
+-   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
 
 While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
-
-## Releasing Packages
-
-Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
-
-If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
-
-### Before Releasing
-
-Confirm that you're logged in to [npm], by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
-
-If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
-
-```json
-{
-	"publishConfig": {
-		"access": "public"
-	}
-}
-```
-
-You can check your package configs by running `npm run lint-pkg-json`.
-
-### Development Release
-
-Run the following command to release a dev version of the outdated packages.
-
-```bash
-npm run publish:dev
-```
-
-Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
-
-Lerna will then publish to [npm], commit the `package.json` changes and create the git tags.
-
-### Production Release
-
-To release a production version for the outdated packages, run the following command:
-
-```bash
-npm run publish:prod
-```
-
-Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
-
-### Legacy Patch Release
-
-To release a patch for the older major or minor version of packages, run the following command:
-
-```bash
-npm run publish:patch
-```
-
-This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 
@@ -284,6 +240,7 @@ For consumers to use the published type declarations, we'll set the `types` fiel
 Ensure that the `build-types` directory will be included in the published package, for example if a `files` field is declared.
 
 [lerna]: https://lerna.js.org/
+[monorepo]: https://monorepo.tools
 [npm]: https://www.npmjs.com/
 
 ## Optimizing for bundlers
@@ -304,8 +261,15 @@ If your package includes a few files with side effects, you can list them instea
 ```json
 {
 	"name": "package",
-	"sideEffects": [ "file-with-side-effects.js", "another-file-with-side-effects.js" ]
+	"sideEffects": [
+		"file-with-side-effects.js",
+		"another-file-with-side-effects.js"
+	]
 }
 ```
 
-Please consult the [side effects documentation](./side-effects.md) for more information on identifying and declaring side effects.
+Please consult the [side effects documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/side-effects.md) for more information on identifying and declaring side effects.
+
+## Publishing to npm
+
+Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates).

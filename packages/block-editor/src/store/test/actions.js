@@ -1,16 +1,32 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
+import { createRegistry } from '@wordpress/data';
+import {
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+	createBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
+
+import * as selectors from '../selectors';
+import reducer from '../reducer';
+import * as actions from '../actions';
+import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+
+const noop = () => {};
+
+const {
 	clearSelectedBlock,
-	enterFormattedText,
-	exitFormattedText,
-	hideInsertionPoint,
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
@@ -23,7 +39,6 @@ import {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	selectPreviousBlock,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -36,14 +51,29 @@ import {
 	updateBlock,
 	updateBlockAttributes,
 	updateBlockListSettings,
-} from '../actions';
+	updateSettings,
+	validateBlocksToTemplate,
+	registerInserterMediaCategory,
+	setBlockEditingMode,
+	unsetBlockEditingMode,
+} = actions;
 
 describe( 'actions', () => {
+	const defaultBlockSettings = {
+		attributes: {
+			content: {},
+		},
+		save: () => 'Saved',
+		category: 'text',
+		title: 'block title',
+	};
+
 	describe( 'resetBlocks', () => {
-		it( 'should return the RESET_BLOCKS actions', () => {
+		it( 'should dispatch the RESET_BLOCKS action', () => {
+			const dispatch = jest.fn();
 			const blocks = [];
-			const result = resetBlocks( blocks );
-			expect( result ).toEqual( {
+			resetBlocks( blocks )( { dispatch } );
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'RESET_BLOCKS',
 				blocks,
 			} );
@@ -59,6 +89,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 
@@ -70,6 +101,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 	} );
@@ -115,14 +147,52 @@ describe( 'actions', () => {
 		} );
 	} );
 	describe( 'multiSelect', () => {
-		it( 'should return MULTI_SELECT action', () => {
+		it( 'should dispatch MULTI_SELECT action if blocks have the same root client id', () => {
 			const start = 'start';
 			const end = 'end';
-			expect( multiSelect( start, end ) ).toEqual( {
+			const select = {
+				getBlockRootClientId() {
+					return 'parent'; // For all client IDs.
+				},
+				getSelectedBlockCount() {
+					return 0;
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelect( start, end )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
+				initialPosition: 0,
 			} );
+		} );
+
+		it( 'should do nothing if blocks have different root client ids', () => {
+			const start = 'start';
+			const end = 'end';
+			const select = {
+				getBlockRootClientId( clientId ) {
+					switch ( clientId ) {
+						case start:
+							return 'parent';
+						case end:
+							return 'another parent';
+						default:
+							return null;
+					}
+				},
+				getSelectedBlockCount() {
+					return 0;
+				},
+			};
+			const dispatch = jest.fn();
+
+			multiSelect( start, end )( { select, dispatch } );
+
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -135,54 +205,36 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'replaceBlock', () => {
-		it( 'should yield the REPLACE_BLOCKS action if the new block can be inserted in the destination root block', () => {
+		it( 'should dispatch the REPLACE_BLOCKS action if the new block can be inserted in the destination root block', () => {
 			const block = {
 				clientId: 'ribs',
 				name: 'core/test-block',
 			};
 
-			const replaceBlockGenerator = replaceBlock( 'chicken', block );
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: () => true,
+				getBlockCount: () => 1,
+			};
+			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
 
-			// Skip getSettings select.
-			replaceBlockGenerator.next();
+			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
 
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					'chicken'
-				)
-			);
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-block',
-					undefined
-				)
-			);
-
-			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
 				time: expect.any( Number ),
-			} );
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getBlockCount' )
-			);
-
-			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
-				value: undefined,
-				done: true,
+				initialPosition: 0,
 			} );
 		} );
 	} );
 
 	describe( 'replaceBlocks', () => {
-		it( 'should not yield the REPLACE_BLOCKS action if the replacement is not possible', () => {
+		it( 'should not dispatch the REPLACE_BLOCKS action if the replacement is not possible', () => {
 			const blocks = [
 				{
 					clientId: 'ribs',
@@ -194,48 +246,27 @@ describe( 'actions', () => {
 				},
 			];
 
-			const replaceBlockGenerator = replaceBlocks(
-				[ 'chicken' ],
-				blocks
-			);
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: ( clientId ) => {
+					switch ( clientId ) {
+						case 'core/test-ribs':
+							return true;
+						case 'core/test-chicken':
+						default:
+							return false;
+					}
+				},
+			};
+			const dispatch = jest.fn();
 
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
-			);
+			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
 
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					'chicken'
-				)
-			);
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					undefined
-				)
-			);
-
-			expect( replaceBlockGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					undefined
-				)
-			);
-
-			expect( replaceBlockGenerator.next( false ) ).toEqual( {
-				value: undefined,
-				done: true,
-			} );
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should yield the REPLACE_BLOCKS action if the all the replacement blocks can be inserted in the parent block', () => {
+		it( 'should dispatch the REPLACE_BLOCKS action if the all the replacement blocks can be inserted in the parent block', () => {
 			const blocks = [
 				{
 					clientId: 'ribs',
@@ -247,54 +278,27 @@ describe( 'actions', () => {
 				},
 			];
 
-			const replaceBlockGenerator = replaceBlocks(
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: () => true,
+				getBlockCount: () => 1,
+			};
+			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
+
+			replaceBlocks(
 				[ 'chicken' ],
 				blocks
-			);
+			)( { select, dispatch, registry } );
 
-			// Skip getSettings select.
-			replaceBlockGenerator.next();
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					'chicken'
-				)
-			);
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					undefined
-				)
-			);
-
-			expect( replaceBlockGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					undefined
-				)
-			);
-
-			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks,
 				time: expect.any( Number ),
-			} );
-
-			expect( replaceBlockGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getBlockCount' )
-			);
-
-			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
-				value: undefined,
-				done: true,
+				initialPosition: 0,
 			} );
 		} );
 
@@ -312,21 +316,25 @@ describe( 'actions', () => {
 
 			const meta = { patternName: 'core/chicken-ribs-pattern' };
 
-			const replaceBlockGenerator = replaceBlocks(
+			const select = {
+				getSettings: () => null,
+				getBlockRootClientId: () => null,
+				canInsertBlockType: () => true,
+				getBlockCount: () => 1,
+			};
+			const dispatch = jest.fn();
+			dispatch.ensureDefaultBlock = jest.fn();
+			const registry = createRegistry();
+
+			replaceBlocks(
 				[ 'chicken' ],
 				blocks,
 				null,
 				null,
 				meta
-			);
+			)( { select, dispatch, registry } );
 
-			// Skip to action yield.
-			replaceBlockGenerator.next();
-			replaceBlockGenerator.next();
-			replaceBlockGenerator.next();
-			replaceBlockGenerator.next( true );
-
-			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks,
@@ -346,180 +354,32 @@ describe( 'actions', () => {
 			};
 			const index = 5;
 
-			const insertBlockGenerator = insertBlock(
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => true,
+			};
+			const dispatch = jest.fn();
+
+			insertBlock(
 				block,
 				index,
 				'testclientid',
 				true
-			);
+			)( { select, dispatch } );
 
-			// Skip getSettings select.
-			insertBlockGenerator.next();
-
-			expect( insertBlockGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-block',
-					'testclientid'
-				)
-			);
-
-			expect( insertBlockGenerator.next( true ) ).toEqual( {
-				done: true,
-				value: {
-					type: 'INSERT_BLOCKS',
-					blocks: [ block ],
-					index,
-					rootClientId: 'testclientid',
-					time: expect.any( Number ),
-					updateSelection: true,
-				},
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'INSERT_BLOCKS',
+				blocks: [ block ],
+				index,
+				rootClientId: 'testclientid',
+				time: expect.any( Number ),
+				updateSelection: true,
+				initialPosition: 0,
 			} );
 		} );
 	} );
 
 	describe( 'insertBlocks', () => {
-		it( 'should apply default styles to blocks if blocks do not contain a style', () => {
-			const ribsBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-			};
-			const chickenBlock = {
-				clientId: 'chicken',
-				name: 'core/test-chicken',
-			};
-			const chickenRibsBlock = {
-				clientId: 'chicken-ribs',
-				name: 'core/test-chicken-ribs',
-			};
-			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
-
-			const insertBlocksGenerator = insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			);
-
-			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
-			);
-
-			expect(
-				insertBlocksGenerator.next( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-							'core/test-chicken-ribs': 'colorful',
-						},
-					},
-				} ).value
-			).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ) ).toEqual( {
-				done: true,
-				value: {
-					type: 'INSERT_BLOCKS',
-					blocks: [
-						{
-							...ribsBlock,
-							attributes: { className: 'is-style-squared' },
-						},
-						chickenBlock,
-						{
-							...chickenRibsBlock,
-							attributes: { className: 'is-style-colorful' },
-						},
-					],
-					index: 5,
-					rootClientId: 'testrootid',
-					time: expect.any( Number ),
-					updateSelection: false,
-				},
-			} );
-		} );
-
-		it( 'should keep styles explicitly set even if different from the default', () => {
-			const ribsWithStyleBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-				attributes: {
-					className: 'is-style-colorful',
-				},
-			};
-			const blocks = [ ribsWithStyleBlock ];
-
-			const insertBlocksGenerator = insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			);
-
-			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select( 'core/block-editor', 'getSettings' )
-			);
-
-			expect(
-				insertBlocksGenerator.next( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-						},
-					},
-				} ).value
-			).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ) ).toEqual( {
-				done: true,
-				value: {
-					type: 'INSERT_BLOCKS',
-					blocks: [
-						{
-							...ribsWithStyleBlock,
-							attributes: { className: 'is-style-colorful' },
-						},
-					],
-					index: 5,
-					rootClientId: 'testrootid',
-					time: expect.any( Number ),
-					updateSelection: false,
-				},
-			} );
-		} );
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
@@ -535,57 +395,42 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
 
-			const insertBlocksGenerator = insertBlocks(
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: ( clientId ) => {
+					switch ( clientId ) {
+						case 'core/test-ribs':
+							return true;
+						case 'core/test-chicken':
+							return false;
+						case 'core/test-chicken-ribs':
+							return true;
+						default:
+							return false;
+					}
+				},
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
 				blocks,
 				5,
 				'testrootid',
 				false
-			);
+			)( { select, dispatch } );
 
-			// Skip getSettings select.
-			insertBlocksGenerator.next();
-
-			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( false ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ) ).toEqual( {
-				done: true,
-				value: {
-					type: 'INSERT_BLOCKS',
-					blocks: [ ribsBlock, chickenRibsBlock ],
-					index: 5,
-					rootClientId: 'testrootid',
-					time: expect.any( Number ),
-					updateSelection: false,
-				},
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'INSERT_BLOCKS',
+				blocks: [ ribsBlock, chickenRibsBlock ],
+				index: 5,
+				rootClientId: 'testrootid',
+				time: expect.any( Number ),
+				updateSelection: false,
+				initialPosition: null,
 			} );
 		} );
 
-		it( 'does not yield INSERT_BLOCKS action if all the blocks are impossible to insert', () => {
+		it( 'does not dispatch INSERT_BLOCKS action if all the blocks are impossible to insert', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
 				name: 'core/test-ribs',
@@ -596,38 +441,20 @@ describe( 'actions', () => {
 			};
 			const blocks = [ ribsBlock, chickenBlock ];
 
-			const insertBlocksGenerator = insertBlocks(
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: () => false,
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
 				blocks,
 				5,
 				'testrootid',
 				false
-			);
+			)( { select, dispatch } );
 
-			// Skip getSettings select.
-			insertBlocksGenerator.next();
-
-			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( false ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( false ) ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should pass patternName through metadata to INSERT_BLOCKS action', () => {
@@ -646,55 +473,41 @@ describe( 'actions', () => {
 			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
 			const meta = { patternName: 'core/chicken-ribs-pattern' };
 
-			const insertBlocksGenerator = insertBlocks(
+			const select = {
+				getSettings: () => null,
+				canInsertBlockType: ( clientId ) => {
+					switch ( clientId ) {
+						case 'core/test-ribs':
+							return true;
+						case 'core/test-chicken':
+							return false;
+						case 'core/test-chicken-ribs':
+							return true;
+						default:
+							return false;
+					}
+				},
+			};
+			const dispatch = jest.fn();
+
+			insertBlocks(
 				blocks,
 				5,
 				'testrootid',
 				false,
+				0,
 				meta
-			);
+			)( { select, dispatch } );
 
-			// Skip getSettings select.
-			insertBlocksGenerator.next();
-
-			expect( insertBlocksGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( false ).value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlockType',
-					'core/test-chicken-ribs',
-					'testrootid'
-				)
-			);
-
-			expect( insertBlocksGenerator.next( true ) ).toEqual( {
-				done: true,
-				value: {
-					type: 'INSERT_BLOCKS',
-					blocks: [ ribsBlock, chickenRibsBlock ],
-					index: 5,
-					rootClientId: 'testrootid',
-					time: expect.any( Number ),
-					updateSelection: false,
-					meta: { patternName: 'core/chicken-ribs-pattern' },
-				},
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'INSERT_BLOCKS',
+				blocks: [ ribsBlock, chickenRibsBlock ],
+				index: 5,
+				rootClientId: 'testrootid',
+				time: expect.any( Number ),
+				updateSelection: false,
+				initialPosition: null,
+				meta: { patternName: 'core/chicken-ribs-pattern' },
 			} );
 		} );
 	} );
@@ -707,282 +520,169 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'hideInsertionPoint', () => {
-		it( 'should return the HIDE_INSERTION_POINT action', () => {
-			expect( hideInsertionPoint() ).toEqual( {
-				type: 'HIDE_INSERTION_POINT',
-			} );
-		} );
-	} );
-
-	describe( 'mergeBlocks', () => {
-		it( 'should return MERGE_BLOCKS action', () => {
-			const firstBlockClientId = 'blockA';
-			const secondBlockClientId = 'blockB';
-			expect(
-				mergeBlocks( firstBlockClientId, secondBlockClientId )
-			).toEqual( {
-				type: 'MERGE_BLOCKS',
-				blocks: [ firstBlockClientId, secondBlockClientId ],
-			} );
-		} );
-	} );
-
 	describe( 'removeBlocks', () => {
-		it( 'should return REMOVE_BLOCKS action', () => {
+		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'clientId';
 			const clientIds = [ clientId ];
 
-			const actions = Array.from( removeBlocks( clientIds ) );
+			const select = {
+				getBlockRootClientId: () => undefined,
+				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectPreviousBlock: jest.fn(),
+			} );
+			const registry = createRegistry();
 
-			expect( actions ).toEqual( [
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					clientId
-				),
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					undefined
-				),
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds,
-				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
-			] );
+			removeBlocks( clientIds )( { select, dispatch, registry } );
+
+			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
+				clientId,
+				true
+			);
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REMOVE_BLOCKS',
+				clientIds,
+			} );
 		} );
 	} );
 
 	describe( 'moveBlocksToPosition', () => {
-		it( 'should yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is not changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
+		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
+			const select = {
+				canMoveBlocks: () => false,
+			};
+			const dispatch = jest.fn();
+
+			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
-			);
+			)( { select, dispatch } );
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect(
-				moveBlockToPositionGenerator.next( 'insert' ).value
-			).toEqual( {
-				type: 'MOVE_BLOCKS_TO_POSITION',
-				fromRootClientId: 'ribs',
-				toRootClientId: 'ribs',
-				clientIds: [ 'chicken' ],
-				index: 5,
-			} );
-
-			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				[ 'chicken' ],
-				'ribs',
-				'ribs',
-				5
-			);
+		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+			const select = {
+				canMoveBlocks: () => true,
+				canRemoveBlocks: () => true,
+				canInsertBlocks: () => true,
+			};
+			const dispatch = jest.fn();
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next( 'all' ) ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
-		} );
-
-		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
+			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
-			);
+			)( { select, dispatch } );
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next( 'insert' ) ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
-		} );
-
-		it( 'should yield MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
-				[ 'chicken' ],
-				'ribs',
-				'chicken-ribs',
-				5
-			);
-
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlocks',
-					[ 'chicken' ],
-					'chicken-ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'chicken-ribs',
 				clientIds: [ 'chicken' ],
 				index: 5,
 			} );
-
-			expect( moveBlockToPositionGenerator.next() ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
 		} );
 
-		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
+		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+			const select = {
+				canMoveBlocks: () => true,
+				canRemoveBlocks: () => true,
+				canInsertBlocks: () => false,
+			};
+			const dispatch = jest.fn();
+
+			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
-			);
+			)( { select, dispatch } );
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'canInsertBlocks',
-					[ 'chicken' ],
-					'chicken-ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next( false ) ).toEqual( {
-				done: true,
-				value: undefined,
-			} );
+			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 	} );
 
 	describe( 'moveBlockToPosition', () => {
-		it( 'should yield MOVE_BLOCKS_TO_POSITION action with a single block', () => {
-			const moveBlockToPositionGenerator = moveBlocksToPosition(
+		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action with a single block', () => {
+			const select = {
+				canMoveBlocks: () => true,
+			};
+			const dispatch = jest.fn();
+
+			moveBlocksToPosition(
 				'chicken',
 				'ribs',
 				'ribs',
 				5
-			);
+			)( { select, dispatch } );
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual(
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					'ribs'
-				)
-			);
-
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
 				clientIds: 'chicken',
 				index: 5,
 			} );
-
-			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
 		} );
 	} );
 
 	describe( 'removeBlock', () => {
-		it( 'should return REMOVE_BLOCKS action', () => {
+		it( 'should dispatch REMOVE_BLOCKS action', () => {
 			const clientId = 'myclientid';
 
-			const actions = Array.from( removeBlock( clientId ) );
+			const select = {
+				getBlockRootClientId: () => null,
+				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectPreviousBlock: jest.fn(),
+			} );
+			const registry = createRegistry();
+			removeBlock( clientId )( { select, dispatch, registry } );
 
-			expect( actions ).toEqual( [
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					clientId
-				),
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					undefined
-				),
-				selectPreviousBlock( clientId ),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
-			] );
+			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
+				clientId,
+				true
+			);
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ clientId ],
+			} );
 		} );
 
-		it( 'should return REMOVE_BLOCKS action, opting out of select previous', () => {
+		it( 'should dispatch REMOVE_BLOCKS action, opting out of select previous', async () => {
 			const clientId = 'myclientid';
 
-			const actions = Array.from( removeBlock( clientId, false ) );
+			const select = {
+				getBlockRootClientId: () => null,
+				canRemoveBlocks: () => true,
+				getBlockRemovalRules: () => false,
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectPreviousBlock: jest.fn(),
+			} );
 
-			expect( actions ).toEqual( [
-				controls.select(
-					'core/block-editor',
-					'getBlockRootClientId',
-					clientId
-				),
-				controls.select(
-					'core/block-editor',
-					'getTemplateLock',
-					undefined
-				),
-				controls.select(
-					'core/block-editor',
-					'getPreviousBlockClientId',
-					'myclientid'
-				),
-				{
-					type: 'REMOVE_BLOCKS',
-					clientIds: [ clientId ],
-				},
-				controls.select( 'core/block-editor', 'getBlockCount' ),
-			] );
+			const registry = createRegistry();
+			removeBlocks(
+				[ clientId ],
+				false
+			)( { select, dispatch, registry } );
+
+			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REMOVE_BLOCKS',
+				clientIds: [ clientId ],
+			} );
 		} );
 	} );
 
@@ -1026,22 +726,6 @@ describe( 'actions', () => {
 		it( 'should return the STOP_DRAGGING_BLOCKS action', () => {
 			expect( stopDraggingBlocks() ).toEqual( {
 				type: 'STOP_DRAGGING_BLOCKS',
-			} );
-		} );
-	} );
-
-	describe( 'enterFormattedText', () => {
-		it( 'should return the ENTER_FORMATTED_TEXT action', () => {
-			expect( enterFormattedText() ).toEqual( {
-				type: 'ENTER_FORMATTED_TEXT',
-			} );
-		} );
-	} );
-
-	describe( 'exitFormattedText', () => {
-		it( 'should return the EXIT_FORMATTED_TEXT action', () => {
-			expect( exitFormattedText() ).toEqual( {
-				type: 'EXIT_FORMATTED_TEXT',
 			} );
 		} );
 	} );
@@ -1100,17 +784,470 @@ describe( 'actions', () => {
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: true,
+				updateSelection: false,
+				initialPosition: null,
 			} );
 		} );
 
-		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection false', () => {
-			expect( replaceInnerBlocks( 'root', [ block ], false ) ).toEqual( {
+		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection true', () => {
+			expect( replaceInnerBlocks( 'root', [ block ], true ) ).toEqual( {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: false,
+				updateSelection: true,
+				initialPosition: 0,
+			} );
+		} );
+	} );
+
+	describe( 'mergeBlocks', () => {
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should only focus the blockA if the blockA has no merge function', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+			} );
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				selectBlock: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
+		} );
+
+		it( 'should merge the blocks if blocks of the same type', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
+				blockA.clientId,
+				'content',
+				'chicken'.length + 1,
+				'chicken'.length + 1
+			);
+
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'chicken', 'ribs' ],
+				[
+					expect.objectContaining( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: { content: 'chicken ribs' },
+					} ),
+				],
+				0
+			);
+		} );
+
+		it( 'should not merge the blocks have different types without transformation', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			registerBlockType( 'core/test-block-2', defaultBlockSettings );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block-2',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content',
+					offset: 0,
+				} ),
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should transform and merge the blocks', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			registerBlockType( 'core/test-block-2', {
+				attributes: {
+					content2: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/test-block' ],
+							transform: ( { content2 } ) => {
+								return createBlock( 'core/test-block', {
+									content: content2,
+								} );
+							},
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block 2',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block-2',
+				attributes: { content2: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const select = {
+				getBlock: ( clientId ) =>
+					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
+				getSelectionStart: () => ( {
+					clientId: blockB.clientId,
+					attributeKey: 'content2',
+					offset: 0,
+				} ),
+			};
+			const dispatch = Object.assign( jest.fn(), {
+				replaceBlocks: jest.fn(),
+				selectionChange: jest.fn(),
+			} );
+
+			mergeBlocks(
+				blockA.clientId,
+				blockB.clientId
+			)( { select, dispatch } );
+
+			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
+				blockA.clientId,
+				'content',
+				'chicken'.length + 1,
+				'chicken'.length + 1
+			);
+
+			expect( dispatch.replaceBlocks ).toHaveBeenCalledWith(
+				[ 'chicken', 'ribs' ],
+				[
+					expect.objectContaining( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: { content: 'chicken ribs' },
+					} ),
+				],
+				0
+			);
+		} );
+	} );
+
+	describe( 'validateBlocksToTemplate', () => {
+		let store;
+		beforeEach( () => {
+			store = createRegistry().registerStore( blockEditorStoreName, {
+				actions,
+				selectors,
+				reducer,
+			} );
+
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+		} );
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should return undefined if no template assigned', async () => {
+			const result = await store.dispatch(
+				validateBlocksToTemplate(
+					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+					store
+				)
+			);
+
+			expect( result ).toEqual( undefined );
+		} );
+
+		it( 'should return undefined if invalid but unlocked', async () => {
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/foo', {} ] ],
+				} )
+			);
+
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
+			);
+
+			expect( result ).toEqual( undefined );
+		} );
+
+		it( 'should return undefined if locked and valid', async () => {
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/test-block' ] ],
+					templateLock: 'all',
+				} )
+			);
+
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
+			);
+
+			expect( result ).toEqual( undefined );
+		} );
+
+		it( 'should return validity set action if invalid on default state', async () => {
+			store.dispatch(
+				updateSettings( {
+					template: [ [ 'core/foo' ] ],
+					templateLock: 'all',
+				} )
+			);
+
+			const result = await store.dispatch(
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
+			);
+
+			expect( result ).toEqual( false );
+		} );
+	} );
+
+	describe( 'registerInserterMediaCategory', () => {
+		describe( 'should log errors when invalid', () => {
+			it( 'valid object', () => {
+				registerInserterMediaCategory()( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should be an `InserterMediaCategory` object.'
+				);
+			} );
+			it( 'has name', () => {
+				registerInserterMediaCategory( {} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `name` that should be unique among all media categories.'
+				);
+			} );
+			it( 'has labels.name', () => {
+				registerInserterMediaCategory( { name: 'a' } )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `labels.name`.'
+				);
+			} );
+			it( 'has proper media type', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'b',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have `mediaType` property that is one of `image|audio|video`.'
+				);
+			} );
+			it( 'has fetch function', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: 'c',
+				} )( {} );
+				expect( console ).toHaveErroredWith(
+					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]>`.'
+				);
+			} );
+			it( 'has unique name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getRegisteredInserterMediaCategories: () => [
+							{ name: 'a' },
+						],
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same name: "a".'
+				);
+			} );
+			it( 'has unique labels.name', () => {
+				registerInserterMediaCategory( {
+					name: 'a',
+					labels: { name: 'a' },
+					mediaType: 'image',
+					fetch: () => {},
+				} )( {
+					select: {
+						getRegisteredInserterMediaCategories: () => [
+							{ labels: { name: 'a' } },
+						],
+					},
+				} );
+				expect( console ).toHaveErroredWith(
+					'A category is already registered with the same labels.name: "a".'
+				);
+			} );
+		} );
+		it( 'should register a media category', () => {
+			const category = {
+				name: 'new',
+				labels: { name: 'new' },
+				mediaType: 'image',
+				fetch: () => {},
+			};
+			const inserterMediaCategories = [
+				{ name: 'a', labels: { name: 'a' } },
+			];
+			const dispatch = jest.fn();
+			registerInserterMediaCategory( category )( {
+				select: {
+					getRegisteredInserterMediaCategories: () =>
+						inserterMediaCategories,
+				},
+				dispatch,
+			} );
+			expect( dispatch ).toHaveBeenLastCalledWith( {
+				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
+				category: { ...category, isExternalResource: true },
+			} );
+		} );
+	} );
+
+	describe( 'setBlockEditingMode', () => {
+		it( 'should return the SET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				setBlockEditingMode(
+					'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+					'default'
+				)
+			).toEqual( {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+		} );
+	} );
+
+	describe( 'unsetBlockEditingMode', () => {
+		it( 'should return the UNSET_BLOCK_EDITING_MODE action', () => {
+			expect(
+				unsetBlockEditingMode( '14501cc2-90a6-4f52-aa36-ab6e896135d1' )
+			).toEqual( {
+				type: 'UNSET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
 		} );
 	} );

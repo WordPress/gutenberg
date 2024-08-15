@@ -6,7 +6,7 @@
  */
 export function getJSONResponse( obj ) {
 	return {
-		content: 'application/json',
+		contentType: 'application/json',
 		body: JSON.stringify( obj ),
 	};
 }

@@ -35,7 +35,7 @@ const getUnstagedReadmes = () =>
 				'\n',
 				'Some API docs may be out of date:',
 				unstagedReadmes.toString(),
-				'Either stage them or continue with --no-verify.',
+				'Either build and stage them with npm run docs:build or continue with --no-verify.',
 				'\n'
 			)
 		);

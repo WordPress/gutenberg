@@ -60,6 +60,7 @@ const gpl2CompatibleLicenses = [
 	'ODC-By-1.0',
 	'Public Domain',
 	'Unlicense',
+	'W3C-20150513',
 	'WTFPL',
 	'Zlib',
 ];
@@ -76,6 +77,7 @@ const otherOssLicenses = [
 	'CC-BY-3.0',
 	'CC-BY-SA-2.0',
 	'LGPL',
+	'Python-2.0',
 ];
 
 const licenses = [
@@ -86,6 +88,9 @@ const licenses = [
 /*
  * Some packages don't included a license string in their package.json file, but they
  * do have a license listed elsewhere. These files are checked for matching license strings.
+ * Only the first matching license file with a matching license string is considered.
+ *
+ * See: licenseFileStrings.
  */
 const licenseFiles = [
 	'LICENCE',
@@ -123,7 +128,7 @@ const licenseFileStrings = {
  * eg, "(MIT OR Zlib)".
  *
  * @param {string} allowedLicense The license that's allowed.
- * @param {string} licenseType The license string to check.
+ * @param {string} licenseType    The license string to check.
  *
  * @return {boolean} true if the licenseType matches the allowedLicense, false if it doesn't.
  */
@@ -173,8 +178,9 @@ const child = spawn.sync(
 		'ls',
 		'--json',
 		'--long',
-		...( prod ? [ '--prod' ] : [] ),
-		...( dev ? [ '--dev' ] : [] ),
+		'--all',
+		...( prod ? [ '--omit=dev' ] : [] ),
+		...( dev ? [ '--include=dev' ] : [] ),
 	],
 	/*
 	 * Set the max buffer to ~157MB, since the output size for
@@ -192,10 +198,14 @@ function traverseDepTree( deps ) {
 		const dep = deps[ key ];
 
 		if ( ignored.includes( dep.name ) ) {
-			return;
+			continue;
 		}
 
-		if ( ! dep.hasOwnProperty( 'path' ) ) {
+		if ( Object.keys( dep ).length === 0 ) {
+			continue;
+		}
+
+		if ( ! dep.hasOwnProperty( 'path' ) && ! dep.missing ) {
 			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
 				process.stdout.write(
 					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
@@ -207,23 +217,22 @@ function traverseDepTree( deps ) {
 				);
 			}
 		} else if ( dep.missing ) {
-			process.stdout.write(
-				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
-			);
+			for ( const problem of dep.problems ) {
+				process.stdout.write( `${ WARNING } ${ problem }.\n` );
+			}
 		} else {
 			checkDepLicense( dep.path );
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {
 			traverseDepTree( dep.dependencies );
-		} else {
-			return;
 		}
 	}
 }
 
 function detectTypeFromLicenseFiles( path ) {
 	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
+		// If another LICENSE file already had licenses in it, use those.
 		if ( detectedType ) {
 			return detectedType;
 		}
@@ -232,29 +241,40 @@ function detectTypeFromLicenseFiles( path ) {
 
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
-
-			// Check if the file contains any of the strings in licenseFileStrings
-			return Object.keys( licenseFileStrings ).reduce(
-				( stringDetectedType, licenseStringType ) => {
-					const licenseFileString =
-						licenseFileStrings[ licenseStringType ];
-
-					return licenseFileString.reduce(
-						( currentDetectedType, fileString ) => {
-							if ( licenseText.includes( fileString ) ) {
-								return licenseStringType;
-							}
-							return currentDetectedType;
-						},
-						stringDetectedType
-					);
-				},
-				detectedType
-			);
+			return detectTypeFromLicenseText( licenseText );
 		}
+
 		return detectedType;
 	}, false );
 }
+
+function detectTypeFromLicenseText( licenseText ) {
+	// Check if the file contains any of the strings in licenseFileStrings.
+	return Object.keys( licenseFileStrings ).reduce(
+		( stringDetectedType, licenseStringType ) => {
+			const licenseFileString = licenseFileStrings[ licenseStringType ];
+
+			return licenseFileString.reduce(
+				( currentDetectedType, fileString ) => {
+					if ( licenseText.includes( fileString ) ) {
+						if ( currentDetectedType ) {
+							return currentDetectedType.concat(
+								' AND ',
+								licenseStringType
+							);
+						}
+						return licenseStringType;
+					}
+					return currentDetectedType;
+				},
+				stringDetectedType
+			);
+		},
+		false
+	);
+}
+
+const reportedPackages = new Set();
 
 function checkDepLicense( path ) {
 	if ( ! path ) {
@@ -291,11 +311,17 @@ function checkDepLicense( path ) {
 		licenseType = undefined;
 	}
 
-	if ( licenseType ) {
-		const allowed = licenses.find( ( allowedLicense ) =>
-			checkLicense( allowedLicense, licenseType )
-		);
-		if ( allowed ) {
+	if ( licenseType !== undefined ) {
+		let licenseTypes = [ licenseType ];
+		if ( licenseType.includes( ' AND ' ) ) {
+			licenseTypes = licenseType
+				.replace( /^\(*/g, '' )
+				.replace( /\)*$/, '' )
+				.split( ' AND ' )
+				.map( ( e ) => e.trim() );
+		}
+
+		if ( checkAllCompatible( licenseTypes, licenses ) ) {
 			return;
 		}
 	}
@@ -310,17 +336,61 @@ function checkDepLicense( path ) {
 		return;
 	}
 
-	// Now that we have a license to check, see if any of the allowed licenses match.
-	const allowed = licenses.find( ( allowedLicense ) =>
-		checkLicense( allowedLicense, detectedLicenseType )
-	);
-
-	if ( ! allowed ) {
-		process.exitCode = 1;
-		process.stdout.write(
-			`${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n`
-		);
+	let detectedLicenseTypes = [ detectedLicenseType ];
+	if ( detectedLicenseType && detectedLicenseType.includes( ' AND ' ) ) {
+		detectedLicenseTypes = detectedLicenseType
+			.replace( /^\(*/g, '' )
+			.replace( /\)*$/, '' )
+			.split( ' AND ' )
+			.map( ( e ) => e.trim() );
 	}
+
+	if ( checkAllCompatible( detectedLicenseTypes, licenses ) ) {
+		return;
+	}
+
+	// Do not report same package twice.
+	if ( reportedPackages.has( packageInfo.name ) ) {
+		return;
+	}
+
+	reportedPackages.add( packageInfo.name );
+
+	process.exitCode = 1;
+	process.stdout.write(
+		`${ ERROR } Module ${ packageInfo.name } has an incompatible license '${ licenseType }'.\n`
+	);
+}
+
+/**
+ * Check that all of the licenses for a package are compatible.
+ *
+ * This function is invoked when the licenses are a conjunctive ("AND") list of licenses.
+ * In that case, the software is only compatible if all of the licenses in the list are
+ * compatible.
+ *
+ * @param {Array} packageLicenses    The licenses that a package is licensed under.
+ * @param {Array} compatibleLicenses The list of compatible licenses.
+ *
+ * @return {boolean} true if all of the packageLicenses appear in compatibleLicenses.
+ */
+function checkAllCompatible( packageLicenses, compatibleLicenses ) {
+	return packageLicenses.reduce( ( compatible, packageLicense ) => {
+		return (
+			compatible &&
+			compatibleLicenses.reduce(
+				( found, allowedLicense ) =>
+					found || checkLicense( allowedLicense, packageLicense ),
+				false
+			)
+		);
+	}, true );
 }
 
 traverseDepTree( topLevelDeps );
+
+// Required for unit testing
+module.exports = {
+	detectTypeFromLicenseText,
+	checkAllCompatible,
+};

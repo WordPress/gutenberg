@@ -7,39 +7,64 @@
 	z-index: z-index(".components-drop-zone");
 	visibility: hidden;
 	opacity: 0;
-	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
-	@include reduce-motion("transition");
-	border: 2px solid var(--wp-admin-theme-color);
-	border-radius: 2px;
+	border-radius: $radius-block-ui;
 
 	&.is-active {
 		opacity: 1;
 		visibility: visible;
-		transition: 0.3s opacity, 0.3s background-color;
-		@include reduce-motion("transition");
 	}
 
-	&.is-dragging-over-element {
-		background-color: var(--wp-admin-theme-color);
+	.components-drop-zone__content {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		background-color: $components-color-accent;
+		align-items: center;
+		justify-content: center;
+		z-index: z-index(".components-drop-zone__content");
+		text-align: center;
+		color: $white;
+		opacity: 0;
+
+		// Without this, when this div is shown,
+		// Safari calls a onDropZoneLeave causing a loop because of this bug
+		// https://bugs.webkit.org/show_bug.cgi?id=66547
+		pointer-events: none;
 	}
-}
 
-.components-drop-zone__content {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	right: 0;
-	z-index: z-index(".components-drop-zone__content");
-	transform: translateY(-50%);
-	width: 100%;
-	text-align: center;
-	color: $white;
-	transition: transform 0.2s ease-in-out;
-	@include reduce-motion("transition");
-}
+	.components-drop-zone__content-inner {
+		opacity: 0;
+		transform: scale(0.9);
+	}
 
-.components-drop-zone.is-dragging-over-element .components-drop-zone__content {
-	transform: translateY(-50%) scale(1.05);
+	&.is-active:not(.has-dragged-out) {
+		.components-drop-zone__content {
+			opacity: 1;
+
+			transition: opacity 0.2s ease-in-out;
+			@media (prefers-reduced-motion) {
+				transition: none;
+			}
+		}
+
+		.components-drop-zone__content-inner {
+			opacity: 1;
+			transform: scale(1);
+
+			transition:
+				opacity 0.1s ease-in-out 0.1s,
+				transform 0.1s ease-in-out 0.1s;
+
+			@media (prefers-reduced-motion) {
+				transition: none;
+			}
+		}
+	}
 }
 
 .components-drop-zone__content-icon,
@@ -48,16 +73,13 @@
 }
 
 .components-drop-zone__content-icon {
-	margin: 0 auto;
+	margin: 0 auto $grid-unit-10;
 	line-height: 0;
 	fill: currentColor;
+	pointer-events: none;
 }
-
 
 .components-drop-zone__content-text {
 	font-family: $default-font;
-}
-
-.components-drop-zone__provider {
-	height: 100%;
+	font-size: $default-font-size;
 }

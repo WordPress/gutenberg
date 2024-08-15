@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
-import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,6 +40,7 @@ import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as listItem from './list-item';
 import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
@@ -52,17 +52,18 @@ import * as search from './search';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
-import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as group from './group';
 import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
+
+import { transformationCategory } from './utils/transformation-categories';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -72,6 +73,7 @@ export const coreBlocks = [
 	heading,
 	gallery,
 	list,
+	listItem,
 	quote,
 
 	// Register all remaining core blocks.
@@ -86,6 +88,7 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
+	group,
 	file,
 	html,
 	mediaText,
@@ -101,7 +104,6 @@ export const coreBlocks = [
 	separator,
 	reusableBlock,
 	spacer,
-	subhead,
 	table,
 	tagCloud,
 	textColumns,
@@ -117,44 +119,32 @@ export const coreBlocks = [
 }, {} );
 
 /**
- * Function to register an individual block.
- *
- * @param {Object} block The block to be registered.
- *
- */
-const registerBlock = ( block ) => {
-	if ( ! block ) {
-		return;
-	}
-	const { metadata, settings, name } = block;
-	registerBlockType( name, {
-		...metadata,
-		...settings,
-	} );
-};
-
-/**
  * Function to register a block variations e.g. social icons different types.
  *
  * @param {Object} block The block which variations will be registered.
- *
  */
 const registerBlockVariations = ( block ) => {
 	const { metadata, settings, name } = block;
 
-	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
-		registerBlockType( `${ name }-${ v.name }`, {
-			...metadata,
-			name: `${ name }-${ v.name }`,
-			...settings,
-			icon: v.icon(),
-			title: v.title,
-			variations: [],
+	if ( ! settings.variations ) {
+		return;
+	}
+
+	[ ...settings.variations ]
+		.sort( ( a, b ) => a.title.localeCompare( b.title ) )
+		.forEach( ( v ) => {
+			registerBlockType( `${ name }-${ v.name }`, {
+				...metadata,
+				name: `${ name }-${ v.name }`,
+				...settings,
+				icon: v.icon(),
+				title: v.title,
+				variations: [],
+			} );
 		} );
-	} );
 };
 
-// only enable code block for development
+// Only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
@@ -175,6 +165,28 @@ addFilter(
 			settings.supports = {
 				...settings.supports,
 				inserter: false,
+			};
+		}
+
+		return settings;
+	}
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if ( ! settings.transforms ) {
+			return settings;
+		}
+
+		if ( ! settings.transforms.supportedMobileTransforms ) {
+			return {
+				...settings,
+				transforms: {
+					...settings.transforms,
+					supportedMobileTransforms: transformationCategory( name ),
+				},
 			};
 		}
 
@@ -205,6 +217,7 @@ export const registerCoreBlocks = () => {
 		nextpage,
 		separator,
 		list,
+		listItem,
 		quote,
 		mediaText,
 		preformatted,
@@ -223,7 +236,14 @@ export const registerCoreBlocks = () => {
 		socialLink,
 		socialLinks,
 		pullquote,
-	].forEach( registerBlock );
+		file,
+		audio,
+		reusableBlock,
+		search,
+		embed,
+	]
+		.filter( Boolean )
+		.forEach( ( { init } ) => init() );
 
 	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
@@ -233,3 +253,22 @@ export const registerCoreBlocks = () => {
 		setGroupingBlockName( group.name );
 	}
 };
+
+/**
+ * Dictates which block types are considered "new." For each of the block types
+ * below, if the native host app does not already have an impression count set,
+ * an initial count will be set. When a block type's impression count is greater
+ * than 0, a "new" badge is displayed on the block type within the block
+ * inserter.
+ *
+ * With the below example, the Audio block will be displayed as "new" until its
+ * impression count reaches 0, which occurs by various actions decrementing
+ * the impression count.
+ *
+ * {
+ * 	[ audio.name ]: 40
+ * }
+ *
+ * @constant {{ string, number }}
+ */
+export const NEW_BLOCK_TYPES = {};

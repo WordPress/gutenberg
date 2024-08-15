@@ -43,9 +43,16 @@ describe( 'WordCounter', () => {
 		{
 			message: 'Punctuation.',
 			string: 'It’s two three \u2026 4?',
-			words: 3,
+			words: 4,
 			characters_excluding_spaces: 15,
 			characters_including_spaces: 19,
+		},
+		{
+			message: 'Numbers as word',
+			string: 'Should be 4 words',
+			words: 4,
+			characters_excluding_spaces: 14,
+			characters_including_spaces: 17,
 		},
 		{
 			message: 'Em dash.',

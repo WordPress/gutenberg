@@ -1,10 +1,9 @@
 .wp-block-video {
-	// Remove the left and right margin the figure is born with.
-	margin-left: 0;
-	margin-right: 0;
-
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	video {
-		max-width: 100%;
+		width: 100%;
+		vertical-align: middle;
 	}
 
 	@supports (position: sticky) {
@@ -20,7 +19,7 @@
 	// Supply caption styles to videos, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
-	figcaption {
+	:where(figcaption) {
 		@include caption-style();
 	}
 }

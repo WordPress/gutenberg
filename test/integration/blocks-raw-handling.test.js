@@ -25,7 +25,7 @@ function readFile( filePath ) {
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
@@ -78,9 +78,35 @@ describe( 'Blocks raw handling', () => {
 						},
 						transform: () => {
 							return createBlock( 'core/embed', {
-								url:
-									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+								url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
+
+		registerBlockType( 'test/transform-to-multiple-blocks', {
+			title: 'Test Transform to Multiple Blocks',
+			category: 'text',
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+						},
+						transform: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.map( ( chunk ) =>
+									createBlock( 'core/paragraph', {
+										content: chunk.substring( 1 ),
+									} )
+								);
 						},
 					},
 				],
@@ -119,6 +145,28 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should paste special whitespace', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>&thinsp;</p>',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
+	} );
+
+	it( 'should paste special whitespace in plain text only', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
+	} );
+
 	it( 'should parse Markdown', () => {
 		const filtered = pasteHandler( {
 			HTML: '* one<br>* two<br>* three',
@@ -128,9 +176,44 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe(
-			'<ul><li>one</li><li>two</li><li>three</li></ul>'
-		);
+		expect( filtered ).toMatchInlineSnapshot( `
+		"<ul class="wp-block-list"><!-- wp:list-item -->
+		<li>one</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>two</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>three</li>
+		<!-- /wp:list-item --></ul>"
+	` );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should parse bulleted list', () => {
+		const filtered = pasteHandler( {
+			HTML: '• one<br>• two<br>• three',
+			plainText: '• one\n• two\n• three',
+			mode: 'AUTO',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( filtered ).toMatchInlineSnapshot( `
+		"<ul class="wp-block-list"><!-- wp:list-item -->
+		<li>one</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>two</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>three</li>
+		<!-- /wp:list-item --></ul>"
+	` );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -147,8 +230,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should parse HTML in plainText', () => {
 		const filtered = pasteHandler( {
-			HTML:
-				'&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
+			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
 			plainText: '<p>Some <strong>bold</strong> text.</p>',
 			mode: 'AUTO',
 		} );
@@ -167,7 +249,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toBe(
-			'<h1>Some <em>heading</em></h1><p>A paragraph.</p>'
+			'<h1 class="wp-block-heading">Some <em>heading</em></h1><p>A paragraph.</p>'
 		);
 		expect( console ).toHaveLogged();
 	} );
@@ -235,118 +317,31 @@ describe( 'Blocks raw handling', () => {
 			.map( getBlockContent )
 			.join( '' );
 
-		expect( filtered ).toBe(
-			'<ul><li>One</li><li>Two</li><li>Three</li></ul>'
+		expect( filtered ).toMatchInlineSnapshot( `
+		"<ul class="wp-block-list"><!-- wp:list-item -->
+		<li>One</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>Two</li>
+		<!-- /wp:list-item -->
+
+		<!-- wp:list-item -->
+		<li>Three</li>
+		<!-- /wp:list-item --></ul>"
+	` );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should correctly handle quotes with mixed content', () => {
+		const filtered = serialize(
+			pasteHandler( {
+				HTML: '<blockquote><h1 class="wp-block-heading">chicken</h1><p>ribs</p></blockquote>',
+				mode: 'AUTO',
+			} )
 		);
-		expect( console ).toHaveLogged();
-	} );
 
-	it( 'should correctly handle quotes with one paragraphs and no citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-	it( 'should correctly handle quotes with multiple paragraphs and no citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should correctly handle quotes with paragraph and citation at the end', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><p>chicken</p><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should handle a citation before the content', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should handle a citation in the middle of the content', () => {
-		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should correctly handle quotes with only a citation', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe(
-			'<blockquote class="wp-block-quote"><p></p><cite>ribs</cite></blockquote>'
-		);
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should convert to paragraph quotes with more than one cite', () => {
-		const filtered = pasteHandler( {
-			HTML: '<blockquote><cite>ribs</cite><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe( '<p>ribsribs</p>' );
-		expect( console ).toHaveLogged();
-	} );
-
-	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
-		const filtered = pasteHandler( {
-			HTML:
-				'<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
-			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
-
-		expect( filtered ).toBe( '<p>chickenribsribs</p>' );
+		expect( filtered ).toMatchSnapshot();
 		expect( console ).toHaveLogged();
 	} );
 
@@ -362,16 +357,61 @@ describe( 'Blocks raw handling', () => {
 		).toBe( block );
 	} );
 
+	it( 'should handle transforms that return an array of blocks', () => {
+		const transformed = pasteHandler( {
+			HTML: '<p>P1 P2</p>',
+			plainText: 'P1 P2\n',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe( '<p>1</p><p>2</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert pre', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre>1\n2</pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-preformatted">1\n2</pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert code', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre><code>1\n2</code></pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-code"><code>1\n2</code></pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
+			'nested-divs',
 			'apple',
 			'google-docs',
+			'google-docs-list-only',
 			'google-docs-table',
+			'google-docs-table-with-colspan',
+			'google-docs-table-with-rowspan',
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',
+			'ms-word-list',
 			'ms-word-styled',
 			'ms-word-online',
 			'evernote',
@@ -382,16 +422,29 @@ describe( 'Blocks raw handling', () => {
 			'wordpress',
 			'gutenberg',
 			'shortcode-matching',
+			'slack-quote',
+			'slack-paragraphs',
+			'mixed-content',
 		].forEach( ( type ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
 				const HTML = readFile(
-					path.join( __dirname, `fixtures/${ type }-in.html` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-in.html`
+					)
 				);
 				const plainText = readFile(
-					path.join( __dirname, `fixtures/${ type }-in.txt` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-in.txt`
+					)
 				);
 				const output = readFile(
-					path.join( __dirname, `fixtures/${ type }-out.html` )
+					path.join(
+						__dirname,
+						`fixtures/documents/${ type }-out.html`
+					)
 				);
 
 				if ( ! ( HTML || plainText ) || ! output ) {
@@ -406,9 +459,14 @@ describe( 'Blocks raw handling', () => {
 
 				expect( serialized ).toBe( output );
 
-				if ( type !== 'gutenberg' ) {
-					expect( console ).toHaveLogged();
-				}
+				const convertedInline = pasteHandler( {
+					HTML,
+					plainText,
+					mode: 'INLINE',
+				} );
+
+				expect( convertedInline ).toMatchSnapshot();
+				expect( console ).toHaveLogged();
 			} );
 		} );
 
@@ -420,7 +478,10 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should remove extra blank lines', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/google-docs-blank-lines.html' )
+				path.join(
+					__dirname,
+					'fixtures/documents/google-docs-blank-lines.html'
+				)
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
@@ -428,7 +489,7 @@ describe( 'Blocks raw handling', () => {
 
 		it( 'should strip windows data', () => {
 			const HTML = readFile(
-				path.join( __dirname, 'fixtures/windows.html' )
+				path.join( __dirname, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
 		} );
@@ -437,7 +498,7 @@ describe( 'Blocks raw handling', () => {
 			const HTML = readFile(
 				path.join(
 					__dirname,
-					'fixtures/inline-with-html-formatting-space.html'
+					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
 			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
@@ -449,21 +510,24 @@ describe( 'Blocks raw handling', () => {
 describe( 'rawHandler', () => {
 	it( 'should convert HTML post to blocks with minimal content changes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/wordpress-convert.html' )
+			path.join( __dirname, 'fixtures/documents/wordpress-convert.html' )
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/shortcode-caption.html' )
+			path.join( __dirname, 'fixtures/documents/shortcode-caption.html' )
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 
 	it( 'should convert a caption shortcode with link', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' )
+			path.join(
+				__dirname,
+				'fixtures/documents/shortcode-caption-with-link.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -472,7 +536,7 @@ describe( 'rawHandler', () => {
 		const HTML = readFile(
 			path.join(
 				__dirname,
-				'fixtures/shortcode-caption-with-caption-link.html'
+				'fixtures/documents/shortcode-caption-with-caption-link.html'
 			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
@@ -480,7 +544,10 @@ describe( 'rawHandler', () => {
 
 	it( 'should convert a list with attributes', () => {
 		const HTML = readFile(
-			path.join( __dirname, 'fixtures/list-with-attributes.html' )
+			path.join(
+				__dirname,
+				'fixtures/documents/list-with-attributes.html'
+			)
 		);
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
@@ -492,6 +559,14 @@ describe( 'rawHandler', () => {
 
 	it( 'should preserve alignment', () => {
 		const HTML = '<p style="text-align:center">center</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve all paragraphs', () => {
+		const HTML = `<p></p>
+<p>&nbsp;&nbsp;</p>
+<p class="p"></p>
+<p style="border: 1px solid tomato;"></p>`;
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

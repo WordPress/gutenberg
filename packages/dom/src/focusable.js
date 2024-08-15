@@ -17,25 +17,38 @@
  *  - https://w3c.github.io/html/editing.html#data-model
  */
 
-const SELECTOR = [
-	'[tabindex]',
-	'a[href]',
-	'button:not([disabled])',
-	'input:not([type="hidden"]):not([disabled])',
-	'select:not([disabled])',
-	'textarea:not([disabled])',
-	'iframe',
-	'object',
-	'embed',
-	'area[href]',
-	'[contenteditable]:not([contenteditable=false])',
-].join( ',' );
+/**
+ * Returns a CSS selector used to query for focusable elements.
+ *
+ * @param {boolean} sequential If set, only query elements that are sequentially
+ *                             focusable. Non-interactive elements with a
+ *                             negative `tabindex` are focusable but not
+ *                             sequentially focusable.
+ *                             https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ *
+ * @return {string} CSS selector.
+ */
+function buildSelector( sequential ) {
+	return [
+		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
+		'a[href]',
+		'button:not([disabled])',
+		'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])',
+		'textarea:not([disabled])',
+		'iframe:not([tabindex^="-"])',
+		'object',
+		'embed',
+		'area[href]',
+		'[contenteditable]:not([contenteditable=false])',
+	].join( ',' );
+}
 
 /**
  * Returns true if the specified element is visible (i.e. neither display: none
  * nor visibility: hidden).
  *
- * @param {Element} element DOM element to test.
+ * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
@@ -48,35 +61,22 @@ function isVisible( element ) {
 }
 
 /**
- * Returns true if the specified element should be skipped from focusable elements.
- * For now it rather specific for `iframes` and  if tabindex attribute is set to -1.
- *
- * @param {Element} element DOM element to test.
- *
- * @return {boolean} Whether element should be skipped from focusable elements.
- */
-function skipFocus( element ) {
-	return (
-		element.nodeName.toLowerCase() === 'iframe' &&
-		element.getAttribute( 'tabindex' ) === '-1'
-	);
-}
-
-/**
  * Returns true if the specified area element is a valid focusable element, or
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
  *
- * @param {Element} element DOM area element to test.
+ * @param {HTMLAreaElement} element DOM area element to test.
  *
  * @return {boolean} Whether area element is valid for focus.
  */
 function isValidFocusableArea( element ) {
+	/** @type {HTMLMapElement | null} */
 	const map = element.closest( 'map[name]' );
 	if ( ! map ) {
 		return false;
 	}
 
+	/** @type {HTMLImageElement | null} */
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
@@ -86,21 +86,31 @@ function isValidFocusableArea( element ) {
 /**
  * Returns all focusable elements within a given context.
  *
- * @param {Element} context Element in which to search.
+ * @param {Element} context              Element in which to search.
+ * @param {Object}  options
+ * @param {boolean} [options.sequential] If set, only return elements that are
+ *                                       sequentially focusable.
+ *                                       Non-interactive elements with a
+ *                                       negative `tabindex` are focusable but
+ *                                       not sequentially focusable.
+ *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
  *
- * @return {Element[]} Focusable elements.
+ * @return {HTMLElement[]} Focusable elements.
  */
-export function find( context ) {
-	const elements = context.querySelectorAll( SELECTOR );
+export function find( context, { sequential = false } = {} ) {
+	/** @type {NodeListOf<HTMLElement>} */
+	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) || skipFocus( element ) ) {
+		if ( ! isVisible( element ) ) {
 			return false;
 		}
 
 		const { nodeName } = element;
 		if ( 'AREA' === nodeName ) {
-			return isValidFocusableArea( element );
+			return isValidFocusableArea(
+				/** @type {HTMLAreaElement} */ ( element )
+			);
 		}
 
 		return true;

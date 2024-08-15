@@ -16,16 +16,19 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import Cell from './cell';
 import cellStyles from './styles.scss';
 import suggestionStyles from './link-suggestion-styles.scss';
-import { posts, pages, empty } from '../gridicons';
+import { posts, pages, empty, clipboard } from '../gridicons';
 
 const icons = {
 	URL: globe,
+	clipboard,
 	post: posts,
 	page: pages,
 };
 
 const getSummaryForType = ( type ) => {
 	switch ( type ) {
+		case 'clipboard':
+			return __( 'From clipboard' );
 		case 'mailto':
 			return __( 'Add this email link' );
 		case 'tel':
@@ -35,8 +38,8 @@ const getSummaryForType = ( type ) => {
 	}
 };
 
-// we use some Cell styles here with a column flex-direction
-function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
+// We use some Cell styles here with a column flex-direction.
+function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 	const { title: contentTitle, url, type, isDirectEntry } = suggestion;
 	const title = isDirectEntry ? url : contentTitle;
 	const summary = isDirectEntry ? getSummaryForType( type ) : url;
@@ -58,9 +61,10 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
 
 	return (
 		<Cell
+			{ ...props }
 			icon={ icons[ type ] || empty }
 			onPress={ pickLink }
-			separatorType={ 'none' }
+			separatorType="none"
 			cellContainerStyle={ suggestionStyles.itemContainerStyle }
 			labelStyle={ suggestionStyles.hidden }
 			valueStyle={ suggestionStyles.hidden }
@@ -69,14 +73,14 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked } ) {
 				<Text
 					style={ titleStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ title }
 				</Text>
 				<Text
 					style={ summaryStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ summary }
 				</Text>

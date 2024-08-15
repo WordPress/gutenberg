@@ -1,15 +1,7 @@
 .block-directory-downloadable-block-icon {
-	width: $button-size;
-	height: $button-size;
-
-	.block-editor-block-icon {
-		width: $button-size;
-		height: $button-size;
-		font-size: $button-size;
-		background-color: $gray-300;
-	}
-
-	> img {
-		width: 100%;
-	}
+	min-width: $button-size * 1.5;
+	width: $button-size * 1.5;
+	height: $button-size * 1.5;
+	vertical-align: middle;
+	border: 1px solid $gray-300;
 }

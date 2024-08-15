@@ -4,12 +4,6 @@ Buttons let users take actions and make choices with a single click or tap.
 
 ![Button components](https://make.wordpress.org/design/files/2019/03/button.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -62,7 +56,7 @@ Since a high-emphasis button commands the most attention, a layout should contai
 
 #### Text label
 
-All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there should be an icon to signify what the button does.
+All button types use text labels to describe the action that happens when a user taps a button. If there’s no text label, there needs to be a [label](#label) added and an icon to signify what the button does.
 
 ![](https://make.wordpress.org/design/files/2019/03/do-link-button.png)
 
@@ -112,7 +106,7 @@ Renders a button with default style.
 ```jsx
 import { Button } from '@wordpress/components';
 
-const MyButton = () => <Button isSecondary>Click me!</Button>;
+const MyButton = () => <Button variant="secondary">Click me!</Button>;
 ```
 
 ### Props
@@ -121,153 +115,181 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
-#### disabled
+#### `accessibleWhenDisabled`: `boolean`
 
-Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
+Whether to keep the button focusable when disabled.
 
--   Type: `Boolean`
+In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or by preventing focus from returning to a trigger element.
+
+Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols) in the WAI-ARIA Authoring Practices Guide.
+
 -   Required: No
 -   Default: `false`
 
-#### href
+#### `children`: `ReactNode`
 
-If provided, renders `a` instead of `button`.
+The button's children.
 
--   Type: `String`
--   Required: No
--   Default: `undefined`
-
-#### isSecondary
-
-Renders a default button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isPrimary
-
-Renders a primary button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isTertiary
-
-Renders a text-based button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isDestructive
-
-Renders a red text-based button style to indicate destructive behavior.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isSmall
-
-Decreases the size of the button.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isPressed
-
-Renders a pressed button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isBusy
-
-Indicates activity while a action is being performed.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isLink
-
-Renders a button with an anchor style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### focus
-
-Whether the button is focused.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### target
-
-If provided with `href`, sets the `target` attribute to the `a`.
-
--   Type: `String`
 -   Required: No
 
-#### className
+#### `className`: `string`
 
 An optional additional class name to apply to the rendered button.
 
--   Type: `String`
 -   Required: No
 
-#### icon
+#### `description`: `string`
+
+An accessible description for the button.
+
+-   Required: No
+
+#### `disabled`: `boolean`
+
+Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
+
+In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
+
+-   Required: No
+
+#### `href`: `string`
+
+If provided, renders `a` instead of `button`.
+
+-   Required: No
+
+#### `icon`: `IconProps< unknown >[ 'icon' ]`
 
 If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.
 
--   Type: `String|Function|WPComponent|null`
 -   Required: No
--   Default: `null`
 
-#### iconSize
+#### `iconPosition`: `'left' | 'right'`
 
-If provided with `icon`, sets the icon size.
+If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
 
--   Type: `Number`
 -   Required: No
--   Default: `20 when a Dashicon is rendered, 24 for all other icons.`
+-   Default: `left`
 
-#### showTooltip
+#### `iconSize`: `IconProps< unknown >[ 'size' ]`
 
-If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
+If provided with `icon`, sets the icon size. Please refer to the [Icon](/packages/components/src/icon/README.md) component for more details regarding the default value of its `size` prop.
 
--   Type: `Boolean`
+-   Required: No
+
+#### `isBusy`: `boolean`
+
+Indicates activity while a action is being performed.
+
+-   Required: No
+
+#### `isDestructive`: `boolean`
+
+Renders a red text-based button style to indicate destructive behavior.
+
+-   Required: No
+
+#### `isLink`: `boolean`
+
+Deprecated: Renders a button with an anchor style.
+Use `variant` prop with `link` value instead.
+
 -   Required: No
 -   Default: `false`
 
-#### tooltipPosition
+#### `isPressed`: `boolean`
 
-If provided with`showTooltip`, sets the position of the tooltip.
+Renders a pressed button style.
 
--   Type: `String`
--   Require: No
--   Default:`top center`
+If the native `aria-pressed` attribute is also set, it will take precedence.
 
-#### shortcut
-
-If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
-
--   Type: `String|Object`
 -   Required: No
--   Default: `undefined`
 
-#### label
+#### `isPrimary`: `boolean`
+
+Deprecated: Renders a primary button style.
+Use `variant` prop with `primary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `isSecondary`: `boolean`
+
+Deprecated: Renders a default button style.
+Use `variant` prop with `secondary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `isSmall`: `boolean`
+
+Decreases the size of the button.
+
+Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
+
+-   Required: No
+
+#### `isTertiary`: `boolean`
+
+Deprecated: Renders a text-based button style.
+Use `variant` prop with `tertiary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `label`: `string`
 
 Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.
 
--   Type: `String`
+-   Required: No
+
+#### `shortcut`: `string | { display: string; ariaLabel: string; }`
+
+If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an object is provided, it should contain `display` and `ariaLabel` keys.
+
+-   Required: No
+
+#### `showTooltip`: `boolean`
+
+If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
+
+-   Required: No
+
+#### `size`: `'default'` | `'compact'` | `'small'`
+
+The size of the button.
+
+-   `'default'`: For normal text-label buttons, unless it is a toggle button.
+-   `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+-   `'small'`: For icon buttons associated with more advanced or auxiliary features.
+
+If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+
+-   Required: No
+-   Default: `'default'`
+
+#### `target`: `string`
+
+If provided with `href`, sets the `target` attribute to the `a`.
+
+-   Required: No
+
+#### `text`: `string`
+
+If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+
+-   Required: No
+
+#### `tooltipPosition`: `PopoverProps[ 'position' ]`
+
+If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
+
+-   Required: No
+
+#### `variant`: `'primary' | 'secondary' | 'tertiary' | 'link'`
+
+Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
+
 -   Required: No
 
 ## Related components

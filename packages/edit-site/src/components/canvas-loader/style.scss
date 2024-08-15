@@ -1,0 +1,28 @@
+.edit-site-canvas-loader {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	align-items: center;
+	justify-content: center;
+
+	animation: 0.5s ease 0.2s edit-site-canvas-loader__fade-in-animation;
+	animation-fill-mode: forwards;
+	@include reduce-motion("animation");
+
+	& > div {
+		width: 160px;
+	}
+}
+
+@keyframes edit-site-canvas-loader__fade-in-animation {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

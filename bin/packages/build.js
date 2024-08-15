@@ -1,6 +1,9 @@
+#!/usr/bin/env node
+
 /**
  * External dependencies
  */
+const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
@@ -14,16 +17,75 @@ const files = process.argv.slice( 2 );
  *
  * @type {string}
  */
-const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
+const PACKAGES_DIR = path
+	.resolve( __dirname, '../../packages' )
+	.replace( /\\/g, '/' );
+
+const stylesheetEntryPoints = glob.sync(
+	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+);
 
 /**
  * Get the package name for a specified file
  *
- * @param  {string} file File name
- * @return {string}      Package name
+ * @param {string} file File name.
+ *
+ * @return {string} Package name.
  */
 function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
+}
+
+/**
+ * Parses all Sass import statements in a given file
+ *
+ * @param {string} file File name.
+ *
+ * @return {Array} List of Import Statements in a file.
+ */
+function parseImportStatements( file ) {
+	const fileContent = fs.readFileSync( file, 'utf8' );
+	return fileContent.toString().match( /@import "(.*?)"/g );
+}
+
+function isFileImportedInStyleEntry( file, importStatements ) {
+	const packageName = getPackageName( file );
+	const regex = new RegExp( `/${ packageName }/`, 'g' );
+
+	return (
+		importStatements &&
+		importStatements.find( ( importStatement ) =>
+			importStatement.match( regex )
+		)
+	);
+}
+
+/**
+ * Finds all stylesheet entry points that contain import statements
+ * that include the given file name
+ *
+ * @param {string} file File name.
+ *
+ * @return {Array} List of entry points that import the styles from the file.
+ */
+function findStyleEntriesThatImportFile( file ) {
+	const entriesWithImport = stylesheetEntryPoints.reduce(
+		( acc, entryPoint ) => {
+			const styleEntryImportStatements =
+				parseImportStatements( entryPoint );
+
+			if (
+				isFileImportedInStyleEntry( file, styleEntryImportStatements )
+			) {
+				acc.push( entryPoint );
+			}
+
+			return acc;
+		},
+		[]
+	);
+
+	return entriesWithImport;
 }
 
 /**
@@ -56,9 +118,33 @@ function createStyleEntryTransform() {
 
 			packages.add( packageName );
 			const entries = await glob(
-				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+				path
+					.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+					.replace( /\\/g, '/' )
 			);
+
+			// Account for the specific case where block styles in
+			// block-library package also need rebuilding.
+			if (
+				packageName === 'block-library' &&
+				[ 'style.scss', 'editor.scss', 'theme.scss' ].includes(
+					path.basename( file )
+				)
+			) {
+				entries.push( file );
+			}
+
 			entries.forEach( ( entry ) => this.push( entry ) );
+
+			// Find other stylesheets that need to be rebuilt because
+			// they import the styles that are being transformed.
+			const styleEntries = findStyleEntriesThatImportFile( file );
+
+			// Rebuild stylesheets that import the styles being transformed.
+			if ( styleEntries.length ) {
+				styleEntries.forEach( ( entry ) => stream.push( entry ) );
+			}
+
 			callback();
 		},
 	} );
@@ -78,9 +164,10 @@ function createBlockJsonEntryTransform() {
 	return new Transform( {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
-			const matches = /block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
-				file
-			);
+			const matches =
+				/block-library[\/\\]src[\/\\](.*)[\/\\]block.json$/.exec(
+					file
+				);
 			const blockName = matches ? matches[ 1 ] : undefined;
 
 			// Only block.json files in the block-library folder are subject to this transform.
@@ -109,7 +196,10 @@ let stream;
 
 if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
-	files.forEach( ( file ) => stream.push( file ) );
+	files.forEach( ( file ) => {
+		stream.push( file );
+	} );
+
 	stream.push( null );
 	stream = stream
 		.pipe( createStyleEntryTransform() )
@@ -124,12 +214,21 @@ if ( files.length ) {
 	bar.tick( 0 );
 
 	stream = glob.stream(
-		[ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ],
+		[
+			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
+			`${ PACKAGES_DIR }/*/src/*.scss`,
+			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
+			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/theme.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*.scss`,
+		],
 		{
 			ignore: [
 				`**/benchmark/**`,
 				`**/{__mocks__,__tests__,test}/**`,
 				`**/{storybook,stories}/**`,
+				`**/e2e-test-utils-playwright/**`,
 			],
 			onlyFiles: true,
 		}
@@ -171,7 +270,8 @@ stream
 				console.error( error );
 			}
 
-			if ( ended && ++complete === files.length ) {
+			++complete;
+			if ( ended && complete === files.length ) {
 				workerFarm.end( worker );
 			}
 		} )

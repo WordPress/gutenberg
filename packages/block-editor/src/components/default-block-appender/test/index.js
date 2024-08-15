@@ -1,60 +1,68 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
  */
-import { DefaultBlockAppender } from '../';
+import DefaultBlockAppender, { ZWNBSP } from '../';
+import * as blockEditorActions from '../../../store/actions';
+import * as blockEditorSelectors from '../../../store/selectors';
+jest.mock( '../../../store/actions', () => {
+	const actions = jest.requireActual( '../../../store/actions' );
+	return {
+		...actions,
+		startTyping: jest.fn( actions.startTyping ),
+	};
+} );
+jest.mock( '../../../store/selectors', () => {
+	const selectors = jest.requireActual( '../../../store/selectors' );
+	return {
+		...selectors,
+		getBlockCount: jest.fn( selectors.getBlockCount ),
+	};
+} );
 
 describe( 'DefaultBlockAppender', () => {
-	const expectOnAppendCalled = ( onAppend ) => {
-		expect( onAppend ).toHaveBeenCalledTimes( 1 );
-		expect( onAppend ).toHaveBeenCalledWith();
-	};
-
-	it( 'should render nothing if not visible', () => {
-		const wrapper = shallow( <DefaultBlockAppender /> );
-
-		expect( wrapper.type() ).toBe( null );
-	} );
-
 	it( 'should match snapshot', () => {
-		const onAppend = jest.fn();
-		const wrapper = shallow(
-			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
-		);
+		const { container } = render( <DefaultBlockAppender /> );
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should append a default block when input focused', () => {
-		const onAppend = jest.fn();
-		const wrapper = shallow(
-			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
+	it( 'should append a default block when input focused', async () => {
+		const startTyping = jest.spyOn( blockEditorActions, 'startTyping' );
+		const user = userEvent.setup();
+
+		const { container } = render( <DefaultBlockAppender /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Add default block' } )
 		);
 
-		wrapper.find( 'TextareaAutosize' ).simulate( 'focus' );
+		expect( container ).toMatchSnapshot();
 
-		expect( wrapper ).toMatchSnapshot();
-
-		expectOnAppendCalled( onAppend );
+		// Called once for focusing and once for clicking.
+		expect( startTyping ).toHaveBeenCalledTimes( 2 );
+		expect( startTyping ).toHaveBeenCalledWith();
 	} );
 
-	it( 'should optionally show without prompt', () => {
-		const onAppend = jest.fn();
-		const wrapper = shallow(
-			<DefaultBlockAppender
-				isVisible
-				onAppend={ onAppend }
-				showPrompt={ false }
-			/>
-		);
-		const input = wrapper.find( 'TextareaAutosize' );
+	it( 'should optionally show without prompt', async () => {
+		blockEditorSelectors.getBlockCount.mockImplementation( () => 1 );
+		const user = userEvent.setup();
 
-		expect( input.prop( 'value' ) ).toEqual( '' );
+		const { container } = render( <DefaultBlockAppender /> );
 
-		expect( wrapper ).toMatchSnapshot();
+		const appender = screen.getByRole( 'button', {
+			name: 'Add default block',
+		} );
+
+		await user.click( appender );
+
+		expect( appender ).toContainHTML( ZWNBSP );
+
+		expect( container ).toMatchSnapshot();
 	} );
 } );

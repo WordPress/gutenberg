@@ -1,0 +1,10 @@
+@import "~@wordpress/base-styles/colors";
+
+// These `body` styles have different values defined in common.css,
+// but are overridden to these values within major UI sections that contain wp-components,
+// such as the .interface-interface-skeleton__sidebar section.
+// Let's assume that this is the CSS environment we will be in when wp-components appear in a WP context.
+body {
+	color: $gray-900 !important;
+	background: $white !important;
+}

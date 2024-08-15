@@ -1,17 +1,18 @@
 /**
- * Verifies that the edit post sidebar is opened, and if it is not, opens it.
+ * Verifies that the edit post/site/widgets sidebar is opened, and if it is not, opens it.
  *
- * @return {Promise} Promise resolving once the edit post sidebar is opened.
+ * @return {Promise} Promise resolving once the sidebar is opened.
  */
 export async function ensureSidebarOpened() {
-	// This try/catch flow relies on the fact that `page.$eval` throws an error
-	// if the element matching the given selector does not exist. Thus, if an
-	// error is thrown, it can be inferred that the sidebar is not opened.
-	try {
-		return page.$eval( '.edit-post-sidebar', () => {} );
-	} catch ( error ) {
-		return page.click(
-			'.edit-post-header__settings [aria-label="Settings"]'
-		);
+	const toggleSidebarButton = await page.$(
+		'.edit-post-header__settings [aria-label="Settings"][aria-expanded="false"],' +
+			'.edit-site-header__actions [aria-label="Settings"][aria-expanded="false"],' +
+			'.edit-widgets-header__actions [aria-label="Settings"][aria-expanded="false"],' +
+			'.edit-site-header-edit-mode__actions [aria-label="Settings"][aria-expanded="false"],' +
+			'.editor-header__settings [aria-label="Settings"][aria-expanded="false"]'
+	);
+
+	if ( toggleSidebarButton ) {
+		await toggleSidebarButton.click();
 	}
 }

@@ -20,11 +20,12 @@ describe( 'Fetch All Middleware', () => {
 		const originalOptions = { url: '/posts?per_page=-1' };
 		let counter = 1;
 		jest.doMock( '../../index.js', () => ( options ) => {
-			if ( counter === 1 ) {
-				expect( options.url ).toBe( '/posts?per_page=100' );
-			} else {
-				expect( options.url ).toBe( '/posts?per_page=100&page=2' );
-			}
+			const expectedUrl =
+				counter === 1
+					? '/posts?per_page=100'
+					: '/posts?per_page=100&page=2';
+			expect( options.url ).toBe( expectedUrl );
+
 			const response = Promise.resolve( {
 				status: 200,
 				headers: {

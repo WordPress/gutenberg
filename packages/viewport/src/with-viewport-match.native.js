@@ -1,13 +1,13 @@
 /**
- * External dependencies
- */
-import { mapValues } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store } from './store';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -16,15 +16,15 @@ import { withSelect } from '@wordpress/data';
  *
  * @see isViewportMatch
  *
- * @param {Object} queries  Object of prop name to viewport query.
+ * @param {Object} queries Object of prop name to viewport query.
  *
  * @example
  *
  * ```jsx
  * function MyComponent( { isMobile } ) {
- * 	return (
- * 		<div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>
- * 	);
+ *     return (
+ *         <div>Currently: { isMobile ? 'Mobile' : 'Not Mobile' }</div>
+ *     );
  * }
  *
  * MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
@@ -32,14 +32,18 @@ import { withSelect } from '@wordpress/data';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) =>
-	createHigherOrderComponent(
+const withViewportMatch = ( queries ) => {
+	const queryEntries = Object.entries( queries );
+	return createHigherOrderComponent(
 		withSelect( ( select ) => {
-			return mapValues( queries, ( query ) => {
-				return select( 'core/viewport' ).isViewportMatch( query );
-			} );
+			return Object.fromEntries(
+				queryEntries.map( ( [ key, query ] ) => {
+					return [ key, select( store ).isViewportMatch( query ) ];
+				} )
+			);
 		} ),
 		'withViewportMatch'
 	);
+};
 
 export default withViewportMatch;

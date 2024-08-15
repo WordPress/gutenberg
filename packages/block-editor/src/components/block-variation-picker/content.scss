@@ -1,0 +1,39 @@
+.block-editor-block-variation-picker__variations,
+.block-editor-block-variation-picker__skip,
+.wp-block-group-placeholder__variations {
+	list-style: none;
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	gap: $grid-unit-10;
+	font-size: $helptext-font-size;
+
+	svg {
+		fill: $gray-600 !important;
+	}
+
+	.components-button {
+		padding: 4px;
+	}
+
+	.components-button:hover {
+		background: none !important; // !important to simplify the selector.
+	}
+
+	.components-button:hover svg {
+		fill: var(--wp-admin-theme-color) !important;
+	}
+
+	& > li {
+		width: auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: $grid-unit-05;
+	}
+}
+

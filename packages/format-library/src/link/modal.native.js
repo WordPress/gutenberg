@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import React from 'react';
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -19,17 +15,22 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 	return useMemo( () => {
 		return (
 			<BottomSheet
-				isChildrenScrollable
 				isVisible={ isVisible }
 				hideHeader
 				onClose={ restProps.onClose }
+				hasNavigation
+				testID="link-settings-modal"
 			>
 				<BottomSheet.NavigationContainer animate main>
 					<BottomSheet.NavigationScreen name={ screens.settings }>
-						<LinkSettingsScreen { ...restProps } />
+						<LinkSettingsScreen
+							isVisible={ isVisible }
+							{ ...restProps }
+						/>
 					</BottomSheet.NavigationScreen>
 					<BottomSheet.NavigationScreen
 						name={ screens.picker }
+						isScrollable
 						fullScreen
 					>
 						<LinkPickerScreen />

@@ -2,15 +2,7 @@
 
 Checkboxes allow the user to select one or more items from a set.
 
-![](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
-
-Selected and unselected checkboxes
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![Selected and unselected checkboxes](https://make.wordpress.org/design/files/2019/02/CheckboxControl.png)
 
 ## Design guidelines
 
@@ -20,8 +12,8 @@ Selected and unselected checkboxes
 
 Use checkboxes when you want users to:
 
-- Select one or multiple items from a list.
-- Open a list containing sub-selections.
+-   Select one or multiple items from a list.
+-   Open a list containing sub-selections.
 
 ![](https://make.wordpress.org/design/files/2019/02/select-from-list.png)
 
@@ -43,7 +35,7 @@ Checkboxes can have a parent-child relationship, with secondary options nested u
 
 ![](https://make.wordpress.org/design/files/2019/02/checkbox-parent.gif)
 
-When the parent checkbox is *checked*, all the child checkboxes are checked. When a parent checkbox is *unchecked*, all the child checkboxes are unchecked.
+When the parent checkbox is _checked_, all the child checkboxes are checked. When a parent checkbox is _unchecked_, all the child checkboxes are unchecked.
 
 ![](https://make.wordpress.org/design/files/2019/02/mixed-checkbox.png)
 
@@ -54,21 +46,22 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 ### Usage
 
 Render an is author checkbox:
+
 ```jsx
+import { useState } from 'react';
 import { CheckboxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<CheckboxControl
-			heading="User"
+			__nextHasNoMarginBottom
 			label="Is author"
 			help="Is the user a author or not?"
 			checked={ isChecked }
 			onChange={ setChecked }
 		/>
-	)
+	);
 };
 ```
 
@@ -77,45 +70,47 @@ const MyCheckboxControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input element.
 
-#### heading
-
-A heading for the input field, that appears above the checkbox. If the prop is not passed no heading will be rendered.
-
-- Type: `String`
-- Required: No
-
-#### label
+#### `label`: `string`
 
 A label for the input field, that appears at the side of the checkbox.
 The prop will be rendered as content a label element.
 If no prop is passed an empty label is rendered.
 
-- Type: `String`
-- Required: No
+-   Required: No
 
-#### help
+#### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String|WPElement`
-- Required: No
+-   Required: No
 
-#### checked
+#### `checked`: `boolean`
 
 If checked is true the checkbox will be checked. If checked is false the checkbox will be unchecked.
 If no value is passed the checkbox will be unchecked.
 
-- Type: `Boolean`
-- Required: No
+-   Required: No
 
-#### onChange
+#### `onChange`: `function`
 
 A function that receives the checked state (boolean) as input.
 
-- Type: `function`
-- Required: Yes
+-   Required: Yes
+
+#### `indeterminate`: `boolean`
+
+If indeterminate is true the state of the checkbox will be indeterminate.
+
+-   Required: No
+
+#### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 
-- To select one option from a set, and you want to show all the available options at once, use the `RadioControl` component.
-- To toggle a single setting on or off, use the `FormToggle` component.
+-   To select one option from a set, and you want to show all the available options at once, use the `RadioControl` component.
+-   To toggle a single setting on or off, use the `FormToggle` component.

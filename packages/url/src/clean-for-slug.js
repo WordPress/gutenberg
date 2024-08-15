@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, trim } from 'lodash';
+import removeAccents from 'remove-accents';
 
 /**
  * Performs some basic cleanup of a string for use as a post slug.
@@ -23,11 +23,17 @@ export function cleanForSlug( string ) {
 	if ( ! string ) {
 		return '';
 	}
-	return trim(
-		deburr( string )
+	return (
+		removeAccents( string )
+			// Convert each group of whitespace, periods, and forward slashes to a hyphen.
 			.replace( /[\s\./]+/g, '-' )
-			.replace( /[^\w-]+/g, '' )
-			.toLowerCase(),
-		'-'
+			// Remove anything that's not a letter, number, underscore or hyphen.
+			.replace( /[^\p{L}\p{N}_-]+/gu, '' )
+			// Convert to lowercase
+			.toLowerCase()
+			// Replace multiple hyphens with a single one.
+			.replace( /-+/g, '-' )
+			// Remove any remaining leading or trailing hyphens.
+			.replace( /(^-+)|(-+$)/g, '' )
 	);
 }

@@ -1,23 +1,28 @@
 /**
  * External dependencies
  */
-import { Platform, Clipboard } from 'react-native';
+import { Platform } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useRef,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import BottomSheet from '../bottom-sheet';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 import PanelBody from '../../panel/body';
 import TextControl from '../../text-control';
 import ToggleControl from '../../toggle-control';
@@ -28,14 +33,11 @@ import LinkRelIcon from './link-rel';
 import styles from './style.scss';
 
 const NEW_TAB_REL = 'noreferrer noopener';
-
 function LinkSettings( {
 	// Control link settings `BottomSheet` visibility
 	isVisible,
 	// Callback that is called on closing bottom sheet
 	onClose,
-	// Object of attributes to be set or updated in `LinkSettings`
-	attributes,
 	// Function called to set attributes
 	setAttributes,
 	// Callback that is called when url input field is empty
@@ -80,12 +82,29 @@ function LinkSettings( {
 	editorSidebarOpened,
 	// Specifies whether icon should be displayed next to the label
 	showIcon,
+	onLinkCellPressed,
+	urlValue,
+	// Attributes properties
+	url,
+	label = '',
+	linkTarget,
+	rel = '',
 } ) {
-	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
+	const onCloseSettingsSheetConsumed = useRef( false );
 	const prevEditorSidebarOpenedRef = useRef();
+
+	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
+	useEffect( () => {
+		if ( onHandleClosingBottomSheet ) {
+			onHandleClosingBottomSheet( onCloseSettingsSheet );
+		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
 
 	useEffect( () => {
 		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
@@ -93,7 +112,12 @@ function LinkSettings( {
 	const prevEditorSidebarOpened = prevEditorSidebarOpenedRef.current;
 
 	useEffect( () => {
-		setUrlInputValue( url || '' );
+		if ( url !== urlInputValue ) {
+			setUrlInputValue( url || '' );
+		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ url ] );
 
 	useEffect( () => {
@@ -106,6 +130,10 @@ function LinkSettings( {
 
 	useEffect( () => {
 		const isSettingSheetOpen = isVisible || editorSidebarOpened;
+		if ( isSettingSheetOpen ) {
+			onCloseSettingsSheetConsumed.current = false;
+		}
+
 		if ( options.url.autoFill && isSettingSheetOpen && ! url ) {
 			getURLFromClipboard();
 		}
@@ -113,51 +141,97 @@ function LinkSettings( {
 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
 			onSetAttributes();
 		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ editorSidebarOpened, isVisible ] );
 
-	function onChangeURL( value ) {
-		if ( ! value && onEmptyURL ) {
+	useEffect( () => {
+		if ( ! urlValue && onEmptyURL ) {
 			onEmptyURL();
 		}
-		setUrlInputValue( value );
-	}
 
-	function onChangeLabel( value ) {
+		if ( prependHTTP( urlValue ) !== url ) {
+			setAttributes( {
+				url: prependHTTP( urlValue ),
+			} );
+		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ urlValue ] );
+
+	const onChangeURL = useCallback(
+		( value ) => {
+			if ( ! value && onEmptyURL ) {
+				onEmptyURL();
+			}
+			setUrlInputValue( value );
+		},
+		[ onEmptyURL ]
+	);
+
+	const onChangeLabel = useCallback( ( value ) => {
 		setLabelInputValue( value );
-	}
+	}, [] );
 
-	function onSetAttributes() {
-		setAttributes( {
-			url: prependHTTP( urlInputValue ),
-			label: labelInputValue,
-			rel: linkRelInputValue,
-		} );
-	}
+	const onSetAttributes = useCallback( () => {
+		const newURL = prependHTTP( urlInputValue );
+		if (
+			url !== newURL ||
+			labelInputValue !== label ||
+			linkRelInputValue !== rel
+		) {
+			setAttributes( {
+				url: newURL,
+				label: labelInputValue,
+				rel: linkRelInputValue,
+			} );
+		}
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
 
-	function onCloseSettingsSheet() {
-		onSetAttributes();
-		onClose();
-	}
-
-	function onChangeOpenInNewTab( value ) {
-		const newLinkTarget = value ? '_blank' : undefined;
-
-		let updatedRel = rel;
-		if ( newLinkTarget && ! rel ) {
-			updatedRel = NEW_TAB_REL;
-		} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
-			updatedRel = undefined;
+	const onCloseSettingsSheet = useCallback( () => {
+		if ( onCloseSettingsSheetConsumed.current ) {
+			return;
 		}
 
-		setAttributes( {
-			linkTarget: newLinkTarget,
-			rel: updatedRel,
-		} );
-	}
+		onCloseSettingsSheetConsumed.current = true;
 
-	function onChangeLinkRel( value ) {
+		onSetAttributes();
+
+		if ( onClose ) {
+			onClose();
+		}
+	}, [ onClose, onSetAttributes ] );
+
+	const onChangeOpenInNewTab = useCallback(
+		( value ) => {
+			const newLinkTarget = value ? '_blank' : undefined;
+
+			let updatedRel = linkRelInputValue;
+			if ( newLinkTarget && ! linkRelInputValue ) {
+				updatedRel = NEW_TAB_REL;
+			} else if ( ! newLinkTarget && linkRelInputValue === NEW_TAB_REL ) {
+				updatedRel = undefined;
+			}
+
+			setAttributes( {
+				linkTarget: newLinkTarget,
+				rel: updatedRel,
+			} );
+		},
+		// Disable reason: deferring this refactor to the native team.
+		// see https://github.com/WordPress/gutenberg/pull/41166
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ linkRelInputValue ]
+	);
+
+	const onChangeLinkRel = useCallback( ( value ) => {
 		setLinkRelInputValue( value );
-	}
+	}, [] );
 
 	async function getURLFromClipboard() {
 		const clipboardText = await Clipboard.getString();
@@ -165,7 +239,7 @@ function LinkSettings( {
 		if ( ! clipboardText ) {
 			return;
 		}
-		// Check if pasted text is URL
+		// Check if pasted text is URL.
 		if ( ! isURL( clipboardText ) ) {
 			return;
 		}
@@ -176,23 +250,31 @@ function LinkSettings( {
 	function getSettings() {
 		return (
 			<>
-				{ options.url && (
-					<TextControl
-						icon={ showIcon && link }
-						label={ options.url.label }
-						value={ urlInputValue }
-						valuePlaceholder={ options.url.placeholder }
-						onChange={ onChangeURL }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={
-							Platform.OS === 'ios' && options.url.autoFocus
-						}
-						keyboardType="url"
-					/>
-				) }
+				{ options.url &&
+					( onLinkCellPressed ? (
+						<BottomSheet.LinkCell
+							showIcon={ showIcon }
+							value={ url }
+							valueMask={ options.url.valueMask }
+							onPress={ onLinkCellPressed }
+						/>
+					) : (
+						<TextControl
+							icon={ showIcon && link }
+							label={ options.url.label }
+							value={ urlInputValue }
+							valuePlaceholder={ options.url.placeholder }
+							onChange={ onChangeURL }
+							onSubmit={ onCloseSettingsSheet }
+							autoCapitalize="none"
+							autoCorrect={ false }
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={
+								Platform.OS === 'ios' && options.url.autoFocus
+							}
+							keyboardType="url"
+						/>
+					) ) }
 				{ options.linkLabel && (
 					<TextControl
 						label={ options.linkLabel.label }
@@ -201,26 +283,30 @@ function LinkSettings( {
 						onChange={ onChangeLabel }
 					/>
 				) }
-				{ options.openInNewTab && (
-					<ToggleControl
-						icon={ showIcon && external }
-						label={ options.openInNewTab.label }
-						checked={ linkTarget === '_blank' }
-						onChange={ onChangeOpenInNewTab }
-					/>
-				) }
-				{ options.linkRel && (
-					<TextControl
-						icon={ showIcon && LinkRelIcon }
-						label={ options.linkRel.label }
-						value={ linkRelInputValue }
-						valuePlaceholder={ options.linkRel.placeholder }
-						onChange={ onChangeLinkRel }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
+				{ !! urlInputValue && (
+					<>
+						{ options.openInNewTab && (
+							<ToggleControl
+								icon={ showIcon && external }
+								label={ options.openInNewTab.label }
+								checked={ linkTarget === '_blank' }
+								onChange={ onChangeOpenInNewTab }
+							/>
+						) }
+						{ options.linkRel && (
+							<TextControl
+								icon={ showIcon && LinkRelIcon }
+								label={ options.linkRel.label }
+								value={ linkRelInputValue }
+								valuePlaceholder={ options.linkRel.placeholder }
+								onChange={ onChangeLinkRel }
+								onSubmit={ onCloseSettingsSheet }
+								autoCapitalize="none"
+								autoCorrect={ false }
+								keyboardType="default"
+							/>
+						) }
+					</>
 				) }
 			</>
 		);
@@ -231,11 +317,7 @@ function LinkSettings( {
 	}
 
 	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onCloseSettingsSheet }
-			hideHeader
-		>
+		<>
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }
 			</PanelBody>
@@ -243,12 +325,12 @@ function LinkSettings( {
 				<PanelBody style={ styles.linkSettingsPanel }>
 					<FooterMessageControl
 						label={ options.footer.label }
-						textAlign="left"
+						separatorType={ options.footer.separatorType }
 					/>
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }
-		</BottomSheet>
+		</>
 	);
 }
 

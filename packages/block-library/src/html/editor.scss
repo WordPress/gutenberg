@@ -1,6 +1,4 @@
-.wp-block-html {
-	margin-bottom: $default-block-margin;
-
+.block-library-html__edit {
 	.block-library-html__preview-overlay {
 		position: absolute;
 		width: 100%;
@@ -9,22 +7,14 @@
 		left: 0;
 	}
 
+	// The editing view for the HTML block is equivalent to block UI.
+	// Therefore we increase specificity to avoid theme styles bleeding in.
 	.block-editor-plain-text {
-		font-family: $editor-html-font;
-		color: $gray-900;
-		padding: 0.8em 1em;
-		border: 1px solid $gray-300;
-		border-radius: 4px;
+		box-sizing: border-box;
 		max-height: 250px;
-
-		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
-		@include break-small {
-			font-size: $default-font-size;
-		}
-
-		&:focus {
-			box-shadow: none;
-		}
+		@include editor-input-reset();
+		// HTML input is always LTR regardless of language.
+		/*rtl:ignore*/
+		direction: ltr;
 	}
 }

@@ -1,12 +1,10 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"references": [
-		{ "path": "../dom-ready" },
-		{ "path": "../i18n" },
-	],
+	"references": [ { "path": "../dom-ready" }, { "path": "../i18n" } ],
 	"include": [ "src/**/*" ]
 }

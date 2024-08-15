@@ -14,17 +14,19 @@ export default class VisualEditor extends Component {
 		super( props );
 		this.renderHeader = this.renderHeader.bind( this );
 	}
+
 	renderHeader() {
 		const { setTitleRef } = this.props;
 		return <Header setTitleRef={ setTitleRef } />;
 	}
+
 	render() {
 		const { safeAreaBottomInset } = this.props;
+
 		return (
 			<BlockList
 				header={ this.renderHeader }
 				safeAreaBottomInset={ safeAreaBottomInset }
-				autoScroll={ true }
 			/>
 		);
 	}

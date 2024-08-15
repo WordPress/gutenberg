@@ -1,0 +1,26 @@
+# Configure Dependabot scanning.
+version: 2
+
+updates:
+    # Check for updates to GitHub Actions.
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+      open-pull-requests-limit: 10
+      labels:
+          - 'GitHub Actions'
+          - '[Type] Build Tooling'
+      groups:
+          github-actions:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'
+          react-native:
+              patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'

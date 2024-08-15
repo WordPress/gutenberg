@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,9 @@ const deprecated = [
 				max: 100,
 			},
 		},
+		isEligible( { width } ) {
+			return isFinite( width );
+		},
 		migrate( attributes ) {
 			return {
 				...attributes,
@@ -29,14 +32,12 @@ const deprecated = [
 		save( { attributes } ) {
 			const { verticalAlignment, width } = attributes;
 
-			const wrapperClasses = classnames( {
-				[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+			const wrapperClasses = clsx( {
+				[ `is-vertically-aligned-${ verticalAlignment }` ]:
+					verticalAlignment,
 			} );
 
-			let style;
-			if ( Number.isFinite( width ) ) {
-				style = { flexBasis: width + '%' };
-			}
+			const style = { flexBasis: width + '%' };
 
 			return (
 				<div className={ wrapperClasses } style={ style }>

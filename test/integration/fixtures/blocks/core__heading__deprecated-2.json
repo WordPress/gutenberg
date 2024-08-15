@@ -1,0 +1,12 @@
+[
+	{
+		"name": "core/heading",
+		"isValid": true,
+		"attributes": {
+			"content": "text",
+			"level": 2,
+			"textColor": "accent"
+		},
+		"innerBlocks": []
+	}
+]

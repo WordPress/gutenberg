@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/report-flaky-tests",
+	"version": "0.0.0",
+	"private": true,
+	"description": "A GitHub action to report flaky E2E tests to GitHub issues.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"E2E",
+		"flaky",
+		"GitHub Actions"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/report-flaky-tests/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/report-flaky-tests"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"types": "build-types",
+	"dependencies": {
+		"@actions/core": "^1.8.0",
+		"@actions/github": "^5.0.1",
+		"jest-message-util": "^29.6.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

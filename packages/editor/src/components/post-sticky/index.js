@@ -3,39 +3,37 @@
  */
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostStickyCheck from './check';
+import { store as editorStore } from '../../store';
 
-export function PostSticky( { onUpdateSticky, postSticky = false } ) {
+/**
+ * Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
+ *
+ * @return {Component} The component to be rendered.
+ */
+export default function PostSticky() {
+	const postSticky = useSelect( ( select ) => {
+		return (
+			select( editorStore ).getEditedPostAttribute( 'sticky' ) ?? false
+		);
+	}, [] );
+	const { editPost } = useDispatch( editorStore );
+
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
-				label={ __( 'Stick to the top of the blog' ) }
+				className="editor-post-sticky__checkbox-control"
+				label={ __( 'Sticky' ) }
+				help={ __( 'Pin this post to the top of the blog' ) }
 				checked={ postSticky }
-				onChange={ () => onUpdateSticky( ! postSticky ) }
+				onChange={ () => editPost( { sticky: ! postSticky } ) }
+				__nextHasNoMarginBottom
 			/>
 		</PostStickyCheck>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			postSticky: select( 'core/editor' ).getEditedPostAttribute(
-				'sticky'
-			),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			onUpdateSticky( postSticky ) {
-				dispatch( 'core/editor' ).editPost( { sticky: postSticky } );
-			},
-		};
-	} ),
-] )( PostSticky );

@@ -1,75 +1,35 @@
 /**
  * External dependencies
  */
-const { createHash } = require( 'crypto' );
 const path = require( 'path' );
-const { ExternalsPlugin } = require( 'webpack' );
-const { RawSource } = require( 'webpack-sources' );
-// Ignore reason: json2php is untyped
-// @ts-ignore
+const webpack = require( 'webpack' );
 const json2php = require( 'json2php' );
+const { createHash } = webpack.util;
 
 /**
  * Internal dependencies
  */
 const {
 	defaultRequestToExternal,
+	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 } = require( './util' );
 
-/**
- * Map module request to an external.
- *
- * @callback RequestToExternal
- *
- * @param {string} request Module request.
- *
- * @return {string|string[]|void} Return `undefined` to ignore the request.
- *                                     Return `string|string[]` to map the request to an external.
- */
+const { RawSource } = webpack.sources;
+const { AsyncDependenciesBlock } = webpack;
 
-/**
- * Map module request to a script handle.
- *
- * @callback RequestToHandle
- *
- * @param {string} request Module request.
- *
- * @return {string|void} Return `undefined` to use the same name as the module.
- *                            Return `string` to map the request to a specific script handle.
- */
-
-/**
- * @typedef AssetData
- *
- * @property {string}   version      String representing a particular build
- * @property {string[]} dependencies The script dependencies
- */
-
-/**
- * @typedef Options
- *
- * @property {boolean}                     injectPolyfill      Force wp-polyfill to be included in each entry point's dependency list. This is like importing `@wordpress/polyfill` for each entry point.
- * @property {boolean}                     useDefaults         Set to `false` to disable the default WordPress script request handling.
- * @property {'php'|'json'}                outputFormat        The output format for the generated asset file.
- * @property {RequestToExternal|undefined} [requestToExternal] Map module requests to an external.
- * @property {RequestToHandle|undefined}   [requestToHandle]   Map module requests to a script handle.
- * @property {string|null}                 combinedOutputFile  This option is useful only when the combineAssets option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
- * @property {boolean|undefined}           combineAssets       By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
- */
+const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
 class DependencyExtractionWebpackPlugin {
-	/**
-	 * @param {Partial<Options>} options
-	 */
 	constructor( options ) {
-		/** @type {Options} */
 		this.options = Object.assign(
 			{
 				combineAssets: false,
 				combinedOutputFile: null,
+				externalizedReport: false,
 				injectPolyfill: false,
 				outputFormat: 'php',
+				outputFilename: null,
 				useDefaults: true,
 			},
 			options
@@ -86,34 +46,54 @@ class DependencyExtractionWebpackPlugin {
 		 */
 		this.externalizedDeps = new Set();
 
-		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new ExternalsPlugin(
-			'window',
-			this.externalizeWpDeps.bind( this )
-		);
+		/**
+		 * Should we use modules. This will be set later to match webpack's
+		 * output.module option.
+		 *
+		 * @type {boolean}
+		 */
+		this.useModules = false;
 	}
 
-	/* eslint-disable jsdoc/valid-types */
 	/**
-	 * @param {Parameters<WebpackExternalsFunction>[0]} _context
-	 * @param {Parameters<WebpackExternalsFunction>[1]} request
-	 * @param {Parameters<WebpackExternalsFunction>[2]} callback
+	 * @param {webpack.ExternalItemFunctionData}                             data
+	 * @param { ( err?: null | Error, result?: string | string[] ) => void } callback
 	 */
-	externalizeWpDeps( _context, request, callback ) {
-		/* eslint-enable jsdoc/valid-types */
+	externalizeWpDeps( { request }, callback ) {
 		let externalRequest;
 
-		// Handle via options.requestToExternal first
-		if ( typeof this.options.requestToExternal === 'function' ) {
-			externalRequest = this.options.requestToExternal( request );
-		}
+		try {
+			// Handle via options.requestToExternal(Module)  first.
+			if ( this.useModules ) {
+				if (
+					typeof this.options.requestToExternalModule === 'function'
+				) {
+					externalRequest =
+						this.options.requestToExternalModule( request );
 
-		// Cascade to default if unhandled and enabled
-		if (
-			typeof externalRequest === 'undefined' &&
-			this.options.useDefaults
-		) {
-			externalRequest = defaultRequestToExternal( request );
+					// requestToExternalModule allows a boolean shorthand
+					if ( externalRequest === false ) {
+						externalRequest = undefined;
+					}
+					if ( externalRequest === true ) {
+						externalRequest = request;
+					}
+				}
+			} else if ( typeof this.options.requestToExternal === 'function' ) {
+				externalRequest = this.options.requestToExternal( request );
+			}
+
+			// Cascade to default if unhandled and enabled.
+			if (
+				typeof externalRequest === 'undefined' &&
+				this.options.useDefaults
+			) {
+				externalRequest = this.useModules
+					? defaultRequestToExternalModule( request )
+					: defaultRequestToExternal( request );
+			}
+		} catch ( err ) {
+			return callback( err );
 		}
 
 		if ( externalRequest ) {
@@ -127,10 +107,10 @@ class DependencyExtractionWebpackPlugin {
 
 	/**
 	 * @param {string} request
-	 * @return {string} Transformed request
+	 * @return {string} Mapped dependency name
 	 */
 	mapRequestToDependency( request ) {
-		// Handle via options.requestToHandle first
+		// Handle via options.requestToHandle first.
 		if ( typeof this.options.requestToHandle === 'function' ) {
 			const scriptDependency = this.options.requestToHandle( request );
 			if ( scriptDependency ) {
@@ -138,7 +118,7 @@ class DependencyExtractionWebpackPlugin {
 			}
 		}
 
-		// Cascade to default if enabled
+		// Cascade to default if enabled.
 		if ( this.options.useDefaults ) {
 			const scriptDependency = defaultRequestToHandle( request );
 			if ( scriptDependency ) {
@@ -146,157 +126,280 @@ class DependencyExtractionWebpackPlugin {
 			}
 		}
 
-		// Fall back to the request name
+		// Fall back to the request name.
 		return request;
 	}
 
 	/**
-	 * @param {Object} asset
-	 * @return {string} Stringified asset
+	 * @param {any} asset Asset Data
+	 * @return {string} Stringified asset data suitable for output
 	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
 				JSON.parse( JSON.stringify( asset ) )
-			) };`;
+			) };\n`;
 		}
 
 		return JSON.stringify( asset );
 	}
 
-	/**
-	 * @param {WebpackCompiler} compiler
-	 * @return {void}
-	 */
+	/** @type {webpack.WebpackPluginInstance['apply']} */
 	apply( compiler ) {
+		this.useModules = Boolean( compiler.options.output?.module );
+
+		/**
+		 * Offload externalization work to the ExternalsPlugin.
+		 * @type {webpack.ExternalsPlugin}
+		 */
+		this.externalsPlugin = new webpack.ExternalsPlugin(
+			this.useModules ? 'import' : 'window',
+			this.externalizeWpDeps.bind( this )
+		);
+
 		this.externalsPlugin.apply( compiler );
 
-		// Assert the `string` type for output filename.
-		// The type indicates the option may be `undefined`.
-		// However, at this point in compilation, webpack has filled the options in if
-		// they were not provided.
-		const outputFilename = /** @type {{filename:string}} */ ( compiler
-			.options.output ).filename;
+		compiler.hooks.thisCompilation.tap(
+			this.constructor.name,
+			( compilation ) => {
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_ANALYSE,
+					},
+					() => this.addAssets( compilation )
+				);
+			}
+		);
+	}
 
-		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
-			const {
-				combineAssets,
-				combinedOutputFile,
-				injectPolyfill,
-				outputFormat,
-			} = this.options;
+	/** @param {webpack.Compilation} compilation */
+	addAssets( compilation ) {
+		const {
+			combineAssets,
+			combinedOutputFile,
+			externalizedReport,
+			injectPolyfill,
+			outputFormat,
+			outputFilename,
+		} = this.options;
 
-			/** @type {Record<string, AssetData>} */
-			const combinedAssetsData = {};
+		// Dump actually externalized dependencies to a report file.
+		if ( externalizedReport ) {
+			const externalizedReportFile =
+				typeof externalizedReport === 'string'
+					? externalizedReport
+					: defaultExternalizedReportFileName;
+			compilation.emitAsset(
+				externalizedReportFile,
+				new RawSource(
+					JSON.stringify( Array.from( this.externalizedDeps ).sort() )
+				)
+			);
+		}
 
-			// Process each entry point independently.
-			for ( const [
-				entrypointName,
-				entrypoint,
-			] of compilation.entrypoints.entries() ) {
-				/** @type {Set<string>} */
-				const entrypointExternalizedWpDeps = new Set();
-				if ( injectPolyfill ) {
-					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
-				}
+		const combinedAssetsData = {};
 
-				// Search for externalized modules in all chunks.
-				for ( const chunk of entrypoint.chunks ) {
-					for ( const { userRequest } of chunk.modulesIterable ) {
-						if ( this.externalizedDeps.has( userRequest ) ) {
-							const scriptDependency = this.mapRequestToDependency(
-								userRequest
+		// Accumulate all entrypoint chunks, some of them shared
+		const entrypointChunks = new Set();
+		for ( const entrypoint of compilation.entrypoints.values() ) {
+			for ( const chunk of entrypoint.chunks ) {
+				entrypointChunks.add( chunk );
+			}
+		}
+
+		// Process each entrypoint chunk independently
+		for ( const chunk of entrypointChunks ) {
+			const chunkFiles = Array.from( chunk.files );
+
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
+			);
+			if ( ! chunkJSFile ) {
+				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
+				continue;
+			}
+
+			/** @type {Set<string>} */
+			const chunkStaticDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkDynamicDeps = new Set();
+
+			if ( injectPolyfill ) {
+				chunkStaticDeps.add( 'wp-polyfill' );
+			}
+
+			/**
+			 * @param {webpack.Module} m
+			 */
+			const processModule = ( m ) => {
+				const { userRequest } = m;
+				if ( this.externalizedDeps.has( userRequest ) ) {
+					if ( this.useModules ) {
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
 							);
-							entrypointExternalizedWpDeps.add(
-								scriptDependency
-							);
-						}
+
+						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
+							m.request
+						);
+					} else {
+						chunkStaticDeps.add(
+							this.mapRequestToDependency( userRequest )
+						);
 					}
 				}
+			};
 
-				const runtimeChunk = entrypoint.getRuntimeChunk();
-
-				/** @type {AssetData} */
-				const assetData = {
-					// Get a sorted array so we can produce a stable, stringified representation.
-					dependencies: Array.from(
-						entrypointExternalizedWpDeps
-					).sort(),
-					version: runtimeChunk.hash,
-				};
-
-				const assetString = this.stringify( assetData );
-
-				// Determine a filename for the asset file.
-				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const buildFilename = compilation.getPath( outputFilename, {
-					chunk: runtimeChunk,
-					filename,
-					query,
-					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
-				} );
-
-				if ( combineAssets ) {
-					combinedAssetsData[ buildFilename ] = assetData;
-					continue;
+			// Search for externalized modules in all chunks.
+			for ( const chunkModule of compilation.chunkGraph.getChunkModulesIterable(
+				chunk
+			) ) {
+				processModule( chunkModule );
+				// Loop through submodules of ConcatenatedModule.
+				if ( chunkModule.modules ) {
+					for ( const concatModule of chunkModule.modules ) {
+						processModule( concatModule );
+					}
 				}
+			}
 
-				const assetFilename = buildFilename.replace(
-					/\.js$/i,
-					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' )
-				);
+			// Go through the assets and hash the sources. We can't just use
+			// `chunk.contentHash` because that's not updated when
+			// assets are minified. In practice the hash is updated by
+			// `RealContentHashPlugin` after minification, but it only modifies
+			// already-produced asset filenames and the updated hash is not
+			// available to plugins.
+			const { hashFunction, hashDigest, hashDigestLength } =
+				compilation.outputOptions;
 
-				// Add source and file into compilation for webpack to output.
-				compilation.assets[ assetFilename ] = new RawSource(
-					assetString
-				);
-				runtimeChunk.files.push( assetFilename );
+			const contentHash = chunkFiles
+				.sort()
+				.reduce( ( hash, filename ) => {
+					const asset = compilation.getAsset( filename );
+					return hash.update( asset.source.buffer() );
+				}, createHash( hashFunction ) )
+				.digest( hashDigest )
+				.slice( 0, hashDigestLength );
+
+			const assetData = {
+				dependencies: [
+					// Sort these so we can produce a stable, stringified representation.
+					...Array.from( chunkStaticDeps ).sort(),
+					...Array.from( chunkDynamicDeps )
+						.sort()
+						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
+				],
+				version: contentHash,
+			};
+
+			if ( this.useModules ) {
+				assetData.type = 'module';
 			}
 
 			if ( combineAssets ) {
-				// Assert the `string` type for output path.
-				// The type indicates the option may be `undefined`.
-				// However, at this point in compilation, webpack has filled the options in if
-				// they were not provided.
-				const outputFolder = /** @type {{path:string}} */ ( compiler
-					.options.output ).path;
-
-				const assetsFilePath = path.resolve(
-					outputFolder,
-					combinedOutputFile ||
-						'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
-				);
-				const assetsFilename = path.relative(
-					outputFolder,
-					assetsFilePath
-				);
-
-				// Add source into compilation for webpack to output.
-				compilation.assets[ assetsFilename ] = new RawSource(
-					this.stringify( combinedAssetsData )
-				);
+				combinedAssetsData[ chunkJSFile ] = assetData;
+				continue;
 			}
-		} );
-	}
-}
 
-/**
- * @param {string} name
- * @return {string} Basename
- */
-function basename( name ) {
-	if ( ! name.includes( '/' ) ) {
-		return name;
+			let assetFilename;
+			if ( outputFilename ) {
+				assetFilename = compilation.getPath( outputFilename, {
+					chunk,
+					filename: chunkJSFile,
+					contentHash,
+				} );
+			} else {
+				const suffix =
+					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' );
+				assetFilename = compilation
+					.getPath( '[file]', { filename: chunkJSFile } )
+					.replace( /\.m?js$/i, suffix );
+			}
+
+			// Add source and file into compilation for webpack to output.
+			compilation.assets[ assetFilename ] = new RawSource(
+				this.stringify( assetData )
+			);
+			chunk.files.add( assetFilename );
+		}
+
+		if ( combineAssets ) {
+			const outputFolder = compilation.outputOptions.path;
+
+			const assetsFilePath = path.resolve(
+				outputFolder,
+				combinedOutputFile ||
+					'assets.' + ( outputFormat === 'php' ? 'php' : 'json' )
+			);
+			const assetsFilename = path.relative(
+				outputFolder,
+				assetsFilePath
+			);
+
+			// Add source into compilation for webpack to output.
+			compilation.assets[ assetsFilename ] = new RawSource(
+				this.stringify( combinedAssetsData )
+			);
+		}
 	}
-	return name.substr( name.lastIndexOf( '/' ) + 1 );
+
+	/**
+	 * Can we trace a line of static dependencies from an entry to a module
+	 *
+	 * @param {webpack.Compilation}       compilation
+	 * @param {webpack.DependenciesBlock} block
+	 *
+	 * @return {boolean} True if there is a static import path to the root
+	 */
+	static hasStaticDependencyPathToRoot( compilation, block ) {
+		const incomingConnections = [
+			...compilation.moduleGraph.getIncomingConnections( block ),
+		].filter(
+			( connection ) =>
+				// Library connections don't have a dependency, this is a root
+				connection.dependency &&
+				// Entry dependencies are another root
+				connection.dependency.constructor.name !== 'EntryDependency'
+		);
+
+		// If we don't have non-entry, non-library incoming connections,
+		// we've reached a root of
+		if ( ! incomingConnections.length ) {
+			return true;
+		}
+
+		const staticDependentModules = incomingConnections.flatMap(
+			( connection ) => {
+				const { dependency } = connection;
+				const parentBlock =
+					compilation.moduleGraph.getParentBlock( dependency );
+
+				return parentBlock.constructor.name !==
+					AsyncDependenciesBlock.name
+					? [ compilation.moduleGraph.getParentModule( dependency ) ]
+					: [];
+			}
+		);
+
+		// All the dependencies were Async, the module was reached via a dynamic import
+		if ( ! staticDependentModules.length ) {
+			return false;
+		}
+
+		// Continue to explore any static dependencies
+		return staticDependentModules.some( ( parentStaticDependentModule ) =>
+			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+				compilation,
+				parentStaticDependentModule
+			)
+		);
+	}
 }
 
 module.exports = DependencyExtractionWebpackPlugin;
-
-/**
- * @typedef {import('webpack').Compiler} WebpackCompiler
- * @typedef {import('webpack').ExternalsFunctionElement} WebpackExternalsFunction
- */

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
-import { noop } from 'lodash';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -11,48 +11,67 @@ import { DotTip } from '..';
 
 describe( 'DotTip', () => {
 	it( 'should not render anything if invisible', () => {
-		const wrapper = shallow(
+		render(
 			<DotTip>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		expect( wrapper.isEmptyRender() ).toBe( true );
+
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should render correctly', () => {
-		const wrapper = shallow(
-			<DotTip isVisible setTimeout={ noop }>
+	it( 'should render correctly', async () => {
+		render(
+			<DotTip isVisible>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		expect( wrapper ).toMatchSnapshot();
+
+		// Wait for the dialog element to be positioned (aligned with the button)
+		await waitFor( () =>
+			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
+		);
+
+		expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
 	} );
 
-	it( 'should call onDismiss when the dismiss button is clicked', () => {
+	it( 'should call onDismiss when the dismiss button is clicked', async () => {
+		const user = userEvent.setup();
 		const onDismiss = jest.fn();
-		const wrapper = shallow(
-			<DotTip isVisible onDismiss={ onDismiss } setTimeout={ noop }>
+
+		render(
+			<DotTip isVisible onDismiss={ onDismiss }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper
-			.find( 'ForwardRef(Button)[children="Got it"]' )
-			.first()
-			.simulate( 'click' );
+
+		await waitFor( () =>
+			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Got it' } ) );
+
 		expect( onDismiss ).toHaveBeenCalled();
 	} );
 
-	it( 'should call onDisable when the X button is clicked', () => {
+	it( 'should call onDisable when the X button is clicked', async () => {
+		const user = userEvent.setup();
 		const onDisable = jest.fn();
-		const wrapper = shallow(
-			<DotTip isVisible onDisable={ onDisable } setTimeout={ noop }>
+
+		render(
+			<DotTip isVisible onDisable={ onDisable }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
-		wrapper
-			.find( 'ForwardRef(Button)[label="Disable tips"]' )
-			.first()
-			.simulate( 'click' );
+
+		await waitFor( () =>
+			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Disable tips' } )
+		);
+
 		expect( onDisable ).toHaveBeenCalled();
 	} );
 } );

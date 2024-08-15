@@ -9,6 +9,7 @@
 const Platform = {
 	OS: 'web',
 	select: ( spec ) => ( 'web' in spec ? spec.web : spec.default ),
+	isWeb: true,
 };
 /**
  * Component used to detect the current Platform being used.
@@ -16,7 +17,7 @@ const Platform = {
  *
  * This is the same concept as the React Native implementation.
  *
- * @see https://facebook.github.io/react-native/docs/platform-specific-code#platform-module
+ * @see https://reactnative.dev/docs/platform-specific-code#platform-module
  *
  * Here is an example of how to use the select method:
  * @example

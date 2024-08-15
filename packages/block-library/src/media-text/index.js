@@ -7,6 +7,7 @@ import { mediaAndText as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -18,11 +19,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Media & Text' ),
-	description: __( 'Set media and words side-by-side for a richer layout.' ),
 	icon,
-	keywords: [ __( 'image' ), __( 'video' ) ],
 	example: {
+		viewportWidth: 601, // Columns collapse "@media (max-width: 600px)".
 		attributes: {
 			mediaType: 'image',
 			mediaUrl:
@@ -50,3 +49,5 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

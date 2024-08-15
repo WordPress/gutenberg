@@ -1,0 +1,29 @@
+[
+	{
+		"name": "core/avatar",
+		"isValid": true,
+		"attributes": {
+			"userId": 4,
+			"size": 85,
+			"isLink": true,
+			"linkTarget": "_self",
+			"borderColor": "vivid-red",
+			"align": "right",
+			"style": {
+				"spacing": {
+					"margin": {
+						"bottom": "40px"
+					}
+				},
+				"border": {
+					"radius": "47px",
+					"width": "3px"
+				},
+				"color": {
+					"duotone": [ "#000000", "#ffe2c7" ]
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

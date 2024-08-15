@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/file",
+		"isValid": true,
+		"attributes": {
+			"href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+			"fileName": "",
+			"showDownloadButton": true,
+			"downloadButtonText": "Download",
+			"previewHeight": 600
+		},
+		"innerBlocks": []
+	}
+]

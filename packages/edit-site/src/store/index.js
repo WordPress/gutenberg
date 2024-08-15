@@ -1,29 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
-import { controls as dataControls } from '@wordpress/data-controls';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
 import * as actions from './actions';
+import * as privateActions from './private-actions';
 import * as selectors from './selectors';
-import controls from './controls';
-import { STORE_KEY } from './constants';
+import * as privateSelectors from './private-selectors';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
-export default function registerEditSiteStore( initialState ) {
-	const store = registerStore( STORE_KEY, {
-		reducer,
-		actions,
-		selectors,
-		controls: { ...dataControls, ...controls },
-		persist: [ 'preferences' ],
-		initialState,
-	} );
+export const storeConfig = {
+	reducer,
+	actions,
+	selectors,
+};
 
-	store.dispatch( actions.showHomepage() );
-
-	return store;
-}
+export const store = createReduxStore( STORE_NAME, storeConfig );
+register( store );
+unlock( store ).registerPrivateSelectors( privateSelectors );
+unlock( store ).registerPrivateActions( privateActions );

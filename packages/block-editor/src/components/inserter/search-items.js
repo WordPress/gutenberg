@@ -1,14 +1,51 @@
 /**
  * External dependencies
  */
-import { deburr, differenceWith, find, words } from 'lodash';
+import removeAccents from 'remove-accents';
+import { noCase } from 'change-case';
 
-// Default search helpers
+// Default search helpers.
 const defaultGetName = ( item ) => item.name || '';
 const defaultGetTitle = ( item ) => item.title;
+const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
+
+// Normalization regexes
+const splitRegexp = [
+	/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+	/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+];
+const stripRegexp = /(\p{C}|\p{P}|\p{S})+/giu; // Anything that's not a punctuation, symbol or control/format character.
+
+// Normalization cache
+const extractedWords = new Map();
+const normalizedStrings = new Map();
+
+/**
+ * Extracts words from an input string.
+ *
+ * @param {string} input The input string.
+ *
+ * @return {Array} Words, extracted from the input string.
+ */
+export function extractWords( input = '' ) {
+	if ( extractedWords.has( input ) ) {
+		return extractedWords.get( input );
+	}
+
+	const result = noCase( input, {
+		splitRegexp,
+		stripRegexp,
+	} )
+		.split( ' ' )
+		.filter( Boolean );
+
+	extractedWords.set( input, result );
+
+	return result;
+}
 
 /**
  * Sanitizes the search input string.
@@ -17,20 +54,26 @@ const defaultGetCollection = () => null;
  *
  * @return {string} The normalized search input.
  */
-function normalizeSearchInput( input = '' ) {
+export function normalizeString( input = '' ) {
+	if ( normalizedStrings.has( input ) ) {
+		return normalizedStrings.get( input );
+	}
+
 	// Disregard diacritics.
 	//  Input: "média"
-	input = deburr( input );
+	let result = removeAccents( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
-	input = input.replace( /^\//, '' );
+	result = result.replace( /^\//, '' );
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	input = input.toLowerCase();
+	result = result.toLowerCase();
 
-	return input;
+	normalizedStrings.set( input, result );
+
+	return result;
 }
 
 /**
@@ -41,16 +84,15 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	// Extract words.
-	return words( normalizeSearchInput( input ) );
+	return extractWords( normalizeString( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
-	return differenceWith(
-		unmatchedTerms,
-		getNormalizedSearchTerms( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
+	return unmatchedTerms.filter(
+		( term ) =>
+			! getNormalizedSearchTerms( unprocessedTerms ).some(
+				( unprocessedTerm ) => unprocessedTerm.includes( term )
+			)
 	);
 };
 
@@ -67,22 +109,9 @@ export const searchBlockItems = (
 
 	const config = {
 		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
+			categories.find( ( { slug } ) => slug === item.category )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
-		getVariations: ( { variations = [] } ) =>
-			Array.from(
-				variations.reduce(
-					( accumulator, { title, keywords = [] } ) => {
-						accumulator.add( title );
-						keywords.forEach( ( keyword ) =>
-							accumulator.add( keyword )
-						);
-						return accumulator;
-					},
-					new Set()
-				)
-			),
 	};
 
 	return searchItems( items, searchInput, config );
@@ -94,7 +123,8 @@ export const searchBlockItems = (
  * @param {Array}  items       Item list
  * @param {string} searchInput Search input.
  * @param {Object} config      Search Config.
- * @return {Array}             Filtered item list.
+ *
+ * @return {Array} Filtered item list.
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
@@ -120,12 +150,14 @@ export const searchItems = ( items = [], searchInput = '', config = {} ) => {
  * @param {Object} item       Item to filter.
  * @param {string} searchTerm Search term.
  * @param {Object} config     Search Config.
- * @return {number}           Search Rank.
+ *
+ * @return {number} Search Rank.
  */
 export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const {
 		getName = defaultGetName,
 		getTitle = defaultGetTitle,
+		getDescription = defaultGetDescription,
 		getKeywords = defaultGetKeywords,
 		getCategory = defaultGetCategory,
 		getCollection = defaultGetCollection,
@@ -133,12 +165,13 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	const name = getName( item );
 	const title = getTitle( item );
+	const description = getDescription( item );
 	const keywords = getKeywords( item );
 	const category = getCategory( item );
 	const collection = getCollection( item );
 
-	const normalizedSearchInput = normalizeSearchInput( searchTerm );
-	const normalizedTitle = normalizeSearchInput( title );
+	const normalizedSearchInput = normalizeString( searchTerm );
+	const normalizedTitle = normalizeString( title );
 
 	let rank = 0;
 
@@ -150,10 +183,15 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
 		rank += 20;
 	} else {
-		const terms = [ name, title, ...keywords, category, collection ].join(
-			' '
-		);
-		const normalizedSearchTerms = words( normalizedSearchInput );
+		const terms = [
+			name,
+			title,
+			description,
+			...keywords,
+			category,
+			collection,
+		].join( ' ' );
+		const normalizedSearchTerms = extractWords( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms
@@ -166,7 +204,9 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 
 	// Give a better rank to "core" namespaced items.
 	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
-		rank++;
+		const isCoreBlockVariation = name !== item.id;
+		// Give a bit better rank to "core" blocks over "core" block variations.
+		rank += isCoreBlockVariation ? 1 : 2;
 	}
 
 	return rank;

@@ -42,7 +42,6 @@ module.exports = {
 		'no-mixed-spaces-and-tabs': 'error',
 		'no-multiple-empty-lines': [ 'error', { max: 1 } ],
 		'no-multi-spaces': 'error',
-		'no-negated-in-lhs': 'error',
 		'no-nested-ternary': 'error',
 		'no-redeclare': 'error',
 		'no-shadow': 'error',
@@ -52,7 +51,7 @@ module.exports = {
 		'no-unreachable': 'error',
 		'no-unsafe-negation': 'error',
 		'no-unused-expressions': 'error',
-		'no-unused-vars': 'error',
+		'no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
 		'no-useless-return': 'error',
 		'no-whitespace-before-property': 'error',
 		'no-with': 'error',
@@ -73,7 +72,13 @@ module.exports = {
 				asyncArrow: 'always',
 			},
 		],
-		'space-in-parens': [ 'error', 'always' ],
+		'space-in-parens': [
+			'error',
+			'always',
+			{
+				exceptions: [ 'empty' ],
+			},
+		],
 		'space-infix-ops': 'error',
 		'space-unary-ops': [
 			'error',

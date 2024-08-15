@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "2.1.0",
+	"version": "10.5.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"environment",
 		"docker"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/env#readme",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/env#readme",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/WordPress/gutenberg.git",
@@ -18,6 +18,10 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"directories": {
 		"lib": "lib",
@@ -34,16 +38,16 @@
 	"dependencies": {
 		"chalk": "^4.0.0",
 		"copy-dir": "^1.3.0",
-		"docker-compose": "^0.22.2",
+		"docker-compose": "^0.24.3",
 		"extract-zip": "^1.6.7",
-		"got": "^10.7.0",
+		"got": "^11.8.5",
 		"inquirer": "^7.1.0",
 		"js-yaml": "^3.13.1",
-		"nodegit": "^0.26.2",
 		"ora": "^4.0.2",
 		"rimraf": "^3.0.2",
+		"simple-git": "^3.5.0",
 		"terminal-link": "^2.0.0",
-		"yargs": "^14.0.0"
+		"yargs": "^17.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

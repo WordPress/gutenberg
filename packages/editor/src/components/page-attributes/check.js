@@ -1,40 +1,37 @@
 /**
- * External dependencies
- */
-import { get, isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
-export function PageAttributesCheck( {
-	availableTemplates,
-	postType,
-	children,
-} ) {
-	const supportsPageAttributes = get(
-		postType,
-		[ 'supports', 'page-attributes' ],
-		false
-	);
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+/**
+ * Wrapper component that renders its children only if the post type supports page attributes.
+ *
+ * @param {Object}  props          - The component props.
+ * @param {Element} props.children - The child components to render.
+ *
+ * @return {Component|null} The rendered child components or null if page attributes are not supported.
+ */
+export function PageAttributesCheck( { children } ) {
+	const supportsPageAttributes = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+		return !! postType?.supports?.[ 'page-attributes' ];
+	}, [] );
 
 	// Only render fields if post type supports page attributes or available templates exist.
-	if ( ! supportsPageAttributes && isEmpty( availableTemplates ) ) {
+	if ( ! supportsPageAttributes ) {
 		return null;
 	}
 
 	return children;
 }
 
-export default withSelect( ( select ) => {
-	const { getEditedPostAttribute, getEditorSettings } = select(
-		'core/editor'
-	);
-	const { getPostType } = select( 'core' );
-	const { availableTemplates } = getEditorSettings();
-	return {
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-		availableTemplates,
-	};
-} )( PageAttributesCheck );
+export default PageAttributesCheck;

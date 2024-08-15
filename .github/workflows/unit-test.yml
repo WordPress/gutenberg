@@ -1,124 +1,381 @@
 name: Unit Tests
 
+# Since Unit Tests are required to pass for each PR,
+# we cannot disable them for documentation-only changes.
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [master]
-    paths-ignore:
-    - '**.md'
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  unit-js:
-    name: JavaScript
+    unit-js:
+        name: JavaScript (Node.js ${{ matrix.node.name }}) ${{ matrix.shard }}
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                node:
+                    - name: 20
+                      version: 20
+                    - name: 22
+                      version: 22.4
+                shard: ['1/4', '2/4', '3/4', '4/4']
 
-    runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node.version }}
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
 
-    - name: Npm install and build
-      # It's not necessary to run the full build, since Jest can interpret
-      # source files with `babel-jest`. Some packages have their own custom
-      # build tasks, however. These must be run.
-      run: |
-        npm ci
-        npx lerna run build
+            - name: Running the tests
+              run: |
+                  npm run test:unit -- \
+                    --ci \
+                    --maxWorkers="${{ steps.cpu-cores.outputs.count }}" \
+                    --shard="${{ matrix.shard }}" \
+                    --cacheDirectory="$HOME/.jest-cache"
 
-    - name: Running the tests
-      run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+    unit-js-date:
+        name: JavaScript Date Tests (Node.js ${{ matrix.node.name }})
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                node:
+                    - name: 20
+                      version: 20
+                    - name: 22
+                      version: 22.4
 
-  unit-php:
-    name: PHP
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    runs-on: ubuntu-latest
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node.version }}
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+            - name: Run the date tests
+              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
-    - name: Npm install and build
-      run: |
-        npm ci
-        npm run build
+    compute-previous-wordpress-version:
+        name: Compute previous WordPress version
+        runs-on: ubuntu-latest
+        outputs:
+            previous-wordpress-version: ${{ steps.get-previous-wordpress-version.outputs.previous-wordpress-version }}
 
-    - name: Install WordPress
-      run: |
-        chmod -R 767 ./ # TODO: Possibly integrate in wp-env
-        npm run wp-env start
+        steps:
+            - name: Get previous WordPress version
+              id: get-previous-wordpress-version
+              run: |
+                  curl \
+                    -H "Accept: application/json" \
+                    -o versions.json \
+                    "http://api.wordpress.org/core/stable-check/1.0/"
+                  LATEST_WP_VERSION=$(jq --raw-output 'with_entries(select(.value=="latest"))|keys[]' versions.json)
+                  IFS='.' read LATEST_WP_MAJOR LATEST_WP_MINOR LATEST_WP_PATCH <<< "${LATEST_WP_VERSION}"
+                  if [[ ${LATEST_WP_MINOR} == "0" ]]; then
+                    PREVIOUS_WP_SERIES="$((LATEST_WP_MAJOR - 1)).9"
+                  else
+                    PREVIOUS_WP_SERIES="${LATEST_WP_MAJOR}.$((LATEST_WP_MINOR - 1))"
+                  fi
+                  PREVIOUS_WP_VERSION=$(jq --raw-output --arg series "${PREVIOUS_WP_SERIES}" 'with_entries(select(.key|startswith($series)))|keys[-1]' versions.json)
+                  echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> $GITHUB_OUTPUT
+                  rm versions.json
 
-    - name: Running the tests
-      run: npm run test-php && npm run test-unit-php-multisite
+    build-assets:
+        name: Build JavaScript assets for PHP unit tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-  mobile-unit-js:
-    name: Mobile
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-    runs-on: ubuntu-latest
+            - name: Run build scripts
+              run: npm run build
 
-    steps:
-    - uses: actions/checkout@v2
+            - name: Upload built JavaScript assets
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              with:
+                  name: build-assets
+                  path: ./build/
 
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+    test-php:
+        name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
+        needs: [compute-previous-wordpress-version, build-assets]
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: true
+            matrix:
+                php:
+                    - '7.2'
+                    - '7.3'
+                    - '7.4'
+                    - '8.0'
+                    - '8.1'
+                    - '8.2'
+                multisite: [false, true]
+                wordpress: [''] # Latest WordPress version.
+                include:
+                    # Test with the previous WP version.
+                    - php: '7.2'
+                      wordpress: 'previous major version'
+                    - php: '7.4'
+                      wordpress: 'previous major version'
+                    - php: '8.2'
+                      wordpress: 'previous major version'
 
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
+        env:
+            WP_ENV_PHP_VERSION: ${{ matrix.php }}
+            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
 
-    - name: Npm install and build
-      # It's not necessary to run the full build, since Jest can interpret
-      # source files with `babel-jest`. Some packages have their own custom
-      # build tasks, however. These must be run.
-      run: |
-        npm ci
-        npx lerna run build
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    - name: Running the tests
-      run: npm run test-unit:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            ##
+            # This allows Composer dependencies to be installed using a single step.
+            #
+            # Since the tests are currently run within the Docker containers where the PHP version varies,
+            # the same PHP version needs to be configured for the action runner machine so that the correct
+            # dependency versions are installed and cached.
+            ##
+            - name: Set up PHP
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
+              with:
+                  php-version: '${{ matrix.php }}'
+                  ini-file: development
+                  coverage: none
+
+            # Ensure that Composer installs the correct versions of packages.
+            - name: Override PHP version in composer.json
+              run: composer config platform.php ${{ matrix.php }}
+
+            # The spatie/phpunit-watcher package is not compatible with PHP < 7.2.
+            # It must be removed before running the tests.
+            - name: Remove incompatible Composer packages
+              if: ${{ matrix.php < '7.2' }}
+              run: composer remove spatie/phpunit-watcher --dev --no-update
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
+              with:
+                  custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
+
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+              with:
+                  name: build-assets
+                  path: ./build
+
+            - name: Docker debug information
+              run: |
+                  docker -v
+
+            - name: General debug information
+              run: |
+                  npm --version
+                  node --version
+                  curl --version
+                  git --version
+                  locale -a
+
+            - name: Start Docker environment
+              run: npm run wp-env start
+
+            - name: Log running Docker containers
+              run: docker ps -a
+
+            - name: Docker container debug information
+              run: |
+                  npm run wp-env run tests-mysql mysql -- --version
+                  npm run wp-env run tests-wordpress php -- --version
+                  npm run wp-env run tests-wordpress php -m
+                  npm run wp-env run tests-wordpress php -i
+                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env run tests-wordpress locale -a
+                  npm run wp-env run tests-cli wp core version
+
+            - name: Running single site unit tests
+              if: ${{ ! matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php | tee phpunit.log
+
+            - name: Running multisite unit tests
+              if: ${{ matrix.multisite }}
+              run: |
+                  set -o pipefail
+                  npm run test:unit:php:multisite | tee phpunit.log
+
+            # Verifies that PHPUnit actually runs in the first place. We want visibility
+            # into issues which can cause it to fail silently, so we check the output
+            # to verify that at least 500 tests have passed. This is an arbitrary
+            # number, but makes sure a drastic change doesn't happen without us noticing.
+            - name: Check number of passed tests
+              run: |
+                  # Note: relies on PHPUnit execution to fail on test failure.
+                  # Extract the number of executed tests from the log file.
+                  if ! num_tests=$(grep -Eo 'OK \([0-9]+ tests' phpunit.log) ; then
+                    if ! num_tests=$(grep -Eo 'Tests: [0-9]+, Assertions:' phpunit.log) ; then
+                      echo "PHPUnit failed or did not run. Check the PHPUnit output in the previous step to debug." && exit 1
+                    fi
+                  fi
+                  # Extract just the number of tests from the string.
+                  num_tests=$(echo "$num_tests" | grep -Eo '[0-9]+')
+                  if [ $num_tests -lt 500 ] ; then
+                    echo "Only $num_tests tests passed, which is much fewer than expected." && exit 1
+                  fi
+                  echo "$num_tests tests passed."
+
+    phpcs:
+        name: PHP coding standards
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
+              with:
+                  php-version: '7.4'
+                  coverage: none
+                  tools: cs2pr
+
+            # This date is used to ensure that the PHPCS cache is cleared at least once every week.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: "Get last Monday's date"
+              id: get-date
+              run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
+
+            - name: Cache PHPCS scan cache
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              with:
+                  path: .cache/phpcs.json
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
+
+            # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
+            # passing a custom cache suffix ensures that the cache is flushed at least once per week.
+            - name: Install Composer dependencies
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
+              with:
+                  custom-cache-suffix: ${{ steps.get-date.outputs.date }}
+
+            - name: Make Composer packages available globally
+              run: echo "${PWD}/vendor/bin" >> $GITHUB_PATH
+
+            - name: Run PHPCS on all Gutenberg files
+              id: phpcs-gutenberg
+              run: phpcs --report-full --report-checkstyle=./.cache/phpcs-report.xml
+
+            - name: Show PHPCS results in PR
+              if: ${{ always() && steps.phpcs-gutenberg.outcome == 'failure' }}
+              run: cs2pr ./.cache/phpcs-report.xml
+
+            - name: Ensure version-controlled files are not modified during the tests
+              run: git diff --exit-code
+
+    # This job is deprecated but be present for compatibility reasons.
+    unit-php:
+        name: PHP
+        runs-on: ubuntu-latest
+        needs: [test-php, phpcs]
+        if: ${{ always() }}
+        steps:
+            - name: Fail the job if the PHPUnit tests fail
+              if: ${{ needs.test-php.result != 'success' }}
+              run: exit 1
+
+            - name: "Fail the job if the code doesn't conform to the coding standards"
+              if: ${{ needs.phpcs.result != 'success' }}
+              run: exit 1
+
+            - name: Mark the job as passed if all the checks pass
+              if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
+              run: exit 0
+
+    mobile-unit-js:
+        name: Mobile
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
+
+            - name: Running the tests
+              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"

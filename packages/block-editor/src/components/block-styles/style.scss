@@ -1,63 +1,67 @@
-.block-editor-block-styles {
+.block-editor-block-styles__preview-panel {
+	display: none;
+	// Same layer as the sidebar from which it's triggered.
+	z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+
+	// Only show in narrow widths.
+	@include break-medium() {
+		display: block;
+	}
+
+	.block-editor-block-icon {
+		display: none;
+	}
+}
+
+.block-editor-block-styles__variants {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-}
+	gap: $grid-unit-10;
 
-.block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-unit-05 });
-	margin: $grid-unit-05 0;
-	flex-shrink: 0;
-	cursor: pointer;
-	overflow: hidden;
-	border-radius: $radius-block-ui;
-	padding: $grid-unit-05 * 1.5;
-	display: flex;
-	flex-direction: column;
+	button.components-button.block-editor-block-styles__item {
+		color: $gray-900;
+		box-shadow: inset 0 0 0 $border-width $gray-300;
+		display: inline-block;
+		width: calc(50% - #{$grid-unit-05});
 
-	&:focus {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&:hover .block-editor-block-styles__item-preview {
-		border-color: var(--wp-admin-theme-color);
-	}
-
-	&.is-active {
-		.block-editor-block-styles__item-label {
-			font-weight: bold;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
-		.block-editor-block-styles__item-preview {
-			margin: 0;
-			border: 2px solid $gray-900;
+		&.is-active,
+		&.is-active:hover {
+			background-color: $gray-900;
+			box-shadow: none;
 		}
+
+		&.is-active .block-editor-block-styles__item-text,
+		&.is-active:hover .block-editor-block-styles__item-text {
+			color: $white;
+		}
+
+		&:focus,
+		&.is-active:focus {
+			@include block-toolbar-button-style__focus();
+		}
+	}
+
+	.block-editor-block-styles__item-text {
+		word-break: break-all;
+		// The Button component is white-space: nowrap, and that won't work with line-clamp.
+		white-space: normal;
+
+		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+		text-align: start;
+		text-align-last: center;
 	}
 }
 
-// Show a little preview thumbnail for style variations.
-.block-editor-block-styles__item-preview {
-	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	padding: 0;
-	margin: 2px;
-	border-radius: $radius-block-ui;
-	display: flex;
-	overflow: hidden;
-	background: $white;
-	align-items: center;
-	flex-grow: 1;
-	min-height: 80px;
-	max-height: 160px;
-}
-
-.block-editor-block-switcher__styles__menugroup {
-	position: relative;
-}
-
-.block-editor-block-styles__item-label {
-	text-align: center;
-	padding: 4px 0;
+// To prevent overflow in the preview container,
+// ensure that block contents' margin and padding
+// do not add to the block container's width.
+.block-editor-block-styles__block-preview-container,
+.block-editor-block-styles__block-preview-container * {
+	box-sizing: border-box !important;
 }

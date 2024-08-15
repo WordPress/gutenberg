@@ -1,50 +1,58 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
+const { clearTimeout, setTimeout } = window;
 const DEBOUNCE_TIMEOUT = 200;
 
 /**
- * Hook that creates a showMover state, as well as debounced show/hide callbacks.
+ * Hook that creates debounced callbacks when the node is hovered or focused.
  *
- * @param {Object}   props                       Component props.
- * @param {Object}   props.ref                   Element reference.
- * @param {boolean}  props.isFocused             Whether the component has current focus.
- * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
- * @param {Function} [props.onChange=noop]       Callback function.
+ * @param {Object}  props                       Component props.
+ * @param {Object}  props.ref                   Element reference.
+ * @param {boolean} props.isFocused             Whether the component has current focus.
+ * @param {number}  props.highlightParent       Whether to highlight the parent block. It defaults in highlighting the selected block.
+ * @param {number}  [props.debounceTimeout=250] Debounce timeout in milliseconds.
  */
-export function useDebouncedShowMovers( {
+function useDebouncedShowGestures( {
 	ref,
 	isFocused,
+	highlightParent,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
-	onChange = noop,
 } ) {
-	const [ showMovers, setShowMovers ] = useState( false );
+	const { getSelectedBlockClientId, getBlockRootClientId } =
+		useSelect( blockEditorStore );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const timeoutRef = useRef();
-
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
 	const handleOnChange = ( nextIsFocused ) => {
-		if ( ref?.current ) {
-			setShowMovers( nextIsFocused );
+		if ( nextIsFocused && isDistractionFree ) {
+			return;
 		}
-
-		onChange( nextIsFocused );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const clientId = highlightParent
+			? getBlockRootClientId( selectedBlockClientId )
+			: selectedBlockClientId;
+		toggleBlockHighlight( clientId, nextIsFocused );
 	};
 
 	const getIsHovered = () => {
 		return ref?.current && ref.current.matches( ':hover' );
 	};
 
-	const shouldHideMovers = () => {
+	const shouldHideGestures = () => {
 		const isHovered = getIsHovered();
-
 		return ! isFocused && ! isHovered;
 	};
 
@@ -56,19 +64,16 @@ export function useDebouncedShowMovers( {
 		}
 	};
 
-	const debouncedShowMovers = ( event ) => {
+	const debouncedShowGestures = ( event ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
 
 		clearTimeoutRef();
-
-		if ( ! showMovers ) {
-			handleOnChange( true );
-		}
+		handleOnChange( true );
 	};
 
-	const debouncedHideMovers = ( event ) => {
+	const debouncedHideGestures = ( event ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
@@ -76,41 +81,53 @@ export function useDebouncedShowMovers( {
 		clearTimeoutRef();
 
 		timeoutRef.current = setTimeout( () => {
-			if ( shouldHideMovers() ) {
+			if ( shouldHideGestures() ) {
 				handleOnChange( false );
 			}
 		}, debounceTimeout );
 	};
 
-	useEffect( () => () => clearTimeoutRef(), [] );
+	useEffect(
+		() => () => {
+			/**
+			 * We need to call the change handler with `isFocused`
+			 * set to false on unmount because we also clear the
+			 * timeout that would handle that.
+			 */
+			handleOnChange( false );
+			clearTimeoutRef();
+		},
+		[]
+	);
 
 	return {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
+		debouncedShowGestures,
+		debouncedHideGestures,
 	};
 }
 
 /**
- * Hook that provides a showMovers state and gesture events for DOM elements
- * that interact with the showMovers state.
+ * Hook that provides gesture events for DOM elements
+ * that interact with the isFocused state.
  *
- * @param {Object}   props                       Component props.
- * @param {Object}   props.ref                   Element reference.
- * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
- * @param {Function} [props.onChange=noop]       Callback function.
+ * @param {Object} props                         Component props.
+ * @param {Object} props.ref                     Element reference.
+ * @param {number} [props.highlightParent=false] Whether to highlight the parent block. It defaults to highlighting the selected block.
+ * @param {number} [props.debounceTimeout=250]   Debounce timeout in milliseconds.
  */
-export function useShowMoversGestures( {
+export function useShowHoveredOrFocusedGestures( {
 	ref,
+	highlightParent = false,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
-	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+	const { debouncedShowGestures, debouncedHideGestures } =
+		useDebouncedShowGestures( {
+			ref,
+			debounceTimeout,
+			isFocused,
+			highlightParent,
+		} );
 
 	const registerRef = useRef( false );
 
@@ -127,14 +144,14 @@ export function useShowMoversGestures( {
 		const handleOnFocus = () => {
 			if ( isFocusedWithin() ) {
 				setIsFocused( true );
-				debouncedShowMovers();
+				debouncedShowGestures();
 			}
 		};
 
 		const handleOnBlur = () => {
 			if ( ! isFocusedWithin() ) {
 				setIsFocused( false );
-				debouncedHideMovers();
+				debouncedHideGestures();
 			}
 		};
 
@@ -158,15 +175,12 @@ export function useShowMoversGestures( {
 		ref,
 		registerRef,
 		setIsFocused,
-		debouncedShowMovers,
-		debouncedHideMovers,
+		debouncedShowGestures,
+		debouncedHideGestures,
 	] );
 
 	return {
-		showMovers,
-		gestures: {
-			onMouseMove: debouncedShowMovers,
-			onMouseLeave: debouncedHideMovers,
-		},
+		onMouseMove: debouncedShowGestures,
+		onMouseLeave: debouncedHideGestures,
 	};
 }

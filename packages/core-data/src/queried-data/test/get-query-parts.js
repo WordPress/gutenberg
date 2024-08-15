@@ -8,6 +8,7 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { page: 2, per_page: 2 } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 2,
 			perPage: 2,
 			stableKey: '',
@@ -17,12 +18,17 @@ describe( 'getQueryParts', () => {
 	} );
 
 	it( 'parses out `include` ID filtering', () => {
+		const first = getQueryParts( { include: '1' } );
+		const second = getQueryParts( { include: 1 } );
 		const parts = getQueryParts( { include: [ 1 ] } );
 
+		expect( first ).toEqual( second );
+		expect( second ).toEqual( parts );
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
-			stableKey: '',
+			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
 		} );
@@ -34,6 +40,7 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( first ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
 			stableKey: '%3F=%26&b=2',
@@ -46,6 +53,7 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { a: [ 1, 2 ] } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
@@ -60,6 +68,7 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( first ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
 			stableKey: 'b=2',
@@ -72,11 +81,38 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { b: 2, page: 1, per_page: -1 } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: -1,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
+		} );
+	} );
+
+	it( 'encodes stable string key with fields parameters', () => {
+		const parts = getQueryParts( { _fields: [ 'id', 'title' ] } );
+
+		expect( parts ).toEqual( {
+			context: 'default',
+			page: 1,
+			perPage: 10,
+			stableKey: '_fields=id%2Ctitle',
+			fields: [ 'id', 'title' ],
+			include: null,
+		} );
+	} );
+
+	it( 'returns the context as a dedicated query part', () => {
+		const parts = getQueryParts( { context: 'view' } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			stableKey: '',
+			include: null,
+			fields: null,
+			context: 'view',
 		} );
 	} );
 } );

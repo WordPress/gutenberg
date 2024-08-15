@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,39 +12,65 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useSettings,
+	useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
+	__experimentalUseCustomUnits as useCustomUnits,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
+
+function ColumnInspectorControls( { width, setAttributes } ) {
+	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const units = useCustomUnits( {
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
+	return (
+		<PanelBody title={ __( 'Settings' ) }>
+			<UnitControl
+				label={ __( 'Width' ) }
+				__unstableInputWidth="calc(50% - 8px)"
+				__next40pxDefaultSize
+				value={ width || '' }
+				onChange={ ( nextWidth ) => {
+					nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+					setAttributes( { width: nextWidth } );
+				} }
+				units={ units }
+			/>
+		</PanelBody>
+	);
+}
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
+	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
-	const classes = classnames( 'block-core-columns', {
+	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
-	const { hasChildBlocks, rootClientId } = useSelect(
+	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } = select(
-				'core/block-editor'
-			);
+			const { getBlockOrder, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			const rootId = getBlockRootClientId( clientId );
 
 			return {
 				hasChildBlocks: getBlockOrder( clientId ).length > 0,
-				rootClientId: getBlockRootClientId( clientId ),
+				rootClientId: rootId,
+				columnsIds: getBlockOrder( rootId ),
 			};
 		},
 		[ clientId ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const updateAlignment = ( value ) => {
 		// Update own alignment.
@@ -55,16 +81,33 @@ function ColumnEdit( {
 		} );
 	};
 
+	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: width ? { flexBasis: width } : undefined,
+		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock,
-		renderAppender: hasChildBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-	} );
+
+	const columnsCount = columnsIds.length;
+	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
+
+	const label = sprintf(
+		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
+		__( '%1$s (%2$d of %3$d)' ),
+		blockProps[ 'aria-label' ],
+		currentColumnPosition,
+		columnsCount
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{ ...blockProps, 'aria-label': label },
+		{
+			templateLock,
+			allowedBlocks,
+			renderAppender: hasChildBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
 		<>
@@ -72,29 +115,14 @@ function ColumnEdit( {
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
+					controls={ [ 'top', 'center', 'bottom', 'stretch' ] }
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						labelPosition="edge"
-						__unstableInputWidth="80px"
-						value={ width || '' }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							setAttributes( { width: nextWidth } );
-						} }
-						units={ [
-							{ value: '%', label: '%', default: '' },
-							{ value: 'px', label: 'px', default: '' },
-							{ value: 'em', label: 'em', default: '' },
-							{ value: 'rem', label: 'rem', default: '' },
-							{ value: 'vw', label: 'vw', default: '' },
-						] }
-					/>
-				</PanelBody>
+				<ColumnInspectorControls
+					width={ width }
+					setAttributes={ setAttributes }
+				/>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>

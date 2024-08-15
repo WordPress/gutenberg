@@ -78,7 +78,10 @@ export default function useScrollWhenDragging() {
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
-			const distancePercentage = dragDistance / moveableDistance;
+			const distancePercentage =
+				moveableDistance === 0 || dragDistance === 0
+					? 0
+					: dragDistance / moveableDistance;
 			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
 		} else if ( event.clientY < offsetDragStartPosition ) {
 			// User is dragging upwards.
@@ -92,7 +95,10 @@ export default function useScrollWhenDragging() {
 					SCROLL_INACTIVE_DISTANCE_PX,
 				0
 			);
-			const distancePercentage = dragDistance / moveableDistance;
+			const distancePercentage =
+				moveableDistance === 0 || dragDistance === 0
+					? 0
+					: dragDistance / moveableDistance;
 			velocityY.current = -VELOCITY_MULTIPLIER * distancePercentage;
 		} else {
 			velocityY.current = 0;

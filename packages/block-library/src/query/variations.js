@@ -16,37 +16,44 @@ import {
 const variations = [
 	{
 		name: 'title-date',
-		title: __( 'Title and Date' ),
+		title: __( 'Title & Date' ),
 		icon: titleDate,
+		attributes: {},
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-date' ] ],
 			],
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results' ],
 		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'title-excerpt',
-		title: __( 'Title and Excerpt' ),
+		title: __( 'Title & Excerpt' ),
 		icon: titleExcerpt,
+		attributes: {},
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
 			],
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results' ],
 		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'title-date-excerpt',
-		title: __( 'Title, Date and Excerpt' ),
+		title: __( 'Title, Date, & Excerpt' ),
 		icon: titleDateExcerpt,
+		attributes: {},
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[
 					[ 'core/post-title' ],
@@ -54,16 +61,19 @@ const variations = [
 					[ 'core/post-excerpt' ],
 				],
 			],
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results' ],
 		],
 		scope: [ 'block' ],
 	},
 	{
 		name: 'image-date-title',
-		title: __( 'Image, Date and Title ' ),
+		title: __( 'Image, Date, & Title' ),
 		icon: imageDateTitle,
+		attributes: {},
 		innerBlocks: [
 			[
-				'core/query-loop',
+				'core/post-template',
 				{},
 				[
 					[ 'core/post-featured-image' ],
@@ -71,6 +81,8 @@ const variations = [
 					[ 'core/post-title' ],
 				],
 			],
+			[ 'core/query-pagination' ],
+			[ 'core/query-no-results' ],
 		],
 		scope: [ 'block' ],
 	},

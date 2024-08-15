@@ -1,75 +1,102 @@
 name: React Native E2E Tests (iOS)
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**.md'
-  push:
-    branches: [master]
-    paths-ignore:
-    - '**.md'
+    pull_request:
+    push:
+        branches: [trunk]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        native-test-name: [
-          gutenberg-editor-gallery
-        ]
+    test:
+        runs-on: macos-12
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            matrix:
+                xcode: ['14.2']
+                device: ['iPhone 14']
+                native-test-name: [gutenberg-editor-rendering]
 
-    steps:
-    - uses: actions/checkout@v2
+        steps:
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-    - name: Restore npm cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+            - uses: ruby/setup-ruby@50ba3386b050ad5b97a41fcb81240cbee1d1821f # v1.188.0
+              with:
+                  # `.ruby-version` file location
+                  working-directory: packages/react-native-editor/ios
 
-    - run: npm ci
+            - name: Switch Xcode version to ${{ matrix.xcode }}
+              run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
 
-    - name: Prepare build cache key
-      run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
+            - name: Launch simulator
+              run: (open -a Simulator && xcrun simctl boot '${{ matrix.device }}') &
 
-    - name: Restore build cache
-      uses: actions/cache@v2
-      with:
-        path: packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
-        key: ${{ runner.os }}-ios-build-${{ hashFiles('ios-checksums.txt') }}
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
-    - name: Restore pods cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          packages/react-native-editor/ios/Pods
-          ~/Library/Caches/CocoaPods
-          ~/.cocoapods/repos/trunk
-          packages/react-native-editor/ios/vendor
-        key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
-          ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-
-          ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-
-          ${{ runner.os }}-pods-
+            - name: Restore tests setup cache
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              with:
+                  path: |
+                      ~/.appium
+                  key: ${{ runner.os }}-tests-setup-${{ hashFiles('package-lock.json') }}
 
-    - name: Bundle iOS
-      run: npm run native test:e2e:bundle:ios
+            - name: Prepare tests setup
+              run: npm run native test:e2e:setup
 
-    - name: Switch Xcode Version
-      run: sudo xcode-select --switch /Applications/Xcode_12.app
+            - name: Prepare build cache key
+              run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
-    - name: Build (if needed)
-      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || npm run native test:e2e:build-app:ios
+            - name: Restore build cache
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              with:
+                  path: |
+                      packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+                      packages/react-native-editor/ios/build/WDA
+                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ matrix.device }}-${{ hashFiles('ios-checksums.txt') }}
 
-    - name: Run iOS Device Tests
-      run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+            - name: Restore pods cache
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+              with:
+                  path: |
+                      packages/react-native-editor/ios/Pods
+                      ~/Library/Caches/CocoaPods
+                      ~/.cocoapods/repos/trunk
+                      packages/react-native-editor/ios/vendor
+                  key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
 
-    - name: Prepare build cache
-      run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
+            - name: Bundle iOS
+              run: npm run native test:e2e:bundle:ios
 
-    - uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: ios-screen-recordings
-        path: packages/react-native-editor/ios-screen-recordings
+            - name: Build (if needed)
+              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+
+            - name: Build Web Driver Agent (if needed)
+              run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+
+            - name: Run iOS Device Tests
+              run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+
+            - name: Prepare build cache
+              run: |
+                  rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
+                  rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/assets
+
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              if: always()
+              with:
+                  name: ios-screen-recordings
+                  path: packages/react-native-editor/ios-screen-recordings
+
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              if: always()
+              with:
+                  name: appium-logs
+                  path: packages/react-native-editor/appium-out.log

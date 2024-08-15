@@ -1,20 +1,28 @@
 {
-	"apiVersion": 2,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/heading",
+	"title": "Heading",
 	"category": "text",
+	"description": "Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.",
+	"keywords": [ "title", "subtitle" ],
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "h1,h2,h3,h4,h5,h6",
-			"default": ""
+			"__experimentalRole": "content"
 		},
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		},
 		"placeholder": {
 			"type": "string"
@@ -23,20 +31,56 @@
 	"supports": {
 		"align": [ "wide", "full" ],
 		"anchor": true,
-		"className": false,
+		"className": true,
+		"splitting": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
-			"link": true
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
-		"fontSize": true,
-		"lineHeight": true,
-		"__experimentalSelector": {
-			"core/heading/h1": "h1",
-			"core/heading/h2": "h2",
-			"core/heading/h3": "h3",
-			"core/heading/h4": "h4",
-			"core/heading/h5": "h5",
-			"core/heading/h6": "h6"
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
-		"__unstablePasteTextInline": true
-	}
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalWritingMode": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__unstablePasteTextInline": true,
+		"__experimentalSlashInserter": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"editorStyle": "wp-block-heading-editor",
+	"style": "wp-block-heading"
 }

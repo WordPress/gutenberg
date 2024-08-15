@@ -12,15 +12,15 @@ Install the module
 npm install @wordpress/data --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
 ## Registering a Store
 
-Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
+Use the `register` function to add your own store to the centralized data registry. This function accepts one argument – a store descriptor that can be created with `createReduxStore` factory function. `createReduxStore` accepts two arguments: a name to identify the module, and a configuration object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { apiFetch } = wp;
-const { registerStore } = wp.data;
+import apiFetch from '@wordpress/api-fetch';
+import { createReduxStore, register } from '@wordpress/data';
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -51,7 +51,7 @@ const actions = {
 	},
 };
 
-registerStore( 'my-shop', {
+const store = createReduxStore( 'my-shop', {
 	reducer( state = DEFAULT_STATE, action ) {
 		switch ( action.type ) {
 			case 'SET_PRICE':
@@ -80,7 +80,7 @@ registerStore( 'my-shop', {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
-			return price * ( 1 - ( 0.01 * discountPercent ) );
+			return price * ( 1 - 0.01 * discountPercent );
 		},
 	},
 
@@ -91,25 +91,29 @@ registerStore( 'my-shop', {
 	},
 
 	resolvers: {
-		* getPrice( item ) {
+		*getPrice( item ) {
 			const path = '/wp/v2/prices/' + item;
 			const price = yield actions.fetchFromAPI( path );
 			return actions.setPrice( item, price );
 		},
 	},
 } );
+
+register( store );
 ```
 
-The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
+The return value of `createReduxStore` is the `StoreDescriptor` object that contains two properties:
 
--   `store.getState()`: Returns the state value of the registered reducer
-    -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
--   `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
--   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
-    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
+-   `name` (`string`) – the name of the store
+-   `instantiate` (`Function`) - it returns a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
+    -   `getState()`: Returns the state value of the registered reducer
+        -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
+    -   `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+        -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
+    -   `dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
+        -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
 
-### Options
+### Redux Store Options
 
 #### `reducer`
 
@@ -135,7 +139,7 @@ A **control** defines the execution flow behavior associated with a specific act
 
 The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
 
-Refer to the [documentation of `@wordpress/redux-routine`](/packages/redux-routine/README.md) for more information.
+Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md) for more information.
 
 #### `initialState`
 
@@ -151,7 +155,7 @@ The `@wordpress/data` module offers a more advanced and generic interface for th
     -   Behaves as Redux [`subscribe`](https://redux.js.org/api/store#subscribelistener)
         with the following differences:
         -   Doesn't have to implement an unsubscribe, since the registry never uses it.
-            			  \- Only has to support one listener (the registry).
+            \- Only has to support one listener (the registry).
 
 By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
 
@@ -160,36 +164,46 @@ Integrating an existing redux store with its own reducers, store enhancers and m
 _Example:_
 
 ```js
+import { register } from '@wordpress/data';
 import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
-const { registerGenericStore } = wp.data;
-
 const reduxStore = createStore();
 
-const mappedSelectors = Object.keys( existingSelectors ).reduce( ( acc, selectorKey ) => {
-	acc[ selectorKey ] = ( ...args ) =>
-		existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
-	return acc;
-}, {} );
+const mapValues = ( obj, callback ) =>
+	Object.entries( obj ).reduce(
+		( acc, [ key, value ] ) => ( {
+			...acc,
+			[ key ]: callback( value ),
+		} ),
+		{}
+	);
 
-const mappedActions = Object.keys( existingActions ).reduce( ( acc, actionKey ) => {
-	acc[ actionKey ] = ( ...args ) => reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
-	return acc;
-}, {} );
+const boundSelectors = mapValues(
+	existingSelectors,
+	( selector ) =>
+		( ...args ) =>
+			selector( reduxStore.getState(), ...args )
+);
+
+const boundActions = mapValues(
+	existingActions,
+	( action ) =>
+		( ...args ) =>
+			reduxStore.dispatch( action( ...args ) )
+);
 
 const genericStore = {
-	getSelectors() {
-		return mappedSelectors;
-	},
-	getActions() {
-		return mappedActions;
-	},
-	subscribe: reduxStore.subscribe,
+	name: 'existing-app',
+	instantiate: () => ( {
+		getSelectors: () => boundSelectors,
+		getActions: () => boundActions,
+		subscribe: reduxStore.subscribe,
+	} ),
 };
 
-registerGenericStore( 'existing-app', genericStore );
+register( genericStore );
 ```
 
 It is also possible to implement a completely custom store from scratch:
@@ -197,46 +211,58 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
-const { registerGenericStore } = wp.data;
+import { register } from '@wordpress/data';
 
-function createCustomStore() {
-	let storeChanged = () => {};
-	const prices = { hammer: 7.50 };
-
-	const selectors = {
-		getPrice( itemName ) {
-			return prices[ itemName ];
-		},
-	};
-
-	const actions = {
-		setPrice( itemName, price ) {
-			prices[ itemName ] = price;
-			storeChanged();
-		},
-	};
-
+function customStore() {
 	return {
-		getSelectors() {
-			return selectors;
+		name: 'custom-data',
+		instantiate: () => {
+			const listeners = new Set();
+			const prices = { hammer: 7.5 };
+
+			function storeChanged() {
+				for ( const listener of listeners ) {
+					listener();
+				}
+			}
+
+			function subscribe( listener ) {
+				listeners.add( listener );
+				return () => listeners.delete( listener );
+			}
+
+			const selectors = {
+				getPrice( itemName ) {
+					return prices[ itemName ];
+				},
+			};
+
+			const actions = {
+				setPrice( itemName, price ) {
+					prices[ itemName ] = price;
+					storeChanged();
+				},
+			};
+
+			return {
+				getSelectors: () => selectors,
+				getActions: () => actions,
+				subscribe,
+			};
 		},
-		getActions() {
-			return actions;
-		},
-		subscribe( listener ) {
-			storeChanged = listener;
-		}
 	};
 }
 
-registerGenericStore( 'custom-data', createCustomStore() );
+register( customStore );
 ```
 
 ## Comparison with Redux
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
-The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
+The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md)).
+
+The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
 
 Specific implementation differences from Redux and React Redux:
 
@@ -251,30 +277,30 @@ Specific implementation differences from Redux and React Redux:
 
 <!-- START TOKEN(Autogenerated API docs) -->
 
-<a name="AsyncModeProvider" href="#AsyncModeProvider">#</a> **AsyncModeProvider**
+### AsyncModeProvider
 
-Context Provider Component used to switch the data module component rerendering
-between Sync and Async modes.
+Context Provider Component used to switch the data module component rerendering between Sync and Async modes.
 
 _Usage_
 
 ```js
 import { useSelect, AsyncModeProvider } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function BlockCount() {
-  const count = useSelect( ( select ) => {
-    return select( 'core/block-editor' ).getBlockCount()
-  }, [] );
+	const count = useSelect( ( select ) => {
+		return select( blockEditorStore ).getBlockCount();
+	}, [] );
 
-  return count;
+	return count;
 }
 
 function App() {
-  return (
-    <AsyncModeProvider value={ true }>
-      <BlockCount />
-    </AsyncModeProvider>
-  );
+	return (
+		<AsyncModeProvider value={ true }>
+			<BlockCount />
+		</AsyncModeProvider>
+	);
 }
 ```
 
@@ -289,40 +315,42 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
-<a name="combineReducers" href="#combineReducers">#</a> **combineReducers**
+### combineReducers
 
-The combineReducers helper function turns an object whose values are different
-reducing functions into a single reducing function you can pass to registerReducer.
+The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to registerReducer.
 
 _Usage_
 
 ```js
-const { combineReducers, registerStore } = wp.data;
+import { combineReducers, createReduxStore, register } from '@wordpress/data';
 
 const prices = ( state = {}, action ) => {
-	return action.type === 'SET_PRICE' ?
-		{
-			...state,
-			[ action.item ]: action.price,
-		} :
-		state;
+	return action.type === 'SET_PRICE'
+		? {
+				...state,
+				[ action.item ]: action.price,
+		  }
+		: state;
 };
 
 const discountPercent = ( state = 0, action ) => {
-	return action.type === 'START_SALE' ?
-		action.discountPercent :
-		state;
+	return action.type === 'START_SALE' ? action.discountPercent : state;
 };
 
-registerStore( 'my-shop', {
+const store = createReduxStore( 'my-shop', {
 	reducer: combineReducers( {
 		prices,
 		discountPercent,
 	} ),
 } );
+register( store );
 ```
+
+_Type_
+
+-   `import('./types').combineReducers`
 
 _Parameters_
 
@@ -332,44 +360,66 @@ _Returns_
 
 -   `Function`: A reducer that invokes every reducer inside the reducers object, and constructs a state object with the same shape.
 
-<a name="controls" href="#controls">#</a> **controls**
+### controls
 
 Undocumented declaration.
 
-<a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
+### createReduxStore
 
-Creates a new store registry, given an optional object of initial store
-configurations.
+Creates a data store descriptor for the provided Redux store configuration containing properties describing reducer, actions, selectors, controls and resolvers.
+
+_Usage_
+
+```js
+import { createReduxStore } from '@wordpress/data';
+
+const store = createReduxStore( 'demo', {
+	reducer: ( state = 'OK' ) => state,
+	selectors: {
+		getValue: ( state ) => state,
+	},
+} );
+```
+
+_Parameters_
+
+-   _key_ `string`: Unique namespace identifier.
+-   _options_ `ReduxStoreConfig<State,Actions,Selectors>`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+
+_Returns_
+
+-   `StoreDescriptor<ReduxStoreConfig<State,Actions,Selectors>>`: Store Object.
+
+### createRegistry
+
+Creates a new store registry, given an optional object of initial store configurations.
 
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `?Object`: Parent registry.
+-   _parent_ `Object?`: Parent registry.
 
 _Returns_
 
 -   `WPDataRegistry`: Data registry.
 
-<a name="createRegistryControl" href="#createRegistryControl">#</a> **createRegistryControl**
+### createRegistryControl
 
-Creates a control function that takes additional curried argument with the `registry` object.
-While a regular control has signature
+Creates a control function that takes additional curried argument with the `registry` object. While a regular control has signature
 
 ```js
-( action ) => ( iteratorOrPromise )
+( action ) => iteratorOrPromise;
 ```
 
 where the control works with the `action` that it's bound to, a registry control has signature:
 
 ```js
-( registry ) => ( action ) => ( iteratorOrPromise )
+( registry ) => ( action ) => iteratorOrPromise;
 ```
 
-A registry control is typically used to select data or dispatch an action to a registered
-store.
+A registry control is typically used to select data or dispatch an action to a registered store.
 
-When registering a control created with `createRegistryControl` with a store, the store
-knows which calling convention to use when executing the control.
+When registering a control created with `createRegistryControl` with a store, the store knows which calling convention to use when executing the control.
 
 _Parameters_
 
@@ -379,20 +429,20 @@ _Returns_
 
 -   `Function`: Registry control that can be registered with a store.
 
-<a name="createRegistrySelector" href="#createRegistrySelector">#</a> **createRegistrySelector**
+### createRegistrySelector
 
-Creates a selector function that takes additional curried argument with the
-registry `select` function. While a regular selector has signature
+Creates a selector function that takes additional curried argument with the registry `select` function. While a regular selector has signature
 
 ```js
-( state, ...selectorArgs ) => ( result )
+( state, ...selectorArgs ) => result;
 ```
 
-that allows to select data from the store's `state`, a registry selector
-has signature:
+that allows to select data from the store's `state`, a registry selector has signature:
 
 ```js
-( select ) => ( state, ...selectorArgs ) => ( result )
+( select ) =>
+	( state, ...selectorArgs ) =>
+		result;
 ```
 
 that supports also selecting from other registered stores.
@@ -400,15 +450,22 @@ that supports also selecting from other registered stores.
 _Usage_
 
 ```js
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
+
 const getCurrentPostId = createRegistrySelector( ( select ) => ( state ) => {
-  return select( 'core/editor' ).getCurrentPostId();
+	return select( editorStore ).getCurrentPostId();
 } );
 
 const getPostEdits = createRegistrySelector( ( select ) => ( state ) => {
-  // calling another registry selector just like any other function
-  const postType = getCurrentPostType( state );
-  const postId = getCurrentPostId( state );
- return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId );
+	// calling another registry selector just like any other function
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	return select( coreStore ).getEntityRecordEdits(
+		'postType',
+		postType,
+		postId
+	);
 } );
 ```
 
@@ -425,31 +482,47 @@ _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
 
-<a name="dispatch" href="#dispatch">#</a> **dispatch**
+### createSelector
 
-Given the name of a registered store, returns an object of the store's action creators.
-Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+Creates a memoized selector that caches the computed values according to the array of "dependants" and the selector parameters, and recomputes the values only when any of them changes.
 
-Note: Action creators returned by the dispatch will return a promise when
-they are called.
+_Related_
+
+-   The documentation for the `rememo` package from which the `createSelector` function is reexported.
+
+_Parameters_
+
+-   _selector_ `Function`: Selector function that calculates a value from state and parameters.
+-   _getDependants_ `Function`: Function that returns an array of "dependant" objects.
+
+_Returns_
+
+-   `Function`: A memoized version of `selector` that caches the calculated return values.
+
+### dispatch
+
+Given a store descriptor, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
+
+Note: Action creators returned by the dispatch will return a promise when they are called.
 
 _Usage_
 
 ```js
-const { dispatch } = wp.data;
+import { dispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
+dispatch( myCustomStore ).setPrice( 'hammer', 9.75 );
 ```
 
 _Parameters_
 
--   _name_ `string`: Store name.
+-   _storeNameOrDescriptor_ `StoreNameOrDescriptor`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the action creators.
+-   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
-<a name="plugins" href="#plugins">#</a> **plugins**
+### plugins
 
 Object of available plugins to use with a registry.
 
@@ -459,46 +532,70 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
-<a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
+### register
 
-Registers a generic store.
+Registers a standard `@wordpress/data` store descriptor.
+
+_Usage_
+
+```js
+import { createReduxStore, register } from '@wordpress/data';
+
+const store = createReduxStore( 'demo', {
+	reducer: ( state = 'OK' ) => state,
+	selectors: {
+		getValue: ( state ) => state,
+	},
+} );
+register( store );
+```
 
 _Parameters_
 
--   _key_ `string`: Store registry key.
--   _config_ `Object`: Configuration (getSelectors, getActions, subscribe).
+-   _store_ `StoreDescriptor`: Store descriptor.
 
-<a name="registerStore" href="#registerStore">#</a> **registerStore**
+### registerGenericStore
+
+> **Deprecated** Use `register( storeDescriptor )` instead.
+
+Registers a generic store instance.
+
+_Parameters_
+
+-   _name_ `string`: Store registry name.
+-   _store_ `Object`: Store instance (`{ getSelectors, getActions, subscribe }`).
+
+### registerStore
+
+> **Deprecated** Use `register` instead.
 
 Registers a standard `@wordpress/data` store.
 
 _Parameters_
 
--   _reducerKey_ `string`: Reducer key.
+-   _storeName_ `string`: Unique namespace identifier for the store.
 -   _options_ `Object`: Store description (reducer, actions, selectors, resolvers).
 
 _Returns_
 
 -   `Object`: Registered store object.
 
-<a name="RegistryConsumer" href="#RegistryConsumer">#</a> **RegistryConsumer**
+### RegistryConsumer
 
-A custom react Context consumer exposing the provided `registry` to
-children components. Used along with the RegistryProvider.
+A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here:
-<https://reactjs.org/docs/context.html#contextprovider>
+You can read more about the react context api here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
 
 _Usage_
 
 ```js
-const {
+import {
   RegistryProvider,
   RegistryConsumer,
   createRegistry
-} = wp.data;
+} from '@wordpress/data';
 
 const registry = createRegistry( {} );
 
@@ -516,46 +613,64 @@ const App = ( { props } ) => {
 }
 ```
 
-<a name="RegistryProvider" href="#RegistryProvider">#</a> **RegistryProvider**
+### RegistryProvider
 
-A custom Context provider for exposing the provided `registry` to children
-components via a consumer.
+A custom Context provider for exposing the provided `registry` to children components via a consumer.
 
-See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
-example.
+See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for example.
 
-<a name="select" href="#select">#</a> **select**
+### resolveSelect
 
-Given the name of a registered store, returns an object of the store's selectors.
-The selector functions are been pre-bound to pass the current state automatically.
-As a consumer, you need only pass arguments of the selector, if applicable.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they return promises that resolve to their eventual values, after any resolvers have ran.
 
 _Usage_
 
 ```js
-const { select } = wp.data;
+import { resolveSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
-select( 'my-shop' ).getPrice( 'hammer' );
+resolveSelect( myCustomStore ).getPrice( 'hammer' ).then( console.log );
 ```
 
 _Parameters_
 
--   _name_ `string`: Store name.
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
 
 _Returns_
 
--   `Object`: Object containing the store's selectors.
+-   `Object`: Object containing the store's promise-wrapped selectors.
 
-<a name="subscribe" href="#subscribe">#</a> **subscribe**
+### select
 
-Given a listener function, the function will be called any time the state value
-of one of the registered stores has changed. This function returns a `unsubscribe`
-function used to stop the subscription.
+Given a store descriptor, returns an object of the store's selectors. The selector functions are been pre-bound to pass the current state automatically. As a consumer, you need only pass arguments of the selector, if applicable.
 
 _Usage_
 
 ```js
-const { subscribe } = wp.data;
+import { select } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
+
+select( myCustomStore ).getPrice( 'hammer' );
+```
+
+_Parameters_
+
+-   _storeNameOrDescriptor_ `string | T`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+
+_Returns_
+
+-   `CurriedSelectorsOf< T >`: Object containing the store's selectors.
+
+### subscribe
+
+Given a listener function, the function will be called any time the state value of one of the registered stores has changed. If you specify the optional `storeNameOrDescriptor` parameter, the listener function will be called only on updates on that one specific registered store.
+
+This function returns an `unsubscribe` function used to stop the subscription.
+
+_Usage_
+
+```js
+import { subscribe } from '@wordpress/data';
 
 const unsubscribe = subscribe( () => {
 	// You could use this opportunity to test whether the derived result of a
@@ -569,23 +684,33 @@ unsubscribe();
 _Parameters_
 
 -   _listener_ `Function`: Callback function.
+-   _storeNameOrDescriptor_ `string|StoreDescriptor?`: Optional store name.
 
-<a name="use" href="#use">#</a> **use**
+### suspendSelect
 
-Extends a registry to inherit functionality provided by a given plugin. A
-plugin is an object with properties aligning to that of a registry, merged
-to extend the default registry behavior.
+Given a store descriptor, returns an object containing the store's selectors pre-bound to state so that you only need to supply additional arguments, and modified so that they throw promises in case the selector is not resolved yet.
+
+_Parameters_
+
+-   _storeNameOrDescriptor_ `StoreDescriptor|string`: The store descriptor. The legacy calling convention of passing the store name is also supported.
+
+_Returns_
+
+-   `Object`: Object containing the store's suspense-wrapped selectors.
+
+### use
+
+Extends a registry to inherit functionality provided by a given plugin. A plugin is an object with properties aligning to that of a registry, merged to extend the default registry behavior.
 
 _Parameters_
 
 -   _plugin_ `Object`: Plugin object.
 
-<a name="useDispatch" href="#useDispatch">#</a> **useDispatch**
+### useDispatch
 
 A custom react hook returning the current registry dispatch actions creators.
 
-Note: The component using this hook must be within the context of a
-RegistryProvider.
+Note: The component using this hook must be within the context of a RegistryProvider.
 
 _Usage_
 
@@ -594,25 +719,30 @@ the server via the `useSelect` hook to use in combination with the dispatch
 action.
 
 ```jsx
-const { useDispatch, useSelect } = wp.data;
-const { useCallback } = wp.element;
+import { useCallback } from 'react';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
-  return <button type="button" onClick={ onClick }>{ children }</button>
+	return (
+		<button type="button" onClick={ onClick }>
+			{ children }
+		</button>
+	);
 }
 
 const SaleButton = ( { children } ) => {
-  const { stockNumber } = useSelect(
-    ( select ) => select( 'my-shop' ).getStockNumber(),
-    []
-  );
-  const { startSale } = useDispatch( 'my-shop' );
-  const onClick = useCallback( () => {
-    const discountPercent = stockNumber > 50 ? 10: 20;
-    startSale( discountPercent );
-  }, [ stockNumber ] );
-  return <Button onClick={ onClick }>{ children }</Button>
-}
+	const { stockNumber } = useSelect(
+		( select ) => select( myCustomStore ).getStockNumber(),
+		[]
+	);
+	const { startSale } = useDispatch( myCustomStore );
+	const onClick = useCallback( () => {
+		const discountPercent = stockNumber > 50 ? 10 : 20;
+		startSale( discountPercent );
+	}, [ stockNumber ] );
+	return <Button onClick={ onClick }>{ children }</Button>;
+};
 
 // Rendered somewhere in the application:
 //
@@ -621,48 +751,40 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeName_ `[string]`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDescriptor_ `[StoreNameOrDescriptor]`: Optionally provide the name of the store or its descriptor from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseDispatchReturn<StoreNameOrDescriptor>`: A custom react hook.
 
-<a name="useRegistry" href="#useRegistry">#</a> **useRegistry**
+### useRegistry
 
 A custom react hook exposing the registry context for use.
 
-This exposes the `registry` value provided via the
-<a href="#RegistryProvider">Registry Provider</a> to a component implementing
-this hook.
+This exposes the `registry` value provided via the <a href="#RegistryProvider">Registry Provider</a> to a component implementing this hook.
 
 It acts similarly to the `useContext` react hook.
 
-Note: Generally speaking, `useRegistry` is a low level hook that in most cases
-won't be needed for implementation. Most interactions with the wp.data api
-can be performed via the `useSelect` hook,  or the `withSelect` and
-`withDispatch` higher order components.
+Note: Generally speaking, `useRegistry` is a low level hook that in most cases won't be needed for implementation. Most interactions with the `@wordpress/data` API can be performed via the `useSelect` hook, or the `withSelect` and `withDispatch` higher order components.
 
 _Usage_
 
 ```js
-const {
-  RegistryProvider,
-  createRegistry,
-  useRegistry,
-} = wp.data
+import { RegistryProvider, createRegistry, useRegistry } from '@wordpress/data';
 
 const registry = createRegistry( {} );
 
 const SomeChildUsingRegistry = ( props ) => {
-  const registry = useRegistry( registry );
-  // ...logic implementing the registry in other react hooks.
+	const registry = useRegistry();
+	// ...logic implementing the registry in other react hooks.
 };
 
-
 const ParentProvidingRegistry = ( props ) => {
-  return <RegistryProvider value={ registry }>
-    <SomeChildUsingRegistry { ...props } />
-  </RegistryProvider>
+	return (
+		<RegistryProvider value={ registry }>
+			<SomeChildUsingRegistry { ...props } />
+		</RegistryProvider>
+	);
 };
 ```
 
@@ -670,26 +792,29 @@ _Returns_
 
 -   `Function`: A custom react hook exposing the registry context value.
 
-<a name="useSelect" href="#useSelect">#</a> **useSelect**
+### useSelect
 
 Custom react hook for retrieving props from registered selectors.
 
-In general, this custom React hook follows the
-[rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+In general, this custom React hook follows the [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
 
 _Usage_
 
 ```js
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 function HammerPriceDisplay( { currency } ) {
-  const price = useSelect( ( select ) => {
-    return select( 'my-shop' ).getPrice( 'hammer', currency )
-  }, [ currency ] );
-  return new Intl.NumberFormat( 'en-US', {
-    style: 'currency',
-    currency,
-  } ).format( price );
+	const price = useSelect(
+		( select ) => {
+			return select( myCustomStore ).getPrice( 'hammer', currency );
+		},
+		[ currency ]
+	);
+	return new Intl.NumberFormat( 'en-US', {
+		style: 'currency',
+		currency,
+	} ).format( price );
 }
 
 // Rendered in the application:
@@ -703,38 +828,75 @@ any price in the state for that currency is retrieved. If the currency prop
 doesn't change and other props are passed in that do change, the price will
 not change because the dependency is just the currency.
 
+When data is only used in an event callback, the data should not be retrieved
+on render, so it may be useful to get the selectors function instead.
+
+**Don't use `useSelect` this way when calling the selectors in the render
+function because your component won't re-render on a data change.**
+
+```js
+import { useSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
+
+function Paste( { children } ) {
+	const { getSettings } = useSelect( myCustomStore );
+	function onPaste() {
+		// Do something with the settings.
+		const settings = getSettings();
+	}
+	return <div onPaste={ onPaste }>{ children }</div>;
+}
+```
+
 _Parameters_
 
--   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
--   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
+-   _deps_ `unknown[]`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Function`: A custom react hook.
+-   `UseSelectReturn<T>`: A custom react hook.
 
-<a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
+### useSuspenseSelect
 
-Higher-order component used to add dispatch props using registered action
-creators.
+A variant of the `useSelect` hook that has the same API, but is a compatible Suspense-enabled data source.
+
+_Parameters_
+
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
+-   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
+
+_Returns_
+
+-   `ReturnType<T>`: Data object returned by the `mapSelect` function.
+
+### withDispatch
+
+Higher-order component used to add dispatch props using registered action creators.
 
 _Usage_
 
 ```jsx
 function Button( { onClick, children } ) {
-    return <button type="button" onClick={ onClick }>{ children }</button>;
+	return (
+		<button type="button" onClick={ onClick }>
+			{ children }
+		</button>
+	);
 }
 
-const { withDispatch } = wp.data;
+import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
-    const { startSale } = dispatch( 'my-shop' );
-    const { discountPercent } = ownProps;
+	const { startSale } = dispatch( myCustomStore );
+	const { discountPercent } = ownProps;
 
-    return {
-        onClick() {
-            startSale( discountPercent );
-        },
-    };
+	return {
+		onClick() {
+			startSale( discountPercent );
+		},
+	};
 } )( Button );
 
 // Rendered in the application:
@@ -757,21 +919,26 @@ only.
 
 ```jsx
 function Button( { onClick, children } ) {
-    return <button type="button" onClick={ onClick }>{ children }</button>;
+	return (
+		<button type="button" onClick={ onClick }>
+			{ children }
+		</button>
+	);
 }
 
-const { withDispatch } = wp.data;
+import { withDispatch } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
-   // Stock number changes frequently.
-   const { getStockNumber } = select( 'my-shop' );
-   const { startSale } = dispatch( 'my-shop' );
-   return {
-       onClick() {
-           const discountPercent = getStockNumber() > 50 ? 10 : 20;
-           startSale( discountPercent );
-       },
-   };
+	// Stock number changes frequently.
+	const { getStockNumber } = select( myCustomStore );
+	const { startSale } = dispatch( myCustomStore );
+	return {
+		onClick() {
+			const discountPercent = getStockNumber() > 50 ? 10 : 20;
+			startSale( discountPercent );
+		},
+	};
 } )( Button );
 
 // Rendered in the application:
@@ -789,29 +956,30 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged dispatcher props.
+-   `ComponentType`: Enhanced component with merged dispatcher props.
 
-<a name="withRegistry" href="#withRegistry">#</a> **withRegistry**
+### withRegistry
 
-Higher-order component which renders the original component with the current
-registry context passed as its `registry` prop.
+Higher-order component which renders the original component with the current registry context passed as its `registry` prop.
 
 _Parameters_
 
--   _OriginalComponent_ `WPComponent`: Original component.
+-   _OriginalComponent_ `Component`: Original component.
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
-<a name="withSelect" href="#withSelect">#</a> **withSelect**
+### withSelect
 
-Higher-order component used to inject state-derived props using registered
-selectors.
+Higher-order component used to inject state-derived props using registered selectors.
 
 _Usage_
 
 ```js
+import { withSelect } from '@wordpress/data';
+import { store as myCustomStore } from 'my-custom-store';
+
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
 		style: 'currency',
@@ -819,10 +987,8 @@ function PriceDisplay( { price, currency } ) {
 	} ).format( price );
 }
 
-const { withSelect } = wp.data;
-
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
-	const { getPrice } = select( 'my-shop' );
+	const { getPrice } = select( myCustomStore );
 	const { currency } = ownProps;
 
 	return {
@@ -846,13 +1012,226 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged state data props.
-
+-   `ComponentType`: Enhanced component with merged state data props.
 
 <!-- END TOKEN(Autogenerated API docs) -->
+
+### batch
+
+As a response of `dispatch` calls, WordPress data based applications updates the connected components (Components using `useSelect` or `withSelect`). This update happens in two steps:
+
+-   The selectors are called with the update state.
+-   If the selectors return values that are different than the previous (strict equality), the component rerenders.
+
+As the application grows, this can become costful, so it's important to ensure that we avoid running both these if possible. One of these situations happen when an interaction requires multiple consecutive `dispatch` calls in order to update the state properly. To avoid rerendering the components each time we call `dispatch`, we can wrap the sequential dispatch calls in `batch` which will ensure that the components only call selectors and rerender once at the end of the sequence.
+
+_Usage_
+
+```js
+import { useRegistry } from '@wordpress/data';
+
+function Component() {
+	const registry = useRegistry();
+
+	function callback() {
+		// This will only rerender the components once.
+		registry.batch( () => {
+			registry.dispatch( someStore ).someAction();
+			registry.dispatch( someStore ).someOtherAction();
+		} );
+	}
+
+	return <button onClick={ callback }>Click me</button>;
+}
+```
+
+## Selectors
+
+The following selectors are available on the object returned by `wp.data.select( 'core' )`.
+
+_Example_
+
+```js
+import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+
+function Component() {
+	const result = useSelect( ( select ) => {
+		const query = { per_page: 20 };
+		const selectorArgs = [ 'postType', 'page', query ];
+
+		return {
+			pages: select( coreDataStore ).getEntityRecords( ...selectorArgs ),
+			hasStartedResolution: select( coreDataStore ).hasStartedResolution(
+				'getEntityRecords', // _selectorName_
+				selectorArgs
+			),
+			hasFinishedResolution: select(
+				coreDataStore
+			).hasFinishedResolution( 'getEntityRecords', selectorArgs ),
+			isResolving: select( coreDataStore ).isResolving(
+				'getEntityRecords',
+				selectorArgs
+			),
+		};
+	} );
+
+	if ( result.hasStartedResolution ) {
+		return <>Fetching data...</>;
+	}
+
+	if ( result.isResolving ) {
+		return (
+			<>
+				{
+					// show a spinner
+				 }
+			</>
+		);
+	}
+
+	if ( result.hasFinishedResolution ) {
+		return (
+			<>
+				{
+					// data is ready
+				 }
+			</>
+		);
+	}
+}
+```
+
+### hasFinishedResolution
+
+Returns true if resolution has completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has completed.
+
+### hasStartedResolution
+
+Returns true if resolution has already been triggered for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution has been triggered.
+
+### isResolving
+
+Returns true if resolution has been triggered but has not yet completed for a given selector name, and arguments set.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _selectorName_ `string`: Selector name.
+-   _args_ `unknown[]?`: Arguments passed to selector.
+
+_Returns_
+
+-   `boolean`: Whether resolution is in progress.
+
+### Normalizing Selector Arguments
+
+In specific circumstances it may be necessary to normalize the arguments passed to a given _call_ of a selector/resolver pairing.
+
+Each resolver has [its resolution status cached in an internal state](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/reducer.ts#L39) where the [key is the arguments supplied to the selector](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/utils.ts#L48) at _call_ time.
+
+For example for a selector with a single argument, the related resolver would generate a cache key of: `[ 123 ]`.
+
+[This cache is used to determine the resolution status of a given resolver](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/selectors.js#L22-L29) which is used to [avoid unwanted additional invocations of resolvers](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/index.js#L469-L474) (which often undertake "expensive" operations such as network requests).
+
+As a result it's important that arguments remain _consistent_ when calling the selector. For example, by _default_ these two calls will not be cached using the same key, even though they are likely identical:
+
+```js
+// Arg as number
+getSomeDataById( 123 );
+
+// Arg as string
+getSomeDataById( '123' );
+```
+
+This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+
+#### Example
+
+The _3rd_ argument of the following selector is intended to be a `Number`:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	return state.items[ name ][ type ][ id ] || null;
+};
+```
+
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+
+```js
+// Define normalization method.
+getItemsSelector.__unstableNormalizeArgs = ( args ) {
+	// "id" argument at the 2nd index
+	if (args[2] && typeof args[2] === 'string' ) {
+		args[2] === Number(args[2]);
+	}
+
+	return args;
+}
+```
+
+With this in place the following code will behave consistently:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[ name ][ type ][ id ] || null;
+};
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+};
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		getItems: getItemsSelector,
+	},
+	resolvers: {
+		getItems: getItemsResolver,
+	},
+} );
+
+// Call with correct number type.
+registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
+
+// Call with the wrong string type, **but** here we have avoided an
+// wanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `__unstableNormalizeArgs` method.
+registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
+```
+
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
 
 ## Going further
 
 -   [What is WordPress Data?](https://unfoldingneurons.com/2020/what-is-wordpress-data/)
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

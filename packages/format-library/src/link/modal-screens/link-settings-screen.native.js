@@ -1,16 +1,14 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View } from 'react-native';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useContext, useEffect, useMemo } from '@wordpress/element';
 import { prependHTTP } from '@wordpress/url';
-
 import { BottomSheet, BottomSheetContext } from '@wordpress/components';
 import {
 	create,
@@ -38,11 +36,16 @@ const LinkSettingsScreen = ( {
 	value,
 	isActive,
 	activeAttributes,
+	isVisible,
 } ) => {
 	const [ text, setText ] = useState( getTextContent( slice( value ) ) );
 	const [ opensInNewWindow, setOpensInNewWindows ] = useState(
 		activeAttributes.target === '_blank'
 	);
+	const [ linkValues, setLinkValues ] = useState( {
+		isActiveLink: isActive,
+		isRemovingLink: false,
+	} );
 
 	const {
 		shouldEnableBottomSheetMaxHeight,
@@ -59,11 +62,38 @@ const LinkSettingsScreen = ( {
 	};
 	useEffect( () => {
 		onHandleClosingBottomSheet( () => {
-			submit( inputValue );
+			submit( inputValue, { skipStateUpdates: true } );
 		} );
 	}, [ inputValue, opensInNewWindow, text ] );
 
-	const submitLink = () => {
+	useEffect( () => {
+		const { isActiveLink, isRemovingLink } = linkValues;
+		if ( !! inputValue && ! isActiveLink && isVisible ) {
+			submitLink( { shouldCloseBottomSheet: false } );
+		} else if (
+			( ( inputValue === '' && isActiveLink ) || isRemovingLink ) &&
+			isVisible
+		) {
+			removeLink( { shouldCloseBottomSheet: false } );
+		}
+	}, [
+		inputValue,
+		isVisible,
+		linkValues.isActiveLink,
+		linkValues.isRemovingLink,
+	] );
+
+	const clearFormat = ( { skipStateUpdates = false } = {} ) => {
+		onChange( { ...value, activeFormats: [] } );
+		if ( ! skipStateUpdates ) {
+			setLinkValues( { isActiveLink: false, isRemovingLink: true } );
+		}
+	};
+
+	const submitLink = ( {
+		shouldCloseBottomSheet = true,
+		skipStateUpdates = false,
+	} = {} ) => {
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -73,7 +103,7 @@ const LinkSettingsScreen = ( {
 		} );
 		let newAttributes;
 		if ( isCollapsed( value ) && ! isActive ) {
-			// insert link
+			// Insert link.
 			const toInsert = applyFormat(
 				create( { text: linkText } ),
 				format,
@@ -82,7 +112,7 @@ const LinkSettingsScreen = ( {
 			);
 			newAttributes = insert( value, toInsert );
 		} else if ( text !== getTextContent( slice( value ) ) ) {
-			// edit text in selected link
+			// Edit text in selected link.
 			const toInsert = applyFormat(
 				create( { text } ),
 				format,
@@ -91,13 +121,24 @@ const LinkSettingsScreen = ( {
 			);
 			newAttributes = insert( value, toInsert, value.start, value.end );
 		} else {
-			// transform selected text into link
+			// Transform selected text into link.
 			newAttributes = applyFormat( value, format );
 		}
-		//move selection to end of link
-		newAttributes.start = newAttributes.end;
+		// Move selection to end of link.
+		const textLength = newAttributes.text.length;
+		// check for zero width spaces
+		if ( newAttributes.end > textLength ) {
+			newAttributes.start = textLength;
+			newAttributes.end = textLength;
+		} else {
+			newAttributes.start = newAttributes.end;
+		}
 		newAttributes.activeFormats = [];
 		onChange( { ...newAttributes, needsSelectionUpdate: true } );
+		if ( ! skipStateUpdates ) {
+			setLinkValues( { isActiveLink: true, isRemovingLink: false } );
+		}
+
 		if ( ! isValidHref( url ) ) {
 			speak(
 				__(
@@ -111,19 +152,27 @@ const LinkSettingsScreen = ( {
 			speak( __( 'Link inserted' ), 'assertive' );
 		}
 
-		onClose();
+		if ( shouldCloseBottomSheet ) {
+			onClose();
+		}
 	};
 
-	const removeLink = () => {
+	const removeLink = ( {
+		shouldCloseBottomSheet = true,
+		skipStateUpdates = false,
+	} = {} ) => {
+		clearFormat( { skipStateUpdates } );
 		onRemove();
-		onClose();
+		if ( shouldCloseBottomSheet ) {
+			onClose();
+		}
 	};
 
-	const submit = ( submitValue ) => {
+	const submit = ( submitValue, { skipStateUpdates = false } = {} ) => {
 		if ( submitValue === '' ) {
-			removeLink();
+			removeLink( { skipStateUpdates } );
 		} else {
-			submitLink();
+			submitLink( { skipStateUpdates } );
 		}
 	};
 
@@ -138,40 +187,40 @@ const LinkSettingsScreen = ( {
 	}, [ navigation, route.params?.text, text ] );
 
 	return useMemo( () => {
+		const shouldShowLinkOptions = !! inputValue;
+
 		return (
 			<>
-				<View style={ styles.container }>
-					<BottomSheet.LinkCell
-						value={ inputValue }
-						onPress={ onLinkCellPressed }
-					/>
-					<BottomSheet.Cell
-						icon={ textColor }
-						label={ __( 'Link text' ) }
-						value={ text }
-						placeholder={ __( 'Add link text' ) }
-						onChangeValue={ setText }
-						onSubmit={ submit }
-					/>
-					<BottomSheet.SwitchCell
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						value={ opensInNewWindow }
-						onValueChange={ setOpensInNewWindows }
-						separatorType={ 'fullWidth' }
-					/>
-					<BottomSheet.Cell
-						label={ __( 'Remove link' ) }
-						labelStyle={ styles.clearLinkButton }
-						separatorType={ 'none' }
-						onPress={ removeLink }
-					/>
-				</View>
-				<View
-					style={ {
-						height: listProps.safeAreaBottomInset || 1,
-					} }
+				<BottomSheet.LinkCell
+					value={ inputValue }
+					onPress={ onLinkCellPressed }
 				/>
+				<BottomSheet.Cell
+					icon={ textColor }
+					label={ __( 'Link text' ) }
+					value={ text }
+					placeholder={ __( 'Add link text' ) }
+					onChangeValue={ setText }
+					onSubmit={ submit }
+					separatorType={ shouldShowLinkOptions ? undefined : 'none' }
+				/>
+				{ shouldShowLinkOptions && (
+					<>
+						<BottomSheet.SwitchCell
+							icon={ external }
+							label={ __( 'Open in new tab' ) }
+							value={ opensInNewWindow }
+							onValueChange={ setOpensInNewWindows }
+							separatorType="fullWidth"
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Remove link' ) }
+							labelStyle={ styles.clearLinkButton }
+							separatorType="none"
+							onPress={ removeLink }
+						/>
+					</>
+				) }
 			</>
 		);
 	}, [ inputValue, text, opensInNewWindow, listProps.safeAreaBottomInset ] );

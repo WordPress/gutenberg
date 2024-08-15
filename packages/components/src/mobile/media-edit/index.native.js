@@ -1,18 +1,17 @@
 /**
- * External dependencies
- */
-import React from 'react';
-import { compact } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Picker } from '@wordpress/components';
 import {
 	requestMediaEditor,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
+
+/**
+ * Internal dependencies
+ */
+import Picker from '../picker';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 
@@ -22,6 +21,7 @@ const editOption = {
 	id: MEDIA_EDITOR,
 	value: MEDIA_EDITOR,
 	label: __( 'Edit' ),
+	requiresModal: true,
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
@@ -32,25 +32,24 @@ const replaceOption = {
 	types: [ MEDIA_TYPE_IMAGE ],
 };
 
-export class MediaEdit extends React.Component {
+export class MediaEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getMediaOptionsItems = this.getMediaOptionsItems.bind( this );
-		this.getDestructiveButtonIndex = this.getDestructiveButtonIndex.bind(
-			this
-		);
+		this.getDestructiveButtonIndex =
+			this.getDestructiveButtonIndex.bind( this );
 	}
 
 	getMediaOptionsItems() {
 		const { pickerOptions, openReplaceMediaOptions, source } = this.props;
 
-		return compact( [
+		return [
 			source?.uri && editOption,
 			openReplaceMediaOptions && replaceOption,
 			...( pickerOptions ? pickerOptions : [] ),
-		] );
+		].filter( Boolean );
 	}
 
 	getDestructiveButtonIndex() {
@@ -108,7 +107,7 @@ export class MediaEdit extends React.Component {
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
-				leftAlign={ true }
+				leftAlign
 				onChange={ this.onPickerSelect }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ __( 'Media options' ) }

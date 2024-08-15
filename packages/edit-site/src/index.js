@@ -1,50 +1,37 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
-import '@wordpress/notices';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { render } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { createRoot, StrictMode } from '@wordpress/element';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	registerLegacyWidgetBlock,
+	registerWidgetGroupBlock,
+} from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
-import './plugins';
 import './hooks';
-import registerEditSiteStore from './store';
-import Editor from './components/editor';
-import { findTemplate } from './utils';
+import { store as editSiteStore } from './store';
+import { unlock } from './lock-unlock';
+import App from './components/app';
 
-const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
-	apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			per_page: perPage,
-			search,
-			type: 'post',
-			subtype: 'post',
-		} ),
-	} )
-		.then( ( posts ) =>
-			Promise.all(
-				posts.map( ( post ) =>
-					apiFetch( { url: post._links.self[ 0 ].href } )
-				)
-			)
-		)
-		.then( ( posts ) =>
-			posts.map( ( post ) => ( {
-				url: post.link,
-				type: post.type,
-				id: post.id,
-				slug: post.slug,
-				title: post.title.rendered || __( '(no title)' ),
-			} ) )
-		);
+const {
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -52,20 +39,83 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {string} id       ID of the root element to render the screen in.
  * @param {Object} settings Editor settings.
  */
-export function initialize( id, settings ) {
-	findTemplate.siteUrl = settings.siteUrl;
-	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
-	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
+export function initializeEditor( id, settings ) {
+	const target = document.getElementById( id );
+	const root = createRoot( target );
 
-	registerEditSiteStore( { settings } );
-
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( { name } ) => name !== 'core/freeform'
+	);
+	registerCoreBlocks( coreBlocks );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
+	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
+	registerLegacyWidgetBlock( { inserter: false } );
+	registerWidgetGroupBlock( { inserter: false } );
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: true,
+		} );
 	}
 
-	render( <Editor />, document.getElementById( id ) );
+	// We dispatch actions and update the store synchronously before rendering
+	// so that we won't trigger unnecessary re-renders with useEffect.
+	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+		welcomeGuide: true,
+		welcomeGuideStyles: true,
+		welcomeGuidePage: true,
+		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		distractionFree: false,
+		editorMode: 'visual',
+		fixedToolbar: false,
+		focusMode: false,
+		inactivePanels: [],
+		keepCaretInsideBlock: false,
+		openPanels: [ 'post-status' ],
+		showBlockBreadcrumbs: true,
+		showListViewByDefault: false,
+	} );
+
+	dispatch( editSiteStore ).updateSettings( settings );
+
+	// Keep the defaultTemplateTypes in the core/editor settings too,
+	// so that they can be selected with core/editor selectors in any editor.
+	// This is needed because edit-site doesn't initialize with EditorProvider,
+	// which internally uses updateEditorSettings as well.
+	dispatch( editorStore ).updateEditorSettings( {
+		defaultTemplateTypes: settings.defaultTemplateTypes,
+		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
+	} );
+
+	// Prevent the default browser action for files dropped outside of dropzones.
+	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
+	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
+
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>
+	);
+
+	return root;
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';
+export function reinitializeEditor() {
+	deprecated( 'wp.editSite.reinitializeEditor', {
+		since: '6.2',
+		version: '6.3',
+	} );
+}
+
+export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
+export { store } from './store';
+export * from './deprecated';
+
+// Temporary: While the posts dashboard is being iterated on
+// it's being built in the same package as the site editor.
+export { initializePostsDashboard } from './posts';

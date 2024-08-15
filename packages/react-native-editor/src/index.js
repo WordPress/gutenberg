@@ -1,143 +1,80 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { I18nManager } from 'react-native';
+import { applyFilters, doAction } from '@wordpress/hooks';
+import { Component, cloneElement, registerComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './globals';
-import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
-import setupApiFetch from './api-fetch-setup';
+import setupLocale from './setup-locale';
+import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
 
 /**
- * WordPress dependencies
+ *	Register Gutenberg editor to React Native App registry.
+ *
+ * @typedef {Object} PluginTranslation
+ * @property {string}              domain                       Domain of the plugin.
+ * @property {Function}            getTranslation               Function for retrieving translations for a locale.
+ *
+ * @param    {Object}              arguments
+ * @param    {Function}            arguments.beforeInitCallback Callback executed before the editor initialization.
+ * @param    {PluginTranslation[]} arguments.pluginTranslations Array with plugin translations.
  */
-import {
-	validateThemeColors,
-	validateThemeGradients,
-} from '@wordpress/block-editor';
+const registerGutenberg = ( {
+	beforeInitCallback,
+	pluginTranslations = [],
+} = {} ) => {
+	class Gutenberg extends Component {
+		constructor( props ) {
+			super( props );
 
-const reactNativeSetup = () => {
-	// Disable warnings as they disrupt the user experience in dev mode
-	// eslint-disable-next-line no-console
-	console.disableYellowBox = true;
+			const { rootTag, ...parentProps } = this.props;
 
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
-};
+			// Setup locale.
+			setupLocale(
+				parentProps.locale,
+				parentProps.translations,
+				getGutenbergTranslation,
+				pluginTranslations
+			);
 
-const gutenbergSetup = () => {
-	const wpData = require( '@wordpress/data' );
+			if ( beforeInitCallback ) {
+				beforeInitCallback( parentProps );
+			}
 
-	// wp-data
-	const userId = 1;
-	const storageKey = 'WP_DATA_USER_' + userId;
-	wpData.use( wpData.plugins.persistence, { storageKey } );
+			// We have to lazy import the setup code to prevent executing any code located
+			// at global scope before the editor is initialized, like translations retrieval.
+			const setup = require( './setup' ).default;
+			// Initialize editor
+			this.editorComponent = setup();
 
-	setupApiFetch();
+			// TODO: Reinstate the optional setup configuration once we identify why
+			// it throws an error after the latest RN 0.73 upgrade.
+			// https://github.com/facebook/metro/blob/877933ddc03672a00214d26afe620b79479d6489/packages/metro-file-map/src/lib/TreeFS.js#L417
+			// Apply optional setup configuration, enabling modification via hooks.
+			// if ( __DEV__ && typeof require.context === 'function' ) {
+			// 	const req = require.context( './', false, /setup-local\.js$/ );
+			// 	req.keys().forEach( ( key ) => req( key ).default() );
+			// }
 
-	const isHermes = () => global.HermesInternal !== null;
-	// eslint-disable-next-line no-console
-	console.log( 'Hermes is: ' + isHermes() );
+			// Dispatch pre-render hooks.
+			doAction( 'native.pre-render', parentProps );
 
-	setupInitHooks();
-
-	const initializeEditor = require( '@wordpress/edit-post' ).initializeEditor;
-	initializeEditor( 'gutenberg', 'post', 1 );
-};
-
-const setupInitHooks = () => {
-	const wpHooks = require( '@wordpress/hooks' );
-
-	wpHooks.addAction(
-		'native.pre-render',
-		'core/react-native-editor',
-		( props ) => {
-			setupLocale( props.locale, props.translations );
+			this.filteredProps = applyFilters(
+				'native.block_editor_props',
+				parentProps
+			);
 		}
-	);
 
-	// Map native props to Editor props
-	// TODO: normalize props in the bridge (So we don't have to map initialData to initialHtml)
-	wpHooks.addFilter(
-		'native.block_editor_props',
-		'core/react-native-editor',
-		( props ) => {
-			const { capabilities = {} } = props;
-			let {
-				initialData,
-				initialTitle,
-				postType,
-				colors,
-				gradients,
-			} = props;
-
-			if ( initialData === undefined && __DEV__ ) {
-				initialData = initialHtml;
-			}
-			if ( initialTitle === undefined ) {
-				initialTitle = 'Welcome to Gutenberg!';
-			}
-			if ( postType === undefined ) {
-				postType = 'post';
-			}
-
-			colors = validateThemeColors( colors );
-
-			gradients = validateThemeGradients( gradients );
-
-			return {
-				initialHtml: initialData,
-				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
-				initialTitle,
-				postType,
-				capabilities,
-				colors,
-				gradients,
-				editorMode: props.editorMode,
-			};
+		render() {
+			return cloneElement( this.editorComponent, this.filteredProps );
 		}
-	);
+	}
+
+	registerComponent( 'gutenberg', () => Gutenberg );
 };
 
-let blocksRegistered = false;
-
-const setupLocale = ( locale, extraTranslations ) => {
-	const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
-
-	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
-
-	let gutenbergTranslations = getTranslation( locale );
-	if ( locale && ! gutenbergTranslations ) {
-		// Try stripping out the regional
-		locale = locale.replace( /[-_][A-Za-z]+$/, '' );
-		gutenbergTranslations = getTranslation( locale );
-	}
-	const translations = Object.assign(
-		{},
-		gutenbergTranslations,
-		extraTranslations
-	);
-	// eslint-disable-next-line no-console
-	console.log( 'locale', locale, translations );
-	// Only change the locale if it's supported by gutenberg
-	if ( gutenbergTranslations || extraTranslations ) {
-		setLocaleData( translations );
-	}
-
-	if ( blocksRegistered ) {
-		return;
-	}
-
-	const registerCoreBlocks = require( '@wordpress/block-library' )
-		.registerCoreBlocks;
-	registerCoreBlocks();
-	blocksRegistered = true;
-};
-
-export { initialHtml as initialHtmlGutenberg };
-export function doGutenbergNativeSetup() {
-	reactNativeSetup();
-	gutenbergSetup();
-}
+export { initialHtml as initialHtmlGutenberg, registerGutenberg, setupLocale };

@@ -4,6 +4,12 @@
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 export class AutosaveMonitor extends Component {
 	constructor( props ) {
@@ -18,15 +24,19 @@ export class AutosaveMonitor extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if (
-			this.props.disableIntervalChecks &&
-			this.props.editsReference !== prevProps.editsReference
-		) {
-			this.props.autosave();
+		if ( this.props.disableIntervalChecks ) {
+			if ( this.props.editsReference !== prevProps.editsReference ) {
+				this.props.autosave();
+			}
 			return;
 		}
 
-		if ( ! this.props.isDirty && prevProps.isDirty ) {
+		if ( this.props.interval !== prevProps.interval ) {
+			clearTimeout( this.timerId );
+			this.setAutosaveTimer();
+		}
+
+		if ( ! this.props.isDirty ) {
 			this.needsAutosave = false;
 			return;
 		}
@@ -70,16 +80,39 @@ export class AutosaveMonitor extends Component {
 	}
 }
 
+/**
+ * Monitors the changes made to the edited post and triggers autosave if necessary.
+ *
+ * The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called.
+ * The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as
+ * the specific way of detecting changes.
+ *
+ * There are two caveats:
+ * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+ * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
+ *
+ * @param {Object}   props                       - The properties passed to the component.
+ * @param {Function} props.autosave              - The function to call when changes need to be saved.
+ * @param {number}   props.interval              - The maximum time in seconds between an unsaved change and an autosave.
+ * @param {boolean}  props.isAutosaveable        - If false, the check for changes is retried every second.
+ * @param {boolean}  props.disableIntervalChecks - If true, disables the timer and any change will immediately trigger `props.autosave()`.
+ * @param {boolean}  props.isDirty               - Indicates if there are unsaved changes.
+ *
+ * @example
+ * ```jsx
+ * <AutosaveMonitor interval={30000} />
+ * ```
+ */
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getReferenceByDistinctEdits } = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( coreStore );
 
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
 			isAutosavingPost,
 			getEditorSettings,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
@@ -93,7 +126,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		autosave() {
-			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			const { autosave = dispatch( editorStore ).autosave } = ownProps;
 			autosave();
 		},
 	} ) ),

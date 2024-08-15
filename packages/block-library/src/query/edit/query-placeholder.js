@@ -3,45 +3,118 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
+import { useState } from '@wordpress/element';
+import {
 	useBlockProps,
+	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
 } from '@wordpress/block-editor';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
+import { Button, Placeholder } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-const QueryPlaceholder = ( { clientId, name, setAttributes } ) => {
-	const { blockType, defaultVariation, variations } = useSelect(
+/**
+ * Internal dependencies
+ */
+import { useScopedBlockVariations, useBlockNameForPatterns } from '../utils';
+
+export default function QueryPlaceholder( {
+	attributes,
+	clientId,
+	name,
+	openPatternSelectionModal,
+} ) {
+	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
+	const blockProps = useBlockProps();
+	const blockNameForPatterns = useBlockNameForPatterns(
+		clientId,
+		attributes
+	);
+	const { blockType, activeBlockVariation, hasPatterns } = useSelect(
 		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
-
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
+			const { getBlockRootClientId, getPatternsByBlockTypes } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
 				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					attributes
+				),
+				hasPatterns: !! getPatternsByBlockTypes(
+					blockNameForPatterns,
+					rootClientId
+				).length,
 			};
 		},
-		[ name ]
+		[ name, blockNameForPatterns, clientId, attributes ]
 	);
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const icon =
+		activeBlockVariation?.icon?.src ||
+		activeBlockVariation?.icon ||
+		blockType?.icon?.src;
+	const label = activeBlockVariation?.title || blockType?.title;
+	if ( isStartingBlank ) {
+		return (
+			<QueryVariationPicker
+				clientId={ clientId }
+				attributes={ attributes }
+				icon={ icon }
+				label={ label }
+			/>
+		);
+	}
+	return (
+		<div { ...blockProps }>
+			<Placeholder
+				icon={ icon }
+				label={ label }
+				instructions={ __(
+					'Choose a pattern for the query loop or start blank.'
+				) }
+			>
+				{ !! hasPatterns && (
+					<Button
+						variant="primary"
+						onClick={ openPatternSelectionModal }
+					>
+						{ __( 'Choose' ) }
+					</Button>
+				) }
+
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						setIsStartingBlank( true );
+					} }
+				>
+					{ __( 'Start blank' ) }
+				</Button>
+			</Placeholder>
+		</div>
+	);
+}
+
+function QueryVariationPicker( { clientId, attributes, icon, label } ) {
+	const scopeVariations = useScopedBlockVariations( attributes );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ blockType?.icon?.src }
-				label={ blockType?.title }
-				variations={ variations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					if ( nextVariation.attributes ) {
-						setAttributes( nextVariation.attributes );
-					}
-					if ( nextVariation.innerBlocks ) {
+				icon={ icon }
+				label={ label }
+				variations={ scopeVariations }
+				onSelect={ ( variation ) => {
+					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
-								nextVariation.innerBlocks
+								variation.innerBlocks
 							),
 							false
 						);
@@ -50,6 +123,4 @@ const QueryPlaceholder = ( { clientId, name, setAttributes } ) => {
 			/>
 		</div>
 	);
-};
-
-export default QueryPlaceholder;
+}

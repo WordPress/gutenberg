@@ -1,18 +1,22 @@
 /**
- * External dependencies
- */
-import { Composite, useCompositeState } from 'reakit';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import InserterListItem from '../inserter-list-item';
+import { InserterListboxGroup, InserterListboxRow } from '../inserter-listbox';
+
+function chunk( array, size ) {
+	const chunks = [];
+	for ( let i = 0, j = array.length; i < j; i += size ) {
+		chunks.push( array.slice( i, i + size ) );
+	}
+	return chunks;
+}
 
 function BlockTypesList( {
 	items = [],
@@ -20,50 +24,32 @@ function BlockTypesList( {
 	onHover = () => {},
 	children,
 	label,
+	isDraggable = true,
 } ) {
-	const composite = useCompositeState();
-	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
-
-	// This ensures the composite state refreshes when the list order changes.
-	useEffect( () => {
-		composite.unstable_sort();
-	}, [ composite.unstable_sort, orderId ] );
-
+	const className = 'block-editor-block-types-list';
+	const listId = useInstanceId( BlockTypesList, className );
 	return (
-		/*
-		 * Disable reason: The `list` ARIA role is redundant but
-		 * Safari+VoiceOver won't announce the list otherwise.
-		 */
-		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<Composite
-			{ ...composite }
-			role="listbox"
-			className="block-editor-block-types-list"
-			aria-label={ label }
-		>
-			{ items.map( ( item ) => {
-				return (
-					<InserterListItem
-						key={ item.id }
-						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
-						composite={ composite }
-					/>
-				);
-			} ) }
+		<InserterListboxGroup className={ className } aria-label={ label }>
+			{ chunk( items, 3 ).map( ( row, i ) => (
+				<InserterListboxRow key={ i }>
+					{ row.map( ( item, j ) => (
+						<InserterListItem
+							key={ item.id }
+							item={ item }
+							className={ getBlockMenuDefaultClassName(
+								item.id
+							) }
+							onSelect={ onSelect }
+							onHover={ onHover }
+							isDraggable={ isDraggable && ! item.isDisabled }
+							isFirst={ i === 0 && j === 0 }
+							rowId={ `${ listId }-${ i }` }
+						/>
+					) ) }
+				</InserterListboxRow>
+			) ) }
 			{ children }
-		</Composite>
-		/* eslint-enable jsx-a11y/no-redundant-roles */
+		</InserterListboxGroup>
 	);
 }
 

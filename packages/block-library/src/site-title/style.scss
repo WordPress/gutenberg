@@ -1,0 +1,8 @@
+.wp-block-site-title {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
+	:where(a) {
+		color: inherit;
+	}
+}

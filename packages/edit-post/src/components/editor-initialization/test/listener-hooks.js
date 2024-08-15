@@ -1,128 +1,103 @@
 /**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { render, act } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
-import { RegistryProvider } from '@wordpress/data';
+import { RegistryProvider, createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
-	useBlockSelectionListener,
-	useUpdatePostLinkListener,
-} from '../listener-hooks';
-import { STORE_KEY } from '../../../store/constants';
+import { useUpdatePostLinkListener } from '../listener-hooks';
+import { STORE_NAME } from '../../../store/constants';
 
 describe( 'listener hook tests', () => {
+	const storeConfig = {
+		actions: {
+			forceUpdate: jest.fn( () => ( { type: 'FORCE_UPDATE' } ) ),
+		},
+		reducer: ( state = {}, action ) =>
+			action.type === 'FORCE_UPDATE' ? { ...state } : state,
+	};
 	const mockStores = {
 		'core/block-editor': {
-			getBlockSelectionStart: jest.fn(),
+			...storeConfig,
+			selectors: {
+				getBlockSelectionStart: jest.fn(),
+			},
 		},
 		'core/editor': {
-			getCurrentPost: jest.fn(),
+			...storeConfig,
+			selectors: {
+				getCurrentPost: jest.fn(),
+			},
 		},
 		'core/viewport': {
-			isViewportMatch: jest.fn(),
+			...storeConfig,
+			selectors: {
+				isViewportMatch: jest.fn(),
+			},
 		},
-		[ STORE_KEY ]: {
-			isEditorSidebarOpened: jest.fn(),
-			openGeneralSidebar: jest.fn(),
-			closeGeneralSidebar: jest.fn(),
-			getActiveGeneralSidebarName: jest.fn(),
+		'core/preferences': {
+			...storeConfig,
+			selectors: {
+				get: jest.fn(),
+			},
+		},
+		[ STORE_NAME ]: {
+			...storeConfig,
+			actions: {
+				...storeConfig.actions,
+				openGeneralSidebar: jest.fn( () => ( {
+					type: 'OPEN_GENERAL_SIDEBAR',
+				} ) ),
+				closeGeneralSidebar: jest.fn( () => ( {
+					type: 'CLOSE_GENERAL_SIDEBAR',
+				} ) ),
+			},
+			selectors: {
+				isEditorSidebarOpened: jest.fn(),
+				getActiveGeneralSidebarName: jest.fn(),
+			},
 		},
 	};
-	let subscribeTrigger;
-	const registry = {
-		select: jest
-			.fn()
-			.mockImplementation( ( storeName ) => mockStores[ storeName ] ),
-		dispatch: jest
-			.fn()
-			.mockImplementation( ( storeName ) => mockStores[ storeName ] ),
-		subscribe: ( subscription ) => {
-			subscribeTrigger = subscription;
-		},
-	};
+
 	const setMockReturnValue = ( store, functionName, value ) => {
-		mockStores[ store ][ functionName ] = jest
-			.fn()
-			.mockReturnValue( value );
+		mockStores[ store ].selectors[ functionName ].mockReturnValue( value );
 	};
-	const getSpyedFunction = ( store, functionName ) =>
-		mockStores[ store ][ functionName ];
-	const renderComponent = ( testedHook, id, renderer = null ) => {
-		const TestComponent = ( { postId } ) => {
-			testedHook( postId );
-			return null;
-		};
-		const TestedOutput = (
-			<RegistryProvider value={ registry }>
-				<TestComponent postId={ id } />
-			</RegistryProvider>
-		);
-		return renderer === null
-			? TestRenderer.create( TestedOutput )
-			: renderer.update( TestedOutput );
-	};
+
 	afterEach( () => {
 		Object.values( mockStores ).forEach( ( storeMocks ) => {
-			Object.values( storeMocks ).forEach( ( mock ) => {
+			Object.values( storeMocks.selectors ).forEach( ( mock ) => {
 				mock.mockClear();
 			} );
-		} );
-		subscribeTrigger = undefined;
-	} );
-	describe( 'useBlockSelectionListener', () => {
-		it( 'does nothing when editor sidebar is not open', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', false );
-			act( () => {
-				renderComponent( useBlockSelectionListener, 10 );
+			Object.values( storeMocks.actions || {} ).forEach( ( mock ) => {
+				mock.mockClear();
 			} );
-			expect(
-				getSpyedFunction( STORE_KEY, 'isEditorSidebarOpened' )
-			).toHaveBeenCalled();
-			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
-			).toHaveBeenCalledTimes( 0 );
-		} );
-		it( 'opens block sidebar if block is selected', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				true
-			);
-			act( () => {
-				renderComponent( useBlockSelectionListener, 10 );
-			} );
-			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/block' );
-		} );
-		it( 'opens document sidebar if block is not selected', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				false
-			);
-			act( () => {
-				renderComponent( useBlockSelectionListener, 10 );
-			} );
-			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/document' );
 		} );
 	} );
 
 	describe( 'useUpdatePostLinkListener', () => {
+		const registry = createRegistry( mockStores );
+		const TestComponent = () => {
+			useUpdatePostLinkListener();
+			return null;
+		};
+		const TestedOutput = () => {
+			return (
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+		};
+
 		const setAttribute = jest.fn();
 		const mockSelector = jest.fn();
 		beforeEach( () => {
+			// eslint-disable-next-line testing-library/no-node-access
 			document.querySelector = mockSelector.mockReturnValue( {
 				setAttribute,
 			} );
@@ -136,29 +111,27 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
-			act( () => {
-				renderComponent( useUpdatePostLinkListener, 10 );
-			} );
+			render( <TestedOutput /> );
+
 			expect( setAttribute ).not.toHaveBeenCalled();
 		} );
 		it( 'updates nothing if there is no permalink', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', { link: '' } );
-			act( () => {
-				renderComponent( useUpdatePostLinkListener, 10 );
-			} );
+			render( <TestedOutput /> );
+
 			expect( setAttribute ).not.toHaveBeenCalled();
 		} );
 		it( 'only calls document query selector once across renders', () => {
-			act( () => {
-				const renderer = renderComponent(
-					useUpdatePostLinkListener,
-					10
-				);
-				renderComponent( useUpdatePostLinkListener, 20, renderer );
+			setMockReturnValue( 'core/editor', 'getCurrentPost', {
+				link: 'foo',
 			} );
+			const { rerender } = render( <TestedOutput /> );
+
+			rerender( <TestedOutput /> );
+
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 			act( () => {
-				subscribeTrigger();
+				registry.dispatch( 'core/editor' ).forceUpdate();
 			} );
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 		} );
@@ -166,11 +139,10 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
+			render( <TestedOutput /> );
+			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
 			act( () => {
-				renderComponent( useUpdatePostLinkListener, 10 );
-			} );
-			act( () => {
-				subscribeTrigger();
+				registry.dispatch( 'core/editor' ).forceUpdate();
 			} );
 			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
 		} );
@@ -178,14 +150,15 @@ describe( 'listener hook tests', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'foo',
 			} );
-			act( () => {
-				renderComponent( useUpdatePostLinkListener, 10 );
-			} );
+			render( <TestedOutput /> );
+			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
+			expect( setAttribute ).toHaveBeenCalledWith( 'href', 'foo' );
+
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
 				link: 'bar',
 			} );
 			act( () => {
-				subscribeTrigger();
+				registry.dispatch( 'core/editor' ).forceUpdate();
 			} );
 			expect( setAttribute ).toHaveBeenCalledTimes( 2 );
 			expect( setAttribute ).toHaveBeenCalledWith( 'href', 'bar' );

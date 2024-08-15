@@ -1,23 +1,23 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { verticalAlignment } = attributes;
+	const { isStackedOnMobile, verticalAlignment } = attributes;
 
-	const className = classnames( {
+	const className = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );
 
-	return (
-		<div { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
-		</div>
-	);
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+	return <div { ...innerBlocksProps } />;
 }

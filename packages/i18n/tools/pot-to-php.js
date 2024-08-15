@@ -4,7 +4,6 @@
  * External dependencies
  */
 const gettextParser = require( 'gettext-parser' );
-const { isEmpty } = require( 'lodash' );
 const fs = require( 'fs' );
 
 const TAB = '\t';
@@ -36,8 +35,8 @@ function escapeSingleQuotes( input ) {
  * Converts a translation parsed from the POT file to lines of WP PHP.
  *
  * @param {Object} translation The translation to convert.
- * @param {string} textdomain The text domain to use in the WordPress translation function call.
- * @param {string} context The context for the translation.
+ * @param {string} textdomain  The text domain to use in the WordPress translation function call.
+ * @param {string} context     The context for the translation.
  * @return {string} Lines of PHP that match the translation.
  */
 function convertTranslationToPHP( translation, textdomain, context = '' ) {
@@ -45,10 +44,10 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 
 	// The format of gettext-js matches the terminology in gettext itself.
 	let original = translation.msgid;
-	const comments = translation.comments;
+	const comments = translation.comments ?? {};
 
-	if ( ! isEmpty( comments ) ) {
-		if ( ! isEmpty( comments.reference ) ) {
+	if ( Object.values( comments ).length ) {
+		if ( comments.reference ) {
 			// All references are split by newlines, add a // Reference prefix to make them tidy.
 			php +=
 				TAB +
@@ -59,7 +58,7 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 				NEWLINE;
 		}
 
-		if ( ! isEmpty( comments.translator ) ) {
+		if ( comments.translator ) {
 			// All extracted comments are split by newlines, add a tab to line them up nicely.
 			const translator = comments.translator
 				.split( NEWLINE )
@@ -68,7 +67,7 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 			php += TAB + `/* ${ translator } */${ NEWLINE }`;
 		}
 
-		if ( ! isEmpty( comments.extracted ) ) {
+		if ( comments.extracted ) {
 			php +=
 				TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
 		}
@@ -77,8 +76,8 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 	if ( '' !== original ) {
 		original = escapeSingleQuotes( original );
 
-		if ( isEmpty( translation.msgid_plural ) ) {
-			if ( isEmpty( context ) ) {
+		if ( ! translation.msgid_plural ) {
+			if ( ! context ) {
 				php += TAB + `__( '${ original }', '${ textdomain }' )`;
 			} else {
 				php +=
@@ -88,7 +87,7 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 		} else {
 			const plural = escapeSingleQuotes( translation.msgid_plural );
 
-			if ( isEmpty( context ) ) {
+			if ( ! context ) {
 				php +=
 					TAB +
 					`_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;

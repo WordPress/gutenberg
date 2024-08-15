@@ -2,43 +2,70 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import {
+	Button,
+	__experimentalConfirmDialog as ConfirmDialog,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
-function PostTrash( { isNew, postId, postType, ...props } ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+/**
+ * Displays the Post Trash Button and Confirm Dialog in the Editor.
+ *
+ * @return {JSX.Element|null} The rendered PostTrash component.
+ */
+export default function PostTrash() {
+	const { isNew, isDeleting, postId } = useSelect( ( select ) => {
+		const store = select( editorStore );
+		return {
+			isNew: store.isEditedPostNew(),
+			isDeleting: store.isDeletingPost(),
+			postId: store.getCurrentPostId(),
+		};
+	}, [] );
+	const { trashPost } = useDispatch( editorStore );
+	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+
 	if ( isNew || ! postId ) {
 		return null;
 	}
 
-	const onClick = () => props.trashPost( postId, postType );
+	const handleConfirm = () => {
+		setShowConfirmDialog( false );
+		trashPost();
+	};
 
 	return (
-		<Button
-			className="editor-post-trash"
-			isDestructive
-			isTertiary
-			onClick={ onClick }
-		>
-			{ __( 'Move to trash' ) }
-		</Button>
+		<>
+			<Button
+				__next40pxDefaultSize
+				className="editor-post-trash"
+				isDestructive
+				variant="secondary"
+				isBusy={ isDeleting }
+				aria-disabled={ isDeleting }
+				onClick={
+					isDeleting ? undefined : () => setShowConfirmDialog( true )
+				}
+			>
+				{ __( 'Move to trash' ) }
+			</Button>
+			<ConfirmDialog
+				isOpen={ showConfirmDialog }
+				onConfirm={ handleConfirm }
+				onCancel={ () => setShowConfirmDialog( false ) }
+				confirmButtonText={ __( 'Move to trash' ) }
+				size="medium"
+			>
+				{ __(
+					'Are you sure you want to move this post to the trash?'
+				) }
+			</ConfirmDialog>
+		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			isEditedPostNew,
-			getCurrentPostId,
-			getCurrentPostType,
-		} = select( 'core/editor' );
-		return {
-			isNew: isEditedPostNew(),
-			postId: getCurrentPostId(),
-			postType: getCurrentPostType(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		trashPost: dispatch( 'core/editor' ).trashPost,
-	} ) ),
-] )( PostTrash );

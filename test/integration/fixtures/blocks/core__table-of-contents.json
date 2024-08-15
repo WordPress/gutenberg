@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/table-of-contents",
+		"isValid": true,
+		"attributes": {
+			"headings": [
+				{
+					"content": "Heading text",
+					"level": 2,
+					"link": "#heading-id-1"
+				},
+				{
+					"content": "A sub-heading",
+					"level": 3,
+					"link": "#heading-id-2"
+				}
+			],
+			"onlyIncludeCurrentPage": false
+		},
+		"innerBlocks": []
+	}
+]

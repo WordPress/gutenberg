@@ -1,34 +1,28 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import {
-	PanelBody,
-	Button,
-	ClipboardButton,
-	TextControl,
-} from '@wordpress/components';
+import { PanelBody, Button, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { addQueryArgs, safeDecodeURIComponent } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { useCopyToClipboard } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import PostScheduleLabel from '../post-schedule/label';
+import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
+const PAGENAME = '%pagename%';
 
 /**
  * Returns URL for a future post.
  *
- * @param {Object} post         Post object.
+ * @param {Object} post Post object.
  *
  * @return {string} PostPublish URL.
  */
@@ -40,8 +34,21 @@ const getFuturePostUrl = ( post ) => {
 		return post.permalink_template.replace( POSTNAME, slug );
 	}
 
+	if ( post.permalink_template.includes( PAGENAME ) ) {
+		return post.permalink_template.replace( PAGENAME, slug );
+	}
+
 	return post.permalink_template;
 };
+
+function CopyButton( { text, onCopy, children } ) {
+	const ref = useCopyToClipboard( text, onCopy );
+	return (
+		<Button variant="secondary" ref={ ref }>
+			{ children }
+		</Button>
+	);
+}
 
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
@@ -83,10 +90,14 @@ class PostPublishPanelPostpublish extends Component {
 
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
-		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
-		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const postLabel = postType?.labels?.singular_name;
+		const viewPostLabel = postType?.labels?.view_item;
+		const addNewPostLabel = postType?.labels?.add_new_item;
 		const link =
 			post.status === 'future' ? getFuturePostUrl( post ) : post.link;
+		const addLink = addQueryArgs( 'post-new.php', {
+			post_type: post.type,
+		} );
 
 		const postPublishNonLinkHeader = isScheduled ? (
 			<>
@@ -109,33 +120,43 @@ class PostPublishPanelPostpublish extends Component {
 					<p className="post-publish-panel__postpublish-subheader">
 						<strong>{ __( 'What’s next?' ) }</strong>
 					</p>
-					<TextControl
-						className="post-publish-panel__postpublish-post-address"
-						readOnly
-						label={ sprintf(
-							/* translators: %s: post type singular name */
-							__( '%s address' ),
-							postLabel
-						) }
-						value={ safeDecodeURIComponent( link ) }
-						onFocus={ this.onSelectInput }
-					/>
+					<div className="post-publish-panel__postpublish-post-address-container">
+						<TextControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							__nextHasNoMarginBottom
+							className="post-publish-panel__postpublish-post-address"
+							readOnly
+							label={ sprintf(
+								/* translators: %s: post type singular name */
+								__( '%s address' ),
+								postLabel
+							) }
+							value={ safeDecodeURIComponent( link ) }
+							onFocus={ this.onSelectInput }
+						/>
+
+						<div className="post-publish-panel__postpublish-post-address__copy-button-wrap">
+							<CopyButton text={ link } onCopy={ this.onCopy }>
+								{ this.state.showCopyConfirmation
+									? __( 'Copied!' )
+									: __( 'Copy' ) }
+							</CopyButton>
+						</div>
+					</div>
+
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button isSecondary href={ link }>
+							<Button variant="primary" href={ link }>
 								{ viewPostLabel }
 							</Button>
 						) }
-
-						<ClipboardButton
-							isSecondary
-							text={ link }
-							onCopy={ this.onCopy }
+						<Button
+							variant={ isScheduled ? 'primary' : 'secondary' }
+							href={ addLink }
 						>
-							{ this.state.showCopyConfirmation
-								? __( 'Copied!' )
-								: __( 'Copy Link' ) }
-						</ClipboardButton>
+							{ addNewPostLabel }
+						</Button>
 					</div>
 				</PanelBody>
 				{ children }
@@ -145,12 +166,9 @@ class PostPublishPanelPostpublish extends Component {
 }
 
 export default withSelect( ( select ) => {
-	const {
-		getEditedPostAttribute,
-		getCurrentPost,
-		isCurrentPostScheduled,
-	} = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
+	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } =
+		select( editorStore );
+	const { getPostType } = select( coreStore );
 
 	return {
 		post: getCurrentPost(),

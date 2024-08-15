@@ -1,38 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
+import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';
 
-const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
-	const onClick = () => {
-		const selectedBlockElement = getBlockDOMNode( selectedBlockClientId );
-		selectedBlockElement.focus();
-	};
-
-	return (
-		selectedBlockClientId && (
-			<Button
-				isSecondary
-				className="block-editor-skip-to-selected-block"
-				onClick={ onClick }
-			>
-				{ __( 'Skip to the selected block' ) }
-			</Button>
-		)
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/skip-to-selected-block/README.md
+ */
+export default function SkipToSelectedBlock() {
+	const selectedBlockClientId = useSelect(
+		( select ) => select( blockEditorStore ).getBlockSelectionStart(),
+		[]
 	);
-};
-
-export default withSelect( ( select ) => {
-	return {
-		selectedBlockClientId: select(
-			'core/block-editor'
-		).getBlockSelectionStart(),
+	const ref = useRef();
+	useBlockElementRef( selectedBlockClientId, ref );
+	const onClick = () => {
+		ref.current?.focus();
 	};
-} )( SkipToSelectedBlock );
+
+	return selectedBlockClientId ? (
+		<Button
+			variant="secondary"
+			className="block-editor-skip-to-selected-block"
+			onClick={ onClick }
+		>
+			{ __( 'Skip to the selected block' ) }
+		</Button>
+	) : null;
+}

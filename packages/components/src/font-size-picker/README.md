@@ -5,29 +5,27 @@ The component renders a user interface that allows the user to select predefined
 
 ## Usage
 
-
 ```jsx
+import { useState } from 'react';
 import { FontSizePicker } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
-...
-const MyFontSizePicker = withState( {
-	fontSize: 16,
-} )( ( { fontSize, setState } ) => {
-	const fontSizes = [
-		{
-			name: __( 'Small' ),
-			slug: 'small',
-			size: 12,
-		},
-		{
-			name: __( 'Big' ),
-			slug: 'big',
-			size: 26,
-		},
-	];
-	const fallbackFontSize = 16;
+const fontSizes = [
+	{
+		name: __( 'Small' ),
+		slug: 'small',
+		size: 12,
+	},
+	{
+		name: __( 'Big' ),
+		slug: 'big',
+		size: 26,
+	},
+];
+const fallbackFontSize = 16;
+
+const MyFontSizePicker = () => {
+	const [ fontSize, setFontSize ] = useState( 12 );
 
 	return (
 		<FontSizePicker
@@ -35,11 +33,11 @@ const MyFontSizePicker = withState( {
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
 			onChange={ ( newFontSize ) => {
-				setState( { fontSize: newFontSize } );
+				setFontSize( newFontSize );
 			} }
 		/>
 	);
-} );
+};
 
 ...
 
@@ -50,22 +48,20 @@ const MyFontSizePicker = withState( {
 
 The component accepts the following props:
 
-### disableCustomFontSizes
+### `disableCustomFontSizes`: `boolean`
 
 If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
 
-- Type: `Boolean`
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `false`
 
-### fallbackFontSize
+### `fallbackFontSize`: `number`
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
 
-- Type: `Number`
-- Required: No
+-   Required: No
 
-### fontSizes
+### `fontSizes`: `FontSize[]`
 
 An array of font size objects. The object should contain properties size, name, and slug.
 The property `size` contains a number with the font size value, in `px` or a string specifying the font size CSS property that should be used eg: "13px", "1em", or "clamp(12px, 5vw, 100px)".
@@ -74,28 +70,46 @@ The `slug` property is a string with a unique identifier for the font size. Used
 
 **Note:** The slugs `default` and `custom` are reserved and cannot be used.
 
-- Type: `Array`
-- Required: No
+-   Required: No
+-   Default: `[]`
 
-### onChange
+### `onChange`: `( value: number | string | undefined, selectedItem?: FontSize ) => void`
 
 A function that receives the new font size value.
 If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font size to undefined or set the font size a starting value.
 
-- Type: `function`
-- Required: Yes
+-   Required: Yes
 
-### value
+### `size`: `'default' | '__unstable-large'`
+
+Size of the control.
+
+-   Required: No
+-   Default: `'default'`
+
+### `units`: `string[]`
+
+Available units for custom font size selection.
+
+-   Required: No
+-   Default: `[ 'px', 'em', 'rem', 'vw', 'vh' ]`
+
+### `value`: `number | string`
 
 The current font size value.
 
-- Type: `Number | String`
-- Required: No
+-   Required: No
 
-### withSlider
+### `withReset`: `boolean`
 
-If `true`, the UI will contain a slider, instead of a numeric text input field. If `false`, no slider will be present.
+If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
 
-- Type: `Boolean`
-- Required: no
-- Default: `false`
+-   Required: no
+-   Default: `true`
+
+### `withSlider`: `boolean`
+
+If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+
+-   Required: no
+-   Default: `false`

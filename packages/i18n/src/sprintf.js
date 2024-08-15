@@ -17,10 +17,10 @@ const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
  * Returns a formatted string. If an error occurs in applying the format, the
  * original format string is returned.
  *
- * @param {string}    format The format of the string to generate.
- * @param {...*} args Arguments to apply to the format.
+ * @param {string} format The format of the string to generate.
+ * @param {...*}   args   Arguments to apply to the format.
  *
- * @see http://www.diveintojavascript.com/projects/javascript-sprintf
+ * @see https://www.npmjs.com/package/sprintf-js
  *
  * @return {string} The formatted string.
  */
@@ -28,8 +28,9 @@ export function sprintf( format, ...args ) {
 	try {
 		return sprintfjs.sprintf( format, ...args );
 	} catch ( error ) {
-		logErrorOnce( 'sprintf error: \n\n' + error.toString() );
-
+		if ( error instanceof Error ) {
+			logErrorOnce( 'sprintf error: \n\n' + error.toString() );
+		}
 		return format;
 	}
 }
