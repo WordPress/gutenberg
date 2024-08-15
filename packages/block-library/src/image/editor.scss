@@ -26,12 +26,24 @@
 		&::before {
 			opacity: 0;
 		}
+
+		.block-bindings-media-placeholder-message {
+			opacity: 1;
+		}
+	}
+
+	.block-editor-media-placeholder.is-small {
+		min-height: 60px;
+	}
+
+	.block-editor-media-placeholder:not(.is-small) {
+		.components-placeholder__fieldset,
+		.components-placeholder__label {
+			display: flex;
+		}
 	}
 	.block-bindings-media-placeholder-message {
 		opacity: 0;
-	}
-	&.is-selected .block-bindings-media-placeholder-message {
-		opacity: 1;
 	}
 
 	// Remove the transition while we still have a legacy placeholder style.
@@ -41,6 +53,11 @@
 	.components-placeholder__instructions,
 	.components-button {
 		transition: none;
+	}
+
+	.components-placeholder__fieldset,
+	.components-placeholder__label {
+		display: none;
 	}
 }
 

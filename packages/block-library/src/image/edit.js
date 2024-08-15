@@ -26,7 +26,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -113,13 +112,11 @@ export function ImageEdit( {
 	} = attributes;
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	// const parentWidth = sizes?.width;
+	// const parsedWidth = width && parseInt( width.replace( /px$/, '' ), 10 );
 
-	const [ resizeListener, sizes ] = useResizeObserver();
-	const parentWidth = sizes?.width;
-	const parsedWidth = width && parseInt( width.replace( /px$/, '' ), 10 );
-
-	const isSmallLayout =
-		( parentWidth && parentWidth < 160 ) || parsedWidth < 160;
+	// const isSmallLayout =
+	// 	( parentWidth && parentWidth < 160 ) || parsedWidth < 160;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -341,15 +338,11 @@ export function ImageEdit( {
 			<Placeholder
 				className={ clsx( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
-						!! borderProps.className &&
-						! isSingleSelected &&
-						! isSmallLayout,
+						!! borderProps.className && ! isSingleSelected,
 				} ) }
 				withIllustration
-				icon={
-					! isSmallLayout && ( lockUrlControls ? pluginsIcon : icon )
-				}
-				label={ ! isSmallLayout && __( 'Image' ) }
+				icon={ lockUrlControls ? pluginsIcon : icon }
+				label={ __( 'Image' ) }
 				instructions={
 					! lockUrlControls &&
 					__(
@@ -382,8 +375,7 @@ export function ImageEdit( {
 	return (
 		<>
 			<figure { ...blockProps }>
-				{ resizeListener }
-				{ ! ( temporaryURL || url ) && (
+				{ ! ( temporaryURL || url ) && ! lockUrlControls && (
 					<BlockControls group="other">
 						<MediaReplaceFlow
 							mediaId={ id }
@@ -426,24 +418,19 @@ export function ImageEdit( {
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ parentLayout?.type }
 				/>
-				{ ! temporaryURL &&
-					! url &&
-					( isSmallLayout ? (
-						placeholder( mediaPreview )
-					) : (
-						<MediaPlaceholder
-							icon={ <BlockIcon icon={ icon } /> }
-							onSelect={ onSelectImage }
-							onSelectURL={ onSelectURL }
-							onError={ onUploadError }
-							placeholder={ placeholder }
-							accept="image/*"
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							value={ { id, src } }
-							mediaPreview={ mediaPreview }
-							disableMediaButtons={ temporaryURL || url }
-						/>
-					) ) }
+
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
 			</figure>
 		</>
 	);
