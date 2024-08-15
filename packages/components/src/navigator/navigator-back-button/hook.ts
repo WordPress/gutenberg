@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -24,6 +25,14 @@ export function useNavigatorBackButton(
 
 		...otherProps
 	} = useContextSystem( props, 'NavigatorBackButton' );
+
+	if ( goToParent !== undefined ) {
+		deprecated( '`goToParent` prop in wp.components.NavigatorBackButton', {
+			since: '6.7',
+			alternative:
+				'"back" navigations are always treated as going to the parent screen',
+		} );
+	}
 
 	const { goBack } = useNavigator();
 	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
