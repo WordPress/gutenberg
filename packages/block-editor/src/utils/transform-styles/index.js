@@ -43,17 +43,13 @@ function transformStyle(
 						prefix: wrapperSelector,
 						exclude: [ ...ignoredSelectors, wrapperSelector ],
 						transform( prefix, selector, prefixedSelector ) {
-							// `html`, `body` and `:root` need some special handling since they
-							// generally cannot be prefixed with a class name and produce a valid
-							// selector. Instead we replace the whole root part of the selector.
-
 							const rootSelector = ROOT_SELECTORS.find(
 								( rootSelectorCandidate ) =>
 									selector.startsWith( rootSelectorCandidate )
 							);
 
 							// Reorganize root selectors such that the root part comes before the prefix,
-							// but the prefix still becomes any other part of the selector.
+							// but the prefix still comes before the remaining part of the selector.
 							if ( rootSelector ) {
 								const selectorWithoutRootPart = selector
 									.replace( rootSelector, '' )
