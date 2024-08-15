@@ -7,7 +7,6 @@ import {
 	RangeControl,
 	Flex,
 	FlexItem,
-	__experimentalSpacer as Spacer,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -162,25 +161,24 @@ export default function HeightControl( {
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
-					<Spacer marginX={ 2 } marginBottom={ 0 }>
-						<RangeControl
-							value={ customRangeValue }
-							min={ 0 }
-							max={
-								RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
-									?.max ?? 100
-							}
-							step={
-								RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
-									?.step ?? 0.1
-							}
-							withInputField={ false }
-							onChange={ handleSliderChange }
-							__nextHasNoMarginBottom
-							label={ label }
-							hideLabelFromVision
-						/>
-					</Spacer>
+					<RangeControl
+						__next40pxDefaultSize
+						value={ customRangeValue }
+						min={ 0 }
+						max={
+							RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
+								?.max ?? 100
+						}
+						step={
+							RANGE_CONTROL_CUSTOM_SETTINGS[ selectedUnit ]
+								?.step ?? 0.1
+						}
+						withInputField={ false }
+						onChange={ handleSliderChange }
+						__nextHasNoMarginBottom
+						label={ label }
+						hideLabelFromVision
+					/>
 				</FlexItem>
 			</Flex>
 		</fieldset>
