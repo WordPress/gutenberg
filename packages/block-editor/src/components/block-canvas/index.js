@@ -38,7 +38,7 @@ export function ExperimentalBlockCanvas( {
 			>
 				<EditorStyles
 					styles={ styles }
-					scope=".editor-styles-wrapper"
+					scope=":where(.editor-styles-wrapper)"
 				/>
 				<WritingFlow
 					ref={ contentRef }

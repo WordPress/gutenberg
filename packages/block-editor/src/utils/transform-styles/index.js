@@ -7,9 +7,13 @@ import rebaseUrl from 'postcss-urlrebase';
 
 const cacheByWrapperSelector = new Map();
 
-// Ordering is important since `:root` would also match `:root :where(body)`.
-const ROOT_SELECTOR_REGEX =
-	/^(:root :where\(body\)|:where\(body\)|:root|html|body)/;
+const ROOT_SELECTORS = [
+	':root :where(body)',
+	':where(body)',
+	':root',
+	'html',
+	'body',
+];
 
 function replaceDoublePrefix( selector, prefix ) {
 	// Avoid prefixing an already prefixed selector.
@@ -42,11 +46,19 @@ function transformStyle(
 							// `html`, `body` and `:root` need some special handling since they
 							// generally cannot be prefixed with a class name and produce a valid
 							// selector. Instead we replace the whole root part of the selector.
-							if ( ROOT_SELECTOR_REGEX.test( selector ) ) {
-								const updatedRootSelector = selector.replace(
-									ROOT_SELECTOR_REGEX,
-									prefix
-								);
+
+							const rootSelector = ROOT_SELECTORS.find(
+								( rootSelectorCandidate ) =>
+									selector.startsWith( rootSelectorCandidate )
+							);
+
+							// Reorganize root selectors such that the root part comes before the prefix,
+							// but the prefix still becomes any other part of the selector.
+							if ( rootSelector ) {
+								const selectorWithoutRootPart =
+									selector.replace( rootSelector, '' );
+								const updatedRootSelector =
+									`${ rootSelector } ${ prefix } ${ selectorWithoutRootPart }`.trim();
 
 								return replaceDoublePrefix(
 									updatedRootSelector,
