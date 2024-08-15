@@ -127,8 +127,10 @@ export function generateBoxRules(
 }
 
 /**
- * Returns a WordPress CSS custom var value from incoming style preset value.
- * The preset value follows the pattern `var:description|context|slug`.
+ * Returns a WordPress CSS custom var value from incoming style preset value,
+ * if one is detected.
+ *
+ * The preset value is a string and follows the pattern `var:description|context|slug`.
  *
  * Example:
  *
@@ -139,9 +141,9 @@ export function generateBoxRules(
  * @return A CSS var value.
  */
 
-export function getCSSValueFromRawStyle(
-	styleValue: string | any
-): string | unknown {
+export function getCSSValueFromRawStyle< CSSStyleValue = string >(
+	styleValue: CSSStyleValue
+): CSSStyleValue {
 	if (
 		typeof styleValue === 'string' &&
 		styleValue.startsWith( VARIABLE_REFERENCE_PREFIX )
@@ -160,7 +162,7 @@ export function getCSSValueFromRawStyle(
 				} )
 			)
 			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
+		return `var(--wp--${ variable })` as CSSStyleValue;
 	}
 	return styleValue;
 }
