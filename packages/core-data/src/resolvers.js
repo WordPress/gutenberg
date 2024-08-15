@@ -301,19 +301,47 @@ export const getEntityRecords =
 					meta
 				);
 
-				// When requesting all fields, the list of results can be used to
-				// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+				// When requesting all fields, the list of results can be used to resolve
+				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
+				// See https://github.com/WordPress/gutenberg/pull/64504
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
+					const targetHints = records
+						.filter( ( record ) => record?.[ key ] )
+						.map( ( record ) => ( {
+							id: record[ key ],
+							permissions: getUserPermissionsFromAllowHeader(
+								record?._links?.self?.[ 0 ].targetHints.allow
+							),
+						} ) );
+
 					dispatch.finishResolutions(
 						'getEntityRecord',
 						resolutionsArgs
 					);
+
+					for ( const targetHint of targetHints ) {
+						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+							const permissionKey = getUserPermissionCacheKey(
+								action,
+								{ kind, name, id: targetHint.id }
+							);
+
+							dispatch.receiveUserPermission(
+								permissionKey,
+								targetHint.permissions[ action ]
+							);
+							dispatch.finishResolution( 'canUser', [
+								action,
+								{ kind, name, id: targetHint.id },
+							] );
+						}
+					}
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
