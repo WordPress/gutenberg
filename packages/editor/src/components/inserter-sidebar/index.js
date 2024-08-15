@@ -38,13 +38,15 @@ export default function InserterSidebar() {
 			getBlockInsertionPoint,
 			getBlockRootClientId,
 			__unstableGetEditorMode,
-			getSettings,
-		} = select( blockEditorStore );
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings() );
+				const sectionRootClientId = getSectionRootClientId();
+
 				if ( sectionRootClientId ) {
 					return sectionRootClientId;
 				}

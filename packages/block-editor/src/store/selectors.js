@@ -36,6 +36,7 @@ import {
 	getContentLockingParent,
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
+	getSectionRootClientId,
 } from './private-selectors';
 
 /**
@@ -2057,9 +2058,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							if ( ! item.rootClientId ) {
 								let sectionRootClientId;
 								try {
-									sectionRootClientId = unlock(
-										getSettings( state )
-									).sectionRootClientId;
+									sectionRootClientId =
+										getSectionRootClientId();
 								} catch ( e ) {}
 								if (
 									sectionRootClientId &&
@@ -2827,7 +2827,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
 	if ( editorMode === 'zoom-out' ) {
-		const { sectionRootClientId } = unlock( getSettings( state ) );
+		const sectionRootClientId = getSectionRootClientId();
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
 				state,
@@ -2920,7 +2920,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings( state ) );
+				const sectionRootClientId = getSectionRootClientId();
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 					return sectionRootClientId ? 'disabled' : 'contentOnly';
 				}

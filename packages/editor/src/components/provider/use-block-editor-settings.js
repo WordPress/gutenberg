@@ -12,10 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
-import {
-	privateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { privateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -23,7 +20,7 @@ import {
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
-import { lock, unlock } from '../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
 
 const EMPTY_BLOCKS_LIST = [];
@@ -74,7 +71,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
-	'sectionRootClientId',
 	'styles',
 	'titlePlaceholder',
 	'supportsLayout',
@@ -95,14 +91,13 @@ const {
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object} settings      EditorProvider settings prop.
- * @param {string} postType      Editor root level post type.
- * @param {string} postId        Editor root level post ID.
- * @param {string} renderingMode Editor rendering mode.
+ * @param {Object} settings EditorProvider settings prop.
+ * @param {string} postType Editor root level post type.
+ * @param {string} postId   Editor root level post ID.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+function useBlockEditorSettings( settings, postType, postId ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
@@ -119,7 +114,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		pageForPosts,
 		userPatternCategories,
 		restBlockPatternCategories,
-		sectionRootClientId,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -131,27 +125,13 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
-			const { getBlocksByName, getBlockAttributes } =
-				select( blockEditorStore );
+
 			const siteSettings = canUser( 'read', {
 				kind: 'root',
 				name: 'site',
 			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
-
-			function getSectionRootBlock() {
-				if ( renderingMode === 'template-locked' ) {
-					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
-				}
-
-				return (
-					getBlocksByName( 'core/group' ).find(
-						( clientId ) =>
-							getBlockAttributes( clientId )?.tagName === 'main'
-					) ?? ''
-				);
-			}
 
 			return {
 				allowRightClickOverrides: get(
@@ -183,10 +163,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
-				sectionRootClientId: getSectionRootBlock(),
 			};
 		},
-		[ postType, postId, isLargeViewport, renderingMode ]
+		[ postType, postId, isLargeViewport ]
 	);
 
 	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
@@ -326,9 +305,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
-		lock( blockEditorSettings, {
-			sectionRootClientId,
-		} );
+
 		return blockEditorSettings;
 	}, [
 		allowedBlockTypes,
@@ -351,7 +328,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		pageForPosts,
 		postType,
 		setIsInserterOpened,
-		sectionRootClientId,
 		globalStylesData,
 		globalStylesLinksData,
 	] );
