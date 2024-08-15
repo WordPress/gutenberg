@@ -88,7 +88,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -156,7 +156,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: 1px;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -175,7 +175,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -424,7 +424,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -648,7 +648,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -716,7 +716,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: 1px;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -735,7 +735,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -978,7 +978,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
