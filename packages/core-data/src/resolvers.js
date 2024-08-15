@@ -19,7 +19,7 @@ import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
 	getUserPermissionCacheKey,
-	getUserPermissionsFromResponse,
+	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 } from './utils';
 import { getSyncProvider } from './sync';
@@ -173,7 +173,9 @@ export const getEntityRecord =
 
 				const response = await apiFetch( { path, parse: false } );
 				const record = await response.json();
-				const permissions = getUserPermissionsFromResponse( response );
+				const permissions = getUserPermissionsFromAllowHeader(
+					response.headers?.get( 'allow' )
+				);
 
 				registry.batch( () => {
 					dispatch.receiveEntityRecords( kind, name, record, query );
@@ -440,7 +442,12 @@ export const canUser =
 			return;
 		}
 
-		const permissions = getUserPermissionsFromResponse( response );
+		// Optional chaining operator is used here because the API requests don't
+		// return the expected result in the React native version. Instead, API requests
+		// only return the result, without including response properties like the headers.
+		const permissions = getUserPermissionsFromAllowHeader(
+			response.headers?.get( 'allow' )
+		);
 		registry.batch( () => {
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				const key = getUserPermissionCacheKey( action, resource, id );
