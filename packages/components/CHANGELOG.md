@@ -31,6 +31,7 @@
 -   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+-   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
 
 ## 28.5.0 (2024-08-07)
 
