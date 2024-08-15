@@ -160,12 +160,6 @@ export type PopoverProps = {
 	 * @default false
 	 */
 	inline?: boolean;
-	/**
-	 * Inline styles to apply to the popover element.
-	 *
-	 * @default undefined
-	 */
-	style?: React.CSSProperties;
 	// Deprecated props
 	/**
 	 * Prevent the popover from flipping and resizing when meeting the viewport
