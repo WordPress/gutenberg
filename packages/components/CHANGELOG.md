@@ -18,6 +18,7 @@
     -   `ToggleControl`
     -   `ToggleGroupControl`
     -   `TreeSelect`
+-   Deprecate `NavigatorToParentButton` and `useNavigator().goToParent()` in favor of `NavigatorBackButton` and `useNavigator().goBack()` ([#63317](https://github.com/WordPress/gutenberg/pull/63317)).
 
 ### Enhancements
 
