@@ -14,7 +14,6 @@ const CONTROL_PROPS = {
 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
 	controlBackgroundColor: COLORS.white,
-	controlBorderRadius: '2px',
 	controlBoxShadow: 'transparent',
 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
