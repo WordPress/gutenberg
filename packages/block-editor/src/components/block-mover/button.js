@@ -46,6 +46,11 @@ const getDirection = ( direction, orientation ) => {
 			return isRTL() ? 'right' : 'left';
 		}
 		return 'up';
+	} else if ( direction === 'down' ) {
+		if ( orientation === 'horizontal' ) {
+			return isRTL() ? 'left' : 'right';
+		}
+		return 'down';
 	}
 	return null;
 };
