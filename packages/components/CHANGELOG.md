@@ -27,6 +27,8 @@
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
 -   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
 -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+-   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
+
 
 ### Bug Fixes
 
