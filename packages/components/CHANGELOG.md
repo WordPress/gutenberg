@@ -28,7 +28,7 @@
 -   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
 -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
 -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
-
+-   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
 
 ### Bug Fixes
 
