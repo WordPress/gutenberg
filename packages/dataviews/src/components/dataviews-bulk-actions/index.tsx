@@ -23,6 +23,7 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
 interface ActionWithModalProps< Item > {
@@ -128,6 +129,11 @@ function BulkActionItem< Item >( {
 
 	const shouldShowModal = 'RenderModal' in action;
 
+	const label =
+		typeof action.label === 'string'
+			? action.label
+			: action.label( eligibleItems );
+
 	return (
 		<DropdownMenuItem
 			key={ action.id }
@@ -141,7 +147,7 @@ function BulkActionItem< Item >( {
 			} }
 			suffix={ eligibleItems.length }
 		>
-			{ action.label }
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
