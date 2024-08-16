@@ -224,20 +224,31 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 
-		const { computedSectionRootClientId } = useSelect( ( select ) => {
-			const { getBlockAttributes, getBlocksByName } =
-				select( blockEditorStore );
+		const { computedSectionRootClientId } = useSelect(
+			( select ) => {
+				const { getBlockAttributes, getBlocksByName } =
+					select( blockEditorStore );
 
-			const _sectionRootClientId =
-				getBlocksByName( 'core/group' ).find(
-					( clientId ) =>
-						getBlockAttributes( clientId )?.tagName === 'main'
-				) ?? '';
+				let _sectionRootClientId;
 
-			return {
-				computedSectionRootClientId: _sectionRootClientId,
-			};
-		}, [] );
+				if ( mode === 'template-locked' ) {
+					_sectionRootClientId =
+						getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
+				} else {
+					_sectionRootClientId =
+						getBlocksByName( 'core/group' ).find(
+							( clientId ) =>
+								getBlockAttributes( clientId )?.tagName ===
+								'main'
+						) ?? '';
+				}
+
+				return {
+					computedSectionRootClientId: _sectionRootClientId,
+				};
+			},
+			[ mode ]
+		);
 
 		const { setSectionRootClientId } = unlock(
 			useDispatch( blockEditorStore )
