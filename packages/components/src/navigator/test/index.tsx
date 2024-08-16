@@ -23,7 +23,6 @@ import {
 	useNavigator,
 } from '..';
 import type { NavigateOptions } from '../types';
-import React from 'react';
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: '/ "\'><=invalid_path',
