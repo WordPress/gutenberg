@@ -58,7 +58,8 @@
 	gap: $grid-unit-05;
 }
 
-.dataviews-field-control__field:hover, .dataviews-field-control__field:focus-within {
+.dataviews-field-control__field:hover,
+.dataviews-field-control__field:focus-within {
 	.dataviews-field-control__actions {
 		position: unset;
 		top: unset;
