@@ -27,6 +27,13 @@ const { state } = store( 'core/accordion', {
 		},
 	},
 	callbacks: {
+		initIsOpen: () => {
+			const context = getContext();
+			const { id, openByDefault } = context;
+			if ( openByDefault ) {
+				context.isOpen.push( id );
+			}
+		},
 		setTabIndex: () => {
 			const { ref } = getElement();
 			ref.querySelectorAll(

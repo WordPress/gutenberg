@@ -19,13 +19,6 @@ function block_core_accordion_item_render( $attributes, $content ) {
 	$p         = new WP_HTML_Tag_Processor( $content );
 	$unique_id = wp_unique_id( 'accordion-item-' );
 
-	// If the item is open by default,
-	// add its id to the accordion group's initial context.isOpen list.
-	if ( $attributes['openByDefault'] ) {
-		// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
-		gutenberg_block_core_accordion_group_item_ids( $unique_id );
-	}
-
 	// Initialize the state of the item on the server using a closure,
 	// since we need to get derived state based on the current context.
 	wp_interactivity_state(
@@ -33,14 +26,15 @@ function block_core_accordion_item_render( $attributes, $content ) {
 		array(
 			'isOpen' => function () {
 				$context = wp_interactivity_get_context();
-				return in_array( $context['id'], $context['isOpen'], true );
+				return $context['openByDefault'];
 			},
 		)
 	);
 
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-item' ) ) ) {
-		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '" }' );
+		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '", "openByDefault": "' . (bool) $attributes['openByDefault'] . '" }' );
 		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
+		$p->set_attribute( 'data-wp-init', 'callbacks.initIsOpen' );
 
 		if ( $p->next_tag( array( 'class_name' => 'accordion-item__toggle' ) ) ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.toggle' );
