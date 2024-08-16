@@ -22,12 +22,15 @@ import {
  * @param {Object} image              Gallery image.
  * @param {string} galleryDestination Gallery's selected link destination.
  * @param {Object} imageDestination   Image blocks attributes.
+ * @param {Object} lightboxSetting    Lightbox setting.
+ *
  * @return {Object}            New attributes to assign to image block.
  */
 export function getHrefAndDestination(
 	image,
 	galleryDestination,
-	imageDestination
+	imageDestination,
+	lightboxSetting
 ) {
 	// Gutenberg and WordPress use different constants so if image_default_link_type
 	// option is set we need to map from the WP Core values.
@@ -37,23 +40,32 @@ export function getHrefAndDestination(
 			return {
 				href: image?.source_url || image?.url, // eslint-disable-line camelcase
 				linkDestination: IMAGE_LINK_DESTINATION_MEDIA,
+				lightbox: lightboxSetting?.enabled
+					? { enabled: false }
+					: undefined,
 			};
 		case LINK_DESTINATION_ATTACHMENT_WP_CORE:
 		case LINK_DESTINATION_ATTACHMENT:
 			return {
 				href: image?.link,
 				linkDestination: IMAGE_LINK_DESTINATION_ATTACHMENT,
+				lightbox: lightboxSetting?.enabled
+					? { enabled: false }
+					: undefined,
 			};
 		case LINK_DESTINATION_LIGHTBOX:
 			return {
 				href: undefined,
-				lightbox: { enabled: true },
+				lightbox: ! lightboxSetting?.enabled
+					? { enabled: true }
+					: undefined,
 				linkDestination: IMAGE_LINK_DESTINATION_NONE,
 			};
 		case LINK_DESTINATION_NONE:
 			return {
 				href: undefined,
 				linkDestination: IMAGE_LINK_DESTINATION_NONE,
+				lightbox: undefined,
 			};
 	}
 

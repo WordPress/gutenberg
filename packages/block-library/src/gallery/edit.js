@@ -117,15 +117,13 @@ export default function GalleryEdit( props ) {
 		onFocus,
 	} = props;
 
-	const lightboxSetting = useSettings( 'blocks.core/image.lightbox' );
+	const lightboxSetting = useSettings( 'blocks.core/image.lightbox' )[ 0 ];
 
-	useEffect( () => {
-		if ( ! lightboxSetting?.allowEditing ) {
-			linkOptions = linkOptions.filter(
-				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-			);
-		}
-	}, [ lightboxSetting?.allowEditing ] );
+	if ( ! lightboxSetting?.allowEditing ) {
+		linkOptions = linkOptions.filter(
+			( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
+		);
+	}
 
 	const { columns, imageCrop, randomOrder, linkTarget, linkTo, sizeSlug } =
 		attributes;
@@ -384,33 +382,12 @@ export default function GalleryEdit( props ) {
 				? imageData.find( ( { id } ) => id === block.attributes.id )
 				: null;
 
-			let hrefAndDestination = getHrefAndDestination( image, value );
-
-			if (
-				value === LINK_DESTINATION_LIGHTBOX &&
-				! lightboxSetting?.enabled
-			) {
-				hrefAndDestination = {
-					...hrefAndDestination,
-					lightbox: { enabled: true },
-				};
-			} else if (
-				value !== LINK_DESTINATION_NONE &&
-				value !== LINK_DESTINATION_LIGHTBOX &&
-				lightboxSetting?.enabled
-			) {
-				hrefAndDestination = {
-					...hrefAndDestination,
-					lightbox: { enabled: false },
-				};
-			} else {
-				hrefAndDestination = {
-					...hrefAndDestination,
-					lightbox: undefined,
-				};
-			}
-
-			changedAttributes[ block.clientId ] = hrefAndDestination;
+			changedAttributes[ block.clientId ] = getHrefAndDestination(
+				image,
+				value,
+				false,
+				lightboxSetting
+			);
 		} );
 		updateBlockAttributes( blocks, changedAttributes, true );
 		const linkToText = [ ...linkOptions ].find(
