@@ -73,6 +73,7 @@ export default function Edit( { attributes, setAttributes } ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleGroupControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						isBlock
 						label={ __( 'Icon' ) }
 						value={ icon }
@@ -112,6 +113,7 @@ export default function Edit( { attributes, setAttributes } ) {
 					</ToggleGroupControl>
 					<ToggleGroupControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						isBlock
 						label={ __( 'Icon Position' ) }
 						value={ iconPosition }
