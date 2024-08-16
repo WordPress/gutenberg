@@ -36,7 +36,7 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { SlotFillProvider } from '@wordpress/components';
+import { ResizableBox, SlotFillProvider } from '@wordpress/components';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -163,10 +163,38 @@ function MetaBoxesWide() {
 		);
 	}
 	return (
-		<div className="edit-post-layout__metaboxes">
-			<MetaBoxes location="normal" />
-			<MetaBoxes location="advanced" />
-		</div>
+		<ResizableBox
+			className="edit-post-layout__metaboxes-resizable-area"
+			enable={ {
+				top: true,
+				right: false,
+				bottom: false,
+				left: false,
+				topLeft: false,
+				topRight: false,
+				bottomRight: false,
+				bottomLeft: false,
+			} }
+			bounds="parent"
+			boundsByDirection
+			// Avoids hiccups while dragging over objects like iframes and ensures that
+			// the event to end the drag is captured by the target (resize handle)
+			// whether or not it’s under the pointer.
+			onPointerDown={ ( { pointerId, target } ) => {
+				target.setPointerCapture( pointerId );
+			} }
+			onResizeStart={ ( event, direction, elementRef ) => {
+				// Avoids an height jump in case the max-height is limiting it.
+				elementRef.style.height = `${ elementRef.offsetHeight }px`;
+				// Stops max-height from being applied.
+				elementRef.classList.add( 'has-user-size' );
+			} }
+		>
+			<div className="edit-post-layout__metaboxes">
+				<MetaBoxes location="normal" />
+				<MetaBoxes location="advanced" />
+			</div>
+		</ResizableBox>
 	);
 }
 
