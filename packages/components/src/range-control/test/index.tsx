@@ -297,7 +297,25 @@ describe( 'RangeControl', () => {
 		} );
 	} );
 
-	describe( 'reset', () => {
+	describe.only( 'reset', () => {
+		// TODO: behaviour to be tested:
+		// - when resetFallbackValue is provided:
+		//    - value resets to resetFallbackValue;
+		//    - onChange() is called with resetFallbackValue;
+		// - when initialPosition is provided:
+		//    - value is assigned to `null`;
+		//    - onChange() is called with `undefined`;
+		//    - value is usually assigned to initialPosition because the component
+		//      is used in controlled mode and initialPosition is used as a fallback;
+		// - when neither resetFallbackValue nor initialPosition are provided:
+		//    - value is assigned to `null`;
+		//    - onChange() is called with `undefined`;
+		//    - value remains `null` (empty) because there is no `initialPosition`
+		//      to fallback to;
+		// - in any case, when the current value is the same as the reset value
+		//   (ie. the value that would be assigned when clicking the reset button),
+		//   the reset button should be disabled;
+
 		it( 'should reset to a custom fallback value, defined by a parent component', () => {
 			const spy = jest.fn();
 			render(
@@ -318,6 +336,8 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '33' );
 			expect( numberInput.value ).toBe( '33' );
 			expect( spy ).toHaveBeenCalledWith( 33 );
+
+			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
 		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
