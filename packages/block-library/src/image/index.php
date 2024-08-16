@@ -263,6 +263,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
  */
 function block_core_image_print_lightbox_overlay() {
 	$close_button_label = esc_attr__( 'Close' );
+	$dialog_label       = esc_attr__( 'Enlarged images' );
 	$prev_button_label  = esc_attr__( 'Previous' );
 	$next_button_label  = esc_attr__( 'Next' );
 
@@ -284,10 +285,10 @@ function block_core_image_print_lightbox_overlay() {
 	echo <<<HTML
 		<div
 			class="wp-lightbox-overlay zoom"
+			aria-label="$dialog_label"
 			data-wp-interactive="core/image"
 			data-wp-context='{}'
 			data-wp-bind--role="state.roleAttribute"
-			data-wp-bind--aria-label="state.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
 			data-wp-class--active="state.overlayEnabled"
 			data-wp-class--show-closing-animation="state.showClosingAnimation"
@@ -304,10 +305,10 @@ function block_core_image_print_lightbox_overlay() {
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>
 				</button>
-				<button type="button" aria-label="$prev_button_label" style="fill: $close_button_color" class="prev-button" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showPreviousImage" data-wp-bind--disabled="!state.hasPreviousImage">
+				<button type="button" aria-label="$prev_button_label" style="fill: $close_button_color" class="prev-button" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showPreviousImage" data-wp-bind--aria-disabled="!state.hasPreviousImage">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>
 				</button>
-				<button type="button" aria-label="$next_button_label" style="fill: $close_button_color" class="next-button" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--disabled="!state.hasNextImage">
+				<button type="button" aria-label="$next_button_label" style="fill: $close_button_color" class="next-button" data-wp-bind--hidden="!state.hasNavigation" data-wp-on--click="actions.showNextImage" data-wp-bind--aria-disabled="!state.hasNextImage">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>
 				</button>
 				<div class="lightbox-image-container">
@@ -320,6 +321,7 @@ function block_core_image_print_lightbox_overlay() {
 						<img data-wp-bind--alt="state.currentImage.alt" data-wp-bind--class="state.currentImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.enlargedSrc">
 					</figure>
 				</div>
+				<div data-wp-watch="callbacks.setScreenReaderText" aria-live="polite" aria-atomic="true" class="lightbox-speak screen-reader-text"></div>
 				<div class="scrim" style="background-color: $background_color" aria-hidden="true"></div>
 				<style data-wp-text="state.overlayStyles"></style>
 		</div>
