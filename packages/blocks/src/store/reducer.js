@@ -328,7 +328,12 @@ export const groupingBlockName = createBlockNameSetterReducer(
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
 		case 'SET_CATEGORIES':
-			return action.categories || [];
+			// Ensure, that categories are unique by slug.
+			const uniqueCategories = new Map();
+			( action.categories || [] ).forEach( ( category ) => {
+				uniqueCategories.set( category.slug, category );
+			} );
+			return [ ...uniqueCategories.values() ];
 		case 'UPDATE_CATEGORY': {
 			if (
 				! action.category ||
@@ -401,6 +406,7 @@ export function blockBindingsSources( state = {}, action ) {
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
 					canUserEditValue: action.canUserEditValue,
+					getFieldsList: action.getFieldsList,
 				},
 			};
 		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':

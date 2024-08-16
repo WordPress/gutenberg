@@ -112,6 +112,7 @@ function PostAuthorEdit( {
 							/>
 						) ) || (
 							<SelectControl
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Author' ) }
 								value={ authorId }
@@ -129,6 +130,7 @@ function PostAuthorEdit( {
 					/>
 					{ showAvatar && (
 						<SelectControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							label={ __( 'Avatar size' ) }
 							value={ attributes.avatarSize }

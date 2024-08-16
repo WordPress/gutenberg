@@ -56,6 +56,7 @@ export function addBlockBindingsSource( source ) {
 		setValues: source.setValues,
 		getPlaceholder: source.getPlaceholder,
 		canUserEditValue: source.canUserEditValue,
+		getFieldsList: source.getFieldsList,
 	};
 }
 

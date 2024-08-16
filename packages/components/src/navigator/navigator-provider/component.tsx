@@ -27,12 +27,12 @@ import type {
 	Screen,
 	NavigateToParentOptions,
 } from '../types';
+import deprecated from '@wordpress/deprecated';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 
 type RouterAction =
 	| { type: 'add' | 'remove'; screen: Screen }
-	| { type: 'goback' }
 	| { type: 'goto'; path: string; options?: NavigateOptions }
 	| { type: 'gotoparent'; options?: NavigateToParentOptions };
 
@@ -160,9 +160,6 @@ function routerReducer(
 		case 'remove':
 			screens = removeScreen( state, action.screen );
 			break;
-		case 'goback':
-			locationHistory = goBack( state );
-			break;
 		case 'goto':
 			locationHistory = goTo( state, action.path, action.options );
 			break;
@@ -223,11 +220,20 @@ function UnconnectedNavigatorProvider(
 	// The methods are constant forever, create stable references to them.
 	const methods = useMemo(
 		() => ( {
-			goBack: () => dispatch( { type: 'goback' } ),
+			// Note: calling goBack calls `goToParent` internally, as it was established
+			// that `goBack` should behave like `goToParent`, and `goToParent` should
+			// be marked as deprecated.
+			goBack: ( options: NavigateToParentOptions | undefined ) =>
+				dispatch( { type: 'gotoparent', options } ),
 			goTo: ( path: string, options?: NavigateOptions ) =>
 				dispatch( { type: 'goto', path, options } ),
-			goToParent: ( options: NavigateToParentOptions | undefined ) =>
-				dispatch( { type: 'gotoparent', options } ),
+			goToParent: ( options: NavigateToParentOptions | undefined ) => {
+				deprecated( `wp.components.useNavigator().goToParent`, {
+					since: '6.7',
+					alternative: 'wp.components.useNavigator().goBack',
+				} );
+				dispatch( { type: 'gotoparent', options } );
+			},
 			addScreen: ( screen: Screen ) =>
 				dispatch( { type: 'add', screen } ),
 			removeScreen: ( screen: Screen ) =>

@@ -21,10 +21,31 @@ function DataViewsPagination() {
 		onChangeView,
 		paginationInfo: { totalItems = 0, totalPages },
 	} = useContext( DataViewsContext );
+
 	if ( ! totalItems || ! totalPages ) {
 		return null;
 	}
+
 	const currentPage = view.page ?? 1;
+	const pageSelectOptions = Array.from( Array( totalPages ) ).map(
+		( _, i ) => {
+			const page = i + 1;
+			return {
+				value: page.toString(),
+				label: page.toString(),
+				'aria-label':
+					currentPage === page
+						? sprintf(
+								// translators: Current page number in total number of pages
+								__( 'Page %1$s of %2$s' ),
+								currentPage,
+								totalPages
+						  )
+						: page.toString(),
+			};
+		}
+	);
+
 	return (
 		!! totalItems &&
 		totalPages !== 1 && (
@@ -37,37 +58,35 @@ function DataViewsPagination() {
 				<HStack
 					justify="flex-start"
 					expanded={ false }
-					spacing={ 2 }
-					className="dataviews-pagination__page-selection"
+					spacing={ 1 }
+					className="dataviews-pagination__page-select"
 				>
 					{ createInterpolateElement(
 						sprintf(
-							// translators: %s: Total number of pages.
-							_x( 'Page <CurrentPageControl /> of %s', 'paging' ),
+							// translators: 1: Current page number, 2: Total number of pages.
+							_x(
+								'<div>Page</div>%1$s<div>of %2$s</div>',
+								'paging'
+							),
+							'<CurrentPage />',
 							totalPages
 						),
 						{
-							CurrentPageControl: (
+							div: <div aria-hidden />,
+							CurrentPage: (
 								<SelectControl
 									aria-label={ __( 'Current page' ) }
-									value={ view.page?.toString() }
-									options={ Array.from(
-										Array( totalPages )
-									).map( ( _, i ) => {
-										const page = i + 1;
-										return {
-											value: page.toString(),
-											label: page.toString(),
-										};
-									} ) }
+									value={ currentPage.toString() }
+									options={ pageSelectOptions }
 									onChange={ ( newValue ) => {
 										onChangeView( {
 											...view,
 											page: +newValue,
 										} );
 									} }
-									size="compact"
+									size="small"
 									__nextHasNoMarginBottom
+									variant="minimal"
 								/>
 							),
 						}

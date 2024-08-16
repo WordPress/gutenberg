@@ -59,6 +59,7 @@ export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	label: 'Is author',
 	help: 'Is the user an author or not?',
 };

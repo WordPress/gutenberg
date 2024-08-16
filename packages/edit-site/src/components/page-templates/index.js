@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
+import { privateApis as corePrivateApis } from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -31,6 +31,7 @@ import {
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -53,8 +54,7 @@ const defaultLayouts = {
 					minWidth: 320,
 				},
 				preview: {
-					minWidth: 120,
-					maxWidth: 120,
+					width: '1%',
 				},
 				author: {
 					width: '1%',
@@ -134,13 +134,10 @@ export default function PageTemplates() {
 		} ) );
 	}, [ activeView ] );
 
-	const { records, isResolving: isLoadingData } = useEntityRecords(
-		'postType',
-		TEMPLATE_POST_TYPE,
-		{
+	const { records, isResolving: isLoadingData } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
-		}
-	);
+		} );
 	const history = useHistory();
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -217,6 +214,7 @@ export default function PageTemplates() {
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }

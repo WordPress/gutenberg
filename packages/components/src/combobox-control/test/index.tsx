@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ComboboxControl from '..';
+import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
 const timezones = [
@@ -56,6 +56,10 @@ const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
+
+const ComboboxControl = ( props: ComboboxControlProps ) => {
+	return <_ComboboxControl { ...props } __nextHasNoMarginBottom />;
+};
 
 const ControlledComboboxControl = ( {
 	value: valueProp,

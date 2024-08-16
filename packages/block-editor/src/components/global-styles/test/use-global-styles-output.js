@@ -763,7 +763,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.is-layout-flow > * + * { margin-block-start: 0.5em; margin-block-end: 0; }.is-layout-flex { gap: 0.5em; }:root { --wp--style--block-gap: 0.5em; }.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > * { margin: 0; }'
+				':root :where(.is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:root :where(.is-layout-flow) > * + * { margin-block-start: 0.5em; margin-block-end: 0; }:root :where(.is-layout-flex) { gap: 0.5em; }:root { --wp--style--block-gap: 0.5em; }.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -780,7 +780,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.is-layout-flex { gap: 12px; }:root { --wp--style--block-gap: 12px; }.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > * { margin: 0; }'
+				':root :where(.is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:root :where(.is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:root :where(.is-layout-flex) { gap: 12px; }:root { --wp--style--block-gap: 12px; }.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -797,7 +797,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				'.wp-block-group-is-layout-flow > * { margin-block-start: 0; margin-block-end: 0; }.wp-block-group-is-layout-flow > * + * { margin-block-start: 12px; margin-block-end: 0; }.wp-block-group-is-layout-flex { gap: 12px; }'
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:root :where(.wp-block-group-is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:root :where(.wp-block-group-is-layout-flex) { gap: 12px; }'
 			);
 		} );
 
@@ -1008,9 +1008,23 @@ describe( 'global styles renderer', () => {
 						ref: 'styles.elements.h1.typography.letterSpacing',
 					},
 				},
+				background: {
+					backgroundImage: {
+						ref: 'styles.background.backgroundImage',
+					},
+					backgroundSize: {
+						ref: 'styles.background.backgroundSize',
+					},
+				},
 			};
 			const tree = {
 				styles: {
+					background: {
+						backgroundImage: {
+							url: 'http://my-image.org/image.gif',
+						},
+						backgroundSize: 'cover',
+					},
 					elements: {
 						h1: {
 							typography: {
@@ -1026,15 +1040,62 @@ describe( 'global styles renderer', () => {
 			).toEqual( [
 				'font-size: var(--wp--preset--font-size--xx-large)',
 				'letter-spacing: 2px',
+				"background-image: url( 'http://my-image.org/image.gif' )",
+				'background-size: cover',
+			] );
+		} );
+		it( 'should set default values for block background styles', () => {
+			const backgroundStyles = {
+				background: {
+					backgroundImage: {
+						url: 'https://wordpress.org/assets/image.jpg',
+						id: 123,
+					},
+				},
+			};
+			expect(
+				getStylesDeclarations( backgroundStyles, '.wp-block-group' )
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+				'background-size: cover',
+			] );
+			// Test with root-level styles.
+			expect(
+				getStylesDeclarations( backgroundStyles, ROOT_BLOCK_SELECTOR )
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+			] );
+			expect(
+				getStylesDeclarations(
+					{
+						background: {
+							...backgroundStyles.background,
+							backgroundSize: 'contain',
+						},
+					},
+					'.wp-block-group'
+				)
+			).toEqual( [
+				"background-image: url( 'https://wordpress.org/assets/image.jpg' )",
+				'background-position: 50% 50%',
+				'background-size: contain',
 			] );
 		} );
 	} );
 
 	describe( 'processCSSNesting', () => {
+		it( 'should return empty string when supplied css is empty', () => {
+			expect( processCSSNesting( '', '.foo' ) ).toEqual( '' );
+		} );
 		it( 'should return processed CSS without any nested selectors', () => {
 			expect(
 				processCSSNesting( 'color: red; margin: auto;', '.foo' )
 			).toEqual( ':root :where(.foo){color: red; margin: auto;}' );
+		} );
+		it( 'should return processed CSS when there are no root selectors', () => {
+			expect(
+				processCSSNesting( '&::before{color: red;}', '.foo' )
+			).toEqual( ':root :where(.foo)::before{color: red;}' );
 		} );
 		it( 'should return processed CSS with nested selectors', () => {
 			expect(
@@ -1049,21 +1110,21 @@ describe( 'global styles renderer', () => {
 		it( 'should return processed CSS with pseudo elements', () => {
 			expect(
 				processCSSNesting(
-					'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;}',
+					'color: red; margin: auto; &::before{color: blue;} & ::before{color: green;}  &.one::before{color: yellow;} & .two::before{color: purple;} & > ::before{color: darkseagreen;}',
 					'.foo'
 				)
 			).toEqual(
-				':root :where(.foo){color: red; margin: auto;}:root :where(.foo::before){color: blue;}:root :where(.foo ::before){color: green;}:root :where(.foo.one::before){color: yellow;}:root :where(.foo .two::before){color: purple;}'
+				':root :where(.foo){color: red; margin: auto;}:root :where(.foo)::before{color: blue;}:root :where(.foo) ::before{color: green;}:root :where(.foo.one)::before{color: yellow;}:root :where(.foo .two)::before{color: purple;}:root :where(.foo) > ::before{color: darkseagreen;}'
 			);
 		} );
 		it( 'should return processed CSS with multiple root selectors', () => {
 			expect(
 				processCSSNesting(
-					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;}',
+					'color: red; margin: auto; &.one{color: blue;} & .two{color: green;} &::before{color: yellow;} & ::before{color: purple;}  &.three::before{color: orange;} & .four::before{color: skyblue;} & > ::before{color: darkseagreen;}',
 					'.foo, .bar'
 				)
 			).toEqual(
-				':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo::before, .bar::before){color: yellow;}:root :where(.foo ::before, .bar ::before){color: purple;}:root :where(.foo.three::before, .bar.three::before){color: orange;}:root :where(.foo .four::before, .bar .four::before){color: skyblue;}'
+				':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo, .bar)::before{color: yellow;}:root :where(.foo, .bar) ::before{color: purple;}:root :where(.foo.three, .bar.three)::before{color: orange;}:root :where(.foo .four, .bar .four)::before{color: skyblue;}:root :where(.foo, .bar) > ::before{color: darkseagreen;}'
 			);
 		} );
 	} );
