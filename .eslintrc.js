@@ -313,8 +313,10 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'CustomSelectControl',
 						'DimensionControl',
 						'FontSizePicker',
+						'NumberControl',
 						'RangeControl',
 						'ToggleGroupControl',
 					].map( ( componentName ) => ( {

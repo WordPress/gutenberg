@@ -3,7 +3,7 @@
 	font-size: $default-font-size;
 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
 	backdrop-filter: blur($grid-unit-20) saturate(180%);
-	border-radius: $radius-block-ui;
+	border-radius: $radius-medium;
 	box-shadow: $shadow-popover;
 	color: $white;
 	padding: $grid-unit-15 ($grid-unit-05 * 5);

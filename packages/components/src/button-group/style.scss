@@ -12,11 +12,11 @@
 		}
 
 		&:first-child {
-			border-radius: $radius-block-ui 0 0 $radius-block-ui;
+			border-radius: $radius-small 0 0 $radius-small;
 		}
 
 		&:last-child {
-			border-radius: 0 $radius-block-ui $radius-block-ui 0;
+			border-radius: 0 $radius-small $radius-small 0;
 		}
 
 		// The focused button should be elevated so the focus ring isn't cropped,
