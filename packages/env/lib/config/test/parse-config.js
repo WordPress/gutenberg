@@ -254,6 +254,26 @@ describe( 'parseConfig', () => {
 		} );
 	} );
 
+	it( 'should ignore `$schema` key', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					$schema: 'test',
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed ).toEqual( DEFAULT_CONFIG );
+	} );
+
 	it( 'should override with environment variables', async () => {
 		process.env.WP_ENV_PORT = 123;
 		process.env.WP_ENV_TESTS_PORT = 456;

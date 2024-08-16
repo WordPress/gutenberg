@@ -695,10 +695,9 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			},
 			{
-				name: 'core/heading',
+				name: 'core/paragraph',
 				attributes: {
 					content: 'bB',
-					level: 2,
 				},
 			},
 		] );

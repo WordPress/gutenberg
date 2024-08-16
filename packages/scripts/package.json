@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "28.1.0",
+	"version": "28.5.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -82,6 +82,7 @@
 		"rtlcss-webpack-plugin": "^4.0.7",
 		"sass": "^1.35.2",
 		"sass-loader": "^12.1.0",
+		"schema-utils": "^4.2.0",
 		"source-map-loader": "^3.0.0",
 		"stylelint": "^14.2.0",
 		"terser-webpack-plugin": "^5.3.9",
@@ -92,7 +93,7 @@
 		"webpack-dev-server": "^4.15.1"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.43.0",
+		"@playwright/test": "^1.46.0",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},

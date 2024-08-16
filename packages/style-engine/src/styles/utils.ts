@@ -61,7 +61,7 @@ export function generateRule(
 				{
 					selector: options?.selector,
 					key: ruleKey,
-					value: getCSSVarFromStyleValue( styleValue ),
+					value: getCSSValueFromRawStyle( styleValue ),
 				},
 		  ]
 		: [];
@@ -103,7 +103,7 @@ export function generateBoxRules(
 	} else {
 		const sideRules = individualProperties.reduce(
 			( acc: GeneratedCSSRule[], side: string ) => {
-				const value: string | undefined = getCSSVarFromStyleValue(
+				const value = getCSSValueFromRawStyle(
 					getStyleValueByPath( boxStyle, [ side ] )
 				);
 				if ( value ) {
@@ -127,13 +127,23 @@ export function generateBoxRules(
 }
 
 /**
- * Returns a CSS var value from incoming style value following the pattern `var:description|context|slug`.
+ * Returns a WordPress CSS custom var value from incoming style preset value,
+ * if one is detected.
  *
- * @param styleValue A raw style value.
+ * The preset value is a string and follows the pattern `var:description|context|slug`.
  *
- * @return string A CSS var value.
+ * Example:
+ *
+ * `getCSSValueFromRawStyle( 'var:preset|color|heavenlyBlue' )` // returns 'var(--wp--preset--color--heavenly-blue)'
+ *
+ * @param styleValue A string representing a raw CSS value. Non-strings won't be processed.
+ *
+ * @return A CSS custom var value if the incoming style value is a preset value.
  */
-export function getCSSVarFromStyleValue( styleValue: string ): string {
+
+export function getCSSValueFromRawStyle< StyleValue = string >(
+	styleValue: StyleValue
+): StyleValue {
 	if (
 		typeof styleValue === 'string' &&
 		styleValue.startsWith( VARIABLE_REFERENCE_PREFIX )
@@ -152,7 +162,7 @@ export function getCSSVarFromStyleValue( styleValue: string ): string {
 				} )
 			)
 			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
+		return `var(--wp--${ variable })` as StyleValue;
 	}
 	return styleValue;
 }

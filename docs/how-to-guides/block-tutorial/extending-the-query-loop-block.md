@@ -12,9 +12,14 @@ By registering your own block variation with some specific Query Loop block sett
 
 With the block variations API you can provide the default settings that make the most sense for your use-case.
 
+In order to have a Query Loop variation properly working, we'll need to:
+- Register the block variation for the `core/query` block with some default values
+- Define a layout for the block variation
+- Use the `namespace` attribute in the `isActive` block variation property
+
 Let's go on a journey, for example, of setting up a variation for a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
 
-### Offer sensible defaults
+### 1. Offer sensible defaults
 
 Your first step would be to create a variation which will be set up in such a way to provide a block variation which will display by default a list of books instead of blog posts. The full variation code will look something like this:
 
@@ -91,7 +96,9 @@ In this way, your block will show up just like any other block while the user is
 
 At this point, your custom variation will be virtually indistinguishable from a stand-alone block. Completely branded to your plugin, easy to discover and directly available to the user as a drop in.
 
-### Customize your variation layout
+However, your query loop variation won't work just yet — we still need to define a layout so that it can render properly.
+
+### 2. Customize your variation layout
 
 Please note that the Query Loop block supports `'block'` as a string in the `scope` property. In theory, that's to allow the variation to be picked up after inserting the block itself. Read more about the Block Variation Picker [here](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md).
 
@@ -125,7 +132,7 @@ In order for a variation to be connected to another Query Loop variation we need
 
 For example, if we have a Query Loop variation exposed to the inserter(`scope: ['inserter']`) with the name `products`, we can connect a scoped `block` variation by setting its `namespace` attribute to `['products']`. If the user selects this variation after having clicked `Start blank`, the namespace attribute will be overridden by the main inserter variation.
 
-### Making Gutenberg recognize your variation
+### 3. Making Gutenberg recognize your variation
 
 There is one slight problem you might have realized after implementing this variation: while it is transparent to the user as they are inserting it, Gutenberg will still recognize the variation as a Query Loop block at its core and so, after its insertion, it will show up as a Query Loop block in the tree view of the editor, for instance.
 

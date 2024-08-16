@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
+## 8.3.0 (2024-07-10)
+
+## 8.2.0 (2024-06-26)
+
 ## 8.1.0 (2024-06-15)
 
 ## 8.0.0 (2024-05-31)
@@ -99,7 +107,7 @@
 
 ## 5.3.0 (2022-10-05)
 
-### New features
+### New Features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).
 
@@ -107,7 +115,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -158,7 +166,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   Added Axe (the Accessibility Engine) API integration with e2e tests suite.
 

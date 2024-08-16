@@ -417,6 +417,11 @@ async function parseEnvironmentConfig(
 			continue;
 		}
 
+		// The $schema key is a special key that is used to validate the configuration.
+		if ( key === '$schema' ) {
+			continue;
+		}
+
 		// We should also check root-only options for the root config
 		// because these aren't part of the above defaults but are
 		// configuration options that we will parse.

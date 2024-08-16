@@ -3,6 +3,7 @@ build
 build-module
 build-types
 packages/block-serialization-spec-parser/parser.js
+packages/edit-site/lib
 packages/react-native-editor/bundle
 packages/url/src/test/fixtures
 vendor

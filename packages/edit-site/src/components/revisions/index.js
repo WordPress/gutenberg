@@ -25,6 +25,7 @@ const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
+	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
@@ -74,7 +75,6 @@ function Revisions( { userConfig, blocks } ) {
 				name="revisions"
 				tabIndex={ 0 }
 			>
-				<EditorStyles styles={ editorStyles } />
 				<style>
 					{
 						// Forming a "block formatting context" to prevent margin collapsing.
@@ -88,6 +88,14 @@ function Revisions( { userConfig, blocks } ) {
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />
+						{ /*
+						 * Styles are printed inside the block editor provider,
+						 * so they can access any registered style overrides.
+						 */ }
+						<EditorStyles styles={ editorStyles } />
+						<__unstableBlockStyleVariationOverridesWithConfig
+							config={ mergedConfig }
+						/>
 					</ExperimentalBlockEditorProvider>
 				</Disabled>
 			</Iframe>

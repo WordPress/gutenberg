@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
 ## 2.1.0 (2024-06-15)
 
 ## 2.0.0 (2024-05-31)
@@ -101,7 +109,7 @@
 
 ## 1.2.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Allow local paths as an option when trying to import a specific file from the package ([#23751](https://github.com/WordPress/gutenberg/pull/23751)).
 

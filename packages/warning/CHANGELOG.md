@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.5.0 (2024-08-07)
+
+## 3.4.0 (2024-07-24)
+
+## 3.3.0 (2024-07-10)
+
+## 3.2.0 (2024-06-26)
+
 ## 3.1.0 (2024-06-15)
 
 ### Internal
@@ -129,7 +137,7 @@
 
 ## 2.2.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Ensure that the warning for a given message is logged only once.
 
@@ -146,11 +154,10 @@
 
 ## 1.1.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
 ## 1.0.0 (2020-02-04)
 
 Initial release.
-

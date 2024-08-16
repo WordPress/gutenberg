@@ -1624,6 +1624,8 @@ export function insertionPoint( state = null, action ) {
 		}
 
 		case 'HIDE_INSERTION_POINT':
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
 			return null;
 	}
 
@@ -2068,6 +2070,27 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer setting currently hovered block.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function hoveredBlockClientId( state = false, action ) {
+	switch ( action.type ) {
+		case 'HOVER_BLOCK':
+			return action.clientId;
+	}
+
+	return state;
+}
+
+export function inserterSearchInputRef( state = { current: null } ) {
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2100,6 +2123,8 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
+	hoveredBlockClientId,
+	inserterSearchInputRef,
 } );
 
 function withAutomaticChangeReset( reducer ) {

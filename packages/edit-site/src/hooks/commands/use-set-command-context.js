@@ -10,6 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useHasEditorCanvasContainer } from '../../components/editor-canvas-container';
 
 const { useCommandContext } = unlock( commandsPrivateApis );
 
@@ -25,6 +26,9 @@ export default function useSetCommandContext() {
 			hasBlockSelected: getBlockSelectionStart(),
 		};
 	}, [] );
+
+	const hasEditorCanvasContainer = useHasEditorCanvasContainer();
+
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
 	if ( canvasMode === 'edit' ) {
@@ -32,6 +36,14 @@ export default function useSetCommandContext() {
 	}
 	if ( hasBlockSelected ) {
 		commandContext = 'block-selection-edit';
+	}
+	if ( hasEditorCanvasContainer ) {
+		/*
+		 * The editor canvas overlay will likely be deprecated in the future, so for now we clear the command context
+		 * to remove the suggested commands that may not make sense with Style Book or Style Revisions open.
+		 * See https://github.com/WordPress/gutenberg/issues/62216.
+		 */
+		commandContext = '';
 	}
 	useCommandContext( commandContext );
 }

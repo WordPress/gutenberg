@@ -284,9 +284,9 @@ The following contributors merged PRs in this release:
 `;
 
 exports[`getContributorProps verify that the contributors props are properly formatted 1`] = `
-"## First time contributors
+"## First-time contributors
 
-The following PRs were merged by first time contributors:
+The following PRs were merged by first-time contributors:
 
 - @leemyongpakvn: Fix a broken MD link in callout. ([54772](https://github.com/WordPress/gutenberg/pull/54772))
 "

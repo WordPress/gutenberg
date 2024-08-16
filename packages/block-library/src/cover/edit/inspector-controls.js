@@ -188,7 +188,6 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
@@ -260,6 +259,7 @@ export default function CoverInspectorControls( {
 									gradient: undefined,
 									customGradient: undefined,
 								} ),
+								clearable: true,
 							},
 						] }
 						panelId={ clientId }

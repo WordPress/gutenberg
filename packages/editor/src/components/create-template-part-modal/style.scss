@@ -1,11 +1,5 @@
 .editor-create-template-part-modal {
 	z-index: z-index(".editor-create-template-part-modal");
-
-	.components-modal__frame {
-		@include break-small {
-			max-width: 500px;
-		}
-	}
 }
 
 .editor-create-template-part-modal__area-radio-group {

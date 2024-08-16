@@ -37,6 +37,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -138,7 +139,9 @@ function useEditorStyles() {
 			return [
 				...baseStyles,
 				{
-					css: 'body{padding-bottom: 40vh}',
+					// Should override global styles padding, so ensure 0-1-0
+					// specificity.
+					css: ':root :where(body){padding-bottom: 40vh}',
 				},
 			];
 		}
@@ -196,7 +199,10 @@ function Layout( {
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canViewTemplate = canUser( 'read', 'templates' );
+			const canViewTemplate = canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 
 			return {
 				mode: select( editorStore ).getEditorMode(),
@@ -322,6 +328,12 @@ function Layout( {
 			id: initialPostId,
 		};
 	}, [ initialPostType, initialPostId ] );
+
+	const backButton =
+		useViewportMatch( 'medium' ) && isFullscreenActive ? (
+			<BackButton initialPost={ initialPost } />
+		) : null;
+
 	return (
 		<SlotFillProvider>
 			<ErrorBoundary>
@@ -368,7 +380,7 @@ function Layout( {
 					<InitPatternModal />
 					<PluginArea onError={ onPluginAreaError } />
 					<PostEditorMoreMenu />
-					<BackButton initialPost={ initialPost } />
+					{ backButton }
 					<EditorSnackbars />
 				</Editor>
 			</ErrorBoundary>

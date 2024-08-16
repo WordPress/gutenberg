@@ -88,7 +88,7 @@ The following configurable variables are used with the template files. Template 
 
 **Block metadata** ([learn more](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/)):
 
--   `folderName` (default: `.`) – the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting.
+-   `folderName` (default: `src`) – the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting.
 -   `$schema` (default: `https://schemas.wp.org/trunk/block.json`) – the schema URL used for block validation.
 -   `apiVersion` (default: `2`) – the block API version ([related dev note](https://make.wordpress.org/core/2020/11/18/block-api-version-2/)).
 -   `slug` (no default) – the block slug used for identification in the block name.
