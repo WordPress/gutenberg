@@ -202,7 +202,7 @@ if ( baseConfig.mode === 'development' ) {
 		liveReload: false,
 		devMiddleware: {
 			writeToDisk( filePath ) {
-				return ! /\.hot-update\.js(on)?$/.test( filePath );
+				return ! /\.hot-update\.js(on)?(\.map)?$/.test( filePath );
 			},
 		},
 		headers: {
