@@ -83,10 +83,10 @@ export default function TextAlignmentControl( {
 				'block-editor-text-alignment-control',
 				className
 			) }
+			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-			value={ value }
 		>
 			{ validOptions.map( ( option ) => {
 				return (

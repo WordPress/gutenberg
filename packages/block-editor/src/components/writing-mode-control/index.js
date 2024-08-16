@@ -44,10 +44,10 @@ export default function WritingModeControl( { className, value, onChange } ) {
 			__next40pxDefaultSize
 			label={ __( 'Orientation' ) }
 			className={ clsx( 'block-editor-writing-mode-control', className ) }
+			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-			value={ value }
 		>
 			{ WRITING_MODES.map( ( option ) => {
 				return (

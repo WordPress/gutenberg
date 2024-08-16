@@ -62,10 +62,10 @@ export default function TextTransformControl( { className, value, onChange } ) {
 				'block-editor-text-transform-control',
 				className
 			) }
+			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-			value={ value }
 		>
 			{ TEXT_TRANSFORMS.map( ( option ) => {
 				return (

@@ -56,10 +56,10 @@ export default function TextDecorationControl( {
 				'block-editor-text-decoration-control',
 				className
 			) }
+			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-			value={ value }
 		>
 			{ TEXT_DECORATIONS.map( ( option ) => {
 				return (
