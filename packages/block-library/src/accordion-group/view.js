@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const { state } = store( 'core/accordion', {
 	state: {
@@ -24,6 +24,16 @@ const { state } = store( 'core/accordion', {
 			} else {
 				context.isOpen.push( id );
 			}
+		},
+	},
+	callbacks: {
+		setTabIndex: () => {
+			const { ref } = getElement();
+			ref.querySelectorAll(
+				'button, a, input, textarea, select, summary, iframe'
+			).forEach( ( el ) => {
+				el.tabIndex = state.isOpen ? 0 : -1;
+			} );
 		},
 	},
 } );
