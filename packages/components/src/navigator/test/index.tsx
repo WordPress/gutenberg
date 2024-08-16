@@ -19,9 +19,11 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
+	NavigatorToParentButton,
 	useNavigator,
 } from '..';
 import type { NavigateOptions } from '../types';
+import React from 'react';
 
 const INVALID_HTML_ATTRIBUTE = {
 	raw: '/ "\'><=invalid_path',
@@ -144,6 +146,44 @@ function CustomNavigatorBackButton( {
 			} }
 			{ ...props }
 		/>
+	);
+}
+
+function CustomNavigatorToParentButton( {
+	onClick,
+	...props
+}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	return (
+		<NavigatorToParentButton
+			onClick={ () => {
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+			{ ...props }
+		/>
+	);
+}
+
+function CustomNavigatorToParentButtonAlternative( {
+	onClick,
+	children,
+}: {
+	children: React.ReactNode;
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	const { goToParent } = useNavigator();
+	return (
+		<button
+			onClick={ () => {
+				goToParent();
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+		>
+			{ children }
+		</button>
 	);
 }
 
@@ -353,6 +393,66 @@ const MyHierarchicalNavigation = ( {
 				>
 					{ BUTTON_TEXT.goToWithSkipFocus }
 				</CustomNavigatorGoToSkipFocusButton>
+			</NavigatorProvider>
+		</>
+	);
+};
+
+const MyDeprecatedNavigation = ( {
+	initialPath = PATHS.HOME,
+	onNavigatorButtonClick,
+}: {
+	initialPath?: string;
+	onNavigatorButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	return (
+		<>
+			<NavigatorProvider initialPath={ initialPath }>
+				<NavigatorScreen path={ PATHS.HOME }>
+					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+				</NavigatorScreen>
+
+				<NavigatorScreen path={ PATHS.CHILD }>
+					<p>{ SCREEN_TEXT.child }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.NESTED }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNestedScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorToParentButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButton>
+				</NavigatorScreen>
+
+				<NavigatorScreen path={ PATHS.NESTED }>
+					<p>{ SCREEN_TEXT.nested }</p>
+					<CustomNavigatorToParentButtonAlternative
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButtonAlternative>
+				</NavigatorScreen>
 			</NavigatorProvider>
 		</>
 	);
@@ -749,6 +849,55 @@ describe( 'Navigator', () => {
 					name: 'First tabbable child screen button',
 				} )
 			).toHaveFocus();
+		} );
+	} );
+
+	describe( 'deprecated APIs', () => {
+		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
+
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+
+			// Navigate back to home screen.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable home screen button',
+				} )
+			).toHaveFocus();
+
+			// Rendering `NavigatorToParentButton` logs a deprecation notice
+			expect( console ).toHaveWarnedWith(
+				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.NavigatorBackButton instead.'
+			);
+		} );
+
+		it( 'should log a deprecation notice when using the useNavigator().goToParent() function', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.NESTED } /> );
+
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+
+			// Navigate back to child screen using the back button.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
+
+			expect( console ).toHaveWarnedWith(
+				'wp.components.useNavigator().goToParent is deprecated since version 6.7. Please use wp.components.useNavigator().goBack instead.'
+			);
 		} );
 	} );
 } );
