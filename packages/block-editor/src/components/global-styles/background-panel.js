@@ -288,10 +288,7 @@ function BackgroundImageControls( {
 	defaultValues,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { id, title, url } = style?.background?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
@@ -374,7 +371,7 @@ function BackgroundImageControls( {
 			);
 			return;
 		}
-		mediaUpload( {
+		getSettings().mediaUpload( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
