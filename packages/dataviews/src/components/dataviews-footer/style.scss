@@ -8,6 +8,7 @@
 	flex-shrink: 0;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
+	z-index: z-index(".dataviews-footer");
 }
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */

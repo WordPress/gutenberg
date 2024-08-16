@@ -168,11 +168,12 @@ function ActionButton< Item >( {
 		<ActionTrigger
 			key={ action.id }
 			action={ action }
-			onClick={ () => {
+			onClick={ async () => {
 				setActionInProgress( action.id );
-				action.callback( selectedItems, {
+				await action.callback( selectedItems, {
 					registry,
 				} );
+				setActionInProgress( null );
 			} }
 			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }
@@ -189,8 +190,7 @@ function renderFooterContent< Item >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onChangeSelection: SetSelection,
-	selectableItems: Item[]
+	onChangeSelection: SetSelection
 ) {
 	const message =
 		selectedItems.length > 0
@@ -318,8 +318,7 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection,
-			selectableItems
+			onChangeSelection
 		);
 	} else if ( ! footerContent.current ) {
 		footerContent.current = renderFooterContent(
@@ -331,8 +330,7 @@ function FooterContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onChangeSelection,
-			selectableItems
+			onChangeSelection
 		);
 	}
 	return footerContent.current;

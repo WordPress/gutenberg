@@ -193,7 +193,6 @@ $z-layers: (
 	// Site editor layout
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
@@ -210,8 +209,8 @@ $z-layers: (
 	// Ensure selection checkbox stays above the preview field.
 	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
 
-	// Ensure quick actions toolbar appear above pagination
-	".dataviews-bulk-actions-toolbar": 2,
+	// Ensure footer stays above the preview field.
+	".dataviews-footer": 2,
 );
 
 @function z-index( $key ) {
