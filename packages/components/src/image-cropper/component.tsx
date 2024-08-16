@@ -190,6 +190,9 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 
 	return (
 		<MaxWidthWrapper
+			// Disable reason: We're using this ID as a namespace only to increase CSS specificity for this component.
+			// eslint-disable-next-line no-restricted-syntax
+			id="components-image-cropper"
 			style={ {
 				width: isAxisSwapped
 					? `${ originalHeight }px`
@@ -232,6 +235,10 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 					crossOrigin="anonymous"
 					isResizing={ isResizing }
 					isDragging={ isDragging }
+					style={ {
+						width: `${ image.width }px`,
+						height: `${ image.height }px`,
+					} }
 				/>
 				<CropWindow>
 					<ContainWindow>
@@ -242,6 +249,10 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 							alt=""
 							crossOrigin="anonymous"
 							ref={ imageRef }
+							style={ {
+								width: `${ image.width }px`,
+								height: `${ image.height }px`,
+							} }
 						/>
 					</ContainWindow>
 				</CropWindow>

@@ -97,7 +97,6 @@ export const Resizable = styled( MotionResizable )`
 export const MaxWidthWrapper = styled.div`
 	position: relative;
 	max-width: 100%;
-
 	min-width: 0;
 `;
 
@@ -115,19 +114,25 @@ export const ContainWindow = styled.div`
 `;
 
 export const Img = styled( motion.img )`
-	position: absolute;
-	pointer-events: none;
-	top: 50%;
-	left: 50%;
-	transform-origin: center center;
-	rotate: var( --wp-cropper-angle );
-	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
-	translate: calc(
-			var( --wp-cropper-image-x ) - var( --wp-cropper-window-x ) - 50%
-		)
-		calc( var( --wp-cropper-image-y ) - var( --wp-cropper-window-y ) - 50% );
-	will-change: rotate, scale, translate;
-	contain: strict;
+	// Using a "namespace" ID to increase CSS specificity for this component.
+	#components-image-cropper & {
+		position: absolute;
+		pointer-events: none;
+		top: 50%;
+		left: 50%;
+		transform-origin: center center;
+		rotate: var( --wp-cropper-angle );
+		scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
+		translate: calc(
+				var( --wp-cropper-image-x ) - var( --wp-cropper-window-x ) - 50%
+			)
+			calc(
+				var( --wp-cropper-image-y ) - var( --wp-cropper-window-y ) - 50%
+			);
+		will-change: rotate, scale, translate;
+		contain: strict;
+		max-width: none;
+	}
 `;
 
 export const BackgroundImg = styled( Img, {

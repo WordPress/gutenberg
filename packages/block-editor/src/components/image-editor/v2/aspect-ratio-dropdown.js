@@ -56,7 +56,7 @@ function presetRatioAsNumber( { ratio, ...rest } ) {
 
 export default function AspectRatioDropdown( { toggleProps } ) {
 	const {
-		state: { image, cropper },
+		state: { image, cropper, isAspectRatioLocked },
 		dispatch,
 	} = useImageCropper();
 	const defaultAspect = image.width / image.height;
@@ -89,7 +89,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							}
 							onClose();
 						} }
-						value={ aspectRatio }
+						value={ isAspectRatioLocked ? aspectRatio : 0 }
 						aspectRatios={ [
 							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
