@@ -277,9 +277,16 @@ function FieldControl() {
 				const isVisible = viewFields.includes( field.id );
 				return (
 					<Item key={ field.id }>
-						<HStack expanded>
+						<HStack
+							expanded
+							className="dataviews-field-control__field"
+						>
 							<span>{ field.label }</span>
-							<HStack justify="flex-end">
+							<HStack
+								justify="flex-end"
+								expanded={ false }
+								className="dataviews-field-control__actions"
+							>
 								{ view.type === LAYOUT_TABLE && (
 									<>
 							<Button
@@ -315,7 +322,7 @@ function FieldControl() {
 											icon={ chevronUp }
 									label={ sprintf(
 										/* translators: %s: field label */
-										__( 'Sort ascending by: %s' ),
+												__( 'Move field %s up' ),
 										field.label
 									) }
 								/>
@@ -355,7 +362,7 @@ function FieldControl() {
 											icon={ chevronDown }
 									label={ sprintf(
 										/* translators: %s: field label */
-										__( 'Sort descending by: %s' ),
+												__( 'Move field %s down' ),
 										field.label
 									) }
 										/>{ ' ' }

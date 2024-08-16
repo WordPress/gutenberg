@@ -46,3 +46,21 @@
 		}
 	}
 }
+.dataviews-field-control__field {
+	height: $grid-unit-40;
+}
+
+.dataviews-field-control__actions {
+	position: absolute;
+	top: -9999em;
+}
+.dataviews-field-control__actions.dataviews-field-control__actions {
+	gap: $grid-unit-05;
+}
+
+.dataviews-field-control__field:hover, .dataviews-field-control__field:focus-within {
+	.dataviews-field-control__actions {
+		position: unset;
+		top: unset;
+	}
+}
