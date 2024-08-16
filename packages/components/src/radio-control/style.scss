@@ -32,7 +32,7 @@
 
 		&::before {
 			content: "";
-			border-radius: 50%;
+			border-radius: $radius-round;
 		}
 	}
 }
