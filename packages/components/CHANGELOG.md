@@ -67,6 +67,10 @@
 -   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
 -   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
 
+### Internal
+
+-   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
+
 ## 28.5.0 (2024-08-07)
 
 ### Bug Fixes
