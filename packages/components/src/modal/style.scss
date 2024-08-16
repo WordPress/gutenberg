@@ -9,7 +9,6 @@
 	backdrop-filter: blur(4px);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
-	// backdrop-filter: blur($grid-unit);
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
 }
@@ -27,9 +26,8 @@
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.2s ease-out;
+	animation: components-modal__appear-animation 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	animation-fill-mode: forwards;
-	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	@include reduce-motion("animation");
 
 	// Show a centered modal on bigger screens.
