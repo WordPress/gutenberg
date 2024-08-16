@@ -38,6 +38,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ 'checkbox' !== type && (
 							<CheckboxControl
+								__nextHasNoMarginBottom
 								label={ __( 'Inline label' ) }
 								checked={ inlineLabel }
 								onChange={ ( newVal ) => {
@@ -48,6 +49,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 							/>
 						) }
 						<CheckboxControl
+							__nextHasNoMarginBottom
 							label={ __( 'Required' ) }
 							checked={ required }
 							onChange={ ( newVal ) => {
@@ -61,6 +63,9 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
+					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Name' ) }
 					value={ name }

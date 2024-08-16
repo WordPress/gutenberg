@@ -25,8 +25,11 @@ import {
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const { BackButton: __experimentalMainDashboardButton } =
-	unlock( editorPrivateApis );
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -84,6 +87,8 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {

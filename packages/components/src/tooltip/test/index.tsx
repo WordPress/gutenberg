@@ -59,7 +59,6 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Second button' } )
 			).toBeVisible();
 
-			await sleep();
 			await press.Tab();
 
 			expectTooltipToBeHidden();
@@ -105,6 +104,24 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Anchor' } )
 			).not.toHaveAttribute( 'data-foo' );
 		} );
+
+		it( 'should add default and custom class names to the tooltip', async () => {
+			render( <Tooltip { ...props } className="foo" /> );
+
+			// Hover over the anchor, tooltip should show
+			await hover(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			);
+
+			// Check default and custom classnames
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text',
+					} )
+				).toHaveClass( 'components-tooltip', 'foo' )
+			);
+		} );
 	} );
 
 	describe( 'keyboard focus', () => {
@@ -127,7 +144,6 @@ describe( 'Tooltip', () => {
 			);
 
 			// Focus the anchor, tooltip should show
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
@@ -135,7 +151,6 @@ describe( 'Tooltip', () => {
 			await waitExpectTooltipToShow();
 
 			// Focus the other button, tooltip should hide
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
@@ -161,13 +176,11 @@ describe( 'Tooltip', () => {
 			expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
 
 			// Focus anchor, tooltip should show
-			await sleep();
 			await press.Tab();
 			expect( anchor ).toHaveFocus();
 			await waitExpectTooltipToShow();
 
 			// Focus another button, tooltip should hide
-			await sleep();
 			await press.Tab();
 			expect(
 				screen.getByRole( 'button', {

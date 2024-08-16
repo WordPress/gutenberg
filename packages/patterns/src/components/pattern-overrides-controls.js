@@ -31,7 +31,11 @@ function addBindings( bindings ) {
 	};
 }
 
-function PatternOverridesControls( { attributes, setAttributes } ) {
+function PatternOverridesControls( {
+	attributes,
+	setAttributes,
+	name: blockName,
+} ) {
 	const controlId = useId();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
 		useState( false );
@@ -40,7 +44,7 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 
 	const hasName = !! attributes.metadata?.name;
 	const defaultBindings = attributes.metadata?.bindings?.__default;
-	const allowOverrides =
+	const hasOverrides =
 		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
 		defaultBindings?.source &&
@@ -71,15 +75,27 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	const hasUnsupportedImageAttributes =
+		blockName === 'core/image' &&
+		( !! attributes.caption?.length || !! attributes.href?.length );
+
+	const helpText =
+		! hasOverrides && hasUnsupportedImageAttributes
+			? __(
+					`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
+			  )
+			: __(
+					'Allow changes to this block throughout instances of this pattern.'
+			  );
+
 	return (
 		<>
 			<InspectorControls group="advanced">
 				<BaseControl
+					__nextHasNoMarginBottom
 					id={ controlId }
 					label={ __( 'Overrides' ) }
-					help={ __(
-						'Allow changes to this block throughout instances of this pattern.'
-					) }
+					help={ helpText }
 				>
 					<Button
 						__next40pxDefaultSize
@@ -87,14 +103,18 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 						variant="secondary"
 						aria-haspopup="dialog"
 						onClick={ () => {
-							if ( allowOverrides ) {
+							if ( hasOverrides ) {
 								setShowDisallowOverridesModal( true );
 							} else {
 								setShowAllowOverridesModal( true );
 							}
 						} }
+						disabled={
+							! hasOverrides && hasUnsupportedImageAttributes
+						}
+						accessibleWhenDisabled
 					>
-						{ allowOverrides
+						{ hasOverrides
 							? __( 'Disable overrides' )
 							: __( 'Enable overrides' ) }
 					</Button>

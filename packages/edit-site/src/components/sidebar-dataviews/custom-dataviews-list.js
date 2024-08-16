@@ -51,6 +51,8 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -61,6 +63,7 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 				<HStack justify="right">
 					<Button
 						variant="tertiary"
+						__next40pxDefaultSize
 						onClick={ () => {
 							setIsRenaming( false );
 						} }
@@ -71,8 +74,9 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title }
+						__next40pxDefaultSize
 					>
-						{ __( 'Rename' ) }
+						{ __( 'Save' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -160,10 +164,12 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 			/>
 			{ isRenaming && (
 				<Modal
-					title={ __( 'Rename view' ) }
+					title={ __( 'Rename' ) }
 					onRequestClose={ () => {
 						setIsRenaming( false );
 					} }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenameItemModalContent
 						dataviewId={ dataviewId }

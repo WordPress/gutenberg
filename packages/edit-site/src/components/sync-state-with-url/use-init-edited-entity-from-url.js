@@ -27,7 +27,7 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
-const authorizedPostTypes = [ 'page' ];
+const authorizedPostTypes = [ 'page', 'post' ];
 
 function useResolveEditedEntityAndContext( { postId, postType } ) {
 	const {
@@ -87,6 +87,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				postTypesWithoutParentTemplate.includes( postType ) &&
 				postId
 			) {
+				return undefined;
+			}
+
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
 				return undefined;
 			}
 
@@ -213,7 +218,8 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
 		}
-
+		// TODO: for post types lists we should probably not render the front page, but maybe a placeholder
+		// with a message like "Select a page" or something similar.
 		if ( homepageId ) {
 			return { postType: 'page', postId: homepageId };
 		}

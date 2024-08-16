@@ -1,4 +1,5 @@
 {
+	"$schema": "./schemas/json/wp-env.json",
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],

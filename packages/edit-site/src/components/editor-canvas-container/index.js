@@ -9,7 +9,7 @@ import {
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
+import { backup, closeSmall, seen } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -30,17 +30,26 @@ const { EditorContentSlotFill, ResizableEditor } = unlock( editorPrivateApis );
  *
  * @param {string} view Editor canvas container view.
  *
- * @return {string} Translated string corresponding to value of view. Default is ''.
+ * @return {Object} Translated string for the view title and associated icon, both defaulting to ''.
  */
-function getEditorCanvasContainerTitle( view ) {
+function getEditorCanvasContainerTitleAndIcon( view ) {
 	switch ( view ) {
 		case 'style-book':
-			return __( 'Style Book' );
+			return {
+				title: __( 'Style Book' ),
+				icon: seen,
+			};
 		case 'global-styles-revisions':
 		case 'global-styles-revisions:style-book':
-			return __( 'Style Revisions' );
+			return {
+				title: __( 'Style Revisions' ),
+				icon: backup,
+			};
 		default:
-			return '';
+			return {
+				title: '',
+				icon: '',
+			};
 	}
 }
 
@@ -109,7 +118,9 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
-	const title = getEditorCanvasContainerTitle( editorCanvasContainerView );
+	const { title } = getEditorCanvasContainerTitleAndIcon(
+		editorCanvasContainerView
+	);
 	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (
@@ -138,10 +149,11 @@ function EditorCanvasContainer( {
 		</EditorContentSlotFill.Fill>
 	);
 }
+
 function useHasEditorCanvasContainer() {
 	const fills = useSlotFills( EditorContentSlotFill.privateKey );
 	return !! fills?.length;
 }
 
 export default EditorCanvasContainer;
-export { useHasEditorCanvasContainer, getEditorCanvasContainerTitle };
+export { useHasEditorCanvasContainer, getEditorCanvasContainerTitleAndIcon };

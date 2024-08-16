@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 28.5.0 (2024-08-07)
+
+## 28.4.0 (2024-07-24)
+
+### New Features
+
+-   Update webpack configuration for the `build` and `start` commands to automatically copy PHP files listed in the `variations` field of `block.json` files from the source to the build folder ([#63098](https://github.com/WordPress/gutenberg/pull/63098)).
+
+## 28.3.0 (2024-07-10)
+
+## 28.2.0 (2024-06-26)
+
 ## 28.1.0 (2024-06-15)
 
 ## 28.0.0 (2024-05-31)

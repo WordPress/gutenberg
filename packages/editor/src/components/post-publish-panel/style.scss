@@ -196,7 +196,7 @@
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;
-	top: 0;
+	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
 	left: 0;

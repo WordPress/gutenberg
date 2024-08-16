@@ -1,3 +1,12 @@
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }
+
+.editor-editor-interface .interface-interface-skeleton__content {
+	// Make this a stacking context to contain the z-index of children elements.
+	isolation: isolate;
+}
+
+.editor-visual-editor {
+	flex: 1 0 auto;
+}

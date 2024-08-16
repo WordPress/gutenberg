@@ -4,6 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
@@ -16,7 +17,8 @@ import { useAuthorsQuery } from './hook';
 
 function PostAuthorToggle( { isOpen, onClick } ) {
 	const { postAuthor } = useAuthorsQuery();
-	const authorName = postAuthor?.name || '';
+	const authorName =
+		decodeEntities( postAuthor?.name ) || __( '(No author)' );
 	return (
 		<Button
 			size="compact"
