@@ -3,8 +3,7 @@
  * An abstract class that all sniff unit tests must extend.
  *
  * @package gutenberg-coding-standards/gbc
- * @link    https://github.com/WordPress/gutenberg
- * @license https://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/WordPress/gutenberg/tree/trunk/test/php/gutenberg-coding-standards
  */
 
 namespace GutenbergCS\Gutenberg\Tests;
@@ -14,6 +13,9 @@ use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest as BaseAbstractSniffUn
 use PHP_CodeSniffer\Ruleset;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
+/**
+ * An abstract test class that contains common methods for all sniff unit tests.
+ */
 abstract class AbstractSniffUnitTest extends BaseAbstractSniffUnitTest {
 
 	/**
@@ -65,7 +67,7 @@ abstract class AbstractSniffUnitTest extends BaseAbstractSniffUnitTest {
 		if ( ! isset( $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] )
 			|| ( ! $GLOBALS['PHP_CODESNIFFER_RULESETS']['Gutenberg'] instanceof Ruleset )
 		) {
-			throw new \RuntimeException( $error_message );
+			throw new \RuntimeException( $error_message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- this is non-production code.
 		}
 
 		// Backup the original Ruleset instance.
@@ -76,7 +78,7 @@ abstract class AbstractSniffUnitTest extends BaseAbstractSniffUnitTest {
 
 		$sniff_fqcn = $this->get_sniff_fqcn();
 		if ( ! isset( $current_ruleset->sniffs[ $sniff_fqcn ] ) ) {
-			throw new \RuntimeException( $error_message );
+			throw new \RuntimeException( $error_message ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- this is non-production code.
 		}
 
 		$sniff = $current_ruleset->sniffs[ $sniff_fqcn ];

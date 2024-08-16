@@ -15,8 +15,11 @@
 		justify-content: center;
 		text-align: center;
 	}
+}
 
-	&__components-button-group {
-		margin-top: 10px;
+.wp-block-search__inspector-controls {
+	.components-base-control {
+		// Counteract the margin added by the block inspector.
+		margin-bottom: 0;
 	}
 }

@@ -314,19 +314,14 @@ test.describe( 'data-wp-each', () => {
 			} )
 		);
 
-		await expect( elements ).toHaveText( [ 'beta', 'gamma', 'delta' ] );
+		await expect( elements ).toHaveText( [ 'b', 'c', 'd' ] );
 
 		await page
 			.getByTestId( 'navigation-updated list' )
 			.getByTestId( 'navigate' )
 			.click();
 
-		await expect( elements ).toHaveText( [
-			'alpha',
-			'beta',
-			'gamma',
-			'delta',
-		] );
+		await expect( elements ).toHaveText( [ 'a', 'b', 'c', 'd' ] );
 
 		// Get the tags. They should not have disappeared or changed,
 		// except for the newly created element.

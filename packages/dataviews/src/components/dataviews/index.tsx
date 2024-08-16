@@ -27,8 +27,6 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
-import DensityPicker from '../../layouts/grid/density-picker';
-import { LAYOUT_GRID } from '../../constants';
 
 type ItemWithId = { id: string };
 
@@ -133,12 +131,6 @@ export default function DataViews< Item >( {
 							isShowingFilter={ isShowingFilter }
 						/>
 					</HStack>
-					{ view.type === LAYOUT_GRID && (
-						<DensityPicker
-							density={ density }
-							setDensity={ setDensity }
-						/>
-					) }
 					<DataViewsBulkActions />
 					<HStack
 						spacing={ 1 }
@@ -147,6 +139,8 @@ export default function DataViews< Item >( {
 					>
 						<DataViewsViewConfig
 							defaultLayouts={ defaultLayouts }
+							density={ density }
+							setDensity={ setDensity }
 						/>
 						{ header }
 					</HStack>
