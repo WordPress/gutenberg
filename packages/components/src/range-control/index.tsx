@@ -213,6 +213,7 @@ function UnforwardedRangeControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="RangeControl"
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
@@ -327,7 +328,7 @@ function UnforwardedRangeControl(
 						<Button
 							className="components-range-control__reset"
 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
-							__experimentalIsFocusable={ ! disabled }
+							accessibleWhenDisabled={ ! disabled }
 							disabled={ disabled || value === undefined }
 							variant="secondary"
 							size="small"
@@ -353,6 +354,7 @@ function UnforwardedRangeControl(
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <RangeControl
+ *       __nextHasNoMarginBottom
  *       help="Please select how transparent you would like this."
  *       initialPosition={50}
  *       label="Opacity"

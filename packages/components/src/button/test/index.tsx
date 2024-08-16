@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { plusCircle } from '@wordpress/icons';
 import Button from '..';
 import Tooltip from '../../tooltip';
 import cleanupTooltip from '../../tooltip/test/utils';
+import { press } from '@ariakit/test';
 
 jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
 
@@ -73,12 +73,10 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with has-text when children are passed', async () => {
-			const user = userEvent.setup();
-
 			render( <Button icon={ plusCircle }>Children</Button> );
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'has-text' );
 		} );
@@ -113,8 +111,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render correctly as a tooltip anchor', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<>
 					<Tooltip text="Tooltip text">
@@ -128,7 +124,7 @@ describe( 'Button', () => {
 				name: 'Tooltip anchor',
 			} );
 
-			await user.tab();
+			await press.Tab();
 
 			expect( anchor ).toHaveFocus();
 
@@ -138,7 +134,7 @@ describe( 'Button', () => {
 
 			expect( tooltip ).toBeVisible();
 
-			await user.tab();
+			await press.Tab();
 
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
@@ -152,8 +148,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render correctly as a tooltip anchor, ignoring its internal tooltip in favour of the external tooltip', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<>
 					<Tooltip text="Tooltip text">
@@ -167,7 +161,7 @@ describe( 'Button', () => {
 				name: 'Button label',
 			} );
 
-			await user.tab();
+			await press.Tab();
 
 			expect( anchor ).toHaveFocus();
 
@@ -184,7 +178,7 @@ describe( 'Button', () => {
 				} )
 			).not.toBeInTheDocument();
 
-			await user.tab();
+			await press.Tab();
 
 			expect(
 				screen.getByRole( 'button', { name: 'Focus me' } )
@@ -198,8 +192,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not trash the rendered HTML elements when toggling between showing and not showing a tooltip', async () => {
-			const user = userEvent.setup();
-
 			const { rerender } = render(
 				<Button label="Button label">Test button</Button>
 			);
@@ -210,7 +202,7 @@ describe( 'Button', () => {
 
 			expect( button ).toBeVisible();
 
-			await user.tab();
+			await press.Tab();
 
 			expect( button ).toHaveFocus();
 
@@ -242,7 +234,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
-			render( <Button disabled __experimentalIsFocusable /> );
+			render( <Button disabled accessibleWhenDisabled /> );
 			const button = screen.getByRole( 'button' );
 
 			expect( button ).toBeEnabled();
@@ -307,14 +299,12 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add an aria-label when the label property is used, with Tooltip wrapper', async () => {
-			const user = userEvent.setup();
-
 			render( <Button icon={ plusCircle } label="WordPress" /> );
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 		} );
@@ -329,7 +319,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should support adding aria-describedby text', () => {
-			render( <Button describedBy="Description text" /> );
+			render( <Button description="Description text" /> );
 			expect(
 				screen.getByRole( 'button', {
 					description: 'Description text',
@@ -338,11 +328,9 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should populate tooltip with label content for buttons without visible labels (no children)', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button
-					describedBy="Description text"
+					description="Description text"
 					label="Label"
 					icon={ plusCircle }
 				/>
@@ -351,20 +339,18 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.getByText( 'Label' ) ).toBeVisible();
 
-			await cleanupTooltip( user );
+			await cleanupTooltip();
 		} );
 
 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button
 					label="Label"
-					describedBy="Description text"
+					description="Description text"
 					icon={ plusCircle }
 					showTooltip
 				>
@@ -378,7 +364,7 @@ describe( 'Button', () => {
 				} )
 			).toBeVisible();
 
-			await user.tab();
+			await press.Tab();
 
 			expect(
 				screen.getByRole( 'tooltip', {
@@ -386,12 +372,10 @@ describe( 'Button', () => {
 				} )
 			).toBeVisible();
 
-			await cleanupTooltip( user );
+			await cleanupTooltip();
 		} );
 
 		it( 'should allow tooltip disable', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button
 					icon={ plusCircle }
@@ -407,14 +391,12 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should show the tooltip for empty children', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
 			);
@@ -422,16 +404,14 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
-			await cleanupTooltip( user );
+			await cleanupTooltip();
 		} );
 
 		it( 'should not show the tooltip when icon and children defined', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button icon={ plusCircle } label="WordPress">
 					Children
@@ -441,14 +421,12 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should force showing the tooltip even if icon and children defined', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<Button icon={ plusCircle } label="WordPress" showTooltip>
 					Children
@@ -458,11 +436,11 @@ describe( 'Button', () => {
 			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
 
 			// Move focus to the button
-			await user.tab();
+			await press.Tab();
 
 			expect( screen.getByText( 'WordPress' ) ).toBeVisible();
 
-			await cleanupTooltip( user );
+			await cleanupTooltip();
 		} );
 
 		describe( 'using `aria-pressed` prop', () => {
@@ -542,6 +520,19 @@ describe( 'Button', () => {
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();
 		} );
+
+		it( 'should become a button again when disabled is supplied, even with `accessibleWhenDisabled`', () => {
+			render(
+				<Button
+					// @ts-expect-error - a button should not have `href`
+					// eslint-disable-next-line no-restricted-syntax
+					href="https://wordpress.org/"
+					disabled
+					accessibleWhenDisabled
+				/>
+			);
+			expect( screen.getByRole( 'button' ) ).toBeVisible();
+		} );
 	} );
 
 	describe( 'ref forwarding', () => {
@@ -619,6 +610,15 @@ describe( 'Button', () => {
 				'mixed'
 			);
 		} );
+
+		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
+			// eslint-disable-next-line no-restricted-syntax
+			render( <Button disabled __experimentalIsFocusable /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toBeEnabled();
+			expect( button ).toHaveAttribute( 'aria-disabled' );
+		} );
 	} );
 
 	describe( 'static typing', () => {
@@ -637,8 +637,8 @@ describe( 'Button', () => {
 			<Button type="image/png" />
 			{ /* @ts-expect-error */ }
 			<Button type="invalidtype" />
-			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
-			<Button disabled __experimentalIsFocusable href="foo" />
+			{ /* @ts-expect-error */ }
+			<Button disabled accessibleWhenDisabled href="foo" />
 		</>;
 	} );
 } );

@@ -1,10 +1,7 @@
 .editor-visual-editor {
 	position: relative;
-	height: 100%;
-	display: block;
+	display: flex;
 	background-color: $gray-300;
-	// Make this a stacking context to contain the z-index of children elements.
-	isolation: isolate;
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;

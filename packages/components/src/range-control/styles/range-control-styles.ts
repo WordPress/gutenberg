@@ -154,7 +154,7 @@ export const Mark = styled.span`
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
-	top: -4px;
+	top: 9px;
 	width: 1px;
 
 	${ markFill };
@@ -168,12 +168,16 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 
 export const MarkLabel = styled.span`
 	color: ${ COLORS.gray[ 300 ] };
-	left: 0;
 	font-size: 11px;
 	position: absolute;
-	top: 12px;
-	transform: translateX( -50% );
+	top: 22px;
 	white-space: nowrap;
+
+	${ rtl( { left: 0 } ) };
+	${ rtl(
+		{ transform: 'translateX( -50% )' },
+		{ transform: 'translateX( 50% )' }
+	) };
 
 	${ markLabelFill };
 `;

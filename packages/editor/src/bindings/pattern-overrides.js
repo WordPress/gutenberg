@@ -1,36 +1,38 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
 export default {
 	name: 'core/pattern-overrides',
-	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	getValue( { registry, clientId, context, attributeName } ) {
+	getValues( { registry, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 
-		if ( ! patternOverridesContent ) {
-			return currentBlockAttributes[ attributeName ];
+		const overridesValues = {};
+		for ( const attributeName of Object.keys( bindings ) ) {
+			const overridableValue =
+				patternOverridesContent?.[
+					currentBlockAttributes?.metadata?.name
+				]?.[ attributeName ];
+
+			// If it has not been overriden, return the original value.
+			// Check undefined because empty string is a valid value.
+			if ( overridableValue === undefined ) {
+				overridesValues[ attributeName ] =
+					currentBlockAttributes[ attributeName ];
+				continue;
+			} else {
+				overridesValues[ attributeName ] =
+					overridableValue === '' ? undefined : overridableValue;
+			}
 		}
-
-		const overridableValue =
-			patternOverridesContent?.[
-				currentBlockAttributes?.metadata?.name
-			]?.[ attributeName ];
-
-		// If there is no pattern client ID, or it is not overwritten, return the default value.
-		if ( overridableValue === undefined ) {
-			return currentBlockAttributes[ attributeName ];
-		}
-
-		return overridableValue === '' ? undefined : overridableValue;
+		return overridesValues;
 	},
-	setValues( { registry, clientId, attributes } ) {
+	setValues( { registry, clientId, bindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
@@ -43,6 +45,15 @@ export default {
 			clientId,
 			'core/block',
 			true
+		);
+
+		// Extract the updated attributes from the source bindings.
+		const attributes = Object.entries( bindings ).reduce(
+			( attrs, [ key, { newValue } ] ) => {
+				attrs[ key ] = newValue;
+				return attrs;
+			},
+			{}
 		);
 
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.

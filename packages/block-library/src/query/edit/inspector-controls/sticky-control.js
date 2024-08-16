@@ -14,12 +14,13 @@ export default function StickyControl( { value, onChange } ) {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Sticky posts' ) }
 			options={ stickyOptions }
 			value={ value }
 			onChange={ onChange }
 			help={ __(
-				'Blog posts can be “stickied”, a feature that places them at the top of the front page of posts, keeping it there until new sticky posts are published.'
+				'Sticky posts always appear first, regardless of their publish date.'
 			) }
 		/>
 	);

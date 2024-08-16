@@ -61,7 +61,7 @@ export function filterSortAndPaginate< Item >(
 		} );
 	}
 
-	if ( view.filters.length > 0 ) {
+	if ( view.filters && view.filters?.length > 0 ) {
 		view.filters.forEach( ( filter ) => {
 			const field = _fields.find(
 				( _field ) => _field.id === filter.field
@@ -140,11 +140,7 @@ export function filterSortAndPaginate< Item >(
 		} );
 		if ( fieldToSort ) {
 			filteredData.sort( ( a, b ) => {
-				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-				return view.sort?.direction === 'asc'
-					? valueA.localeCompare( valueB )
-					: valueB.localeCompare( valueA );
+				return fieldToSort.sort( a, b, view.sort?.direction ?? 'desc' );
 			} );
 		}
 	}

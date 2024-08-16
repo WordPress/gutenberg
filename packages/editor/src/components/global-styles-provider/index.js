@@ -23,27 +23,47 @@ const { GlobalStylesContext, cleanEmptyObject } = unlock(
 
 export function mergeBaseAndUserConfigs( base, user ) {
 	return deepmerge( base, user, {
-		// We only pass as arrays the presets,
-		// in which case we want the new array of values
-		// to override the old array (no merging).
+		/*
+		 * We only pass as arrays the presets,
+		 * in which case we want the new array of values
+		 * to override the old array (no merging).
+		 */
 		isMergeableObject: isPlainObject,
+		/*
+		 * Exceptions to the above rule.
+		 * Background images should be replaced, not merged,
+		 * as they themselves are specific object definitions for the style.
+		 */
+		customMerge: ( key ) => {
+			if ( key === 'backgroundImage' ) {
+				return ( baseConfig, userConfig ) => userConfig;
+			}
+			return undefined;
+		},
 	} );
 }
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
+			const { getEditedEntityRecord, hasFinishedResolution, canUser } =
 				select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+
+			const record =
+				_globalStylesId &&
+				canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: _globalStylesId,
+				} )
+					? getEditedEntityRecord(
+							'root',
+							'globalStyles',
+							_globalStylesId
+					  )
+					: undefined;
 
 			let hasResolved = false;
 			if (
@@ -126,9 +146,13 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
+		const { __experimentalGetCurrentThemeBaseGlobalStyles, canUser } =
+			select( coreStore );
+
+		return (
+			canUser( 'read', { kind: 'root', name: 'theme' } ) &&
+			__experimentalGetCurrentThemeBaseGlobalStyles()
+		);
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];

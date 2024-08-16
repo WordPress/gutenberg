@@ -227,12 +227,16 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				__nextHasNoMarginBottom
 				label={ __( 'Link rel' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>
 			<TextControl
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
@@ -272,7 +276,7 @@ const ImageURLInputUI = ( {
 						icon={ linkOff }
 						label={ __( 'Disable expand on click' ) }
 						onClick={ () => {
-							onSetLightbox( false );
+							onSetLightbox?.( false );
 						} }
 						size="compact"
 					/>
@@ -302,7 +306,7 @@ const ImageURLInputUI = ( {
 						label={ __( 'Remove link' ) }
 						onClick={ () => {
 							onLinkRemove();
-							resetLightbox();
+							resetLightbox?.();
 						} }
 						size="compact"
 					/>
@@ -366,7 +370,7 @@ const ImageURLInputUI = ( {
 													LINK_DESTINATION_NONE,
 												href: '',
 											} );
-											onSetLightbox( true );
+											onSetLightbox?.( true );
 											stopEditLink();
 										} }
 									>

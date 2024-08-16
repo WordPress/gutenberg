@@ -1,10 +1,25 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
-import { arrowLeft, arrowUp, arrowDown, arrowRight } from '@wordpress/icons';
+import {
+	VisuallyHidden,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
+import {
+	chevronLeft,
+	chevronUp,
+	chevronDown,
+	chevronRight,
+} from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -32,97 +47,138 @@ export function GridItemMovers( {
 	const columnCount = parentLayout?.columnCount;
 	const rowCount = parentLayout?.rowCount;
 
-	const columnCountNumber = parseInt( columnCount, 10 );
-	const rowStartNumber = parseInt( rowStart, 10 );
-	const columnStartNumber = parseInt( columnStart, 10 );
-
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
-		columnCountNumber
+		columnCount
 	);
 
 	return (
 		<BlockControls group="parent">
-			<ToolbarButton
-				icon={ arrowUp }
-				label={ __( 'Move block up' ) }
-				disabled={ rowStart <= 1 }
-				onClick={ () => {
-					onChange( {
-						rowStart: rowStart - 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber - 1
-						)
-					);
-				} }
-			/>
-			<ToolbarButton
-				icon={ arrowDown }
-				label={ __( 'Move block down' ) }
-				disabled={ rowCount && rowEnd >= rowCount }
-				onClick={ () => {
-					onChange( {
-						rowStart: rowStart + 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber + 1
-						)
-					);
-				} }
-			/>
-			<ToolbarButton
-				icon={ arrowLeft }
-				label={ __( 'Move block left' ) }
-				disabled={ columnStart <= 1 }
-				onClick={ () => {
-					onChange( {
-						columnStart: columnStartNumber - 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber - 1,
-							rowStartNumber
-						)
-					);
-				} }
-			/>
-			<ToolbarButton
-				icon={ arrowRight }
-				label={ __( 'Move block right' ) }
-				disabled={ columnCount && columnEnd >= columnCount }
-				onClick={ () => {
-					onChange( {
-						columnStart: columnStartNumber + 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber + 1,
-							rowStartNumber
-						)
-					);
-				} }
-			/>
+			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
+				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-left">
+					<GridItemMover
+						icon={ chevronLeft }
+						label={ __( 'Move left' ) }
+						description={ __( 'Move left' ) }
+						isDisabled={ columnStart <= 1 }
+						onClick={ () => {
+							onChange( {
+								columnStart: columnStart - 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart - 1,
+									rowStart
+								)
+							);
+						} }
+					/>
+				</div>
+				<div className="block-editor-grid-item-mover__move-vertical-button-container">
+					<GridItemMover
+						className="is-up-button"
+						icon={ chevronUp }
+						label={ __( 'Move up' ) }
+						description={ __( 'Move up' ) }
+						isDisabled={ rowStart <= 1 }
+						onClick={ () => {
+							onChange( {
+								rowStart: rowStart - 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart,
+									rowStart - 1
+								)
+							);
+						} }
+					/>
+					<GridItemMover
+						className="is-down-button"
+						icon={ chevronDown }
+						label={ __( 'Move down' ) }
+						description={ __( 'Move down' ) }
+						isDisabled={ rowCount && rowEnd >= rowCount }
+						onClick={ () => {
+							onChange( {
+								rowStart: rowStart + 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart,
+									rowStart + 1
+								)
+							);
+						} }
+					/>
+				</div>
+				<div className="block-editor-grid-item-mover__move-horizontal-button-container is-right">
+					<GridItemMover
+						icon={ chevronRight }
+						label={ __( 'Move right' ) }
+						description={ __( 'Move right' ) }
+						isDisabled={ columnCount && columnEnd >= columnCount }
+						onClick={ () => {
+							onChange( {
+								columnStart: columnStart + 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart + 1,
+									rowStart
+								)
+							);
+						} }
+					/>
+				</div>
+			</ToolbarGroup>
 		</BlockControls>
+	);
+}
+
+function GridItemMover( {
+	className,
+	icon,
+	label,
+	isDisabled,
+	onClick,
+	description,
+} ) {
+	const instanceId = useInstanceId( GridItemMover );
+	const descriptionId = `block-editor-grid-item-mover-button__description-${ instanceId }`;
+	return (
+		<>
+			<ToolbarButton
+				className={ clsx(
+					'block-editor-grid-item-mover-button',
+					className
+				) }
+				icon={ icon }
+				label={ label }
+				aria-describedby={ descriptionId }
+				onClick={ isDisabled ? null : onClick }
+				disabled={ isDisabled }
+				accessibleWhenDisabled
+			/>
+			<VisuallyHidden id={ descriptionId }>
+				{ description }
+			</VisuallyHidden>
+		</>
 	);
 }
