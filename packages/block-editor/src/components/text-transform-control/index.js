@@ -13,11 +13,10 @@ import {
 	formatLowercase,
 	formatUppercase,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import SegmentedTextControl from '../segmented-text-control';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 const TEXT_TRANSFORMS = [
 	{
@@ -54,17 +53,30 @@ const TEXT_TRANSFORMS = [
  */
 export default function TextTransformControl( { className, value, onChange } ) {
 	return (
-		<SegmentedTextControl
+		<ToggleGroupControl
+			isDeselectable
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Letter case' ) }
-			options={ TEXT_TRANSFORMS }
 			className={ clsx(
 				'block-editor-text-transform-control',
 				className
 			) }
-			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-		/>
+			value={ value }
+		>
+			{ TEXT_TRANSFORMS.map( ( option ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ option.value }
+						value={ option.value }
+						icon={ option.icon }
+						label={ option.label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }
