@@ -73,9 +73,16 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState(
-		__experimentalInitialTab
-	);
+	function getInitialTab() {
+		if ( __experimentalInitialTab ) {
+			return __experimentalInitialTab;
+		}
+
+		if ( isZoomOutMode ) {
+			return 'patterns';
+		}
+	}
+	const [ selectedTab, setSelectedTab ] = useState( getInitialTab() );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {

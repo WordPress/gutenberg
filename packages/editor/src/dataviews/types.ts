@@ -14,6 +14,13 @@ export interface CommonPost {
 	type: string;
 	id: string | number;
 	blocks?: Object[];
+	_links?: Links;
+}
+
+interface Links {
+	'predecessor-version'?: { href: string; id: number }[];
+	'version-history'?: { href: string; count: number }[];
+	[ key: string ]: { href: string }[] | undefined;
 }
 
 export interface BasePost extends CommonPost {
@@ -27,13 +34,15 @@ export interface BasePost extends CommonPost {
 	featured_media?: number;
 	menu_order?: number;
 	ping_status?: 'open' | 'closed';
-	_links?: Record< string, { href: string }[] >;
+	link?: string;
 }
 
 export interface Template extends CommonPost {
 	type: 'wp_template';
 	is_custom: boolean;
 	source: string;
+	origin: string;
+	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
 }
@@ -41,6 +50,7 @@ export interface Template extends CommonPost {
 export interface TemplatePart extends CommonPost {
 	type: 'wp_template_part';
 	source: string;
+	origin: string;
 	has_theme_file: boolean;
 	id: string;
 	area: string;
@@ -63,9 +73,11 @@ export type PostWithPermissions = Post & {
 
 export interface PostType {
 	slug: string;
+	viewable: boolean;
 	supports?: {
 		'page-attributes'?: boolean;
 		title?: boolean;
+		revisions?: boolean;
 	};
 }
 

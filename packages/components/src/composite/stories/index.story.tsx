@@ -15,7 +15,7 @@ import { Composite, useCompositeStore } from '..';
 import { UseCompositeStorePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStorePlaceholder > = {
-	title: 'Components/Composite',
+	title: 'Components/Composite (V2)',
 	component: UseCompositeStorePlaceholder,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -50,6 +50,7 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 			options: [ 'horizontal', 'vertical', 'both' ],
 		},
 	},
+	tags: [ 'status-private' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: {
@@ -74,6 +75,28 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 						table: { type: { summary: 'React.ReactNode' } },
 					},
 				};
+				const accessibleWhenDisabled = {
+					name: 'accessibleWhenDisabled',
+					description: `Indicates whether the element should be focusable even when it is
+\`disabled\`.
+
+This is important when discoverability is a concern. For example:
+
+> A toolbar in an editor contains a set of special smart paste functions
+> that are disabled when the clipboard is empty or when the function is not
+> applicable to the current content of the clipboard. It could be helpful to
+> keep the disabled buttons focusable if the ability to discover their
+> functionality is primarily via their presence on the toolbar.
+
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).`,
+					table: {
+						type: {
+							summary: 'boolean',
+						},
+					},
+				};
+
 				const argTypes = {
 					useCompositeStore: {
 						activeId: {
@@ -226,11 +249,58 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
 							},
 							type: { required: true },
 						},
+						focusable: {
+							name: 'focusable',
+							description: `Makes the component a focusable element. When this element gains keyboard focus, it gets a \`data-focus-visible\` attribute and triggers the \`onFocusVisible\` prop.
+
+The component supports the \`disabled\` prop even for those elements not supporting the native \`disabled\` attribute. Disabled elements may be still accessible via keyboard by using the the \`accessibleWhenDisabled\` prop.
+
+Non-native focusable elements will lose their focusability entirely. However, native focusable elements will retain their inherent focusability.`,
+							table: {
+								type: {
+									summary: 'boolean',
+								},
+							},
+						},
+						disabled: {
+							name: 'disabled',
+							description: `Determines if the element is disabled. This sets the \`aria-disabled\` attribute accordingly, enabling support for all elements, including those that don't support the native \`disabled\` attribute.
+
+This feature can be combined with the \`accessibleWhenDisabled\` prop to
+make disabled elements still accessible via keyboard.
+
+**Note**: For this prop to work, the \`focusable\` prop must be set to
+\`true\`, if it's not set by default.`,
+							table: {
+								defaultValue: {
+									summary: 'false',
+								},
+								type: {
+									summary: 'boolean',
+								},
+							},
+						},
+						accessibleWhenDisabled,
+						onFocusVisible: {
+							name: 'onFocusVisible',
+							description: `Custom event handler invoked when the element gains focus through keyboard interaction or a key press occurs while the element is in focus. This is the programmatic equivalent of the \`data-focus-visible\` attribute.
+
+**Note**: For this prop to work, the \`focusable\` prop must be set to \`true\` if it's not set by default.`,
+							table: {
+								type: {
+									summary:
+										'(event: SyntheticEvent<HTMLElement>) => void',
+								},
+							},
+						},
 					},
 					'Composite.Group': commonArgTypes,
 					'Composite.GroupLabel': commonArgTypes,
 					'Composite.Row': commonArgTypes,
-					'Composite.Item': commonArgTypes,
+					'Composite.Item': {
+						...commonArgTypes,
+						accessibleWhenDisabled,
+					},
 					'Composite.Hover': commonArgTypes,
 					'Composite.Typeahead': commonArgTypes,
 				};
