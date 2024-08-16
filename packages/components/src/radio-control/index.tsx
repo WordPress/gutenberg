@@ -18,6 +18,7 @@ import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
 import { useBaseControlProps } from '../base-control/hooks';
 import { StyledHelp } from '../base-control/styles/base-control-styles';
+import { VisuallyHidden } from '../visually-hidden';
 
 function generateOptionDescriptionId( radioGroupId: string, index: number ) {
 	return `${ radioGroupId }-${ index }-option-description`;
@@ -85,14 +86,17 @@ export function RadioControl(
 	}
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom
-			label={ label }
-			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			className={ clsx( className, 'components-radio-control' ) }
-		>
+		<fieldset className="components-radio-control">
+			{ hideLabelFromVision ? (
+				<VisuallyHidden as="label" htmlFor={ id }>
+					{ label }
+				</VisuallyHidden>
+			) : (
+				<BaseControl.VisualLabel as="legend">
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+
 			<VStack
 				spacing={ 3 }
 				className={ clsx( 'components-radio-control__group-wrapper', {
@@ -142,7 +146,7 @@ export function RadioControl(
 					</div>
 				) ) }
 			</VStack>
-		</BaseControl>
+		</fieldset>
 	);
 }
 
