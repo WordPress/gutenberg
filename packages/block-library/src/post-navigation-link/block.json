@@ -71,11 +71,11 @@
 			"color": true,
 			"width": true,
 			"style": true
-		},
-		"selectors": {
-			"border": ".wp-block-post-navigation-link:not(:empty)",
-			"spacing": ".wp-block-post-navigation-link:not(:empty)"
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-post-navigation-link:not(:empty)",
+		"spacing": ".wp-block-post-navigation-link:not(:empty)"
 	},
 	"style": "wp-block-post-navigation-link"
 }
