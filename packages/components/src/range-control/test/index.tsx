@@ -298,20 +298,13 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe.only( 'reset', () => {
-		// TODO: behaviour to be tested:
-		// - when resetFallbackValue is provided:
-		//    - value resets to resetFallbackValue;
-		//    - onChange() is called with resetFallbackValue;
-		// - when initialPosition is provided:
-		//    - value is assigned to `null`;
-		//    - onChange() is called with `undefined`;
-		//    - value is usually assigned to initialPosition because the component
-		//      is used in controlled mode and initialPosition is used as a fallback;
-		// - when neither resetFallbackValue nor initialPosition are provided:
-		//    - value is assigned to `null`;
-		//    - onChange() is called with `undefined`;
-		//    - value remains `null` (empty) because there is no `initialPosition`
-		//      to fallback to;
+		// TODO: behaviour to be tested, in controlled mode:
+		// - when `resetFallbackValue` is provided, the value is ultimately set to
+		//   `resetFallbackValue`; `onChange()` is called with `resetFallbackValue`.
+		// - when `initialPosition` is provided, the value is ultimately set to
+		//   `initialPosition`; `onChange()` is called with `undefined`.
+		// - when neither `resetFallbackValue` nor `initialPosition` are provided,
+		//   the input values is cleared; `onChange()` is called with `undefined`.
 		// - in any case, when the current value is the same as the reset value
 		//   (ie. the value that would be assigned when clicking the reset button),
 		//   the reset button should be disabled;
