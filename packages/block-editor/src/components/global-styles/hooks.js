@@ -82,6 +82,7 @@ const VALID_SETTINGS = [
 	'typography.textDecoration',
 	'typography.textTransform',
 	'typography.writingMode',
+	'typography.textOrientation',
 ];
 
 export const useGlobalStylesReset = () => {
@@ -299,6 +300,7 @@ export function useSettingsForBlockElement(
 			'textTransform',
 			'textDecoration',
 			'writingMode',
+			'textOrientation',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.typography = {

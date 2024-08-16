@@ -193,6 +193,7 @@ Settings related to typography.
 | textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
 | writingMode | Allow users to set the writing mode. | `boolean` | `false` |
+| textOrientation | Allow users to set the textOrientation. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
@@ -327,6 +328,7 @@ Typography styles.
 | textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
 | textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
+| textOrientation | Sets the `text-orientation` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
 
 ---

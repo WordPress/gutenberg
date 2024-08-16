@@ -96,6 +96,7 @@ require __DIR__ . '/compat/wordpress-6.6/blocks.php';
 require __DIR__ . '/compat/wordpress-6.6/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.6/compat.php';
 require __DIR__ . '/compat/wordpress-6.6/resolve-patterns.php';
+require __DIR__ . '/compat/wordpress-6.6/kses.php';
 require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';

@@ -102,6 +102,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_text_orientation_support = $typography_supports['__experimentalTextOrientation'] ?? false;
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
@@ -115,6 +116,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
 	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
+	$should_skip_text_orentation = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textOrientation' );
 
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
@@ -172,6 +174,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	if ( $has_writing_mode_support && ! $should_skip_writing_mode && isset( $block_attributes['style']['typography']['writingMode'] ) ) {
 		$typography_block_styles['writingMode'] = $block_attributes['style']['typography']['writingMode'] ?? null;
+		// Text orientation requires writing mode to be set.
+		if ( $has_text_orientation_support && ! $should_skip_text_orentation && isset( $block_attributes['style']['typography']['textOrientation'] ) ) {
+			$typography_block_styles['textOrientation'] = _wp_array_get( $block_attributes, array( 'style', 'typography', 'textOrientation' ), null );
+		}
 	}
 
 	$attributes = array();

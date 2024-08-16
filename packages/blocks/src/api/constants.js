@@ -258,6 +258,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalWritingMode' ],
 		useEngine: true,
 	},
+	textOrientation: {
+		value: [ 'typography', 'textOrientation' ],
+		support: [ 'typography', '__experimentalTextOrientation' ],
+		useEngine: true,
+	},
 	'--wp--style--root--padding': {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],

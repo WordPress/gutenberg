@@ -603,6 +603,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textOrientation": {
+							"description": "Allow users to set the textOrientation.",
+							"type": "boolean",
+							"default": false
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",
@@ -1660,6 +1665,17 @@
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textOrientation": {
+							"description": "Sets the `text-orientation` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
 							]
 						},
 						"textTransform": {
