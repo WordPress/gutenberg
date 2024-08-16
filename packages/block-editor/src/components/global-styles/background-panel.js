@@ -313,7 +313,6 @@ function BackgroundImageControls( {
 		);
 
 	const onSelectMedia = ( media ) => {
-
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
 			setIsUploading( false );
@@ -321,7 +320,6 @@ function BackgroundImageControls( {
 		}
 
 		if ( isBlobURL( media.url ) ) {
-			// Still uploading.
 			setIsUploading( true );
 			return;
 		}
@@ -368,7 +366,14 @@ function BackgroundImageControls( {
 		setIsUploading( false );
 	};
 
+	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
+		if ( filesList?.length > 1 ) {
+			onUploadError(
+				__( 'Only one image can be used as a background image.' )
+			);
+			return;
+		}
 		mediaUpload( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
@@ -401,14 +406,19 @@ function BackgroundImageControls( {
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
 	const imgLabel =
 		title || getFilename( url ) || __( 'Add background image' );
-// opaque when loading?
+
 	return (
 		<div
 			ref={ replaceContainerRef }
 			className="block-editor-global-styles-background-panel__image-tools-panel-item"
+			clsx={
+				( 'block-editor-global-styles-background-panel__image-tools-panel-item',
+				{
+					'is-uploading': isUploading,
+				} )
+			}
 		>
 			{ isUploading && <LoadingSpinner /> }
-			<LoadingSpinner />
 			<MediaReplaceFlow
 				mediaId={ id }
 				mediaURL={ url }
@@ -430,7 +440,7 @@ function BackgroundImageControls( {
 					/>
 				}
 				variant="secondary"
-				onError={ () => {} }
+				onError={ onUploadError }
 			>
 				{ canRemove && (
 					<MenuItem
