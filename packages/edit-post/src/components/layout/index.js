@@ -152,10 +152,10 @@ function useEditorStyles() {
 }
 
 function MetaBoxesWide() {
-	const isShort = useMediaQuery( '(max-height: 599px)' );
+	const isShort = useMediaQuery( '(max-height: 549px)' );
 	if ( isShort ) {
 		return (
-			<details className="edit-post-layout__metaboxes" open>
+			<details className="edit-post-layout__metaboxes">
 				<summary>{ __( 'Meta Boxes' ) }</summary>
 				<MetaBoxes location="normal" />
 				<MetaBoxes location="advanced" />
