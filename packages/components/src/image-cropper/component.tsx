@@ -11,22 +11,28 @@ import {
 	useContext,
 	useRef,
 	useEffect,
-	useMemo,
 	useState,
 } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { Resizable, Draggable, Container, Img } from './styles';
+import {
+	Resizable,
+	Draggable,
+	MaxWidthWrapper,
+	Container,
+	ContainWindow,
+	Img,
+	BackgroundImg,
+} from './styles';
 import { ImageCropperContext } from './context';
 import { useImageCropper } from './hook';
 import type { Position } from './types';
 
 const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
-const MIN_PADDING = 20; // 20px;
 
-function CropWindow() {
+function CropWindow( { children }: { children: ReactNode } ) {
 	const {
 		state: {
 			transforms: { scale },
@@ -131,9 +137,9 @@ function CropWindow() {
 			} }
 			ref={ resizableScope }
 		>
-			<Draggable
-				ref={ cropperWindowRef as RefObject< HTMLDivElement > }
-			/>
+			<Draggable ref={ cropperWindowRef as RefObject< HTMLDivElement > }>
+				{ children }
+			</Draggable>
 		</Resizable>
 	);
 }
@@ -143,25 +149,22 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		state: {
 			image,
 			transforms: { rotate, scale, translate },
+			cropper,
 			isAxisSwapped,
+			isResizing,
 			isDragging,
 			isZooming,
 		},
-		src,
 		originalWidth,
 		originalHeight,
+		src,
 		refs: { imageRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const aspectRatio = useMemo(
-		() => originalWidth / originalHeight,
-		[ originalWidth, originalHeight ]
-	);
-	const largerDimension = Math.max( image.width, image.height );
 
-	const containerRef = useRef< HTMLDivElement >( null! );
+	const maxWidthWrapperRef = useRef< HTMLDivElement >( null! );
 	useEffect( () => {
-		const container = containerRef.current;
+		const maxWidthWrapper = maxWidthWrapperRef.current;
 
 		const resizeObserver = new ResizeObserver( ( [ entry ] ) => {
 			const [ { inlineSize } ] = entry.contentBoxSize;
@@ -178,57 +181,72 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			} );
 		} );
 
-		resizeObserver.observe( container );
+		resizeObserver.observe( maxWidthWrapper );
 
 		return () => {
 			resizeObserver.disconnect();
 		};
-	}, [
-		dispatch,
-		originalWidth,
-		originalHeight,
-		aspectRatio,
-		isAxisSwapped,
-	] );
+	}, [ dispatch, originalWidth, originalHeight, isAxisSwapped ] );
 
 	return (
-		<Container
-			animate={ {
-				'--wp-cropper-angle': `${ rotate }rad`,
-				...( isZooming
-					? {}
-					: {
-							'--wp-cropper-scale-x': scale.x,
-							'--wp-cropper-scale-y': scale.y,
-					  } ),
-				...( isDragging || isZooming
-					? {}
-					: {
-							'--wp-cropper-image-x': `${ translate.x }px`,
-							'--wp-cropper-image-y': `${ translate.y }px`,
-					  } ),
-			} }
+		<MaxWidthWrapper
 			style={ {
-				width: `${ largerDimension + MIN_PADDING * 2 }px`,
-				aspectRatio: '1 / 1',
-				'--wp-cropper-image-x': `${ translate.x }px`,
-				'--wp-cropper-image-y': `${ translate.y }px`,
-				'--wp-cropper-scale-x': scale.x,
-				'--wp-cropper-scale-y': scale.y,
-				padding: `${ MIN_PADDING }px`,
+				width: isAxisSwapped
+					? `${ originalHeight }px`
+					: `${ originalWidth }px`,
 			} }
-			ref={ useMergeRefs( [ containerRef, ref ] ) }
+			ref={ useMergeRefs( [ maxWidthWrapperRef, ref ] ) }
 		>
-			<Img
-				width={ image.width }
-				height={ image.height }
-				src={ src }
-				alt=""
-				crossOrigin="anonymous"
-				ref={ imageRef }
-			/>
-			<CropWindow />
-		</Container>
+			<Container
+				animate={ {
+					width: `${ cropper.width }px`,
+					height: `${ cropper.height }px`,
+					'--wp-cropper-angle': `${ rotate }rad`,
+					...( isZooming
+						? {}
+						: {
+								'--wp-cropper-scale-x': scale.x,
+								'--wp-cropper-scale-y': scale.y,
+						  } ),
+					...( isDragging || isZooming
+						? {}
+						: {
+								'--wp-cropper-image-x': `${ translate.x }px`,
+								'--wp-cropper-image-y': `${ translate.y }px`,
+						  } ),
+				} }
+				style={ {
+					'--wp-cropper-image-x': `${ translate.x }px`,
+					'--wp-cropper-image-y': `${ translate.y }px`,
+					'--wp-cropper-window-x': '0px',
+					'--wp-cropper-window-y': '0px',
+					'--wp-cropper-scale-x': scale.x,
+					'--wp-cropper-scale-y': scale.y,
+				} }
+			>
+				<BackgroundImg
+					width={ image.width }
+					height={ image.height }
+					src={ src }
+					alt=""
+					crossOrigin="anonymous"
+					isResizing={ isResizing }
+					isDragging={ isDragging }
+				/>
+				<CropWindow>
+					<ContainWindow>
+						<Img
+							width={ image.width }
+							height={ image.height }
+							src={ src }
+							alt=""
+							crossOrigin="anonymous"
+							ref={ imageRef }
+						/>
+					</ContainWindow>
+				</CropWindow>
+			</Container>
+		</MaxWidthWrapper>
 	);
 } );
 
