@@ -89,11 +89,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		&::after {
 			@include selected-block-focus();
 			z-index: 1;
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 
@@ -285,11 +280,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
 			outline-color: var(--wp-block-synced-color);
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 }

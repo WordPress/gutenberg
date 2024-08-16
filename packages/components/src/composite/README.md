@@ -1,5 +1,9 @@
 # `Composite`
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `Composite` provides a single tab stop on the page and allows navigation through the focusable descendants with arrow keys. This abstract component is based on the [WAI-ARIA Composite Role⁠](https://w3c.github.io/aria/#composite).
 
 ## Usage
@@ -315,3 +319,7 @@ Allows the component to be rendered as a different HTML element or React compone
 The contents of the component.
 
 -   Required: no
+
+### `Composite.Context`
+
+The React context used by the composite components. It can be used by to access the composite store, and to forward the context when composite sub-components are rendered across portals (ie. `SlotFill` components) that would not otherwise forward the context to the `Fill` children.
