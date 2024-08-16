@@ -135,15 +135,10 @@
 		}
 	}
 
-	&.is-uploading {
-		opacity: 0.5;
-	}
-
 	.block-editor-global-styles-background-panel__loading {
 		height: 100%;
 		position: absolute;
 		z-index: 1;
-		background-color: rgba(255, 255, 255, 0.5);
 		width: 100%;
 		padding: 10px 0 0 0;
 		svg {
