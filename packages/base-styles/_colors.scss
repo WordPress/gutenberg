@@ -25,3 +25,6 @@ $light-gray-placeholder: rgba($white, 0.65);
 $alert-yellow: #f0b849;
 $alert-red: #cc1818;
 $alert-green: #4ab866;
+
+// Deprecated, please avoid using these.
+$dark-theme-focus: $white;	// Focus color when the theme is dark.
