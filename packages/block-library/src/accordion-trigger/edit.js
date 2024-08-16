@@ -150,6 +150,12 @@ export default function Edit( { attributes, setAttributes } ) {
 					} }
 				>
 					<RichText
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
 						disableLineBreaks
 						tagName="span"
 						value={ title }
