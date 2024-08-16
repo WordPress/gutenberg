@@ -146,6 +146,15 @@ export function RadioControl(
 					</div>
 				) ) }
 			</VStack>
+			{ !! help && (
+				<StyledHelp
+					__nextHasNoMarginBottom
+					id={ id ? id + '__help' : undefined }
+					className="components-base-control__help"
+				>
+					{ help }
+				</StyledHelp>
+			) }
 		</fieldset>
 	);
 }
