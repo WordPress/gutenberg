@@ -108,7 +108,7 @@ Function which is called before internal updates to the value state. It receives
 
 Start opting into the new margin-free styles that will become the default in a future version.
 
-#### `__nextHasNoMarginBottom`
+### `__nextHasNoMarginBottom`
 
 -   Type: `Boolean`
 -   Required: No
