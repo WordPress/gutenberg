@@ -9,6 +9,7 @@ import {
 	BlockEditorProvider,
 	BlockContextProvider,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
@@ -222,6 +223,26 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
+
+		const { computedSectionRootClientId } = useSelect( ( select ) => {
+			const { getBlockAttributes, getBlocksByName } =
+				select( blockEditorStore );
+
+			const _sectionRootClientId =
+				getBlocksByName( 'core/group' ).find(
+					( clientId ) =>
+						getBlockAttributes( clientId )?.tagName === 'main'
+				) ?? '';
+
+			return {
+				computedSectionRootClientId: _sectionRootClientId,
+			};
+		}, [] );
+
+		const { setSectionRootClientId } = unlock(
+			useDispatch( blockEditorStore )
+		);
+
 		const { createWarningNotice } = useDispatch( noticesStore );
 
 		// Ideally this should be synced on each change and not just something you do once.
@@ -270,6 +291,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		// Sets the section root client id once it is computed.
+		useEffect( () => {
+			if ( computedSectionRootClientId ) {
+				setSectionRootClientId( computedSectionRootClientId );
+			}
+		}, [ computedSectionRootClientId, setSectionRootClientId ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 
