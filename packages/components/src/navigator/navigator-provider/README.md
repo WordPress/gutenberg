@@ -45,7 +45,7 @@ For example:
 -   `/parent/child` is a child of `/parent`.
 -   `/parent/child/grand-child` is a child of `/parent/child`.
 -   `/parent/:param` is a child of `/parent` as well.
--   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" Navigator will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
+-   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
 
 ## Props
 
@@ -76,11 +76,11 @@ The available options are:
 
 ### `goBack`: `( path: string, options: NavigateOptions ) => void`
 
-The `goBack` function allows navigating to the parent screen. Parent/child navigation only works if the path you define are hierarchical (see note above).
+The `goBack` function allows navigating to the parent screen. Parent/child navigation only works if the paths you define are hierarchical (see note above).
 
 When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
 
-The available options are the same as for the `goTo` method minus the `isBack` property, which is not available for the `goBack` method.
+The available options are the same as for the `goTo` method, except for the `isBack` property, which is not available for the `goBack` method.
 
 ### `location`: `NavigatorLocation`
 

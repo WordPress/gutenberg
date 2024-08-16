@@ -28,6 +28,6 @@ For example:
 -   `/parent/child` is a child of `/parent`.
 -   `/parent/child/grand-child` is a child of `/parent/child`.
 -   `/parent/:param` is a child of `/parent` as well.
--   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" Navigator will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
+-   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
 
 -   Required: Yes

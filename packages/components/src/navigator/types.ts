@@ -37,7 +37,7 @@ export type NavigateToParentOptions = Omit< NavigateOptions, 'isBack' >;
 
 export type NavigatorLocation = NavigateOptions & {
 	/**
-	 * Wether the current location is the initial one (ie. first in the stack).
+	 * Whether the current location is the initial one (ie. first in the stack).
 	 */
 	isInitial?: boolean;
 	/**
