@@ -23,6 +23,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
+	Placeholder,
+	Spinner,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -268,6 +270,14 @@ function BackgroundControlsPanel( {
 	);
 }
 
+function LoadingSpinner() {
+	return (
+		<Placeholder className="block-editor-global-styles-background-panel__loading">
+			<Spinner />
+		</Placeholder>
+	);
+}
+
 function BackgroundImageControls( {
 	onChange,
 	style,
@@ -277,6 +287,7 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 } ) {
+	const [ isUploading, setIsUploading ] = useState( false );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -289,6 +300,7 @@ function BackgroundImageControls( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setIsUploading( false );
 	};
 
 	const resetBackgroundImage = () =>
@@ -301,12 +313,16 @@ function BackgroundImageControls( {
 		);
 
 	const onSelectMedia = ( media ) => {
+
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
+			setIsUploading( false );
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
+			// Still uploading.
+			setIsUploading( true );
 			return;
 		}
 
@@ -349,6 +365,7 @@ function BackgroundImageControls( {
 				backgroundSize: sizeValue,
 			} )
 		);
+		setIsUploading( false );
 	};
 
 	const onFilesDrop = ( filesList ) => {
@@ -356,9 +373,6 @@ function BackgroundImageControls( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
 				onSelectMedia( image );
 			},
 			onError: onUploadError,
@@ -387,12 +401,14 @@ function BackgroundImageControls( {
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
 	const imgLabel =
 		title || getFilename( url ) || __( 'Add background image' );
-
+// opaque when loading?
 	return (
 		<div
 			ref={ replaceContainerRef }
 			className="block-editor-global-styles-background-panel__image-tools-panel-item"
 		>
+			{ isUploading && <LoadingSpinner /> }
+			<LoadingSpinner />
 			<MediaReplaceFlow
 				mediaId={ id }
 				mediaURL={ url }
@@ -414,6 +430,7 @@ function BackgroundImageControls( {
 					/>
 				}
 				variant="secondary"
+				onError={ () => {} }
 			>
 				{ canRemove && (
 					<MenuItem
