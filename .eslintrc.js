@@ -316,6 +316,7 @@ module.exports = {
 						'CustomSelectControl',
 						'DimensionControl',
 						'FontSizePicker',
+						'NumberControl',
 						'ToggleGroupControl',
 					].map( ( componentName ) => ( {
 						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
