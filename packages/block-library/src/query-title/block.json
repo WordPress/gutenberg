@@ -27,6 +27,10 @@
 		"showSearchTerm": {
 			"type": "boolean",
 			"default": true
+		},
+		"blogTitle": {
+			"type": "string",
+			"default": "Blog"
 		}
 	},
 	"supports": {

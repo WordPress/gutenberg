@@ -27,6 +27,11 @@ function render_block_core_query_title( $attributes ) {
 		return '';
 	}
 	$title = '';
+
+	if ( is_home() || is_front_page() ) {
+		$title = isset( $attributes[ 'blogTitle' ] ) ? $attributes[ 'blogTitle' ] : __( 'Blog' );
+	}
+
 	if ( $is_archive ) {
 		$show_prefix = isset( $attributes['showPrefix'] ) ? $attributes['showPrefix'] : true;
 		if ( ! $show_prefix ) {
