@@ -56,12 +56,11 @@ figure.wp-block-gallery.has-nested-images {
 		// Create a background blur layer.
 		&:has(figcaption)::before {
 			content: "";
-			z-index: 0;
 			height: 100%;
 			max-height: 40%;
 
 			// Blur the background under the gradient scrim.
-			backdrop-filter: blur(4px);
+			backdrop-filter: blur(3px);
 
 			// Crop the caption so the blur is only on the edge.
 			mask-image: linear-gradient(0deg, rgba($color: $black, $alpha: 1) 20%, rgba($color: $black, $alpha: 0) 100%);
@@ -69,9 +68,8 @@ figure.wp-block-gallery.has-nested-images {
 
 		// Place the caption at the bottom.
 		figcaption {
-			z-index: 1;
 			color: $white;
-			text-shadow: 0 0 1.5px rgba($color: $black, $alpha: 1);
+			text-shadow: 0 0 1.5px $black;
 			font-size: $default-font-size;
 			margin: 0;
 			overflow: auto;
@@ -81,7 +79,8 @@ figure.wp-block-gallery.has-nested-images {
 			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
 
 			// Dark gradient scrim.
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0) 100%, transparent);
+			//background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0) 100%, transparent);
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, transparent 100%);
 
 			img {
 				display: inline;
