@@ -23,6 +23,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
+	Placeholder,
+	Spinner,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -268,6 +270,14 @@ function BackgroundControlsPanel( {
 	);
 }
 
+function LoadingSpinner() {
+	return (
+		<Placeholder className="block-editor-global-styles-background-panel__loading">
+			<Spinner />
+		</Placeholder>
+	);
+}
+
 function BackgroundImageControls( {
 	onChange,
 	style,
@@ -277,6 +287,7 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 } ) {
+	const [ isUploading, setIsUploading ] = useState( false );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -289,6 +300,7 @@ function BackgroundImageControls( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setIsUploading( false );
 	};
 
 	const resetBackgroundImage = () =>
@@ -303,10 +315,12 @@ function BackgroundImageControls( {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
+			setIsUploading( false );
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
+			setIsUploading( true );
 			return;
 		}
 
@@ -349,16 +363,21 @@ function BackgroundImageControls( {
 				backgroundSize: sizeValue,
 			} )
 		);
+		setIsUploading( false );
 	};
 
+	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
+		if ( filesList?.length > 1 ) {
+			onUploadError(
+				__( 'Only one image can be used as a background image.' )
+			);
+			return;
+		}
 		mediaUpload( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
 				onSelectMedia( image );
 			},
 			onError: onUploadError,
@@ -393,6 +412,7 @@ function BackgroundImageControls( {
 			ref={ replaceContainerRef }
 			className="block-editor-global-styles-background-panel__image-tools-panel-item"
 		>
+			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
 				mediaId={ id }
 				mediaURL={ url }
@@ -414,6 +434,7 @@ function BackgroundImageControls( {
 					/>
 				}
 				variant="secondary"
+				onError={ onUploadError }
 			>
 				{ canRemove && (
 					<MenuItem
