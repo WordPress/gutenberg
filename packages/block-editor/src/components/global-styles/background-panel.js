@@ -410,13 +410,12 @@ function BackgroundImageControls( {
 	return (
 		<div
 			ref={ replaceContainerRef }
-			className="block-editor-global-styles-background-panel__image-tools-panel-item"
-			clsx={
-				( 'block-editor-global-styles-background-panel__image-tools-panel-item',
+			className={ clsx(
+				'block-editor-global-styles-background-panel__image-tools-panel-item',
 				{
 					'is-uploading': isUploading,
-				} )
-			}
+				}
+			) }
 		>
 			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
