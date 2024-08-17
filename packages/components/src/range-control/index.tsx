@@ -41,6 +41,10 @@ import { space } from '../utils/space';
 
 const noop = () => {};
 
+/**
+ * Computes the value that `RangeControl` should reset to when pressing
+ * the reset button.
+ */
 function computeResetValue( {
 	resetFallbackValue,
 	initialPosition,
@@ -182,15 +186,11 @@ function UnforwardedRangeControl(
 
 	const handleOnReset = () => {
 		// Reset to `resetFallbackValue` if defined, otherwise set internal value
-		// to `null`.
+		// to `null` — which, if propagated to the `value` prop, will cause
+		// the value to be reset to the `initialPosition` prop if defined.
 		const resetValue = Number.isNaN( resetFallbackValue )
 			? null
 			: resetFallbackValue ?? null;
-
-		// const resetValue = computeResetValue( {
-		// 	resetFallbackValue,
-		// 	initialPosition,
-		// } );
 
 		setValue( resetValue );
 
