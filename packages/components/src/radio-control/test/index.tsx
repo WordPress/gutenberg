@@ -67,6 +67,21 @@ describe.each( [
 			).toBeVisible();
 		} );
 
+		it( 'should group all radios under a fieldset with an accessible label even when the lavel is visually hidden', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Component
+					{ ...defaultProps }
+					hideLabelFromVision
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: defaultProps.label } )
+			).toBeVisible();
+		} );
+
 		it( 'should describe the radio group with the help text', () => {
 			const onChangeSpy = jest.fn();
 			render(
