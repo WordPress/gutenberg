@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type { MotionProps } from 'framer-motion';
 import type { Placement, ReferenceType } from '@floating-ui/react-dom';
 

@@ -33,7 +33,7 @@
 		}
 	}
 
-	p:not(.components-base-control__help) {
+	p:not(.components-base-control__help, .components-form-token-field__help) {
 		margin-top: 0;
 	}
 

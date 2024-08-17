@@ -65,18 +65,6 @@ const meta: Meta< typeof DropdownMenu > = {
 			source: { excludeDecorators: true },
 		},
 	},
-	decorators: [
-		// Layout wrapper
-		( Story ) => (
-			<div
-				style={ {
-					minHeight: '300px',
-				} }
-			>
-				<Story />
-			</div>
-		),
-	],
 };
 export default meta;
 

@@ -35,6 +35,23 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
+	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+	// write code that stores a string attribute instead of a number.
+	if ( process.env.NODE_ENV === 'development' ) {
+		if ( columnStart && typeof columnStart !== 'number' ) {
+			throw new Error( 'columnStart must be a number' );
+		}
+		if ( rowStart && typeof rowStart !== 'number' ) {
+			throw new Error( 'rowStart must be a number' );
+		}
+		if ( columnSpan && typeof columnSpan !== 'number' ) {
+			throw new Error( 'columnSpan must be a number' );
+		}
+		if ( rowSpan && typeof rowSpan !== 'number' ) {
+			throw new Error( 'rowSpan must be a number' );
+		}
+	}
+
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
 		if ( selfStretch === 'fixed' && flexSize ) {
@@ -59,6 +76,19 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				grid-column: span ${ columnSpan };
 			}`;
 		}
+		if ( rowStart && rowSpan ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart } / span ${ rowSpan };
+			}`;
+		} else if ( rowStart ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart };
+			}`;
+		} else if ( rowSpan ) {
+			css += `${ selector } {
+				grid-row: span ${ rowSpan };
+			}`;
+		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no
 		 * columnCount is set, the grid is responsive so a
@@ -68,16 +98,6 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			( columnSpan || columnStart ) &&
 			( minimumColumnWidth || ! columnCount )
 		) {
-			// Check if columnSpan and columnStart are numbers so Math.max doesn't break.
-			const columnSpanNumber = columnSpan ? parseInt( columnSpan ) : null;
-			const columnStartNumber = columnStart
-				? parseInt( columnStart )
-				: null;
-			const highestNumber = Math.max(
-				columnSpanNumber,
-				columnStartNumber
-			);
-
 			let parentColumnValue = parseFloat( minimumColumnWidth );
 			/**
 			 * 12rem is the default minimumColumnWidth value.
@@ -99,30 +119,36 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				parentColumnUnit = 'rem';
 			}
 
+			let numColsToBreakAt = 2;
+
+			if ( columnSpan && columnStart ) {
+				numColsToBreakAt = columnSpan + columnStart - 1;
+			} else if ( columnSpan ) {
+				numColsToBreakAt = columnSpan;
+			} else {
+				numColsToBreakAt = columnStart;
+			}
+
 			const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
 			const containerQueryValue =
-				highestNumber * parentColumnValue +
-				( highestNumber - 1 ) * defaultGapValue;
+				numColsToBreakAt * parentColumnValue +
+				( numColsToBreakAt - 1 ) * defaultGapValue;
+			// For blocks that only span one column, we want to remove any rowStart values as
+			// the container reduces in size, so that blocks are still arranged in markup order.
+			const minimumContainerQueryValue =
+				parentColumnValue * 2 + defaultGapValue - 1;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
+			const gridColumnValue =
+				columnSpan && columnSpan > 1 ? '1/-1' : 'auto';
 
-			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
+			css += `@container (max-width: ${ Math.max(
+				containerQueryValue,
+				minimumContainerQueryValue
+			) }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
+					grid-row: auto;
 				}
-			}`;
-		}
-		if ( rowStart && rowSpan ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart } / span ${ rowSpan };
-			}`;
-		} else if ( rowStart ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart };
-			}`;
-		} else if ( rowSpan ) {
-			css += `${ selector } {
-				grid-row: span ${ rowSpan };
 			}`;
 		}
 	}
@@ -143,7 +169,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-		columnCount,
+		isManualPlacement,
 	} = parentLayout;
 
 	const rootClientId = useSelect(
@@ -159,8 +185,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	if ( parentLayoutType !== 'grid' ) {
 		return null;
 	}
-
-	const isManualGrid = !! columnCount;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -190,15 +214,16 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualGrid && window.__experimentalEnableGridInteractivity && (
-				<GridItemMovers
-					layout={ style?.layout }
-					parentLayout={ parentLayout }
-					onChange={ updateLayout }
-					gridClientId={ rootClientId }
-					blockClientId={ clientId }
-				/>
-			) }
+			{ isManualPlacement &&
+				window.__experimentalEnableGridInteractivity && (
+					<GridItemMovers
+						layout={ style?.layout }
+						parentLayout={ parentLayout }
+						onChange={ updateLayout }
+						gridClientId={ rootClientId }
+						blockClientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }

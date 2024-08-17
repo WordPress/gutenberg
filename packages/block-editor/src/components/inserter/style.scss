@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -17,18 +17,18 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__main-area {
-	position: relative;
-	display: flex;
-	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
+	position: relative;
 
 	&.show-as-tabs {
 		gap: 0;
 	}
 
-	@include break-medium {
-		width: $block-inserter-width;
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
 	}
 }
 
@@ -91,6 +91,12 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -107,48 +113,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-}
-
-.block-editor-inserter__tabs {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-
-	.block-editor-inserter__tablist-and-close-button {
-		border-bottom: $border-width solid $gray-300;
-		padding-right: $grid-unit-15;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.block-editor-inserter__close-button {
-		/* stylelint-disable-next-line property-disallowed-list -- This should be refactored to avoid order if possible */
-		order: 1;
-		align-self: center;
-	}
-
-	.block-editor-inserter__tablist {
-		width: 100%;
-		margin-bottom: -$border-width;
-
-		button[role="tab"] {
-			flex-grow: 1;
-			&[id$="reusable"] {
-				flex-grow: inherit;
-				// These are to align the `reusable` icon with the search icon.
-				padding-left: $grid-unit-20;
-				padding-right: $grid-unit-20;
-			}
-		}
-	}
-
-	.block-editor-inserter__tabpanel {
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		overflow-y: auto;
-	}
 }
 
 .block-editor-inserter__no-tab-container {
@@ -276,6 +240,13 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
+	// Temporarily disable the component's indicator animation.
+	// TODO: remove in favor of using the native component's styles and behavior,
+	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
+	&[aria-orientation="vertical"]::after {
+		content: none;
+	}
+
 	.block-editor-inserter__category-tab {
 		// Account for the icon on the right so that it's visually balanced.
 		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
@@ -332,34 +303,34 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__category-panel {
-	background: $gray-100;
-	border-top: $border-width solid $gray-200;
-	box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
-	position: absolute;
-	top: -$border-width;
-	left: 0;
-	height: calc(100% + #{$border-width});
-	width: 100%;
-	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
+	padding: 0 $grid-unit-20;
 
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
-		width: 300px;
-	}
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
+		position: absolute;
+		top: -$border-width;
+		height: calc(100% + #{$border-width});
+		background: $gray-100;
+		border-top: $border-width solid $gray-200;
 
-	.block-editor-inserter__media-list,
-	.block-editor-block-patterns-list {
-		padding: 0 $grid-unit-30 $grid-unit-20;
+		.block-editor-inserter__media-list,
+		.block-editor-block-patterns-list {
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
 	}
 }
 
 .block-editor-inserter__patterns-category-panel-header {
-	padding: $grid-unit-10 $grid-unit-30;
+	padding: $grid-unit-10 0;
+	@include break-medium {
+		padding: $grid-unit-10 $grid-unit-30;
+	}
 }
 
 .block-editor-inserter__patterns-category-no-results {
@@ -374,7 +345,6 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__preview-content {
-	min-height: $grid-unit-60 * 3;
 	background: $gray-100;
 	display: grid;
 	flex-grow: 1;
@@ -407,7 +377,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
@@ -564,10 +534,15 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		padding: $grid-unit-20 $grid-unit-30 $grid-unit-10;
+		margin-bottom: $grid-unit-30;
 		// TODO: Consider using the Theme component to automatically adapt to a gray background.
-		&:not(:focus-within) {
-			--wp-components-color-background: #{$white};
+		@include break-medium() {
+			margin-bottom: 0;
+			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+
+			&:not(:focus-within) {
+				--wp-components-color-background: #{$white};
+			}
 		}
 	}
 }
@@ -691,30 +666,6 @@ $block-inserter-tabs-height: 44px;
 	margin: $grid-unit-20 $grid-unit-20 0;
 }
 
-.reusable-blocks-menu-items__rename-hint {
-	align-items: top;
-	background: $gray-100;
-	border-radius: $radius-block-ui;
-	color: $gray-900;
-	display: flex;
-	flex-direction: row;
-	max-width: 380px;
-}
-
-.reusable-blocks-menu-items__rename-hint-content {
-	margin: $grid-unit-15 0 $grid-unit-15 $grid-unit-15;
-}
-
-.reusable-blocks-menu-items__rename-hint-dismiss {
-	// The dismiss button has a lot of empty space through its padding.
-	// Apply margin to visually align the icon with the top of the text to its left.
-	margin: $grid-unit-05 $grid-unit-05 $grid-unit-05 0;
-}
-
-.components-menu-group .reusable-blocks-menu-items__rename-hint {
-	margin: 0;
-}
-
 .block-editor-patterns__sync-status-filter {
 	.components-input-control__container {
 		select.components-select-control__input {
@@ -737,6 +688,26 @@ $block-inserter-tabs-height: 44px;
 			display: block;
 			width: 300px;
 			height: 100%;
+		}
+	}
+}
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
 		}
 	}
 }

@@ -214,6 +214,21 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 }
 
 /**
+ * Returns an action object used in signalling that the block with the
+ * specified client ID has been hovered.
+ *
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object} Action object.
+ */
+export function hoverBlock( clientId ) {
+	return {
+		type: 'HOVER_BLOCK',
+		clientId,
+	};
+}
+
+/**
  * Yields action objects used in signalling that the block preceding the given
  * clientId (or optionally, its first parent from bottom to top)
  * should be selected.
@@ -1668,11 +1683,19 @@ export const __unstableSetEditorMode =
 				if ( sectionRootClientId ) {
 					const sectionClientIds =
 						select.getBlockOrder( sectionRootClientId );
-					sectionClientId = select
-						.getBlockParents( firstSelectedClientId )
-						.find( ( parent ) =>
-							sectionClientIds.includes( parent )
-						);
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
 				} else {
 					sectionClientId = select.getBlockHierarchyRootClientId(
 						firstSelectedClientId

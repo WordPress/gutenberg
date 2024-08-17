@@ -92,6 +92,7 @@ function PatternOverridesControls( {
 		<>
 			<InspectorControls group="advanced">
 				<BaseControl
+					__nextHasNoMarginBottom
 					id={ controlId }
 					label={ __( 'Overrides' ) }
 					help={ helpText }
@@ -111,7 +112,7 @@ function PatternOverridesControls( {
 						disabled={
 							! hasOverrides && hasUnsupportedImageAttributes
 						}
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ hasOverrides
 							? __( 'Disable overrides' )

@@ -132,7 +132,10 @@ function UncontrolledInnerBlocks( props ) {
 		/>
 	);
 
-	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+	if (
+		! blockType?.providesContext ||
+		Object.keys( blockType.providesContext ).length === 0
+	) {
 		return items;
 	}
 
@@ -203,13 +206,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getSettings,
 			} = unlock( select( blockEditorStore ) );
 			let _isDropZoneDisabled;
-			// In zoom out mode, we want to disable the drop zone for the sections.
-			// The inner blocks belonging to the section drop zone is
-			// already disabled by the blocks themselves being disabled.
-			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings() );
-				_isDropZoneDisabled = clientId !== sectionRootClientId;
-			}
+
 			if ( ! clientId ) {
 				return { isDropZoneDisabled: _isDropZoneDisabled };
 			}
@@ -222,8 +219,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 
-			if ( _isDropZoneDisabled !== undefined ) {
-				_isDropZoneDisabled = blockEditingMode === 'disabled';
+			_isDropZoneDisabled = blockEditingMode === 'disabled';
+
+			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				// In zoom out mode, we want to disable the drop zone for the sections.
+				// The inner blocks belonging to the section drop zone is
+				// already disabled by the blocks themselves being disabled.
+				const { sectionRootClientId } = unlock( getSettings() );
+
+				_isDropZoneDisabled = clientId !== sectionRootClientId;
 			}
 
 			return {
@@ -269,7 +273,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		props.ref,
 		__unstableDisableDropZone ||
 		isDropZoneDisabled ||
-		( layout?.columnCount && window.__experimentalEnableGridInteractivity )
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
 			? null
 			: blockDropZoneRef,
 	] );

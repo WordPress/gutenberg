@@ -17,26 +17,7 @@ import type { WordPressComponentProps } from '../context';
 
 export const noop = () => {};
 
-/**
- * FormToggle switches a single setting on or off.
- *
- * ```jsx
- * import { FormToggle } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const MyFormToggle = () => {
- *   const [ isChecked, setChecked ] = useState( true );
- *
- *   return (
- *     <FormToggle
- *       checked={ isChecked }
- *       onChange={ () => setChecked( ( state ) => ! state ) }
- *     />
- *   );
- * };
- * ```
- */
-export function FormToggle(
+function UnforwardedFormToggle(
 	props: WordPressComponentProps< FormToggleProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
@@ -71,4 +52,25 @@ export function FormToggle(
 	);
 }
 
-export default forwardRef( FormToggle );
+/**
+ * FormToggle switches a single setting on or off.
+ *
+ * ```jsx
+ * import { FormToggle } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyFormToggle = () => {
+ *   const [ isChecked, setChecked ] = useState( true );
+ *
+ *   return (
+ *     <FormToggle
+ *       checked={ isChecked }
+ *       onChange={ () => setChecked( ( state ) => ! state ) }
+ *     />
+ *   );
+ * };
+ * ```
+ */
+export const FormToggle = forwardRef( UnforwardedFormToggle );
+
+export default FormToggle;

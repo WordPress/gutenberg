@@ -289,9 +289,7 @@ describe( 'List block', () => {
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
-		const reverseButton = screen.getByLabelText(
-			/Reverse list numbering\. Off/
-		);
+		const reverseButton = screen.getByLabelText( /Reverse order\. Off/ );
 		fireEvent.press( reverseButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();

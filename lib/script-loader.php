@@ -44,17 +44,19 @@ function gutenberg_enqueue_global_styles() {
 
 	$stylesheet = gutenberg_get_global_stylesheet();
 
-	/*
-	 * Dequeue the Customizer's custom CSS
-	 * and add it before the global styles custom CSS.
-	 */
-	remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
-	// Get the custom CSS from the Customizer and add it to the global stylesheet.
-	$custom_css  = wp_get_custom_css();
-	$stylesheet .= $custom_css;
+	if ( $is_block_theme ) {
+		/*
+		 * Dequeue the Customizer's custom CSS
+		 * and add it before the global styles custom CSS.
+		 */
+		remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
+		// Get the custom CSS from the Customizer and add it to the global stylesheet.
+		$custom_css  = wp_get_custom_css();
+		$stylesheet .= $custom_css;
 
-	// Add the global styles custom CSS at the end.
-	$stylesheet .= gutenberg_get_global_stylesheet( array( 'custom-css' ) );
+		// Add the global styles custom CSS at the end.
+		$stylesheet .= gutenberg_get_global_stylesheet( array( 'custom-css' ) );
+	}
 
 	if ( empty( $stylesheet ) ) {
 		return;

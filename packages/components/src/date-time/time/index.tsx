@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BaseControl from '../../base-control';
+import { VisuallyHidden } from '../../visually-hidden';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimeInputValue, TimePickerProps } from '../types';
@@ -32,7 +33,9 @@ import {
 	validateInputElementTarget,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
-import { TimeInput } from '../time-input';
+import { TimeInput } from './time-input';
+
+const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
 /**
  * TimePicker is a React component that renders a clock for time selection.
@@ -58,6 +61,8 @@ export function TimePicker( {
 	is12Hour,
 	currentTime,
 	onChange,
+	dateOrder: dateOrderProp,
+	hideLabelFromVision = false,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -74,10 +79,28 @@ export function TimePicker( {
 		);
 	}, [ currentTime ] );
 
+	const monthOptions = [
+		{ value: '01', label: __( 'January' ) },
+		{ value: '02', label: __( 'February' ) },
+		{ value: '03', label: __( 'March' ) },
+		{ value: '04', label: __( 'April' ) },
+		{ value: '05', label: __( 'May' ) },
+		{ value: '06', label: __( 'June' ) },
+		{ value: '07', label: __( 'July' ) },
+		{ value: '08', label: __( 'August' ) },
+		{ value: '09', label: __( 'September' ) },
+		{ value: '10', label: __( 'October' ) },
+		{ value: '11', label: __( 'November' ) },
+		{ value: '12', label: __( 'December' ) },
+	] as const;
+
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
 			day: format( date, 'dd' ),
-			month: format( date, 'MM' ),
+			month: format(
+				date,
+				'MM'
+			) as ( typeof monthOptions )[ number ][ 'value' ],
 			year: format( date, 'yyyy' ),
 			minutes: format( date, 'mm' ),
 			hours: format( date, 'HH' ),
@@ -116,6 +139,7 @@ export function TimePicker( {
 
 	const dayField = (
 		<DayInput
+			key="day"
 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
@@ -134,7 +158,7 @@ export function TimePicker( {
 	);
 
 	const monthField = (
-		<MonthSelectWrapper>
+		<MonthSelectWrapper key="month">
 			<SelectControl
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
@@ -142,20 +166,7 @@ export function TimePicker( {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ month }
-				options={ [
-					{ value: '01', label: __( 'January' ) },
-					{ value: '02', label: __( 'February' ) },
-					{ value: '03', label: __( 'March' ) },
-					{ value: '04', label: __( 'April' ) },
-					{ value: '05', label: __( 'May' ) },
-					{ value: '06', label: __( 'June' ) },
-					{ value: '07', label: __( 'July' ) },
-					{ value: '08', label: __( 'August' ) },
-					{ value: '09', label: __( 'September' ) },
-					{ value: '10', label: __( 'October' ) },
-					{ value: '11', label: __( 'November' ) },
-					{ value: '12', label: __( 'December' ) },
-				] }
+				options={ monthOptions }
 				onChange={ ( value ) => {
 					const newDate = setMonth( date, Number( value ) - 1 );
 					setDate( newDate );
@@ -165,17 +176,63 @@ export function TimePicker( {
 		</MonthSelectWrapper>
 	);
 
+	const yearField = (
+		<YearInput
+			key="year"
+			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+			label={ __( 'Year' ) }
+			hideLabelFromVision
+			__next40pxDefaultSize
+			value={ year }
+			step={ 1 }
+			min={ 1 }
+			max={ 9999 }
+			required
+			spinControls="none"
+			isPressEnterToChange
+			isDragEnabled={ false }
+			isShiftStepEnabled={ false }
+			onChange={ buildNumberControlChangeCallback( 'year' ) }
+			__unstableStateReducer={ buildPadInputStateReducer( 4 ) }
+		/>
+	);
+
+	const defaultDateOrder = is12Hour ? 'mdy' : 'dmy';
+	const dateOrder =
+		dateOrderProp && VALID_DATE_ORDERS.includes( dateOrderProp )
+			? dateOrderProp
+			: defaultDateOrder;
+
+	const fields = dateOrder.split( '' ).map( ( field ) => {
+		switch ( field ) {
+			case 'd':
+				return dayField;
+			case 'm':
+				return monthField;
+			case 'y':
+				return yearField;
+			default:
+				return null;
+		}
+	} );
+
 	return (
 		<Wrapper
 			className="components-datetime__time" // Unused, for backwards compatibility.
 		>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Time' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Time' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Time' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
@@ -192,49 +249,51 @@ export function TimePicker( {
 				</HStack>
 			</Fieldset>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Date' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Date' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Date' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
-					{ is12Hour ? (
-						<>
-							{ monthField }
-							{ dayField }
-						</>
-					) : (
-						<>
-							{ dayField }
-							{ monthField }
-						</>
-					) }
-					<YearInput
-						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
-						label={ __( 'Year' ) }
-						hideLabelFromVision
-						__next40pxDefaultSize
-						value={ year }
-						step={ 1 }
-						min={ 1 }
-						max={ 9999 }
-						required
-						spinControls="none"
-						isPressEnterToChange
-						isDragEnabled={ false }
-						isShiftStepEnabled={ false }
-						onChange={ buildNumberControlChangeCallback( 'year' ) }
-						__unstableStateReducer={ buildPadInputStateReducer(
-							4
-						) }
-					/>
+					{ fields }
 				</HStack>
 			</Fieldset>
 		</Wrapper>
 	);
 }
+
+/**
+ * A component to input a time.
+ *
+ * Values are passed as an object in 24-hour format (`{ hours: number, minutes: number }`).
+ *
+ * ```jsx
+ * import { TimePicker } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const MyTimeInput = () => {
+ * 	const [ time, setTime ] = useState( { hours: 13, minutes: 30 } );
+ *
+ * 	return (
+ * 		<TimePicker.TimeInput
+ * 			value={ time }
+ * 			onChange={ setTime }
+ * 			label="Time"
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+TimePicker.TimeInput = TimeInput;
+Object.assign( TimePicker.TimeInput, { displayName: 'TimePicker.TimeInput' } );
 
 export default TimePicker;

@@ -25,9 +25,10 @@ import {
 	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
-import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
-import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
+import {
+	getEntityActions as _getEntityActions,
+	isEntityReady as _isEntityReady,
+} from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -112,34 +113,14 @@ export const getPostIcon = createRegistrySelector(
 			// `icon` is the `menu_icon` property of a post type. We
 			// only handle `dashicons` for now, even if the `menu_icon`
 			// also supports urls and svg as values.
-			if ( postTypeEntity?.icon?.startsWith( 'dashicons-' ) ) {
+			if (
+				typeof postTypeEntity?.icon === 'string' &&
+				postTypeEntity.icon.startsWith( 'dashicons-' )
+			) {
 				return postTypeEntity.icon.slice( 10 );
 			}
 			return pageIcon;
 		}
-	}
-);
-
-/**
- * Returns the template parts and their blocks for the current edited template.
- *
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
- */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => () => {
-		const templateParts = select( coreStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
 	}
 );
 
@@ -185,3 +166,40 @@ export const hasPostMetaChanges = createRegistrySelector(
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
 }
+
+export function isEntityReady( state, ...args ) {
+	return _isEntityReady( state.dataviews, ...args );
+}
+
+/**
+ * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * blocks that aren't descendants of the query block.
+ *
+ * @param {Object}       state      Global application state.
+ * @param {Array|string} blockNames Block names of the blocks to retrieve.
+ *
+ * @return {Array} Block client IDs.
+ */
+export const getPostBlocksByName = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter( ( clientId ) =>
+				getBlockParents( clientId ).every( ( parentClientId ) => {
+					const parentBlockName = getBlockName( parentClientId );
+					return (
+						// Ignore descendents of the query block.
+						parentBlockName !== 'core/query' &&
+						// Enable only the top-most block.
+						! blockNames.includes( parentBlockName )
+					);
+				} )
+			);
+		},
+		() => [ select( blockEditorStore ).getBlocks() ]
+	)
+);

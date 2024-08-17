@@ -86,7 +86,10 @@ export default function PatternConvertButton( {
 				) &&
 				// Hide when current doesn't have permission to do that.
 				// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
-				!! canUser( 'create', 'blocks' );
+				!! canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_block',
+				} );
 
 			return _canConvert;
 		},

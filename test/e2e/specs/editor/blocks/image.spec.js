@@ -708,13 +708,14 @@ test.describe( 'Image', () => {
 
 		await editor.clickBlockToolbarButton( 'Upload to Media Library' );
 
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
+		await expect(
+			editor.canvas
+				.locator( 'role=document[name="Block: Image"i]' )
+				.locator( 'img[src^="http"]' )
+		).toHaveAttribute(
+			'src',
+			expect.stringMatching( /\/wp-content\/uploads\// )
 		);
-		const image = imageBlock.locator( 'img[src^="http"]' );
-		const src = await image.getAttribute( 'src' );
-
-		expect( src ).toMatch( /\/wp-content\/uploads\// );
 	} );
 
 	test( 'should upload through prepublish panel', async ( {
@@ -736,14 +737,45 @@ test.describe( 'Image', () => {
 			.click();
 
 		await expect( page.locator( '.components-spinner' ) ).toHaveCount( 0 );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
+		await expect(
+			editor.canvas
+				.locator( 'role=document[name="Block: Image"i]' )
+				.locator( 'img[src^="http"]' )
+		).toHaveAttribute(
+			'src',
+			expect.stringMatching( /\/wp-content\/uploads\// )
 		);
-		const image = imageBlock.locator( 'img[src^="http"]' );
-		const src = await image.getAttribute( 'src' );
+	} );
 
-		expect( src ).toMatch( /\/wp-content\/uploads\// );
+	test( 'uploads data url through blobs from raw handling', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const blobUrl = await page.evaluate( async () => {
+			const canvas = document.createElement( 'canvas' );
+			canvas.width = 20;
+			canvas.height = 20;
+
+			const ctx = canvas.getContext( '2d' );
+			ctx.fillStyle = 'red';
+			ctx.fillRect( 0, 0, 20, 20 );
+
+			return canvas.toDataURL( 'image/png' );
+		} );
+
+		pageUtils.setClipboardData( { html: `<img src="${ blobUrl }">` } );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect(
+			editor.canvas
+				.locator( 'role=document[name="Block: Image"i]' )
+				.locator( 'img[src^="http"]' )
+		).toHaveAttribute(
+			'src',
+			expect.stringMatching( /\/wp-content\/uploads\// )
+		);
 	} );
 
 	test( 'should have keyboard navigable link UI popover', async ( {
@@ -935,6 +967,37 @@ test.describe( 'Image - lightbox', () => {
 					} )
 				).toBeHidden();
 			} );
+		} );
+	} );
+
+	test.describe( 'should render as expected on front end', () => {
+		test( "Overlay image should not inherit content image's margins", async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none",
+			"lightbox":{"enabled":true},"style":{"spacing":{"margin":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}}} -->
+			<figure class="wp-block-image size-full" style="margin-top:var(--wp--preset--spacing--40);margin-right:var(--wp--preset--spacing--40);margin-bottom:var(--wp--preset--spacing--40);margin-left:var(--wp--preset--spacing--40)">
+			<img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const lightboxImage = page.locator( '.wp-lightbox-container img' );
+			await expect( lightboxImage ).toBeVisible();
+			await lightboxImage.click();
+
+			const figure = page
+				.locator( '.wp-lightbox-overlay .wp-block-image' )
+				.first();
+			await expect( figure ).toBeVisible();
+			const margin = await figure.evaluate( ( element ) => {
+				return window
+					.getComputedStyle( element )
+					.getPropertyValue( 'margin' );
+			} );
+			expect( margin ).toBe( '0px' );
 		} );
 	} );
 } );
