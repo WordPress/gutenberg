@@ -14,8 +14,8 @@ const {
 	initialVdom,
 	toVdom,
 	render,
-	parseInitialData,
-	populateInitialData,
+	parseServerData,
+	populateServerData,
 	batch,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
@@ -103,7 +103,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 		} );
 	}
 	const title = dom.querySelector( 'title' )?.innerText;
-	const initialData = parseInitialData( dom );
+	const initialData = parseServerData( dom );
 	return { regions, head, title, initialData };
 };
 
@@ -119,7 +119,7 @@ const renderRegions = ( page: Page ) => {
 			}
 		}
 		if ( navigationMode === 'regionBased' ) {
-			populateInitialData( page.initialData );
+			populateServerData( page.initialData );
 			const attrName = `data-${ directivePrefix }-router-region`;
 			document
 				.querySelectorAll( `[${ attrName }]` )

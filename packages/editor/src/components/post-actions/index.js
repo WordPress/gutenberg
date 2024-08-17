@@ -17,7 +17,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-import { store as editorStore } from '../../store';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -27,25 +26,23 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-export default function PostActions( { onActionPerformed, buttonProps } ) {
+export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, permissions, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const { getEditedEntityRecord, getEntityRecordPermissions } = unlock(
-			select( coreStore )
-		);
-		const _postType = getCurrentPostType();
-		const _id = getCurrentPostId();
-		return {
-			item: getEditedEntityRecord( 'postType', _postType, _id ),
-			permissions: getEntityRecordPermissions(
-				'postType',
-				_postType,
-				_id
-			),
-			postType: _postType,
-		};
-	}, [] );
+	const { item, permissions } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecordPermissions } =
+				unlock( select( coreStore ) );
+			return {
+				item: getEditedEntityRecord( 'postType', postType, postId ),
+				permissions: getEntityRecordPermissions(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
+		[ postId, postType ]
+	);
 	const itemWithPermissions = useMemo( () => {
 		return {
 			...item,
@@ -76,7 +73,6 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
 					}
-					{ ...buttonProps }
 				/>
 			}
 			onOpenChange={ setIsActionsMenuOpen }

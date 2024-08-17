@@ -254,6 +254,7 @@ export default function PostStatus() {
 														id={ passwordInputId }
 														__next40pxDefaultSize
 														__nextHasNoMarginBottom
+														maxLength={ 255 }
 													/>
 												</div>
 											) }

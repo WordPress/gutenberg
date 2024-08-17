@@ -44,7 +44,7 @@ function FontLibraryModal( {
 	onRequestClose,
 	defaultTabId = 'installed-fonts',
 } ) {
-	const { collections, setNotice } = useContext( FontLibraryContext );
+	const { collections } = useContext( FontLibraryContext );
 	const canUserCreate = useSelect( ( select ) => {
 		return select( coreStore ).canUser( 'create', {
 			kind: 'postType',
@@ -59,11 +59,6 @@ function FontLibraryModal( {
 		tabs.push( ...tabsFromCollections( collections || [] ) );
 	}
 
-	// Reset notice when new tab is selected.
-	const onSelect = () => {
-		setNotice( null );
-	};
-
 	return (
 		<Modal
 			title={ __( 'Fonts' ) }
@@ -72,7 +67,7 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs defaultTabId={ defaultTabId } onSelect={ onSelect }>
+				<Tabs defaultTabId={ defaultTabId }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>

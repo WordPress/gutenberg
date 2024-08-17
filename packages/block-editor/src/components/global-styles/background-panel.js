@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalUseNavigator as useNavigator,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
@@ -15,27 +14,30 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
-	Button,
-	ColorIndicator,
 	DropZone,
-	Flex,
 	FlexItem,
 	FocalPointPicker,
 	MenuItem,
 	VisuallyHidden,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	__experimentalZStack as ZStack,
 	Dropdown,
+	Placeholder,
+	Spinner,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	Platform,
+	useRef,
+	useState,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -43,19 +45,19 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps, getResolvedValue } from './utils';
 import { setImmutably } from '../../utils/object';
-import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import ColorGradientControl from '../colors-gradients/control';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-import { getResolvedThemeFilePath } from './theme-file-uri-utils';
-import { unlock } from '../../lock-unlock';
+
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../../store/private-keys';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	background: true,
 };
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
@@ -167,24 +169,33 @@ function InspectorImagePreviewItem( {
 	filename,
 	label,
 	className,
+	onToggleCallback = noop,
 } ) {
+	useEffect( () => {
+		if ( typeof toggleProps?.isOpen !== 'undefined' ) {
+			onToggleCallback( toggleProps?.isOpen );
+		}
+	}, [ toggleProps?.isOpen, onToggleCallback ] );
 	return (
-		<Item as={ as } className={ className } { ...toggleProps }>
+		<ItemGroup as={ as } className={ className } { ...toggleProps }>
 			<HStack
 				justify="flex-start"
 				as="span"
 				className="block-editor-global-styles-background-panel__inspector-preview-inner"
 			>
-				<ColorIndicator
-					aria-hidden
-					style={ {
-						'--image-url': imgUrl ? `url(${ imgUrl })` : undefined,
-					} }
-					className={ clsx(
-						'block-editor-global-styles-background-panel__inspector-image-indicator',
-						{ 'has-image': !! imgUrl }
-					) }
-				/>
+				{ imgUrl && (
+					<span
+						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
+						aria-hidden
+					>
+						<span
+							className="block-editor-global-styles-background-panel__inspector-image-indicator"
+							style={ {
+								backgroundImage: `url(${ imgUrl })`,
+							} }
+						/>
+					</span>
+				) }
 				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
 					<Truncate
 						numberOfLines={ 1 }
@@ -203,7 +214,7 @@ function InspectorImagePreviewItem( {
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
-		</Item>
+		</ItemGroup>
 	);
 }
 
@@ -212,13 +223,15 @@ function BackgroundControlsPanel( {
 	filename,
 	url: imgUrl,
 	children,
+	onToggle: onToggleCallback = noop,
 	hasImageValue,
 } ) {
 	if ( ! hasImageValue ) {
 		return;
 	}
 
-	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
+	const imgLabel =
+		label || getFilename( imgUrl ) || __( 'Add background image' );
 
 	return (
 		<Dropdown
@@ -226,12 +239,8 @@ function BackgroundControlsPanel( {
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleProps = {
 					onClick: onToggle,
-					className: clsx(
+					className:
 						'block-editor-global-styles-background-panel__dropdown-toggle',
-						{
-							'is-open': isOpen,
-						}
-					),
 					'aria-expanded': isOpen,
 					'aria-label': __(
 						'Background size, position and repeat options.'
@@ -245,6 +254,7 @@ function BackgroundControlsPanel( {
 						label={ imgLabel }
 						toggleProps={ toggleProps }
 						as="button"
+						onToggleCallback={ onToggleCallback }
 					/>
 				);
 			} }
@@ -260,18 +270,25 @@ function BackgroundControlsPanel( {
 	);
 }
 
+function LoadingSpinner() {
+	return (
+		<Placeholder className="block-editor-global-styles-background-panel__loading">
+			<Spinner />
+		</Placeholder>
+	);
+}
+
 function BackgroundImageControls( {
 	onChange,
 	style,
 	inheritedValue,
 	onRemoveImage = noop,
+	onResetImage = noop,
 	displayInPanel,
-	themeFileURIs,
+	defaultValues,
 } ) {
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const [ isUploading, setIsUploading ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { id, title, url } = style?.background?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
@@ -280,6 +297,7 @@ function BackgroundImageControls( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setIsUploading( false );
 	};
 
 	const resetBackgroundImage = () =>
@@ -294,10 +312,12 @@ function BackgroundImageControls( {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
+			setIsUploading( false );
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
+			setIsUploading( true );
 			return;
 		}
 
@@ -315,9 +335,9 @@ function BackgroundImageControls( {
 			return;
 		}
 
-		const sizeValue = style?.background?.backgroundSize;
+		const sizeValue =
+			style?.background?.backgroundSize || defaultValues?.backgroundSize;
 		const positionValue = style?.background?.backgroundPosition;
-
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
@@ -328,21 +348,33 @@ function BackgroundImageControls( {
 					title: media.title || undefined,
 				},
 				backgroundPosition:
+					/*
+					 * A background image uploaded and set in the editor receives a default background position of '50% 0',
+					 * when the background image size is the equivalent of "Tile".
+					 * This is to increase the chance that the image's focus point is visible.
+					 * This is in-editor only to assist with the user experience.
+					 */
 					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
 						? '50% 0'
 						: positionValue,
+				backgroundSize: sizeValue,
 			} )
 		);
+		setIsUploading( false );
 	};
 
+	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
-		mediaUpload( {
+		if ( filesList?.length > 1 ) {
+			onUploadError(
+				__( 'Only one image can be used as a background image.' )
+			);
+			return;
+		}
+		getSettings().mediaUpload( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
 				onSelectMedia( image );
 			},
 			onError: onUploadError,
@@ -364,16 +396,20 @@ function BackgroundImageControls( {
 
 	const onRemove = () =>
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+			setImmutably( style, [ 'background' ], {
+				backgroundImage: 'none',
+			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel = title || getFilename( url ) || __( 'Image' );
+	const imgLabel =
+		title || getFilename( url ) || __( 'Add background image' );
 
 	return (
 		<div
 			ref={ replaceContainerRef }
 			className="block-editor-global-styles-background-panel__image-tools-panel-item"
 		>
+			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
 				mediaId={ id }
 				mediaURL={ url }
@@ -389,21 +425,20 @@ function BackgroundImageControls( {
 				name={
 					<InspectorImagePreviewItem
 						className="block-editor-global-styles-background-panel__image-preview"
-						imgUrl={ getResolvedThemeFilePath(
-							url,
-							themeFileURIs
-						) }
+						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }
 					/>
 				}
 				variant="secondary"
+				onError={ onUploadError }
 			>
 				{ canRemove && (
 					<MenuItem
 						onClick={ () => {
 							closeAndFocus();
 							onRemove();
+							onRemoveImage();
 						} }
 					>
 						{ __( 'Remove' ) }
@@ -413,7 +448,7 @@ function BackgroundImageControls( {
 					<MenuItem
 						onClick={ () => {
 							closeAndFocus();
-							onRemoveImage();
+							onResetImage();
 						} }
 					>
 						{ __( 'Reset ' ) }
@@ -433,7 +468,6 @@ function BackgroundSizeControls( {
 	style,
 	inheritedValue,
 	defaultValues,
-	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -444,6 +478,7 @@ function BackgroundSizeControls( {
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
+	const isUploadedImage = style?.background?.backgroundImage?.id;
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
@@ -452,20 +487,24 @@ function BackgroundSizeControls( {
 		inheritedValue?.background?.backgroundAttachment;
 
 	/*
-	 * An `undefined` value is replaced with any supplied
-	 * default control value for the toggle group control.
-	 * An empty string is treated as `auto` - this allows a user
-	 * to select "Size" and then enter a custom value, with an
-	 * empty value being treated as `auto`.
+	 * Set default values for uploaded images.
+	 * The default values are passed by the consumer.
+	 * Block-level controls may have different defaults to root-level controls.
+	 * A falsy value is treated by default as `auto` (Tile).
 	 */
-	const currentValueForToggle =
-		( sizeValue !== undefined &&
-			sizeValue !== 'cover' &&
-			sizeValue !== 'contain' ) ||
-		sizeValue === ''
-			? 'auto'
-			: sizeValue || defaultValues?.backgroundSize;
-
+	let currentValueForToggle =
+		! sizeValue && isUploadedImage
+			? defaultValues?.backgroundSize
+			: sizeValue || 'auto';
+	/*
+	 * The incoming value could be a value + unit, e.g. '20px'.
+	 * In this case set the value to 'tile'.
+	 */
+	currentValueForToggle = ! [ 'cover', 'contain', 'auto' ].includes(
+		currentValueForToggle
+	)
+		? 'auto'
+		: currentValueForToggle;
 	/*
 	 * If the current value is `cover` and the repeat value is `undefined`, then
 	 * the toggle should be unchecked as the default state. Otherwise, the toggle
@@ -502,6 +541,7 @@ function BackgroundSizeControls( {
 			 * receives a default background position of '50% 0',
 			 * when the toggle switches to "Tile". This is to increase the chance that
 			 * the image's focus point is visible.
+			 * This is in-editor only to assist with the user experience.
 			 */
 			if ( !! style?.background?.backgroundImage?.id ) {
 				nextPosition = '50% 0';
@@ -554,14 +594,19 @@ function BackgroundSizeControls( {
 			)
 		);
 
+	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
+	const backgroundPositionValue =
+		! positionValue && isUploadedImage && 'contain' === sizeValue
+			? defaultValues?.backgroundPosition
+			: positionValue;
+
 	return (
-		<VStack spacing={ 4 } className="single-column">
+		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
-				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
-				value={ backgroundPositionToCoords( positionValue ) }
+				url={ imageValue }
+				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
@@ -569,9 +614,6 @@ function BackgroundSizeControls( {
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
-				help={ __(
-					'Whether your image should scroll with the page or stay fixed in place.'
-				) }
 			/>
 			<ToggleGroupControl
 				__nextHasNoMarginBottom
@@ -652,7 +694,7 @@ function BackgroundToolsPanel( {
 	return (
 		<VStack
 			as={ ToolsPanel }
-			spacing={ 4 }
+			spacing={ 2 }
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -660,142 +702,6 @@ function BackgroundToolsPanel( {
 		>
 			{ children }
 		</VStack>
-	);
-}
-
-const { Tabs } = unlock( componentsPrivateApis );
-
-function ColorPanelTab( {
-	isGradient,
-	inheritedValue,
-	userValue,
-	setValue,
-	colorGradientControlSettings,
-} ) {
-	return (
-		<ColorGradientControl
-			{ ...colorGradientControlSettings }
-			showTitle={ false }
-			enableAlpha
-			__experimentalIsRenderedInSidebar
-			colorValue={ isGradient ? undefined : inheritedValue }
-			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={ isGradient ? undefined : setValue }
-			onGradientChange={ isGradient ? setValue : undefined }
-			clearable={ inheritedValue === userValue }
-			headingLevel={ 3 }
-		/>
-	);
-}
-
-const LabeledColorIndicators = ( { indicators, label } ) => (
-	<Item>
-		<HStack justify="flex-start">
-			<ZStack isLayered={ false } offset={ -8 }>
-				{ indicators.map( ( indicator, index ) => (
-					<Flex key={ index } expanded={ false }>
-						<ColorIndicator colorValue={ indicator } />
-					</Flex>
-				) ) }
-			</ZStack>
-			<FlexItem
-				className="block-editor-panel-color-gradient-settings__color-name"
-				title={ label }
-			>
-				{ label }
-			</FlexItem>
-		</HStack>
-	</Item>
-);
-
-function ColorPanelDropdown( {
-	label,
-	hasValue,
-	resetValue,
-	isShownByDefault,
-	indicators,
-	tabs,
-	colorGradientControlSettings,
-	panelId,
-} ) {
-	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-	return (
-		<ToolsPanelItem
-			className="block-editor-global-styles-background-panel__image-tools-panel-item"
-			hasValue={ hasValue }
-			label={ label }
-			onDeselect={ resetValue }
-			isShownByDefault={ isShownByDefault }
-			panelId={ panelId }
-		>
-			<Dropdown
-				popoverProps={ BACKGROUND_POPOVER_PROPS }
-				renderToggle={ ( { onToggle, isOpen } ) => {
-					const toggleProps = {
-						onClick: onToggle,
-						className: clsx(
-							'block-editor-panel-color-gradient-settings__dropdown',
-							{ 'is-open': isOpen }
-						),
-						'aria-expanded': isOpen,
-						'aria-label': sprintf(
-							/* translators: %s is the type of color property, e.g., "background" */
-							__( 'Color %s styles' ),
-							label
-						),
-					};
-
-					return (
-						<Button { ...toggleProps }>
-							<LabeledColorIndicators
-								indicators={ indicators }
-								label={ label }
-							/>
-						</Button>
-					);
-				} }
-				renderContent={ () => (
-					<DropdownContentWrapper paddingSize="none">
-						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
-							{ tabs.length > 1 && (
-								<Tabs defaultTabId={ currentTab?.key }>
-									<Tabs.TabList>
-										{ tabs.map( ( tab ) => (
-											<Tabs.Tab
-												key={ tab.key }
-												tabId={ tab.key }
-											>
-												{ tab.label }
-											</Tabs.Tab>
-										) ) }
-									</Tabs.TabList>
-
-									{ tabs.map( ( tab ) => {
-										const { key: tabKey, ...restTabProps } =
-											tab;
-										return (
-											<Tabs.TabPanel
-												key={ tabKey }
-												tabId={ tabKey }
-												focusable={ false }
-											>
-												<ColorPanelTab
-													key={ tabKey }
-													{ ...restTabProps }
-													colorGradientControlSettings={
-														colorGradientControlSettings
-													}
-												/>
-											</Tabs.TabPanel>
-										);
-									} ) }
-								</Tabs>
-							) }
-						</div>
-					</DropdownContentWrapper>
-				) }
-			/>
-		</ToolsPanelItem>
 	);
 }
 
@@ -808,83 +714,49 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
-	headerLabel = __( 'Elements' ),
-	themeFileURIs,
+	headerLabel = __( 'Background image' ),
 } ) {
-	const navigator = useNavigator();
-	const { path } = navigator.location;
+	/*
+	 * Resolve any inherited "ref" pointers.
+	 * Should the block editor need resolved, inherited values
+	 * across all controls, this could be abstracted into a hook,
+	 * e.g., useResolveGlobalStyle
+	 */
+	const { globalStyles, _links } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const _settings = getSettings();
+		return {
+			globalStyles: _settings[ globalStylesDataKey ],
+			_links: _settings[ globalStylesLinksDataKey ],
+		};
+	}, [] );
+	const resolvedInheritedValue = useMemo( () => {
+		const resolvedValues = {
+			background: {},
+		};
 
-	const colors = useColorsPerOrigin( settings );
-	const gradients = useGradientsPerOrigin( settings );
-	const areCustomSolidsEnabled = settings?.color?.custom;
-	const areCustomGradientsEnabled = settings?.color?.customGradient;
-	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
-	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
-	const encodeColorValue = ( colorValue ) => {
-		const allColors = colors.flatMap(
-			( { colors: originColors } ) => originColors
-		);
-		const colorObject = allColors.find(
-			( { color } ) => color === colorValue
-		);
-		return colorObject
-			? 'var:preset|color|' + colorObject.slug
-			: colorValue;
-	};
-	const encodeGradientValue = ( gradientValue ) => {
-		const allGradients = gradients.flatMap(
-			( { gradients: originGradients } ) => originGradients
-		);
-		const gradientObject = allGradients.find(
-			( { gradient } ) => gradient === gradientValue
-		);
-		return gradientObject
-			? 'var:preset|gradient|' + gradientObject.slug
-			: gradientValue;
-	};
+		if ( ! inheritedValue?.background ) {
+			return inheritedValue;
+		}
 
-	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
-	const backgroundColor = decodeValue( inheritedValue?.color?.background );
-	const userBackgroundColor = decodeValue( value?.color?.background );
-	const gradient = decodeValue( inheritedValue?.color?.gradient );
-	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
-	const setBackgroundColor = ( newColor ) => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'background' ],
-			encodeColorValue( newColor )
+		Object.entries( inheritedValue?.background ).forEach(
+			( [ key, backgroundValue ] ) => {
+				resolvedValues.background[ key ] = getResolvedValue(
+					backgroundValue,
+					{
+						styles: globalStyles,
+						_links,
+					}
+				);
+			}
 		);
-		newValue.color.gradient = undefined;
-		onChange( newValue );
-	};
-	const setGradient = ( newGradient ) => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'gradient' ],
-			encodeGradientValue( newGradient )
-		);
-		newValue.color.background = undefined;
-		onChange( newValue );
-	};
-	const resetBackgroundColor = () => {
-		const newValue = setImmutably(
-			value,
-			[ 'color', 'background' ],
-			undefined
-		);
-		newValue.color.gradient = undefined;
-		onChange( newValue );
-	};
+		return resolvedValues;
+	}, [ globalStyles, _links, inheritedValue ] );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
 			background: {},
-			color: undefined,
 		};
 	}, [] );
 
@@ -892,17 +764,24 @@ export default function BackgroundPanel( {
 		onChange( setImmutably( value, [ 'background' ], {} ) );
 
 	const { title, url } = value?.background?.backgroundImage || {
-		...inheritedValue?.background?.backgroundImage,
+		...resolvedInheritedValue?.background?.backgroundImage,
 	};
 	const hasImageValue =
 		hasBackgroundImageValue( value ) ||
-		hasBackgroundImageValue( inheritedValue );
+		hasBackgroundImageValue( resolvedInheritedValue );
+
+	const imageValue =
+		value?.background?.backgroundImage ||
+		inheritedValue?.background?.backgroundImage;
 
 	const shouldShowBackgroundImageControls =
 		hasImageValue &&
+		'none' !== imageValue &&
 		( settings?.background?.backgroundSize ||
 			settings?.background?.backgroundPosition ||
 			settings?.background?.backgroundRepeat );
+
+	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
 
 	return (
 		<Wrapper
@@ -912,92 +791,68 @@ export default function BackgroundPanel( {
 			panelId={ panelId }
 			headerLabel={ headerLabel }
 		>
-			<ItemGroup
-				className="block-editor-global-styles-background-panel__inspector-media-replace-container"
-				isSeparated
-				isBordered
+			<div
+				className={ clsx(
+					'block-editor-global-styles-background-panel__inspector-media-replace-container',
+					{
+						'is-open': isDropDownOpen,
+					}
+				) }
 			>
-				{ shouldShowBackgroundImageControls ? (
-					<BackgroundControlsPanel
-						label={ title }
-						filename={ title }
-						url={ getResolvedThemeFilePath( url, themeFileURIs ) }
-						hasImageValue={ hasImageValue }
-					>
-						<VStack spacing={ 3 } className="single-column">
-							<BackgroundImageControls
-								onChange={ onChange }
-								style={ value }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-								displayInPanel
-								onRemoveImage={ () => {
-									resetBackground();
-								} }
-							/>
-							<BackgroundSizeControls
-								onChange={ onChange }
-								panelId={ panelId }
-								style={ value }
-								defaultValues={ defaultValues }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-							/>
-						</VStack>
-					</BackgroundControlsPanel>
-				) : (
-					<BackgroundImageControls
-						onChange={ onChange }
-						style={ value }
-						inheritedValue={ inheritedValue }
-						themeFileURIs={ themeFileURIs }
-					/>
-				) }
-				{ showBackgroundPanel && path === '/background' && (
-					<ColorPanelDropdown
-						key="background"
-						label={ __( 'Color' ) }
-						hasValue={ hasBackground }
-						resetValue={ resetBackgroundColor }
-						isShownByDefault={ defaultControls.background }
-						indicators={ [ gradient ?? backgroundColor ] }
-						tabs={ [
-							hasSolidColors && {
-								key: 'background',
-								label: __( 'Background' ),
-								inheritedValue: backgroundColor,
-								setValue: setBackgroundColor,
-								userValue: userBackgroundColor,
-							},
-							hasGradientColors && {
-								key: 'gradient',
-								label: __( 'Gradient' ),
-								inheritedValue: gradient,
-								setValue: setGradient,
-								userValue: userGradient,
-								isGradient: true,
-							},
-						].filter( Boolean ) }
-						colorGradientControlSettings={ {
-							colors,
-							disableCustomColors: ! areCustomSolidsEnabled,
-							gradients,
-							disableCustomGradients: ! areCustomGradientsEnabled,
-						} }
-						panelId={ panelId }
-					/>
-				) }
-			</ItemGroup>
-
-			{ /* Dummy ToolsPanel items, so we can control what's in the dropdown popover */ }
-			<ToolsPanelItem
-				hasValue={ () => hasImageValue }
-				label={ __( 'Image' ) }
-				onDeselect={ resetBackground }
-				isShownByDefault={ defaultControls.backgroundImage }
-				panelId={ panelId }
-				className="block-editor-global-styles-background-panel__hidden-tools-panel-item"
-			/>
+				<ToolsPanelItem
+					hasValue={ () => !! value?.background }
+					label={ __( 'Image' ) }
+					onDeselect={ resetBackground }
+					isShownByDefault={ defaultControls.backgroundImage }
+					panelId={ panelId }
+				>
+					{ shouldShowBackgroundImageControls ? (
+						<BackgroundControlsPanel
+							label={ title }
+							filename={ title }
+							url={ url }
+							onToggle={ setIsDropDownOpen }
+							hasImageValue={ hasImageValue }
+						>
+							<VStack spacing={ 3 } className="single-column">
+								<BackgroundImageControls
+									onChange={ onChange }
+									style={ value }
+									inheritedValue={ resolvedInheritedValue }
+									displayInPanel
+									onResetImage={ () => {
+										setIsDropDownOpen( false );
+										resetBackground();
+									} }
+									onRemoveImage={ () =>
+										setIsDropDownOpen( false )
+									}
+									defaultValues={ defaultValues }
+								/>
+								<BackgroundSizeControls
+									onChange={ onChange }
+									panelId={ panelId }
+									style={ value }
+									defaultValues={ defaultValues }
+									inheritedValue={ resolvedInheritedValue }
+								/>
+							</VStack>
+						</BackgroundControlsPanel>
+					) : (
+						<BackgroundImageControls
+							onChange={ onChange }
+							style={ value }
+							inheritedValue={ resolvedInheritedValue }
+							defaultValues={ defaultValues }
+							onResetImage={ () => {
+								setIsDropDownOpen( false );
+								resetBackground();
+							} }
+							onRemoveImage={ () => setIsDropDownOpen( false ) }
+						/>
+					) }
+				</ToolsPanelItem>
+			</div>
 		</Wrapper>
 	);
 }

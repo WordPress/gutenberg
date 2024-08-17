@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { getCSSRules } from '@wordpress/style-engine';
+import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
@@ -24,6 +24,7 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
+	getResolvedValue,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -36,7 +37,6 @@ import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
-import { setThemeFileUris } from './theme-file-uri-utils';
 
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
@@ -53,21 +53,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 const { kebabCase } = unlock( componentsPrivateApis );
-
-function compileStyleValue( uncompiledValue ) {
-	const VARIABLE_REFERENCE_PREFIX = 'var:';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-
-	if ( uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
 
 /**
  * Transform given preset tree into a set of style declarations.
@@ -371,7 +356,7 @@ export function getStylesDeclarations(
 						? name
 						: kebabCase( name );
 					declarations.push(
-						`${ cssProperty }: ${ compileStyleValue(
+						`${ cssProperty }: ${ getCSSValueFromRawStyle(
 							getValueFromObjectPath( styleValue, [ prop ] )
 						) }`
 					);
@@ -383,7 +368,7 @@ export function getStylesDeclarations(
 					? key
 					: kebabCase( key );
 				declarations.push(
-					`${ cssProperty }: ${ compileStyleValue(
+					`${ cssProperty }: ${ getCSSValueFromRawStyle(
 						getValueFromObjectPath( blockStyles, pathToValue )
 					) }`
 				);
@@ -395,21 +380,40 @@ export function getStylesDeclarations(
 	);
 
 	/*
-	 * Set background defaults.
-	 * Applies to all background styles except the top-level site background.
+	 * Preprocess background image values.
+	 *
+	 * Note: As we absorb more and more styles into the engine, we could simplify this function.
+	 * A refactor is for the style engine to handle ref resolution (and possibly defaults)
+	 * via a public util used internally and externally. Theme.json tree and defaults could be passed
+	 * as options.
 	 */
-	if ( ! isRoot && !! blockStyles.background ) {
-		blockStyles = {
-			...blockStyles,
-			background: {
-				...blockStyles.background,
-				...setBackgroundStyleDefaults( blockStyles.background ),
-			},
-		};
+	if ( !! blockStyles.background ) {
+		/*
+		 * Resolve dynamic values before they are compiled by the style engine,
+		 * which doesn't (yet) resolve dynamic values.
+		 */
+		if ( blockStyles.background?.backgroundImage ) {
+			blockStyles.background.backgroundImage = getResolvedValue(
+				blockStyles.background.backgroundImage,
+				tree
+			);
+		}
+
+		/*
+		 * Set default values for block background styles.
+		 * Top-level styles are an exception as they are applied to the body.
+		 */
+		if ( ! isRoot && !! blockStyles.background?.backgroundImage?.id ) {
+			blockStyles = {
+				...blockStyles,
+				background: {
+					...blockStyles.background,
+					...setBackgroundStyleDefaults( blockStyles.background ),
+				},
+			};
+		}
 	}
 
-	// The goal is to move everything to server side generated engine styles
-	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
@@ -424,18 +428,7 @@ export function getStylesDeclarations(
 			? rule.key
 			: kebabCase( rule.key );
 
-		let ruleValue = rule.value;
-		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
-			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = compileStyleValue(
-				getValueFromObjectPath( tree, refPath )
-			);
-			// Presence of another ref indicates a reference to another dynamic value.
-			// Pointing to another dynamic value is not supported.
-			if ( ! ruleValue || ruleValue?.ref ) {
-				return;
-			}
-		}
+		let ruleValue = getResolvedValue( rule.value, tree, null );
 
 		// Calculate fluid typography rules where available.
 		if ( cssProperty === 'font-size' ) {
@@ -544,10 +537,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `.${ className }${
+										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -1398,10 +1391,6 @@ export function useGlobalStylesOutputWithConfig(
 	disableRootPadding
 ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
-	mergedConfig = setThemeFileUris(
-		mergedConfig,
-		mergedConfig?._links?.[ 'wp:theme-file' ]
-	);
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {

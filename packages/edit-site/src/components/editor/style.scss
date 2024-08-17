@@ -22,7 +22,6 @@
 	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 	view-transition-name: toggle;
 	/* stylelint-enable */
-	position: fixed;
 	top: 0;
 	left: 0;
 	height: $header-height;
@@ -72,5 +71,7 @@
 
 	&.has-site-icon {
 		background-color: hsla(0, 0%, 100%, 0.6);
+		-webkit-backdrop-filter: saturate(180%) blur(15px);
+		backdrop-filter: saturate(180%) blur(15px);
 	}
 }

@@ -547,7 +547,7 @@ _Returns_
 
 > **Deprecated**
 
-This function was accidentially exposed for mobile/native usage.
+This function was accidentally exposed for mobile/native usage.
 
 _Returns_
 
@@ -920,20 +920,15 @@ _Usage_
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
+	const blockProps = useBlockProps( {
+		className: 'my-custom-class',
+		style: {
+			color: '#222222',
+			backgroundColor: '#eeeeee',
+		},
+	} );
 
-  const blockProps = useBlockProps(
-    className: 'my-custom-class',
-    style: {
-      color: '#222222',
-      backgroundColor: '#eeeeee'
-    }
-  )
-
-  return (
-    <div { ...blockProps }>
-
-    </div>
-  )
+	return <div { ...blockProps }></div>;
 }
 ```
 

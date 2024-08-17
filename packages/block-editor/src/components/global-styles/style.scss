@@ -166,6 +166,17 @@
 			color: var(--wp-admin-theme-color);
 		}
 	}
+
+	.block-editor-global-styles-background-panel__loading {
+		height: 100%;
+		position: absolute;
+		z-index: 1;
+		width: 100%;
+		padding: 10px 0 0 0;
+		svg {
+			margin: 0;
+		}
+	}
 }
 
 .block-editor-global-styles-background-panel__image-preview-content,
@@ -218,12 +229,6 @@
 	.components-focal-point-picker::after {
 		content: none;
 	}
-}
-
-.block-editor-global-styles-background-panel__hidden-tools-panel-item {
-	height: 0;
-	width: 0;
-	position: absolute;
 }
 
 // Push control panel into the background when the media modal is open.

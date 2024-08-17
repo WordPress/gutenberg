@@ -259,7 +259,6 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 								<Button
 									icon={ dragHandle }
 									className="block-selection-button_drag-handle"
-									aria-hidden="true"
 									label={ dragHandleLabel }
 									// Should not be able to tab to drag handle as this
 									// button can only be used with a pointer device.

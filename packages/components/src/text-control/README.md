@@ -62,6 +62,7 @@ const MyTextControl = () => {
 
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
 			label="Additional CSS Class"
 			value={ className }
 			onChange={ ( value ) => setClassName( value ) }

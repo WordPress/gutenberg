@@ -70,11 +70,10 @@ export default function PostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, getCurrentPostType } =
+		const { isEditorPanelRemoved } =
 			select( editorStore );
 		return {
 			isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
-			postType: getCurrentPostType(),
 		};
 	}, [] );
 
@@ -85,11 +84,7 @@ export default function PostSummary( { onActionPerformed } ) {
 					<>
 						<VStack spacing={ 4 }>
 							<PostCardPanel
-								actions={
-									<PostActions
-										onActionPerformed={ onActionPerformed }
-									/>
-								}
+								onActionPerformed={ onActionPerformed }
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />

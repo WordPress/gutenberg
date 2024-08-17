@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../../utils';
+import { COLORS, CONFIG } from '../../utils';
 import type {
 	AlignmentMatrixControlProps,
 	AlignmentMatrixControlCellProps,
@@ -15,7 +15,7 @@ import type {
 
 export const rootBase = () => {
 	return css`
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusMedium };
 		box-sizing: border-box;
 		direction: ltr;
 		display: grid;
