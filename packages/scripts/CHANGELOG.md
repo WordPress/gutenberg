@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 28.6.0 (2024-08-17)
+
+-   Fixed the issue with `@wordpress/scripts` having 5 high severity vulnerabilities by upgrading the `puppeteer-core` package to the latest version (23.1.0).
+
 ## 28.5.0 (2024-08-07)
 
 ## 28.4.0 (2024-07-24)
