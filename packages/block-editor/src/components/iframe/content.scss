@@ -1,22 +1,3 @@
-iframe[name="editor-canvas"].is-zoomed-out {
-	$max-width: 750px; // This is also hardcoded as ZOOM_OUT_MAX_WIDTH in the iframe component and needs to be manually kept in sync.
-	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
-	$inset: var(--wp-block-editor-iframe-zoom-out-inset);
-	position: relative;
-	inset: $inset;
-	outline: calc(1px / #{$scale}) solid rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
-	transform: scale(#{$scale});
-	transform-origin: 50% 0;
-	// Transform scale doesn’t affect the layout size of the element, so counterscale
-	// the width, height and negative margins to fit the untransformed size.
-	width: calc((100% - #{$inset} * 2) / #{$scale});
-	height: calc((100% - #{$inset} * 2) / #{$scale});
-	margin-block: 0 calc(-100% / #{$scale});
-	$inset-max-width: "(#{$max-width} - #{$inset} * 2)";
-	max-width: calc(#{$inset-max-width} / #{$scale});
-	margin-inline: calc(max(-50% + #{$inset}, -0.5 * #{$inset-max-width}) / #{$scale} + 50% - #{$inset});
-}
-
 .block-editor-iframe__html {
 	// Keeps body background styles from being clipped.
 	// See: https://github.com/WordPress/gutenberg/issues/44374#issuecomment-1260784743
@@ -24,6 +5,9 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	// Keeps body background image from repeating.
 	// See: https://github.com/WordPress/gutenberg/issues/46782
 	min-height: 100%;
+	// Keeps the scrollbar gutter present to avoid a minor layout shift in case zoom out
+	// increases the height enough to remove overflow.
+	overflow-y: scroll;
 }
 
 .block-editor-iframe__html.is-zoomed-out {
