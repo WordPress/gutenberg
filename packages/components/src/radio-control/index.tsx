@@ -90,7 +90,7 @@ export function RadioControl(
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
 			{ hideLabelFromVision ? (
-				<VisuallyHidden>{ label }</VisuallyHidden>
+				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
 			) : (
 				<BaseControl.VisualLabel as="legend">
 					{ label }
