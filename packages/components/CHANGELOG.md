@@ -61,6 +61,7 @@
 
 -   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
 -   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
+-   `RadioGroup`: use fieldset and legend to group radio inputs ([#64582](https://github.com/WordPress/gutenberg/pull/64582)).
 
 ### Internal
 
