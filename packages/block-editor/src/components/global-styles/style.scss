@@ -71,72 +71,41 @@
 	direction: ltr;
 }
 
+
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	// Full width. ToolsPanel lays out children in a grid.
+	grid-column: 1 / -1;
 
-	& > div {
-		width: 100%;
-
-		&:not(:only-child):nth-child(1 of &) {
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-		}
-
-		// Identify the last visible instance as placeholder items will not have this class.
-		&:not(:only-child):nth-last-child(1 of &) {
-			border-top-left-radius: 0;
-			border-top-right-radius: 0;
-		}
-
-		&:only-child {
-			> div {
-				border-bottom: 0;
-			}
-		}
-
-		> div,
-		> div > div,
-		> div > button,
-		> div > div > button {
-			border-radius: inherit;
-		}
-	}
-
-	.components-item {
-		padding: 0;
-
-		&.block-editor-global-styles-background-panel__dropdown-toggle {
-			&.is-open {
-				background-color: $gray-100;
-			}
-			padding: 6px 12px;
-		}
+	&.is-open {
+		background-color: $gray-100;
 	}
 
 	.block-editor-global-styles-background-panel__image-tools-panel-item {
+		padding: 0;
+		flex-grow: 1;
 		border: 0;
-	}
-
-	.block-editor-panel-color-gradient-settings__dropdown {
-		&.is-open {
-			background-color: $gray-100;
+		.components-dropdown {
+			display: block;
 		}
 	}
 
-	.block-editor-global-styles-background-panel__dropdown-toggle {
-		&:focus {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
-			outline: 3px solid transparent;
-			border-radius: inherit;
-		}
+	.block-editor-global-styles-background-panel__color-tools-panel-item {
+		padding: 0;
+	}
+
+	.block-editor-global-styles-background-panel__inspector-preview-inner {
+		height: 100%;
+	}
+
+	.components-dropdown {
+		display: block;
+		height: 36px;
 	}
 }
 
 .block-editor-global-styles-background-panel__image-tools-panel-item {
-
-	.block-editor-global-styles-background-panel__image-preview {
-		padding: 0;
-	}
-
 	border: 1px solid $gray-300;
 	border-radius: 2px;
 
@@ -165,6 +134,10 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		&:focus {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
 	}
 
 	.block-editor-global-styles-background-panel__loading {
@@ -179,6 +152,14 @@
 	}
 }
 
+.block-editor-global-styles-background-panel__color-tools-panel-item {
+
+	button.components-button {
+
+		padding: 0;
+	}
+}
+
 .block-editor-global-styles-background-panel__image-preview-content,
 .block-editor-global-styles-background-panel__dropdown-toggle {
 	height: 100%;
@@ -190,6 +171,16 @@
 	cursor: pointer;
 	background: transparent;
 	border: none;
+
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: none;
+	}
 }
 
 .block-editor-global-styles-background-panel__inspector-media-replace-title {
@@ -199,6 +190,14 @@
 
 	// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
 	text-align: start;
+}
+
+.block-editor-global-styles-background-panel__inspector-preview-inner {
+	.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
+		width: 20px;
+		height: 20px;
+		min-width: auto;
+	}
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
@@ -234,6 +233,12 @@
 // Push control panel into the background when the media modal is open.
 .modal-open .block-editor-global-styles-background-panel__popover {
 	z-index: z-index(".block-editor-global-styles-background-panel__popover");
+}
+
+.block-editor-global-styles-background-panel__popover {
+	.block-editor-global-styles-background-panel__image-tools-panel-item {
+		padding: 0;
+	}
 }
 
 .block-editor-global-styles-background-panel__media-replace-popover {
