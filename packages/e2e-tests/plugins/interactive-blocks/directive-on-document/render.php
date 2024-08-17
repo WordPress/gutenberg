@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-on-document-view' );
 ?>
 
 <div data-wp-interactive="directive-on-document">
@@ -25,5 +23,9 @@ wp_enqueue_script_module( 'directive-on-document-view' );
 		>
 			<p data-wp-text="state.counter" data-testid="counter">0</p>
 		</div>
+	</div>
+	<div data-wp-on-document--keydown="actions.keydownHandler" data-wp-on-document--keydown--second="actions.keydownSecondHandler">
+		<p data-wp-text="state.keydownHandler" data-testid="keydownHandler">no</p>
+		<p data-wp-text="state.keydownSecondHandler" data-testid="keydownSecondHandler">no</p>
 	</div>
 </div>

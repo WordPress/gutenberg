@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'with-scope-view' );
 ?>
 
 <div data-wp-interactive="with-scope" data-wp-context='{"asyncCounter": 0, "syncCounter": 0}' data-wp-init--a='callbacks.asyncInit' data-wp-init--b='callbacks.syncInit'>

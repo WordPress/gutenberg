@@ -86,7 +86,7 @@ exports[`Blocks raw handling pasteHandler wordpress 1`] = `"Howdy<br>This is a p
 
 exports[`Blocks raw handling should correctly handle quotes with mixed content 1`] = `
 "<!-- wp:quote -->
-<blockquote class="wp-block-quote"><!-- wp:heading {"level":1} -->
+<blockquote class="wp-block-quote"><!-- wp:heading {"level":1,"className":"wp-block-heading"} -->
 <h1 class="wp-block-heading">chicken</h1>
 <!-- /wp:heading -->
 

@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+### Internal
+
+-   Upgrade `@octokit/webhooks` dependency ([#62666](https://github.com/WordPress/gutenberg/pull/62666)).
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 1.57.0 (2024-05-16)
+
+## 1.56.0 (2024-05-02)
+
+## 1.55.0 (2024-04-19)
+
+## 1.54.0 (2024-04-03)
+
+## 1.53.0 (2024-03-21)
+
+## 1.52.0 (2024-03-06)
+
 ## 1.51.0 (2024-02-21)
 
 ## 1.50.0 (2024-02-09)
@@ -74,12 +106,12 @@
 
 ## 1.4.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 -   The "Add First Time Contributor Label" task now prompts the user to link their GitHub account to their WordPress.org profile if necessary for props credit. The task has been renamed "First Time Contributor".
 
-### Improvements
+### Enhancements
 
 -   The "Add First Time Contributor Label" task now runs retroactively on pushes to trunk, due to [permission constraints](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token) of GitHub Actions.
 

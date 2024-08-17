@@ -21,14 +21,18 @@ const MAX_MONTHS_TO_QUERY = 4;
 
 // The following paths will be ignored when generating the issue content.
 const IGNORED_PATHS = [
+	'init.php', // plugin specific code.
 	'lib/load.php', // plugin specific code.
 	'lib/experiments-page.php', // experiments are plugin specific.
 	'packages/e2e-tests/plugins', // PHP files related to e2e tests only.
-	'packages/block-library', // this is handled automatically.
+	'packages/block-library', // packages are synced to WP Core via npm packages.
 ];
 
 // PRs containing the following labels will be ignored when generating the issue content.
-const LABELS_TO_IGNORE = [ 'Backport from WordPress Core' ];
+const LABELS_TO_IGNORE = [
+	'Backport from WordPress Core', // PRs made "upstream" in Core that were synced back into Gutenberg.
+	'Backported to WP Core', // PRs that were synced into Core during a previous release.
+];
 
 const MAX_NESTING_LEVEL = 3;
 
@@ -72,28 +76,6 @@ async function main() {
 		process.exit( 1 );
 	}
 
-	const lastRcDateArg = getArg( 'lastrcdate' );
-	let lastRcDate;
-
-	if ( lastRcDateArg ) {
-		if (
-			validateDate( lastRcDateArg ) &&
-			isAfter( lastRcDateArg, since )
-		) {
-			lastRcDate = lastRcDateArg;
-		} else {
-			console.error(
-				`Error: The --lastrcdate argument must be a date after the --since date.`
-			);
-			process.exit( 1 );
-		}
-	} else {
-		console.error(
-			`Error: The --lastrcdate argument is required (e.g. YYYY-MM-DD).`
-		);
-		process.exit( 1 );
-	}
-
 	console.log( 'Welcome to the PHP Sync Issue Generator!' );
 
 	console.log( '--------------------------------' );
@@ -126,11 +108,7 @@ async function main() {
 		commits.map( async ( commit ) => {
 			const commitData = await fetchCommit( commit.sha );
 
-			// In the future we will want to exclude PRs based on label
-			// so we will need to fetch the full PR data for each commit.
-			// For now we can just set this to null.
-			const fullPRData = null;
-			// const fullPRData = getPullRequestDataForCommit( commit.sha );
+			const fullPRData = await getPullRequestDataForCommit( commit.sha );
 
 			// Our Issue links to the PRs associated with the commits so we must
 			// provide this data. We could also get the PR data from the commit data,
@@ -154,18 +132,6 @@ async function main() {
 				)
 			) {
 				return null;
-			}
-
-			// This is temporarily required because PRs merged between Beta 1 (since)
-			// and the final RC may have already been manually backported to Core.
-			// This is however no reliable way to identify these PRs as the `Backport to WP beta/RC`
-			// label is manually removed once the PR has been backported.
-			// In future releases we will add a **new** label `Backported`
-			// to indicate the PR was backported to Core.
-			// As a result, in the future we will be able to exclude any PRs that have
-			// already been backported using the `Backported` label.
-			if ( isAfter( lastRcDate, commitData.commit.committer.date ) ) {
-				commitData.isBeforeLastRCDate = true;
 			}
 
 			return commitData;
@@ -426,12 +392,8 @@ function processCommits( commits ) {
 	return result;
 }
 
-function formatPRLine( { pullRequest: pr, isBeforeLastRCDate } ) {
-	return `- [ ] ${ pr.url } - @${
-		pr.creator
-	} | Trac ticket | Core backport PR ${
-		isBeforeLastRCDate ? '(⚠️ Check for existing WP Core backport)' : ''
-	}\n`;
+function formatPRLine( { pullRequest: pr } ) {
+	return `- [ ] ${ pr.url } - @${ pr.creator } | Trac ticket | Core backport PR \n`;
 }
 
 function formatHeading( level, key ) {
@@ -466,7 +428,7 @@ function generateIssueContent( result, level = 1 ) {
 }
 
 async function fetchAllCommits( since, path ) {
-	return await octokitPaginate( 'GET /repos/{owner}/{repo}/commits', {
+	return octokitPaginate( 'GET /repos/{owner}/{repo}/commits', {
 		since,
 		per_page: 30,
 		path,
@@ -481,7 +443,7 @@ async function fetchCommit( sha ) {
 
 // eslint-disable-next-line no-unused-vars
 async function getPullRequestDataForCommit( commitSha ) {
-	const pullRequests = octokitRequest(
+	const pullRequests = await octokitRequest(
 		'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',
 		{
 			commit_sha: commitSha,

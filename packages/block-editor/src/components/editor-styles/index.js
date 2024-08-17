@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -67,7 +67,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
-export default function EditorStyles( { styles, scope } ) {
+function EditorStyles( { styles, scope } ) {
 	const overrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		[]
@@ -124,3 +124,5 @@ export default function EditorStyles( { styles, scope } ) {
 		</>
 	);
 }
+
+export default memo( EditorStyles );

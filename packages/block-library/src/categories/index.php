@@ -8,6 +8,8 @@
 /**
  * Renders the `core/categories` block on server.
  *
+ * @since 5.0.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the categories list/dropdown markup.
@@ -32,7 +34,10 @@ function render_block_core_categories( $attributes ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
 		$args['show_option_none'] = __( 'Select Category' );
-		$wrapper_markup           = '<div %1$s><label class="screen-reader-text" for="' . esc_attr( $id ) . '">' . __( 'Categories' ) . '</label>%2$s</div>';
+		$show_label               = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
+		$default_label            = __( 'Categories' );
+		$label_text               = ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+		$wrapper_markup           = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">' . $label_text . '</label>%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
 
@@ -63,6 +68,8 @@ function render_block_core_categories( $attributes ) {
 /**
  * Generates the inline script for a categories dropdown field.
  *
+ * @since 5.0.0
+ *
  * @param string $dropdown_id ID of the dropdown field.
  *
  * @return string Returns the dropdown onChange redirection script.
@@ -87,6 +94,8 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 
 /**
  * Registers the `core/categories` block on server.
+ *
+ * @since 5.0.0
  */
 function register_block_core_categories() {
 	register_block_type_from_metadata(

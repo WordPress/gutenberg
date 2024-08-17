@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	humanTimeDiff,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -64,7 +68,9 @@ export default function Edit( {
 	let commentDate =
 		date instanceof Date ? (
 			<time dateTime={ dateI18n( 'c', date ) }>
-				{ dateI18n( format || siteFormat, date ) }
+				{ format === 'human-diff'
+					? humanTimeDiff( date )
+					: dateI18n( format || siteFormat, date ) }
 			</time>
 		) : (
 			<time>{ date }</time>

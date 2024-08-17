@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -40,7 +41,7 @@ const identity = ( value: string ) => value;
  * Tokens are separated by the "," character. Suggestions can be selected with the up or down arrows and added with the tab or enter key.
  *
  * The `value` property is handled in a manner similar to controlled form components.
- * See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
+ * See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
  */
 export function FormTokenField( props: FormTokenFieldProps ) {
 	const {
@@ -76,6 +77,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__nextHasNoMarginBottom = false,
 		tokenizeOnBlur = false,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
+			since: '6.7',
+			version: '7.0',
+			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+		} );
+	}
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -644,7 +653,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			autoCapitalize,
 			autoComplete,
 			placeholder: value.length === 0 ? placeholder : '',
-			key: 'input',
 			disabled,
 			value: incompleteTokenValue,
 			onBlur,
@@ -654,6 +662,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 		return (
 			<TokenInput
+				key="input"
 				{ ...inputProps }
 				onChange={
 					! ( maxLength && value.length >= maxLength )
@@ -665,7 +674,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		);
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		className,
 		'components-form-token-field__input-container',
 		{
@@ -694,12 +703,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<StyledLabel
-				htmlFor={ `components-form-token-input-${ instanceId }` }
-				className="components-form-token-field__label"
-			>
-				{ label }
-			</StyledLabel>
+			{ label && (
+				<StyledLabel
+					htmlFor={ `components-form-token-input-${ instanceId }` }
+					className="components-form-token-field__label"
+				>
+					{ label }
+				</StyledLabel>
+			) }
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
@@ -711,7 +722,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
-					wrap={ true }
+					wrap
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>

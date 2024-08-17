@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
+## 8.3.0 (2024-07-10)
+
+## 8.2.0 (2024-06-26)
+
+## 8.1.0 (2024-06-15)
+
+## 8.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 7.29.0 (2024-05-16)
+
+## 7.28.0 (2024-05-02)
+
+## 7.27.0 (2024-04-19)
+
+## 7.26.0 (2024-04-03)
+
+## 7.25.0 (2024-03-21)
+
+## 7.24.0 (2024-03-06)
+
 ## 7.23.0 (2024-02-21)
 
 ## 7.22.0 (2024-02-09)
@@ -52,7 +81,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 6.5.0 (2023-03-01)
 
@@ -78,7 +107,7 @@
 
 ## 5.3.0 (2022-10-05)
 
-### New features
+### New Features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).
 
@@ -86,7 +115,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -137,7 +166,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   Added Axe (the Accessibility Engine) API integration with e2e tests suite.
 

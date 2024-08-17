@@ -21,7 +21,9 @@ import type { HexInputProps } from './types';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
-		if ( ! nextValue ) return;
+		if ( ! nextValue ) {
+			return;
+		}
 		const hexValue = nextValue.startsWith( '#' )
 			? nextValue
 			: '#' + nextValue;

@@ -8,7 +8,6 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useHasBlockToolbar } from '../block-toolbar/use-has-block-toolbar';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -16,58 +15,58 @@ import { useHasBlockToolbar } from '../block-toolbar/use-has-block-toolbar';
  * @return {Object} Object of which block tools will be shown.
  */
 export function useShowBlockTools() {
-	const hasBlockToolbar = useHasBlockToolbar();
+	return useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getFirstMultiSelectedBlockClientId,
+			getBlock,
+			getBlockMode,
+			getSettings,
+			hasMultiSelection,
+			__unstableGetEditorMode,
+			isTyping,
+		} = select( blockEditorStore );
 
-	return useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getFirstMultiSelectedBlockClientId,
-				getBlock,
-				getSettings,
-				hasMultiSelection,
-				__unstableGetEditorMode,
-				isTyping,
-			} = select( blockEditorStore );
+		const clientId =
+			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-			const clientId =
-				getSelectedBlockClientId() ||
-				getFirstMultiSelectedBlockClientId();
+		const block = getBlock( clientId );
+		const editorMode = __unstableGetEditorMode();
+		const hasSelectedBlock = !! clientId && !! block;
+		const isEmptyDefaultBlock =
+			hasSelectedBlock &&
+			isUnmodifiedDefaultBlock( block ) &&
+			getBlockMode( clientId ) !== 'html';
+		const _showEmptyBlockSideInserter =
+			clientId &&
+			! isTyping() &&
+			editorMode === 'edit' &&
+			isEmptyDefaultBlock;
+		const maybeShowBreadcrumb =
+			hasSelectedBlock &&
+			! hasMultiSelection() &&
+			editorMode === 'navigation';
 
-			const { name = '', attributes = {} } = getBlock( clientId ) || {};
-			const editorMode = __unstableGetEditorMode();
-			const hasSelectedBlock = clientId && name;
-			const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( {
-				name,
-				attributes,
-			} );
-			const _showEmptyBlockSideInserter =
-				clientId &&
-				! isTyping() &&
-				editorMode === 'edit' &&
-				isUnmodifiedDefaultBlock( { name, attributes } );
-			const maybeShowBreadcrumb =
-				hasSelectedBlock &&
-				! hasMultiSelection() &&
-				( editorMode === 'navigation' || editorMode === 'zoom-out' );
+		const isZoomOut = editorMode === 'zoom-out';
+		const _showZoomOutToolbar =
+			isZoomOut &&
+			block?.attributes?.align === 'full' &&
+			! _showEmptyBlockSideInserter &&
+			! maybeShowBreadcrumb;
+		const _showBlockToolbarPopover =
+			! _showZoomOutToolbar &&
+			! getSettings().hasFixedToolbar &&
+			! _showEmptyBlockSideInserter &&
+			hasSelectedBlock &&
+			! isEmptyDefaultBlock &&
+			! maybeShowBreadcrumb;
 
-			return {
-				showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
-				showBreadcrumb:
-					! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
-				showBlockToolbarPopover:
-					hasBlockToolbar &&
-					! getSettings().hasFixedToolbar &&
-					! _showEmptyBlockSideInserter &&
-					hasSelectedBlock &&
-					! isEmptyDefaultBlock &&
-					! maybeShowBreadcrumb,
-				showFixedToolbar:
-					editorMode !== 'zoom-out' &&
-					hasBlockToolbar &&
-					getSettings().hasFixedToolbar,
-			};
-		},
-		[ hasBlockToolbar ]
-	);
+		return {
+			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
+			showBreadcrumb:
+				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
+			showBlockToolbarPopover: _showBlockToolbarPopover,
+			showZoomOutToolbar: _showZoomOutToolbar,
+		};
+	}, [] );
 }

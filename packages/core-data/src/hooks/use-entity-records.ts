@@ -4,6 +4,7 @@
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,6 +13,7 @@ import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
+import { unlock } from '../lock-unlock';
 
 interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
@@ -151,4 +153,52 @@ export function __experimentalUseEntityRecords(
 		since: '6.1',
 	} );
 	return useEntityRecords( kind, name, queryArgs, options );
+}
+
+export function useEntityRecordsWithPermissions< RecordType >(
+	kind: string,
+	name: string,
+	queryArgs: Record< string, unknown > = {},
+	options: Options = { enabled: true }
+): EntityRecordsResolution< RecordType > {
+	const entityConfig = useSelect(
+		( select ) => select( coreStore ).getEntityConfig( kind, name ),
+		[ kind, name ]
+	);
+	const { records: data, ...ret } = useEntityRecords(
+		kind,
+		name,
+		queryArgs,
+		options
+	);
+	const ids = useMemo(
+		() =>
+			data?.map(
+				// @ts-ignore
+				( record: RecordType ) => record[ entityConfig?.key ?? 'id' ]
+			) ?? [],
+		[ data, entityConfig?.key ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordsPermissions } = unlock(
+				select( coreStore )
+			);
+			return getEntityRecordsPermissions( kind, name, ids );
+		},
+		[ ids, kind, name ]
+	);
+
+	const dataWithPermissions = useMemo(
+		() =>
+			data?.map( ( record, index ) => ( {
+				// @ts-ignore
+				...record,
+				permissions: permissions[ index ],
+			} ) ) ?? [],
+		[ data, permissions ]
+	);
+
+	return { records: dataWithPermissions, ...ret };
 }

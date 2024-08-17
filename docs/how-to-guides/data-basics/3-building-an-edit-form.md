@@ -120,7 +120,7 @@ Great! We now have a basic user interface to work with.
 
 We want the `EditPageForm` to display the title of the currently edited page. You may have noticed that it doesn't receive a `page` prop, only `pageId`. That's okay. Gutenberg Data allows us to easily access entity records from any component.
 
-In this case, we need to use the [`getEntityRecord`](/docs/reference-guides/data/data-core/#getentityrecord) selector. The list of records is already available thanks to the `getEntityRecords` call in `MyFirstApp`, so there won't even be any additional HTTP requests involved – we'll get the cached record right away.
+In this case, we need to use the [`getEntityRecord`](/docs/reference-guides/data/data-core.md#getentityrecord) selector. The list of records is already available thanks to the `getEntityRecords` call in `MyFirstApp`, so there won't even be any additional HTTP requests involved – we'll get the cached record right away.
 
 Here's how you can try it in your browser's dev tools:
 
@@ -215,7 +215,7 @@ As you can see, the `title` of an Entity Record is an object, but the `title` of
 
 This is no accident. Fields like `title`, `excerpt`, and `content` may contain [shortcodes](https://developer.wordpress.org/apis/handbook/shortcode/) or [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md), which means they can only be rendered on the server. For such fields, the REST API exposes both the `raw` markup _and_ the `rendered` string. For example, in the block editor, `content.rendered` could used as a visual preview, and `content.raw` could be used to populate the code editor.
 
-So why is the `content` of an Edited Entity Record a string? Since Javascript is not be able to properly render arbitrary block markup, it stores only the `raw` markup without the `rendered` part. And since that's a string, the entire field becomes a string.
+So why is the `content` of an Edited Entity Record a string? Since JavaScript is not be able to properly render arbitrary block markup, it stores only the `raw` markup without the `rendered` part. And since that's a string, the entire field becomes a string.
 
 We can now update `EditPageForm` accordingly. We can access the actions using the [`useDispatch`](/packages/data/README.md#usedispatch) hook similarly to how we use `useSelect` to access selectors:
 

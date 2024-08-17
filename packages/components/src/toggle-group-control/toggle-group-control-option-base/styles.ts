@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { CONFIG, COLORS, reduceMotion } from '../../utils';
+import { CONFIG, COLORS } from '../../utils';
 import type {
 	ToggleGroupControlProps,
 	ToggleGroupControlOptionBaseProps,
@@ -37,7 +37,7 @@ export const buttonView = ( {
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusXSmall };
 	color: ${ COLORS.gray[ 700 ] };
 	fill: currentColor;
 	cursor: pointer;
@@ -50,17 +50,23 @@ export const buttonView = ( {
 	padding: 0 12px;
 	position: relative;
 	text-align: center;
-	transition:
-		background ${ CONFIG.transitionDurationFast } linear,
-		color ${ CONFIG.transitionDurationFast } linear,
-		font-weight 60ms linear;
-	${ reduceMotion( 'transition' ) }
+	@media not ( prefers-reduced-motion ) {
+		transition:
+			background ${ CONFIG.transitionDurationFast } linear,
+			color ${ CONFIG.transitionDurationFast } linear,
+			font-weight 60ms linear;
+	}
 	user-select: none;
 	width: 100%;
 	z-index: 2;
 
 	&::-moz-focus-inner {
 		border: 0;
+	}
+
+	&[disabled] {
+		opacity: 0.4;
+		cursor: default;
 	}
 
 	&:active {
@@ -116,7 +122,7 @@ const isIconStyles = ( {
 
 export const backdropView = css`
 	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusXSmall };
 	position: absolute;
 	inset: 0;
 	z-index: 1;

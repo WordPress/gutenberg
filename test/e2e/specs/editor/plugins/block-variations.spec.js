@@ -133,7 +133,7 @@ test.describe( 'Block variations', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Select the quote block.
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		await expect(
 			page

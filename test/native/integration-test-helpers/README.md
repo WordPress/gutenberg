@@ -6,10 +6,6 @@ The following helper functions can be used within integration tests to simplify 
 
 Adds a block via the block picker.
 
-### [`advanceAnimationByTime`, `advanceAnimationByFrames` ](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/advance-animation.js)
-
-Advance Reanimated animations by time or frames.
-
 ### [`dismissModal`](https://github.com/WordPress/gutenberg/blob/HEAD/test/native/integration-test-helpers/dismiss-block.js)
 
 Dismisses a modal.

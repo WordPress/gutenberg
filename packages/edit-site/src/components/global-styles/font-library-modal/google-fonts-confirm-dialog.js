@@ -6,6 +6,7 @@ import {
 	Button,
 	Card,
 	CardBody,
+	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
@@ -24,7 +25,9 @@ function GoogleFontsConfirmDialog() {
 		<div className="font-library__google-fonts-confirm">
 			<Card>
 				<CardBody>
-					<Text as="h3">{ __( 'Connect to Google Fonts' ) }</Text>
+					<Heading level={ 2 }>
+						{ __( 'Connect to Google Fonts' ) }
+					</Heading>
 					<Spacer margin={ 6 } />
 					<Text as="p">
 						{ __(
@@ -38,7 +41,11 @@ function GoogleFontsConfirmDialog() {
 						) }
 					</Text>
 					<Spacer margin={ 6 } />
-					<Button variant="primary" onClick={ handleConfirm }>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ handleConfirm }
+					>
 						{ __( 'Allow access to Google Fonts' ) }
 					</Button>
 				</CardBody>

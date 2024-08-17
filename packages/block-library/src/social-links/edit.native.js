@@ -53,7 +53,7 @@ function SocialLinksEdit( {
 
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.footerAppenderContainer }>
-			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
+			<InnerBlocks.ButtonBlockAppender isFloating />
 		</View>
 	) );
 
@@ -95,7 +95,7 @@ function SocialLinksEdit( {
 			renderFooterAppender={
 				shouldRenderFooterAppender && renderFooterAppender.current
 			}
-			orientation={ 'horizontal' }
+			orientation="horizontal"
 			onDeleteBlock={ shouldDelete ? onDelete : undefined }
 			marginVertical={ spacing }
 			marginHorizontal={ spacing }

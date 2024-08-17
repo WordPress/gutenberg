@@ -44,8 +44,8 @@ export default function BlockActions( {
 				: null;
 
 			return {
-				canMove: canMoveBlocks( clientIds, rootClientId ),
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canMove: canMoveBlocks( clientIds ),
+				canRemove: canRemoveBlocks( clientIds ),
 				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
@@ -98,16 +98,10 @@ export default function BlockActions( {
 			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
-			const clientId = Array.isArray( clientIds )
-				? clientIds[ 0 ]
-				: clientId;
-			insertBeforeBlock( clientId );
+			insertBeforeBlock( clientIds[ 0 ] );
 		},
 		onInsertAfter() {
-			const clientId = Array.isArray( clientIds )
-				? clientIds[ clientIds.length - 1 ]
-				: clientId;
-			insertAfterBlock( clientId );
+			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onMoveTo() {
 			setNavigationMode( true );

@@ -73,7 +73,7 @@ The value of `attributes.content` will be displayed inside the `div` when insert
 
 ### isSelected
 
-The isSelected property is an boolean that communicates whether the block is currently selected.
+The isSelected property is a boolean that communicates whether the block is currently selected.
 
 
 ```jsx
@@ -188,7 +188,7 @@ When saving your block, you want to save the attributes in the same format speci
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together. For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together.
 
 ### Saving Attributes to Child Elements
 
@@ -269,14 +269,14 @@ If a block is detected to be invalid, the user will be prompted to choose how to
 
 ![Invalid block prompt](https://user-images.githubusercontent.com/7753001/88754471-4cf7e900-d191-11ea-9123-3cee20719d10.png)
 
-Clicking **Attempt Block Recovery** button will attempt recovery action as much as possible.
+Clicking the **Attempt Block Recovery** button will attempt a recovery action as much as possible.
 
 Clicking the "3-dot" menu on the side of the block displays three options:
 
 -   **Resolve**: Open Resolve Block dialog box with two buttons:
-    -   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
-    -   **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
--   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+    -   **Convert to HTML**: Protects the original markup from the saved post content and converts the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+    -   **Convert to Blocks**: Protects the original markup from the saved post content and converts the block from its original type to the validated block type.
+-   **Convert to HTML**: Protects the original markup from the saved post content and converts the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
 -   **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
 
 ### Validation FAQ

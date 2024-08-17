@@ -16,6 +16,8 @@ import { FontLibraryContext } from './context';
 import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 function LibraryFontVariant( { face, font } ) {
 	const { isFontActivated, toggleActivateFont } =
 		useContext( FontLibraryContext );
@@ -39,7 +41,6 @@ function LibraryFontVariant( { face, font } ) {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const checkboxId = kebabCase(
 		`${ font.slug }-${ getFontFaceVariantName( face ) }`
 	);
@@ -50,7 +51,7 @@ function LibraryFontVariant( { face, font } ) {
 				<CheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
+					__nextHasNoMarginBottom
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>

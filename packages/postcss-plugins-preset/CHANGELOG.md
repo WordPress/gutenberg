@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.42.0 (2024-05-16)
+
+## 4.41.0 (2024-05-02)
+
+## 4.40.0 (2024-04-19)
+
+## 4.39.0 (2024-04-03)
+
+## 4.38.0 (2024-03-21)
+
+## 4.37.0 (2024-03-06)
+
 ## 4.36.0 (2024-02-21)
 
 ## 4.35.0 (2024-02-09)
@@ -74,7 +102,7 @@
 
 ## 4.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 

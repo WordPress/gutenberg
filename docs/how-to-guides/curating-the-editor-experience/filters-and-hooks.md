@@ -2,6 +2,39 @@
 
 The Editor provides numerous filters and hooks that allow you to modify the editing experience. Here are a few.
 
+## Editor settings
+
+One of the most common ways to modify the Editor is through the [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) PHP filter, which is applied before settings are sent to the initialized Editor. 
+
+The `block_editor_settings_all` hook passes two parameters to the callback function:
+
+- `$settings` – An array of [configurable settings](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#editor-settings) for the Editor.
+- `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
+
+The following example disables the Code Editor for users who cannot activate plugins (Administrators). Add this to a plugin or your theme's `functions.php` file to test it.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_restrict_code_editor' );
+
+function example_restrict_code_editor( $settings ) {
+	$can_active_plugins = current_user_can( 'activate_plugins' );
+
+	// Disable the Code Editor for users that cannot activate plugins (Administrators).
+	if ( ! $can_active_plugins ) {
+		$settings[ 'codeEditingEnabled' ] = false;
+	}
+
+	return $settings;
+}
+```
+
+For more examples, check out the [Editor Hooks](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/) documentation that includes the following use cases: 
+
+- [Set a default image size](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#set-a-default-image-size)
+- [Disable Openverse](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-openverse)
+- [Disable the Font Library](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-the-font-library)
+- [Disable block inspector tabs](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-block-inspector-tabs)
+
 ## Server-side theme.json filters
 
 The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
@@ -102,6 +135,43 @@ addFilter(
 	}
 );
 ```
+
+## Block Filters
+
+Beyond curating the Editor itself, there are many ways that you can modify individual blocks. Perhaps you want to disable particular block supports like background color or define which settings should be displayed by default on specific blocks.
+
+One of the most commonly used filters is [`block_type_metadata`](https://developer.wordpress.org/reference/hooks/block_type_metadata/). It allows you to filter the raw metadata loaded from a block's `block.json` file when a block type is registered on the server with PHP. 
+
+The filter takes one parameter:
+
+- `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+
+The `$metadata` array contains everything you might want to know about a block, from its description and [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) to block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/). 
+
+In the following example, background color and gradient support are disabled for Heading blocks.
+
+```php
+function example_disable_heading_background_color_and_gradients( $metadata ) {
+
+    // Only apply the filter to Heading blocks.
+    if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
+        return $metadata;
+    }
+
+    // Check if 'supports' key exists.
+    if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
+
+        // Remove Background color and Gradients support.
+        $metadata['supports']['color']['background'] = false;
+        $metadata['supports']['color']['gradients']  = false;
+    }
+
+    return $metadata;
+}
+add_filter( 'block_type_metadata', 'example_disable_heading_background_color_and_gradients' );
+```
+
+You can learn more about the available block filters in the [Block Filters](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/) documentation.
 
 ## Additional resources
 

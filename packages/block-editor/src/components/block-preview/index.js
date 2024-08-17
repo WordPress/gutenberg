@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,11 +20,13 @@ import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
+const EMPTY_ADDITIONAL_STYLES = [];
+
 export function BlockPreview( {
 	blocks,
 	viewportWidth = 1200,
 	minHeight,
-	additionalStyles = [],
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 	// Deprecated props:
 	__experimentalMinHeight,
 	__experimentalPadding,
@@ -146,7 +148,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-preview__live-content',
 			'components-disabled'

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ export default function SidebarNavigationScreenDetailsPanelRow( {
 			key={ label }
 			spacing={ 5 }
 			alignment="left"
-			className={ classnames(
+			className={ clsx(
 				'edit-site-sidebar-navigation-details-screen-panel__row',
 				className
 			) }

@@ -142,6 +142,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 
 		return () => {
 			controller.stop();
+			controller.set( { x: 0, y: 0 } );
 		};
 	}, [
 		previous,

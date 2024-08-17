@@ -179,13 +179,44 @@ describe( 'Popover', () => {
 			} );
 		} );
 
+		describe( 'style', () => {
+			it( 'outputs inline styles added through the style prop in addition to built-in popover positioning styles', async () => {
+				render(
+					<Popover
+						style={ { zIndex: 0 } }
+						data-testid="popover-element"
+					>
+						Hello
+					</Popover>
+				);
+				const popover = screen.getByTestId( 'popover-element' );
+
+				await waitFor( () => expect( popover ).toBeVisible() );
+				expect( popover ).toHaveStyle(
+					'position: absolute; top: 0px; left: 0px; z-index: 0;'
+				);
+			} );
+
+			it( 'is not possible to override built-in popover positioning styles via the style prop', async () => {
+				render(
+					<Popover
+						style={ { position: 'static' } }
+						data-testid="popover-element"
+					>
+						Hello
+					</Popover>
+				);
+				const popover = screen.getByTestId( 'popover-element' );
+
+				await waitFor( () => expect( popover ).toBeVisible() );
+				expect( popover ).not.toHaveStyle( 'position: static;' );
+			} );
+		} );
+
 		describe( 'focus behavior', () => {
 			it( 'should focus the popover container when opened', async () => {
 				render(
-					<Popover
-						focusOnMount={ true }
-						data-testid="popover-element"
-					>
+					<Popover focusOnMount data-testid="popover-element">
 						Popover content
 					</Popover>
 				);

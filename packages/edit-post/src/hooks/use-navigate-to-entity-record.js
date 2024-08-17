@@ -1,7 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useReducer, useMemo } from '@wordpress/element';
+import { useCallback, useReducer } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -11,20 +13,22 @@ import { useCallback, useReducer, useMemo } from '@wordpress/element';
  *
  * Used to control displaying UI elements like the back button.
  *
- * @param {number} initialPostId   The post id of the post when the editor loaded.
- * @param {string} initialPostType The post type of the post when the editor loaded.
+ * @param {number} initialPostId        The post id of the post when the editor loaded.
+ * @param {string} initialPostType      The post type of the post when the editor loaded.
+ * @param {string} defaultRenderingMode The rendering mode to switch to when navigating.
  *
  * @return {Object} An object containing the `currentPost` variable and
  *                 `onNavigateToEntityRecord` and `onNavigateToPreviousEntityRecord` functions.
  */
 export default function useNavigateToEntityRecord(
 	initialPostId,
-	initialPostType
+	initialPostType,
+	defaultRenderingMode
 ) {
 	const [ postHistory, dispatch ] = useReducer(
-		( historyState, { type, post } ) => {
+		( historyState, { type, post, previousRenderingMode } ) => {
 			if ( type === 'push' ) {
-				return [ ...historyState, post ];
+				return [ ...historyState, { post, previousRenderingMode } ];
 			}
 			if ( type === 'pop' ) {
 				// Try to leave one item in the history.
@@ -34,32 +38,41 @@ export default function useNavigateToEntityRecord(
 			}
 			return historyState;
 		},
-		[ { postId: initialPostId, postType: initialPostType } ]
+		[
+			{
+				post: { postId: initialPostId, postType: initialPostType },
+			},
+		]
 	);
 
-	const initialPost = useMemo( () => {
-		return {
-			type: initialPostType,
-			id: initialPostId,
-		};
-	}, [ initialPostType, initialPostId ] );
+	const { post, previousRenderingMode } =
+		postHistory[ postHistory.length - 1 ];
 
-	const onNavigateToEntityRecord = useCallback( ( params ) => {
-		dispatch( {
-			type: 'push',
-			post: { postId: params.postId, postType: params.postType },
-		} );
-	}, [] );
+	const { getRenderingMode } = useSelect( editorStore );
+	const { setRenderingMode } = useDispatch( editorStore );
+
+	const onNavigateToEntityRecord = useCallback(
+		( params ) => {
+			dispatch( {
+				type: 'push',
+				post: { postId: params.postId, postType: params.postType },
+				// Save the current rendering mode so we can restore it when navigating back.
+				previousRenderingMode: getRenderingMode(),
+			} );
+			setRenderingMode( defaultRenderingMode );
+		},
+		[ getRenderingMode, setRenderingMode, defaultRenderingMode ]
+	);
 
 	const onNavigateToPreviousEntityRecord = useCallback( () => {
 		dispatch( { type: 'pop' } );
-	}, [] );
-
-	const currentPost = postHistory[ postHistory.length - 1 ];
+		if ( previousRenderingMode ) {
+			setRenderingMode( previousRenderingMode );
+		}
+	}, [ setRenderingMode, previousRenderingMode ] );
 
 	return {
-		currentPost,
-		initialPost,
+		currentPost: post,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord:
 			postHistory.length > 1

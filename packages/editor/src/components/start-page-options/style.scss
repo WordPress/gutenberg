@@ -1,0 +1,26 @@
+// 2 column masonry layout.
+.editor-start-page-options__modal-content .block-editor-block-patterns-list {
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+		margin-bottom: $grid-unit-30;
+
+		.block-editor-block-preview__container {
+			min-height: 100px;
+		}
+
+		.block-editor-block-preview__content {
+			width: 100%;
+		}
+	}
+}

@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-bind-view' );
 ?>
 
 <div data-wp-interactive="directive-bind">
@@ -95,6 +93,7 @@ wp_enqueue_script_module( 'directive-bind-view' );
 		<button
 			data-testid="toggle value"
 			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>

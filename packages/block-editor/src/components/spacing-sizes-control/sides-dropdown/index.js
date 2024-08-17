@@ -30,7 +30,7 @@ export default function SidesDropdown( {
 			icon={ sideIcon }
 			label={ labelProp }
 			className="spacing-sizes-control__dropdown"
-			toggleProps={ { isSmall: true } }
+			toggleProps={ { size: 'small' } }
 		>
 			{ ( { onClose } ) => {
 				return (

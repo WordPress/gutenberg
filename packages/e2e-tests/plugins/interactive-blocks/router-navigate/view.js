@@ -14,8 +14,8 @@ const { state } = store( 'router', {
 		data: {
 			get getterProp() {
 				return `value from getter (${ state.data.prop1 })`;
-			}
-		}
+			},
+		},
 	},
 	actions: {
 		*navigate( e ) {
@@ -29,7 +29,7 @@ const { state } = store( 'router', {
 			const { timeout } = state;
 
 			const { actions } = yield import(
-				"@wordpress/interactivity-router"
+				'@wordpress/interactivity-router'
 			);
 			yield actions.navigate( e.target.href, { force, timeout } );
 

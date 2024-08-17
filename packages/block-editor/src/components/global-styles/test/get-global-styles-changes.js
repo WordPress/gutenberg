@@ -17,6 +17,14 @@ import {
 describe( 'getGlobalStylesChanges and utils', () => {
 	const next = {
 		styles: {
+			background: {
+				backgroundImage: {
+					url: 'https://example.com/image.jpg',
+				},
+				backgroundSize: 'contain',
+				backgroundPosition: '30% 30%',
+				backgroundRepeat: 'no-repeat',
+			},
 			typography: {
 				fontSize: 'var(--wp--preset--font-size--potato)',
 				fontStyle: 'normal',
@@ -84,6 +92,14 @@ describe( 'getGlobalStylesChanges and utils', () => {
 	};
 	const previous = {
 		styles: {
+			background: {
+				backgroundImage: {
+					url: 'https://example.com/image_new.jpg',
+				},
+				backgroundSize: 'contain',
+				backgroundPosition: '40% 77%',
+				backgroundRepeat: 'repeat',
+			},
 			typography: {
 				fontSize: 'var(--wp--preset--font-size--fungus)',
 				fontStyle: 'normal',
@@ -195,7 +211,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 		it( 'returns a list of changes', () => {
 			const result = getGlobalStylesChanges( next, previous );
 			expect( result ).toEqual( [
-				'Colors, Typography styles.',
+				'Background, Colors, Typography styles.',
 				'Test pumpkin flowers block.',
 				'H3, Caption, H6, Link elements.',
 				'Color, Typography settings.',
@@ -204,10 +220,10 @@ describe( 'getGlobalStylesChanges and utils', () => {
 
 		it( 'returns a list of truncated changes', () => {
 			const resultA = getGlobalStylesChanges( next, previous, {
-				maxResults: 3,
+				maxResults: 4,
 			} );
 			expect( resultA ).toEqual( [
-				'Colors, Typography styles.',
+				'Background, Colors, Typography styles.',
 				'Test pumpkin flowers block.',
 			] );
 		} );
@@ -254,6 +270,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
 			const resultA = getGlobalStylesChangelist( next, previous );
 
 			expect( resultA ).toEqual( [
+				[ 'styles', 'Background' ],
 				[ 'styles', 'Colors' ],
 				[ 'styles', 'Typography' ],
 				[ 'blocks', 'Test pumpkin flowers' ],

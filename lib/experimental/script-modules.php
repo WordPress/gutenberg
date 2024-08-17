@@ -165,11 +165,12 @@ add_action( 'rest_api_init', 'gutenberg_register_view_module_ids_rest_field' );
  * Registers the module if no module with that module identifier has already
  * been registered.
  *
+ * @deprecated 17.6.0 gutenberg_register_module is deprecated. Please use wp_register_script_module instead.
+ *
  * @param string            $module_identifier The identifier of the module. Should be unique. It will be used in the final import map.
  * @param string            $src               Full URL of the module, or path of the script relative to the WordPress root directory.
  * @param array             $dependencies      Optional. An array of module identifiers of the dependencies of this module. The dependencies can be strings or arrays. If they are arrays, they need an `id` key with the module identifier, and can contain an `import` key with either `static` or `dynamic`. By default, dependencies that don't contain an import are considered static.
  * @param string|false|null $version           Optional. String specifying module version number. Defaults to false. It is added to the URL as a query string for cache busting purposes. If $version is set to false, the version number is the currently installed WordPress version. If $version is set to null, no version is added.
- * @deprecated 17.6.0 gutenberg_register_module is deprecated. Please use wp_register_script_module instead.
  */
 function gutenberg_register_module( $module_identifier, $src = '', $dependencies = array(), $version = false ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_register_script_module' );
@@ -179,8 +180,9 @@ function gutenberg_register_module( $module_identifier, $src = '', $dependencies
 /**
  * Marks the module to be enqueued in the page.
  *
- * @param string $module_identifier The identifier of the module.
  * @deprecated 17.6.0 gutenberg_enqueue_module is deprecated. Please use wp_enqueue_script_module instead.
+ *
+ * @param string $module_identifier The identifier of the module.
  */
 function gutenberg_enqueue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_enqueue_script_module' );
@@ -190,8 +192,9 @@ function gutenberg_enqueue_module( $module_identifier ) {
 /**
  * Unmarks the module so it is not longer enqueued in the page.
  *
- * @param string $module_identifier The identifier of the module.
  * @deprecated 17.6.0 gutenberg_dequeue_module is deprecated. Please use wp_dequeue_script_module instead.
+ *
+ * @param string $module_identifier The identifier of the module.
  */
 function gutenberg_dequeue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_dequeue_script_module' );

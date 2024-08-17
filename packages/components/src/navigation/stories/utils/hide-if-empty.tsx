@@ -42,11 +42,7 @@ export const HideIfEmptyStory: StoryFn< typeof Navigation > = ( {
 					/>
 				</NavigationMenu>
 
-				<NavigationMenu
-					menu="root-sub-1"
-					parentMenu="root"
-					isEmpty={ true }
-				/>
+				<NavigationMenu menu="root-sub-1" parentMenu="root" isEmpty />
 				<NavigationMenu
 					menu="root-sub-2"
 					parentMenu="root"
@@ -57,7 +53,7 @@ export const HideIfEmptyStory: StoryFn< typeof Navigation > = ( {
 				<NavigationMenu
 					menu="root-sub-1-sub-1"
 					parentMenu="root-sub-1"
-					isEmpty={ true }
+					isEmpty
 				/>
 			</Navigation>
 

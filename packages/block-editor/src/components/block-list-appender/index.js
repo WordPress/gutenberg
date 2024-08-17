@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -76,7 +76,7 @@ export default function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames( 'block-list-appender wp-block', className, {
+			className={ clsx( 'block-list-appender wp-block', className, {
 				'is-drag-over': isDragOver,
 			} ) }
 			// Needed in case the whole editor is content editable (for multi

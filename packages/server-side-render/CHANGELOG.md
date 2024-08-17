@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.35.0 (2024-05-16)
+
+## 4.34.0 (2024-05-02)
+
+## 4.33.0 (2024-04-19)
+
+## 4.32.0 (2024-04-03)
+
+## 4.31.0 (2024-03-21)
+
+## 4.30.0 (2024-03-06)
+
 ## 4.29.0 (2024-02-21)
 
 ## 4.28.0 (2024-02-09)
@@ -72,7 +100,7 @@
 
 ## 3.18.0 (2022-10-19)
 
-### Feature
+### New Features
 
 -   Add `skipBlockSupportAttributes` props to prevent duplication of styles in the block wrapper and the `ServerSideRender` components. [#44491](https://github.com/WordPress/gutenberg/pull/44491)
 
@@ -112,7 +140,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -131,19 +159,19 @@
 
 ## 1.17.0 (2020-09-03)
 
-### Feature
+### New Features
 
 -   Add an optional prop `httpMethod`, which can be 'POST' or the default 'GET'. Requires WP 5.5 or later. When 'POST', this sends the attributes in the request body, not in the URL. This can allow a bigger attributes object. [#21068](https://github.com/WordPress/gutenberg/pull/21068)
 
 ## 1.7.0 (2020-02-04)
 
-### Bug
+### Bug Fixes
 
 -   Fix errant `className` being output on default empty placeholder. [#19555](https://github.com/WordPress/gutenberg/pull/19555)
 
 ## 1.2.0 (2019-08-29)
 
-### Feature
+### New Features
 
 -   Add `EmptyResponsePlaceholder`, `ErrorResponsePlaceholder` and `LoadingResponsePlaceholder` render props for parent components to swap out alternate placeholders for the various states (see https://github.com/WordPress/gutenberg/pull/16512).
 

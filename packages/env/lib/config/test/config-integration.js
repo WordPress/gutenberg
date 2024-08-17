@@ -48,7 +48,9 @@ describe( 'Config Integration', () => {
 	afterEach( () => {
 		delete process.env.WP_ENV_HOME;
 		delete process.env.WP_ENV_PORT;
+		delete process.env.WP_ENV_MYSQL_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
+		delete process.env.WP_ENV_TESTS_MYSQL_PORT;
 		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
@@ -61,6 +63,8 @@ describe( 'Config Integration', () => {
 
 		expect( config.env.development.port ).toEqual( 8888 );
 		expect( config.env.tests.port ).toEqual( 8889 );
+		expect( config.env.development.mysqlPort ).toEqual( null );
+		expect( config.env.tests.mysqlPort ).toEqual( null );
 		expect( config ).toMatchSnapshot();
 	} );
 
@@ -75,6 +79,14 @@ describe( 'Config Integration', () => {
 						afterClean: null,
 						afterDestroy: null,
 					},
+					env: {
+						development: {
+							mysqlPort: 13306,
+						},
+						tests: {
+							mysqlPort: 23307,
+						},
+					},
 				} );
 			}
 
@@ -85,6 +97,8 @@ describe( 'Config Integration', () => {
 
 		expect( config.env.development.port ).toEqual( 123 );
 		expect( config.env.tests.port ).toEqual( 8889 );
+		expect( config.env.development.mysqlPort ).toEqual( 13306 );
+		expect( config.env.tests.mysqlPort ).toEqual( 23307 );
 		expect( config ).toMatchSnapshot();
 	} );
 
@@ -100,6 +114,11 @@ describe( 'Config Integration', () => {
 						afterClean: null,
 						afterDestroy: null,
 					},
+					env: {
+						tests: {
+							mysqlPort: 13306,
+						},
+					},
 				} );
 			}
 
@@ -111,6 +130,14 @@ describe( 'Config Integration', () => {
 						afterClean: null,
 						afterDestroy: 'test',
 					},
+					env: {
+						development: {
+							mysqlPort: 23306,
+						},
+						tests: {
+							mysqlPort: 23307,
+						},
+					},
 				} );
 			}
 
@@ -121,12 +148,16 @@ describe( 'Config Integration', () => {
 
 		expect( config.env.development.port ).toEqual( 999 );
 		expect( config.env.tests.port ).toEqual( 456 );
+		expect( config.env.development.mysqlPort ).toEqual( 23306 );
+		expect( config.env.tests.mysqlPort ).toEqual( 23307 );
 		expect( config ).toMatchSnapshot();
 	} );
 
 	it( 'should use environment variables over local and override configuration files', async () => {
 		process.env.WP_ENV_PORT = 12345;
+		process.env.WP_ENV_MYSQL_PORT = 23306;
 		process.env.WP_ENV_TESTS_PORT = 61234;
+		process.env.WP_ENV_TESTS_MYSQL_PORT = 23307;
 		process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START = 'test';
 
 		readFile.mockImplementation( async ( fileName ) => {
@@ -139,6 +170,11 @@ describe( 'Config Integration', () => {
 						afterStart: 'local',
 						afterClean: null,
 						afterDestroy: null,
+					},
+					env: {
+						tests: {
+							mysqlPort: 13306,
+						},
 					},
 				} );
 			}
@@ -156,6 +192,8 @@ describe( 'Config Integration', () => {
 
 		expect( config.env.development.port ).toEqual( 12345 );
 		expect( config.env.tests.port ).toEqual( 61234 );
+		expect( config.env.development.mysqlPort ).toEqual( 23306 );
+		expect( config.env.tests.mysqlPort ).toEqual( 23307 );
 		expect( config.lifecycleScripts ).toHaveProperty(
 			'afterStart',
 			'test'

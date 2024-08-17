@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -30,7 +31,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
-import calculateScale from '../../utils/calculate-scale';
+
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -104,52 +105,31 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	shouldZoom = false,
+	scale = 1,
+	frameSize = 0,
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				resolvedAssets: settings.__unstableResolvedAssets,
-				isPreviewMode: settings.__unstableIsPreviewMode,
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-			};
-		},
-		[]
-	);
+	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			resolvedAssets: settings.__unstableResolvedAssets,
+			isPreviewMode: settings.__unstableIsPreviewMode,
+		};
+	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
+	const prevContainerWidth = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [
-		contentResizeListener,
-		{ height: contentHeight, width: contentWidth },
-	] = useResizeObserver();
-
-	// When zoom-out mode is enabled, the iframe is scaled down to fit the
-	// content within the viewport.
-	// At 1000px wide, the iframe is scaled to 45%.
-	// At 400px wide, the iframe is scaled to 90%.
-	const scale =
-		isZoomOutMode && shouldZoom
-			? calculateScale(
-					{
-						maxWidth: 1000,
-						minWidth: 400,
-						maxScale: 0.45,
-						minScale: 0.9,
-					},
-					contentWidth
-			  )
-			: 1;
-	const frameSize = isZoomOutMode ? 100 : 0;
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -229,6 +209,44 @@ function Iframe( {
 		};
 	}, [] );
 
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
+	const iframeResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		const onResize = () => {
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
+
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		setWindowInnerWidth( nodeWindow.innerWidth );
+		const onResize = () => {
+			setWindowInnerWidth( nodeWindow.innerWidth );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const isZoomedOut = scale !== 1;
+
+	useEffect( () => {
+		if ( ! isZoomedOut ) {
+			prevContainerWidth.current = containerWidth;
+		}
+	}, [ containerWidth, isZoomedOut ] );
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -236,6 +254,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		isZoomedOut ? iframeResizeRef : null,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -251,12 +273,12 @@ function Iframe( {
 				height: auto !important;
 				min-height: 100%;
 			}
-
-			body {
+			/* Lowest specificity to not override global styles */
+			:where(body) {
 				margin: 0;
 				/* Default background color in case zoom out mode background
 				colors the html element */
-				background: white;
+				background-color: white;
 			}
 		</style>
 		${ styles }
@@ -276,41 +298,88 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
-	// We need to counter the margin created by scaling the iframe. If the scale
-	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
-	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
-	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
-
 	useEffect( () => {
-		if ( iframeDocument && scale !== 1 ) {
-			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
-			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
-			iframeDocument.documentElement.style.marginBottom = `${
-				-marginFromScaling * 2 + frameSize
-			}px`;
-			return () => {
-				iframeDocument.documentElement.style.transform = '';
-				iframeDocument.documentElement.style.marginTop = '';
-				iframeDocument.documentElement.style.marginBottom = '';
-			};
+		if ( ! iframeDocument || ! isZoomedOut ) {
+			return;
 		}
-	}, [ scale, frameSize, marginFromScaling, iframeDocument ] );
+
+		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
+
+		const maxWidth = 750;
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			scale === 'default'
+				? Math.min( containerWidth, maxWidth ) /
+						prevContainerWidth.current
+				: scale
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-frame-size',
+			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-inner-height',
+			`${ iframeWindowInnerHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-container-width',
+			`${ containerWidth }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-prev-container-width',
+			`${ prevContainerWidth.current }px`
+		);
+
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-frame-size'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-content-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inner-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-container-width'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-prev-container-width'
+			);
+		};
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		iframeWindowInnerHeight,
+		contentHeight,
+		containerWidth,
+		windowInnerWidth,
+		isZoomedOut,
+	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
-	return (
+	const iframe = (
 		<>
 			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
 				style={ {
-					border: 0,
 					...props.style,
 					height: props.style?.height,
-					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
@@ -329,11 +398,19 @@ function Iframe( {
 					// though by doing so we also trigger another React event,
 					// so we need to stop the propagation of this event to avoid
 					// duplication.
-					else if (
+					if (
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {
+						// We should only stop propagation of the React event,
+						// the native event should further bubble inside the
+						// iframe to the document and window.
+						// Alternatively, we could consider redispatching the
+						// native event in the iframe.
+						const { stopPropagation } = event.nativeEvent;
+						event.nativeEvent.stopPropagation = () => {};
 						event.stopPropagation();
+						event.nativeEvent.stopPropagation = stopPropagation;
 						bubbleEvent(
 							event,
 							window.KeyboardEvent,
@@ -349,7 +426,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
@@ -365,6 +442,26 @@ function Iframe( {
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
 		</>
+	);
+
+	return (
+		<div className="block-editor-iframe__container" ref={ windowResizeRef }>
+			{ containerResizeListener }
+			<div
+				className={ clsx(
+					'block-editor-iframe__scale-container',
+					isZoomedOut && 'is-zoomed-out'
+				) }
+				style={ {
+					'--wp-block-editor-iframe-zoom-out-container-width':
+						isZoomedOut && `${ containerWidth }px`,
+					'--wp-block-editor-iframe-zoom-out-prev-container-width':
+						isZoomedOut && `${ prevContainerWidth.current }px`,
+				} }
+			>
+				{ iframe }
+			</div>
+		</div>
 	);
 }
 

@@ -1,21 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
  * Internal dependencies
  */
-import {
-	Composite as CompositeV2,
-	CompositeGroup as CompositeGroupV2,
-	CompositeItem as CompositeItemV2,
-	CompositeRow as CompositeRowV2,
-	useCompositeStore as useCompositeStoreV2,
-} from './composite/v2';
-import { default as CustomSelectControl } from './custom-select-control';
+import { Composite, useCompositeStore } from './composite';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
-import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
 import {
 	DropdownMenu as DropdownMenuV2,
@@ -35,16 +22,14 @@ import { lock } from './lock-unlock';
 
 export const privateApis = {};
 lock( privateApis, {
-	CompositeV2,
-	CompositeGroupV2,
-	CompositeItemV2,
-	CompositeRowV2,
-	useCompositeStoreV2,
-	CustomSelectControl,
+	CompositeV2: Composite,
+	CompositeGroupV2: Composite.Group,
+	CompositeItemV2: Composite.Item,
+	CompositeRowV2: Composite.Row,
+	useCompositeStoreV2: useCompositeStore,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,
-	ProgressBar,
 	Tabs,
 	Theme,
 	DropdownMenuV2,

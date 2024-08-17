@@ -16,8 +16,7 @@ export default function MoreEdit( {
 } ) {
 	const onChangeInput = ( event ) => {
 		setAttributes( {
-			customText:
-				event.target.value !== '' ? event.target.value : undefined,
+			customText: event.target.value,
 		} );
 	};
 

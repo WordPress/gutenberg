@@ -29,7 +29,9 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected, prefix ) {
-	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+	if ( typeof selected !== 'object' ) {
+		return { [ prefix ]: selected };
+	}
 	return Object.fromEntries(
 		Object.entries( selected ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
@@ -39,7 +41,9 @@ function prefixSelectKeys( selected, prefix ) {
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
-	if ( selected[ prefix ] ) return selected[ prefix ];
+	if ( selected[ prefix ] ) {
+		return selected[ prefix ];
+	}
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
 		.reduce( ( accumulator, key ) => {

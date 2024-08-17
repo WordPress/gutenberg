@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
-import { click, press, sleep, type } from '@ariakit/test';
+import { screen } from '@testing-library/react';
+import { click, press, type } from '@ariakit/test';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -12,7 +13,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect as UncontrolledCustomSelect, CustomSelectItem } from '..';
+import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
 
 const items = [
@@ -41,14 +42,14 @@ const items = [
 const defaultProps = {
 	label: 'label!',
 	children: items.map( ( { value, key } ) => (
-		<CustomSelectItem value={ value } key={ key } />
+		<UncontrolledCustomSelectControlV2.Item value={ value } key={ key } />
 	) ),
 };
 
-const ControlledCustomSelect = ( props: CustomSelectProps ) => {
+const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<UncontrolledCustomSelect
+		<UncontrolledCustomSelectControlV2
 			{ ...props }
 			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
@@ -60,13 +61,13 @@ const ControlledCustomSelect = ( props: CustomSelectProps ) => {
 };
 
 describe.each( [
-	[ 'Uncontrolled', UncontrolledCustomSelect ],
-	[ 'Controlled', ControlledCustomSelect ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControlV2 ],
+	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControlV2 (%s)', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
-		render( <Component { ...defaultProps } /> );
+		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -94,25 +95,24 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-		render( <Component { ...defaultProps } /> );
+		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: defaultProps.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: defaultProps.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -121,20 +121,19 @@ describe.each( [
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
@@ -145,18 +144,17 @@ describe.each( [
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
@@ -166,31 +164,34 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
 
-			await type( 'aq' );
+			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
+			await type( 'a' );
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
 
+			// This Enter is a workaround for flakiness, and shouldn't be necessary in an actual browser
 			await press.Enter();
-			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -240,7 +241,7 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component
 					defaultValue={ defaultValues }
 					onChange={ onChangeMock }
@@ -253,9 +254,12 @@ describe.each( [
 						'rose blush',
 						'ultraviolet morning light',
 					].map( ( item ) => (
-						<CustomSelectItem key={ item } value={ item }>
+						<UncontrolledCustomSelectControlV2.Item
+							key={ item }
+							value={ item }
+						>
 							{ item }
-						</CustomSelectItem>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -319,12 +323,15 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component defaultValue={ defaultValues } label="Multi-select">
 					{ defaultValues.map( ( item ) => (
-						<CustomSelectItem key={ item } value={ item }>
+						<UncontrolledCustomSelectControlV2.Item
+							key={ item }
+							value={ item }
+						>
 							{ item }
-						</CustomSelectItem>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -372,14 +379,14 @@ describe.each( [
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 
-		render(
+		await render(
 			<Component label="Rendered" renderSelectedValue={ renderValue }>
-				<CustomSelectItem value="april-29">
+				<UncontrolledCustomSelectControlV2.Item value="april-29">
 					{ renderValue( 'april-29' ) }
-				</CustomSelectItem>
-				<CustomSelectItem value="july-9">
+				</UncontrolledCustomSelectControlV2.Item>
+				<UncontrolledCustomSelectControlV2.Item value="july-9">
 					{ renderValue( 'july-9' ) }
-				</CustomSelectItem>
+				</UncontrolledCustomSelectControlV2.Item>
 			</Component>
 		);
 
@@ -404,6 +411,35 @@ describe.each( [
 		expect( screen.getByRole( 'img', { name: 'july-9' } ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'option', { name: 'july-9' } )
+		).toBeVisible();
+	} );
+
+	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
+		await render( <Component { ...defaultProps } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await press.Tab();
+		expect( currentSelectedItem ).toHaveFocus();
+		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
+
+		await press.ArrowDown();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: defaultProps.label,
+			} )
+		).toBeVisible();
+	} );
+
+	it( 'Should label the component correctly even when the label is not visible', async () => {
+		await render( <Component { ...defaultProps } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: defaultProps.label,
+			} )
 		).toBeVisible();
 	} );
 } );

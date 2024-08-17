@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/preferences",
-	"version": "3.29.0",
+	"version": "4.5.0",
 	"description": "Utilities for managing WordPress preferences.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -38,7 +39,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/private-apis": "file:../private-apis",
-		"classnames": "^2.3.1"
+		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

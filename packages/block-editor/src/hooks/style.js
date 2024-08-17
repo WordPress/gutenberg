@@ -332,7 +332,15 @@ function BlockStyleControls( {
 		clientId,
 		name,
 		setAttributes,
-		settings,
+		settings: {
+			...settings,
+			typography: {
+				...settings.typography,
+				// The text alignment UI for individual blocks is rendered in
+				// the block toolbar, so disable it here.
+				textAlign: false,
+			},
+		},
 	};
 	if ( blockEditingMode !== 'default' ) {
 		return null;

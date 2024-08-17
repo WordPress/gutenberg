@@ -64,7 +64,7 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 			{ ...props }
 			icon={ icons[ type ] || empty }
 			onPress={ pickLink }
-			separatorType={ 'none' }
+			separatorType="none"
 			cellContainerStyle={ suggestionStyles.itemContainerStyle }
 			labelStyle={ suggestionStyles.hidden }
 			valueStyle={ suggestionStyles.hidden }
@@ -73,14 +73,14 @@ function LinkSuggestionItemCell( { suggestion, onLinkPicked, ...props } ) {
 				<Text
 					style={ titleStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ title }
 				</Text>
 				<Text
 					style={ summaryStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ summary }
 				</Text>

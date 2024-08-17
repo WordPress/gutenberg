@@ -15,35 +15,42 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  * @return {boolean} Whether the block toolbar component will be rendered.
  */
 export function useHasBlockToolbar() {
-	const hasAnyBlockControls = useHasAnyBlockControls();
-	return useSelect(
+	const { isToolbarEnabled, isDefaultEditingMode } = useSelect(
 		( select ) => {
 			const {
 				getBlockEditingMode,
 				getBlockName,
-				getSelectedBlockClientIds,
+				getBlockSelectionStart,
 			} = select( blockEditorStore );
 
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-			const isDefaultEditingMode =
-				getBlockEditingMode( selectedBlockClientId ) === 'default';
+			// we only care about the 1st selected block
+			// for the toolbar, so we use getBlockSelectionStart
+			// instead of getSelectedBlockClientIds
+			const selectedBlockClientId = getBlockSelectionStart();
+
 			const blockType =
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) );
-			const isToolbarEnabled =
-				blockType &&
-				hasBlockSupport( blockType, '__experimentalToolbar', true );
 
-			if (
-				! isToolbarEnabled ||
-				( ! isDefaultEditingMode && ! hasAnyBlockControls )
-			) {
-				return false;
-			}
-
-			return true;
+			return {
+				isToolbarEnabled:
+					blockType &&
+					hasBlockSupport( blockType, '__experimentalToolbar', true ),
+				isDefaultEditingMode:
+					getBlockEditingMode( selectedBlockClientId ) === 'default',
+			};
 		},
-		[ hasAnyBlockControls ]
+		[]
 	);
+
+	const hasAnyBlockControls = useHasAnyBlockControls();
+
+	if (
+		! isToolbarEnabled ||
+		( ! isDefaultEditingMode && ! hasAnyBlockControls )
+	) {
+		return false;
+	}
+
+	return true;
 }

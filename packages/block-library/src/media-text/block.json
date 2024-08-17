@@ -92,12 +92,29 @@
 		},
 		"allowedBlocks": {
 			"type": "array"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"heading": true,

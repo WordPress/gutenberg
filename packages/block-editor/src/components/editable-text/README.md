@@ -25,10 +25,6 @@ _Optional._ `Text` won't insert line breaks on `Enter` if set to `true`.
 _Optional._ Placeholder text to show when the field is empty, similar to the
 [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
-### `onSplit( value: String ): Function`
-
-_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
-
 ### `onReplace( blocks: Array ): Function`
 
 _Optional._ Called when the `Text` instance can be replaced with the given blocks.

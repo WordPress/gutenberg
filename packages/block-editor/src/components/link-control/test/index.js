@@ -2166,7 +2166,7 @@ describe( 'Rich link previews', () => {
 		const titlePreview = screen.getByText( selectedLink.title );
 
 		// eslint-disable-next-line testing-library/no-node-access
-		expect( titlePreview.parentElement ).toHaveClass(
+		expect( titlePreview.parentElement.parentElement ).toHaveClass(
 			'block-editor-link-control__search-item-title'
 		);
 	} );

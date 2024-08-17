@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,7 @@ const ComplementaryAreaHeader = ( {
 				{ toggleButton }
 			</div>
 			<div
-				className={ classnames(
+				className={ clsx(
 					'components-panel__header',
 					'interface-complementary-area-header',
 					className

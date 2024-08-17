@@ -2,18 +2,22 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { store as editPostStore } from '.';
 import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -25,7 +29,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editPostStore.name, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -34,9 +38,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editPostStore.name );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -78,37 +80,52 @@ export const closeModal =
 /**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function openPublishSidebar() {
-	return {
-		type: 'OPEN_PUBLISH_SIDEBAR',
+export const openPublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).openPublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').openPublishSidebar",
+		} );
+		registry.dispatch( editorStore ).openPublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user closed the
  * publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function closePublishSidebar() {
-	return {
-		type: 'CLOSE_PUBLISH_SIDEBAR',
+export const closePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).closePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').closePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).closePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user toggles the publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function togglePublishSidebar() {
-	return {
-		type: 'TOGGLE_PUBLISH_SIDEBAR',
+export const togglePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).togglePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').togglePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).togglePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used to enable or disable a panel in the editor.
@@ -204,14 +221,11 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/edit-post', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ](
-				'core/edit-post',
-				pluginName
-			);
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**
@@ -276,9 +290,21 @@ export const requestMetaBoxUpdates =
 			window.tinyMCE.triggerSave();
 		}
 
+		// We gather the base form data.
+		const baseFormData = new window.FormData(
+			document.querySelector( '.metabox-base-form' )
+		);
+
+		const postId = baseFormData.get( 'post_ID' );
+		const postType = baseFormData.get( 'post_type' );
+
 		// Additional data needed for backward compatibility.
 		// If we do not provide this data, the post will be overridden with the default values.
-		const post = registry.select( editorStore ).getCurrentPost();
+		// We cannot rely on getCurrentPost because right now on the editor we may be editing a pattern or a template.
+		// We need to retrieve the post that the base form data is referring to.
+		const post = registry
+			.select( coreStore )
+			.getEditedEntityRecord( 'postType', postType, postId );
 		const additionalData = [
 			post.comment_status
 				? [ 'comment_status', post.comment_status ]
@@ -288,10 +314,7 @@ export const requestMetaBoxUpdates =
 			post.author ? [ 'post_author', post.author ] : false,
 		].filter( Boolean );
 
-		// We gather all the metaboxes locations data and the base form data.
-		const baseFormData = new window.FormData(
-			document.querySelector( '.metabox-base-form' )
-		);
+		// We gather all the metaboxes locations.
 		const activeMetaBoxLocations = select.getActiveMetaBoxLocations();
 		const formDataToMerge = [
 			baseFormData,

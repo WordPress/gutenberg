@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 1.45.0 (2024-05-16)
+
+## 1.44.0 (2024-05-02)
+
+## 1.43.0 (2024-04-19)
+
+## 1.42.0 (2024-04-03)
+
+## 1.41.0 (2024-03-21)
+
+## 1.40.0 (2024-03-06)
+
 ## 1.39.0 (2024-02-21)
 
 ## 1.38.0 (2024-02-09)
@@ -81,7 +109,7 @@
 
 ## 1.2.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Allow local paths as an option when trying to import a specific file from the package ([#23751](https://github.com/WordPress/gutenberg/pull/23751)).
 

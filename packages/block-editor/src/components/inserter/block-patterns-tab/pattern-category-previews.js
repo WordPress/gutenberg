@@ -44,7 +44,8 @@ export function PatternCategoryPreviews( {
 } ) {
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
-		rootClientId
+		rootClientId,
+		category?.name
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -128,14 +129,19 @@ export function PatternCategoryPreviews( {
 	);
 
 	return (
-		<div className="block-editor-inserter__patterns-category-panel">
+		<>
 			<VStack
 				spacing={ 2 }
 				className="block-editor-inserter__patterns-category-panel-header"
 			>
 				<HStack>
 					<FlexBlock>
-						<Heading level={ 4 } as="div">
+						<Heading
+							className="block-editor-inserter__patterns-category-panel-title"
+							size={ 13 }
+							level={ 4 }
+							as="div"
+						>
 							{ category.label }
 						</Heading>
 					</FlexBlock>
@@ -174,6 +180,6 @@ export function PatternCategoryPreviews( {
 					pagingProps={ pagingProps }
 				/>
 			) }
-		</div>
+		</>
 	);
 }

@@ -11,6 +11,10 @@
 		"id": {
 			"type": "number"
 		},
+		"blob": {
+			"type": "string",
+			"__experimentalRole": "local"
+		},
 		"href": {
 			"type": "string"
 		},

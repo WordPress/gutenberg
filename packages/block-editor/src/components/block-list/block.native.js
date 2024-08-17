@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	getMergedGlobalStyles,
-	useMobileGlobalStylesColors,
-	useGlobalStyles,
-	withFilters,
-} from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 	getBlockType,
@@ -49,6 +43,14 @@ import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
+import BlockCrashBoundary from './block-crash-boundary';
+import BlockCrashWarning from './block-crash-warning';
+import {
+	getMergedGlobalStyles,
+	GlobalStylesContext,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
+} from '../global-styles/use-global-styles-context';
 
 const EMPTY_ARRAY = [];
 
@@ -71,7 +73,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (
@@ -139,14 +141,19 @@ function BlockWrapper( {
 				isSelected={ isSelected }
 				name={ name }
 			/>
-			<BlockDraggable
-				clientId={ clientId }
-				draggingClientId={ draggingClientId }
-				enabled={ draggingEnabled }
-				testID="draggable-trigger-content"
+			<BlockCrashBoundary
+				blockName={ name }
+				fallback={ <BlockCrashWarning /> }
 			>
-				{ children }
-			</BlockDraggable>
+				<BlockDraggable
+					clientId={ clientId }
+					draggingClientId={ draggingClientId }
+					enabled={ draggingEnabled }
+					testID="draggable-trigger-content"
+				>
+					{ children }
+				</BlockDraggable>
+			</BlockCrashBoundary>
 		</Pressable>
 	);
 }
@@ -425,8 +432,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const attributes = getBlockAttributes( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const canRemove = canRemoveBlock( clientId, rootClientId );
-	const canMove = canMoveBlock( clientId, rootClientId );
+	const canRemove = canRemoveBlock( clientId );
+	const canMove = canMoveBlock( clientId );
 
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
@@ -662,12 +669,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
-				} else {
-					removeBlock( clientId );
+				} else if (
+					getBlockName( clientId ) !== getDefaultBlockName()
+				) {
+					const replacement = switchToBlockType(
+						getBlock( clientId ),
+						getDefaultBlockName()
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( clientId, replacement );
+					}
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect, initialPosition ) {
+		onReplace( blocks, indexToSelect, initialPosition, meta ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
@@ -678,7 +693,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				[ ownProps.clientId ],
 				blocks,
 				indexToSelect,
-				initialPosition
+				initialPosition,
+				meta
 			);
 		},
 		toggleSelection( selectionEnabled ) {

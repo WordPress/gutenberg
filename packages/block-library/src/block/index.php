@@ -8,6 +8,8 @@
 /**
  * Renders the `core/block` block on server.
  *
+ * @since 5.0.0
+ *
  * @global WP_Embed $wp_embed
  *
  * @param array $attributes The block attributes.
@@ -76,7 +78,7 @@ function render_block_core_block( $attributes ) {
 	 * filter so that it is available when a pattern's inner blocks are
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
-	$has_pattern_overrides = isset( $attributes['content'] );
+	$has_pattern_overrides = isset( $attributes['content'] ) && null !== get_block_bindings_source( 'core/pattern-overrides' );
 	if ( $has_pattern_overrides ) {
 		$filter_block_context = static function ( $context ) use ( $attributes ) {
 			$context['pattern/overrides'] = $attributes['content'];
@@ -97,6 +99,8 @@ function render_block_core_block( $attributes ) {
 
 /**
  * Registers the `core/block` block.
+ *
+ * @since 5.3.0
  */
 function register_block_core_block() {
 	register_block_type_from_metadata(

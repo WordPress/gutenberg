@@ -14,7 +14,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 import ColorVariations from './variations/variations-color';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -47,19 +46,13 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
-		filter: ( variation ) =>
-			variation?.settings?.color &&
-			Object.keys( variation?.settings?.color ).length,
-	} );
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
 	return (
 		<VStack
 			className="edit-site-global-styles-color-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeColors && !! themeColors.length && (
 				<PaletteEdit
@@ -85,20 +78,15 @@ export default function ColorPalettePanel( { name } ) {
 						popoverProps={ popoverProps }
 					/>
 				) }
-			{ !! colorVariations.length && (
-				<ColorVariations variations={ colorVariations } />
-			) }
 			<PaletteEdit
 				colors={ customColors }
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
-				emptyMessage={ __(
-					'Custom colors are empty! Add some colors to create your own color palette.'
-				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
+			<ColorVariations title={ __( 'Palettes' ) } />
 		</VStack>
 	);
 }

@@ -16,6 +16,8 @@ import Tabs from '..';
 import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
 import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
+import Tooltip from '../../tooltip';
+import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
 	title: 'Components (Experimental)/Tabs',
@@ -31,7 +33,6 @@ const meta: Meta< typeof Tabs > = {
 	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
-		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -69,11 +70,25 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 
 export const Default = Template.bind( {} );
 
+const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	return (
+		<Tabs orientation="vertical" { ...props }>
+			<Tabs.TabList style={ { maxWidth: '10rem' } }>
+				<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
+			</Tabs.TabList>
+		</Tabs>
+	);
+};
+
+export const Vertical = VerticalTemplate.bind( {} );
+
 const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab tabId="tab1" disabled={ true }>
+				<Tabs.Tab tabId="tab1" disabled>
 					Tab 1
 				</Tabs.Tab>
 				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
@@ -97,24 +112,29 @@ const WithTabIconsAndTooltipsTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab
-					tabId="tab1"
-					render={
-						<Button icon={ wordpress } label="Tab 1" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab2"
-					render={
-						<Button icon={ link } label="Tab 2" showTooltip />
-					}
-				/>
-				<Tabs.Tab
-					tabId="tab3"
-					render={
-						<Button icon={ more } label="Tab 3" showTooltip />
-					}
-				/>
+				{ [
+					{
+						id: 'tab1',
+						label: 'Tab one',
+						icon: wordpress,
+					},
+					{
+						id: 'tab2',
+						label: 'Tab two',
+						icon: link,
+					},
+					{
+						id: 'tab3',
+						label: 'Tab three',
+						icon: more,
+					},
+				].map( ( { id, label, icon } ) => (
+					<Tooltip text={ label } key={ id }>
+						<Tabs.Tab tabId={ id } aria-label={ label }>
+							<Icon icon={ icon } />
+						</Tabs.Tab>
+					</Tooltip>
+				) ) }
 			</Tabs.TabList>
 			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
@@ -203,7 +223,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 							</Tabs.TabList>
 							<Button
-								variant={ 'tertiary' }
+								variant="tertiary"
 								style={ {
 									marginLeft: 'auto',
 									alignSelf: 'center',
@@ -225,10 +245,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					</Tabs>
 				</div>
 			) : (
-				<Button
-					variant={ 'tertiary' }
-					onClick={ () => setIsOpen( true ) }
-				>
+				<Button variant="tertiary" onClick={ () => setIsOpen( true ) }>
 					Open Tabs
 				</Button>
 			) }
@@ -269,31 +286,29 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					<p>Selected tab: Tab 3</p>
 				</Tabs.TabPanel>
 			</Tabs>
-			{
-				<div style={ { marginTop: '200px' } }>
-					<p>Select a tab:</p>
-					<DropdownMenu
-						controls={ [
-							{
-								onClick: () => setSelectedTabId( 'tab1' ),
-								title: 'Tab 1',
-								isActive: selectedTabId === 'tab1',
-							},
-							{
-								onClick: () => setSelectedTabId( 'tab2' ),
-								title: 'Tab 2',
-								isActive: selectedTabId === 'tab2',
-							},
-							{
-								onClick: () => setSelectedTabId( 'tab3' ),
-								title: 'Tab 3',
-								isActive: selectedTabId === 'tab3',
-							},
-						] }
-						label="Choose a tab. The power is yours."
-					/>
-				</div>
-			}
+			<div style={ { marginTop: '200px' } }>
+				<p>Select a tab:</p>
+				<DropdownMenu
+					controls={ [
+						{
+							onClick: () => setSelectedTabId( 'tab1' ),
+							title: 'Tab 1',
+							isActive: selectedTabId === 'tab1',
+						},
+						{
+							onClick: () => setSelectedTabId( 'tab2' ),
+							title: 'Tab 2',
+							isActive: selectedTabId === 'tab2',
+						},
+						{
+							onClick: () => setSelectedTabId( 'tab3' ),
+							title: 'Tab 3',
+							isActive: selectedTabId === 'tab3',
+						},
+					] }
+					label="Choose a tab. The power is yours."
+				/>
+			</div>
 		</>
 	);
 };

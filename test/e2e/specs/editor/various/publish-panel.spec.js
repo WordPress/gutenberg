@@ -53,7 +53,7 @@ test.describe( 'Post publish panel', () => {
 		// Test focus is moved back to the Publish panel toggle button.
 		await expect(
 			page.locator(
-				'role=region[name="Editor top bar"i] >> role=button[name="Update"i]'
+				'role=region[name="Editor top bar"i] >> role=button[name="Save"i]'
 			)
 		).toBeFocused();
 	} );

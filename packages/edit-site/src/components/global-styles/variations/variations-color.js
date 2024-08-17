@@ -5,22 +5,37 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import StylesPreviewColors from '../preview-colors';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Subtitle from '../subtitle';
 import Variation from './variation';
-import StylesPreviewColors from '../preview-colors';
 
-export default function ColorVariations( { variations } ) {
+export default function ColorVariations( { title, gap = 2 } ) {
+	const propertiesToFilter = [ 'color' ];
+	const colorVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
+
+	// Return null if there is only one variation (the default).
+	if ( colorVariations?.length <= 1 ) {
+		return null;
+	}
+
 	return (
 		<VStack spacing={ 3 }>
-			<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
-			<Grid columns={ 3 }>
-				{ variations.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation }>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
+			<Grid spacing={ gap }>
+				{ colorVariations.map( ( variation, index ) => (
+					<Variation
+						key={ index }
+						variation={ variation }
+						isPill
+						properties={ propertiesToFilter }
+						showTooltip
+					>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }

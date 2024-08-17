@@ -6,7 +6,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import RangeControl from '../';
+import _RangeControl from '../';
 
 const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
 const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
@@ -14,6 +14,12 @@ const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
 
 const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
 	fireEvent.change( input, { target: { value } } );
+
+const RangeControl = (
+	props: React.ComponentProps< typeof _RangeControl >
+) => {
+	return <_RangeControl { ...props } __nextHasNoMarginBottom />;
+};
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
@@ -297,7 +303,7 @@ describe( 'RangeControl', () => {
 			render(
 				<RangeControl
 					initialPosition={ 10 }
-					allowReset={ true }
+					allowReset
 					onChange={ spy }
 					resetFallbackValue={ 33 }
 				/>
@@ -320,7 +326,7 @@ describe( 'RangeControl', () => {
 					initialPosition={ undefined }
 					min={ 0 }
 					max={ 100 }
-					allowReset={ true }
+					allowReset
 					resetFallbackValue={ undefined }
 				/>
 			);

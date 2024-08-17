@@ -14,9 +14,13 @@ export function getLineHeight(
 	adjustLineHeightForInnerControls: Props[ 'adjustLineHeightForInnerControls' ],
 	lineHeight: CSSProperties[ 'lineHeight' ]
 ) {
-	if ( lineHeight ) return lineHeight;
+	if ( lineHeight ) {
+		return lineHeight;
+	}
 
-	if ( ! adjustLineHeightForInnerControls ) return;
+	if ( ! adjustLineHeightForInnerControls ) {
+		return;
+	}
 
 	let value = `calc(${ CONFIG.controlHeight } + ${ space( 2 ) })`;
 

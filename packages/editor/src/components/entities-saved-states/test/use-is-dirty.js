@@ -32,6 +32,9 @@ jest.mock( '@wordpress/data', () => {
 					getEntityRecordEdits: jest.fn().mockReturnValue( {
 						title: 'My Site',
 					} ),
+					getEntityConfig: jest.fn().mockReturnValue( {
+						meta: { labels: { title: 'Title' } },
+					} ),
 				};
 			};
 			return fn( select );

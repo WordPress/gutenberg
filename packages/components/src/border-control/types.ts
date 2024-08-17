@@ -62,6 +62,10 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
+		 * Placeholder text for the number input.
+		 */
+		placeholder?: HTMLInputElement[ 'placeholder' ];
+		/**
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
 		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;

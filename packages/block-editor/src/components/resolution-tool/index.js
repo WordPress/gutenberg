@@ -44,12 +44,13 @@ export default function ResolutionTool( {
 			panelId={ panelId }
 		>
 			<SelectControl
+				__nextHasNoMarginBottom
 				label={ __( 'Resolution' ) }
 				value={ displayValue }
 				options={ options }
 				onChange={ onChange }
 				help={ __( 'Select the size of the source image.' ) }
-				size={ '__unstable-large' }
+				size="__unstable-large"
 			/>
 		</ToolsPanelItem>
 	);

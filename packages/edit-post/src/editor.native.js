@@ -9,7 +9,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider, store as editorStore } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	store as editorStore,
+} from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -28,11 +32,6 @@ import Layout from './components/layout';
 class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
-
-		// need to set this globally to avoid race with deprecations
-		// defaulting to true to avoid issues with a not-yet-cached value
-		const { galleryWithImageBlocks = true } = props;
-		window.wp.galleryBlockV2Enabled = galleryWithImageBlocks;
 
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// Enable html mode if the initial mode the parent wants it but we're not already in it.
@@ -143,7 +142,9 @@ class Editor extends Component {
 						useSubRegistry={ false }
 						{ ...props }
 					>
-						<Layout setTitleRef={ this.setTitleRef } />
+						<ErrorBoundary>
+							<Layout setTitleRef={ this.setTitleRef } />
+						</ErrorBoundary>
 					</EditorProvider>
 				</SlotFillProvider>
 			</GestureHandlerRootView>
