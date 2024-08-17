@@ -72,7 +72,7 @@ export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	help: 'Please select how transparent you would like this.',
-	// initialPosition: 50,
+	initialPosition: 50,
 	label: 'Opacity',
 	max: 100,
 	min: 0,
