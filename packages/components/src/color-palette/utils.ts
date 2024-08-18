@@ -72,6 +72,18 @@ export const isMultiplePaletteArray = (
 };
 
 /**
+ * Checks if a color value is a simple CSS color.
+ *
+ * @param value The color value to check.
+ * @return A boolean indicating whether the color value is a simple CSS color.
+ */
+const isSimpleCSSColor = ( value: string | undefined ): boolean => {
+	const valueIsCssVariable = /var\(/.test( value ?? '' );
+	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
+	return ! valueIsCssVariable && ! valueIsColorMix;
+};
+
+/**
  * Transform a CSS variable used as background color into the color value itself.
  *
  * @param value   The color value that may be a CSS variable.
@@ -82,10 +94,7 @@ export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
 ) => {
-	const valueIsCssVariable = /var\(/.test( value ?? '' );
-	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
-
-	const valueIsSimpleColor = ! valueIsCssVariable && ! valueIsColorMix;
+	const valueIsSimpleColor = isSimpleCSSColor( value );
 
 	if ( valueIsSimpleColor || element === null ) {
 		return value;
