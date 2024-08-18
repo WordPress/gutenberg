@@ -27,7 +27,7 @@ export const extractColorNameFromCurrentValue = (
 	}
 
 	const currentValueIsCssVariable = /^var\(/.test( currentValue );
-	const currentValueIsColorMix = /^color-mix\(.*\)$/.test( currentValue );
+	const currentValueIsColorMix = /color-mix\(/.test( currentValue );
 	const normalizedCurrentValue =
 		currentValueIsCssVariable || currentValueIsColorMix
 			? currentValue
@@ -82,9 +82,12 @@ export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
 ) => {
-	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
+	const valueIsCssVariable = /var\(/.test( value ?? '' );
+	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
 
-	if ( ! currentValueIsCssVariable || element === null ) {
+	const valueIsSimpleColor = ! valueIsCssVariable && ! valueIsColorMix;
+
+	if ( valueIsSimpleColor || element === null ) {
 		return value;
 	}
 
