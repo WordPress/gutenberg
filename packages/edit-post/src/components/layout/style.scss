@@ -6,7 +6,7 @@ $shadow: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray
 	background-color: $white;
 
 	&:not(.has-user-size) {
-		max-height: 50%;
+		max-height: 50% !important;
 	}
 
 	& .components-resizable-box__handle-top {

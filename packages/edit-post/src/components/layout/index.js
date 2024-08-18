@@ -175,6 +175,8 @@ function MetaBoxesWide() {
 				bottomRight: false,
 				bottomLeft: false,
 			} }
+			// This is overriden by an !important rule that applies until user resizes.
+			maxHeight="100%"
 			bounds="parent"
 			boundsByDirection
 			// Avoids hiccups while dragging over objects like iframes and ensures that
@@ -184,9 +186,9 @@ function MetaBoxesWide() {
 				target.setPointerCapture( pointerId );
 			} }
 			onResizeStart={ ( event, direction, elementRef ) => {
-				// Avoids an height jump in case the max-height is limiting it.
+				// Avoids height jumping in case it’s limited by max-height.
 				elementRef.style.height = `${ elementRef.offsetHeight }px`;
-				// Stops max-height from being applied.
+				// Stops initial max-height from being applied.
 				elementRef.classList.add( 'has-user-size' );
 			} }
 		>
