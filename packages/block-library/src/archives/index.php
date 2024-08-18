@@ -45,6 +45,33 @@ function render_block_core_archives( $attributes ) {
 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
 
+		$style_attribute            = '';
+		$has_classes                = [];
+		$wrapper_attributes_classes = [];
+
+
+		// Extract the style attribute
+		if ( preg_match( '/style="([^"]+)"/', $wrapper_attributes, $matches ) ) {
+			$style_attribute = $matches[1];
+		}
+
+		// Extract the class attribute
+		if ( preg_match( '/class="([^"]+)"/', $wrapper_attributes, $matches ) ) {
+			$classes = explode( ' ', $matches[1] );
+
+			foreach ( $classes as $class ) {
+				if ( strpos( $class, 'has-' ) === 0 ) {
+					$has_classes[] = $class;
+				} else {
+					$wrapper_attributes_classes[] = $class;
+				}
+			}
+		}
+
+		// Convert arrays to strings
+		$style_classes              = implode( ' ', $has_classes );
+		$wrapper_attributes_classes = implode( ' ', $wrapper_attributes_classes );
+
 		switch ( $dropdown_args['type'] ) {
 			case 'yearly':
 				$label = __( 'Select Year' );
@@ -65,13 +92,22 @@ function render_block_core_archives( $attributes ) {
 
 		$show_label = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 
-		$block_content = '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . esc_html( $title ) . '</label>
-		<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
-		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
+		$block_content = "<label for=\"{$dropdown_id}\"";
+
+		if ( ! empty( $style_attribute ) ) {
+			$block_content .= ' style="' . esc_attr( $style_attribute ) . '"';
+		}
+
+
+		$block_content .= ' class="wp-block-archives__label' . $show_label . ( ! empty( $style_classes ) ? ' ' . esc_attr( $style_classes ) : '' ) . '">' . esc_html( $title ) . '</label>
+			<select id="' . esc_attr( $dropdown_id ) . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
+				<option value="">' . esc_html( $label ) . '</option>' . $archives . '
+			</select>';
+
 
 		return sprintf(
-			'<div %1$s>%2$s</div>',
-			$wrapper_attributes,
+			'<div class="%1$s">%2$s</div>',
+			$wrapper_attributes_classes,
 			$block_content
 		);
 	}
