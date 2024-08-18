@@ -1,4 +1,5 @@
-/* @jsx createElement */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
 
 /**
  * External dependencies
@@ -8,16 +9,19 @@ import {
 	options,
 	createContext,
 	cloneElement,
+	type ComponentChildren,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context, RefObject } from 'preact';
+import type { VNode, Context } from 'preact';
 
 /**
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-interface DirectiveEntry {
-	value: string | Object;
+import { warn } from './utils';
+import { getScope, setScope, resetScope, type Scope } from './scopes';
+export interface DirectiveEntry {
+	value: string | object;
 	namespace: string;
 	suffix: string;
 }
@@ -32,11 +36,15 @@ interface DirectiveArgs {
 	/**
 	 * Props present in the current element.
 	 */
-	props: Object;
+	props: { children?: ComponentChildren };
 	/**
 	 * Virtual node representing the element.
 	 */
-	element: VNode;
+	element: VNode< {
+		class?: string;
+		style?: string | Record< string, string | number >;
+		content?: ComponentChildren;
+	} >;
 	/**
 	 * The inherited context.
 	 */
@@ -49,7 +57,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
+	( args: DirectiveArgs ): VNode< any > | null | void;
 }
 
 interface DirectiveOptions {
@@ -62,14 +70,7 @@ interface DirectiveOptions {
 	priority?: number;
 }
 
-interface Scope {
-	evaluate: Evaluate;
-	context: Context< any >;
-	ref: RefObject< HTMLElement >;
-	attributes: createElement.JSX.HTMLAttributes;
-}
-
-interface Evaluate {
+export interface Evaluate {
 	( entry: DirectiveEntry, ...args: any[] ): any;
 }
 
@@ -93,84 +94,6 @@ interface DirectivesProps {
 
 // Main context.
 const context = createContext< any >( {} );
-
-// Wrap the element props to prevent modifications.
-const immutableMap = new WeakMap();
-const immutableError = () => {
-	throw new Error(
-		'Please use `data-wp-bind` to modify the attributes of an element.'
-	);
-};
-const immutableHandlers = {
-	get( target, key, receiver ) {
-		const value = Reflect.get( target, key, receiver );
-		return !! value && typeof value === 'object'
-			? deepImmutable( value )
-			: value;
-	},
-	set: immutableError,
-	deleteProperty: immutableError,
-};
-const deepImmutable = < T extends Object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) )
-		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
-	return immutableMap.get( target );
-};
-
-// Store stacks for the current scope and the default namespaces and export APIs
-// to interact with them.
-const scopeStack: Scope[] = [];
-const namespaceStack: string[] = [];
-
-/**
- * Retrieves the context inherited by the element evaluating a function from the
- * store. The returned value depends on the element and the namespace where the
- * function calling `getContext()` exists.
- *
- * @param namespace Store namespace. By default, the namespace where the calling
- *                  function exists is used.
- * @return The context content.
- */
-export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || getNamespace() ];
-
-/**
- * Retrieves a representation of the element where a function from the store
- * is being evalutated. Such representation is read-only, and contains a
- * reference to the DOM element, its props and a local reactive state.
- *
- * @return Element representation.
- */
-export const getElement = () => {
-	if ( ! getScope() ) {
-		throw Error(
-			'Cannot call `getElement()` outside getters and actions used by directives.'
-		);
-	}
-	const { ref, attributes } = getScope();
-	return Object.freeze( {
-		ref: ref.current,
-		attributes: deepImmutable( attributes ),
-	} );
-};
-
-export const getScope = () => scopeStack.slice( -1 )[ 0 ];
-
-export const setScope = ( scope: Scope ) => {
-	scopeStack.push( scope );
-};
-export const resetScope = () => {
-	scopeStack.pop();
-};
-
-export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
-
-export const setNamespace = ( namespace: string ) => {
-	namespaceStack.push( namespace );
-};
-export const resetNamespace = () => {
-	namespaceStack.pop();
-};
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -223,7 +146,7 @@ const directivePriorities: Record< string, number > = {};
  * ```js
  * directive(
  *   'color', // Name without prefix and suffix.
- *   ( { directives: { color }, ref, evaluate } ) =>
+ *   ( { directives: { color: colors }, ref, evaluate } ) =>
  *     colors.forEach( ( color ) => {
  *       if ( color.suffix = 'text' ) {
  *         ref.style.setProperty(
@@ -258,19 +181,27 @@ export const directive = (
 };
 
 // Resolve the path to some property of the store object.
-const resolve = ( path, namespace ) => {
+const resolve = ( path: string, namespace: string ) => {
+	if ( ! namespace ) {
+		warn(
+			`Namespace missing for "${ path }". The value for that path won't be resolved.`
+		);
+		return;
+	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
 			lock: universalUnlock,
 		} );
 	}
-	let current = {
+	const current = {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
-	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
-	return current;
+	try {
+		// TODO: Support lazy/dynamically initialized stores
+		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {}
 };
 
 // Generate the evaluate function.
@@ -334,17 +265,15 @@ const Directives = ( {
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
-		nextPriorityLevels.length > 0 ? (
-			<Directives
-				directives={ directives }
-				priorityLevels={ nextPriorityLevels }
-				element={ element }
-				originalProps={ originalProps }
-				previousScope={ scope }
-			/>
-		) : (
-			element
-		);
+		nextPriorityLevels.length > 0
+			? createElement( Directives, {
+					directives,
+					priorityLevels: nextPriorityLevels,
+					element,
+					originalProps,
+					previousScope: scope,
+			  } )
+			: element;
 
 	const props = { ...originalProps, children };
 	const directiveArgs = {
@@ -359,7 +288,9 @@ const Directives = ( {
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) props.children = wrapper;
+		if ( wrapper !== undefined ) {
+			props.children = wrapper;
+		}
 	}
 
 	resetScope();
@@ -373,10 +304,11 @@ options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key )
+		if ( directives.key ) {
 			vnode.key = directives.key.find(
 				( { suffix } ) => suffix === 'default'
 			).value;
+		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {
@@ -392,5 +324,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 		}
 	}
 
-	if ( old ) old( vnode );
+	if ( old ) {
+		old( vnode );
+	}
 };

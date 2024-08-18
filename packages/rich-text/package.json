@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "6.30.0",
+	"version": "7.5.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -39,8 +40,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"memize": "^2.1.0",
-		"rememo": "^4.0.2"
+		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

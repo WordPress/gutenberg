@@ -256,7 +256,7 @@ function entity( entityConfig ) {
 						const nextState = { ...state };
 
 						for ( const record of action.items ) {
-							const recordId = record[ action.key ];
+							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
 								continue;

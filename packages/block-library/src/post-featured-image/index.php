@@ -50,6 +50,13 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	if ( ! empty( $attributes['scale'] ) ) {
 		$extra_styles .= "object-fit:{$attributes['scale']};";
 	}
+	if ( ! empty( $attributes['style']['shadow'] ) ) {
+		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
+
+		if ( ! empty( $shadow_styles['css'] ) ) {
+			$extra_styles .= $shadow_styles['css'];
+		}
+	}
 
 	if ( ! empty( $extra_styles ) ) {
 		$attr['style'] = empty( $attr['style'] ) ? $extra_styles : $attr['style'] . $extra_styles;

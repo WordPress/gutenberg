@@ -6,7 +6,8 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { undoIgnoreBlocks } from './undo-ignore';
+import { store as blockEditorStore } from './index';
+import { unlock } from '../lock-unlock';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -103,11 +104,7 @@ export const privateRemoveBlocks =
 		}
 
 		clientIds = castArray( clientIds );
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const canRemoveBlocks = select.canRemoveBlocks(
-			clientIds,
-			rootClientId
-		);
+		const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 		if ( ! canRemoveBlocks ) {
 			return;
@@ -291,34 +288,6 @@ export function deleteStyleOverride( id ) {
 }
 
 /**
- * A higher-order action that mark every change inside a callback as "non-persistent"
- * and ignore pushing to the undo history stack. It's primarily used for synchronized
- * derived updates from the block editor without affecting the undo history.
- *
- * @param {() => void} callback The synchronous callback to derive updates.
- */
-export function syncDerivedUpdates( callback ) {
-	return ( { dispatch, select, registry } ) => {
-		registry.batch( () => {
-			// Mark every change in the `callback` as non-persistent.
-			dispatch( {
-				type: 'SET_EXPLICIT_PERSISTENT',
-				isPersistentChange: false,
-			} );
-			callback();
-			dispatch( {
-				type: 'SET_EXPLICIT_PERSISTENT',
-				isPersistentChange: undefined,
-			} );
-
-			// Ignore pushing undo stack for the updated blocks.
-			const updatedBlocks = select.getBlocks();
-			undoIgnoreBlocks.add( updatedBlocks );
-		} );
-	};
-}
-
-/**
  * Action that sets the element that had focus when focus leaves the editor canvas.
  *
  * @param {Object} lastFocus The last focused element.
@@ -339,9 +308,10 @@ export function setLastFocus( lastFocus = null ) {
  * @param {string} clientId The block's clientId.
  */
 export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch } ) => {
-		const focusModeToRevert =
-			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+	return ( { select, dispatch, registry } ) => {
+		const focusModeToRevert = unlock(
+			registry.select( blockEditorStore )
+		).getTemporarilyEditingFocusModeToRevert();
 		dispatch.__unstableMarkNextChangeAsNotPersistent();
 		dispatch.updateBlockAttributes( clientId, {
 			templateLock: 'contentOnly',
@@ -376,3 +346,39 @@ export function stopDragging() {
 		type: 'STOP_DRAGGING',
 	};
 }
+
+/**
+ * @param {string|null} clientId The block's clientId, or `null` to clear.
+ *
+ * @return  {Object} Action object.
+ */
+export function expandBlock( clientId ) {
+	return {
+		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+		clientId,
+	};
+}
+
+/**
+ * Temporarily modify/unlock the content-only block for editions.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export const modifyContentLockBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: undefined,
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: false,
+		} );
+		const focusModeToRevert = select.getSettings().focusMode;
+		dispatch.updateSettings( { focusMode: true } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks(
+			clientId,
+			focusModeToRevert
+		);
+	};

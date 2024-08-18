@@ -17,7 +17,9 @@ export function overlayMiddlewares() {
 				const { firstElementChild } = elements.floating ?? {};
 
 				// Only HTMLElement instances have the `style` property.
-				if ( ! ( firstElementChild instanceof HTMLElement ) ) return;
+				if ( ! ( firstElementChild instanceof HTMLElement ) ) {
+					return;
+				}
 
 				// Reduce the height of the popover to the available space.
 				Object.assign( firstElementChild.style, {

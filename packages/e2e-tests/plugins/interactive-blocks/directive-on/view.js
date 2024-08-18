@@ -26,5 +26,17 @@ const { state } = store( 'directive-on', {
 			const context = getContext();
 			context.customEvents += 1;
 		},
+		setClicked: () => {
+			const context = getContext();
+			context.clicked = true;
+		},
+		countClick: () => {
+			const context = getContext();
+			context.clickCount += 1;
+		},
+		toggle: () => {
+			const context = getContext();
+			context.isOpen = ! context.isOpen;
+		},
 	},
 } );

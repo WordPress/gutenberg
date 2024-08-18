@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -302,7 +302,7 @@ export default function ListViewDropIndicatorPreview( {
 		>
 			<div
 				style={ style }
-				className={ classnames(
+				className={ clsx(
 					'block-editor-list-view-drop-indicator__line',
 					{
 						'block-editor-list-view-drop-indicator__line--darker':
@@ -315,7 +315,7 @@ export default function ListViewDropIndicatorPreview( {
 					aria-level={ ariaLevel }
 				>
 					<div
-						className={ classnames(
+						className={ clsx(
 							'block-editor-list-view-block-select-button',
 							'block-editor-list-view-block-contents'
 						) }

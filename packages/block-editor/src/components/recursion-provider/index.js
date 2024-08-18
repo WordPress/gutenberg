@@ -92,10 +92,10 @@ export const DeprecatedExperimentalRecursionProvider = ( props ) => {
 	return <RecursionProvider { ...props } />;
 };
 
-export const DeprecatedExperimentalUseHasRecursion = ( props ) => {
+export const DeprecatedExperimentalUseHasRecursion = ( ...args ) => {
 	deprecated( 'wp.blockEditor.__experimentalUseHasRecursion', {
 		since: '6.5',
 		alternative: 'wp.blockEditor.useHasRecursion',
 	} );
-	return useHasRecursion( ...props );
+	return useHasRecursion( ...args );
 };

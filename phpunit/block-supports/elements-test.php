@@ -72,10 +72,12 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 			),
 		);
 
-		// To ensure a consistent elements class name it is generated within a
-		// `render_block_data` filter and stored in the `className` attribute.
-		// As a result the block data needs to be passed through the same
-		// function for this test.
+		/*
+		 * To ensure a consistent elements class name it is generated within a
+		 * `render_block_data` filter and stored in the `className` attribute.
+		 * As a result the block data needs to be passed through the same
+		 * function for this test.
+		 */
 		$filtered_block = gutenberg_render_elements_support_styles( $block );
 		$actual         = gutenberg_render_elements_class_name( $block_markup, $filtered_block );
 

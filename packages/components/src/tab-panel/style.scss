@@ -67,7 +67,7 @@
 
 		// Draw the indicator.
 		box-shadow: 0 0 0 0 transparent;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 
 		// Animation
 		transition: all 0.1s linear;
@@ -79,5 +79,21 @@
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
+	}
+}
+
+.components-tab-panel__tab-content {
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:focus-visible {
+		border-radius: 2px;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: 0;
 	}
 }

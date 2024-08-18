@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -77,10 +77,13 @@ function UnforwardedSearchControl(
 
 	const contextValue = useMemo(
 		() => ( {
-			// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-			// to provide backwards compatibile margin for SearchControl.
-			// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
-			BaseControl: { _overrides: { __nextHasNoMarginBottom } },
+			BaseControl: {
+				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+				// to provide backwards compatibile margin for SearchControl.
+				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+				_overrides: { __nextHasNoMarginBottom },
+				__associatedWPComponentName: 'SearchControl',
+			},
 			// `isBorderless` is still experimental and not a public prop for InputControl yet.
 			InputBase: { isBorderless: true },
 		} ),
@@ -97,10 +100,7 @@ function UnforwardedSearchControl(
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 				type="search"
 				size={ size }
-				className={ classnames(
-					'components-search-control',
-					className
-				) }
+				className={ clsx( 'components-search-control', className ) }
 				onChange={ ( nextValue?: string ) =>
 					onChange( nextValue ?? '' )
 				}

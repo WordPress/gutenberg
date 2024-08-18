@@ -325,6 +325,7 @@ function FlexLayoutJustifyContentControl( {
 
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
@@ -370,6 +371,7 @@ function OrientationControl( { layout, onChange } ) {
 	} = layout;
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
@@ -403,12 +405,12 @@ function OrientationControl( { layout, onChange } ) {
 		>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }
-				value={ 'horizontal' }
+				value="horizontal"
 				label={ __( 'Horizontal' ) }
 			/>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowDown }
-				value={ 'vertical' }
+				value="vertical"
 				label={ __( 'Vertical' ) }
 			/>
 		</ToggleGroupControl>

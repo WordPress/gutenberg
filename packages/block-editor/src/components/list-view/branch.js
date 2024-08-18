@@ -194,10 +194,14 @@ function ListViewBranch( props ) {
 				// This prevents the entire tree from being rendered when a branch is
 				// selected, or a user selects all blocks, while still enabling scroll
 				// into view behavior when selecting a block or opening the list view.
+				// The first and last blocks of the list are always rendered, to ensure
+				// that Home and End keys work as expected.
 				const showBlock =
 					isDragged ||
 					blockInView ||
-					( isSelected && clientId === selectedClientIds[ 0 ] );
+					( isSelected && clientId === selectedClientIds[ 0 ] ) ||
+					index === 0 ||
+					index === blockCount - 1;
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (

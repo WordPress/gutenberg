@@ -18,7 +18,6 @@ import {
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
-	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import { searchPatterns } from '../../utils/search-patterns';
@@ -31,11 +30,11 @@ export default function TemplatePartSelectionModal( {
 	clientId,
 } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
 	);
+
 	// We can map template parts to block patters to reuse the BlockPatternsList UI
 	const filteredTemplateParts = useMemo( () => {
 		const partsAsPatterns = templateParts.map( ( templatePart ) =>
@@ -49,7 +48,6 @@ export default function TemplatePartSelectionModal( {
 	const filteredBlockPatterns = useMemo( () => {
 		return searchPatterns( blockPatterns, searchValue );
 	}, [ blockPatterns, searchValue ] );
-	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
@@ -71,11 +69,6 @@ export default function TemplatePartSelectionModal( {
 		);
 		onClose();
 	};
-
-	const createFromBlocks = useCreateTemplatePartFromBlocks(
-		area,
-		setAttributes
-	);
 
 	const hasTemplateParts = !! filteredTemplateParts.length;
 	const hasBlockPatterns = !! filteredBlockPatterns.length;
@@ -99,20 +92,6 @@ export default function TemplatePartSelectionModal( {
 						shownPatterns={ shownTemplateParts }
 						onClickPattern={ ( pattern ) => {
 							onTemplatePartSelect( pattern.templatePart );
-						} }
-					/>
-				</div>
-			) }
-
-			{ hasBlockPatterns && (
-				<div>
-					<h2>{ __( 'Patterns' ) }</h2>
-					<BlockPatternsList
-						blockPatterns={ filteredBlockPatterns }
-						shownPatterns={ shownBlockPatterns }
-						onClickPattern={ ( pattern, blocks ) => {
-							createFromBlocks( blocks, pattern.title );
-							onClose();
 						} }
 					/>
 				</div>

@@ -51,8 +51,8 @@ function render_block_core_query( $attributes, $content, $block ) {
 			// Add the necessary directives.
 			$p->set_attribute( 'data-wp-interactive', 'core/query' );
 			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
-			$p->set_attribute( 'data-wp-init', 'callbacks.setQueryRef' );
 			$p->set_attribute( 'data-wp-context', '{}' );
+			$p->set_attribute( 'data-wp-key', $attributes['queryId'] );
 			$content = $p->get_updated_html();
 		}
 	}

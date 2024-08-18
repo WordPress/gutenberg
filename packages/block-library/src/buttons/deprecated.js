@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -63,7 +63,7 @@ const deprecated = [
 			return (
 				<div
 					{ ...useBlockProps.save( {
-						className: classnames( {
+						className: clsx( {
 							[ `is-content-justification-${ contentJustification }` ]:
 								contentJustification,
 							'is-vertical': orientation === 'vertical',

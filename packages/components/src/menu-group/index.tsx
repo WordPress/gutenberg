@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ export function MenuGroup( props: MenuGroupProps ) {
 	}
 
 	const labelId = `components-menu-group-label-${ instanceId }`;
-	const classNames = classnames( className, 'components-menu-group', {
+	const classNames = clsx( className, 'components-menu-group', {
 		'has-hidden-separator': hideSeparator,
 	} );
 

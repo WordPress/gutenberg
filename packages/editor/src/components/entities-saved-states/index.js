@@ -3,37 +3,38 @@
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	__experimentalUseDialog as useDialog,
 	useInstanceId,
 } from '@wordpress/compose';
-import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
-
-const PUBLISH_ON_SAVE_ENTITIES = [
-	{
-		kind: 'postType',
-		name: 'wp_navigation',
-	},
-];
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function identity( values ) {
 	return values;
 }
 
+/**
+ * Renders the component for managing saved states of entities.
+ *
+ * @param {Object}   props              The component props.
+ * @param {Function} props.close        The function to close the dialog.
+ * @param {Function} props.renderDialog The function to render the dialog.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function EntitiesSavedStates( {
 	close,
 	renderDialog = undefined,
@@ -48,6 +49,23 @@ export default function EntitiesSavedStates( {
 	);
 }
 
+/**
+ * Renders a panel for saving entities with dirty records.
+ *
+ * @param {Object}   props                       The component props.
+ * @param {string}   props.additionalPrompt      Additional prompt to display.
+ * @param {Function} props.close                 Function to close the panel.
+ * @param {Function} props.onSave                Function to call when saving entities.
+ * @param {boolean}  props.saveEnabled           Flag indicating if save is enabled.
+ * @param {string}   props.saveLabel             Label for the save button.
+ * @param {Function} props.renderDialog          Function to render a custom dialog.
+ * @param {Array}    props.dirtyEntityRecords    Array of dirty entity records.
+ * @param {boolean}  props.isDirty               Flag indicating if there are dirty entities.
+ * @param {Function} props.setUnselectedEntities Function to set unselected entities.
+ * @param {Array}    props.unselectedEntities    Array of unselected entities.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export function EntitiesSavedStatesExtensible( {
 	additionalPrompt = undefined,
 	close,
@@ -55,25 +73,13 @@ export function EntitiesSavedStatesExtensible( {
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
 	renderDialog = undefined,
-
 	dirtyEntityRecords,
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
 } ) {
 	const saveButtonRef = useRef();
-	const {
-		editEntityRecord,
-		saveEditedEntityRecord,
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
-
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
-
-	const { createSuccessNotice, createErrorNotice, removeNotice } =
-		useDispatch( noticesStore );
-
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
 	// To group entities by type.
 	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
 		const { name } = record;
@@ -99,94 +105,6 @@ export function EntitiesSavedStatesExtensible( {
 	].filter( Array.isArray );
 
 	const saveEnabled = saveEnabledProp ?? isDirty;
-
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
-
-	const saveCheckedEntities = () => {
-		const saveNoticeId = 'site-editor-save-success';
-		removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! unselectedEntities.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-
-		close( entitiesToSave );
-
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					editEntityRecord( kind, name, key, { status: 'publish' } );
-				}
-
-				pendingSavedRecords.push(
-					saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				saveSpecifiedEntityEdits(
-					'root',
-					'site',
-					undefined,
-					siteItemsToSave
-				)
-			);
-		}
-
-		__unstableMarkLastChangeAsPersistent();
-
-		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave( values );
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					createSuccessNotice( __( 'Site updated.' ), {
-						type: 'snackbar',
-						id: saveNoticeId,
-						actions: [
-							{
-								label: __( 'View site' ),
-								url: homeUrl,
-							},
-						],
-					} );
-				}
-			} )
-			.catch( ( error ) =>
-				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
-			);
-	};
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -216,8 +134,15 @@ export function EntitiesSavedStatesExtensible( {
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={ ! saveEnabled }
-					__experimentalIsFocusable
-					onClick={ saveCheckedEntities }
+					accessibleWhenDisabled
+					onClick={ () =>
+						saveDirtyEntities( {
+							onSave,
+							dirtyEntityRecords,
+							entitiesToSkip: unselectedEntities,
+							close,
+						} )
+					}
 					className="editor-entities-saved-states__save-button"
 				>
 					{ saveLabel }

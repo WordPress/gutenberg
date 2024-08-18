@@ -7,6 +7,8 @@ export {
 export { getBlockCSSSelector } from './get-block-css-selector';
 export {
 	getLayoutStyles,
+	getBlockSelectors,
+	toStyles,
 	useGlobalStylesOutput,
 	useGlobalStylesOutputWithConfig,
 } from './use-global-styles-output';
@@ -31,5 +33,9 @@ export {
 	useHasImageSettingsPanel,
 } from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
+export {
+	default as BackgroundPanel,
+	useHasBackgroundPanel,
+} from './background-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
 export { default as getGlobalStylesChanges } from './get-global-styles-changes';

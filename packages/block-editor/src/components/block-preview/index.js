@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -148,7 +148,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-preview__live-content',
 			'components-disabled'

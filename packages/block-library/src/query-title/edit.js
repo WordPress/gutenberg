@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,33 +13,33 @@ import {
 	useBlockProps,
 	Warning,
 	HeadingLevelDropdown,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { useArchiveLabel } from './use-archive-label';
 
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
+	attributes: {
+		type,
+		level,
+		levelOptions,
+		textAlign,
+		showPrefix,
+		showSearchTerm,
+	},
 	setAttributes,
 } ) {
-	const { archiveTypeTitle, archiveNameLabel } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const {
-			__experimentalArchiveTitleNameLabel,
-			__experimentalArchiveTitleTypeLabel,
-		} = getSettings();
-		return {
-			archiveTypeTitle: __experimentalArchiveTitleTypeLabel,
-			archiveNameLabel: __experimentalArchiveTitleNameLabel,
-		};
-	} );
+	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
 
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-query-title__placeholder', {
+		className: clsx( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -55,20 +55,20 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		let title;
-		if ( archiveTypeTitle ) {
+		if ( archiveTypeLabel ) {
 			if ( showPrefix ) {
 				if ( archiveNameLabel ) {
 					title = sprintf(
 						/* translators: 1: Archive type title e.g: "Category", 2: Label of the archive e.g: "Shoes" */
 						__( '%1$s: %2$s' ),
-						archiveTypeTitle,
+						archiveTypeLabel,
 						archiveNameLabel
 					);
 				} else {
 					title = sprintf(
 						/* translators: %s: Archive type title e.g: "Category", "Tag"... */
 						__( '%s: Name' ),
-						archiveTypeTitle
+						archiveTypeLabel
 					);
 				}
 			} else if ( archiveNameLabel ) {
@@ -77,7 +77,7 @@ export default function QueryTitleEdit( {
 				title = sprintf(
 					/* translators: %s: Archive type title e.g: "Category", "Tag"... */
 					__( '%s name' ),
-					archiveTypeTitle
+					archiveTypeLabel
 				);
 			}
 		} else {
@@ -137,6 +137,7 @@ export default function QueryTitleEdit( {
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

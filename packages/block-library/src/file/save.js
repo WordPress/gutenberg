@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ export default function save( { attributes } ) {
 				{ showDownloadButton && (
 					<a
 						href={ href }
-						className={ classnames(
+						className={ clsx(
 							'wp-block-file__button',
 							__experimentalGetElementClassName( 'button' )
 						) }

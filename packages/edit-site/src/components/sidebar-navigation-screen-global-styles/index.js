@@ -5,9 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -16,7 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import StyleVariationsContainer from '../global-styles/style-variations-container';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
@@ -24,8 +21,7 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
-
-const noop = () => {};
+import SidebarNavigationScreenGlobalStylesContent from './content';
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -40,10 +36,10 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 	if ( hasGlobalStyleVariations ) {
 		return (
-			<NavigatorButton
+			<SidebarNavigationItem
 				{ ...props }
-				as={ SidebarNavigationItem }
-				path="/wp_global_styles"
+				params={ { path: '/wp_global_styles' } }
+				uid="global-styles-navigation-item"
 			/>
 		);
 	}
@@ -60,32 +56,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 }
 
-function SidebarNavigationScreenGlobalStylesContent() {
-	const { storedSettings } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-
-		return {
-			storedSettings: getSettings(),
-		};
-	}, [] );
-
-	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
-	// loaded. This is necessary because the Iframe component waits until
-	// the block editor store's `__internalIsInitialized` is true before
-	// rendering the iframe. Without this, the iframe previews will not render
-	// in mobile viewport sizes, where the editor canvas is hidden.
-	return (
-		<BlockEditorProvider
-			settings={ storedSettings }
-			onChange={ noop }
-			onInput={ noop }
-		>
-			<StyleVariationsContainer />
-		</BlockEditorProvider>
-	);
-}
-
-export default function SidebarNavigationScreenGlobalStyles() {
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -161,6 +132,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (

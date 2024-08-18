@@ -79,7 +79,7 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
+			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>
@@ -188,7 +188,6 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
@@ -211,7 +210,14 @@ export default function CoverInspectorControls( {
 								}
 								help={
 									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
 											{ __(
 												'Describe the purpose of the image.'
 											) }
@@ -253,6 +259,7 @@ export default function CoverInspectorControls( {
 									gradient: undefined,
 									customGradient: undefined,
 								} ),
+								clearable: true,
 							},
 						] }
 						panelId={ clientId }

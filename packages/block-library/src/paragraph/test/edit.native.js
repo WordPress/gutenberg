@@ -64,6 +64,131 @@ describe( 'Paragraph block', () => {
 		expect( screen.toJSON() ).toMatchSnapshot();
 	} );
 
+	it( 'should prevent deleting the first Paragraph block when pressing backspace at the start', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Heading block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '# ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+
+		const headingBlock = getBlock( screen, 'Heading' );
+		expect( headingBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Quote block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '> ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const quoteBlock = getBlock( screen, 'Quote' );
+		await triggerBlockListLayout( quoteBlock );
+
+		expect( quoteBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '- ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a numbered List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '1. ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 2,
+			finalSelectionEnd: 2,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
 	it( 'should bold text', async () => {
 		// Arrange
 		const screen = await initializeEditor();

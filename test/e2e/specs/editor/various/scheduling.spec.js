@@ -56,7 +56,7 @@ test.describe( 'Scheduling', () => {
 				await page.keyboard.press( 'Escape' );
 
 				await expect(
-					topBar.getByRole( 'button', { name: 'Schedule…' } )
+					topBar.getByRole( 'button', { name: 'Schedule' } )
 				).toBeVisible();
 			} );
 		} );

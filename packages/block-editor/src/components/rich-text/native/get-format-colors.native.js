@@ -27,7 +27,7 @@ export function getFormatColors( formats, colors ) {
 						);
 						const currentStyles = currentFormat?.attributes?.style;
 						if (
-							colorObject &&
+							colorObject?.color &&
 							( ! currentStyles ||
 								currentStyles?.indexOf( colorObject.color ) ===
 									-1 )

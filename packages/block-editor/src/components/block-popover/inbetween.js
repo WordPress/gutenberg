@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
@@ -241,7 +241,7 @@ function BlockPopoverInbetween( {
 			// This makes sure the popover doesn't animate from its previous position.
 			key={ nextClientId + '--' + rootClientId }
 			{ ...props }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-block-popover',
 				'block-editor-block-popover__inbetween',
 				props.className

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
+import { Composite, useCompositeStore } from '../composite';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
@@ -61,17 +61,16 @@ export function AlignmentMatrixControl( {
 		activeId: getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
 			const nextValue = getItemValue( baseId, nextActiveId );
-			if ( nextValue ) onChange?.( nextValue );
+			if ( nextValue ) {
+				onChange?.( nextValue );
+			}
 		},
 		rtl: isRTL(),
 	} );
 
 	const activeId = compositeStore.useState( 'activeId' );
 
-	const classes = classnames(
-		'component-alignment-matrix-control',
-		className
-	);
+	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite
@@ -88,7 +87,7 @@ export function AlignmentMatrixControl( {
 			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<CompositeRow render={ <Row role="row" /> } key={ index }>
+				<Composite.Row render={ <Row role="row" /> } key={ index }>
 					{ cells.map( ( cell ) => {
 						const cellId = getItemId( baseId, cell );
 						const isActive = cellId === activeId;
@@ -102,7 +101,7 @@ export function AlignmentMatrixControl( {
 							/>
 						);
 					} ) }
-				</CompositeRow>
+				</Composite.Row>
 			) ) }
 		</Composite>
 	);

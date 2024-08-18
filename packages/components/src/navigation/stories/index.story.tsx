@@ -19,8 +19,14 @@ import { MoreExamplesStory } from './utils/more-examples';
 import { HideIfEmptyStory } from './utils/hide-if-empty';
 import './style.css';
 
+/**
+ * Render a navigation list with optional groupings and hierarchy.
+ *
+ * This component is deprecated. Consider using `Navigator` instead.
+ */
 const meta: Meta< typeof Navigation > = {
-	title: 'Components (Experimental)/Navigation',
+	title: 'Components (Deprecated)/Navigation',
+	id: 'components-navigation',
 	component: Navigation,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

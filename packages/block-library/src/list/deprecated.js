@@ -219,6 +219,93 @@ const v2 = {
 	migrate: migrateTypeToInlineStyle,
 };
 
+// Version without block support 'className: true'.
+const v3 = {
+	attributes: {
+		ordered: {
+			type: 'boolean',
+			default: false,
+			__experimentalRole: 'content',
+		},
+		values: {
+			type: 'string',
+			source: 'html',
+			selector: 'ol,ul',
+			multiline: 'li',
+			__unstableMultilineWrapperTags: [ 'ol', 'ul' ],
+			default: '',
+			__experimentalRole: 'content',
+		},
+		type: {
+			type: 'string',
+		},
+		start: {
+			type: 'number',
+		},
+		reversed: {
+			type: 'boolean',
+		},
+		placeholder: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		className: false,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		spacing: {
+			margin: true,
+			padding: true,
+			__experimentalDefaultControls: {
+				margin: false,
+				padding: false,
+			},
+		},
+		__unstablePasteTextInline: true,
+		__experimentalSelector: 'ol,ul',
+		__experimentalOnMerge: 'true',
+		__experimentalSlashInserter: true,
+	},
+	save( { attributes } ) {
+		const { ordered, type, reversed, start } = attributes;
+		const TagName = ordered ? 'ol' : 'ul';
+		return (
+			<TagName
+				{ ...useBlockProps.save( {
+					reversed,
+					start,
+					style: {
+						listStyleType:
+							ordered && type !== 'decimal' ? type : undefined,
+					},
+				} ) }
+			>
+				<InnerBlocks.Content />
+			</TagName>
+		);
+	},
+};
+
 /**
  * New deprecations need to be placed first
  * for them to have higher priority.
@@ -227,4 +314,4 @@ const v2 = {
  *
  * See block-deprecation.md
  */
-export default [ v2, v1, v0 ];
+export default [ v3, v2, v1, v0 ];

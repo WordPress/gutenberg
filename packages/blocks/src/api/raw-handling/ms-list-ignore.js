@@ -17,7 +17,10 @@ export default function msListIgnore( node ) {
 
 	const rules = style.split( ';' ).reduce( ( acc, rule ) => {
 		const [ key, value ] = rule.split( ':' );
-		acc[ key.trim().toLowerCase() ] = value.trim().toLowerCase();
+
+		if ( key && value ) {
+			acc[ key.trim().toLowerCase() ] = value.trim().toLowerCase();
+		}
 		return acc;
 	}, {} );
 

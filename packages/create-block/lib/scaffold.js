@@ -98,7 +98,8 @@ module.exports = async (
 
 	const view = {
 		...transformedValues,
-		namespaceSnakeCase: snakeCase( transformedValues.slug ),
+		namespaceSnakeCase: snakeCase( transformedValues.namespace ),
+		namespacePascalCase: pascalCase( transformedValues.namespace ),
 		slugSnakeCase: snakeCase( transformedValues.slug ),
 		slugPascalCase: pascalCase( transformedValues.slug ),
 		...variantVars,

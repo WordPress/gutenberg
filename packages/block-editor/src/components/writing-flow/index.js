@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -78,7 +78,7 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
 			<div
 				{ ...props }
 				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-				className={ classNames(
+				className={ clsx(
 					props.className,
 					'block-editor-writing-flow'
 				) }

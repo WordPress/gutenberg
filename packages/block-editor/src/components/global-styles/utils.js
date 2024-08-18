@@ -4,6 +4,12 @@
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
+ * WordPress dependencies
+ */
+import { useViewportMatch } from '@wordpress/compose';
+import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
+
+/**
  * Internal dependencies
  */
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -11,6 +17,7 @@ import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
 export const ROOT_BLOCK_SELECTOR = 'body';
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -135,12 +142,18 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontFamily': 'fontFamily',
 };
 
-export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
-	popoverProps: {
-		placement: 'left-start',
-		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-	},
-};
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+}
 
 function findInPresetsBy(
 	features,
@@ -363,6 +376,10 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( ! scope || ! selector ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
@@ -374,6 +391,57 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Scopes a collection of selectors for features and subfeatures.
+ *
+ * @example
+ * ```js
+ * const scope = '.custom-scope';
+ * const selectors = {
+ *     color: '.wp-my-block p',
+ *     typography: { fontSize: '.wp-my-block caption' },
+ * };
+ * const result = scopeFeatureSelector( scope, selectors );
+ * // result is {
+ * //     color: '.custom-scope .wp-my-block p',
+ * //     typography: { fonSize: '.custom-scope .wp-my-block caption' },
+ * // }
+ * ```
+ *
+ * @param {string} scope     Selector to scope collection of selectors with.
+ * @param {Object} selectors Collection of feature selectors e.g.
+ *
+ * @return {Object|undefined} Scoped collection of feature selectors.
+ */
+export function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			featureSelectors[ feature ] = {};
+
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
 }
 
 /**
@@ -457,4 +525,93 @@ export function getBlockStyleVariationSelector( variation, blockSelector ) {
 		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
 
 	return result.join( ',' );
+}
+
+/**
+ * Looks up a theme file URI based on a relative path.
+ *
+ * @param {string}        file          A relative path.
+ * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
+ * @return {string} A resolved theme file URI, if one is found in the themeFileURIs collection.
+ */
+export function getResolvedThemeFilePath( file, themeFileURIs ) {
+	if ( ! file || ! themeFileURIs || ! Array.isArray( themeFileURIs ) ) {
+		return file;
+	}
+
+	const uri = themeFileURIs.find(
+		( themeFileUri ) => themeFileUri?.name === file
+	);
+
+	if ( ! uri?.href ) {
+		return file;
+	}
+
+	return uri?.href;
+}
+
+/**
+ * Resolves ref values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedRefValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	/*
+	 * Where the rule value is an object with a 'ref' property pointing
+	 * to a path, this converts that path into the value at that path.
+	 * For example: { "ref": "style.color.background" } => "#fff".
+	 */
+	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+		const refPath = ruleValue.ref.split( '.' );
+		const resolvedRuleValue = getCSSValueFromRawStyle(
+			getValueFromObjectPath( tree, refPath )
+		);
+
+		/*
+		 * Presence of another ref indicates a reference to another dynamic value.
+		 * Pointing to another dynamic value is not supported.
+		 */
+		if ( resolvedRuleValue?.ref ) {
+			return undefined;
+		}
+
+		if ( ! resolvedRuleValue ) {
+			return ruleValue;
+		}
+
+		return resolvedRuleValue;
+	}
+	return ruleValue;
+}
+
+/**
+ * Resolves ref and relative path values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	// Resolve ref values.
+	const resolvedValue = getResolvedRefValue( ruleValue, tree );
+
+	// Resolve relative paths.
+	if ( resolvedValue?.url ) {
+		resolvedValue.url = getResolvedThemeFilePath(
+			resolvedValue.url,
+			tree?._links?.[ 'wp:theme-file' ]
+		);
+	}
+
+	return resolvedValue;
 }

@@ -53,6 +53,7 @@ export const InputWithSlider = ( {
 			/>
 			<RangeControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ label }
 				hideLabelFromVision
 				min={ min }

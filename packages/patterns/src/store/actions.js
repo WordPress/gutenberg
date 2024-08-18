@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { cloneBlock } from '@wordpress/blocks';
+import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -93,6 +93,7 @@ export const convertSyncedPatternToStatic =
 		const patternBlock = registry
 			.select( blockEditorStore )
 			.getBlock( clientId );
+		const existingOverrides = patternBlock.attributes?.content;
 
 		function cloneBlocksAndRemoveBindings( blocks ) {
 			return blocks.map( ( block ) => {
@@ -101,6 +102,24 @@ export const convertSyncedPatternToStatic =
 					metadata = { ...metadata };
 					delete metadata.id;
 					delete metadata.bindings;
+					// Use overridden values of the pattern block if they exist.
+					if ( existingOverrides?.[ metadata.name ] ) {
+						// Iterate over each overriden attribute.
+						for ( const [ attributeName, value ] of Object.entries(
+							existingOverrides[ metadata.name ]
+						) ) {
+							// Skip if the attribute does not exist in the block type.
+							if (
+								! getBlockType( block.name )?.attributes[
+									attributeName
+								]
+							) {
+								continue;
+							}
+							// Update the block attribute with the override value.
+							block.attributes[ attributeName ] = value;
+						}
+					}
 				}
 				return cloneBlock(
 					block,
@@ -115,11 +134,15 @@ export const convertSyncedPatternToStatic =
 			} );
 		}
 
+		const patternInnerBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( patternBlock.clientId );
+
 		registry
 			.dispatch( blockEditorStore )
 			.replaceBlocks(
 				patternBlock.clientId,
-				cloneBlocksAndRemoveBindings( patternBlock.innerBlocks )
+				cloneBlocksAndRemoveBindings( patternInnerBlocks )
 			);
 	};
 

@@ -48,6 +48,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open by default' ) }
 						checked={ showContent }
 						onChange={ () =>
@@ -64,6 +65,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			>
 				<summary onClick={ ( event ) => event.preventDefault() }>
 					<RichText
+						identifier="summary"
 						aria-label={ __( 'Write summary' ) }
 						placeholder={ __( 'Write summary…' ) }
 						allowedFormats={ [] }

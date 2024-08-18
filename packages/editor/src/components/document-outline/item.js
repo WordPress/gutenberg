@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 const TableOfContentsItem = ( {
 	children,
@@ -11,7 +11,7 @@ const TableOfContentsItem = ( {
 	onSelect,
 } ) => (
 	<li
-		className={ classnames(
+		className={ clsx(
 			'document-outline__item',
 			`is-${ level.toLowerCase() }`,
 			{

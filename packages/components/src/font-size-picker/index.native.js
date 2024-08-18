@@ -10,7 +10,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,6 +17,7 @@ import { BottomSheet } from '@wordpress/components';
 import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
+import BottomSheet from '../mobile/bottom-sheet';
 
 const DEFAULT_FONT_SIZE = 16;
 
@@ -59,7 +59,7 @@ function FontSizePicker( {
 	const label = __( 'Font Size' );
 
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	} );
 
 	const accessibilityLabel = sprintf(
@@ -85,7 +85,7 @@ function FontSizePicker( {
 							: __( 'Default' )
 					}
 					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityLabel={ accessibilityLabel }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. Small
@@ -112,8 +112,8 @@ function FontSizePicker( {
 						label={ __( 'Default' ) }
 						onPress={ onChangeValue( undefined ) }
 						leftAlign
-						key={ 'default' }
-						accessibilityRole={ 'button' }
+						key="default"
+						accessibilityRole="button"
 						accessibilityLabel={ __( 'Selected: Default' ) }
 						accessibilityHint={ __(
 							'Double tap to select default font size'
@@ -139,7 +139,7 @@ function FontSizePicker( {
 								onPress={ onChangeValue( item.sizePx ) }
 								leftAlign
 								key={ index }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityLabel={
 									item.sizePx === selectedValue
 										? sprintf(

@@ -128,7 +128,9 @@ export function getSaveElement(
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	if ( ! blockType?.save ) return null;
+	if ( ! blockType?.save ) {
+		return null;
+	}
 
 	let { save } = blockType;
 
@@ -232,6 +234,11 @@ export function getCommentAttributes( blockType, attributes ) {
 			// Ignore all attributes but the ones with an "undefined" source
 			// "undefined" source refers to attributes saved in the block comment.
 			if ( attributeSchema.source !== undefined ) {
+				return accumulator;
+			}
+
+			// Ignore all local attributes
+			if ( attributeSchema.__experimentalRole === 'local' ) {
 				return accumulator;
 			}
 

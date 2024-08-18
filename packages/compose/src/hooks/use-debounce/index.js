@@ -19,7 +19,7 @@ import { debounce } from '../../utils/debounce';
  * including the function to debounce, so please wrap functions created on
  * render in components in `useCallback`.
  *
- * @see https://docs-lodash.com/v4/debounce/
+ * @see https://lodash.com/docs/4#debounce
  *
  * @template {(...args: any[]) => void} TFunc
  *

@@ -32,11 +32,17 @@ export default function BlockRenameControl( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const customName = metadata?.name;
+	const hasPatternOverrides =
+		!! customName &&
+		!! metadata?.bindings &&
+		Object.values( metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		);
 
 	function onChange( newName ) {
 		updateBlockAttributes( [ clientId ], {
 			metadata: {
-				...( metadata && metadata ),
+				...metadata,
 				name: newName,
 			},
 		} );
@@ -59,6 +65,7 @@ export default function BlockRenameControl( { clientId } ) {
 				<BlockRenameModal
 					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
+					hasOverridesWarning={ hasPatternOverrides }
 					onClose={ () => setRenamingBlock( false ) }
 					onSave={ ( newName ) => {
 						// If the new value is the block's original name (e.g. `Group`)

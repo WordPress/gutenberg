@@ -18,7 +18,7 @@
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments            @michalczaplinski
 /packages/block-library/src/table-of-contents   @ZebulanStanphill
-/packages/block-library/src/image               @artemiomorales @michalczaplinski
+/packages/block-library/src/image               @artemiomorales
 
 # Duotone
 /lib/block-supports/duotone.php
@@ -47,7 +47,7 @@
 /packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
-/packages/edit-widgets                          @draganescu @talldan @adamziel @kevin940726
+/packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
 
@@ -81,7 +81,6 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726 @Mamaduka
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
@@ -120,9 +119,9 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @fluiddot @dcalhoun
-/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
-/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
+/packages/format-library                        @ellatrix @dcalhoun
+/packages/rich-text                             @ellatrix @dcalhoun
+/packages/block-editor/src/components/rich-text @ellatrix @dcalhoun
 
 # Project Management
 /.github                                        @desrosj

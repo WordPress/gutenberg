@@ -22,18 +22,20 @@
 		margin-left: 5px;
 		text-decoration: none;
 	}
+}
 
-	&.is-style-outline {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1ch;
-
-		a {
-			border: 1px solid currentColor;
-			font-size: unset !important; // !important Needed to override the inline styles.
-			margin-right: 0;
-			padding: 1ch 2ch;
-			text-decoration: none !important; // !important needed to override generic post content link decoration.
-		}
-	}
+// Specificity is set to 0-1-0 to match global styles selectors.
+:root :where(.wp-block-tag-cloud.is-style-outline) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1ch;
+}
+// The block support related styles below haven't been replicated in the base theme.json
+// as the block doesn't yet adopt them for its inner links.
+:root :where(.wp-block-tag-cloud.is-style-outline a) {
+	border: 1px solid currentColor;
+	font-size: unset !important; // !important Needed to override the inline styles.
+	margin-right: 0;
+	padding: 1ch 2ch;
+	text-decoration: none !important; // !important needed to override generic post content link decoration.
 }

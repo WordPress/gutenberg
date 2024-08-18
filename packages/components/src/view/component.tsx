@@ -2,13 +2,25 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-import type { RefAttributes } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { WordPressComponent } from '../context/wordpress-component';
-import type { ViewProps } from './types';
+import type { WordPressComponentProps } from '../context';
+
+const PolymorphicDiv = styled.div``;
+
+function UnforwardedView< T extends React.ElementType = 'div' >(
+	{ as, ...restProps }: WordPressComponentProps< {}, T >,
+	ref: React.ForwardedRef< any >
+) {
+	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
+}
 
 /**
  * `View` is a core component that renders everything in the library.
@@ -26,13 +38,8 @@ import type { ViewProps } from './types';
  * }
  * ```
  */
-export const View: WordPressComponent<
-	'div',
-	ViewProps & RefAttributes< any >,
-	true
-> = styled.div``;
-
-View.selector = '.components-view';
-View.displayName = 'View';
+export const View = Object.assign( forwardRef( UnforwardedView ), {
+	selector: '.components-view',
+} );
 
 export default View;

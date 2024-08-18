@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "4.30.0",
+	"version": "5.5.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -28,8 +29,7 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes",
-		"rememo": "^4.0.2"
+		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

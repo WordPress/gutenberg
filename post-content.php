@@ -61,7 +61,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul>
+<ul class="wp-block-list">
 	<li><?php _e( 'Text &amp; Headings', 'gutenberg' ); ?></li>
 	<li><?php _e( 'Images &amp; Videos', 'gutenberg' ); ?></li>
 	<li><?php _e( 'Galleries', 'gutenberg' ); ?></li>

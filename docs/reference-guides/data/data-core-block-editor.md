@@ -81,7 +81,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -95,7 +94,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be moved.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -109,7 +107,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -123,7 +120,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be removed.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -416,7 +412,7 @@ Returns all blocks that match a blockName. Results include nested blocks.
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _blockName_ `?string`: Optional block name, if not specified, returns an empty array.
+-   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
 
 _Returns_
 
@@ -565,6 +561,18 @@ _Parameters_
 _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
+
+### getHoveredBlockClientId
+
+Returns the currently hovered block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Client Id of the hovered block.
 
 ### getInserterItems
 
@@ -1261,6 +1269,18 @@ _Parameters_
 
 Action that hides the insertion point.
 
+### hoverBlock
+
+Returns an action object used in signalling that the block with the specified client ID has been hovered.
+
+_Parameters_
+
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### insertAfterBlock
 
 Action that inserts a default block after a given block.
@@ -1439,7 +1459,7 @@ wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
 			per_page: 'page_size',
 			search: 'q',
 		};
-		const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+		const url = new URL( 'https://api.openverse.org/v1/images/' );
 		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
 			const queryKey = mapFromInserterMediaRequest[ key ] || key;
 			url.searchParams.set( queryKey, value );
@@ -1841,11 +1861,11 @@ _Returns_
 
 ### updateBlockListSettings
 
-Action that changes the nested settings of a given block.
+Action that changes the nested settings of the given block(s).
 
 _Parameters_
 
--   _clientId_ `string`: Client ID of the block whose nested setting are being received.
+-   _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
 -   _settings_ `Object`: Object with the new settings for the nested block.
 
 _Returns_

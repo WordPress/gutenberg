@@ -70,7 +70,7 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to submit your block(s) to the Block Directory all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
 
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
@@ -427,7 +427,7 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 
 ### Variations
 
--   Type: `object[]`
+-   Type: `object[]|WPDefinedPath` ([learn more](#wpdefinedpath))
 -   Optional
 -   Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 -   Property: `variations`
@@ -453,6 +453,48 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
+
+Starting with version 6.7, it is possible to specify a PHP file in `block.json` that generates the list of block variations on the server side:
+
+```json
+{ "variations": "file:./variations.php" }
+```
+
+That PHP file is expected to `return` an array that contains the block variations. Strings found in the variations returned from the PHP file will not be localized automatically; instead, use the `__()` function as usual.
+
+For example:
+
+```php
+<?php
+// Generate variations for a Social Icon kind of block.
+
+return array(
+	array(
+		'isDefault'  => true,
+		'name'       => 'wordpress',
+		'title'      => 'WordPress',
+		'icon'       => 'wordpress',
+		'attributes' => array(
+			'service' => 'wordpress',
+		),
+		'isActive'   => array( 'service' )
+	),
+	array(
+		'name'       => 'mail',
+		'title'      => __( 'Mail' ),
+		'keywords'   => array(
+			__( 'email' ),
+			__( 'e-mail' )
+		),
+		'icon'       => 'mail',
+		'attributes' => array(
+			'service' => 'mail',
+		),
+		'isActive'   => array( 'mail' )
+	),
+);
+
+```
 
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
@@ -543,7 +585,7 @@ Block type frontend script module definition. They will be enqueued only when vi
 
 It's possible to pass a script module ID registered with the [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/) function, a path to a JavaScript module relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
-WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. In the future, it will be possible to depend on scripts from script modules.
+WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. [More functionality](https://core.trac.wordpress.org/ticket/60647) will gradually become available to Script Modules.
 
 _Note: Available since WordPress `6.5.0`._
 
@@ -745,7 +787,7 @@ $metadata = array(
 );
 ```
 
-Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+Implementation follows the existing [get_plugin_data](https://developer.wordpress.org/reference/functions/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
 
 ### JavaScript
 

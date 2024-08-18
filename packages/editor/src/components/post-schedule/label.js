@@ -10,10 +10,25 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the PostScheduleLabel component.
+ *
+ * @param {Object} props Props.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostScheduleLabel( props ) {
 	return usePostScheduleLabel( props );
 }
 
+/**
+ * Custom hook to get the label for post schedule.
+ *
+ * @param {Object}  options      Options for the hook.
+ * @param {boolean} options.full Whether to get the full label or not. Default is false.
+ *
+ * @return {string} The label for post schedule.
+ */
 export function usePostScheduleLabel( { full = false } = {} ) {
 	const { date, isFloating } = useSelect(
 		( select ) => ( {

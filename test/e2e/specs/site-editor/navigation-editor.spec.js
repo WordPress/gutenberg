@@ -20,7 +20,7 @@ test.describe( 'Editing Navigation Menus', () => {
 		editor,
 	} ) => {
 		await test.step( 'Check Navigation block is present and locked', async () => {
-			// create a Navigation Menu called "Test Menu" using the REST API helpers
+			// Create a Navigation Menu called "Primary Menu" using the REST API helpers.
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Primary Menu',
 				content:
@@ -45,7 +45,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			const listView = page
 				.getByRole( 'region', {
-					name: 'List View',
+					name: 'Document Overview',
 				} )
 				.getByRole( 'treegrid', {
 					name: 'Block navigation structure',
@@ -54,19 +54,25 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation (locked)',
+				name: 'Navigation',
 				exact: true,
 			} );
 
-			// The Navigation block should be present and locked.
+			// The Navigation block should be present.
 			await expect( navBlockNode ).toBeVisible();
+
+			// The Navigation block description should contain the locked state information.
+			await expect( navBlockNode ).toHaveAccessibleDescription(
+				/This block is locked./
+			);
 
 			// The block should have no options menu.
 			await expect(
-				listView.getByRole( 'button', {
-					name: 'Options for Navigation',
-					exact: true,
-				} )
+				navBlockNode
+					.locator( '..' ) // parent selector.
+					.getByRole( 'button', {
+						name: 'Options',
+					} )
 			).toBeHidden();
 
 			// Select the Navigation block.
@@ -91,7 +97,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			// Check the standard tabs are not present.
 			await expect(
-				sidebar.getByRole( 'tab', { name: 'List View' } )
+				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )

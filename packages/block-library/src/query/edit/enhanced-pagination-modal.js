@@ -27,7 +27,11 @@ export default function EnhancedPaginationModal( {
 		useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		if ( enhancedPagination && hasUnsupportedBlocks ) {
+		if (
+			enhancedPagination &&
+			hasUnsupportedBlocks &&
+			! window.__experimentalFullPageClientSideNavigation
+		) {
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
 		}
@@ -43,7 +47,7 @@ export default function EnhancedPaginationModal( {
 	if ( hasBlocksFromPlugins ) {
 		notice =
 			__(
-				'Currently, avoiding full page reloads is not possible when blocks from plugins are present inside the Query block.'
+				'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
 			) +
 			' ' +
 			notice;

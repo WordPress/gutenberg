@@ -232,7 +232,6 @@ export default function useOnBlockDrop(
 		getBlocksByClientId,
 		getSettings,
 		getBlock,
-		isGroupable,
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
@@ -252,18 +251,14 @@ export default function useOnBlockDrop(
 			initialPosition = 0,
 			clientIdsToReplace = []
 		) => {
-			if ( ! Array.isArray( blocks ) ) blocks = [ blocks ];
-
+			if ( ! Array.isArray( blocks ) ) {
+				blocks = [ blocks ];
+			}
 			const clientIds = getBlockOrder( targetRootClientId );
 			const clientId = clientIds[ targetBlockIndex ];
-			const blocksClientIds = blocks.map( ( block ) => block.clientId );
-			const areGroupableBlocks = isGroupable( [
-				...blocksClientIds,
-				clientId,
-			] );
 			if ( operation === 'replace' ) {
 				replaceBlocks( clientId, blocks, undefined, initialPosition );
-			} else if ( operation === 'group' && areGroupableBlocks ) {
+			} else if ( operation === 'group' ) {
 				const targetBlock = getBlock( clientId );
 				if ( nearestSide === 'left' ) {
 					blocks.push( targetBlock );
@@ -323,7 +318,6 @@ export default function useOnBlockDrop(
 			getBlockOrder,
 			targetRootClientId,
 			targetBlockIndex,
-			isGroupable,
 			operation,
 			replaceBlocks,
 			getBlock,

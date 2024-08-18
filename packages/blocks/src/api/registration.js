@@ -1,10 +1,9 @@
-/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-
 /**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -131,6 +130,10 @@ function isObject( object ) {
 /**
  * Sets the server side block definition of blocks.
  *
+ * Ignored from documentation due to being marked as unstable.
+ *
+ * @ignore
+ *
  * @param {Object} definitions Server-side block definitions
  */
 // eslint-disable-next-line camelcase
@@ -142,7 +145,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
 }
 
 /**
- * Gets block settings from metadata loaded from `block.json` file.
+ * Gets block settings from metadata loaded from `block.json` file
  *
  * @param {Object} metadata            Block metadata loaded from `block.json`.
  * @param {string} metadata.textdomain Textdomain to use with translations.
@@ -225,18 +228,18 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		: blockNameOrMetadata;
 
 	if ( typeof name !== 'string' ) {
-		console.error( 'Block names must be strings.' );
+		warning( 'Block names must be strings.' );
 		return;
 	}
 
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
+		warning(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
 	if ( select( blocksStore ).getBlockType( name ) ) {
-		console.error( 'Block "' + name + '" is already registered.' );
+		warning( 'Block "' + name + '" is already registered.' );
 		return;
 	}
 
@@ -381,7 +384,7 @@ export function unregisterBlockCollection( namespace ) {
 export function unregisterBlockType( name ) {
 	const oldBlock = select( blocksStore ).getBlockType( name );
 	if ( ! oldBlock ) {
-		console.error( 'Block "' + name + '" is not registered.' );
+		warning( 'Block "' + name + '" is not registered.' );
 		return;
 	}
 	dispatch( blocksStore ).removeBlockTypes( name );
@@ -611,13 +614,13 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 };
 
 /**
- * Registers a new block style for the given block.
+ * Registers a new block style for the given block types.
  *
  * For more information on connecting the styles with CSS
  * [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
  *
- * @param {string} blockName      Name of block (example: “core/latest-posts”).
- * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+ * @param {string|Array} blockNames     Name of blocks e.g. “core/latest-posts” or `["core/group", "core/columns"]`.
+ * @param {Object}       styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  *
  * @example
  * ```js
@@ -642,8 +645,8 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * };
  * ```
  */
-export const registerBlockStyle = ( blockName, styleVariation ) => {
-	dispatch( blocksStore ).addBlockStyles( blockName, styleVariation );
+export const registerBlockStyle = ( blockNames, styleVariation ) => {
+	dispatch( blocksStore ).addBlockStyles( blockNames, styleVariation );
 };
 
 /**
@@ -723,6 +726,10 @@ export const getBlockVariations = ( blockName, scope ) => {
  * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
+	if ( typeof variation.name !== 'string' ) {
+		warning( 'Variation names must be unique strings.' );
+	}
+
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 
@@ -754,3 +761,193 @@ export const registerBlockVariation = ( blockName, variation ) => {
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };
+
+/**
+ * Registers a new block bindings source with an object defining its
+ * behavior. Once registered, the source is available to be connected
+ * to the supported block attributes.
+ *
+ * @param {Object}   source                    Properties of the source to be registered.
+ * @param {string}   source.name               The unique and machine-readable name.
+ * @param {string}   [source.label]            Human-readable label.
+ * @param {Array}    [source.usesContext]      Array of context needed by the source only in the editor.
+ * @param {Function} [source.getValues]        Function to get the values from the source.
+ * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
+ * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
+ * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
+ *
+ * @example
+ * ```js
+ * import { _x } from '@wordpress/i18n';
+ * import { registerBlockBindingsSource } from '@wordpress/blocks'
+ *
+ * registerBlockBindingsSource( {
+ *     name: 'plugin/my-custom-source',
+ *     label: _x( 'My Custom Source', 'block bindings source' ),
+ *     getValues: () => getSourceValues(),
+ *     setValues: () => updateMyCustomValuesInBatch(),
+ *     getPlaceholder: () => 'Placeholder text when the value is undefined',
+ *     canUserEditValue: () => true,
+ * } );
+ * ```
+ */
+export const registerBlockBindingsSource = ( source ) => {
+	const {
+		name,
+		label,
+		usesContext,
+		getValues,
+		setValues,
+		getPlaceholder,
+		canUserEditValue,
+		getFieldsList,
+	} = source;
+
+	const existingSource = unlock(
+		select( blocksStore )
+	).getBlockBindingsSource( name );
+
+	/*
+	 * Check if the source has been already registered on the client.
+	 * If the `getValues` property is defined, it could be assumed the source is already registered.
+	 */
+	if ( existingSource?.getValues ) {
+		warning(
+			'Block bindings source "' + name + '" is already registered.'
+		);
+		return;
+	}
+
+	// Check the `name` property is correct.
+	if ( ! name ) {
+		warning( 'Block bindings source must contain a name.' );
+		return;
+	}
+
+	if ( typeof name !== 'string' ) {
+		warning( 'Block bindings source name must be a string.' );
+		return;
+	}
+
+	if ( /[A-Z]+/.test( name ) ) {
+		warning(
+			'Block bindings source name must not contain uppercase characters.'
+		);
+		return;
+	}
+
+	if ( ! /^[a-z0-9/-]+$/.test( name ) ) {
+		warning(
+			'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
+		);
+		return;
+	}
+
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+		warning(
+			'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
+		);
+		return;
+	}
+
+	// Check the `label` property is correct.
+	if ( label && existingSource?.label ) {
+		warning(
+			'Block bindings "' +
+				name +
+				'" source label is already defined in the server.'
+		);
+		return;
+	}
+
+	if ( ! label && ! existingSource?.label ) {
+		warning( 'Block bindings source must contain a label.' );
+		return;
+	}
+
+	if ( label && typeof label !== 'string' ) {
+		warning( 'Block bindings source label must be a string.' );
+		return;
+	}
+
+	// Check the `usesContext` property is correct.
+	if ( usesContext && ! Array.isArray( usesContext ) ) {
+		warning( 'Block bindings source usesContext must be an array.' );
+		return;
+	}
+
+	// Check the `getValues` property is correct.
+	if ( getValues && typeof getValues !== 'function' ) {
+		warning( 'Block bindings source getValues must be a function.' );
+		return;
+	}
+
+	// Check the `setValues` property is correct.
+	if ( setValues && typeof setValues !== 'function' ) {
+		warning( 'Block bindings source setValues must be a function.' );
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
+		warning( 'Block bindings source getPlaceholder must be a function.' );
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
+		warning( 'Block bindings source canUserEditValue must be a function.' );
+		return;
+	}
+
+	// Check the `getFieldsList` property is correct.
+	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+		// eslint-disable-next-line no-console
+		warning( 'Block bindings source getFieldsList must be a function.' );
+		return;
+	}
+
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+};
+
+/**
+ * Unregisters a block bindings source
+ *
+ * @param {string} name The name of the block bindings source to unregister.
+ *
+ * @example
+ * ```js
+ * import { unregisterBlockBindingsSource } from '@wordpress/blocks';
+ *
+ * unregisterBlockBindingsSource( 'plugin/my-custom-source' );
+ * ```
+ */
+export function unregisterBlockBindingsSource( name ) {
+	const oldSource = getBlockBindingsSource( name );
+	if ( ! oldSource ) {
+		warning( 'Block bindings source "' + name + '" is not registered.' );
+		return;
+	}
+	unlock( dispatch( blocksStore ) ).removeBlockBindingsSource( name );
+}
+
+/**
+ * Returns a registered block bindings source.
+ *
+ * @param {string} name Block bindings source name.
+ *
+ * @return {?Object} Block bindings source.
+ */
+export function getBlockBindingsSource( name ) {
+	return unlock( select( blocksStore ) ).getBlockBindingsSource( name );
+}
+
+/**
+ * Returns all registered block bindings sources.
+ *
+ * @return {Array} Block bindings sources.
+ */
+export function getBlockBindingsSources() {
+	return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
+}

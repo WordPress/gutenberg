@@ -31,7 +31,7 @@
 	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
 	:where(body .is-layout-constrained) &,
 	:where(.wp-site-blocks) & {
-		> :first-child:first-child {
+		> :first-child {
 			margin-block-start: 0;
 			margin-block-end: 0;
 		}
@@ -101,7 +101,7 @@
 		height: $button-size-small;
 	}
 
-	// @todo: these are currently two separate components. Since we're now
+	// @todo these are currently two separate components. Since we're now
 	// treating them the same, one or both can be retired.
 	.block-editor-inserter__toggle.components-button.has-icon,
 	.block-list-appender__toggle {
@@ -134,7 +134,7 @@
 
 	// These could be avoided by employing a :not(:only-child) on the parent,
 	// but this should be more performant.
-	// @todo: These styles can almost certainly be refactored away we refactor
+	// @todo These styles can almost certainly be refactored away we refactor
 	// the markup and classes of the component itself. The rules provide some
 	// baseline styles for when the block is the only one inside.
 	&:only-child {

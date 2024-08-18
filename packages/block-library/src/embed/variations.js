@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,9 +27,18 @@ import {
 	embedPinterestIcon,
 	embedWolframIcon,
 	embedPocketCastsIcon,
+	embedBlueskyIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+
+function getTitle( providerName ) {
+	return sprintf(
+		/* translators: %s: provider name */
+		__( '%s Embed' ),
+		providerName
+	);
+}
 
 /**
  * The embed provider services.
@@ -39,7 +48,7 @@ import {
 const variations = [
 	{
 		name: 'twitter',
-		title: 'Twitter',
+		title: getTitle( 'Twitter' ),
 		icon: embedTwitterIcon,
 		keywords: [ 'tweet', __( 'social' ) ],
 		description: __( 'Embed a tweet.' ),
@@ -48,7 +57,7 @@ const variations = [
 	},
 	{
 		name: 'youtube',
-		title: 'YouTube',
+		title: getTitle( 'YouTube' ),
 		icon: embedYouTubeIcon,
 		keywords: [ __( 'music' ), __( 'video' ) ],
 		description: __( 'Embed a YouTube video.' ),
@@ -62,7 +71,7 @@ const variations = [
 		// Deprecate Facebook Embed per FB policy
 		// See: https://developers.facebook.com/docs/plugins/oembed-legacy
 		name: 'facebook',
-		title: 'Facebook',
+		title: getTitle( 'Facebook' ),
 		icon: embedFacebookIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Facebook post.' ),
@@ -78,7 +87,7 @@ const variations = [
 		// Deprecate Instagram per FB policy
 		// See: https://developers.facebook.com/docs/instagram/oembed-legacy
 		name: 'instagram',
-		title: 'Instagram',
+		title: getTitle( 'Instagram' ),
 		icon: embedInstagramIcon,
 		keywords: [ __( 'image' ), __( 'social' ) ],
 		description: __( 'Embed an Instagram post.' ),
@@ -88,7 +97,7 @@ const variations = [
 	},
 	{
 		name: 'wordpress',
-		title: 'WordPress',
+		title: getTitle( 'WordPress' ),
 		icon: embedWordPressIcon,
 		keywords: [ __( 'post' ), __( 'blog' ) ],
 		description: __( 'Embed a WordPress post.' ),
@@ -98,7 +107,7 @@ const variations = [
 	},
 	{
 		name: 'soundcloud',
-		title: 'SoundCloud',
+		title: getTitle( 'SoundCloud' ),
 		icon: embedAudioIcon,
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed SoundCloud content.' ),
@@ -107,7 +116,7 @@ const variations = [
 	},
 	{
 		name: 'spotify',
-		title: 'Spotify',
+		title: getTitle( 'Spotify' ),
 		icon: embedSpotifyIcon,
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Spotify content.' ),
@@ -116,7 +125,7 @@ const variations = [
 	},
 	{
 		name: 'flickr',
-		title: 'Flickr',
+		title: getTitle( 'Flickr' ),
 		icon: embedFlickrIcon,
 		keywords: [ __( 'image' ) ],
 		description: __( 'Embed Flickr content.' ),
@@ -128,7 +137,7 @@ const variations = [
 	},
 	{
 		name: 'vimeo',
-		title: 'Vimeo',
+		title: getTitle( 'Vimeo' ),
 		icon: embedVimeoIcon,
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Vimeo video.' ),
@@ -137,7 +146,7 @@ const variations = [
 	},
 	{
 		name: 'animoto',
-		title: 'Animoto',
+		title: getTitle( 'Animoto' ),
 		icon: embedAnimotoIcon,
 		description: __( 'Embed an Animoto video.' ),
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
@@ -145,7 +154,7 @@ const variations = [
 	},
 	{
 		name: 'cloudup',
-		title: 'Cloudup',
+		title: getTitle( 'Cloudup' ),
 		icon: embedContentIcon,
 		description: __( 'Embed Cloudup content.' ),
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
@@ -154,7 +163,7 @@ const variations = [
 	{
 		// Deprecated since CollegeHumor content is now powered by YouTube.
 		name: 'collegehumor',
-		title: 'CollegeHumor',
+		title: getTitle( 'CollegeHumor' ),
 		icon: embedVideoIcon,
 		description: __( 'Embed CollegeHumor content.' ),
 		scope: [ 'block' ],
@@ -163,7 +172,7 @@ const variations = [
 	},
 	{
 		name: 'crowdsignal',
-		title: 'Crowdsignal',
+		title: getTitle( 'Crowdsignal' ),
 		icon: embedContentIcon,
 		keywords: [ 'polldaddy', __( 'survey' ) ],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
@@ -174,7 +183,7 @@ const variations = [
 	},
 	{
 		name: 'dailymotion',
-		title: 'Dailymotion',
+		title: getTitle( 'Dailymotion' ),
 		icon: embedDailymotionIcon,
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a Dailymotion video.' ),
@@ -183,7 +192,7 @@ const variations = [
 	},
 	{
 		name: 'imgur',
-		title: 'Imgur',
+		title: getTitle( 'Imgur' ),
 		icon: embedPhotoIcon,
 		description: __( 'Embed Imgur content.' ),
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
@@ -191,7 +200,7 @@ const variations = [
 	},
 	{
 		name: 'issuu',
-		title: 'Issuu',
+		title: getTitle( 'Issuu' ),
 		icon: embedContentIcon,
 		description: __( 'Embed Issuu content.' ),
 		patterns: [ /^https?:\/\/(www\.)?issuu\.com\/.+/i ],
@@ -199,7 +208,7 @@ const variations = [
 	},
 	{
 		name: 'kickstarter',
-		title: 'Kickstarter',
+		title: getTitle( 'Kickstarter' ),
 		icon: embedContentIcon,
 		description: __( 'Embed Kickstarter content.' ),
 		patterns: [
@@ -210,7 +219,7 @@ const variations = [
 	},
 	{
 		name: 'mixcloud',
-		title: 'Mixcloud',
+		title: getTitle( 'Mixcloud' ),
 		icon: embedAudioIcon,
 		keywords: [ __( 'music' ), __( 'audio' ) ],
 		description: __( 'Embed Mixcloud content.' ),
@@ -219,7 +228,7 @@ const variations = [
 	},
 	{
 		name: 'pocket-casts',
-		title: 'Pocket Casts',
+		title: getTitle( 'Pocket Casts' ),
 		icon: embedPocketCastsIcon,
 		keywords: [ __( 'podcast' ), __( 'audio' ) ],
 		description: __( 'Embed a podcast player from Pocket Casts.' ),
@@ -228,7 +237,7 @@ const variations = [
 	},
 	{
 		name: 'reddit',
-		title: 'Reddit',
+		title: getTitle( 'Reddit' ),
 		icon: embedRedditIcon,
 		description: __( 'Embed a Reddit thread.' ),
 		patterns: [ /^https?:\/\/(www\.)?reddit\.com\/.+/i ],
@@ -236,7 +245,7 @@ const variations = [
 	},
 	{
 		name: 'reverbnation',
-		title: 'ReverbNation',
+		title: getTitle( 'ReverbNation' ),
 		icon: embedAudioIcon,
 		description: __( 'Embed ReverbNation content.' ),
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
@@ -244,7 +253,7 @@ const variations = [
 	},
 	{
 		name: 'screencast',
-		title: 'Screencast',
+		title: getTitle( 'Screencast' ),
 		icon: embedVideoIcon,
 		description: __( 'Embed Screencast content.' ),
 		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
@@ -252,23 +261,15 @@ const variations = [
 	},
 	{
 		name: 'scribd',
-		title: 'Scribd',
+		title: getTitle( 'Scribd' ),
 		icon: embedContentIcon,
 		description: __( 'Embed Scribd content.' ),
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
 		attributes: { providerNameSlug: 'scribd', responsive: true },
 	},
 	{
-		name: 'slideshare',
-		title: 'Slideshare',
-		icon: embedContentIcon,
-		description: __( 'Embed Slideshare content.' ),
-		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
-		attributes: { providerNameSlug: 'slideshare', responsive: true },
-	},
-	{
 		name: 'smugmug',
-		title: 'SmugMug',
+		title: getTitle( 'SmugMug' ),
 		icon: embedPhotoIcon,
 		description: __( 'Embed SmugMug content.' ),
 		patterns: [ /^https?:\/\/(.+\.)?smugmug\.com\/.*/i ],
@@ -280,7 +281,7 @@ const variations = [
 	},
 	{
 		name: 'speaker-deck',
-		title: 'Speaker Deck',
+		title: getTitle( 'Speaker Deck' ),
 		icon: embedContentIcon,
 		description: __( 'Embed Speaker Deck content.' ),
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
@@ -288,7 +289,7 @@ const variations = [
 	},
 	{
 		name: 'tiktok',
-		title: 'TikTok',
+		title: getTitle( 'TikTok' ),
 		icon: embedVideoIcon,
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a TikTok video.' ),
@@ -297,7 +298,7 @@ const variations = [
 	},
 	{
 		name: 'ted',
-		title: 'TED',
+		title: getTitle( 'TED' ),
 		icon: embedVideoIcon,
 		description: __( 'Embed a TED video.' ),
 		patterns: [ /^https?:\/\/(www\.|embed\.)?ted\.com\/.+/i ],
@@ -305,7 +306,7 @@ const variations = [
 	},
 	{
 		name: 'tumblr',
-		title: 'Tumblr',
+		title: getTitle( 'Tumblr' ),
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
@@ -314,7 +315,7 @@ const variations = [
 	},
 	{
 		name: 'videopress',
-		title: 'VideoPress',
+		title: getTitle( 'VideoPress' ),
 		icon: embedVideoIcon,
 		keywords: [ __( 'video' ) ],
 		description: __( 'Embed a VideoPress video.' ),
@@ -323,7 +324,7 @@ const variations = [
 	},
 	{
 		name: 'wordpress-tv',
-		title: 'WordPress.tv',
+		title: getTitle( 'WordPress.tv' ),
 		icon: embedVideoIcon,
 		description: __( 'Embed a WordPress.tv video.' ),
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
@@ -331,7 +332,7 @@ const variations = [
 	},
 	{
 		name: 'amazon-kindle',
-		title: 'Amazon Kindle',
+		title: getTitle( 'Amazon Kindle' ),
 		icon: embedAmazonIcon,
 		keywords: [ __( 'ebook' ) ],
 		description: __( 'Embed Amazon Kindle content.' ),
@@ -343,7 +344,7 @@ const variations = [
 	},
 	{
 		name: 'pinterest',
-		title: 'Pinterest',
+		title: getTitle( 'Pinterest' ),
 		icon: embedPinterestIcon,
 		keywords: [ __( 'social' ), __( 'bookmark' ) ],
 		description: __( 'Embed Pinterest pins, boards, and profiles.' ),
@@ -354,11 +355,19 @@ const variations = [
 	},
 	{
 		name: 'wolfram-cloud',
-		title: 'Wolfram',
+		title: getTitle( 'Wolfram' ),
 		icon: embedWolframIcon,
 		description: __( 'Embed Wolfram notebook content.' ),
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
+	},
+	{
+		name: 'bluesky',
+		title: getTitle( 'Bluesky' ),
+		icon: embedBlueskyIcon,
+		description: __( 'Embed a Bluesky post.' ),
+		patterns: [ /^https?:\/\/bsky\.app\/profile\/.+\/post\/.+/i ],
+		attributes: { providerNameSlug: 'bluesky' },
 	},
 ];
 
@@ -368,7 +377,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.providerNameSlug ===
 		variationAttributes.providerNameSlug;

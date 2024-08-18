@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { FormToggle } from '..';
+import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,

@@ -102,34 +102,13 @@ const exportDefaultPackages = [
 	'warning',
 ];
 
-const vendors = {
-	react: [
-		'react/umd/react.development.js',
-		'react/umd/react.production.min.js',
-	],
-	'react-dom': [
-		'react-dom/umd/react-dom.development.js',
-		'react-dom/umd/react-dom.production.min.js',
-	],
-	'inert-polyfill': [
-		'wicg-inert/dist/inert.js',
-		'wicg-inert/dist/inert.min.js',
-	],
+const copiedVendors = {
+	'react.js': 'react/umd/react.development.js',
+	'react.min.js': 'react/umd/react.production.min.js',
+	'react-dom.js': 'react-dom/umd/react-dom.development.js',
+	'react-dom.min.js': 'react-dom/umd/react-dom.production.min.js',
 };
-const vendorsCopyConfig = Object.entries( vendors ).flatMap(
-	( [ key, [ devFilename, prodFilename ] ] ) => {
-		return [
-			{
-				from: `node_modules/${ devFilename }`,
-				to: `build/vendors/${ key }.js`,
-			},
-			{
-				from: `node_modules/${ prodFilename }`,
-				to: `build/vendors/${ key }.min.js`,
-			},
-		];
-	}
-);
+
 module.exports = {
 	...baseConfig,
 	name: 'packages',
@@ -177,7 +156,12 @@ module.exports = {
 					noErrorOnMissing: true,
 				} ) )
 				.concat( bundledPackagesPhpConfig )
-				.concat( vendorsCopyConfig ),
+				.concat(
+					Object.entries( copiedVendors ).map( ( [ to, from ] ) => ( {
+						from: `node_modules/${ from }`,
+						to: `build/vendors/${ to }`,
+					} ) )
+				),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,

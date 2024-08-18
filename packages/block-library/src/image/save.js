@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ export default function save( { attributes } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( {
+	const classes = clsx( {
 		// All other align classes are handled by block supports.
 		// `{ align: 'none' }` is unique to transforms for the image block.
 		alignnone: 'none' === align,
@@ -49,7 +49,7 @@ export default function save( { attributes } ) {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const imageClasses = classnames( borderProps.className, {
+	const imageClasses = clsx( borderProps.className, {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 

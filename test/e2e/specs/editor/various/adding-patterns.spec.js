@@ -9,10 +9,9 @@ test.describe( 'adding patterns', () => {
 	} );
 
 	test( 'should insert a block pattern', async ( { page, editor } ) => {
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
-		);
+		await page.getByLabel( 'Toggle block inserter' ).click();
 
+		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			'Social links with a shared background color'

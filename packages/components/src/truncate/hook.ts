@@ -53,7 +53,11 @@ export default function useTruncate(
 		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
 
 	const classes = useMemo( () => {
+		// The `word-break: break-all` property first makes sure a text line
+		// breaks even when it contains 'unbreakable' content such as long URLs.
+		// See https://github.com/WordPress/gutenberg/issues/60860.
 		const truncateLines = css`
+			${ numberOfLines === 1 ? 'word-break: break-all;' : '' }
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: ${ numberOfLines };
 			display: -webkit-box;

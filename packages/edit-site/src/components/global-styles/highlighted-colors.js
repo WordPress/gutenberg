@@ -16,7 +16,7 @@ export default function HighlightedColors( {
 	const scaledSwatchSize = normalizedColorSwatchSize * ratio;
 	return highlightedColors.map( ( { slug, color }, index ) => (
 		<motion.div
-			key={ slug }
+			key={ `${ slug }-${ index }` }
 			style={ {
 				height: scaledSwatchSize,
 				width: scaledSwatchSize,

@@ -30,18 +30,12 @@ test.describe( 'Style Book', () => {
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).toBeHidden();
+		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
-		).toBeHidden();
+		).toBeDisabled();
 		await expect(
-			page.locator( 'role=button[name="Undo"i]' )
-		).toBeHidden();
-		await expect(
-			page.locator( 'role=button[name="Redo"i]' )
-		).toBeHidden();
-		await expect(
-			page.locator( 'role=button[name="View"i]' )
+			page.locator( 'role=button[name="Document Overview"i]' )
 		).toBeDisabled();
 	} );
 
@@ -132,9 +126,7 @@ test.describe( 'Style Book', () => {
 		} );
 
 		// Close Style Book via click event.
-		await styleBookRegion
-			.getByRole( 'button', { name: 'Close Style Book' } )
-			.click();
+		await styleBookRegion.getByRole( 'button', { name: 'Close' } ).click();
 
 		await expect(
 			styleBookRegion,
@@ -182,6 +174,21 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'style book should be visible'
+		).toBeVisible();
+	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+	} ) => {
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Book',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
 		).toBeVisible();
 	} );
 } );

@@ -200,7 +200,7 @@ export function __experimentalReceiveThemeGlobalStyleVariations(
 /**
  * Returns an action object used in signalling that the index has been received.
  *
- * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector directly.
  *
  * @return {Object} Action object.
  */
@@ -286,13 +286,13 @@ export const deleteEntityRecord =
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
 		let error;
 		let deletedRecord = false;
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -396,7 +396,7 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const objectId = entityConfig.getSyncObjectId( recordId );
 				getSyncProvider().update(
 					entityConfig.syncObjectType + '--edit',
@@ -503,11 +503,11 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
@@ -598,10 +598,14 @@ export const saveEntityRecord =
 							return acc;
 						},
 						{
+							// Do not update the `status` if we have edited it when auto saving.
+							// It's very important to let the user explicitly save this change,
+							// because it can lead to unexpected results. An example would be to
+							// have a draft post and change the status to publish.
 							status:
 								data.status === 'auto-draft'
 									? 'draft'
-									: data.status,
+									: undefined,
 						}
 					);
 					updatedRecord = await __unstableFetch( {
@@ -769,10 +773,10 @@ export const __experimentalBatch =
 /**
  * Action triggered to save an entity record's edits.
  *
- * @param {string} kind     Kind of the entity.
- * @param {string} name     Name of the entity.
- * @param {Object} recordId ID of the record.
- * @param {Object} options  Saving options.
+ * @param {string}  kind     Kind of the entity.
+ * @param {string}  name     Name of the entity.
+ * @param {Object}  recordId ID of the record.
+ * @param {Object=} options  Saving options.
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
@@ -780,7 +784,7 @@ export const saveEditedEntityRecord =
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -824,7 +828,7 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -948,7 +952,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);

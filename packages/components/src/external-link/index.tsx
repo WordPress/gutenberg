@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -9,13 +9,10 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../visually-hidden';
-import { StyledIcon } from './styles/external-link-styles';
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -37,7 +34,7 @@ function UnforwardedExternalLink(
 			].filter( Boolean )
 		),
 	].join( ' ' );
-	const classes = classnames( 'components-external-link', className );
+	const classes = clsx( 'components-external-link', className );
 	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
 	to prevent them from being opened in the editor. */
@@ -66,17 +63,18 @@ function UnforwardedExternalLink(
 			rel={ optimizedRel }
 			ref={ ref }
 		>
-			{ children }
-			<VisuallyHidden as="span">
-				{
+			<span className="components-external-link__contents">
+				{ children }
+			</span>
+			<span
+				className="components-external-link__icon"
+				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )
 				}
-			</VisuallyHidden>
-			<StyledIcon
-				icon={ external }
-				className="components-external-link__icon"
-			/>
+			>
+				&#8599;
+			</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);

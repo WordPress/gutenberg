@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dataviews",
-	"version": "0.7.0",
+	"version": "4.1.0",
 	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -27,18 +28,18 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.3.12",
+		"@ariakit/react": "^0.4.7",
 		"@babel/runtime": "^7.16.0",
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
-		"classnames": "^2.3.1",
+		"@wordpress/warning": "file:../warning",
+		"clsx": "^2.1.1",
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {

@@ -1,23 +1,26 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { textHorizontal, textVertical } from '@wordpress/icons';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 const WRITING_MODES = [
 	{
-		name: __( 'Horizontal' ),
+		label: __( 'Horizontal' ),
 		value: 'horizontal-tb',
 		icon: textHorizontal,
 	},
 	{
-		name: __( 'Vertical' ),
+		label: __( 'Vertical' ),
 		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
 		icon: textVertical,
 	},
@@ -35,34 +38,27 @@ const WRITING_MODES = [
  */
 export default function WritingModeControl( { className, value, onChange } ) {
 	return (
-		<fieldset
-			className={ classnames(
-				'block-editor-writing-mode-control',
-				className
-			) }
+		<ToggleGroupControl
+			isDeselectable
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			label={ __( 'Orientation' ) }
+			className={ clsx( 'block-editor-writing-mode-control', className ) }
+			value={ value }
+			onChange={ ( newValue ) => {
+				onChange( newValue === value ? undefined : newValue );
+			} }
 		>
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Orientation' ) }
-			</BaseControl.VisualLabel>
-			<div className="block-editor-writing-mode-control__buttons">
-				{ WRITING_MODES.map( ( writingMode ) => {
-					return (
-						<Button
-							key={ writingMode.value }
-							icon={ writingMode.icon }
-							label={ writingMode.name }
-							isPressed={ writingMode.value === value }
-							onClick={ () => {
-								onChange(
-									writingMode.value === value
-										? undefined
-										: writingMode.value
-								);
-							} }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+			{ WRITING_MODES.map( ( option ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ option.value }
+						value={ option.value }
+						icon={ option.icon }
+						label={ option.label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }

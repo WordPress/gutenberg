@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,10 +12,7 @@ export default function SidebarButton( props ) {
 	return (
 		<Button
 			{ ...props }
-			className={ classnames(
-				'edit-site-sidebar-button',
-				props.className
-			) }
+			className={ clsx( 'edit-site-sidebar-button', props.className ) }
 		/>
 	);
 }

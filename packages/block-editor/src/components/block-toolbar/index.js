@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,9 +35,8 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
-import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+
 /**
  * Renders the block toolbar.
  *
@@ -62,7 +61,6 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
-		blockName,
 		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
@@ -94,13 +92,14 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
-			?.metadata?.bindings;
+		const _isUsingBindings = selectedBlockClientIds.every(
+			( clientId ) =>
+				!! getBlockAttributes( clientId )?.metadata?.bindings
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockName: _blockName,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
@@ -140,12 +139,13 @@ export function PrivateBlockToolbar( {
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
-	const classes = classnames( 'block-editor-block-contextual-toolbar', {
+	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
 	} );
 
-	const innerClasses = classnames( 'block-editor-block-toolbar', {
+	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
+		'is-connected': isUsingBindings,
 	} );
 
 	return (
@@ -167,26 +167,31 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				{ isUsingBindings && canBindBlock( blockName ) && (
-					<BlockBindingsIndicator />
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					isDefaultEditingMode && (
+					( isDefaultEditingMode || isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
-								<BlockMover
+								<BlockSwitcher
 									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
+									disabled={ ! isDefaultEditingMode }
+									isUsingBindings={ isUsingBindings }
 								/>
+								{ isDefaultEditingMode && (
+									<>
+										{ ! isMultiToolbar && (
+											<BlockLockToolbar
+												clientId={ blockClientId }
+											/>
+										) }
+										<BlockMover
+											clientIds={ blockClientIds }
+											hideDragHandle={ hideDragHandle }
+										/>
+									</>
+								) }
 							</ToolbarGroup>
 						</div>
 					) }

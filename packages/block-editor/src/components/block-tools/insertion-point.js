@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,6 +38,7 @@ function InbetweenInsertionPointPopover( {
 		isInserterShown,
 		isDistractionFree,
 		isNavigationMode,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -48,6 +49,7 @@ function InbetweenInsertionPointPopover( {
 			getNextBlockClientId,
 			getSettings,
 			isNavigationMode: _isNavigationMode,
+			__unstableGetEditorMode,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -79,6 +81,7 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );
@@ -145,12 +148,20 @@ function InbetweenInsertionPointPopover( {
 		return null;
 	}
 
+	// Zoom out mode should only show the insertion point for the insert operation.
+	// Other operations such as "group" are when the editor tries to create a row
+	// block by grouping the block being dragged with the block it's being dropped
+	// onto.
+	if ( isZoomOutMode && operation !== 'insert' ) {
+		return null;
+	}
+
 	const orientationClassname =
 		orientation === 'horizontal' || operation === 'group'
 			? 'is-horizontal'
 			: 'is-vertical';
 
-	const className = classnames(
+	const className = clsx(
 		'block-editor-block-list__insertion-point',
 		orientationClassname
 	);
@@ -175,7 +186,7 @@ function InbetweenInsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ classnames( className, {
+				className={ clsx( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
 				onHoverEnd={ maybeHideInserterPoint }
@@ -188,7 +199,7 @@ function InbetweenInsertionPointPopover( {
 				{ isInserterShown && (
 					<motion.div
 						variants={ inserterVariants }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
 					>

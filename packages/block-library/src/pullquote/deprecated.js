@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ const v5 = {
 		return (
 			<figure
 				{ ...useBlockProps.save( {
-					className: classnames( {
+					className: clsx( {
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					} ),
 				} ) }
@@ -145,7 +145,7 @@ const v4 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -164,7 +164,7 @@ const v4 = {
 			'color',
 			textColor
 		);
-		const blockquoteClasses = classnames( {
+		const blockquoteClasses = clsx( {
 			'has-text-color': textColor || customTextColor,
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 		} );
@@ -275,7 +275,7 @@ const v3 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -308,7 +308,7 @@ const v3 = {
 		);
 		const blockquoteClasses =
 			( textColor || customTextColor ) &&
-			classnames( 'has-text-color', {
+			clsx( 'has-text-color', {
 				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 			} );
 
@@ -446,7 +446,7 @@ const v2 = {
 		);
 		const blockquoteClasses =
 			textColor || customTextColor
-				? classnames( 'has-text-color', {
+				? clsx( 'has-text-color', {
 						[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 				  } )
 				: undefined;
