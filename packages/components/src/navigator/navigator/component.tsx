@@ -289,35 +289,30 @@ function UnconnectedNavigator(
 }
 
 /**
- * The `NavigatorProvider` component allows rendering nested views/panels/menus
- * (via the `NavigatorScreen` component and navigate between these different
- * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+ * The `Navigator` component allows rendering nested views/panels/menus
+ * (via the `Navigator.Screen` component) and navigate between these different
+ * view (via the `Navigator.Button` and `Navigator.BackButton` components or the
  * `useNavigator` hook).
  *
  * ```jsx
- * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorBackButton as NavigatorBackButton,
- * } from '@wordpress/components';
+ * import { Navigator } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <NavigatorProvider initialPath="/">
- *     <NavigatorScreen path="/">
+ *   <Navigator initialPath="/">
+ *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorButton path="/child">
+ *        <Navigator.Button path="/child">
  *          Navigate to child screen.
- *       </NavigatorButton>
- *     </NavigatorScreen>
+ *       </Navigator.Button>
+ *     </Navigator.Screen>
  *
- *     <NavigatorScreen path="/child">
+ *     <Navigator.Screen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>
+ *       <Navigator.BackButton>
  *         Go back
- *       </NavigatorBackButton>
- *     </NavigatorScreen>
- *   </NavigatorProvider>
+ *       </Navigator.BackButton>
+ *     </Navigator.Screen>
+ *   </Navigator>
  * );
  * ```
  */

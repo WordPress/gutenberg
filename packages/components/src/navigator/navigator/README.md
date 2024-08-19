@@ -1,35 +1,25 @@
-# `NavigatorProvider`
+# `Navigator`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
-The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md), [`NavigatorToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+The `Navigator` component allows rendering nested views/panels/menus (via the [`Navigator.Screen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) and [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook).
 
 ## Usage
 
 ```jsx
-import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalNavigatorBackButton as NavigatorBackButton,
-} from '@wordpress/components';
+import { Navigator } from '@wordpress/components';
 
 const MyNavigation = () => (
-	<NavigatorProvider initialPath="/">
-		<NavigatorScreen path="/">
+	<Navigator initialPath="/">
+		<Navigator.Screen path="/">
 			<p>This is the home screen.</p>
-			<NavigatorButton path="/child">
+			<Navigator.Button path="/child">
 				Navigate to child screen.
-			</NavigatorButton>
-		</NavigatorScreen>
-
-		<NavigatorScreen path="/child">
+			</Navigator.Button>
+		</Navigator.Screen>
+		*<Navigator.Screen path="/child">
 			<p>This is the child screen.</p>
-			<NavigatorBackButton>Go back</NavigatorBackButton>
-		</NavigatorScreen>
-	</NavigatorProvider>
+			<Navigator.BackButton>Go back</Navigator.BackButton>
+		</Navigator.Screen>
+	</Navigator>
 );
 ```
 
