@@ -74,21 +74,6 @@ export function rectUnion( rect1, rect2 ) {
 }
 
 /**
- * Returns the intersection of two DOMRect objects.
- *
- * @param {DOMRect} rect1 First rectangle.
- * @param {DOMRect} rect2 Second rectangle.
- * @return {DOMRect} Intersection of the two rectangles.
- */
-function rectIntersect( rect1, rect2 ) {
-	const left = Math.max( rect1.left, rect2.left );
-	const top = Math.max( rect1.top, rect2.top );
-	const right = Math.min( rect1.right, rect2.right );
-	const bottom = Math.min( rect1.bottom, rect2.bottom );
-	return new window.DOMRect( left, top, right - left, bottom - top );
-}
-
-/**
  * Returns whether an element is visible.
  *
  * @param {Element} element Element.
@@ -129,22 +114,22 @@ function isElementVisible( element ) {
 }
 
 /**
- * Returns the rect of the element that is visible in the viewport.
+ * Returns the rect of the element including all visible nested elements.
  *
  * Visible nested elements, including elements that overflow the parent, are
- * taken into account. The returned rect is clipped to the viewport.
+ * taken into account.
  *
  * This function is useful for calculating the visible area of a block that
  * contains nested elements that overflow the block, e.g. the Navigation block,
  * which can contain overflowing Submenu blocks.
  *
- * The returned rect is suitable for passing to the Popover component to
- * position the popover relative to the visible area of the block.
+ * The returned rect represents the full extent of the element and its visible
+ * children, which may extend beyond the viewport.
  *
  * @param {Element} element Element.
- * @return {DOMRect} Bounding client rect.
+ * @return {DOMRect} Bounding client rect of the element and its visible children.
  */
-export function getVisibleBoundingRect( element ) {
+export function getVisibleElementBounds( element ) {
 	const viewport = element.ownerDocument.defaultView;
 	if ( ! viewport ) {
 		return new window.DOMRect();
@@ -165,11 +150,5 @@ export function getVisibleBoundingRect( element ) {
 		}
 	}
 
-	const viewportRect = new window.DOMRect(
-		0,
-		0,
-		viewport.innerWidth,
-		viewport.innerHeight
-	);
-	return rectIntersect( bounds, viewportRect );
+	return bounds;
 }
