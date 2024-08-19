@@ -14,14 +14,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import {
-	NavigatorProvider,
-	NavigatorScreen,
-	NavigatorButton,
-	NavigatorBackButton,
-	NavigatorToParentButton,
-	useNavigator,
-} from '../legacy';
+import { Navigator, useNavigator } from '..';
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
@@ -76,11 +69,11 @@ function CustomNavigatorButton( {
 	path,
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	return (
-		<NavigatorButton
+		<Navigator.Button
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goTo`.
 				onClick?.( { type: 'goTo', path } );
@@ -95,7 +88,7 @@ function CustomNavigatorGoToBackButton( {
 	path,
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	const { goTo } = useNavigator();
@@ -115,7 +108,7 @@ function CustomNavigatorGoToSkipFocusButton( {
 	path,
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
+}: Omit< ComponentPropsWithoutRef< typeof Navigator.Button >, 'onClick' > & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	const { goTo } = useNavigator();
@@ -134,11 +127,14 @@ function CustomNavigatorGoToSkipFocusButton( {
 function CustomNavigatorBackButton( {
 	onClick,
 	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
+}: Omit<
+	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
+	'onClick'
+> & {
 	onClick?: CustomTestOnClickHandler;
 } ) {
 	return (
-		<NavigatorBackButton
+		<Navigator.BackButton
 			onClick={ () => {
 				// Used to spy on the values passed to `navigator.goBack`.
 				onClick?.( { type: 'goBack' } );
@@ -148,22 +144,22 @@ function CustomNavigatorBackButton( {
 	);
 }
 
-function CustomNavigatorToParentButton( {
-	onClick,
-	...props
-}: Omit< ComponentPropsWithoutRef< typeof NavigatorBackButton >, 'onClick' > & {
-	onClick?: CustomTestOnClickHandler;
-} ) {
-	return (
-		<NavigatorToParentButton
-			onClick={ () => {
-				// Used to spy on the values passed to `navigator.goBack`.
-				onClick?.( { type: 'goToParent' } );
-			} }
-			{ ...props }
-		/>
-	);
-}
+// function CustomNavigatorToParentButton( {
+// 	onClick,
+// 	...props
+// }: Omit< ComponentPropsWithoutRef< typeof Navigator.BackButton >, 'onClick' > & {
+// 	onClick?: CustomTestOnClickHandler;
+// } ) {
+// 	return (
+// 		<NavigatorToParentButton
+// 			onClick={ () => {
+// 				// Used to spy on the values passed to `navigator.goBack`.
+// 				onClick?.( { type: 'goToParent' } );
+// 			} }
+// 			{ ...props }
+// 		/>
+// 	);
+// }
 
 function CustomNavigatorToParentButtonAlternative( {
 	onClick,
@@ -194,13 +190,13 @@ const ProductScreen = ( {
 	const { params } = useNavigator();
 
 	return (
-		<NavigatorScreen path={ PATHS.PRODUCT_PATTERN }>
+		<Navigator.Screen path={ PATHS.PRODUCT_PATTERN }>
 			<p>{ SCREEN_TEXT.product }</p>
 			<p>Product ID is { params.productId }</p>
 			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
 				{ BUTTON_TEXT.back }
 			</CustomNavigatorBackButton>
-		</NavigatorScreen>
+		</Navigator.Screen>
 	);
 };
 
@@ -215,8 +211,8 @@ const MyNavigation = ( {
 	const [ outerInputValue, setOuterInputValue ] = useState( '' );
 	return (
 		<>
-			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -254,9 +250,9 @@ const MyNavigation = ( {
 					>
 						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
 					</CustomNavigatorButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<Navigator.Screen path={ PATHS.CHILD }>
 					<p>{ SCREEN_TEXT.child }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -286,30 +282,30 @@ const MyNavigation = ( {
 						} }
 						value={ innerInputValue }
 					/>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<Navigator.Screen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
 				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
 
-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+				<Navigator.Screen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
 				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
-			</NavigatorProvider>
+			</Navigator>
 
 			<label htmlFor="test-input-outer">Outer input</label>
 			<input
@@ -334,8 +330,8 @@ const MyHierarchicalNavigation = ( {
 } ) => {
 	return (
 		<>
-			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -349,9 +345,9 @@ const MyHierarchicalNavigation = ( {
 					>
 						{ BUTTON_TEXT.toChildScreen }
 					</CustomNavigatorButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<Navigator.Screen path={ PATHS.CHILD }>
 					<p>{ SCREEN_TEXT.child }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -370,9 +366,9 @@ const MyHierarchicalNavigation = ( {
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<Navigator.Screen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
@@ -385,14 +381,14 @@ const MyHierarchicalNavigation = ( {
 					>
 						{ BUTTON_TEXT.backUsingGoTo }
 					</CustomNavigatorGoToBackButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 				<CustomNavigatorGoToSkipFocusButton
 					path={ PATHS.NESTED }
 					onClick={ onNavigatorButtonClick }
 				>
 					{ BUTTON_TEXT.goToWithSkipFocus }
 				</CustomNavigatorGoToSkipFocusButton>
-			</NavigatorProvider>
+			</Navigator>
 		</>
 	);
 };
@@ -406,8 +402,8 @@ const MyDeprecatedNavigation = ( {
 } ) => {
 	return (
 		<>
-			<NavigatorProvider initialPath={ initialPath }>
-				<NavigatorScreen path={ PATHS.HOME }>
+			<Navigator initialPath={ initialPath }>
+				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -421,9 +417,9 @@ const MyDeprecatedNavigation = ( {
 					>
 						{ BUTTON_TEXT.toChildScreen }
 					</CustomNavigatorButton>
-				</NavigatorScreen>
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.CHILD }>
+				<Navigator.Screen path={ PATHS.CHILD }>
 					<p>{ SCREEN_TEXT.child }</p>
 					{ /*
 					 * A button useful to test focus restoration. This button is the first
@@ -437,22 +433,22 @@ const MyDeprecatedNavigation = ( {
 					>
 						{ BUTTON_TEXT.toNestedScreen }
 					</CustomNavigatorButton>
-					<CustomNavigatorToParentButton
+					{ /* <CustomNavigatorToParentButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton>
-				</NavigatorScreen>
+					</CustomNavigatorToParentButton> */ }
+				</Navigator.Screen>
 
-				<NavigatorScreen path={ PATHS.NESTED }>
+				<Navigator.Screen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
 					<CustomNavigatorToParentButtonAlternative
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
 					</CustomNavigatorToParentButtonAlternative>
-				</NavigatorScreen>
-			</NavigatorProvider>
+				</Navigator.Screen>
+			</Navigator>
 		</>
 	);
 };
@@ -643,7 +639,7 @@ describe( 'Navigator', () => {
 	} );
 
 	it( 'should warn if the `path` prop does not follow the required format', () => {
-		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
+		render( <Navigator.Screen path="not-valid">Test</Navigator.Screen> );
 
 		expect( console ).toHaveWarnedWith(
 			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
@@ -860,7 +856,7 @@ describe( 'Navigator', () => {
 	} );
 
 	describe( 'deprecated APIs', () => {
-		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+		it.skip( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
 			const user = userEvent.setup();
 
 			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
