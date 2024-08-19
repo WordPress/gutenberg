@@ -317,6 +317,7 @@ module.exports = {
 						'CustomSelectControl',
 						'DimensionControl',
 						'FontSizePicker',
+						'FormTokenField',
 						'NumberControl',
 						'RangeControl',
 						'ToggleGroupControl',
