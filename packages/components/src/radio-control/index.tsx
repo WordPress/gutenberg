@@ -86,7 +86,7 @@ export function RadioControl(
 	return (
 		<fieldset
 			id={ id }
-			className={ clsx( 'components-radio-control', className ) }
+			className={ clsx( className, 'components-radio-control' ) }
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
 			{ hideLabelFromVision ? (
