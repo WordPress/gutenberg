@@ -407,6 +407,7 @@ export function HierarchicalTermSelector( { slug } ) {
 		<Flex direction="column" gap="4">
 			{ showFilter && (
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ filterLabel }
 					value={ filterValue }

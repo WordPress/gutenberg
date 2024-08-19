@@ -70,7 +70,7 @@ export const separated = css`
 	}
 `;
 
-const borderRadius = CONFIG.controlBorderRadius;
+const borderRadius = CONFIG.radiusSmall;
 
 export const spacedAround = css`
 	border-radius: ${ borderRadius };

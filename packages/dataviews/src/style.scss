@@ -5,7 +5,11 @@
 @import "./components/dataviews-pagination/style.scss";
 @import "./components/dataviews-item-actions/style.scss";
 @import "./components/dataviews-selection-checkbox/style.scss";
+@import "./components/dataviews-view-config/style.scss";
 
-@import "./layouts/grid/style.scss";
-@import "./layouts/list/style.scss";
-@import "./layouts/table/style.scss";
+@import "./dataviews-layouts/grid/style.scss";
+@import "./dataviews-layouts/list/style.scss";
+@import "./dataviews-layouts/table/style.scss";
+
+@import "./dataform-controls/style.scss";
+@import "./dataforms-layouts/panel/style.scss";

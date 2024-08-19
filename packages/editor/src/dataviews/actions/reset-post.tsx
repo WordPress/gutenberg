@@ -32,7 +32,8 @@ const resetPost: Action< Post > = {
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === TEMPLATE_ORIGINS.custom &&
-			item?.has_theme_file
+			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
+				item?.has_theme_file )
 		);
 	},
 	icon: backup,

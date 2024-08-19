@@ -53,14 +53,13 @@ function InstalledFonts() {
 		isInstalling,
 		saveFontFamilies,
 		getFontFacesActivated,
-		notice,
-		setNotice,
 	} = useContext( FontLibraryContext );
 
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
 	);
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const [ notice, setNotice ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
 		undefined,
@@ -118,6 +117,24 @@ function InstalledFonts() {
 
 	const handleUninstallClick = () => {
 		setIsConfirmDeleteOpen( true );
+	};
+
+	const handleUpdate = async () => {
+		setNotice( null );
+		try {
+			await saveFontFamilies( fontFamilies );
+			setNotice( {
+				type: 'success',
+				message: __( 'Font family updated successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message:
+					__( 'There was an error updating the font family. ' ) +
+					error.message,
+			} );
+		}
 	};
 
 	const getFontFacesToDisplay = ( font ) => {
@@ -265,6 +282,7 @@ function InstalledFonts() {
 															font
 														) }
 														onClick={ () => {
+															setNotice( null );
 															handleSetLibraryFontSelected(
 																font
 															);
@@ -305,6 +323,7 @@ function InstalledFonts() {
 															font
 														) }
 														onClick={ () => {
+															setNotice( null );
 															handleSetLibraryFontSelected(
 																font
 															);
@@ -337,6 +356,7 @@ function InstalledFonts() {
 									size="small"
 									onClick={ () => {
 										handleSetLibraryFontSelected( null );
+										setNotice( null );
 									} }
 									label={ __( 'Back' ) }
 								/>
@@ -406,9 +426,7 @@ function InstalledFonts() {
 						) }
 						<Button
 							variant="primary"
-							onClick={ () => {
-								saveFontFamilies( fontFamilies );
-							} }
+							onClick={ handleUpdate }
 							disabled={ ! fontFamiliesHasChanges }
 							accessibleWhenDisabled
 						>

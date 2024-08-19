@@ -28,7 +28,7 @@ import {
 	ToolbarButton,
 	ResizableBox,
 	PanelBody,
-	BaseControl,
+	__experimentalVStack as VStack,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
@@ -408,12 +408,14 @@ export default function SearchEdit( {
 
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					<BaseControl
-						label={ __( 'Width' ) }
-						id={ unitControlInputId }
+					<VStack
+						className="wp-block-search__inspector-controls"
+						spacing={ 4 }
 					>
 						<UnitControl
-							id={ unitControlInputId }
+							__next40pxDefaultSize
+							label={ __( 'Width' ) }
+							id={ unitControlInputId } // unused, kept for backwards compatibility
 							min={
 								isPercentageUnit( widthUnit ) ? 0 : MIN_WIDTH
 							}
@@ -427,7 +429,6 @@ export default function SearchEdit( {
 									parseInt( newWidth, 10 ) > 100
 										? 100
 										: newWidth;
-
 								setAttributes( {
 									width: parseInt( filteredWidth, 10 ),
 								} );
@@ -445,9 +446,8 @@ export default function SearchEdit( {
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
-
 						<ButtonGroup
-							className="wp-block-search__components-button-group"
+							className="wp-block-search__components-button-group" // unused, kept for backwards compatibility
 							aria-label={ __( 'Percentage Width' ) }
 						>
 							{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
@@ -473,7 +473,7 @@ export default function SearchEdit( {
 								);
 							} ) }
 						</ButtonGroup>
-					</BaseControl>
+					</VStack>
 				</PanelBody>
 			</InspectorControls>
 		</>

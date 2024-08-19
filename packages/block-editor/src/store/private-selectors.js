@@ -511,3 +511,39 @@ export function getTemporarilyEditingAsBlocks( state ) {
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
+
+export function getInserterSearchInputRef( state ) {
+	return state.inserterSearchInputRef;
+}
+
+/**
+ * Returns the style attributes of multiple blocks.
+ *
+ * @param {Object}   state     Global application state.
+ * @param {string[]} clientIds An array of block client IDs.
+ *
+ * @return {Object} An object where keys are client IDs and values are the corresponding block styles or undefined.
+ */
+export const getBlockStyles = createSelector(
+	( state, clientIds ) =>
+		clientIds.reduce( ( styles, clientId ) => {
+			styles[ clientId ] = state.blocks.attributes.get( clientId )?.style;
+			return styles;
+		}, {} ),
+	( state, clientIds ) => [
+		...clientIds.map(
+			( clientId ) => state.blocks.attributes.get( clientId )?.style
+		),
+	]
+);
+
+/**
+ * Returns whether zoom out mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Is zoom out mode enabled.
+ */
+export function isZoomOutMode( state ) {
+	return state.editorMode === 'zoom-out';
+}

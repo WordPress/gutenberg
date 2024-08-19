@@ -1,3 +1,14 @@
-.components-panel__block-bindings-panel .components-item__block-bindings-source {
-	color: $gray-700;
+div.block-editor-bindings__panel {
+	grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+	button:hover .block-editor-bindings__item-explanation {
+		color: inherit;
+	}
+}
+
+.block-editor-bindings__popover {
+	// This won't be needed if `DropdownMenuGroup` component handles the label.
+	.block-editor-bindings__source-label {
+		grid-column: 2;
+		margin: $grid-unit-10 0;
+	}
 }

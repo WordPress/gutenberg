@@ -64,6 +64,7 @@ registerBlockType( 'my-plugin/my-block', {
 		const paddingControl = ( labelComponent, viewport ) => {
 			return (
 				<DimensionControl
+					__nextHasNoMarginBottom
 					label={ viewport.label }
 					onChange={ // handle update to padding value here  }
 					value={ paddingSize }
