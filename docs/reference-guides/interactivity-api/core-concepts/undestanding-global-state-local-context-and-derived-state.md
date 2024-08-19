@@ -68,7 +68,7 @@ You should use global state when:
         </div>
         ```
 
-    _Please, visit [the Server-side Rendering guide](./server-side-rendering.md) to learn more about how directives are processed on the server._
+    _Please, visit [the Server-side Rendering guide](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md) to learn more about how directives are processed on the server._
 
     In cases where the global state is not used during the rendering of the page in PHP, it can also be defined directly on the client.
 
@@ -189,7 +189,7 @@ You should use global state when:
 
     Changes to the global state will automatically trigger updates in any directives that depend on the modified values.
 
-    _Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
+    _Please, visit [The Reactive and Declarative mindset](/docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
 
 ### Example: Two interactive blocks using global state to communicate
 
@@ -332,7 +332,7 @@ You should use local context when:
 
     Changes to the local context will automatically trigger updates in any directives that depend on the modified values.
 
-    _Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
+    _Please, visit [The Reactive and Declarative mindset](/docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md) guide to learn more about how reactivity works in the Interactivity API._
 
 -   **Nesting local contexts**
 
@@ -407,7 +407,7 @@ Derived state offers several key benefits that make it an essential part of a we
 
 In essence, derived state allows you to express relationships between different pieces of data in your interactive blocks declaratively, instead of imperatively updating related values whenever something changes.
 
-_Please, visit [The Reactive and Declarative mindset](./the-reactive-and-declarative-mindset.md) guide to learn more about how to leverage declarative coding in the Interactivity API._
+_Please, visit [The Reactive and Declarative mindset](/docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md) guide to learn more about how to leverage declarative coding in the Interactivity API._
 
 You should use derived state:
 
@@ -445,7 +445,7 @@ You should use derived state:
 
     Regardless of the approach, the initial derived state values will be used during the rendering of the page in PHP, and the HTML can be populated with the correct values.
 
-    _Please, visit [the Server-side Rendering guide](./server-side-rendering.md) to learn more about how directives are processed on the server._
+    _Please, visit [the Server-side Rendering guide](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md) to learn more about how directives are processed on the server._
 
     The same mechanism applies even when the derived state property depends on the local context.
 
