@@ -17,3 +17,23 @@
 		padding: $grid-unit-15 $grid-unit-30;
 	}
 }
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 560px) {
+	.dataviews-footer {
+		flex-direction: column !important;
+
+		.dataviews-bulk-actions-footer__container {
+			width: 100%;
+		}
+
+		.dataviews-bulk-actions-footer__item-count {
+			flex-grow: 1;
+		}
+
+		.dataviews-pagination {
+			width: 100%;
+			justify-content: space-between;
+		}
+	}
+}

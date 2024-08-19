@@ -49,7 +49,11 @@ function DataViewsPagination() {
 	return (
 		!! totalItems &&
 		totalPages !== 1 && (
-			<HStack expanded={ false } justify="end">
+			<HStack
+				expanded={ false }
+				className="dataviews-pagination"
+				justify="end"
+			>
 				<HStack
 					justify="flex-start"
 					expanded={ false }

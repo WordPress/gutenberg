@@ -39,7 +39,6 @@ export default function DataViewsFooter() {
 		!! totalItems && (
 			<HStack
 				expanded={ false }
-				spacing={ 6 }
 				justify="end"
 				className="dataviews-footer"
 			>
