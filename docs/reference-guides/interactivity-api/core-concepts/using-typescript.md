@@ -16,6 +16,14 @@ If you want to explore an example of an interactive block using TypeScript in yo
 
 To do this, follow the instructions in the [Getting Started Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/) for the Interactivity API, but replace the `@wordpress/create-block-interactive-template` with the `@wordpress/create-block-interactive-typescript-template`. The rest of the instructions remain the same.
 
+## Installing `@wordpress/interactivity` locally
+
+If you haven't done so already, you need to install the package `@wordpress/interactivity` locally so TypeScript can use its types in your IDE. You can do this using the following command:
+
+`npm install @wordpress/interactivity`
+
+It is also a good practice to keep that package updated.
+
 ## Inferring types from an existing store
 
 When you create a store using the `store` function, TypeScript automatically infers the types of the store's properties (`state`, `actions`, `callbacks`, etc.). This means that you can often get away with just writing plain JavaScript objects, and TypeScript will figure out the types for you.
