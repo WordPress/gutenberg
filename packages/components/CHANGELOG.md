@@ -59,6 +59,7 @@
 
 ### Bug Fixes
 
+-   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
 -   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
 
 ### Internal

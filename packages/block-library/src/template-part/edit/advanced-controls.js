@@ -73,8 +73,7 @@ export function TemplatePartAdvancedControls( {
 			{ isEntityAvailable && (
 				<>
 					<TextControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
@@ -85,8 +84,7 @@ export function TemplatePartAdvancedControls( {
 					/>
 
 					<SelectControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Area' ) }
 						labelPosition="top"
