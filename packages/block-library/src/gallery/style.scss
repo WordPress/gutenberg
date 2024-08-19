@@ -79,7 +79,6 @@ figure.wp-block-gallery.has-nested-images {
 			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
 
 			// Dark gradient scrim.
-			//background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0) 100%, transparent);
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, transparent 100%);
 
 			img {
