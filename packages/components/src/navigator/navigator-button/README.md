@@ -1,14 +1,10 @@
-# `NavigatorButton`
+# `Navigator.Button`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
-The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+The `Navigator.Button` component can be used to navigate to a screen and should be used in combination with the [`Navigator`](/packages/components/src/navigator/navigator/README.md), the [`Navigator.Screen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components, and the `useNavigator` hook.
 
 ## Usage
 
-Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
+Refer to [the `Navigator` component](/packages/components/src/navigator/navigator/README.md#usage) for a usage example.
 
 ## Props
 

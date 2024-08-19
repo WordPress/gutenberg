@@ -1104,7 +1104,7 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorButton",
+		"title": "Navigator.Button",
 		"slug": "navigator-button",
 		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
 		"parent": "components"
