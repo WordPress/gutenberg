@@ -1098,27 +1098,27 @@
 		"parent": "components"
 	},
 	{
-		"title": "Navigator.BackButton",
+		"title": "NavigatorBackButton",
 		"slug": "navigator-back-button",
 		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
 		"parent": "components"
 	},
 	{
-		"title": "Navigator.Button",
+		"title": "NavigatorButton",
 		"slug": "navigator-button",
 		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "NavigatorScreen",
+		"slug": "navigator-screen",
+		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
 		"parent": "components"
 	},
 	{
 		"title": "Navigator",
 		"slug": "navigator",
 		"markdown_source": "../packages/components/src/navigator/navigator/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Navigator.Screen",
-		"slug": "navigator-screen",
-		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
 		"parent": "components"
 	},
 	{
