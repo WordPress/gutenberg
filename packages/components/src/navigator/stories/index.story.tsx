@@ -21,7 +21,7 @@ const meta: Meta< typeof NavigatorProvider > = {
 	component: NavigatorProvider,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
-	title: 'Components (Experimental)/Navigator',
+	title: 'Components/Navigator',
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },
