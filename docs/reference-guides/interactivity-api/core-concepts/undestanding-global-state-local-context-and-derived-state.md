@@ -86,7 +86,7 @@ You should use global state when:
     } );
     ```
 
-    _Please note that, although this works, in general is a good practice to define all the global state on the server._
+    _Please note that, although this works, in general it is a good practice to define all the global state on the server._
 
 -   **Accessing the global state**
 
@@ -544,7 +544,7 @@ You should use derived state:
     <span data-wp-text="state.double"></span>
     ```
 
-    The same happens in Javascript. Both global state and derived state can be consumed through the `state` property of the store:
+    The same happens in JavaScript. Both global state and derived state can be consumed through the `state` property of the store:
 
     ```js
     const { state } = store( 'myCounterPlugin', {

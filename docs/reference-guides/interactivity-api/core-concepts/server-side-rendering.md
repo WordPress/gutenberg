@@ -257,7 +257,7 @@ In most cases, the initial derived state can be defined statically, as in the pr
 
 To see an example of this, let's continue by adding a shopping cart emoji (🛒) for each fruit, depending on whether it is on a shopping list or not.
 
-First, let's add an array that represents the shopping list. _Remember that even though these arrays are static for simplicity shake, usually you will work with dynamic information, for example, information coming from the database._
+First, let's add an array that represents the shopping list. _Remember that even though these arrays are static for simplicity sake, usually you will work with dynamic information, for example, information coming from the database._
 
 ```php
 wp_interactivity_state( 'myFruitPlugin', array(
