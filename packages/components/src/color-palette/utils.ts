@@ -17,6 +17,18 @@ import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
+/**
+ * Checks if a color value is a simple CSS color.
+ *
+ * @param value The color value to check.
+ * @return A boolean indicating whether the color value is a simple CSS color.
+ */
+const isSimpleCSSColor = ( value: string ): boolean => {
+	const valueIsCssVariable = /var\(/.test( value ?? '' );
+	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
+	return ! valueIsCssVariable && ! valueIsColorMix;
+};
+
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
@@ -25,13 +37,12 @@ export const extractColorNameFromCurrentValue = (
 	if ( ! currentValue ) {
 		return '';
 	}
-
-	const currentValueIsCssVariable = /^var\(/.test( currentValue );
-	const currentValueIsColorMix = /color-mix\(/.test( currentValue );
-	const normalizedCurrentValue =
-		currentValueIsCssVariable || currentValueIsColorMix
-			? currentValue
-			: colord( currentValue ).toHex();
+	const currentValueIsSimpleColor = currentValue
+		? isSimpleCSSColor( currentValue )
+		: false;
+	const normalizedCurrentValue = currentValueIsSimpleColor
+		? colord( currentValue ).toHex()
+		: currentValue;
 
 	// Normalize format of `colors` to simplify the following loop
 	type normalizedPaletteObject = { colors: ColorObject[] };
@@ -40,10 +51,9 @@ export const extractColorNameFromCurrentValue = (
 		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			const normalizedColorValue =
-				currentValueIsCssVariable || currentValueIsColorMix
-					? colorValue
-					: colord( colorValue ).toHex();
+			const normalizedColorValue = currentValueIsSimpleColor
+				? colord( colorValue ).toHex()
+				: colorValue;
 
 			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
@@ -72,18 +82,6 @@ export const isMultiplePaletteArray = (
 };
 
 /**
- * Checks if a color value is a simple CSS color.
- *
- * @param value The color value to check.
- * @return A boolean indicating whether the color value is a simple CSS color.
- */
-const isSimpleCSSColor = ( value: string | undefined ): boolean => {
-	const valueIsCssVariable = /var\(/.test( value ?? '' );
-	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
-	return ! valueIsCssVariable && ! valueIsColorMix;
-};
-
-/**
  * Transform a CSS variable used as background color into the color value itself.
  *
  * @param value   The color value that may be a CSS variable.
@@ -94,7 +92,7 @@ export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
 ) => {
-	const valueIsSimpleColor = isSimpleCSSColor( value );
+	const valueIsSimpleColor = value ? isSimpleCSSColor( value ) : false;
 
 	if ( valueIsSimpleColor || element === null ) {
 		return value;
