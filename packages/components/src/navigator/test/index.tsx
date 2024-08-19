@@ -15,6 +15,13 @@ import { useState } from '@wordpress/element';
  */
 import Button from '../../button';
 import { Navigator, useNavigator } from '..';
+import {
+	// NavigatorProvider,
+	// NavigatorScreen,
+	// NavigatorButton,
+	// NavigatorBackButton,
+	NavigatorToParentButton,
+} from '../legacy';
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
@@ -144,22 +151,25 @@ function CustomNavigatorBackButton( {
 	);
 }
 
-// function CustomNavigatorToParentButton( {
-// 	onClick,
-// 	...props
-// }: Omit< ComponentPropsWithoutRef< typeof Navigator.BackButton >, 'onClick' > & {
-// 	onClick?: CustomTestOnClickHandler;
-// } ) {
-// 	return (
-// 		<NavigatorToParentButton
-// 			onClick={ () => {
-// 				// Used to spy on the values passed to `navigator.goBack`.
-// 				onClick?.( { type: 'goToParent' } );
-// 			} }
-// 			{ ...props }
-// 		/>
-// 	);
-// }
+function CustomNavigatorToParentButton( {
+	onClick,
+	...props
+}: Omit<
+	ComponentPropsWithoutRef< typeof Navigator.BackButton >,
+	'onClick'
+> & {
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	return (
+		<NavigatorToParentButton
+			onClick={ () => {
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+			{ ...props }
+		/>
+	);
+}
 
 function CustomNavigatorToParentButtonAlternative( {
 	onClick,
@@ -433,11 +443,11 @@ const MyDeprecatedNavigation = ( {
 					>
 						{ BUTTON_TEXT.toNestedScreen }
 					</CustomNavigatorButton>
-					{ /* <CustomNavigatorToParentButton
+					<CustomNavigatorToParentButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton> */ }
+					</CustomNavigatorToParentButton>
 				</Navigator.Screen>
 
 				<Navigator.Screen path={ PATHS.NESTED }>
@@ -856,7 +866,7 @@ describe( 'Navigator', () => {
 	} );
 
 	describe( 'deprecated APIs', () => {
-		it.skip( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
 			const user = userEvent.setup();
 
 			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
