@@ -222,7 +222,7 @@ function UnconnectedNavigator(
 		children,
 		className,
 		...otherProps
-	} = useContextSystem( props, 'NavigatorProvider' );
+	} = useContextSystem( props, 'Navigator' );
 
 	const [ routerState, dispatch ] = useReducer(
 		routerReducer,
@@ -275,7 +275,7 @@ function UnconnectedNavigator(
 
 	const cx = useCx();
 	const classes = useMemo(
-		() => cx( styles.navigatorProviderWrapper, className ),
+		() => cx( styles.navigatorWrapper, className ),
 		[ className, cx ]
 	);
 
@@ -321,9 +321,4 @@ function UnconnectedNavigator(
  * );
  * ```
  */
-export const Navigator = contextConnect(
-	UnconnectedNavigator,
-	'NavigatorProvider'
-);
-
-export default Navigator;
+export const Navigator = contextConnect( UnconnectedNavigator, 'Navigator' );
