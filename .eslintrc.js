@@ -317,6 +317,7 @@ module.exports = {
 						'CustomSelectControl',
 						'DimensionControl',
 						'FontSizePicker',
+						'FormTokenField',
 						'InputControl',
 						'NumberControl',
 						'RangeControl',
@@ -328,6 +329,13 @@ module.exports = {
 							componentName +
 							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					} ) ),
+					{
+						// Falsy `__next40pxDefaultSize` without a `render` prop.
+						selector:
+							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+						message:
+							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					},
 					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
 					...[ 'SelectControl', 'TextControl' ].map(
 						( componentName ) => ( {
