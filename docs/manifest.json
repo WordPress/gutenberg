@@ -1098,7 +1098,7 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorBackButton",
+		"title": "Navigator.BackButton",
 		"slug": "navigator-back-button",
 		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
 		"parent": "components"
