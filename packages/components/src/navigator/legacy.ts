@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Navigator as InternalNavigator } from './navigator-provider/component';
+import { Navigator as InternalNavigator } from './navigator/component';
 import { NavigatorScreen as InternalNavigatorScreen } from './navigator-screen/component';
 import { NavigatorButton as InternalNavigatorButton } from './navigator-button/component';
 import { NavigatorBackButton as InternalNavigatorBackButton } from './navigator-back-button/component';
