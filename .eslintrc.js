@@ -318,6 +318,7 @@ module.exports = {
 						'DimensionControl',
 						'FontSizePicker',
 						'FormTokenField',
+						'InputControl',
 						'NumberControl',
 						'RangeControl',
 						'TextControl',
