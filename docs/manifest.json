@@ -1110,9 +1110,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorProvider",
-		"slug": "navigator-provider",
-		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
+		"title": "Navigator",
+		"slug": "navigator",
+		"markdown_source": "../packages/components/src/navigator/navigator/README.md",
 		"parent": "components"
 	},
 	{
