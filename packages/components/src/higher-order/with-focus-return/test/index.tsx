@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -45,30 +46,30 @@ describe( 'withFocusReturn()', () => {
 			activeElement.blur();
 		} );
 
-		it( 'should render a basic Test component inside the HOC', () => {
-			render( <Composite /> );
+		it( 'should render a basic Test component inside the HOC', async () => {
+			await render( <Composite /> );
 
 			expect( screen.getByTestId( 'test-element' ) ).toBeVisible();
 		} );
 
-		it( 'should pass own props through to the wrapped element', () => {
-			render( <Composite className="test" /> );
+		it( 'should pass own props through to the wrapped element', async () => {
+			await render( <Composite className="test" /> );
 
 			expect( screen.getByTestId( 'test-element' ) ).toHaveClass(
 				'test'
 			);
 		} );
 
-		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
-			render( <Composite className="test" /> );
+		it( 'should not pass any withFocusReturn context props through to the wrapped element', async () => {
+			await render( <Composite className="test" /> );
 
 			expect( screen.getByTestId( 'test-element' ) ).not.toHaveAttribute(
 				'data-focus-history'
 			);
 		} );
 
-		it( 'should not switch focus back to the bound focus element', () => {
-			const { unmount } = render( <Composite />, {
+		it( 'should not switch focus back to the bound focus element', async () => {
+			const { unmount } = await render( <Composite />, {
 				container: document.body.appendChild(
 					document.createElement( 'div' )
 				),
@@ -86,7 +87,7 @@ describe( 'withFocusReturn()', () => {
 		it( 'should switch focus back when unmounted while having focus', async () => {
 			const user = userEvent.setup();
 
-			const { unmount } = render( <Composite />, {
+			const { unmount } = await render( <Composite />, {
 				container: document.body.appendChild(
 					document.createElement( 'div' )
 				),

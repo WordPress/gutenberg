@@ -500,13 +500,27 @@ module.exports = {
 					// the `@wordpress/components` package, hence why importing those
 					// dependencies should be allowed in the components package.
 					{
-						paths: restrictedImports.filter(
-							( { name } ) =>
-								! [
-									'@ariakit/react',
-									'framer-motion',
-								].includes( name )
-						),
+						paths: [
+							...restrictedImports.filter(
+								( { name } ) =>
+									! [
+										'@ariakit/react',
+										'framer-motion',
+									].includes( name )
+							),
+							// TODO: enable this rule in the future.
+							// {
+							// 	name: '@testing-library/user-event',
+							// 	message:
+							// 		'Please use event triggers (`click`, `press`, etc) from `@ariakit/test` instead.',
+							// },
+							{
+								name: '@testing-library/react',
+								importNames: [ 'render' ],
+								message:
+									'Please use `render` from `@ariakit/test` instead.',
+							},
+						],
 					},
 				],
 			},

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, screen, render, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -48,7 +49,7 @@ describe( 'ColorPicker', () => {
 			const onChangeComplete = jest.fn();
 			const color = '#000';
 
-			render(
+			await render(
 				<ColorPicker
 					onChangeComplete={ onChangeComplete }
 					color={ color }
@@ -79,7 +80,7 @@ describe( 'ColorPicker', () => {
 			const onChange = jest.fn();
 			const color = '#000';
 
-			render(
+			await render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -113,7 +114,7 @@ describe( 'ColorPicker', () => {
 			const onChange = jest.fn();
 			const color = '#fff';
 
-			render(
+			await render(
 				<ColorPicker
 					onChange={ onChange }
 					color={ color }
@@ -169,7 +170,7 @@ describe( 'ColorPicker', () => {
 				);
 			};
 
-			render(
+			await render(
 				<ControlledColorPicker
 					onChange={ onChange }
 					enableAlpha={ false }
@@ -316,7 +317,7 @@ describe( 'ColorPicker', () => {
 				const onChange = jest.fn();
 				const color = '#2ad5d5';
 
-				render(
+				await render(
 					<ColorPicker
 						onChange={ onChange }
 						color={ color }

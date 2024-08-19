@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,8 +10,8 @@ import { render, screen } from '@testing-library/react';
 import NoticeList from '../list';
 
 describe( 'NoticeList', () => {
-	it( 'should merge className', () => {
-		render(
+	it( 'should merge className', async () => {
+		await render(
 			<NoticeList notices={ [] } className="is-ok">
 				List of notices
 			</NoticeList>

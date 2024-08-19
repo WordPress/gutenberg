@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, hover, click, sleep } from '@ariakit/test';
 
 /**
@@ -44,7 +45,7 @@ const hoverOutside = async () => {
 describe( 'Tooltip', () => {
 	describe( 'basic behavior', () => {
 		it( 'should not render the tooltip if multiple children are passed', async () => {
-			render(
+			await render(
 				// @ts-expect-error Tooltip cannot have more than one child element
 				<Tooltip { ...props }>
 					<button>First button</button>
@@ -65,7 +66,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
-			render( <Tooltip { ...props } /> );
+			await render( <Tooltip { ...props } /> );
 
 			// The anchor can not be found by querying for its description,
 			// since that is present only when the tooltip is visible
@@ -94,8 +95,8 @@ describe( 'Tooltip', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should not leak Tooltip props to the tooltip anchor', () => {
-			render(
+		it( 'should not leak Tooltip props to the tooltip anchor', async () => {
+			await render(
 				<Tooltip data-foo>
 					<button>Anchor</button>
 				</Tooltip>
@@ -106,7 +107,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should add default and custom class names to the tooltip', async () => {
-			render( <Tooltip { ...props } className="foo" /> );
+			await render( <Tooltip { ...props } className="foo" /> );
 
 			// Hover over the anchor, tooltip should show
 			await hover(
@@ -125,8 +126,8 @@ describe( 'Tooltip', () => {
 	} );
 
 	describe( 'keyboard focus', () => {
-		it( 'should not render the tooltip if there is no focus', () => {
-			render( <Tooltip { ...props } /> );
+		it( 'should not render the tooltip if there is no focus', async () => {
+			await render( <Tooltip { ...props } /> );
 
 			expect(
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
@@ -136,7 +137,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show the tooltip when focusing on the tooltip anchor and hide it the anchor loses focus', async () => {
-			render(
+			await render(
 				<>
 					<Tooltip { ...props } />
 					<button>Focus me</button>
@@ -159,7 +160,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show tooltip when focussing a disabled (but focussable) anchor button', async () => {
-			render(
+			await render(
 				<>
 					<Tooltip { ...props }>
 						<button aria-disabled="true">Tooltip anchor</button>
@@ -193,7 +194,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'mouse hover', () => {
 		it( 'should show the tooltip when the tooltip anchor is hovered and hide it when the cursor stops hovering the anchor', async () => {
-			render( <Tooltip { ...props } /> );
+			await render( <Tooltip { ...props } /> );
 
 			const anchor = screen.getByRole( 'button', {
 				name: 'Tooltip anchor',
@@ -211,7 +212,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show tooltip when hovering over a disabled (but focussable) anchor button', async () => {
-			render(
+			await render(
 				<>
 					<Tooltip { ...props }>
 						<button aria-disabled="true">Tooltip anchor</button>
@@ -239,7 +240,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'mouse click', () => {
 		it( 'should hide tooltip when the tooltip anchor is clicked', async () => {
-			render( <Tooltip { ...props } /> );
+			await render( <Tooltip { ...props } /> );
 
 			const anchor = screen.getByRole( 'button', {
 				name: 'Tooltip anchor',
@@ -257,7 +258,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should not hide tooltip when the tooltip anchor is clicked and the `hideOnClick` prop is `false', async () => {
-			render(
+			await render(
 				<>
 					<Tooltip { ...props } hideOnClick={ false } />
 					<button>Click me</button>
@@ -288,7 +289,7 @@ describe( 'Tooltip', () => {
 		it( 'should respect custom delay prop when showing tooltip', async () => {
 			const ADDITIONAL_DELAY = 100;
 
-			render(
+			await render(
 				<Tooltip
 					{ ...props }
 					delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY }
@@ -329,7 +330,7 @@ describe( 'Tooltip', () => {
 			const onMouseLeaveMock = jest.fn();
 			const HOVER_OUTSIDE_ANTICIPATION = 200;
 
-			render(
+			await render(
 				<Tooltip { ...props }>
 					<button
 						onMouseEnter={ onMouseEnterMock }
@@ -372,7 +373,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'shortcut', () => {
 		it( 'should show the shortcut in the tooltip when a string is passed as the shortcut', async () => {
-			render( <Tooltip { ...props } shortcut="shortcut text" /> );
+			await render( <Tooltip { ...props } shortcut="shortcut text" /> );
 
 			// Hover over the anchor, tooltip should show
 			await hover(
@@ -392,7 +393,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show the shortcut in the tooltip when an object is passed as the shortcut', async () => {
-			render(
+			await render(
 				<Tooltip
 					{ ...props }
 					shortcut={ {
@@ -428,7 +429,7 @@ describe( 'Tooltip', () => {
 	describe( 'event propagation', () => {
 		it( 'should close the parent dialog component when pressing the Escape key while the tooltip is visible', async () => {
 			const onRequestClose = jest.fn();
-			render(
+			await render(
 				<Modal onRequestClose={ onRequestClose }>
 					<p>Modal content</p>
 				</Modal>
@@ -460,7 +461,7 @@ describe( 'Tooltip', () => {
 
 	describe( 'nested', () => {
 		it( 'should render the outer tooltip and ignore nested tooltips', async () => {
-			render(
+			await render(
 				<Tooltip text="Outer tooltip">
 					<Tooltip text="Middle tooltip">
 						<Tooltip text="Inner tooltip">
@@ -503,8 +504,8 @@ describe( 'Tooltip', () => {
 			);
 		} );
 
-		it( 'should not leak Tooltip component classname to the anchor element', () => {
-			render(
+		it( 'should not leak Tooltip component classname to the anchor element', async () => {
+			await render(
 				<Tooltip>
 					<Tooltip>
 						<button>Anchor</button>

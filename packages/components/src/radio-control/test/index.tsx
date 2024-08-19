@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -56,9 +57,9 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	describe( 'semantics and labelling', () => {
-		it( 'should render radio inputs with accessible labels', () => {
+		it( 'should render radio inputs with accessible labels', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
@@ -71,9 +72,9 @@ describe.each( [
 			}
 		} );
 
-		it( 'should not select have a selected value when the `selected` prop does not match any available options', () => {
+		it( 'should not select have a selected value when the `selected` prop does not match any available options', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
@@ -84,9 +85,9 @@ describe.each( [
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should render mutually exclusive radio inputs', () => {
+		it( 'should render mutually exclusive radio inputs', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component
 					{ ...defaultProps }
 					onChange={ onChangeSpy }
@@ -101,9 +102,9 @@ describe.each( [
 			).toHaveAccessibleName( defaultProps.options[ 1 ].label );
 		} );
 
-		it( 'should use the group help text to describe individual options', () => {
+		it( 'should use the group help text to describe individual options', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component
 					{ ...defaultProps }
 					onChange={ onChangeSpy }
@@ -119,9 +120,9 @@ describe.each( [
 			}
 		} );
 
-		it( 'should use the option description text to describe individual options', () => {
+		it( 'should use the option description text to describe individual options', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component
 					{ ...defaultPropsWithDescriptions }
 					onChange={ onChangeSpy }
@@ -140,9 +141,9 @@ describe.each( [
 			}
 		} );
 
-		it( 'should use both the option description text and the group help text to describe individual options', () => {
+		it( 'should use both the option description text and the group help text to describe individual options', async () => {
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component
 					{ ...defaultPropsWithDescriptions }
 					onChange={ onChangeSpy }
@@ -167,7 +168,7 @@ describe.each( [
 		it( 'should select a new value when clicking on the radio input', async () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
@@ -192,7 +193,7 @@ describe.each( [
 		it( 'should select a new value when clicking on the radio label', async () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
@@ -215,7 +216,7 @@ describe.each( [
 		it( 'should select a new value when using the arrow keys', async () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
-			render(
+			await render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 

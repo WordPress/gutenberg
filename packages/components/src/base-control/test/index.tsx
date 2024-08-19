@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -21,8 +22,8 @@ const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
 };
 
 describe( 'BaseControl', () => {
-	it( 'should render help text as description', () => {
-		render( <MyBaseControl label="Text" help="My help text" /> );
+	it( 'should render help text as description', async () => {
+		await render( <MyBaseControl label="Text" help="My help text" /> );
 
 		expect(
 			screen.getByRole( 'textbox', {
@@ -31,8 +32,8 @@ describe( 'BaseControl', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should still render help as aria-describedby when not plain text', () => {
-		render(
+	it( 'should still render help as aria-describedby when not plain text', async () => {
+		await render(
 			<MyBaseControl
 				label="Text"
 				help={ <a href="/foo">My help text</a> }

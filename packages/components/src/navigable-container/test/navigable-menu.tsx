@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -50,7 +51,7 @@ describe( 'NavigableMenu', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		render( <NavigableMenuTestCase onNavigate={ onNavigateSpy } /> );
+		await render( <NavigableMenuTestCase onNavigate={ onNavigateSpy } /> );
 
 		const focusables = getNavigableMenuFocusables();
 
@@ -89,7 +90,7 @@ describe( 'NavigableMenu', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		render(
+		await render(
 			<NavigableMenuTestCase
 				orientation="horizontal"
 				onNavigate={ onNavigateSpy }
@@ -133,7 +134,7 @@ describe( 'NavigableMenu', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		const { rerender } = render(
+		const { rerender } = await render(
 			<NavigableMenuTestCase onNavigate={ onNavigateSpy } />
 		);
 
@@ -160,7 +161,7 @@ describe( 'NavigableMenu', () => {
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
 		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstFocusable );
 
-		rerender(
+		await rerender(
 			<NavigableMenuTestCase
 				onNavigate={ onNavigateSpy }
 				cycle={ false }
@@ -191,7 +192,7 @@ describe( 'NavigableMenu', () => {
 
 		const externalWrapperOnKeyDownSpy = jest.fn();
 
-		render(
+		await render(
 			// Disable reason: this is only for test purposes.
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ externalWrapperOnKeyDownSpy }>
@@ -218,7 +219,7 @@ describe( 'NavigableMenu', () => {
 	it( 'skips its internal logic when the tab key is pressed', async () => {
 		const user = userEvent.setup();
 
-		render(
+		await render(
 			<>
 				<button>Before menu</button>
 				<NavigableMenuTestCase />

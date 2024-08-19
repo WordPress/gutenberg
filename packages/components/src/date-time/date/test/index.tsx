@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { format } from 'date-fns';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -11,16 +12,16 @@ import userEvent from '@testing-library/user-event';
 import DatePicker from '..';
 
 describe( 'DatePicker', () => {
-	it( 'should highlight the current date', () => {
-		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
+	it( 'should highlight the current date', async () => {
+		await render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
 		).toBeInTheDocument();
 	} );
 
-	it( "should highlight today's date when not provided a currentDate", () => {
-		render( <DatePicker /> );
+	it( "should highlight today's date when not provided a currentDate", async () => {
+		await render( <DatePicker /> );
 
 		const todayDescription = format( new Date(), 'MMMM d, yyyy' );
 		expect(
@@ -35,7 +36,7 @@ describe( 'DatePicker', () => {
 
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				onChange={ onChange }
@@ -55,7 +56,7 @@ describe( 'DatePicker', () => {
 		const onMonthPreviewed = jest.fn();
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				onMonthPreviewed={ onMonthPreviewed }
@@ -80,8 +81,8 @@ describe( 'DatePicker', () => {
 		expect( onChange ).toHaveBeenCalledWith( '2022-06-20T11:00:00' );
 	} );
 
-	it( 'should highlight events on the calendar', () => {
-		render(
+	it( 'should highlight events on the calendar', async () => {
+		await render(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				events={ [
@@ -102,7 +103,7 @@ describe( 'DatePicker', () => {
 	} );
 
 	it( 'should not allow invalid date to be selected', async () => {
-		render(
+		await render(
 			<DatePicker
 				currentDate="2022-05-02T11:00:00"
 				isInvalidDate={ ( date ) => date.getDate() === 20 }

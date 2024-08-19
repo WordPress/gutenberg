@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,9 +10,15 @@ import { render, screen } from '@testing-library/react';
 import { ProgressBar } from '..';
 import { INDETERMINATE_TRACK_WIDTH } from '../styles';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'ProgressBar', () => {
-	it( 'should render an indeterminate semantic progress bar element', () => {
-		render( <ProgressBar /> );
+	it( 'should render an indeterminate semantic progress bar element', async () => {
+		await render( <ProgressBar /> );
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
@@ -20,8 +27,8 @@ describe( 'ProgressBar', () => {
 		expect( progressBar ).not.toHaveValue();
 	} );
 
-	it( 'should render a determinate semantic progress bar element', () => {
-		render( <ProgressBar value={ 55 } /> );
+	it( 'should render a determinate semantic progress bar element', async () => {
+		await render( <ProgressBar value={ 55 } /> );
 
 		const progressBar = screen.getByRole( 'progressbar' );
 
@@ -30,8 +37,9 @@ describe( 'ProgressBar', () => {
 		expect( progressBar ).toHaveValue( 55 );
 	} );
 
-	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', () => {
-		const { container } = render( <ProgressBar /> );
+	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', async () => {
+		const container = createContainer();
+		await render( <ProgressBar />, { container } );
 
 		/**
 		 * We're intentionally not using an accessible selector, because
@@ -48,8 +56,9 @@ describe( 'ProgressBar', () => {
 		} );
 	} );
 
-	it( 'should use `value`% as width for determinate progress bar', () => {
-		const { container } = render( <ProgressBar value={ 55 } /> );
+	it( 'should use `value`% as width for determinate progress bar', async () => {
+		const container = createContainer();
+		await render( <ProgressBar value={ 55 } />, { container } );
 
 		/**
 		 * We're intentionally not using an accessible selector, because
@@ -63,12 +72,12 @@ describe( 'ProgressBar', () => {
 		} );
 	} );
 
-	it( 'should pass any additional props down to the underlying `progress` element', () => {
+	it( 'should pass any additional props down to the underlying `progress` element', async () => {
 		const id = 'foo-bar-123';
 		const ariaLabel = 'in progress...';
 		const style = { opacity: 1 };
 
-		render(
+		await render(
 			<ProgressBar id={ id } aria-label={ ariaLabel } style={ style } />
 		);
 

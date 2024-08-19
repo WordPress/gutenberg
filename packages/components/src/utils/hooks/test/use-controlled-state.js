@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -35,9 +36,9 @@ describe( 'hooks', () => {
 			);
 		};
 
-		it( 'should use incoming prop as state on initial render', () => {
+		it( 'should use incoming prop as state on initial render', async () => {
 			const spy = jest.fn();
-			render( <Example value="Hello" onChange={ spy } /> );
+			await render( <Example value="Hello" onChange={ spy } /> );
 
 			const input = getInput();
 
@@ -45,9 +46,9 @@ describe( 'hooks', () => {
 			expect( spy ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should update rendered value onChange', () => {
+		it( 'should update rendered value onChange', async () => {
 			const spy = jest.fn();
-			render( <Example onChange={ spy } /> );
+			await render( <Example onChange={ spy } /> );
 
 			const input = getInput();
 
@@ -73,7 +74,7 @@ describe( 'hooks', () => {
 		 * Unlike the basic useState hook, useControlledState's state can
 		 * be updated if a new incoming prop value is changed.
 		 */
-		it( 'should update changed value with new incoming prop value', () => {
+		it( 'should update changed value with new incoming prop value', async () => {
 			const spy = jest.fn();
 
 			/**
@@ -81,7 +82,7 @@ describe( 'hooks', () => {
 			 * from props. The prop being rendered is the state provided by
 			 * useControlledState, rather than the value prop directly.
 			 */
-			const { rerender } = render( <Example onChange={ spy } /> );
+			const { rerender } = await render( <Example onChange={ spy } /> );
 
 			const input = getInput();
 
@@ -97,16 +98,16 @@ describe( 'hooks', () => {
 			 * internal state value, which will be rerendered into
 			 * the <input />.
 			 */
-			rerender( <Example value="New Value" /> );
+			await rerender( <Example value="New Value" /> );
 
 			expect( input.value ).toBe( 'New Value' );
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should render with initial value and be controllable', () => {
+		it( 'should render with initial value and be controllable', async () => {
 			const spy = jest.fn();
 			// Input starts off as being uncontrolled / self-managed.
-			const { rerender } = render(
+			const { rerender } = await render(
 				<Example onChange={ spy } initial="Hello" />
 			);
 			const input = getInput();
@@ -119,7 +120,7 @@ describe( 'hooks', () => {
 			expect( spy ).toHaveBeenCalledWith( 'There' );
 
 			// Input is now controlled.
-			rerender( <Example value="New Value" /> );
+			await rerender( <Example value="New Value" /> );
 			expect( input.value ).toBe( 'New Value' );
 
 			fireEvent.change( input, {

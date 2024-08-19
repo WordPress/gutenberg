@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -18,8 +19,8 @@ import type { ModalProps } from '../types';
 const noop = () => {};
 
 describe( 'Modal', () => {
-	it( 'applies the aria-describedby attribute when provided', () => {
-		render(
+	it( 'applies the aria-describedby attribute when provided', async () => {
+		await render(
 			<Modal
 				aria={ { describedby: 'description-id' } }
 				onRequestClose={ noop }
@@ -34,8 +35,8 @@ describe( 'Modal', () => {
 		);
 	} );
 
-	it( 'applies the aria-labelledby attribute when provided', () => {
-		render(
+	it( 'applies the aria-labelledby attribute when provided', async () => {
+		await render(
 			<Modal aria={ { labelledby: 'title-id' } } onRequestClose={ noop }>
 				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
@@ -46,8 +47,8 @@ describe( 'Modal', () => {
 		);
 	} );
 
-	it( 'prefers the aria label of the title prop over the aria.labelledby prop', () => {
-		render(
+	it( 'prefers the aria label of the title prop over the aria.labelledby prop', async () => {
+		await render(
 			<Modal
 				title="Modal Title Attribute"
 				aria={ { labelledby: 'title-id' } }
@@ -62,8 +63,8 @@ describe( 'Modal', () => {
 		);
 	} );
 
-	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
-		render(
+	it( 'hides the header when the `__experimentalHideHeader` prop is used', async () => {
+		await render(
 			<Modal
 				title="Test Title"
 				__experimentalHideHeader
@@ -80,7 +81,7 @@ describe( 'Modal', () => {
 	it( 'should call onRequestClose when the escape key is pressed', async () => {
 		const user = userEvent.setup();
 		const onRequestClose = jest.fn();
-		render(
+		await render(
 			<Modal onRequestClose={ onRequestClose }>
 				<p>Modal content</p>
 			</Modal>
@@ -104,7 +105,7 @@ describe( 'Modal', () => {
 				</div>
 			);
 		};
-		render( <ReturnDemo /> );
+		await render( <ReturnDemo /> );
 
 		const opener = screen.getByRole( 'button' );
 		await user.click( opener );
@@ -136,7 +137,7 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-		render( <DismissAdjacent /> );
+		await render( <DismissAdjacent /> );
 
 		await user.click( screen.getByRole( 'button', { name: '💥' } ) );
 		expect( onRequestClose ).toHaveBeenCalled();
@@ -161,7 +162,7 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-		render( <NestSupport /> );
+		await render( <NestSupport /> );
 
 		await user.click( screen.getByRole( 'button', { name: '🪆' } ) );
 		expect( onRequestClose ).not.toHaveBeenCalled();
@@ -192,7 +193,7 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-		render( <RequestCloseOfNested /> );
+		await render( <RequestCloseOfNested /> );
 
 		await user.keyboard( 'o' );
 		expect( onRequestClose ).toHaveBeenCalled();
@@ -230,7 +231,9 @@ describe( 'Modal', () => {
 				</>
 			);
 		};
-		const { container } = render( <AriaDemo /> );
+		const container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		await render( <AriaDemo />, { container } );
 
 		// Opens outer modal > hides container.
 		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
@@ -255,7 +258,7 @@ describe( 'Modal', () => {
 	} );
 
 	it( 'should render `headerActions` React nodes', async () => {
-		render(
+		await render(
 			<Modal
 				headerActions={ <button>A sweet button</button> }
 				onRequestClose={ noop }
@@ -323,7 +326,7 @@ describe( 'Modal', () => {
 		it( 'should focus the Modal dialog by default when `focusOnMount` prop is not provided', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo /> );
+			await render( <FocusMountDemo /> );
 
 			const opener = screen.getByRole( 'button', {
 				name: 'Toggle Modal',
@@ -337,7 +340,7 @@ describe( 'Modal', () => {
 		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount /> );
+			await render( <FocusMountDemo focusOnMount /> );
 
 			const opener = screen.getByRole( 'button', {
 				name: 'Toggle Modal',
@@ -351,7 +354,9 @@ describe( 'Modal', () => {
 		it( 'should focus the first focusable element in the contents (if found) when `firstContentElement` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount="firstContentElement" /> );
+			await render(
+				<FocusMountDemo focusOnMount="firstContentElement" />
+			);
 
 			const opener = screen.getByRole( 'button' );
 
@@ -365,7 +370,7 @@ describe( 'Modal', () => {
 		it( 'should focus the first element anywhere within the Modal when `firstElement` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount="firstElement" /> );
+			await render( <FocusMountDemo focusOnMount="firstElement" /> );
 
 			const opener = screen.getByRole( 'button' );
 
@@ -379,7 +384,7 @@ describe( 'Modal', () => {
 		it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount={ false } /> );
+			await render( <FocusMountDemo focusOnMount={ false } /> );
 
 			const opener = screen.getByRole( 'button', {
 				name: 'Toggle Modal',
@@ -459,29 +464,29 @@ describe( 'Modal', () => {
 		it( 'is added and removed when modal opens and closes including when closed due to another modal opening', async () => {
 			const user = userEvent.setup();
 
-			const { baseElement } = render( <BodyClassDemo /> );
+			await render( <BodyClassDemo /> );
 
 			await user.keyboard( 'a' ); // Opens modal A.
-			expect( baseElement ).toHaveClass( 'is-A-open' );
+			expect( document.body ).toHaveClass( 'is-A-open' );
 
 			await user.keyboard( 'b' ); // Opens modal B > closes modal A.
-			expect( baseElement ).toHaveClass( 'is-B-open' );
-			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+			expect( document.body ).toHaveClass( 'is-B-open' );
+			expect( document.body ).not.toHaveClass( 'is-A-open' );
 
 			await user.keyboard( 'b' ); // Closes modal B.
-			expect( baseElement ).not.toHaveClass( 'is-B-open' );
+			expect( document.body ).not.toHaveClass( 'is-B-open' );
 		} );
 
 		it( 'is removed even when prop changes while nested modal is open', async () => {
 			const user = userEvent.setup();
 
-			const { baseElement } = render( <BodyClassDemo /> );
+			await render( <BodyClassDemo /> );
 
 			await user.keyboard( 'a' ); // Opens modal A.
 			await user.keyboard( '{Meta>}a{/Meta}' ); // Opens nested modal.
 			await user.keyboard( 'c' ); // Changes `bodyOpenClassName`.
 			await user.keyboard( 'a' ); // Closes modal A.
-			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+			expect( document.body ).not.toHaveClass( 'is-A-open' );
 		} );
 	} );
 } );

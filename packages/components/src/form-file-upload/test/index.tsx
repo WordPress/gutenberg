@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -22,8 +23,8 @@ const fakePath = expect.objectContaining( {
 } );
 
 describe( 'FormFileUpload', () => {
-	it( 'should show an Icon Button and a hidden input', () => {
-		render(
+	it( 'should show an Icon Button and a hidden input', async () => {
+		await render(
 			<FormFileUpload onChange={ () => {} }>
 				My Upload Button
 			</FormFileUpload>
@@ -40,7 +41,7 @@ describe( 'FormFileUpload', () => {
 
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<FormFileUpload onChange={ onChange }>
 				My Upload Button
 			</FormFileUpload>
@@ -65,7 +66,7 @@ describe( 'FormFileUpload', () => {
 
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<FormFileUpload
 				onClick={ jest.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
 				onChange={ onChange }

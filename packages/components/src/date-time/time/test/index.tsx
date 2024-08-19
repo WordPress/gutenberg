@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -15,7 +16,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -69,7 +70,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -91,7 +92,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -113,7 +114,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -135,7 +136,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -157,7 +158,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -177,7 +178,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T23:00:00"
 				onChange={ onChangeSpy }
@@ -197,7 +198,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -230,7 +231,7 @@ describe( 'TimePicker', () => {
 
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime="1986-10-18T23:12:35"
 				onChange={ onChangeSpy }
@@ -247,10 +248,10 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:22:00' );
 	} );
 
-	it( 'should reset the date when currentTime changed', () => {
+	it( 'should reset the date when currentTime changed', async () => {
 		const onChangeSpy = jest.fn();
 
-		const { rerender } = render(
+		const { rerender } = await render(
 			<TimePicker
 				currentTime="1986-10-18T11:00:00"
 				onChange={ onChangeSpy }
@@ -258,7 +259,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		rerender(
+		await rerender(
 			<TimePicker
 				currentTime="2020-07-13T18:00:00"
 				onChange={ onChangeSpy }
@@ -289,10 +290,10 @@ describe( 'TimePicker', () => {
 		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
 	} );
 
-	it( 'should have different layouts/orders for 12/24 hour formats', () => {
+	it( 'should have different layouts/orders for 12/24 hour formats', async () => {
 		const onChangeSpy = jest.fn();
 
-		const { rerender } = render(
+		const { rerender } = await render(
 			<form aria-label="form">
 				<TimePicker
 					currentTime="1986-10-18T11:00:00"
@@ -313,7 +314,7 @@ describe( 'TimePicker', () => {
 
 		expect( monthInputIndex > dayInputIndex ).toBe( true );
 
-		rerender(
+		await rerender(
 			<form aria-label="form">
 				<TimePicker
 					currentTime="1986-10-18T11:00:00"
@@ -333,10 +334,10 @@ describe( 'TimePicker', () => {
 		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
-	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
+	it( 'Should change layouts/orders when `dateOrder` prop is passed', async () => {
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<form aria-label="form">
 				<TimePicker
 					currentTime="1986-10-18T11:00:00"
@@ -363,10 +364,10 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', async () => {
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<form aria-label="form">
 				<TimePicker
 					currentTime="1986-10-18T11:00:00"
@@ -394,10 +395,10 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should set a time when passed a null currentTime', () => {
+	it( 'Should set a time when passed a null currentTime', async () => {
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimePicker
 				currentTime={ null }
 				onChange={ onChangeSpy }

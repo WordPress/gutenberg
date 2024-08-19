@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,33 +10,45 @@ import { render } from '@testing-library/react';
 import { View } from '../../view';
 import { VStack } from '..';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render(
+	test( 'should render correctly', async () => {
+		const container = createContainer();
+		await render(
 			<VStack>
 				<View />
 				<View />
-			</VStack>
+			</VStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render alignment', () => {
-		const { container } = render(
+	test( 'should render alignment', async () => {
+		const container = createContainer();
+		await render(
 			<VStack alignment="center">
 				<View />
 				<View />
-			</VStack>
+			</VStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render spacing', () => {
-		const { container } = render(
+	test( 'should render spacing', async () => {
+		const container = createContainer();
+		await render(
 			<VStack spacing={ 5 }>
 				<View />
 				<View />
-			</VStack>
+			</VStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );

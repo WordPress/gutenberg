@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { createEvent, fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -31,7 +32,7 @@ describe( 'KeyboardShortcuts', () => {
 	it( 'should capture key events', async () => {
 		const spy = jest.fn();
 
-		render(
+		await render(
 			<KeyboardShortcuts
 				shortcuts={ {
 					d: spy,
@@ -44,10 +45,10 @@ describe( 'KeyboardShortcuts', () => {
 		expect( spy ).toHaveBeenCalled();
 	} );
 
-	it( 'should capture key events globally', () => {
+	it( 'should capture key events globally', async () => {
 		const spy = jest.fn();
 
-		render(
+		await render(
 			<div>
 				<KeyboardShortcuts
 					bindGlobal
@@ -64,10 +65,10 @@ describe( 'KeyboardShortcuts', () => {
 		expect( spy ).toHaveBeenCalled();
 	} );
 
-	it( 'should capture key events on specific event', () => {
+	it( 'should capture key events on specific event', async () => {
 		const spy = jest.fn();
 
-		render(
+		await render(
 			<div>
 				<KeyboardShortcuts
 					eventName="keyup"
@@ -84,10 +85,10 @@ describe( 'KeyboardShortcuts', () => {
 		expect( spy.mock.calls[ 0 ][ 0 ].type ).toBe( 'keyup' );
 	} );
 
-	it( 'should capture key events on children', () => {
+	it( 'should capture key events on children', async () => {
 		const spy = jest.fn();
 
-		render(
+		await render(
 			<div>
 				<KeyboardShortcuts
 					shortcuts={ {

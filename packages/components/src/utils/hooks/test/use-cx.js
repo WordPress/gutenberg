@@ -4,7 +4,8 @@
 // eslint-disable-next-line no-restricted-imports
 import { cx as innerCx } from '@emotion/css';
 import { insertStyles } from '@emotion/utils';
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 import { css, CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 
@@ -28,7 +29,7 @@ function Example( { args } ) {
 }
 
 describe( 'useCx', () => {
-	it( 'should call cx with the built style name and pass serialized styles to insertStyles', () => {
+	it( 'should call cx with the built style name and pass serialized styles to insertStyles', async () => {
 		const serializedStyle = css`
 			color: red;
 		`;
@@ -43,7 +44,7 @@ describe( 'useCx', () => {
 
 		const cache = createCache( { container, key } );
 
-		render(
+		await render(
 			<CacheProvider value={ cache }>
 				<Example args={ [ className, serializedStyle, object ] } />
 			</CacheProvider>

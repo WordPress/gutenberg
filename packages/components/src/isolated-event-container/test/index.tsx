@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -13,7 +14,7 @@ describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
 		const user = userEvent.setup();
 		const clickHandler = jest.fn();
-		render(
+		await render(
 			<IsolatedEventContainer
 				title="Container"
 				className="test"
@@ -31,7 +32,7 @@ describe( 'IsolatedEventContainer', () => {
 	} );
 
 	it( 'should render children', async () => {
-		render(
+		await render(
 			<IsolatedEventContainer title="Container">
 				<p>Child</p>
 			</IsolatedEventContainer>
@@ -47,7 +48,7 @@ describe( 'IsolatedEventContainer', () => {
 
 		const mousedownHandler = jest.fn();
 		const keydownHandler = jest.fn();
-		render(
+		await render(
 			<button
 				onMouseDown={ mousedownHandler }
 				onKeyDown={ keydownHandler }

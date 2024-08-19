@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -22,39 +23,41 @@ describe( 'InputControl', () => {
 	);
 
 	describe( 'Basic rendering', () => {
-		it( 'should render', () => {
-			render( <InputControl /> );
+		it( 'should render', async () => {
+			await render( <InputControl /> );
 
 			const input = getInput();
 
 			expect( input ).toBeTruthy();
 		} );
 
-		it( 'should render with specified type', () => {
-			render( <InputControl type="number" /> );
+		it( 'should render with specified type', async () => {
+			await render( <InputControl type="number" /> );
 
 			const input = getInput();
 
 			expect( input ).toHaveAttribute( 'type', 'number' );
 		} );
 
-		it( 'should render label', () => {
-			render( <InputControl label="Hello" value="There" /> );
+		it( 'should render label', async () => {
+			await render( <InputControl label="Hello" value="There" /> );
 
 			const input = screen.getByText( 'Hello' );
 
 			expect( input ).toBeInTheDocument();
 		} );
 
-		it( 'should render help text as description', () => {
-			render( <InputControl help="My help text" /> );
+		it( 'should render help text as description', async () => {
+			await render( <InputControl help="My help text" /> );
 			expect(
 				screen.getByRole( 'textbox', { description: 'My help text' } )
 			).toBeInTheDocument();
 		} );
 
-		it( 'should still render help as aria-describedby when not plain text', () => {
-			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
+		it( 'should still render help as aria-describedby when not plain text', async () => {
+			await render(
+				<InputControl help={ <a href="/foo">My help text</a> } />
+			);
 
 			const input = screen.getByRole( 'textbox' );
 			const help = screen.getByRole( 'link', { name: 'My help text' } );
@@ -70,7 +73,7 @@ describe( 'InputControl', () => {
 		it( 'should focus its input on mousedown events', async () => {
 			const user = await userEvent.setup();
 			const spy = jest.fn();
-			render( <InputControl type="number" onFocus={ spy } /> );
+			await render( <InputControl type="number" onFocus={ spy } /> );
 			const target = getInput();
 
 			// Hovers the input and presses (without releasing) primary button.
@@ -87,7 +90,7 @@ describe( 'InputControl', () => {
 		it( 'should update value onChange', async () => {
 			const user = await userEvent.setup();
 			const spy = jest.fn();
-			render(
+			await render(
 				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
 			);
 			const input = getInput();
@@ -131,7 +134,7 @@ describe( 'InputControl', () => {
 					/>
 				);
 			};
-			render( <Example /> );
+			await render( <Example /> );
 			const input = getInput();
 
 			await user.type( input, '2' );
@@ -154,20 +157,22 @@ describe( 'InputControl', () => {
 			expect( spy ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should change back to initial value prop, if controlled', () => {
+		it( 'should change back to initial value prop, if controlled', async () => {
 			const spy = jest.fn();
-			const { rerender } = render(
+			const { rerender } = await render(
 				<InputControl value="Original" onChange={ spy } />
 			);
 			const input = getInput();
 
 			// Updating the value.
-			rerender( <InputControl value="New" onChange={ spy } /> );
+			await rerender( <InputControl value="New" onChange={ spy } /> );
 
 			expect( input ).toHaveValue( 'New' );
 
 			// Change it back to the original value.
-			rerender( <InputControl value="Original" onChange={ spy } /> );
+			await rerender(
+				<InputControl value="Original" onChange={ spy } />
+			);
 
 			expect( input ).toHaveValue( 'Original' );
 			expect( spy ).toHaveBeenCalledTimes( 0 );
@@ -176,7 +181,7 @@ describe( 'InputControl', () => {
 		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
 			const user = await userEvent.setup();
 			const spy = jest.fn();
-			render(
+			await render(
 				<InputControl
 					value=""
 					onChange={ ( v ) => spy( v ) }
@@ -196,7 +201,7 @@ describe( 'InputControl', () => {
 		it( 'should commit value when blurred if value is invalid', async () => {
 			const user = await userEvent.setup();
 			const spyChange = jest.fn();
-			render(
+			await render(
 				<InputControl
 					value="this is"
 					onChange={ ( v ) => spyChange( v ) }

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -18,6 +19,12 @@ const DimensionControl = ( props ) => {
 	return <_DimensionControl { ...props } __nextHasNoMarginBottom />;
 };
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'DimensionControl', () => {
 	const onChangeHandler = jest.fn();
 	const instanceId = 1;
@@ -27,37 +34,43 @@ describe( 'DimensionControl', () => {
 	} );
 
 	describe( 'rendering', () => {
-		it( 'renders with defaults', () => {
-			const { container } = render(
-				<DimensionControl instanceId={ instanceId } label="Padding" />
+		it( 'renders with defaults', async () => {
+			const container = createContainer();
+			await render(
+				<DimensionControl instanceId={ instanceId } label="Padding" />,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'renders with icon and default icon label', () => {
-			const { container } = render(
+		it( 'renders with icon and default icon label', async () => {
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Margin"
 					icon={ plus }
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'renders with icon and custom icon label', () => {
-			const { container } = render(
+		it( 'renders with icon and custom icon label', async () => {
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Margin"
 					icon={ plus }
 					iconLabel="Tablet Devices"
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'renders with custom sizes', () => {
+		it( 'renders with custom sizes', async () => {
 			const customSizes = [
 				{
 					name: 'Mini',
@@ -76,12 +89,14 @@ describe( 'DimensionControl', () => {
 				},
 			];
 
-			const { container } = render(
+			const container = createContainer();
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Custom Dimension"
 					sizes={ customSizes }
-				/>
+				/>,
+				{ container }
 			);
 			expect( container ).toMatchSnapshot();
 		} );
@@ -91,7 +106,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with correct args on size change', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Padding"
@@ -113,7 +128,7 @@ describe( 'DimensionControl', () => {
 		it( 'should call onChange handler with undefined value when no size is provided on change', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<DimensionControl
 					instanceId={ instanceId }
 					label="Padding"

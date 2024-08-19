@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -16,7 +17,7 @@ describe( 'TimeInput', () => {
 		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimeInput
 				defaultValue={ timeInputValue }
 				onChange={ onChangeSpy }
@@ -68,7 +69,7 @@ describe( 'TimeInput', () => {
 		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimeInput
 				is12Hour
 				defaultValue={ timeInputValue }
@@ -116,7 +117,7 @@ describe( 'TimeInput', () => {
 		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
-		render(
+		await render(
 			<TimeInput
 				defaultValue={ timeInputValue }
 				minutesProps={ { step: 5 } }
@@ -155,11 +156,11 @@ describe( 'TimeInput', () => {
 		expect( minutesInput ).toHaveValue( 50 );
 	} );
 
-	it( 'should reflect changes to the value prop', () => {
-		const { rerender } = render(
+	it( 'should reflect changes to the value prop', async () => {
+		const { rerender } = await render(
 			<TimeInput value={ { hours: 0, minutes: 0 } } />
 		);
-		rerender( <TimeInput value={ { hours: 1, minutes: 2 } } /> );
+		await rerender( <TimeInput value={ { hours: 1, minutes: 2 } } /> );
 
 		expect(
 			screen.getByRole( 'spinbutton', { name: 'Hours' } )

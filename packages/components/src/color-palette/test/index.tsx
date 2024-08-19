@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
@@ -39,10 +40,10 @@ const ControlledColorPalette = ( {
 };
 
 describe( 'ColorPalette', () => {
-	it( 'should render three color button options', () => {
+	it( 'should render three color button options', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -59,7 +60,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -79,7 +80,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -105,7 +106,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -119,10 +120,10 @@ describe( 'ColorPalette', () => {
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
 
-	it( 'should render custom color picker', () => {
+	it( 'should render custom color picker', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -135,10 +136,10 @@ describe( 'ColorPalette', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should allow disabling custom color picker', () => {
+	it( 'should allow disabling custom color picker', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				disableCustomColors
@@ -156,7 +157,7 @@ describe( 'ColorPalette', () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -192,10 +193,10 @@ describe( 'ColorPalette', () => {
 		);
 	} );
 
-	it( 'should show the clear button by default', () => {
+	it( 'should show the clear button by default', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<ColorPalette
 				colors={ EXAMPLE_COLORS }
 				value={ INITIAL_COLOR }
@@ -208,10 +209,10 @@ describe( 'ColorPalette', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should show the clear button even when `colors` is an empty array', () => {
+	it( 'should show the clear button even when `colors` is an empty array', async () => {
 		const onChange = jest.fn();
 
-		render( <ColorPalette colors={ [] } onChange={ onChange } /> );
+		await render( <ColorPalette colors={ [] } onChange={ onChange } /> );
 
 		expect(
 			screen.getByRole( 'button', { name: 'Clear' } )
@@ -221,7 +222,7 @@ describe( 'ColorPalette', () => {
 	it( 'should display the selected color name and value', async () => {
 		const user = userEvent.setup();
 
-		render( <ControlledColorPalette /> );
+		await render( <ControlledColorPalette /> );
 
 		const { name: colorName, color: colorCode } = EXAMPLE_COLORS[ 0 ];
 

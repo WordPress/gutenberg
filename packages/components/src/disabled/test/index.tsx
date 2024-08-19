@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -17,8 +18,8 @@ describe( 'Disabled', () => {
 		</form>
 	);
 
-	it( 'will disable all fields', () => {
-		render(
+	it( 'will disable all fields', async () => {
+		await render(
 			<Disabled data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
@@ -29,7 +30,7 @@ describe( 'Disabled', () => {
 		);
 	} );
 
-	it( 'should cleanly un-disable via reconciliation', () => {
+	it( 'should cleanly un-disable via reconciliation', async () => {
 		const MaybeDisable = ( { isDisabled = true } ) =>
 			isDisabled ? (
 				<Disabled data-testid="disabled-wrapper">
@@ -39,33 +40,33 @@ describe( 'Disabled', () => {
 				<Form />
 			);
 
-		const { rerender } = render( <MaybeDisable /> );
+		const { rerender } = await render( <MaybeDisable /> );
 
 		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
 			'inert'
 		);
 
-		rerender( <MaybeDisable isDisabled={ false } /> );
+		await rerender( <MaybeDisable isDisabled={ false } /> );
 
 		expect(
 			screen.queryByTestId( 'disabled-wrapper' )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
+	it( 'will disable or enable descendant fields based on the isDisabled prop value', async () => {
 		const MaybeDisable = ( { isDisabled = true } ) => (
 			<Disabled isDisabled={ isDisabled } data-testid="disabled-wrapper">
 				<Form />
 			</Disabled>
 		);
 
-		const { rerender } = render( <MaybeDisable /> );
+		const { rerender } = await render( <MaybeDisable /> );
 
 		expect( screen.getByTestId( 'disabled-wrapper' ) ).toHaveAttribute(
 			'inert'
 		);
 
-		rerender( <MaybeDisable isDisabled={ false } /> );
+		await rerender( <MaybeDisable isDisabled={ false } /> );
 
 		expect( screen.getByTestId( 'disabled-wrapper' ) ).not.toHaveAttribute(
 			'inert'
@@ -84,7 +85,9 @@ describe( 'Disabled', () => {
 		const getInput = () => screen.getByRole( 'textbox' );
 		const getContentEditable = () => screen.getByTitle( 'edit my content' );
 
-		const { rerender } = render( <MaybeDisable isDisabled={ false } /> );
+		const { rerender } = await render(
+			<MaybeDisable isDisabled={ false } />
+		);
 
 		await user.type( getInput(), 'This is input.' );
 		expect( getInput() ).toHaveValue( 'This is input.' );
@@ -94,13 +97,13 @@ describe( 'Disabled', () => {
 			'This is contentEditable.'
 		);
 
-		rerender( <MaybeDisable isDisabled /> );
+		await rerender( <MaybeDisable isDisabled /> );
 		expect( getInput() ).toHaveValue( 'This is input.' );
 		expect( getContentEditable() ).toHaveTextContent(
 			'This is contentEditable.'
 		);
 
-		rerender( <MaybeDisable isDisabled={ false } /> );
+		await rerender( <MaybeDisable isDisabled={ false } /> );
 		expect( getInput() ).toHaveValue( 'This is input.' );
 		expect( getContentEditable() ).toHaveTextContent(
 			'This is contentEditable.'

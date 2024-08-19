@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -48,13 +49,16 @@ describe( 'TreeGrid', () => {
 	} );
 
 	describe( 'simple rendering', () => {
-		it( 'renders a table, tbody and any child elements', () => {
-			const { container } = render(
+		it( 'renders a table, tbody and any child elements', async () => {
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render(
 				<TreeGrid>
 					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
 						<TreeGridCell withoutGridItem>Test</TreeGridCell>
 					</TreeGridRow>
-				</TreeGrid>
+				</TreeGrid>,
+				{ container }
 			);
 
 			expect( container.innerHTML ).toMatchSnapshot();
@@ -62,10 +66,10 @@ describe( 'TreeGrid', () => {
 	} );
 
 	describe( 'onExpandRow', () => {
-		it( 'should call onExpandRow when pressing Right Arrow on a collapsed row', () => {
+		it( 'should call onExpandRow when pressing Right Arrow on a collapsed row', async () => {
 			const onExpandRow = jest.fn();
 
-			render(
+			await render(
 				<TreeGrid onExpandRow={ onExpandRow }>
 					<TreeGridRow
 						level={ 1 }
@@ -114,10 +118,10 @@ describe( 'TreeGrid', () => {
 	} );
 
 	describe( 'onCollapseRow', () => {
-		it( 'should call onCollapseRow when pressing Left Arrow on an expanded row', () => {
+		it( 'should call onCollapseRow when pressing Left Arrow on an expanded row', async () => {
 			const onCollapseRow = jest.fn();
 
-			render(
+			await render(
 				<TreeGrid onCollapseRow={ onCollapseRow }>
 					<TreeGridRow
 						level={ 1 }
@@ -190,9 +194,9 @@ describe( 'TreeGrid', () => {
 			</TreeGrid>
 		);
 
-		it( 'should call onFocusRow with event, start and end nodes when pressing Down Arrow', () => {
+		it( 'should call onFocusRow with event, start and end nodes when pressing Down Arrow', async () => {
 			const onFocusRow = jest.fn();
-			render( <TestTree onFocusRow={ onFocusRow } /> );
+			await render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();
 
@@ -212,9 +216,9 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
-		it( 'should call onFocusRow with event, start and end nodes when pressing End', () => {
+		it( 'should call onFocusRow with event, start and end nodes when pressing End', async () => {
 			const onFocusRow = jest.fn();
-			render( <TestTree onFocusRow={ onFocusRow } /> );
+			await render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 1' ).focus();
 
@@ -234,9 +238,9 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
-		it( 'should call onFocusRow with event, start and end nodes when pressing Up Arrow', () => {
+		it( 'should call onFocusRow with event, start and end nodes when pressing Up Arrow', async () => {
 			const onFocusRow = jest.fn();
-			render( <TestTree onFocusRow={ onFocusRow } /> );
+			await render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();
 
@@ -256,9 +260,9 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
-		it( 'should call onFocusRow with event, start and end nodes when pressing Home', () => {
+		it( 'should call onFocusRow with event, start and end nodes when pressing Home', async () => {
 			const onFocusRow = jest.fn();
-			render( <TestTree onFocusRow={ onFocusRow } /> );
+			await render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 3' ).focus();
 
@@ -278,9 +282,9 @@ describe( 'TreeGrid', () => {
 			);
 		} );
 
-		it( 'should call onFocusRow when shift key is held', () => {
+		it( 'should call onFocusRow when shift key is held', async () => {
 			const onFocusRow = jest.fn();
-			render( <TestTree onFocusRow={ onFocusRow } /> );
+			await render( <TestTree onFocusRow={ onFocusRow } /> );
 
 			screen.getByText( 'Row 2' ).focus();
 

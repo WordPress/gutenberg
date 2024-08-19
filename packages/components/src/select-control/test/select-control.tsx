@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -16,8 +17,8 @@ const SelectControl = (
 };
 
 describe( 'SelectControl', () => {
-	it( 'should not render when no options or children are provided', () => {
-		render( <SelectControl /> );
+	it( 'should not render when no options or children are provided', async () => {
+		await render( <SelectControl /> );
 
 		// use `queryByRole` to avoid throwing an error with `getByRole`
 		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
@@ -27,7 +28,7 @@ describe( 'SelectControl', () => {
 		const user = userEvent.setup();
 		const handleChangeMock = jest.fn();
 
-		render(
+		await render(
 			<SelectControl onChange={ handleChangeMock } label="Select">
 				<option value="option-1">Option 1</option>
 				<option value="option-2">Option 2</option>
@@ -56,7 +57,7 @@ describe( 'SelectControl', () => {
 		const user = userEvent.setup();
 		const handleChangeMock = jest.fn();
 
-		render(
+		await render(
 			<SelectControl
 				label="Select"
 				onChange={ handleChangeMock }

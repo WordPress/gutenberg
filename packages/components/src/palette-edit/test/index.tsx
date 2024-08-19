@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { click, type, press } from '@ariakit/test';
 
 /**
@@ -123,8 +124,8 @@ describe( 'PaletteEdit', () => {
 		},
 	];
 
-	it( 'shows heading label', () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+	it( 'shows heading label', async () => {
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		const paletteLabel = screen.getByRole( 'heading', {
 			level: 2,
@@ -134,8 +135,8 @@ describe( 'PaletteEdit', () => {
 		expect( paletteLabel ).toBeVisible();
 	} );
 
-	it( 'shows heading label with custom heading level', () => {
-		render(
+	it( 'shows heading label with custom heading level', async () => {
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -151,8 +152,8 @@ describe( 'PaletteEdit', () => {
 		).toBeVisible();
 	} );
 
-	it( 'shows empty message', () => {
-		render(
+	it( 'shows empty message', async () => {
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				emptyMessage="Test empty message"
@@ -163,7 +164,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows an option to remove all colors', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		await click(
 			screen.getByRole( 'button', {
@@ -181,7 +182,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
-		render(
+		await render(
 			<PaletteEdit { ...defaultProps } colors={ colors } canReset />
 		);
 
@@ -200,7 +201,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
-		render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
+		await render( <PaletteEdit { ...defaultProps } colors={ colors } /> );
 
 		await click(
 			screen.getByRole( 'button', {
@@ -217,7 +218,7 @@ describe( 'PaletteEdit', () => {
 	it( 'calls the `onChange` with the new color appended', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -246,7 +247,7 @@ describe( 'PaletteEdit', () => {
 	it( 'calls the `onChange` with the new gradient appended', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				gradients={ gradients }
@@ -273,8 +274,8 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can not add new colors when `canOnlyChangeValues` is enabled', () => {
-		render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
+	it( 'can not add new colors when `canOnlyChangeValues` is enabled', async () => {
+		await render( <PaletteEdit { ...defaultProps } canOnlyChangeValues /> );
 
 		expect(
 			screen.queryByRole( 'button', {
@@ -286,7 +287,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can remove a color', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -319,7 +320,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update palette name', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -359,7 +360,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update color palette value', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				colors={ colors }
@@ -390,7 +391,7 @@ describe( 'PaletteEdit', () => {
 	it( 'can update gradient palette value', async () => {
 		const onChange = jest.fn();
 
-		render(
+		await render(
 			<PaletteEdit
 				{ ...defaultProps }
 				gradients={ gradients }

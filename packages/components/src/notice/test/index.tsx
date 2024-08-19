@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -12,6 +13,12 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import Notice from '../index';
+
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
 
 jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
 const mockedSpeak = jest.mocked( speak );
@@ -25,8 +32,9 @@ describe( 'Notice', () => {
 		mockedSpeak.mockReset();
 	} );
 
-	it( 'should match snapshot', () => {
-		const { container } = render(
+	it( 'should match snapshot', async () => {
+		const container = createContainer();
+		await render(
 			<Notice
 				status="success"
 				actions={ [
@@ -36,15 +44,18 @@ describe( 'Notice', () => {
 				] }
 			>
 				Example
-			</Notice>
+			</Notice>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should not have is-dismissible class when isDismissible prop is false', () => {
-		const { container } = render(
-			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>
+	it( 'should not have is-dismissible class when isDismissible prop is false', async () => {
+		const container = createContainer();
+		await render(
+			<Notice isDismissible={ false }>I cannot be dismissed!</Notice>,
+			{ container }
 		);
 		const wrapper = getNoticeWrapper( container );
 
@@ -52,33 +63,34 @@ describe( 'Notice', () => {
 		expect( wrapper ).not.toHaveClass( 'is-dismissible' );
 	} );
 
-	it( 'should default to info status', () => {
-		const { container } = render( <Notice>FYI</Notice> );
+	it( 'should default to info status', async () => {
+		const container = createContainer();
+		await render( <Notice>FYI</Notice>, { container } );
 
 		expect( getNoticeWrapper( container ) ).toHaveClass( 'is-info' );
 	} );
 
 	describe( 'useSpokenMessage', () => {
-		it( 'should speak the given message', () => {
-			render( <Notice>FYI</Notice> );
+		it( 'should speak the given message', async () => {
+			await render( <Notice>FYI</Notice> );
 
 			expect( speak ).toHaveBeenCalledWith( 'FYI', 'polite' );
 		} );
 
-		it( 'should speak the given message by explicit politeness', () => {
-			render( <Notice politeness="assertive">Uh oh!</Notice> );
+		it( 'should speak the given message by explicit politeness', async () => {
+			await render( <Notice politeness="assertive">Uh oh!</Notice> );
 
 			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
 		} );
 
-		it( 'should speak the given message by implicit politeness by status', () => {
-			render( <Notice status="error">Uh oh!</Notice> );
+		it( 'should speak the given message by implicit politeness by status', async () => {
+			await render( <Notice status="error">Uh oh!</Notice> );
 
 			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
 		} );
 
-		it( 'should speak the given message, preferring explicit to implicit politeness', () => {
-			render(
+		it( 'should speak the given message, preferring explicit to implicit politeness', async () => {
+			await render(
 				<Notice politeness="polite" status="error">
 					No need to panic
 				</Notice>
@@ -90,10 +102,10 @@ describe( 'Notice', () => {
 			);
 		} );
 
-		it( 'should coerce a message to a string', () => {
+		it( 'should coerce a message to a string', async () => {
 			// This test assumes that `@wordpress/a11y` is capable of handling
 			// markup strings appropriately.
-			render(
+			await render(
 				<Notice>
 					With <em>emphasis</em> this time.
 				</Notice>
@@ -105,13 +117,13 @@ describe( 'Notice', () => {
 			);
 		} );
 
-		it( 'should not re-speak an effectively equivalent element message', () => {
-			const { rerender } = render(
+		it( 'should not re-speak an effectively equivalent element message', async () => {
+			const { rerender } = await render(
 				<Notice>
 					With <em>emphasis</em> this time.
 				</Notice>
 			);
-			rerender(
+			await rerender(
 				<Notice>
 					With <em>emphasis</em> this time.
 				</Notice>

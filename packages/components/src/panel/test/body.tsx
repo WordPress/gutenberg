@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -11,14 +12,16 @@ import { PanelBody } from '../body';
 
 describe( 'PanelBody', () => {
 	describe( 'basic rendering', () => {
-		it( 'should render an empty div with the matching className', () => {
-			const { container } = render( <PanelBody /> );
+		it( 'should render an empty div with the matching className', async () => {
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render( <PanelBody />, { container } );
 
 			expect( container ).toMatchSnapshot();
 		} );
 
-		it( 'should render inner content, if opened', () => {
-			render(
+		it( 'should render inner content, if opened', async () => {
+			await render(
 				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -27,8 +30,8 @@ describe( 'PanelBody', () => {
 			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
-		it( 'should be opened by default', () => {
-			render(
+		it( 'should be opened by default', async () => {
+			await render(
 				<PanelBody>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -37,8 +40,8 @@ describe( 'PanelBody', () => {
 			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
-		it( 'should render as initially opened, if specified', () => {
-			render(
+		it( 'should render as initially opened, if specified', async () => {
+			await render(
 				<PanelBody initialOpen>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -47,8 +50,8 @@ describe( 'PanelBody', () => {
 			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 		} );
 
-		it( 'should call the children function, if specified', () => {
-			const { rerender } = render(
+		it( 'should call the children function, if specified', async () => {
+			const { rerender } = await render(
 				<PanelBody opened>
 					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
@@ -64,7 +67,7 @@ describe( 'PanelBody', () => {
 			expect( panelContent ).not.toBeVisible();
 			expect( panelContent ).toHaveAttribute( 'hidden', '' );
 
-			rerender(
+			await rerender(
 				<PanelBody opened={ false }>
 					{ ( { opened } ) => (
 						<div hidden={ opened } data-testid="inner-content">
@@ -82,8 +85,8 @@ describe( 'PanelBody', () => {
 	} );
 
 	describe( 'toggling', () => {
-		it( 'should toggle collapse with opened prop', () => {
-			const { rerender } = render(
+		it( 'should toggle collapse with opened prop', async () => {
+			const { rerender } = await render(
 				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -91,7 +94,7 @@ describe( 'PanelBody', () => {
 
 			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
 
-			rerender(
+			await rerender(
 				<PanelBody opened={ false }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -101,7 +104,7 @@ describe( 'PanelBody', () => {
 				screen.queryByTestId( 'inner-content' )
 			).not.toBeInTheDocument();
 
-			rerender(
+			await rerender(
 				<PanelBody opened>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -113,7 +116,7 @@ describe( 'PanelBody', () => {
 		it( 'should toggle when clicking header', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<PanelBody title="Panel" initialOpen={ false }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>
@@ -140,7 +143,7 @@ describe( 'PanelBody', () => {
 			const user = userEvent.setup();
 			const mock = jest.fn();
 
-			render(
+			await render(
 				<PanelBody title="Panel" buttonProps={ { onClick: mock } }>
 					<div data-testid="inner-content">Content</div>
 				</PanelBody>

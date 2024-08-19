@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -23,10 +24,10 @@ const RangeControl = (
 
 describe( 'RangeControl', () => {
 	describe( '#render()', () => {
-		it( 'should trigger change callback with numeric value', () => {
+		it( 'should trigger change callback with numeric value', async () => {
 			const onChange = jest.fn();
 
-			render( <RangeControl onChange={ onChange } /> );
+			await render( <RangeControl onChange={ onChange } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -41,12 +42,15 @@ describe( 'RangeControl', () => {
 			expect( onChange ).toHaveBeenCalledWith( 10 );
 		} );
 
-		it( 'should render with icons', () => {
-			const { container } = render(
+		it( 'should render with icons', async () => {
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+			await render(
 				<RangeControl
 					beforeIcon="format-image"
 					afterIcon="format-video"
-				/>
+				/>,
+				{ container }
 			);
 
 			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -64,8 +68,8 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'validation', () => {
-		it( 'should not apply if new value is lower than minimum', () => {
-			render( <RangeControl min={ 11 } /> );
+		it( 'should not apply if new value is lower than minimum', async () => {
+			await render( <RangeControl min={ 11 } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -76,8 +80,8 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '10' );
 		} );
 
-		it( 'should not apply if new value is greater than maximum', () => {
-			render( <RangeControl max={ 20 } /> );
+		it( 'should not apply if new value is greater than maximum', async () => {
+			await render( <RangeControl max={ 20 } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -88,9 +92,9 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '21' );
 		} );
 
-		it( 'should not call onChange if new value is invalid', () => {
+		it( 'should not call onChange if new value is invalid', async () => {
 			const onChange = jest.fn();
-			render(
+			await render(
 				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
 			);
 
@@ -102,9 +106,9 @@ describe( 'RangeControl', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should keep invalid values in number input until loss of focus', () => {
+		it( 'should keep invalid values in number input until loss of focus', async () => {
 			const onChange = jest.fn();
-			render(
+			await render(
 				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
 			);
 
@@ -122,8 +126,8 @@ describe( 'RangeControl', () => {
 			expect( numberInput.value ).toBe( '-1' );
 		} );
 
-		it( 'should validate when provided a max or min of zero', () => {
-			render( <RangeControl min={ -100 } max={ 0 } /> );
+		it( 'should validate when provided a max or min of zero', async () => {
+			await render( <RangeControl min={ -100 } max={ 0 } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -135,8 +139,8 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '0' );
 		} );
 
-		it( 'should validate when min and max are negative', () => {
-			render( <RangeControl min={ -100 } max={ -50 } /> );
+		it( 'should validate when min and max are negative', async () => {
+			await render( <RangeControl min={ -100 } max={ -50 } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -153,9 +157,9 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
-		it( 'should take into account the step starting from min', () => {
+		it( 'should take into account the step starting from min', async () => {
 			const onChange = jest.fn();
-			render(
+			await render(
 				<RangeControl
 					onChange={ onChange }
 					min={ 0.1 }
@@ -180,32 +184,34 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'initialPosition / value', () => {
-		it( 'should render initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
-			render( <RangeControl min={ 0 } max={ 10 } /> );
+		it( 'should render initial rendered value of 50% of min/max, if no initialPosition or value is defined', async () => {
+			await render( <RangeControl min={ 0 } max={ 10 } /> );
 
 			const rangeInput = getRangeInput();
 
 			expect( rangeInput.value ).toBe( '5' );
 		} );
 
-		it( 'should render initialPosition if no value is provided', () => {
-			render( <RangeControl initialPosition={ 50 } /> );
+		it( 'should render initialPosition if no value is provided', async () => {
+			await render( <RangeControl initialPosition={ 50 } /> );
 
 			const rangeInput = getRangeInput();
 
 			expect( rangeInput.value ).toBe( '50' );
 		} );
 
-		it( 'should render value instead of initialPosition is provided', () => {
-			render( <RangeControl initialPosition={ 50 } value={ 10 } /> );
+		it( 'should render value instead of initialPosition is provided', async () => {
+			await render(
+				<RangeControl initialPosition={ 50 } value={ 10 } />
+			);
 
 			const rangeInput = getRangeInput();
 
 			expect( rangeInput.value ).toBe( '10' );
 		} );
 
-		it( 'should clamp initialPosition between min and max on first render, and on reset', () => {
-			render(
+		it( 'should clamp initialPosition between min and max on first render, and on reset', async () => {
+			await render(
 				<RangeControl
 					initialPosition={ 200 }
 					min={ 0 }
@@ -236,24 +242,24 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'input field', () => {
-		it( 'should render an input field by default', () => {
-			render( <RangeControl /> );
+		it( 'should render an input field by default', async () => {
+			await render( <RangeControl /> );
 
 			const numberInput = getNumberInput();
 
 			expect( numberInput ).toBeInTheDocument();
 		} );
 
-		it( 'should not render an input field, if disabled', () => {
-			render( <RangeControl withInputField={ false } /> );
+		it( 'should not render an input field, if disabled', async () => {
+			await render( <RangeControl withInputField={ false } /> );
 
 			const numberInput = screen.queryByRole( 'spinbutton' );
 
 			expect( numberInput ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render a zero value into input range and field', () => {
-			render( <RangeControl value={ 0 } /> );
+		it( 'should render a zero value into input range and field', async () => {
+			await render( <RangeControl value={ 0 } /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -262,8 +268,8 @@ describe( 'RangeControl', () => {
 			expect( numberInput.value ).toBe( '0' );
 		} );
 
-		it( 'should update both field and range on change', () => {
-			render( <RangeControl /> );
+		it( 'should update both field and range on change', async () => {
+			await render( <RangeControl /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -281,8 +287,8 @@ describe( 'RangeControl', () => {
 			expect( numberInput.value ).toBe( '7' );
 		} );
 
-		it( 'should reset input values if next value is removed', () => {
-			render( <RangeControl /> );
+		it( 'should reset input values if next value is removed', async () => {
+			await render( <RangeControl /> );
 
 			const rangeInput = getRangeInput();
 			const numberInput = getNumberInput();
@@ -298,9 +304,9 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'reset', () => {
-		it( 'should reset to a custom fallback value, defined by a parent component', () => {
+		it( 'should reset to a custom fallback value, defined by a parent component', async () => {
 			const spy = jest.fn();
-			render(
+			await render(
 				<RangeControl
 					initialPosition={ 10 }
 					allowReset
@@ -320,8 +326,8 @@ describe( 'RangeControl', () => {
 			expect( spy ).toHaveBeenCalledWith( 33 );
 		} );
 
-		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
-			render(
+		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', async () => {
+			await render(
 				<RangeControl
 					initialPosition={ undefined }
 					min={ 0 }

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press } from '@ariakit/test';
 
 /**
@@ -28,7 +29,7 @@ function getOption( name: string ) {
 describe( 'CircularOptionPicker', () => {
 	describe( 'when `asButtons` is not set', () => {
 		it( 'should render as a listbox', async () => {
-			render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
+			await render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
 
 			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
 			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
@@ -38,7 +39,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is false', () => {
 		it( 'should render as a listbox', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					asButtons={ false }
@@ -53,7 +54,9 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is true', () => {
 		it( 'should render as buttons', async () => {
-			render( <CircularOptionPicker { ...DEFAULT_PROPS } asButtons /> );
+			await render(
+				<CircularOptionPicker { ...DEFAULT_PROPS } asButtons />
+			);
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
@@ -63,7 +66,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
@@ -81,7 +84,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is true', () => {
 		it( 'should loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
@@ -100,7 +103,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is false', () => {
 		it( 'should not loop', async () => {
-			render(
+			await render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					loop={ false }

@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
  */
 import TextHighlight from '..';
+
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
 
 const getMarks = ( container: Element ) =>
 	// Use querySelectorAll because the `mark` role is not officially supported
@@ -22,11 +29,13 @@ describe( 'TextHighlight', () => {
 		it.each( [ [ 'Gutenberg' ], [ 'media' ] ] )(
 			'should highlight the singular occurance of the text "%s" in the text if it exists',
 			( highlight ) => {
-				const { container } = render(
+				const container = createContainer();
+				render(
 					<TextHighlight
 						text={ defaultText }
 						highlight={ highlight }
-					/>
+					/>,
+					{ container }
 				);
 
 				const highlightedEls = getMarks( container );
@@ -39,11 +48,13 @@ describe( 'TextHighlight', () => {
 			}
 		);
 
-		it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
+		it( 'should highlight multiple occurances of the string every time it exists in the text', async () => {
 			const highlight = 'edit';
 
-			const { container } = render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );
@@ -55,13 +66,15 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should highlight occurances of a string regardless of capitalisation', () => {
+		it( 'should highlight occurances of a string regardless of capitalisation', async () => {
 			// Note that `The` occurs twice in the default text, once in
 			// lowercase and once capitalized.
 			const highlight = 'The';
 
-			const { container } = render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );
@@ -77,11 +90,13 @@ describe( 'TextHighlight', () => {
 			} );
 		} );
 
-		it( 'should not highlight a string that is not in the text', () => {
+		it( 'should not highlight a string that is not in the text', async () => {
 			const highlight = 'Antidisestablishmentarianism';
 
-			const { container } = render(
-				<TextHighlight text={ defaultText } highlight={ highlight } />
+			const container = createContainer();
+			await render(
+				<TextHighlight text={ defaultText } highlight={ highlight } />,
+				{ container }
 			);
 
 			const highlightedEls = getMarks( container );

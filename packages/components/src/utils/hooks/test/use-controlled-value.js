@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -23,24 +24,28 @@ function getInput() {
 }
 
 describe( 'useControlledValue', () => {
-	it( 'should use the default value', () => {
-		render( <Input defaultValue="WordPress.org" /> );
+	it( 'should use the default value', async () => {
+		await render( <Input defaultValue="WordPress.org" /> );
 		expect( getInput() ).toHaveValue( 'WordPress.org' );
 	} );
 
-	it( 'should use the default value then switch to the controlled value', () => {
-		const { rerender } = render( <Input defaultValue="WordPress.org" /> );
+	it( 'should use the default value then switch to the controlled value', async () => {
+		const { rerender } = await render(
+			<Input defaultValue="WordPress.org" />
+		);
 		expect( getInput() ).toHaveValue( 'WordPress.org' );
 
-		rerender(
+		await rerender(
 			<Input defaultValue="WordPress.org" value="Code is Poetry" />
 		);
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 	} );
 
-	it( 'should call onChange only when there is no value being passed in', () => {
+	it( 'should call onChange only when there is no value being passed in', async () => {
 		const onChange = jest.fn();
-		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
+		await render(
+			<Input defaultValue="WordPress.org" onChange={ onChange } />
+		);
 
 		expect( getInput() ).toHaveValue( 'WordPress.org' );
 
@@ -50,9 +55,9 @@ describe( 'useControlledValue', () => {
 		expect( onChange ).toHaveBeenCalledWith( 'Code is Poetry' );
 	} );
 
-	it( 'should call onChange when there is a value passed in', () => {
+	it( 'should call onChange when there is a value passed in', async () => {
 		const onChange = jest.fn();
-		const { rerender } = render(
+		const { rerender } = await render(
 			<Input
 				defaultValue="WordPress.org"
 				value="Code is Poetry"
@@ -66,7 +71,7 @@ describe( 'useControlledValue', () => {
 			target: { value: 'WordPress rocks!' },
 		} );
 
-		rerender(
+		await rerender(
 			<Input
 				defaultValue="WordPress.org"
 				value="WordPress rocks!"
@@ -78,8 +83,8 @@ describe( 'useControlledValue', () => {
 		expect( onChange ).toHaveBeenCalledWith( 'WordPress rocks!' );
 	} );
 
-	it( 'should not maintain internal state if no onChange is passed but a value is passed', () => {
-		const { rerender } = render( <Input value="Code is Poetry" /> );
+	it( 'should not maintain internal state if no onChange is passed but a value is passed', async () => {
+		const { rerender } = await render( <Input value="Code is Poetry" /> );
 
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
@@ -94,7 +99,7 @@ describe( 'useControlledValue', () => {
 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
 
 		// Next we un-set the value to uncover the internal state which was still maintained.
-		rerender( <Input /> );
+		await rerender( <Input /> );
 
 		expect( getInput() ).toHaveValue( 'WordPress.org' );
 	} );

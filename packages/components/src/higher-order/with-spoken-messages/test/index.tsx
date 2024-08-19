@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,7 +10,7 @@ import { render } from '@testing-library/react';
 import withSpokenMessages from '../';
 
 describe( 'withSpokenMessages', () => {
-	it( 'should generate speak and debouncedSpeak props', () => {
+	it( 'should generate speak and debouncedSpeak props', async () => {
 		const testSpeak = jest.fn();
 		const testDebouncedSpeak = jest.fn();
 		const isFunction = ( maybeFunc: any ) =>
@@ -21,7 +22,7 @@ describe( 'withSpokenMessages', () => {
 				return <div />;
 			}
 		);
-		render( <DumpComponent /> );
+		await render( <DumpComponent /> );
 
 		// Unrendered element.
 		expect( testSpeak ).toHaveBeenCalledWith( true );

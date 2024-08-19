@@ -551,7 +551,7 @@ describe( 'FontSizePicker', () => {
 			);
 			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 
-			rerender(
+			await rerender(
 				<FontSizePicker
 					disableCustomFontSizes
 					fontSizes={ fontSizes }
@@ -569,7 +569,7 @@ describe( 'FontSizePicker', () => {
 			);
 			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 
-			rerender(
+			await rerender(
 				<FontSizePicker
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }

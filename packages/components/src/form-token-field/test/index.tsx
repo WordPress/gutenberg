@@ -4,12 +4,12 @@
  * External dependencies
  */
 import {
-	render,
 	screen,
 	within,
 	getDefaultNormalizer,
 	waitFor,
 } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 
@@ -125,7 +125,9 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
+			await render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -150,7 +152,9 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
+			await render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -166,7 +170,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
 			);
 
@@ -178,7 +182,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'dragon fruit' ] );
 			expectTokensToBeInTheDocument( [ 'dragon fruit' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					tokenizeOnSpace
@@ -210,7 +214,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
 			);
 
@@ -222,7 +226,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
 			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					tokenizeOnBlur
@@ -245,7 +249,9 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onChange={ onChangeSpy } /> );
+			await render(
+				<FormTokenFieldWithState onChange={ onChangeSpy } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -261,7 +267,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'banana', 'mango' ] }
@@ -289,7 +295,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'lemon', 'bergamot' ] }
 					onChange={ onChangeSpy }
@@ -331,7 +337,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'persimmon', 'plum' ] }
@@ -366,7 +372,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'papaya' ] }
 					onChange={ onChangeSpy }
@@ -393,7 +399,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'melon' ] }
 					onChange={ onChangeSpy }
@@ -413,7 +419,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'kiwi', 'peach', 'nectarine', 'coconut' ] }
 					onChange={ onChangeSpy }
@@ -508,8 +514,10 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should add additional classnames passed via the `className` prop to the input element's 2nd level wrapper", () => {
-			render( <FormTokenFieldWithState className="test-classname" /> );
+		it( "should add additional classnames passed via the `className` prop to the input element's 2nd level wrapper", async () => {
+			await render(
+				<FormTokenFieldWithState className="test-classname" />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -521,14 +529,14 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should label the input correctly via the `label` prop', () => {
-			const { rerender } = render( <FormTokenFieldWithState /> );
+		it( 'should label the input correctly via the `label` prop', async () => {
+			const { rerender } = await render( <FormTokenFieldWithState /> );
 
 			expect(
 				screen.getByRole( 'combobox', { name: 'Add item' } )
 			).toBeVisible();
 
-			rerender( <FormTokenFieldWithState label="Test label" /> );
+			await rerender( <FormTokenFieldWithState label="Test label" /> );
 
 			expect(
 				screen.getByRole( 'combobox', { name: 'Test label' } )
@@ -540,7 +548,7 @@ describe( 'FormTokenField', () => {
 
 			const onFocusSpy = jest.fn();
 
-			render( <FormTokenFieldWithState onFocus={ onFocusSpy } /> );
+			await render( <FormTokenFieldWithState onFocus={ onFocusSpy } /> );
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -562,7 +570,7 @@ describe( 'FormTokenField', () => {
 
 			const onInputChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState onInputChange={ onInputChangeSpy } />
 			);
 
@@ -579,14 +587,14 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', () => {
+		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', async () => {
 			const instructionsTokenizeSpace =
 				'Separate with commas, spaces, or the Enter key.';
 			const instructionsDefault =
 				'Separate with commas or the Enter key.';
 
 			// The __experimentalShowHowTo prop is `true` by default
-			const { rerender } = render( <FormTokenFieldWithState /> );
+			const { rerender } = await render( <FormTokenFieldWithState /> );
 
 			expect( screen.getByText( instructionsDefault ) ).toBeVisible();
 
@@ -595,7 +603,7 @@ describe( 'FormTokenField', () => {
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsDefault );
 
-			rerender( <FormTokenFieldWithState tokenizeOnSpace /> );
+			await rerender( <FormTokenFieldWithState tokenizeOnSpace /> );
 
 			expect(
 				screen.getByText( instructionsTokenizeSpace )
@@ -606,7 +614,7 @@ describe( 'FormTokenField', () => {
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsTokenizeSpace );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					tokenizeOnSpace
 					__experimentalShowHowTo={ false }
@@ -629,7 +637,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					placeholder="Test placeholder"
@@ -658,7 +666,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'français', 'español', '日本', 'עברית' ] }
@@ -688,8 +696,8 @@ describe( 'FormTokenField', () => {
 	} );
 
 	describe( 'suggestions', () => {
-		it( 'should not render suggestions in its default state', () => {
-			render(
+		it( 'should not render suggestions in its default state', async () => {
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ [ 'Red', 'Magenta', 'Vermilion' ] }
 				/>
@@ -705,7 +713,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Cobalt', 'Blue', 'Octane' ];
 
-			render(
+			await render(
 				<>
 					<FormTokenFieldWithState
 						onFocus={ onFocusSpy }
@@ -748,7 +756,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
-			render(
+			await render(
 				<>
 					<FormTokenFieldWithState
 						onFocus={ onFocusSpy }
@@ -780,7 +788,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
-			render(
+			await render(
 				<>
 					<FormTokenFieldWithState
 						onFocus={ onFocusSpy }
@@ -811,7 +819,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
-			render(
+			await render(
 				<>
 					<FormTokenFieldWithState
 						onFocus={ onFocusSpy }
@@ -843,7 +851,9 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'White', 'Pearl', 'Alabaster' ];
 
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			await render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -858,7 +868,9 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Yellow', 'Canary', 'Gold', 'Blonde' ];
 
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			await render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -883,7 +895,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ suggestions }
 					initialValue={ [ 'Green' ] }
@@ -914,7 +926,7 @@ describe( 'FormTokenField', () => {
 				'Neon',
 			];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					suggestions={ suggestions }
@@ -987,7 +999,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Tiger', 'Tangerine', 'Orange' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					suggestions={ suggestions }
@@ -1057,7 +1069,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Black', 'Ash', 'Onyx', 'Ebony' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					suggestions={ suggestions }
@@ -1088,7 +1100,9 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'One', 'Two', 'Three' ];
 
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			await render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -1110,7 +1124,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'One', 'Two', 'Three' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ suggestions }
 					__experimentalValidateInput={ ( token ) =>
@@ -1139,7 +1153,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'One', 'Two', 'Three' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ suggestions }
 					__experimentalValidateInput={ ( token ) =>
@@ -1168,7 +1182,9 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Cinnamon', 'Tawny', 'Mocha' ];
 
-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			await render(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -1200,7 +1216,7 @@ describe( 'FormTokenField', () => {
 				'Abnormality',
 			];
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState suggestions={ suggestions } />
 			);
 
@@ -1216,7 +1232,7 @@ describe( 'FormTokenField', () => {
 				suggestions
 			);
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					suggestions={ suggestions }
 					maxSuggestions={ 3 }
@@ -1233,7 +1249,7 @@ describe( 'FormTokenField', () => {
 		it( 'should match the search text against the unescaped values of suggestions with special characters (including spaces)', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					displayTransform={ unescapeAndFormatSpaces }
 					suggestions={ [
@@ -1276,7 +1292,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Aluminum', 'Silver', 'Bronze' ];
 
-			const { rerender } = render( <FormTokenFieldWithState /> );
+			const { rerender } = await render( <FormTokenFieldWithState /> );
 
 			// Type "sil", but there are no suggestions.
 			await user.type( screen.getByRole( 'combobox' ), 'sil' );
@@ -1285,7 +1301,9 @@ describe( 'FormTokenField', () => {
 
 			// When suggestions change, the "sil" text is matched against the new
 			// suggestions, which results in the "Silver" suggestion being shown.
-			rerender( <FormTokenFieldWithState suggestions={ suggestions } /> );
+			await rerender(
+				<FormTokenFieldWithState suggestions={ suggestions } />
+			);
 
 			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
 				'Silver',
@@ -1297,7 +1315,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Walnut', 'Hazelnut', 'Pecan' ];
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState suggestions={ suggestions } />
 			);
 
@@ -1319,7 +1337,7 @@ describe( 'FormTokenField', () => {
 				} )
 			).not.toBeInTheDocument();
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					__experimentalAutoSelectFirstMatch
 					suggestions={ suggestions }
@@ -1338,7 +1356,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Wood', 'Stone', 'Metal' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ suggestions }
 					__experimentalRenderItem={ ( { item } ) => (
@@ -1369,7 +1387,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					__experimentalExpandOnFocus
@@ -1388,7 +1406,7 @@ describe( 'FormTokenField', () => {
 
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					__experimentalExpandOnFocus
@@ -1410,7 +1428,7 @@ describe( 'FormTokenField', () => {
 			const onMouseEnterSpy = jest.fn();
 			const onMouseLeaveSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [
 						{
@@ -1445,8 +1463,8 @@ describe( 'FormTokenField', () => {
 			expect( onMouseLeaveSpy ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should add an accessible `title` to a token when specified', () => {
-			render(
+		it( 'should add an accessible `title` to a token when specified', async () => {
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [
 						{ value: 'France' },
@@ -1462,7 +1480,7 @@ describe( 'FormTokenField', () => {
 		it( 'should be still used to filter out duplicate suggestions', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					__experimentalExpandOnFocus
 					initialValue={ [
@@ -1491,7 +1509,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'potato' ] }
 					onChange={ onChangeSpy }
@@ -1525,7 +1543,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expectTokensToBeInTheDocument( [ 'potato', 'carrot' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					initialValue={ [ 'potato' ] }
 					onChange={ onChangeSpy }
@@ -1555,7 +1573,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState
 					onFocus={ onChangeSpy }
 					initialValue={ [ 'small trousers', 'small shirt' ] }
@@ -1567,7 +1585,7 @@ describe( 'FormTokenField', () => {
 				'small shirt',
 			] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'small trousers', 'small shirt' ] }
@@ -1620,7 +1638,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Expensive food', 'Free food' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					suggestions={ suggestions }
@@ -1656,7 +1674,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'dark blue', 'dark green' ] }
@@ -1665,7 +1683,7 @@ describe( 'FormTokenField', () => {
 
 			expectTokensToBeInTheDocument( [ 'dark blue', 'dark green' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'dark blue', 'dark green' ] }
@@ -1714,7 +1732,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Hot coffee', 'Hot tea' ];
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					suggestions={ suggestions }
@@ -1742,7 +1760,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should allow to pass a function that renders tokens with escaped special characters correctly', async () => {
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [
 						'a   b',
@@ -1768,7 +1786,7 @@ describe( 'FormTokenField', () => {
 			// worth testing, so we can be sure that token values with
 			// dangerous characters in them don't have these characters carried
 			// through unescaped to the HTML.
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'a   b', 'i <3 tags', '1&2&3&4' ] }
 					displayTransform={ unescapeAndFormatSpaces }
@@ -1792,7 +1810,7 @@ describe( 'FormTokenField', () => {
 			const startsWithCapitalLetter = ( tokenText: string ) =>
 				/^[A-Z]/.test( tokenText );
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
 			);
 
@@ -1804,7 +1822,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'cherry' ] );
 			expectTokensToBeInTheDocument( [ 'cherry' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					__experimentalValidateInput={ startsWithCapitalLetter }
@@ -1835,7 +1853,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'square', 'triangle', 'circle' ] }
@@ -1883,8 +1901,8 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "should not affect the number of tokens set via the `value` prop (ie. not caused by tokenizing the user's input)", () => {
-			render(
+		it( "should not affect the number of tokens set via the `value` prop (ie. not caused by tokenizing the user's input)", async () => {
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'rectangle', 'ellipse', 'pentagon' ] }
 					maxLength={ 2 }
@@ -1903,7 +1921,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
 			);
 
@@ -1919,7 +1937,7 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'cube', 'sphere', 'cylinder' ] );
 
 			// Add a `maxLength` after some tokens have already been added.
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					maxLength={ 1 }
@@ -1946,7 +1964,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			const { rerender } = render(
+			const { rerender } = await render(
 				<FormTokenFieldWithState onChange={ onChangeSpy } />
 			);
 
@@ -1958,7 +1976,7 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'sun' ] );
 			expectTokensToBeInTheDocument( [ 'sun' ] );
 
-			rerender(
+			await rerender(
 				<FormTokenFieldWithState onChange={ onChangeSpy } disabled />
 			);
 
@@ -1974,7 +1992,7 @@ describe( 'FormTokenField', () => {
 
 			const onChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					onChange={ onChangeSpy }
 					initialValue={ [ 'sea', 'ocean' ] }
@@ -2018,7 +2036,7 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the addition of a new token', async () => {
 			const user = userEvent.setup();
 
-			render( <FormTokenFieldWithState /> );
+			await render( <FormTokenFieldWithState /> );
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -2034,7 +2052,9 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the addition of a new token with a custom message', async () => {
 			const user = userEvent.setup();
 
-			render( <FormTokenFieldWithState messages={ customMessages } /> );
+			await render(
+				<FormTokenFieldWithState messages={ customMessages } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -2050,7 +2070,9 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the removal of a token', async () => {
 			const user = userEvent.setup();
 
-			render( <FormTokenFieldWithState initialValue={ [ 'horse' ] } /> );
+			await render(
+				<FormTokenFieldWithState initialValue={ [ 'horse' ] } />
+			);
 
 			const input = screen.getByRole( 'combobox' );
 
@@ -2065,7 +2087,7 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the removal of a token with a custom message', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'donkey' ] }
 					messages={ customMessages }
@@ -2085,7 +2107,7 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the failure of a potential token to pass validation', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					__experimentalValidateInput={ () => false }
 				/>
@@ -2105,7 +2127,7 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the failure of a potential token to pass validation with a custom message', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					__experimentalValidateInput={ () => false }
 					messages={ customMessages }
@@ -2126,7 +2148,7 @@ describe( 'FormTokenField', () => {
 		it( 'should announce to assistive technology the result of the matching of the search text against the list of suggestions', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FormTokenFieldWithState
 					suggestions={ [ 'Donkey', 'Horse', 'Dog' ] }
 				/>
@@ -2169,7 +2191,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should update the label for the "delete" button of a token', async () => {
-			render(
+			await render(
 				<FormTokenFieldWithState
 					initialValue={ [ 'bear', 'panda' ] }
 					messages={ customMessages }
@@ -2190,7 +2212,7 @@ describe( 'FormTokenField', () => {
 
 			const suggestions = [ 'Pine', 'Pistachio', 'Sage' ];
 
-			render(
+			await render(
 				<>
 					<FormTokenFieldWithState suggestions={ suggestions } />
 					<button>Click me</button>

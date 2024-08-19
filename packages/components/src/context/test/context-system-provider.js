@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import styled from '@emotion/styled';
 
 /**
@@ -16,24 +17,32 @@ import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 const View = styled.div``;
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
+	test( 'should render correctly', async () => {
 		const Component = ( props, ref ) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
-		const { container } = render(
+		const container = createContainer();
+		await render(
 			<ContextSystemProvider>
 				<ConnectedComponent />
-			</ContextSystemProvider>
+			</ContextSystemProvider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render context props', () => {
+	test( 'should render context props', async () => {
 		const Component = ( props, ref ) => {
 			const { quote, ...otherProps } = useContextSystem(
 				props,
@@ -54,17 +63,19 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		const container = createContainer();
+		await render(
 			<ContextSystemProvider value={ contextValue }>
 				<ConnectedComponent />
-			</ContextSystemProvider>
+			</ContextSystemProvider>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
 		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
 	} );
 
-	test( 'should render _override props', () => {
+	test( 'should render _override props', async () => {
 		const Component = ( props, ref ) => {
 			const { quote, ...otherProps } = useContextSystem(
 				props,
@@ -87,7 +98,8 @@ describe( 'props', () => {
 			},
 		};
 
-		const { container } = render(
+		const container = createContainer();
+		await render(
 			<>
 				<ContextSystemProvider value={ contextValue }>
 					<ConnectedComponent
@@ -95,7 +107,8 @@ describe( 'props', () => {
 						quote="WordPress.org"
 					/>
 				</ContextSystemProvider>
-			</>
+			</>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
@@ -109,13 +122,13 @@ describe( 'props', () => {
 } );
 
 describe( 'children', () => {
-	test( 'should pass through children', () => {
+	test( 'should pass through children', async () => {
 		const Component = ( props, ref ) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
 
-		render(
+		await render(
 			<ContextSystemProvider>
 				<ConnectedComponent>Pass through</ConnectedComponent>
 			</ContextSystemProvider>
@@ -124,13 +137,13 @@ describe( 'children', () => {
 		expect( screen.getByText( 'Pass through' ) ).toBeInTheDocument();
 	} );
 
-	test( 'should not accept children via `context`', () => {
+	test( 'should not accept children via `context`', async () => {
 		const Component = ( props, ref ) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
 		);
 		const ConnectedComponent = contextConnect( Component, 'Component' );
 
-		render(
+		await render(
 			<ContextSystemProvider
 				context={ { Component: { children: 'Override' } } }
 			>
@@ -142,7 +155,7 @@ describe( 'children', () => {
 	} );
 
 	// This matches the behavior for normal, non-context-connected components.
-	test( 'should not override inherent children', () => {
+	test( 'should not override inherent children', async () => {
 		const Component = ( props, ref ) => (
 			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
 				Inherent
@@ -151,7 +164,7 @@ describe( 'children', () => {
 		const ConnectedComponent = contextConnect( Component, 'Component' );
 		const NormalComponent = ( props ) => <div { ...props }>Inherent</div>;
 
-		render(
+		await render(
 			<ContextSystemProvider>
 				<ConnectedComponent />
 				<ConnectedComponent>Explicit children</ConnectedComponent>
@@ -175,8 +188,8 @@ describe( 'children', () => {
 			'ComponentThatClones'
 		);
 
-		test( 'should not override cloned inherent children with implicit `undefined` children', () => {
-			render(
+		test( 'should not override cloned inherent children with implicit `undefined` children', async () => {
+			await render(
 				<ContextSystemProvider>
 					<ConnectedComponentThatClones
 						content={ <span>Inherent</span> }
@@ -186,8 +199,8 @@ describe( 'children', () => {
 			expect( screen.getByText( 'Inherent' ) ).toBeInTheDocument();
 		} );
 
-		test( 'should override cloned inherent children with explicit children', () => {
-			render(
+		test( 'should override cloned inherent children with explicit children', async () => {
+			await render(
 				<ContextSystemProvider>
 					<ConnectedComponentThatClones
 						content={ <span>Inherent</span> }

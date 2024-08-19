@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -56,8 +57,8 @@ describe( 'Placeholder', () => {
 	} );
 
 	describe( 'basic rendering', () => {
-		it( 'should by default render label section and content section.', () => {
-			render( <Placeholder /> );
+		it( 'should by default render label section and content section.', async () => {
+			await render( <Placeholder /> );
 			const placeholder = getPlaceholder();
 
 			expect( placeholder ).toHaveClass( 'components-placeholder' );
@@ -89,8 +90,8 @@ describe( 'Placeholder', () => {
 			expect( placeholderFieldset ).toBeEmptyDOMElement();
 		} );
 
-		it( 'should render an Icon in the label section', () => {
-			render( <Placeholder icon={ testIcon } /> );
+		it( 'should render an Icon in the label section', async () => {
+			await render( <Placeholder icon={ testIcon } /> );
 
 			const placeholder = getPlaceholder();
 			const icon = within( placeholder ).getByTestId( 'icon' );
@@ -101,9 +102,9 @@ describe( 'Placeholder', () => {
 			expect( icon ).toBeInTheDocument();
 		} );
 
-		it( 'should render a label section', () => {
+		it( 'should render a label section', async () => {
 			const label = 'WordPress';
-			render( <Placeholder label={ label } /> );
+			await render( <Placeholder label={ label } /> );
 			const placeholderLabel = screen.getByText( label );
 
 			expect( placeholderLabel ).toHaveClass(
@@ -112,18 +113,18 @@ describe( 'Placeholder', () => {
 			expect( placeholderLabel ).toBeInTheDocument();
 		} );
 
-		it( 'should display content from the children property', () => {
+		it( 'should display content from the children property', async () => {
 			const content = 'Placeholder content';
-			render( <Placeholder>{ content }</Placeholder> );
+			await render( <Placeholder>{ content }</Placeholder> );
 			const placeholder = screen.getByText( content );
 
 			expect( placeholder ).toBeInTheDocument();
 			expect( placeholder ).toHaveTextContent( content );
 		} );
 
-		it( 'should display instructions when provided', () => {
+		it( 'should display instructions when provided', async () => {
 			const instructions = 'Choose an option.';
-			render(
+			await render(
 				<Placeholder instructions={ instructions }>
 					<div>Placeholder content</div>
 				</Placeholder>
@@ -135,9 +136,9 @@ describe( 'Placeholder', () => {
 			expect( instructionsContainer ).toBeInTheDocument();
 		} );
 
-		it( 'should announce instructions to screen readers', () => {
+		it( 'should announce instructions to screen readers', async () => {
 			const instructions = 'Awesome block placeholder instructions.';
-			render(
+			await render(
 				<Placeholder instructions={ instructions }>
 					<div>Placeholder content</div>
 				</Placeholder>
@@ -146,16 +147,16 @@ describe( 'Placeholder', () => {
 			expect( speak ).toHaveBeenCalledWith( instructions );
 		} );
 
-		it( 'should add an additional className to the top container', () => {
-			render( <Placeholder className="wp-placeholder" /> );
+		it( 'should add an additional className to the top container', async () => {
+			await render( <Placeholder className="wp-placeholder" /> );
 			const placeholder = getPlaceholder();
 
 			expect( placeholder ).toHaveClass( 'components-placeholder' );
 			expect( placeholder ).toHaveClass( 'wp-placeholder' );
 		} );
 
-		it( 'should add additional props to the top level container', () => {
-			render( <Placeholder data-test="test" /> );
+		it( 'should add additional props to the top level container', async () => {
+			await render( <Placeholder data-test="test" /> );
 			const placeholder = getPlaceholder();
 
 			expect( placeholder ).toHaveAttribute( 'data-test', 'test' );
@@ -163,14 +164,14 @@ describe( 'Placeholder', () => {
 	} );
 
 	describe( 'resize aware', () => {
-		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
+		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', async () => {
 			// @ts-ignore
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: 480 },
 			] );
 
-			render( <Placeholder /> );
+			await render( <Placeholder /> );
 			const placeholder = getPlaceholder();
 
 			expect( placeholder ).toHaveClass( 'is-large' );
@@ -178,14 +179,14 @@ describe( 'Placeholder', () => {
 			expect( placeholder ).not.toHaveClass( 'is-small' );
 		} );
 
-		it( 'should assign modifier class', () => {
+		it( 'should assign modifier class', async () => {
 			// @ts-ignore
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
 				{ width: null },
 			] );
 
-			render( <Placeholder /> );
+			await render( <Placeholder /> );
 			const placeholder = getPlaceholder();
 
 			expect( placeholder ).not.toHaveClass( 'is-large' );

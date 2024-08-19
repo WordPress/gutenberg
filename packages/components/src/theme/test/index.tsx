@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -26,8 +27,8 @@ const MyThemableComponent = ( props: MyThemableComponentProps ) => {
 
 describe( 'Theme', () => {
 	describe( 'accent color', () => {
-		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
-			render(
+		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', async () => {
+			await render(
 				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
@@ -49,8 +50,8 @@ describe( 'Theme', () => {
 			} );
 		} );
 
-		it( 'defines the accent color (and its variations) as a CSS variable', () => {
-			render(
+		it( 'defines the accent color (and its variations) as a CSS variable', async () => {
+			await render(
 				<Theme accent="#123abc" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
@@ -66,8 +67,8 @@ describe( 'Theme', () => {
 	} );
 
 	describe( 'background color', () => {
-		it( 'does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', () => {
-			render(
+		it( 'does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', async () => {
+			await render(
 				<Theme data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>
@@ -91,8 +92,8 @@ describe( 'Theme', () => {
 			} );
 		} );
 
-		it( 'defines the background color (and its dependent colors) as a CSS variable', () => {
-			render(
+		it( 'defines the background color (and its dependent colors) as a CSS variable', async () => {
+			await render(
 				<Theme background="#ffffff" data-testid="theme">
 					<MyThemableComponent>Inner</MyThemableComponent>
 				</Theme>

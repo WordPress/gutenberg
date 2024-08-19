@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { click, type } from '@ariakit/test';
 
 /**
@@ -43,7 +44,7 @@ describe( 'SearchControl', () => {
 
 		it( 'should call onChange with input value when value is changed', async () => {
 			const onChangeSpy = jest.fn();
-			render( <Component onChange={ onChangeSpy } /> );
+			await render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
 			await type( 'test', searchInput );
@@ -53,7 +54,7 @@ describe( 'SearchControl', () => {
 
 		it( 'should render a Reset search button if no onClose function is provided', async () => {
 			const onChangeSpy = jest.fn();
-			render( <Component onChange={ onChangeSpy } /> );
+			await render( <Component onChange={ onChangeSpy } /> );
 
 			const searchInput = screen.getByRole( 'searchbox' );
 
@@ -75,7 +76,7 @@ describe( 'SearchControl', () => {
 		it( 'should should render a Close button (instead of Reset) when onClose function is provided', async () => {
 			const onChangeSpy = jest.fn();
 			const onCloseSpy = jest.fn();
-			render(
+			await render(
 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
 			);
 

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { click } from '@ariakit/test';
 
 /**
@@ -25,8 +26,8 @@ describe( 'Snackbar', () => {
 		mockedSpeak.mockReset();
 	} );
 
-	it( 'should render correctly', () => {
-		render( <Snackbar>Message</Snackbar> );
+	it( 'should render correctly', async () => {
+		await render( <Snackbar>Message</Snackbar> );
 
 		const snackbar = screen.getByTestId( testId );
 
@@ -34,20 +35,20 @@ describe( 'Snackbar', () => {
 		expect( snackbar ).toHaveTextContent( 'Message' );
 	} );
 
-	it( 'should render with an additional className', () => {
-		render( <Snackbar className="gutenberg">Message</Snackbar> );
+	it( 'should render with an additional className', async () => {
+		await render( <Snackbar className="gutenberg">Message</Snackbar> );
 
 		expect( screen.getByTestId( testId ) ).toHaveClass( 'gutenberg' );
 	} );
 
-	it( 'should render with an icon', () => {
+	it( 'should render with an icon', async () => {
 		const testIcon = (
 			<SVG data-testid="icon">
 				<Path />
 			</SVG>
 		);
 
-		render( <Snackbar icon={ testIcon }>Message</Snackbar> );
+		await render( <Snackbar icon={ testIcon }>Message</Snackbar> );
 
 		const snackbar = screen.getByTestId( testId );
 		const icon = within( snackbar ).getByTestId( 'icon' );
@@ -59,7 +60,7 @@ describe( 'Snackbar', () => {
 		const onRemove = jest.fn();
 		const onDismiss = jest.fn();
 
-		render(
+		await render(
 			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
 				Message
 			</Snackbar>
@@ -83,7 +84,7 @@ describe( 'Snackbar', () => {
 		const onRemove = jest.fn();
 		const onDismiss = jest.fn();
 
-		render(
+		await render(
 			<Snackbar
 				explicitDismiss
 				onRemove={ onRemove }
@@ -114,7 +115,7 @@ describe( 'Snackbar', () => {
 		const onRemove = jest.fn();
 		const onDismiss = jest.fn();
 
-		render(
+		await render(
 			<Snackbar
 				explicitDismiss
 				onRemove={ onRemove }
@@ -136,8 +137,8 @@ describe( 'Snackbar', () => {
 	} );
 
 	describe( 'actions', () => {
-		it( 'should render only the first action with a warning when multiple actions are passed', () => {
-			render(
+		it( 'should render only the first action with a warning when multiple actions are passed', async () => {
+			await render(
 				<Snackbar
 					actions={ [
 						{ label: 'One', url: 'https://example.com' },
@@ -160,8 +161,8 @@ describe( 'Snackbar', () => {
 			expect( action ).toHaveTextContent( 'One' );
 		} );
 
-		it( 'should be rendered as a link when the `url` prop is set', () => {
-			render(
+		it( 'should be rendered as a link when the `url` prop is set', async () => {
+			await render(
 				<Snackbar
 					actions={ [
 						{ label: 'View post', url: 'https://example.com' },
@@ -182,7 +183,7 @@ describe( 'Snackbar', () => {
 		it( 'should be rendered as a button and call `onClick` when the `onClick` prop is set', async () => {
 			const onClick = jest.fn();
 
-			render(
+			await render(
 				<Snackbar actions={ [ { label: 'View post', onClick } ] }>
 					Post updated.
 				</Snackbar>
@@ -198,8 +199,8 @@ describe( 'Snackbar', () => {
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', () => {
-			render(
+		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', async () => {
+			await render(
 				<Snackbar
 					actions={ [
 						{
@@ -222,22 +223,22 @@ describe( 'Snackbar', () => {
 	} );
 
 	describe( 'useSpokenMessage', () => {
-		it( 'should speak the given message', () => {
-			render( <Snackbar>FYI</Snackbar> );
+		it( 'should speak the given message', async () => {
+			await render( <Snackbar>FYI</Snackbar> );
 
 			expect( speak ).toHaveBeenCalledWith( 'FYI', 'polite' );
 		} );
 
-		it( 'should speak the given message by explicit politeness', () => {
-			render( <Snackbar politeness="assertive">Uh oh!</Snackbar> );
+		it( 'should speak the given message by explicit politeness', async () => {
+			await render( <Snackbar politeness="assertive">Uh oh!</Snackbar> );
 
 			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
 		} );
 
-		it( 'should coerce a message to a string', () => {
+		it( 'should coerce a message to a string', async () => {
 			// This test assumes that `@wordpress/a11y` is capable of handling
 			// markup strings appropriately.
-			render(
+			await render(
 				<Snackbar>
 					With <em>emphasis</em> this time.
 				</Snackbar>
@@ -249,13 +250,13 @@ describe( 'Snackbar', () => {
 			);
 		} );
 
-		it( 'should not re-speak an effectively equivalent element message', () => {
-			const { rerender } = render(
+		it( 'should not re-speak an effectively equivalent element message', async () => {
+			const { rerender } = await render(
 				<Snackbar>
 					With <em>emphasis</em> this time.
 				</Snackbar>
 			);
-			rerender(
+			await rerender(
 				<Snackbar>
 					With <em>emphasis</em> this time.
 				</Snackbar>

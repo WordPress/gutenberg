@@ -1,7 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen, waitFor } from '@testing-library/react';
+// eslint-disable-next-line no-restricted-imports
+import { screen, waitFor, render as renderSync } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import { press, click, hover, type } from '@ariakit/test';
 
 /**
@@ -28,7 +30,7 @@ const delay = ( delayInMs: number ) => {
 describe( 'DropdownMenu', () => {
 	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
 	it( 'should follow the WAI-ARIA spec', async () => {
-		render(
+		await render(
 			<DropdownMenu trigger={ <button>Open dropdown</button> }>
 				<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
 				<DropdownMenuSeparator />
@@ -94,7 +96,7 @@ describe( 'DropdownMenu', () => {
 
 	describe( 'pointer and keyboard interactions', () => {
 		it( 'should open and focus the menu when clicking the trigger', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
 				</DropdownMenu>
@@ -115,7 +117,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem disabled>First item</DropdownMenuItem>
 					<DropdownMenuItem>Second item</DropdownMenuItem>
@@ -145,7 +147,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem disabled>First item</DropdownMenuItem>
 					<DropdownMenuItem>Second item</DropdownMenuItem>
@@ -175,7 +177,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should close when pressing the escape key', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
 				</DropdownMenu>
@@ -204,7 +206,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should close when clicking outside of the content', async () => {
-			render(
+			await render(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -222,7 +224,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should close when clicking on a menu item', async () => {
-			render(
+			await render(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -240,7 +242,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
-			render(
+			await render(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -260,7 +262,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should not close when clicking on a disabled menu item', async () => {
-			render(
+			await render(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -280,7 +282,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
-			render(
+			await render(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -325,7 +327,9 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
-			render(
+			// TODO: temporarily using the sync version of render until we figure out why it fails when async
+			// see: https://github.com/WordPress/gutenberg/pull/64180
+			renderSync(
 				<DropdownMenu
 					defaultOpen
 					trigger={ <button>Open dropdown</button> }
@@ -479,7 +483,7 @@ describe( 'DropdownMenu', () => {
 				);
 			};
 
-			render( <ControlledRadioGroup /> );
+			await render( <ControlledRadioGroup /> );
 
 			// Open dropdown
 			await click(
@@ -532,7 +536,7 @@ describe( 'DropdownMenu', () => {
 
 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
 			const onRadioValueChangeSpy = jest.fn();
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuGroup>
 						<DropdownMenuRadioItem
@@ -653,7 +657,7 @@ describe( 'DropdownMenu', () => {
 				);
 			};
 
-			render( <ControlledRadioGroup /> );
+			await render( <ControlledRadioGroup /> );
 
 			// Open dropdown
 			await click(
@@ -739,7 +743,7 @@ describe( 'DropdownMenu', () => {
 		it( 'should check checkbox items and keep the menu open when clicking (uncontrolled)', async () => {
 			const onCheckboxValueChangeSpy = jest.fn();
 
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuCheckboxItem
 						name="item-one"
@@ -856,7 +860,7 @@ describe( 'DropdownMenu', () => {
 
 	describe( 'modality', () => {
 		it( 'should be modal by default', async () => {
-			render(
+			await render(
 				<>
 					<DropdownMenu trigger={ <button>Open dropdown</button> }>
 						<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
@@ -883,7 +887,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should not be modal when the `modal` prop is set to `false`', async () => {
-			render(
+			await render(
 				<>
 					<DropdownMenu
 						trigger={ <button>Open dropdown</button> }
@@ -921,7 +925,7 @@ describe( 'DropdownMenu', () => {
 
 	describe( 'items prefix and suffix', () => {
 		it( 'should display a prefix on regular items', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem prefix={ <>Item prefix</> }>
 						Dropdown menu item
@@ -945,7 +949,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should display a suffix on regular items', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem suffix={ <>Item suffix</> }>
 						Dropdown menu item
@@ -969,7 +973,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should display a suffix on radio items', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuRadioItem
 						name="radio-test"
@@ -997,7 +1001,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should display a suffix on checkbox items', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuCheckboxItem
 						name="checkbox-test"
@@ -1027,7 +1031,7 @@ describe( 'DropdownMenu', () => {
 
 	describe( 'typeahead', () => {
 		it( 'should highlight matching item', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem>One</DropdownMenuItem>
 					<DropdownMenuItem>Two</DropdownMenuItem>
@@ -1060,7 +1064,7 @@ describe( 'DropdownMenu', () => {
 		} );
 
 		it( 'should keep previous focus when no matches are found', async () => {
-			render(
+			await render(
 				<DropdownMenu trigger={ <button>Open dropdown</button> }>
 					<DropdownMenuItem>One</DropdownMenuItem>
 					<DropdownMenuItem>Two</DropdownMenuItem>

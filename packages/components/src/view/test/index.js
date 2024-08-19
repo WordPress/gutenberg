@@ -1,34 +1,45 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
  */
 import { View } from '../index';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render(
+	test( 'should render correctly', async () => {
+		const container = createContainer();
+		await render(
 			<View>
 				<span />
-			</View>
+			</View>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render as another element', () => {
-		const { container } = render(
+	test( 'should render as another element', async () => {
+		const container = createContainer();
+		await render(
 			<View as="p">
 				<span />
-			</View>
+			</View>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render with custom styles (string)', () => {
-		const { container } = render(
+	test( 'should render with custom styles (string)', async () => {
+		const container = createContainer();
+		await render(
 			<View
 				as="p"
 				css={ `
@@ -36,13 +47,15 @@ describe( 'props', () => {
 				` }
 			>
 				<span />
-			</View>
+			</View>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render with custom styles (object)', () => {
-		const { container } = render(
+	test( 'should render with custom styles (object)', async () => {
+		const container = createContainer();
+		await render(
 			<View
 				as="p"
 				css={ {
@@ -50,13 +63,15 @@ describe( 'props', () => {
 				} }
 			>
 				<span />
-			</View>
+			</View>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
-	test( 'should render with custom styles (Array)', () => {
-		const { container } = render(
+	test( 'should render with custom styles (Array)', async () => {
+		const container = createContainer();
+		await render(
 			<View
 				as="p"
 				css={ [
@@ -67,7 +82,8 @@ describe( 'props', () => {
 				] }
 			>
 				<span />
-			</View>
+			</View>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );

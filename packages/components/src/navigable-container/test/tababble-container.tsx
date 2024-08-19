@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -57,7 +58,9 @@ describe( 'TabbableContainer', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		render( <TabbableContainerTestCase onNavigate={ onNavigateSpy } /> );
+		await render(
+			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
+		);
 
 		const tabbables = getTabbableContainerTabbables();
 
@@ -90,7 +93,7 @@ describe( 'TabbableContainer', () => {
 
 		const onNavigateSpy = jest.fn();
 
-		const { rerender } = render(
+		const { rerender } = await render(
 			<TabbableContainerTestCase onNavigate={ onNavigateSpy } />
 		);
 
@@ -121,7 +124,7 @@ describe( 'TabbableContainer', () => {
 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
 		expect( onNavigateSpy ).toHaveBeenLastCalledWith( 0, firstTabbable );
 
-		rerender(
+		await rerender(
 			<TabbableContainerTestCase
 				onNavigate={ onNavigateSpy }
 				cycle={ false }
@@ -162,7 +165,7 @@ describe( 'TabbableContainer', () => {
 
 		const externalWrapperOnKeyDownSpy = jest.fn();
 
-		render(
+		await render(
 			// Disable reason: this is only for test purposes.
 			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 			<div onKeyDown={ externalWrapperOnKeyDownSpy }>

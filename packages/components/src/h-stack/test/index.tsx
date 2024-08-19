@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render } from '@testing-library/react';
+
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -9,33 +10,45 @@ import { render } from '@testing-library/react';
 import { View } from '../../view';
 import { HStack } from '..';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'props', () => {
 	test( 'should render correctly', () => {
-		const { container } = render(
+		const container = createContainer();
+		render(
 			<HStack>
 				<View />
 				<View />
-			</HStack>
+			</HStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render alignment', () => {
-		const { container } = render(
+		const container = createContainer();
+		render(
 			<HStack alignment="center">
 				<View />
 				<View />
-			</HStack>
+			</HStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render spacing', () => {
-		const { container } = render(
+		const container = createContainer();
+		render(
 			<HStack spacing={ 5 }>
 				<View />
 				<View />
-			</HStack>
+			</HStack>,
+			{ container }
 		);
 		expect( container ).toMatchSnapshot();
 	} );

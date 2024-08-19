@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -10,10 +11,17 @@ import { getFontSize } from '../../utils/font-size';
 import { COLORS } from '../../utils';
 import { Text } from '../';
 
+function createContainer() {
+	const container = document.createElement( 'div' );
+	document.body.appendChild( container );
+	return container;
+}
+
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
 		test( 'should render correctly', () => {
-			const { container } = render( <Text>Lorem ipsum.</Text> );
+			const container = createContainer();
+			render( <Text>Lorem ipsum.</Text>, { container } );
 			expect( container ).toMatchSnapshot();
 		} );
 	} );
@@ -142,14 +150,16 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render highlighted words with highlightCaseSensitive', () => {
-		const { container } = render(
+		const container = createContainer();
+		render(
 			<Text
 				role="heading"
 				highlightCaseSensitive
 				highlightWords={ [ 'IPSUM' ] }
 			>
 				Lorem ipsum.
-			</Text>
+			</Text>,
+			{ container }
 		);
 
 		expect( container ).toMatchSnapshot();
