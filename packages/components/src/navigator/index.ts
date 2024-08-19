@@ -38,6 +38,34 @@ export { useNavigator } from './use-navigator';
  */
 export const Navigator = Object.assign( TopLevelNavigator, {
 	dislayName: 'Navigator',
+	/**
+	 * The `Navigator.Screen` component represents a single view/screen/panel and
+	 * should be used in combination with the `Navigator`, the `Navigator.Button`
+	 * and the `Navigator.BackButton` components, and the `useNavigator` hook.
+	 *
+	 * @example
+	 * ```jsx
+	 * import { Navigator } from '@wordpress/components';
+	 *
+	 * const MyNavigation = () => (
+	 *   <Navigator initialPath="/">
+	 *     <Navigator.Screen path="/">
+	 *       <p>This is the home screen.</p>
+	 *        <Navigator.Button path="/child">
+	 *          Navigate to child screen.
+	 *       </Navigator.Button>
+	 *     </Navigator.Screen>
+	 *
+	 *     <Navigator.Screen path="/child">
+	 *       <p>This is the child screen.</p>
+	 *       <Navigator.BackButton>
+	 *         Go back
+	 *       </Navigator.BackButton>
+	 *     </Navigator.Screen>
+	 *   </Navigator>
+	 * );
+	 * ```
+	 */
 	Screen: Object.assign( NavigatorScreen, {
 		displayName: 'Navigator.Screen',
 	} ),

@@ -1116,7 +1116,7 @@
 		"parent": "components"
 	},
 	{
-		"title": "NavigatorScreen",
+		"title": "Navigator.Screen",
 		"slug": "navigator-screen",
 		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
 		"parent": "components"

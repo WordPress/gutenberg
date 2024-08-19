@@ -36,7 +36,7 @@ function UnconnectedNavigatorScreen(
 ) {
 	if ( ! /^\//.test( props.path ) ) {
 		warning(
-			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+			'wp.components.Navigator.Screen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
 		);
 	}
 
