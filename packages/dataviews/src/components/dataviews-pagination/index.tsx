@@ -53,6 +53,7 @@ function DataViewsPagination() {
 				expanded={ false }
 				className="dataviews-pagination"
 				justify="end"
+				spacing={ 6 }
 			>
 				<HStack
 					justify="flex-start"
