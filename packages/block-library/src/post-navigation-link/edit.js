@@ -120,6 +120,7 @@ export default function PostNavigationLinkEdit( {
 						/>
 					) }
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Arrow' ) }
 						value={ arrow }
@@ -157,6 +158,8 @@ export default function PostNavigationLinkEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

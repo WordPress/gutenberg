@@ -48,7 +48,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 					getItemTitle( posts[ 0 ] )
 				);
 			} else {
-				successMessage = __( 'The posts were permanently deleted.' );
+				successMessage = __( 'The items were permanently deleted.' );
 			}
 			createSuccessNotice( successMessage, {
 				type: 'snackbar',
@@ -67,7 +67,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 					errorMessage = typedError.reason.message;
 				} else {
 					errorMessage = __(
-						'An error occurred while permanently deleting the post.'
+						'An error occurred while permanently deleting the item.'
 					);
 				}
 				// If we were trying to permanently delete multiple posts
@@ -86,13 +86,13 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 				}
 				if ( errorMessages.size === 0 ) {
 					errorMessage = __(
-						'An error occurred while permanently deleting the posts.'
+						'An error occurred while permanently deleting the items.'
 					);
 				} else if ( errorMessages.size === 1 ) {
 					errorMessage = sprintf(
 						/* translators: %s: an error message */
 						__(
-							'An error occurred while permanently deleting the posts: %s'
+							'An error occurred while permanently deleting the items: %s'
 						),
 						[ ...errorMessages ][ 0 ]
 					);
@@ -100,7 +100,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 					errorMessage = sprintf(
 						/* translators: %s: a list of comma separated error messages */
 						__(
-							'Some errors occurred while permanently deleting the posts: %s'
+							'Some errors occurred while permanently deleting the items: %s'
 						),
 						[ ...errorMessages ].join( ',' )
 					);

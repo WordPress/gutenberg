@@ -78,6 +78,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }

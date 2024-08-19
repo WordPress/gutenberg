@@ -31,7 +31,7 @@ const ITEM_PADDING_INLINE = space( 3 );
 const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.gray[ 200 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
@@ -87,7 +87,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	padding: ${ CONTENT_WRAPPER_PADDING };
 
 	background-color: ${ COLORS.ui.background };
-	border-radius: 4px;
+	border-radius: ${ CONFIG.radiusMedium };
 	${ ( props ) => css`
 		box-shadow: ${ props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BOX_SHADOW
@@ -150,7 +150,7 @@ const baseItem = css`
 	line-height: 20px;
 
 	color: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusSmall };
 
 	padding-block: ${ ITEM_PADDING_BLOCK };
 	padding-inline: ${ ITEM_PADDING_INLINE };
