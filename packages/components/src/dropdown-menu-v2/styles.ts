@@ -30,7 +30,7 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - border color and divider color are different?
 const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.gray[ 200 ];
-const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
+const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
@@ -149,7 +149,7 @@ const baseItem = css`
 	font-weight: normal;
 	line-height: 20px;
 
-	color: ${ COLORS.gray[ 900 ] };
+	color: ${ COLORS.theme.foreground };
 	border-radius: ${ CONFIG.radiusSmall };
 
 	padding-block: ${ ITEM_PADDING_BLOCK };
@@ -194,7 +194,7 @@ const baseItem = css`
 	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ COLORS.gray[ 100 ] };
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 	}
 
 	svg {
