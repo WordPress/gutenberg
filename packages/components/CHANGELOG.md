@@ -59,13 +59,19 @@
 
 ### Bug Fixes
 
+-   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
 -   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
+-   `RadioGroup`: use fieldset and legend to group radio inputs ([#64582](https://github.com/WordPress/gutenberg/pull/64582)).
 
 ### Internal
 
 -   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
 -   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
 -   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+
+### Internal
+
+-   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
 
 ## 28.5.0 (2024-08-07)
 
@@ -82,6 +88,7 @@
 
 ### Enhancements
 
+-   `ColorPalette`: partial support of `color-mix()` CSS colors ([#64224](https://github.com/WordPress/gutenberg/pull/64224)).
 -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
 -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
 -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
