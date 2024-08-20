@@ -150,12 +150,13 @@ test.describe( 'List View', () => {
 		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
-	test( 'expands nested list items', async ( {
+	test( 'expands and collapses nested list items', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
+		await editor.insertBlock( { name: 'core/group' } );
 
 		// Click first color option from the block placeholder's color picker to
 		// make the inner blocks appear.
@@ -196,8 +197,9 @@ test.describe( 'List View', () => {
 			// intentionally aria-hidden. See the implementation for details.
 			.click( { force: true } );
 
-		// Check that we're collapsed.
-		await expect( listView.getByRole( 'row' ) ).toHaveCount( 1 );
+		// Check that blocks are collapsed:
+		// 2 blocks: (one Cover block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 
 		// Click the Cover block List View item.
 		await listView
@@ -221,6 +223,32 @@ test.describe( 'List View', () => {
 				selected: true,
 			} )
 		).toBeVisible();
+
+		// Check that blocks are expanded:
+		// 3 blocks: (one Cover block containing a Paragraph block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
+
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
+			.click();
+
+		// Move down to the Group block.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Collapse all but the Group block.
+		await pageUtils.pressKeys( 'alt+l' );
+
+		// Check that the Cover block is collapsed.
+		await expect(
+			listView.getByRole( 'link', {
+				name: 'Cover',
+				expanded: false,
+			} )
+		).toBeVisible();
+
+		// Check that blocks are collapsed:
+		// 2 blocks: (one Cover block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
 	test( 'moves focus to start/end of list with Home/End keys', async ( {
@@ -280,7 +308,7 @@ test.describe( 'List View', () => {
 			imageItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 
@@ -295,7 +323,7 @@ test.describe( 'List View', () => {
 			groupItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 	} );
@@ -468,7 +496,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should cut, copy, paste, select, duplicate, delete, and deselect blocks using keyboard', async ( {
+	test( 'should cut, copy, paste, select, duplicate, insert, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -635,8 +663,44 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', focused: true },
 			] );
 
-		// Move focus to the first file block, and then delete it.
-		await page.keyboard.press( 'ArrowUp' );
+		// Test insert before.
+		await pageUtils.pressKeys( 'primaryAlt+t' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Inserting a block before should move selection and focus to the inserted block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: false },
+				{ name: 'core/paragraph', focused: true, selected: true },
+				{ name: 'core/file', selected: false },
+			] );
+
+		// Test insert after.
+		await pageUtils.pressKeys( 'primaryAlt+y' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Inserting a block before should move selection and focus to the inserted block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: false },
+				{ name: 'core/paragraph', focused: false, selected: false },
+				{ name: 'core/paragraph', focused: true, selected: true },
+				{ name: 'core/file', selected: false },
+			] );
+
+		// Remove the inserted blocks.
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+
+		// Delete the first File block.
 		await page.keyboard.press( 'Delete' );
 		await expect
 			.poll(
@@ -922,6 +986,45 @@ test.describe( 'List View', () => {
 			] );
 	} );
 
+	test( 'should create a group block from the selected multiple blocks', async ( {
+		editor,
+		pageUtils,
+		listViewUtils,
+	} ) => {
+		// Insert some blocks of different types.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/file' } );
+
+		await listViewUtils.openListView();
+
+		// Group Heading and File blocks.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await pageUtils.pressKeys( 'primary+g' );
+		await expect
+			.poll( listViewUtils.getBlocksWithA11yAttributes )
+			.toMatchObject( [
+				{ name: 'core/paragraph', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					focused: true,
+					innerBlocks: [
+						{
+							name: 'core/heading',
+							selected: false,
+							focused: false,
+						},
+						{
+							name: 'core/file',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
+			] );
+	} );
+
 	test( 'block settings dropdown menu', async ( {
 		editor,
 		page,
@@ -936,12 +1039,12 @@ test.describe( 'List View', () => {
 		const listView = await listViewUtils.openListView();
 
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Duplicate' } )
 			.click();
 		await expect
@@ -957,11 +1060,11 @@ test.describe( 'List View', () => {
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
@@ -979,9 +1082,9 @@ test.describe( 'List View', () => {
 			.filter( {
 				has: page.getByRole( 'gridcell', { name: 'File' } ),
 			} )
-			.getByRole( 'button', { name: 'Actions' } );
+			.getByRole( 'button', { name: 'Options' } );
 		const optionsForFileMenu = page.getByRole( 'menu', {
-			name: 'Actions',
+			name: 'Options',
 		} );
 		await expect(
 			optionsForFileToggle,
@@ -1017,7 +1120,7 @@ test.describe( 'List View', () => {
 				'Pressing keyboard shortcut should also work when the menu is opened and focused'
 			)
 			.toMatchObject( [
-				{ name: 'core/paragraph', selected: true, focused: false },
+				{ name: 'core/paragraph', selected: true, focused: true },
 				{ name: 'core/file', selected: false, focused: false },
 			] );
 		await expect(

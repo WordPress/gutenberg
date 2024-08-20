@@ -1,22 +1,10 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
-	FlexBlock,
-	Button,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,6 +15,8 @@ import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
+import CategoryTabs from '../category-tabs';
+import InserterNoResults from '../no-results';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -35,6 +25,7 @@ function MediaTab( {
 	selectedCategory,
 	onSelectCategory,
 	onInsert,
+	children,
 } ) {
 	const mediaCategories = useMediaCategories( rootClientId );
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -49,7 +40,7 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
-	const mobileMediaCategories = useMemo(
+	const categories = useMemo(
 		() =>
 			mediaCategories.map( ( mediaCategory ) => ( {
 				...mediaCategory,
@@ -57,82 +48,52 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
+
+	if ( ! categories.length ) {
+		return <InserterNoResults />;
+	}
+
 	return (
 		<>
 			{ ! isMobile && (
 				<div className={ `${ baseCssClass }-container` }>
-					<nav aria-label={ __( 'Media categories' ) }>
-						<ItemGroup role="list" className={ baseCssClass }>
-							{ mediaCategories.map( ( mediaCategory ) => (
-								<Item
-									role="listitem"
-									key={ mediaCategory.name }
-									onClick={ () =>
-										onSelectCategory( mediaCategory )
-									}
-									className={ classNames(
-										`${ baseCssClass }__media-category`,
-										{
-											'is-selected':
-												selectedCategory ===
-												mediaCategory,
-										}
-									) }
-									aria-label={ mediaCategory.labels.name }
-									aria-current={
-										mediaCategory === selectedCategory
-											? 'true'
-											: undefined
-									}
+					<CategoryTabs
+						categories={ categories }
+						selectedCategory={ selectedCategory }
+						onSelectCategory={ onSelectCategory }
+					>
+						{ children }
+					</CategoryTabs>
+					<MediaUploadCheck>
+						<MediaUpload
+							multiple={ false }
+							onSelect={ onSelectMedia }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							render={ ( { open } ) => (
+								<Button
+									onClick={ ( event ) => {
+										// Safari doesn't emit a focus event on button elements when
+										// clicked and we need to manually focus the button here.
+										// The reason is that core's Media Library modal explicitly triggers a
+										// focus event and therefore a `blur` event is triggered on a different
+										// element, which doesn't contain the `data-unstable-ignore-focus-outside-for-relatedtarget`
+										// attribute making the Inserter dialog to close.
+										event.target.focus();
+										open();
+									} }
+									className="block-editor-inserter__media-library-button"
+									variant="secondary"
+									data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
 								>
-									<HStack>
-										<FlexBlock>
-											{ mediaCategory.labels.name }
-										</FlexBlock>
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</Item>
-							) ) }
-							<div role="listitem">
-								<MediaUploadCheck>
-									<MediaUpload
-										multiple={ false }
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										render={ ( { open } ) => (
-											<Button
-												onClick={ ( event ) => {
-													// Safari doesn't emit a focus event on button elements when
-													// clicked and we need to manually focus the button here.
-													// The reason is that core's Media Library modal explicitly triggers a
-													// focus event and therefore a `blur` event is triggered on a different
-													// element, which doesn't contain the `data-unstable-ignore-focus-outside-for-relatedtarget`
-													// attribute making the Inserter dialog to close.
-													event.target.focus();
-													open();
-												} }
-												className="block-editor-inserter__media-library-button"
-												variant="secondary"
-												data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
-											>
-												{ __( 'Open Media Library' ) }
-											</Button>
-										) }
-									/>
-								</MediaUploadCheck>
-							</div>
-						</ItemGroup>
-					</nav>
+									{ __( 'Open Media Library' ) }
+								</Button>
+							) }
+						/>
+					</MediaUploadCheck>
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ mobileMediaCategories }>
+				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }

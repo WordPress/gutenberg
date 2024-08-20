@@ -94,6 +94,9 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 		// Insert a quote block.
 		await blockListBox.getByRole( 'option', { name: 'Quote' } ).click();
 
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+
 		// Verify if the custom block appender text changed as expected.
 		await expect(
 			dynamimcAppender.getByText( 'Single Blocks Appender' )

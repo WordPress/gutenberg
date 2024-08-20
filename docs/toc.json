@@ -203,6 +203,35 @@
 				]
 			},
 			{
+				"docs/reference-guides/interactivity-api/README.md": [
+					{
+						"docs/reference-guides/interactivity-api/core-concepts/README.md": [
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md": []
+							}
+						]
+					},
+					{
+						"docs/reference-guides/interactivity-api/iapi-quick-start-guide.md": []
+					},
+					{
+						"docs/reference-guides/interactivity-api/api-reference.md": []
+					},
+					{
+						"docs/reference-guides/interactivity-api/iapi-about.md": []
+					},
+					{
+						"docs/reference-guides/interactivity-api/iapi-faq.md": []
+					}
+				]
+			},
+			{
 				"docs/reference-guides/slotfills/README.md": [
 					{
 						"docs/reference-guides/slotfills/main-dashboard-button.md": []
@@ -239,6 +268,9 @@
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-v1.md": []
+					},
+					{
+						"docs/reference-guides/theme-json-reference/theme-json-v2.md": []
 					},
 					{
 						"docs/reference-guides/theme-json-reference/theme-json-migrations.md": []

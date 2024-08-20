@@ -130,9 +130,22 @@ class MediaContainer extends Component {
 		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
-	updateMediaProgress() {
-		if ( ! this.state.isUploadInProgress ) {
+	updateMediaProgress( payload ) {
+		const { isUploadInProgress } = this.state;
+		const { mediaUrl, state } = payload;
+		const { mediaType, onMediaThumbnailUpdate } = this.props;
+
+		if ( ! isUploadInProgress ) {
 			this.setState( { isUploadInProgress: true } );
+		}
+
+		if (
+			isUploadInProgress &&
+			mediaType === MEDIA_TYPE_IMAGE &&
+			mediaUrl &&
+			! state
+		) {
+			onMediaThumbnailUpdate( mediaUrl );
 		}
 	}
 
@@ -317,7 +330,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
-				className={ 'no-block-outline' }
+				className="no-block-outline"
 			/>
 		);
 	}

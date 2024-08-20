@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.58.0 (2024-05-16)
+
+## 4.57.0 (2024-05-02)
+
+## 4.56.0 (2024-04-19)
+
+## 4.55.0 (2024-04-03)
+
 ## 4.54.0 (2024-03-21)
 
 ## 4.53.0 (2024-03-06)
@@ -121,11 +145,11 @@
 
 ## 3.0.0 (2019-03-06)
 
-## Breaking Change
+### Breaking Changes
 
 -   A `parser.js` file generated from the PEGJS grammar is now outputted in commonjs format.
 
-## New Feature
+### New Features
 
 -   A `parser.php` file generated from the PEGJS grammar is now added upon installation.
 
@@ -135,7 +159,7 @@
 
 ## 2.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   JS and PHP parsers now behave consistently when parsing empty attributes.
 

@@ -1,15 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
-const CONTENT_ONLY_BLOCKS = [
-	'core/post-content',
-	'core/post-featured-image',
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
-	'core/template-part',
+	'core/post-featured-image',
+	'core/post-content',
 ];
 
 /**
@@ -17,56 +23,61 @@ const CONTENT_ONLY_BLOCKS = [
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockParents, getBlockName } =
-			select( blockEditorStore );
-		return getBlocksByName( CONTENT_ONLY_BLOCKS ).filter( ( clientId ) =>
-			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = getBlockName( parentClientId );
-				return (
-					// Ignore descendents of the query block.
-					parentBlockName !== 'core/query' &&
-					// Enable only the top-most block.
-					! CONTENT_ONLY_BLOCKS.includes( parentBlockName )
-				);
-			} )
-		);
-	}, [] );
+	const contentOnlyBlockTypes = useMemo(
+		() => [
+			...applyFilters(
+				'editor.postContentBlockTypes',
+				POST_CONTENT_BLOCK_TYPES
+			),
+			'core/template-part',
+		],
+		[]
+	);
 
+	// Note that there are two separate subscriptions because the result for each
+	// returns a new array.
+	const contentOnlyIds = useSelect(
+		( select ) => {
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName( contentOnlyBlockTypes );
+		},
+		[ contentOnlyBlockTypes ]
+	);
 	const disabledIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
-			( clientId ) => getBlockOrder( clientId )
+		return getBlocksByName( 'core/template-part' ).flatMap( ( clientId ) =>
+			getBlockOrder( clientId )
 		);
 	}, [] );
 
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	useEffect( () => {
-		setBlockEditingMode( '', 'disabled' );
-		for ( const clientId of contentOnlyIds ) {
-			setBlockEditingMode( clientId, 'contentOnly' );
-		}
-		for ( const clientId of disabledIds ) {
-			setBlockEditingMode( clientId, 'disabled' );
-		}
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
 
-		return () => {
-			unsetBlockEditingMode( '' );
+		registry.batch( () => {
+			setBlockEditingMode( '', 'disabled' );
 			for ( const clientId of contentOnlyIds ) {
-				unsetBlockEditingMode( clientId );
+				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 			for ( const clientId of disabledIds ) {
-				unsetBlockEditingMode( clientId );
+				setBlockEditingMode( clientId, 'disabled' );
 			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				unsetBlockEditingMode( '' );
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of disabledIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
 		};
-	}, [
-		contentOnlyIds,
-		disabledIds,
-		setBlockEditingMode,
-		unsetBlockEditingMode,
-	] );
+	}, [ contentOnlyIds, disabledIds, registry ] );
 
 	return null;
 }

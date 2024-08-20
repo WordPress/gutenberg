@@ -1,3 +1,9 @@
 [class].editor-post-format__suggestion {
 	margin: $grid-unit-05 0 0 0;
 }
+
+.editor-post-format__dialog .editor-post-format__dialog-content {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+}

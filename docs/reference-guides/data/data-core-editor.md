@@ -485,7 +485,7 @@ _Returns_
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into its three parts: the prefix, the postName, and the suffix.
 
 _Parameters_
 
@@ -1058,6 +1058,18 @@ _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
 
+### isPublishSidebarOpened
+
+Returns true if the publish sidebar is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state
+
+_Returns_
+
+-   `boolean`: Whether the publish sidebar is open.
+
 ### isSavingNonPostEntityChanges
 
 Returns true if non-post entities are currently being saved, or false otherwise.
@@ -1119,6 +1131,14 @@ _Parameters_
 _Related_
 
 -   clearSelectedBlock in core/block-editor store.
+
+### closePublishSidebar
+
+Returns an action object used in signalling that the user closed the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### createUndoLevel
 
@@ -1272,6 +1292,14 @@ _Related_
 _Related_
 
 -   multiSelect in core/block-editor store.
+
+### openPublishSidebar
+
+Returns an action object used in signalling that the user opened the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
 
 ### receiveBlocks
 
@@ -1521,6 +1549,14 @@ Opens a closed panel and closes an open panel.
 _Parameters_
 
 -   _panelName_ `string`: A string that identifies the panel to open or close.
+
+### togglePublishSidebar
+
+Returns an action object used in signalling that the user toggles the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
 
 ### toggleSelection
 

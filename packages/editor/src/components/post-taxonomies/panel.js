@@ -63,4 +63,13 @@ function PostTaxonomies() {
 	);
 }
 
+/**
+ * Renders a panel for a specific taxonomy.
+ *
+ * @param {Object}  props          The component props.
+ * @param {Object}  props.taxonomy The taxonomy object.
+ * @param {Element} props.children The child components.
+ *
+ * @return {Component} The rendered taxonomy panel.
+ */
 export default PostTaxonomies;

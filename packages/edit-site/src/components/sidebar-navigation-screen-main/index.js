@@ -1,15 +1,10 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalUseNavigator as useNavigator,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-
 import { useEffect } from '@wordpress/element';
 
 /**
@@ -20,19 +15,21 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 export default function SidebarNavigationScreenMain() {
-	const { location } = useNavigator();
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
 
 	// Clear the editor canvas container view when accessing the main navigation screen.
 	useEffect( () => {
-		if ( location?.path === '/' ) {
-			setEditorCanvasContainerView( undefined );
-		}
-	}, [ setEditorCanvasContainerView, location?.path ] );
+		setEditorCanvasContainerView( undefined );
+	}, [ setEditorCanvasContainerView ] );
 
 	return (
 		<SidebarNavigationScreen
@@ -44,44 +41,45 @@ export default function SidebarNavigationScreenMain() {
 			content={
 				<>
 					<ItemGroup>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/navigation"
+						<SidebarNavigationItem
+							uid="navigation-navigation-item"
+							params={ { postType: NAVIGATION_POST_TYPE } }
 							withChevron
 							icon={ navigation }
 						>
 							{ __( 'Navigation' ) }
-						</NavigatorButton>
+						</SidebarNavigationItem>
 						<SidebarNavigationItemGlobalStyles
+							uid="styles-navigation-item"
 							withChevron
 							icon={ styles }
 						>
 							{ __( 'Styles' ) }
 						</SidebarNavigationItemGlobalStyles>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/page"
+						<SidebarNavigationItem
+							uid="page-navigation-item"
+							params={ { postType: 'page' } }
 							withChevron
 							icon={ page }
 						>
 							{ __( 'Pages' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/wp_template"
+						</SidebarNavigationItem>
+						<SidebarNavigationItem
+							uid="template-navigation-item"
+							params={ { postType: TEMPLATE_POST_TYPE } }
 							withChevron
 							icon={ layout }
 						>
 							{ __( 'Templates' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
-							path="/patterns"
+						</SidebarNavigationItem>
+						<SidebarNavigationItem
+							uid="patterns-navigation-item"
+							params={ { postType: PATTERN_TYPES.user } }
 							withChevron
 							icon={ symbol }
 						>
 							{ __( 'Patterns' ) }
-						</NavigatorButton>
+						</SidebarNavigationItem>
 					</ItemGroup>
 				</>
 			}

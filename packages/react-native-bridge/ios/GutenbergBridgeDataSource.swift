@@ -82,9 +82,6 @@ public extension GutenbergBridgeDataSource {
 
 public protocol GutenbergEditorSettings {
     var isFSETheme: Bool { get }
-    var galleryWithImageBlocks: Bool { get }
-    var quoteBlockV2: Bool { get }
-    var listBlockV2: Bool { get }
     var rawStyles: String? { get }
     var rawFeatures: String? { get }
     var colors: [[String: String]]? { get }

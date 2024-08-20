@@ -2,16 +2,10 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalHStack as HStack,
-	FlexBlock,
-	Button,
-} from '@wordpress/components';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { Button, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,93 +14,79 @@ import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
+import CategoryTabs from '../category-tabs';
+import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 function BlockPatternsTab( {
 	onSelectCategory,
 	selectedCategory,
 	onInsert,
 	rootClientId,
+	children,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 
 	const categories = usePatternCategories( rootClientId );
 
-	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const isResolvingPatterns = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).isResolvingPatterns(),
+		[]
+	);
+
+	if ( isResolvingPatterns ) {
+		return (
+			<div className="block-editor-inserter__patterns-loading">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if ( ! categories.length ) {
+		return <InserterNoResults />;
+	}
 
 	return (
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<nav
-						aria-label={ __( 'Block pattern categories' ) }
-						className="block-editor-inserter__block-patterns-tabs"
+					<CategoryTabs
+						categories={ categories }
+						selectedCategory={ selectedCategory }
+						onSelectCategory={ onSelectCategory }
 					>
-						<ItemGroup role="list">
-							{ categories.map( ( category ) => (
-								<Item
-									role="listitem"
-									key={ category.name }
-									onClick={ () =>
-										onSelectCategory( category )
-									}
-									className={
-										category === selectedCategory
-											? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
-											: 'block-editor-inserter__patterns-category'
-									}
-									aria-label={ category.label }
-									aria-current={
-										category === selectedCategory
-											? 'true'
-											: undefined
-									}
-								>
-									<HStack>
-										<FlexBlock>
-											{ category.label }
-										</FlexBlock>
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</Item>
-							) ) }
-							<div role="listitem">
-								<Button
-									className="block-editor-inserter__patterns-explore-button"
-									onClick={ () =>
-										setShowPatternsExplorer( true )
-									}
-									variant="secondary"
-								>
-									{ __( 'Explore all patterns' ) }
-								</Button>
-							</div>
-						</ItemGroup>
-					</nav>
+						{ children }
+					</CategoryTabs>
+					<Button
+						className="block-editor-inserter__patterns-explore-button"
+						onClick={ () => setShowPatternsExplorer( true ) }
+						variant="secondary"
+					>
+						{ __( 'Explore all patterns' ) }
+					</Button>
 				</div>
 			) }
 			{ isMobile && (
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
-						<PatternCategoryPreviews
-							key={ category.name }
-							onInsert={ onInsert }
-							rootClientId={ rootClientId }
-							category={ category }
-							showTitlesAsTooltip={ false }
-						/>
+						<div className="block-editor-inserter__category-panel">
+							<PatternCategoryPreviews
+								key={ category.name }
+								onInsert={ onInsert }
+								rootClientId={ rootClientId }
+								category={ category }
+								showTitlesAsTooltip={ false }
+							/>
+						</div>
 					) }
 				</MobileTabNavigation>
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ initialCategory }
+					initialCategory={ selectedCategory || categories[ 0 ] }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 					rootClientId={ rootClientId }

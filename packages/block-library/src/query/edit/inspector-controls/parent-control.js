@@ -55,7 +55,9 @@ function ParentControl( { parents, postType, onChange } ) {
 	);
 	const currentParents = useSelect(
 		( select ) => {
-			if ( ! parents?.length ) return EMPTY_ARRAY;
+			if ( ! parents?.length ) {
+				return EMPTY_ARRAY;
+			}
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', postType, {
 				...BASE_QUERY,
@@ -71,7 +73,9 @@ function ParentControl( { parents, postType, onChange } ) {
 		if ( ! parents?.length ) {
 			setValue( EMPTY_ARRAY );
 		}
-		if ( ! currentParents?.length ) return;
+		if ( ! currentParents?.length ) {
+			return;
+		}
 		const currentParentsInfo = getEntitiesInfo(
 			mapToIHasNameAndId( currentParents, 'title.rendered' )
 		);
@@ -91,27 +95,35 @@ function ParentControl( { parents, postType, onChange } ) {
 	}, [ parents, currentParents ] );
 
 	const entitiesInfo = useMemo( () => {
-		if ( ! searchResults?.length ) return EMPTY_ARRAY;
+		if ( ! searchResults?.length ) {
+			return EMPTY_ARRAY;
+		}
 		return getEntitiesInfo(
 			mapToIHasNameAndId( searchResults, 'title.rendered' )
 		);
 	}, [ searchResults ] );
 	// Update suggestions only when the query has resolved.
 	useEffect( () => {
-		if ( ! searchHasResolved ) return;
+		if ( ! searchHasResolved ) {
+			return;
+		}
 		setSuggestions( entitiesInfo.names );
 	}, [ entitiesInfo.names, searchHasResolved ] );
 
 	const getIdByValue = ( entitiesMappedByName, entity ) => {
 		const id = entity?.id || entitiesMappedByName?.[ entity ]?.id;
-		if ( id ) return id;
+		if ( id ) {
+			return id;
+		}
 	};
 	const onParentChange = ( newValue ) => {
 		const ids = Array.from(
 			newValue.reduce( ( accumulator, entity ) => {
 				// Verify that new values point to existing entities.
 				const id = getIdByValue( entitiesInfo.mapByName, entity );
-				if ( id ) accumulator.add( id );
+				if ( id ) {
+					accumulator.add( id );
+				}
 				return accumulator;
 			}, new Set() )
 		);
@@ -120,12 +132,14 @@ function ParentControl( { parents, postType, onChange } ) {
 	};
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			label={ __( 'Parents' ) }
 			value={ value }
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onParentChange }
 			__experimentalShowHowTo={ false }
+			__nextHasNoMarginBottom
 		/>
 	);
 }

@@ -532,7 +532,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
-		if ( format ) delete format.formatType;
+		if ( format ) {
+			delete format.formatType;
+		}
 
 		const value = createFromElement( {
 			element: node,

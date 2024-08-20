@@ -13,13 +13,13 @@
 
 Welcome to the development hub for the WordPress Gutenberg project!
 
-"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, **Customization** (which includes Full Site Editing, Block Patterns, Block Directory and Block based themes), Collaboration, and Multilingual -- and is focused on a new editing experience, the block editor.
+"Gutenberg" is a codename for a whole new paradigm in WordPress site building and publishing, that aims to revolutionize the entire publishing experience as much as Gutenberg did the printed word. Right now, the project is in the second phase of a four-phase process that will touch every piece of WordPress -- Editing, Customization, **Collaboration** (which includes [Real-time collaboration](https://make.wordpress.org/core/2023/07/03/real-time-collaboration/), [Asynchronous collaboration](https://make.wordpress.org/core/2023/07/04/workflows/), [Publishing flows](https://make.wordpress.org/core/2023/07/04/workflows/), [Post revisions interface](https://make.wordpress.org/core/2023/07/05/revisions/), [Admin design](https://make.wordpress.org/core/2023/07/12/admin-design/), [Library](https://make.wordpress.org/core/2023/07/10/block-library/)), and Multilingual -- and is focused on a new editing experience, the block editor.
 
 The block editor introduces a modular approach to pages and posts: each piece of content in the editor, from a paragraph to an image gallery to a headline, is its own block. And just like physical blocks, WordPress blocks can be added, arranged, and rearranged, allowing WordPress users to create media-rich pages in a visually intuitive way -- and without work-arounds like shortcodes or custom HTML.
 
 The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor, so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
-Check out the [Ways to keep up with Gutenberg & Full Site Editing (FSE)](https://make.wordpress.org/core/2020/05/20/ways-to-keep-up-with-full-site-editing-fse/)
+Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/)
 
 ## Getting Started
 
@@ -37,7 +37,7 @@ Get hands on: check out the [block editor live demo](https://wordpress.org/guten
 
 Extending and customizing is at the heart of the WordPress platform, this is no different for the Gutenberg project. The editor and future products can be extended by third-party developers using plugins.
 
-Review the [Create a Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for the fastest way to get started extending the block editor. See the [Developer Documentation](https://developer.wordpress.org/block-editor/#develop-for-the-block-editor) for extensive tutorials, documentation, and API references.
+Review the [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide/) for the fastest way to get started extending the block editor. See the [Block Editor Handbook](https://developer.wordpress.org/block-editor/) for extensive tutorials, documentation, and API references. Also, check the [WordPress Developer Blog](https://developer.wordpress.org/blog/) for great articles about block development, among other topics.
 
 ### Contribute to Gutenberg
 
@@ -54,8 +54,6 @@ As with all WordPress projects, we want to ensure a welcoming environment for ev
 ## Get Involved
 
 You can join us in the `#core-editor` channel in Slack, see the [WordPress Slack page](https://make.wordpress.org/chat/) for signup information; it is free to join.
-
-**Weekly meetings** The Editor Team meets weekly on Wednesdays at 14:00 UTC in Slack. If you can not join the meeting, [agenda](https://make.wordpress.org/core/tag/core-editor-agenda/) and [notes](https://make.wordpress.org/core/tag/core-editor-summary/) are posted to the [Make WordPress Blog](https://make.wordpress.org/core/).
 
 ## License
 

@@ -2,24 +2,25 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { postType } from '.';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 function useDeleteNavigationMenu() {
-	const { goTo } = useNavigator();
-
 	const { deleteEntityRecord } = useDispatch( coreStore );
-
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const history = useHistory();
 
 	const handleDelete = async ( navigationMenu ) => {
 		const postId = navigationMenu?.id;
@@ -36,17 +37,17 @@ function useDeleteNavigationMenu() {
 				}
 			);
 			createSuccessNotice(
-				__( 'Navigation menu successfully deleted.' ),
+				__( 'Navigation Menu successfully deleted.' ),
 				{
 					type: 'snackbar',
 				}
 			);
-			goTo( '/navigation' );
+			history.push( { postType: 'wp_navigation' } );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to delete Navigation menu (%s).` ),
+					__( `Unable to delete Navigation Menu (%s).` ),
 					error?.message
 				),
 
@@ -107,7 +108,7 @@ function useSaveNavigationMenu() {
 					throwOnError: true,
 				}
 			);
-			createSuccessNotice( __( 'Renamed Navigation menu' ), {
+			createSuccessNotice( __( 'Renamed Navigation Menu' ), {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
@@ -117,7 +118,7 @@ function useSaveNavigationMenu() {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be renamed. */
-					__( `Unable to rename Navigation menu (%s).` ),
+					__( `Unable to rename Navigation Menu (%s).` ),
 					error?.message
 				),
 
@@ -132,8 +133,7 @@ function useSaveNavigationMenu() {
 }
 
 function useDuplicateNavigationMenu() {
-	const { goTo } = useNavigator();
-
+	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const { createSuccessNotice, createErrorNotice } =
@@ -162,16 +162,16 @@ function useDuplicateNavigationMenu() {
 			);
 
 			if ( savedRecord ) {
-				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
+				createSuccessNotice( __( 'Duplicated Navigation Menu' ), {
 					type: 'snackbar',
 				} );
-				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
+				history.push( { postType, postId: savedRecord.id } );
 			}
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to duplicate Navigation menu (%s).` ),
+					__( `Unable to duplicate Navigation Menu (%s).` ),
 					error?.message
 				),
 

@@ -9,7 +9,7 @@ import { useZoomOut } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import ScreenHeader from './header';
-import StyleVariationsContainer from './style-variations-container';
+import SidebarNavigationScreenGlobalStylesContent from '../sidebar-navigation-screen-global-styles/content';
 
 function ScreenStyleVariations() {
 	// Move to zoom out mode when this component is mounted
@@ -19,7 +19,6 @@ function ScreenStyleVariations() {
 	return (
 		<>
 			<ScreenHeader
-				back="/"
 				title={ __( 'Browse styles' ) }
 				description={ __(
 					'Choose a variation to change the look of the site.'
@@ -32,7 +31,7 @@ function ScreenStyleVariations() {
 				className="edit-site-global-styles-screen-style-variations"
 			>
 				<CardBody>
-					<StyleVariationsContainer />
+					<SidebarNavigationScreenGlobalStylesContent />
 				</CardBody>
 			</Card>
 		</>

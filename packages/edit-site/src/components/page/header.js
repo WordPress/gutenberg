@@ -5,7 +5,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
-	FlexBlock,
+	__experimentalVStack as VStack,
 	FlexItem,
 } from '@wordpress/components';
 
@@ -15,25 +15,30 @@ import {
 
 export default function Header( { title, subTitle, actions } ) {
 	return (
-		<HStack as="header" alignment="left" className="edit-site-page-header">
-			<FlexBlock className="edit-site-page-header__page-title">
+		<VStack className="edit-site-page-header" as="header" spacing={ 0 }>
+			<HStack className="edit-site-page-header__page-title">
 				<Heading
 					as="h2"
 					level={ 3 }
 					weight={ 500 }
 					className="edit-site-page-header__title"
+					truncate
 				>
 					{ title }
 				</Heading>
-				{ subTitle && (
-					<Text as="p" className="edit-site-page-header__sub-title">
-						{ subTitle }
-					</Text>
-				) }
-			</FlexBlock>
-			<FlexItem className="edit-site-page-header__actions">
-				{ actions }
-			</FlexItem>
-		</HStack>
+				<FlexItem className="edit-site-page-header__actions">
+					{ actions }
+				</FlexItem>
+			</HStack>
+			{ subTitle && (
+				<Text
+					variant="muted"
+					as="p"
+					className="edit-site-page-header__sub-title"
+				>
+					{ subTitle }
+				</Text>
+			) }
+		</VStack>
 	);
 }

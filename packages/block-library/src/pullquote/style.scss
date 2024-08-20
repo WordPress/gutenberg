@@ -1,8 +1,9 @@
 .wp-block-pullquote {
-	padding: 4em 0;
 	text-align: center; // Default text-alignment where the `textAlign` attribute value isn't specified.
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 	box-sizing: border-box;
+	margin: 0 0 1em 0;
+	padding: 4em 0;
 
 	p,
 	blockquote,
@@ -36,11 +37,6 @@
 	}
 }
 
-// Lowest specificity to avoid overriding layout styles.
-:where(.wp-block-pullquote) {
-	margin: 0 0 1em 0;
-}
-
 // Ensure that we are reasonably specific to override theme defaults.
 .wp-block-pullquote.has-text-align-left blockquote {
 	text-align: left;
@@ -52,6 +48,8 @@
 }
 
 // .is-style-solid-color is deprecated.
+// This selector has not been scoped with `:root :where`, as global styles
+// does, to keep its specificity as it was at the time of deprecation.
 .wp-block-pullquote.is-style-solid-color {
 	border: none;
 	blockquote {

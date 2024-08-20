@@ -10,9 +10,9 @@ import { State } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { Draggable, DraggableTrigger } from '@wordpress/components';
+import Draggable, { DraggableTrigger } from '../../draggable';
 
 // Touch event type constants have been extracted from original source code, as they are not exported in the package.
 // Reference: https://github.com/software-mansion/react-native-gesture-handler/blob/90895e5f38616a6be256fceec6c6a391cd9ad7c7/src/TouchEventType.ts

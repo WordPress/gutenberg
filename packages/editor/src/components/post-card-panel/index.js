@@ -1,105 +1,121 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
 import {
 	Icon,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalText as Text,
-	PanelBody,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { humanTimeDiff } from '@wordpress/date';
+import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	GLOBAL_POST_TYPES,
+} from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import PostActions from '../post-actions';
 
-export default function PostCardPanel( { className, actions, children } ) {
-	const { modified, title, templateInfo, icon } = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getCurrentPostType,
-			getCurrentPostId,
-			__experimentalGetTemplateInfo,
-		} = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _type = getCurrentPostType();
-		const _id = getCurrentPostId();
-		let _templateInfo;
-		const _record = getEditedEntityRecord( 'postType', _type, _id );
-		return {
-			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
-			modified: getEditedPostAttribute( 'modified' ),
-			id: _id,
-			templateInfo: __experimentalGetTemplateInfo( _record ),
-			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
-				area: _record?.area,
-			} ),
-		};
-	} );
-	const description = templateInfo?.description;
-	const lastEditedText =
-		modified &&
-		sprintf(
-			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s.' ),
-			humanTimeDiff( modified )
-		);
-
+export default function PostCardPanel( {
+	postType,
+	postId,
+	onActionPerformed,
+} ) {
+	const { isFrontPage, isPostsPage, title, icon, isSync } = useSelect(
+		( select ) => {
+			const { __experimentalGetTemplateInfo } = select( editorStore );
+			const { canUser, getEditedEntityRecord } = select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
+			const _record = getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+			const _templateInfo =
+				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+					postType
+				) && __experimentalGetTemplateInfo( _record );
+			let _isSync = false;
+			if ( GLOBAL_POST_TYPES.includes( postType ) ) {
+				if ( PATTERN_POST_TYPE === postType ) {
+					// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
+					const currentSyncStatus =
+						_record?.meta?.wp_pattern_sync_status === 'unsynced'
+							? 'unsynced'
+							: _record?.wp_pattern_sync_status;
+					_isSync = currentSyncStatus !== 'unsynced';
+				} else {
+					_isSync = true;
+				}
+			}
+			return {
+				title: _templateInfo?.title || _record?.title,
+				icon: unlock( select( editorStore ) ).getPostIcon( postType, {
+					area: _record?.area,
+				} ),
+				isSync: _isSync,
+				isFrontPage: siteSettings?.page_on_front === postId,
+				isPostsPage: siteSettings?.page_for_posts === postId,
+			};
+		},
+		[ postId, postType ]
+	);
 	return (
-		<PanelBody>
-			<div
-				className={ classnames( 'editor-post-card-panel', className ) }
+		<div className="editor-post-card-panel">
+			<HStack
+				spacing={ 2 }
+				className="editor-post-card-panel__header"
+				align="flex-start"
 			>
-				<HStack
-					spacing={ 2 }
-					className="editor-post-card-panel__header"
-					align="flex-start"
+				<Icon
+					className={ clsx( 'editor-post-card-panel__icon', {
+						'is-sync': isSync,
+					} ) }
+					icon={ icon }
+				/>
+				<Text
+					numberOfLines={ 2 }
+					truncate
+					className="editor-post-card-panel__title"
+					weight={ 500 }
+					as="h2"
+					lineHeight="20px"
 				>
-					<Icon
-						className="editor-post-card-panel__icon"
-						icon={ icon }
-					/>
-					<Text
-						numberOfLines={ 2 }
-						truncate
-						className="editor-post-card-panel__title"
-						weight={ 500 }
-						as="h2"
-					>
-						{ title ? decodeEntities( title ) : __( 'No Title' ) }
-					</Text>
-					{ actions }
-				</HStack>
-				<VStack className="editor-post-card-panel__content">
-					{ ( description || lastEditedText ) && (
-						<VStack
-							className="editor-post-card-panel__description"
-							spacing={ 2 }
-						>
-							{ !! description && <Text>{ description }</Text> }
-							{ !! lastEditedText && (
-								<Text>{ lastEditedText }</Text>
-							) }
-						</VStack>
+					{ title ? decodeEntities( title ) : __( 'No title' ) }
+					{ isFrontPage && (
+						<span className="editor-post-card-panel__title-badge">
+							{ __( 'Homepage' ) }
+						</span>
 					) }
-					{
-						// Todo: move TemplateAreas (and the selectors it depends) to the editor package, and use it here removing the children prop.
-						children
-					}
-				</VStack>
-			</div>
-		</PanelBody>
+					{ isPostsPage && (
+						<span className="editor-post-card-panel__title-badge">
+							{ __( 'Posts Page' ) }
+						</span>
+					) }
+				</Text>
+				<PostActions
+					postType={ postType }
+					postId={ postId }
+					onActionPerformed={ onActionPerformed }
+				/>
+			</HStack>
+		</div>
 	);
 }

@@ -4,7 +4,6 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useGlobalStyles } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -21,6 +20,7 @@ import {
 	useHasTextPanel,
 	useHasBackgroundPanel,
 } from './color-panel.js';
+import { useGlobalStyles } from './use-global-styles-context';
 
 const ColorPanel = ( {
 	value,

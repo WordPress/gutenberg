@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ export default function NavigationItemBase( props: NavigationItemBaseProps ) {
 		return null;
 	}
 
-	const classes = classnames( 'components-navigation__item', className );
+	const classes = clsx( 'components-navigation__item', className );
 
 	return (
 		<ItemBaseUI className={ classes } { ...restProps }>

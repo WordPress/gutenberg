@@ -21,7 +21,7 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js 18.0.0 or later. It also requires webpack 5.0.0 or newer. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It also requires webpack 5.0.0 or newer. It is not compatible with older versions.
 
 ## Usage
 

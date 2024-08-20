@@ -24,6 +24,8 @@ _Returns_
 
 ### getCurrentTemplateTemplateParts
 
+> **Deprecated**
+
 Returns the template parts and their blocks for the current edited template.
 
 _Parameters_
@@ -58,7 +60,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Post ID.
+-   `?string`: Post ID.
 
 ### getEditedPostType
 
@@ -70,7 +72,7 @@ _Parameters_
 
 _Returns_
 
--   `TemplateType?`: Template type.
+-   `?TemplateType`: Template type.
 
 ### getEditorMode
 
@@ -371,7 +373,7 @@ Resolves the template for a page and displays both. If no path is given, attempt
 
 _Returns_
 
--   `number`: The resolved template ID for the page route.
+-   `Object`: Action object.
 
 ### setTemplate
 

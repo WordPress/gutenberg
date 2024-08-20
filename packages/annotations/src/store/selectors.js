@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid

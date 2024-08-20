@@ -207,7 +207,7 @@ class LatestPostsEdit extends Component {
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
 								onChange={ this.onSetAddLinkToFeaturedImage }
-								separatorType={ 'topFullWidth' }
+								separatorType="topFullWidth"
 							/>
 						</>
 					) }

@@ -24,7 +24,7 @@ By the end of this article, you will have a solid understanding of the block edi
 
 ## Code syntax
 
-The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so most code examples in the Block Editor Handbook use this syntax.
+The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so all code examples in the Block Editor Handbook use this syntax.
 
 ## What you're going to be building
 
@@ -277,7 +277,7 @@ function Editor( { settings } ) {
 }
 ```
 
-In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://reactjs.org/docs/context.html#contextprovider) that make specific functionality available throughout the component hierarchy.
+In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://react.dev/reference/react/createContext#provider) that make specific functionality available throughout the component hierarchy.
 
 Let's examine these in more detail:
 

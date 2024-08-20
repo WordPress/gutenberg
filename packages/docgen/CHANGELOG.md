@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+### Bug Fixes
+
+-   Fix getting param annotations for exported variables assigned to function expressions ([#tbd](https://github.com/WordPress/gutenberg/pull/tbd)).
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 1.67.0 (2024-05-16)
+
+## 1.66.0 (2024-05-02)
+
+## 1.65.0 (2024-04-19)
+
+## 1.64.0 (2024-04-03)
+
 ## 1.63.0 (2024-03-21)
 
 ## 1.62.0 (2024-03-06)
@@ -80,7 +108,7 @@
 
 ### Bug Fixes
 
--	Fix getting param annotations for default exported functions. ([#31603](https://github.com/WordPress/gutenberg/pull/31603))
+-   Fix getting param annotations for default exported functions ([#31603](https://github.com/WordPress/gutenberg/pull/31603)).
 
 ## 1.17.0 (2021-04-29)
 
@@ -109,7 +137,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### Enhancement
+### Enhancements
 
 -   Docblocks including a `@private` tag will be omitted from the generated result.
 

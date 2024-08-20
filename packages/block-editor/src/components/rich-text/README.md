@@ -25,13 +25,9 @@ _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-na
 _Optional._ Placeholder text to show when the field is empty, similar to the
 [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
-### `multiline: Boolean | String`
+### `disableLineBreaks: Boolean`
 
-_Optional._ By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
-
-### `onSplit( value: String ): Function`
-
-_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
+_Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
 
 ### `onReplace( blocks: Array ): Function`
 

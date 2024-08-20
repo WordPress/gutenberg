@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ export default function LinkViewer( {
 } ) {
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				'block-editor-url-popover__link-viewer',
 				className
 			) }

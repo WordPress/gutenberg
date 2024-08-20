@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ export default function PostNavigationLinkEdit( {
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -120,6 +120,7 @@ export default function PostNavigationLinkEdit( {
 						/>
 					) }
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Arrow' ) }
 						value={ arrow }
@@ -157,6 +158,8 @@ export default function PostNavigationLinkEdit( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

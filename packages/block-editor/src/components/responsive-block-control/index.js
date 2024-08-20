@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -98,7 +98,7 @@ function ResponsiveBlockControl( props ) {
 					help={ toggleHelpText }
 				/>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-responsive-block-control__group',
 						{
 							'is-responsive': isResponsive,

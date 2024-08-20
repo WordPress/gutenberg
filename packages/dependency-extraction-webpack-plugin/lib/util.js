@@ -42,6 +42,10 @@ function defaultRequestToExternal( request ) {
 
 		case 'react-dom':
 			return 'ReactDOM';
+
+		case 'react/jsx-runtime':
+		case 'react/jsx-dev-runtime':
+			return 'ReactJSXRuntime';
 	}
 
 	if ( request.includes( 'react-refresh/runtime' ) ) {
@@ -113,10 +117,13 @@ function defaultRequestToExternalModule( request ) {
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
 		case '@babel/runtime/regenerator':
-			return 'wp-polyfill';
+			return 'regenerator-runtime';
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react/jsx-runtime':
+			return 'react-jsx-runtime';
 	}
 
 	if ( request.includes( 'react-refresh/runtime' ) ) {

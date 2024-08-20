@@ -13,12 +13,7 @@ import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
-import { useCopyHandler } from './use-copy-handler';
-import { useFormatBoundaries } from './use-format-boundaries';
-import { useSelectObject } from './use-select-object';
-import { useInputAndSelection } from './use-input-and-selection';
-import { useSelectionChangeCompat } from './use-selection-change-compat';
-import { useDelete } from './use-delete';
+import { useEventListeners } from './event-listeners';
 
 export function useRichText( {
 	value = '',
@@ -186,22 +181,15 @@ export function useRichText( {
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { record } ),
-		useCopyHandler( { record } ),
-		useSelectObject(),
-		useFormatBoundaries( { record, applyRecord } ),
-		useDelete( {
-			createRecord,
-			handleChange,
-		} ),
-		useInputAndSelection( {
+		useEventListeners( {
 			record,
+			handleChange,
 			applyRecord,
 			createRecord,
-			handleChange,
 			isSelected,
 			onSelectionChange,
+			forceRender,
 		} ),
-		useSelectionChangeCompat(),
 		useRefEffect( () => {
 			applyFromProps();
 			didMount.current = true;

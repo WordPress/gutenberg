@@ -13,8 +13,19 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 		level
 	);
 
-export const getBlockPropertiesDescription = ( isLocked ) =>
-	isLocked ? __( 'This block is locked.' ) : '';
+export const getBlockPropertiesDescription = ( blockInformation, isLocked ) =>
+	[
+		blockInformation?.positionLabel
+			? `${ sprintf(
+					// translators: %s: Position of selected block, e.g. "Sticky" or "Fixed".
+					__( 'Position: %s' ),
+					blockInformation.positionLabel
+			  ) }.`
+			: undefined,
+		isLocked ? __( 'This block is locked.' ) : undefined,
+	]
+		.filter( Boolean )
+		.join( ' ' );
 
 /**
  * Returns true if the client ID occurs within the block selection or multi-selection,
@@ -74,7 +85,9 @@ export function focusListItem( focusClientId, treeGridElement ) {
 		const row = treeGridElement?.querySelector(
 			`[role=row][data-block="${ focusClientId }"]`
 		);
-		if ( ! row ) return null;
+		if ( ! row ) {
+			return null;
+		}
 		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
 		return focus.focusable.find( row )[ 0 ];
 	};

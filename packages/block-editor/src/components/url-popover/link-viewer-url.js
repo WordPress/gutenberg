@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,7 @@ import { ExternalLink } from '@wordpress/components';
 import { safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 
 export default function LinkViewerURL( { url, urlLabel, className } ) {
-	const linkClassName = classnames(
+	const linkClassName = clsx(
 		className,
 		'block-editor-url-popover__link-viewer-url'
 	);

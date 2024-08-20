@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 4.5.0 (2024-08-07)
+
+## 4.4.0 (2024-07-24)
+
+## 4.3.0 (2024-07-10)
+
+## 4.2.0 (2024-06-26)
+
+## 4.1.0 (2024-06-15)
+
+## 4.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 3.58.0 (2024-05-16)
+
+## 3.57.0 (2024-05-02)
+
+## 3.56.0 (2024-04-19)
+
+## 3.55.0 (2024-04-03)
+
+-   fix return types of `focus.tabbable` methods to be `HTMLElement` instead of `Element`.
+
 ## 3.54.0 (2024-03-21)
 
 ## 3.53.0 (2024-03-06)
@@ -84,7 +110,7 @@
 
 ## 3.14.0 (2022-07-27)
 
-- `getRectangleFromRange` may now return `null`.
+-   `getRectangleFromRange` may now return `null`.
 
 ## 3.13.0 (2022-07-13)
 
@@ -96,9 +122,9 @@
 
 ## 3.9.0 (2022-05-18)
 
-### Deprecation
+### Deprecations
 
-- Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).
+-   Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).
 
 ## 3.8.0 (2022-05-04)
 
@@ -125,7 +151,7 @@
 
 ## 2.18.0 (2021-04-29)
 
-### New Feature
+### New Features
 
 -   Export type definitions.
 
@@ -133,19 +159,19 @@
 
 ## 2.11.0 (2020-06-15)
 
-### New Feature
+### New Features
 
 -   Add `documentHasUncollapsedSelection` to inquire about ranges of selected text in the document, including the separately managed selections inside <input> and <textarea> elements.
 
 ## 2.10.0 (2020-05-28)
 
-### New Feature
+### New Features
 
 -   Add `documentHasTextSelection` to inquire specifically about ranges of selected text, in addition to the existing `documentHasSelection`.
 
 ## 2.1.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update `isHorizontalEdge` to account for empty text nodes.
 -   `tabbables.find` considers at most a single radio input for a given name. The checked input is given priority, falling back to the first in the tabindex-sorted set if there is no checked input.
@@ -164,6 +190,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

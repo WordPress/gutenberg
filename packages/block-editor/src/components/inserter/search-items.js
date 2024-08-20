@@ -30,7 +30,7 @@ const normalizedStrings = new Map();
  *
  * @return {Array} Words, extracted from the input string.
  */
-function extractWords( input = '' ) {
+export function extractWords( input = '' ) {
 	if ( extractedWords.has( input ) ) {
 		return extractedWords.get( input );
 	}
@@ -54,7 +54,7 @@ function extractWords( input = '' ) {
  *
  * @return {string} The normalized search input.
  */
-function normalizeString( input = '' ) {
+export function normalizeString( input = '' ) {
 	if ( normalizedStrings.has( input ) ) {
 		return normalizedStrings.get( input );
 	}

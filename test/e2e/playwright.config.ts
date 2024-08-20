@@ -33,7 +33,7 @@ const config = defineConfig( {
 				 * Headless webkit won't receive dataTransfer with custom types in the
 				 * drop event on Linux. The solution is to use `xvfb-run` to run the tests.
 				 * ```sh
-				 * xvfb-run npm run test:e2e:playwright
+				 * xvfb-run npm run test:e2e
 				 * ```
 				 * See `.github/workflows/end2end-test-playwright.yml` for advanced usages.
 				 */

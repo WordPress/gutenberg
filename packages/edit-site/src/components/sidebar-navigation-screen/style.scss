@@ -33,9 +33,8 @@
 }
 
 .edit-site-sidebar-navigation-screen__meta {
-	margin: 0 0 $grid-unit-20 0;
+	margin: 0 0 $grid-unit-20 $grid-unit-20;
 	color: $gray-400;
-	margin-left: $grid-unit-20;
 	.components-text {
 		color: $gray-400;
 	}
@@ -60,7 +59,7 @@
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $header-height;
+	padding-top: $grid-unit-60;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
@@ -68,8 +67,8 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
-	padding: $grid-unit-15 * 0.5 0 0 0;
 	overflow-wrap: break-word;
+	padding: $grid-unit-05 * 0.5 0 0 0;
 }
 
 .edit-site-sidebar-navigation-screen__actions {
@@ -100,20 +99,22 @@
 }
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variations_item {
+
+	// Use a white outline to provide contrast with the dark background.
 	.edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width $gray-900;
+		outline-color: rgba($white, 0.05);
 	}
 
-	&:focus .edit-site-global-styles-variations_item-preview,
+	&:not(.is-active):hover .edit-site-global-styles-variations_item-preview {
+		outline-color: rgba($white, 0.15);
+	}
+
 	&.is-active .edit-site-global-styles-variations_item-preview {
-		box-shadow: inset 0 0 0 $border-width $gray-900, 0 0 0 var(--wp-admin-border-width-focus) $white;
+		outline-color: $white;
+	}
 
-		// Shown in Windows 10 high contrast mode.
-		outline-width: 3px;
-
-		&::after {
-			box-shadow: inset 0 0 0 1px $gray-900;
-		}
+	&:focus-visible .edit-site-global-styles-variations_item-preview {
+		outline-color: var(--wp-admin-theme-color);
 	}
 }
 
@@ -125,25 +126,6 @@
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
-}
-
-.edit-site-sidebar__notice {
-	background: $gray-800;
-	color: $gray-300;
-	margin: $grid-unit-30 0;
-	&.is-dismissible {
-		padding-right: $grid-unit-10;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
-		color: $gray-400;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		color: $white;
-	}
 }
 
 /* In general style overrides are discouraged.

@@ -4,6 +4,7 @@
 import { Button, Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,9 +13,32 @@ import PostScheduleCheck from './check';
 import PostScheduleForm from './index';
 import { usePostScheduleLabel } from './label';
 import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
 
+const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+];
+
+/**
+ * Renders the Post Schedule Panel component.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSchedulePanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const postType = useSelect(
+		( select ) => select( editorStore ).getCurrentPostType(),
+		[]
+	);
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
 		() => ( {
@@ -22,13 +46,18 @@ export default function PostSchedulePanel() {
 			// move around when the label changes.
 			anchor: popoverAnchor,
 			'aria-label': __( 'Change publish date' ),
-			placement: 'bottom-end',
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
 		} ),
 		[ popoverAnchor ]
 	);
 
 	const label = usePostScheduleLabel();
 	const fullLabel = usePostScheduleLabel( { full: true } );
+	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+		return null;
+	}
 
 	return (
 		<PostScheduleCheck>
@@ -40,9 +69,10 @@ export default function PostSchedulePanel() {
 					contentClassName="editor-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
-							__next40pxDefaultSize
+							size="compact"
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
+							tooltipPosition="middle left"
 							onClick={ onToggle }
 							aria-label={ sprintf(
 								// translators: %s: Current post date.

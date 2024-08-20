@@ -44,8 +44,8 @@ export default function BlockActions( {
 				: null;
 
 			return {
-				canMove: canMoveBlocks( clientIds, rootClientId ),
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canMove: canMoveBlocks( clientIds ),
+				canRemove: canRemoveBlocks( clientIds ),
 				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
 				canCopyStyles: blocks.every( ( block ) => {
 					return (

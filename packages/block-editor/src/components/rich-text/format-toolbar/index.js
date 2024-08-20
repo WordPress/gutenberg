@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,11 +48,11 @@ const FormatToolbar = () => {
 									label={ __( 'More' ) }
 									toggleProps={ {
 										...toggleProps,
-										className: classnames(
+										className: clsx(
 											toggleProps.className,
 											{ 'is-pressed': hasActive }
 										),
-										describedBy: __(
+										description: __(
 											'Displays more block tools'
 										),
 									} }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -43,39 +43,35 @@ const meta: Meta< typeof DropdownMenu > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
-	<div style={ { height: 150 } }>
-		<DropdownMenu { ...props } />
-	</div>
-);
-
-export const Default = Template.bind( {} );
-Default.args = {
-	label: 'Select a direction.',
-	icon: menu,
-	controls: [
-		{
-			title: 'First Menu Item Label',
-			icon: arrowUp,
-			// eslint-disable-next-line no-console
-			onClick: () => console.log( 'up!' ),
-		},
-		{
-			title: 'Second Menu Item Label',
-			icon: arrowDown,
-			// eslint-disable-next-line no-console
-			onClick: () => console.log( 'down!' ),
-		},
-	],
+export const Default: StoryObj< typeof DropdownMenu > = {
+	args: {
+		label: 'Select a direction.',
+		icon: menu,
+		controls: [
+			{
+				title: 'First Menu Item Label',
+				icon: arrowUp,
+				// eslint-disable-next-line no-console
+				onClick: () => console.log( 'up!' ),
+			},
+			{
+				title: 'Second Menu Item Label',
+				icon: arrowDown,
+				// eslint-disable-next-line no-console
+				onClick: () => console.log( 'down!' ),
+			},
+		],
+	},
 };
 
-export const WithChildren = Template.bind( {} );
-// Adding custom source because Storybook is not able to show the contents of
-// the `children` prop correctly in the code snippet.
-WithChildren.parameters = {
-	docs: {
-		source: {
-			code: `<DropdownMenu label="Select a direction." icon={ more }>
+export const WithChildren: StoryObj< typeof DropdownMenu > = {
+	...Default,
+	// Adding custom source because Storybook is not able to show the contents of
+	// the `children` prop correctly in the code snippet.
+	parameters: {
+		docs: {
+			source: {
+				code: `<DropdownMenu label="Select a direction." icon={ more }>
   <MenuGroup>
     <MenuItem icon={ arrowUp } onClick={ onClose }>
       Move Up
@@ -90,29 +86,30 @@ WithChildren.parameters = {
     </MenuItem>
   </MenuGroup>
 </DropdownMenu>`,
-			language: 'jsx',
-			type: 'auto',
+				language: 'jsx',
+				type: 'auto',
+			},
 		},
 	},
-};
-WithChildren.args = {
-	label: 'Select a direction.',
-	icon: more,
-	children: ( { onClose } ) => (
-		<>
-			<MenuGroup>
-				<MenuItem icon={ arrowUp } onClick={ onClose }>
-					Move Up
-				</MenuItem>
-				<MenuItem icon={ arrowDown } onClick={ onClose }>
-					Move Down
-				</MenuItem>
-			</MenuGroup>
-			<MenuGroup>
-				<MenuItem icon={ trash } onClick={ onClose }>
-					Remove
-				</MenuItem>
-			</MenuGroup>
-		</>
-	),
+	args: {
+		label: 'Select a direction.',
+		icon: more,
+		children: ( { onClose } ) => (
+			<>
+				<MenuGroup>
+					<MenuItem icon={ arrowUp } onClick={ onClose }>
+						Move Up
+					</MenuItem>
+					<MenuItem icon={ arrowDown } onClick={ onClose }>
+						Move Down
+					</MenuItem>
+				</MenuGroup>
+				<MenuGroup>
+					<MenuItem icon={ trash } onClick={ onClose }>
+						Remove
+					</MenuItem>
+				</MenuGroup>
+			</>
+		),
+	},
 };

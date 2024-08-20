@@ -6,20 +6,16 @@ import { getPhotoHtml } from './util';
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import {
-	RichText,
-	BlockIcon,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
+import { BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { getAuthority } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -56,33 +52,19 @@ class EmbedPreview extends Component {
 	}
 
 	render() {
-		const {
-			preview,
-			previewable,
-			url,
-			type,
-			caption,
-			onCaptionChange,
-			isSelected,
-			className,
-			icon,
-			label,
-			insertBlocksAfter,
-		} = this.props;
+		const { preview, previewable, url, type, className, icon, label } =
+			this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = new URL( url ).host.split( '.' );
-		const parsedHostBaseUrl = parsedHost
-			.splice( parsedHost.length - 2, parsedHost.length - 1 )
-			.join( '.' );
+		const embedSourceUrl = getAuthority( url );
 		const iframeTitle = sprintf(
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
-			parsedHostBaseUrl
+			embedSourceUrl
 		);
-		const sandboxClassnames = classnames(
+		const sandboxClassnames = clsx(
 			type,
 			className,
 			'wp-block-embed__wrapper'
@@ -116,7 +98,7 @@ class EmbedPreview extends Component {
 
 		return (
 			<figure
-				className={ classnames( className, 'wp-block-embed', {
+				className={ clsx( className, 'wp-block-embed', {
 					'is-type-video': 'video' === type,
 				} ) }
 			>
@@ -136,28 +118,10 @@ class EmbedPreview extends Component {
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),
-								parsedHostBaseUrl
+								embedSourceUrl
 							) }
 						</p>
 					</Placeholder>
-				) }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						identifier="caption"
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ onCaptionChange }
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
 				) }
 			</figure>
 		);

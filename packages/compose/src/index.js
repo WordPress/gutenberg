@@ -4,6 +4,8 @@ export * from './utils/create-higher-order-component';
 export * from './utils/debounce';
 // The `throttle` helper and its types.
 export * from './utils/throttle';
+// The `ObservableMap` data structure
+export * from './utils/observable-map';
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
@@ -46,3 +48,4 @@ export { default as useRefEffect } from './hooks/use-ref-effect';
 export { default as __experimentalUseDropZone } from './hooks/use-drop-zone';
 export { default as useFocusableIframe } from './hooks/use-focusable-iframe';
 export { default as __experimentalUseFixedWindowList } from './hooks/use-fixed-window-list';
+export { default as useObservableValue } from './hooks/use-observable-value';

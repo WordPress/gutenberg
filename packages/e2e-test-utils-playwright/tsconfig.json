@@ -4,7 +4,7 @@
 	"compilerOptions": {
 		"incremental": false,
 		"composite": false,
-		"module": "CommonJS",
+		"module": "Node16",
 		"moduleResolution": "node16",
 		"types": [ "node" ],
 		"rootDir": "src",
@@ -18,10 +18,5 @@
 		"allowJs": true,
 		"checkJs": false
 	},
-	"references": [
-		{ "path": "../api-fetch" },
-		{ "path": "../keycodes" },
-		{ "path": "../url" }
-	],
 	"include": [ "src/**/*" ]
 }

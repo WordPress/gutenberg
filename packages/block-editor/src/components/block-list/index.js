@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,15 +55,15 @@ function Root( { className, ...settings } ) {
 		const {
 			getSettings,
 			__unstableGetEditorMode,
-			__unstableGetTemporarilyEditingAsBlocks,
-		} = select( blockEditorStore );
+			getTemporarilyEditingAsBlocks,
+			isTyping,
+		} = unlock( select( blockEditorStore ) );
 		const { outlineMode, focusMode } = getSettings();
 		return {
-			isOutlineMode: outlineMode,
+			isOutlineMode: outlineMode && ! isTyping(),
 			isFocusMode: focusMode,
 			editorMode: __unstableGetEditorMode(),
-			temporarilyEditingAsBlocks:
-				__unstableGetTemporarilyEditingAsBlocks(),
+			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 		};
 	}, [] );
 	const registry = useRegistry();
@@ -111,7 +111,7 @@ function Root( { className, ...settings } ) {
 				useInBetweenInserter(),
 				useTypingObserver(),
 			] ),
-			className: classnames( 'is-root-container', className, {
+			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
@@ -160,6 +160,9 @@ export default function BlockList( settings ) {
 	);
 }
 
+const EMPTY_ARRAY = [];
+const EMPTY_SET = new Set();
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -175,6 +178,7 @@ function Items( {
 		useSelect(
 			( select ) => {
 				const {
+					getSettings,
 					getBlockOrder,
 					getSelectedBlockClientId,
 					getSelectedBlockClientIds,
@@ -183,20 +187,32 @@ function Items( {
 					getBlockEditingMode,
 					__unstableGetEditorMode,
 				} = select( blockEditorStore );
+
+				const _order = getBlockOrder( rootClientId );
+
+				if ( getSettings().__unstableIsPreviewMode ) {
+					return {
+						order: _order,
+						selectedBlocks: EMPTY_ARRAY,
+						visibleBlocks: EMPTY_SET,
+					};
+				}
+
 				const selectedBlockClientId = getSelectedBlockClientId();
 				return {
-					order: getBlockOrder( rootClientId ),
+					order: _order,
 					selectedBlocks: getSelectedBlockClientIds(),
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:
 						hasAppender &&
+						__unstableGetEditorMode() !== 'zoom-out' &&
 						( hasCustomAppender
 							? ! getTemplateLock( rootClientId ) &&
-							  getBlockEditingMode( rootClientId ) !==
-									'disabled' &&
-							  __unstableGetEditorMode() !== 'zoom-out'
+							  getBlockEditingMode( rootClientId ) !== 'disabled'
 							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId && ! selectedBlockClientId ) ),
+							  ( ! rootClientId &&
+									! selectedBlockClientId &&
+									! _order.length ) ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]

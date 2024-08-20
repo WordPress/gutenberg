@@ -2,13 +2,18 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-
+/**
+ * WordPress dependencies
+ */
+import { seen, unseen } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
@@ -81,4 +86,29 @@ WithEdgeLabel.args = {
 	...Default.args,
 	__unstableInputWidth: '20em',
 	labelPosition: 'edge',
+};
+
+export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+	const [ visible, setVisible ] = useState( false );
+	return (
+		<InputControl
+			type={ visible ? 'text' : 'password' }
+			label="Password"
+			suffix={
+				<InputControlSuffixWrapper>
+					<div style={ { display: 'flex' } }>
+						<Button
+							size="small"
+							icon={ visible ? unseen : seen }
+							onClick={ () => setVisible( ( value ) => ! value ) }
+							label={
+								visible ? 'Hide password' : 'Show password'
+							}
+						/>
+					</div>
+				</InputControlSuffixWrapper>
+			}
+			{ ...args }
+		/>
+	);
 };

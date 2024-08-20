@@ -63,82 +63,91 @@ function MyControlledCustomSelectControl() {
 
 ### Props
 
-#### className
+#### `className`: `string`
 
-A custom class name to append to the outer `<div>`.
+Optional classname for the component.
 
--   Type: `String`
 -   Required: No
 
-#### hideLabelFromVision
+#### `hideLabelFromVision`: `boolean`
 
-Used to visually hide the label. It will always be visible to screen readers.
+Hide the label visually, while keeping available to assistive technology.
 
--   Type: `Boolean`
 -   Required: No
 
-#### label
+#### `describedBy`: `string`
 
-The label for the control.
+Description for the select trigger button used by assistive technology. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
 
--   Type: `String`
+-   Required: No
+
+#### `label`: `string`
+
+Label for the control.
+
 -   Required: Yes
 
-#### describedBy
-
-Pass in a description that will be shown to screen readers associated with the select trigger button. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
-
--   Type: `String`
--   Required: No
-
-#### options
-
-The options that can be chosen from.
-
--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
--   Required: Yes
-
-#### onChange
+#### `onChange`: `( newValue: ChangeObject ) => void`
 
 Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
 
--   Type: `Function`
 -   Required: No
 
-#### value
+#### `options`: `Array< Option >`
+
+The list of options that can be chosen from.
+
+-   Required: Yes
+
+#### `size`: `'default' | 'small' | '\_\_unstable-large'`
+
+The size of the control.
+
+-   Default: `'default'`
+-   Required: No
+
+#### `showSelectedHint`: `boolean`
+
+Show the hint of the selected item in the trigger button.
+
+-   Required: No
+
+#### `value`: `Option`
 
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
 
--   Type: `Object`
 -   Required: No
 
-#### onMouseOver
+#### `onMouseOver`: `MouseEventHandler< HTMLButtonElement >`
 
-A handler for onMouseOver events.
+A handler for `mouseover` events on the trigger button.
 
--   Type: `Function`
 -   Required: No
 
-#### onMouseOut
+#### `onMouseOut`: `MouseEventHandler< HTMLButtonElement >`
 
-A handler for onMouseOut events.
+A handler for `mouseout` events on the trigger button.
 
--   Type: `Function`
 -   Required: No
 
-#### onFocus
+#### `onFocus`: `FocusEventHandler< HTMLButtonElement >`
 
-A handler for onFocus events.
+A handler for `focus` events on the trigger button.
 
--   Type: `Function`
 -   Required: No
 
-#### onBlur
+#### `onBlur`: `FocusEventHandler< HTMLButtonElement >`
 
-A handler for onBlur events.
+A handler for `blur` events on the trigger button.
 
--   Type: `Function`
 -   Required: No
+
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`
 
 ## Related components
 

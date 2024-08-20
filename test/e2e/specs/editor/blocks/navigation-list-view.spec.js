@@ -266,21 +266,21 @@ test.describe( 'Navigation block - List view editing', () => {
 				hasText: 'Block 2 of 2, Level 1.', // proxy for filtering by description.
 			} );
 
-		// The actions menu button is a sibling of the menu item gridcell.
+		// The options menu button is a sibling of the menu item gridcell.
 		const subMenuItemActions = subMenuItem
 			.locator( '..' ) // parent selector.
 			.getByRole( 'button', {
-				name: 'Actions',
+				name: 'Options',
 			} );
 
 		// Open the actions menu.
 		await subMenuItemActions.click();
 
-		// usage of `page` is required because the actions menu is rendered into a slot
+		// usage of `page` is required because the options menu is rendered into a slot
 		// outside of the treegrid.
 		const removeBlockAction = page
 			.getByRole( 'menu', {
-				name: 'Actions',
+				name: 'Options',
 			} )
 			.getByRole( 'menuitem', {
 				name: 'Remove Top Level Item 2',
@@ -401,7 +401,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			description: 'Structure for navigation menu: Test Menu',
 		} );
 
-		// click on actions menu for the first menu item and select remove.
+		// click on options menu for the first menu item and select remove.
 		const firstMenuItem = listView
 			.getByRole( 'gridcell', {
 				name: 'Top Level Item 1',
@@ -410,22 +410,22 @@ test.describe( 'Navigation block - List view editing', () => {
 				hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
 			} );
 
-		// The actions menu button is a sibling of the menu item gridcell.
+		// The options menu button is a sibling of the menu item gridcell.
 		const firstItemActions = firstMenuItem
 			.locator( '..' ) // parent selector.
 			.getByRole( 'button', {
-				name: 'Actions',
+				name: 'Options',
 			} );
 
 		// Open the actions menu.
 		await firstItemActions.click();
 
 		// Add the submenu.
-		// usage of `page` is required because the actions menu is rendered into a slot
+		// usage of `page` is required because the options menu is rendered into a slot
 		// outside of the treegrid.
 		const addSubmenuAction = page
 			.getByRole( 'menu', {
-				name: 'Actions',
+				name: 'Options',
 			} )
 			.getByRole( 'menuitem', {
 				name: 'Add submenu',
@@ -560,13 +560,13 @@ test.describe( 'Navigation block - List view editing', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Create new menu' } )
+			page.getByRole( 'menuitem', { name: 'Create new Menu' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			page.getByText( 'This navigation menu is empty.' )
+			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
 
 		// Move focus to the appender

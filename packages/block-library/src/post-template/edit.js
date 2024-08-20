@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -27,9 +27,9 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-post' },
+		{ className: clsx( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -38,13 +38,14 @@ function PostTemplateInnerBlocks() {
 function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
+	classList,
 	isHidden,
 	setActiveBlockContextId,
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: 'wp-block-post',
+			className: clsx( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -213,12 +214,13 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
+				classList: post.class_list ?? '',
 			} ) ),
 		[ posts ]
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
+		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
 		} ),
@@ -244,13 +246,13 @@ export default function PostTemplateEdit( {
 	const displayLayoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Post template block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {
 					type: 'grid',
@@ -280,11 +282,14 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									classList={ blockContext.classList }
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
+								classList={ blockContext.classList }
 								setActiveBlockContextId={
 									setActiveBlockContextId
 								}

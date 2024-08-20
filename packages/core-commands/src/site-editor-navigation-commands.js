@@ -10,22 +10,23 @@ import {
 	post,
 	page,
 	layout,
+	symbol,
 	symbolFilled,
 	styles,
 	navigation,
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
+import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
 	post,
@@ -49,7 +50,19 @@ function useDebouncedValue( value ) {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
+			( select ) => {
+				return {
+					isBlockBasedTheme:
+						select( coreStore ).getCurrentTheme()?.is_block_theme,
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_template',
+					} ),
+				};
+			},
+			[]
+		);
 		const delayedSearch = useDebouncedValue( search );
 		const { records, isLoading } = useSelect(
 			( select ) => {
@@ -92,12 +105,13 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
-						? record.title?.rendered
+						? decodeEntities( record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ postType ],
 				};
 
 				if (
+					! canCreateTemplate ||
 					postType === 'post' ||
 					( postType === 'page' && ! isBlockBasedTheme )
 				) {
@@ -118,14 +132,6 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
-				const extraArgs = isSiteEditor
-					? {
-							canvas: getQueryArg(
-								window.location.href,
-								'canvas'
-							),
-					  }
-					: {};
 
 				return {
 					...command,
@@ -133,7 +139,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						const args = {
 							postType,
 							postId: record.id,
-							...extraArgs,
+							canvas: 'edit',
 						};
 						const targetUrl = addQueryArgs(
 							'site-editor.php',
@@ -148,7 +154,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, isBlockBasedTheme, history ] );
+		}, [ canCreateTemplate, records, isBlockBasedTheme, history ] );
 
 		return {
 			commands,
@@ -159,15 +165,19 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const location = useLocation();
-
-		const isPatternsPage =
-			location?.params?.path === '/patterns' ||
-			location?.params?.postType === 'wp_block';
-		const didAccessPatternsPage =
-			!! location?.params?.didAccessPatternsPage;
-
-		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
+			( select ) => {
+				return {
+					isBlockBasedTheme:
+						select( coreStore ).getCurrentTheme()?.is_block_theme,
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: templateType,
+					} ),
+				};
+			},
+			[]
+		);
 		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const query = { per_page: -1 };
@@ -191,36 +201,57 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 
 		const commands = useMemo( () => {
 			if (
-				! isBlockBasedTheme &&
-				! templateType === 'wp_template_part'
+				! canCreateTemplate ||
+				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
 			) {
 				return [];
 			}
-			return orderedRecords.map( ( record ) => {
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
-				const extraArgs = isSiteEditor
-					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
-					: {};
+			const isSiteEditor = getPath( window.location.href )?.includes(
+				'site-editor.php'
+			);
+			const result = [];
+			result.push(
+				...orderedRecords.map( ( record ) => {
+					return {
+						name: templateType + '-' + record.id,
+						searchLabel: record.title?.rendered + ' ' + record.id,
+						label: record.title?.rendered
+							? record.title?.rendered
+							: __( '(no title)' ),
+						icon: icons[ templateType ],
+						callback: ( { close } ) => {
+							const args = {
+								postType: templateType,
+								postId: record.id,
+								canvas: 'edit',
+							};
+							const targetUrl = addQueryArgs(
+								'site-editor.php',
+								args
+							);
+							if ( isSiteEditor ) {
+								history.push( args );
+							} else {
+								document.location = targetUrl;
+							}
+							close();
+						},
+					};
+				} )
+			);
 
-				return {
-					name: templateType + '-' + record.id,
-					searchLabel: record.title?.rendered + ' ' + record.id,
-					label: record.title?.rendered
-						? record.title?.rendered
-						: __( '(no title)' ),
-					icon: icons[ templateType ],
+			if (
+				orderedRecords?.length > 0 &&
+				templateType === 'wp_template_part'
+			) {
+				result.push( {
+					name: 'core/edit-site/open-template-parts',
+					label: __( 'Template parts' ),
+					icon: symbolFilled,
 					callback: ( { close } ) => {
 						const args = {
-							postType: templateType,
-							postId: record.id,
-							didAccessPatternsPage:
-								! isBlockBasedTheme &&
-								( isPatternsPage || didAccessPatternsPage )
-									? 1
-									: undefined,
-							...extraArgs,
+							postType: 'wp_template_part',
+							categoryId: 'all-parts',
 						};
 						const targetUrl = addQueryArgs(
 							'site-editor.php',
@@ -233,9 +264,10 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 						}
 						close();
 					},
-				};
-			} );
-		}, [ isBlockBasedTheme, orderedRecords, history ] );
+				} );
+			}
+			return result;
+		}, [ canCreateTemplate, isBlockBasedTheme, orderedRecords, history ] );
 
 		return {
 			commands,
@@ -257,89 +289,118 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
-	const isTemplatesAccessible = useIsTemplatesAccessible();
-	const isBlockBasedTheme = useIsBlockBasedTheme();
+	const { isBlockBasedTheme, canCreateTemplate } = useSelect( ( select ) => {
+		return {
+			isBlockBasedTheme:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
+			canCreateTemplate: select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+		};
+	}, [] );
 	const commands = useMemo( () => {
 		const result = [];
 
-		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
-			return result;
+		if ( canCreateTemplate && isBlockBasedTheme ) {
+			result.push( {
+				name: 'core/edit-site/open-navigation',
+				label: __( 'Navigation' ),
+				icon: navigation,
+				callback: ( { close } ) => {
+					const args = {
+						postType: 'wp_navigation',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-styles',
+				label: __( 'Styles' ),
+				icon: styles,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/wp_global_styles',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-pages',
+				label: __( 'Pages' ),
+				icon: page,
+				callback: ( { close } ) => {
+					const args = {
+						postType: 'page',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-templates',
+				label: __( 'Templates' ),
+				icon: layout,
+				callback: ( { close } ) => {
+					const args = {
+						postType: 'wp_template',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
 		}
 
 		result.push( {
-			name: 'core/edit-site/open-navigation',
-			label: __( 'Navigation' ),
-			icon: navigation,
+			name: 'core/edit-site/open-patterns',
+			label: __( 'Patterns' ),
+			icon: symbol,
 			callback: ( { close } ) => {
-				const args = {
-					path: '/navigation',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
+				if ( canCreateTemplate ) {
+					const args = {
+						postType: 'wp_block',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
 				} else {
-					document.location = targetUrl;
+					// If a user cannot access the site editor
+					document.location.href = 'edit.php?post_type=wp_block';
 				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-styles',
-			label: __( 'Styles' ),
-			icon: styles,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/wp_global_styles',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-pages',
-			label: __( 'Pages' ),
-			icon: page,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/page',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-templates',
-			label: __( 'Templates' ),
-			icon: layout,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/wp_template',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
 			},
 		} );
 
 		return result;
-	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
+	}, [ history, isSiteEditor, canCreateTemplate, isBlockBasedTheme ] );
 
 	return {
 		commands,

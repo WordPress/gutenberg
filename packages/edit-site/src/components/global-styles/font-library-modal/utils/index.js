@@ -15,6 +15,7 @@ import { formatFontFaceName } from './preview-styles';
  * Browser dependencies
  */
 const { File } = window;
+const { kebabCase } = unlock( componentsPrivateApis );
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -184,7 +185,6 @@ export function getDisplaySrcFromFontFace( input ) {
 
 export function makeFontFamilyFormData( fontFamily ) {
 	const formData = new FormData();
-	const { kebabCase } = unlock( componentsPrivateApis );
 
 	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
 	const fontFamilySettings = {
@@ -234,10 +234,23 @@ export function makeFontFacesFormData( font ) {
 }
 
 export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
-	const promises = fontFacesData.map( ( faceData ) =>
-		fetchInstallFontFace( fontFamilyId, faceData )
-	);
-	const responses = await Promise.allSettled( promises );
+	const responses = [];
+
+	/*
+	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work
+	 * around a race condition that can cause an error when the fonts directory doesn't exist yet.
+	 */
+	for ( const faceData of fontFacesData ) {
+		try {
+			const response = await fetchInstallFontFace(
+				fontFamilyId,
+				faceData
+			);
+			responses.push( { status: 'fulfilled', value: response } );
+		} catch ( error ) {
+			responses.push( { status: 'rejected', reason: error } );
+		}
+	}
 
 	const results = {
 		errors: [],

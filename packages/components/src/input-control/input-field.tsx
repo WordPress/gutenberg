@@ -35,18 +35,15 @@ function InputField(
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isFocused,
 		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
 		onDrag = noop,
 		onDragEnd = noop,
 		onDragStart = noop,
-		onFocus = noop,
 		onKeyDown = noop,
 		onValidate = noop,
 		size = 'default',
-		setIsFocused,
 		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
@@ -85,7 +82,6 @@ function InputField(
 
 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
-		setIsFocused?.( false );
 
 		/**
 		 * If isPressEnterToChange is set, this commits the value to
@@ -95,11 +91,6 @@ function InputField(
 			wasDirtyOnBlur.current = true;
 			handleOnCommit( event );
 		}
-	};
-
-	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
-		onFocus( event );
-		setIsFocused?.( true );
 	};
 
 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
@@ -164,7 +155,9 @@ function InputField(
 				target,
 			};
 
-			if ( ! distance ) return;
+			if ( ! distance ) {
+				return;
+			}
 			event.stopPropagation();
 
 			/**
@@ -222,7 +215,6 @@ function InputField(
 			id={ id }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
-			onFocus={ handleOnFocus }
 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
 			onMouseDown={ handleOnMouseDown }
 			ref={ ref }

@@ -70,7 +70,7 @@ async function getDecFile( packagePath ) {
 async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
 		exec(
-			`npx tsc --target esnext --moduleResolution node --noEmit ${ file }`,
+			`npx tsc --target esnext --moduleResolution node --noEmit --skipLibCheck "${ file }"`,
 			( error, stdout, stderr ) => {
 				if ( error ) {
 					reject( { file, error, stderr, stdout } );

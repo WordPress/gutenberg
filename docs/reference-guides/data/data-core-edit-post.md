@@ -306,6 +306,8 @@ _Returns_
 
 ### isPublishSidebarOpened
 
+> **Deprecated**
+
 Returns true if the publish sidebar is opened.
 
 _Parameters_
@@ -349,6 +351,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### closePublishSidebar
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user closed the publish sidebar.
 
@@ -407,6 +411,8 @@ _Returns_
 -   `Object`: Action object.
 
 ### openPublishSidebar
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user opened the publish sidebar.
 
@@ -531,6 +537,8 @@ _Parameters_
 -   _pluginName_ `string`: Plugin name.
 
 ### togglePublishSidebar
+
+> **Deprecated**
 
 Returns an action object used in signalling that the user toggles the publish sidebar.
 

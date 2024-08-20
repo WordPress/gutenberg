@@ -10,6 +10,11 @@ import { __, _x } from '@wordpress/i18n';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the sync status of a post.
+ *
+ * @return {JSX.Element|null} The rendered sync status component.
+ */
 export default function PostSyncStatus() {
 	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
@@ -35,14 +40,8 @@ export default function PostSyncStatus() {
 		<PostPanelRow label={ __( 'Sync status' ) }>
 			<div className="editor-post-sync-status__value">
 				{ syncStatus === 'unsynced'
-					? _x(
-							'Not synced',
-							'Text that indicates that the pattern is not synchronized'
-					  )
-					: _x(
-							'Synced',
-							'Text that indicates that the pattern is synchronized'
-					  ) }
+					? _x( 'Not synced', 'pattern (singular)' )
+					: _x( 'Synced', 'pattern (singular)' ) }
 			</div>
 		</PostPanelRow>
 	);

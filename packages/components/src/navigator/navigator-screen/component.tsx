@@ -106,7 +106,7 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location?.focusTargetSelector ) {
+		if ( location.isBack && location.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
 				location.focusTargetSelector
 			);
@@ -115,9 +115,7 @@ function UnconnectedNavigatorScreen(
 		// If the previous query didn't run or find any element to focus, fallback
 		// to the first tabbable element in the screen (or the screen itself).
 		if ( ! elementToFocus ) {
-			const firstTabbable = (
-				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
-			 )[ 0 ];
+			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 

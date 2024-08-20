@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,6 +21,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 
 /**
@@ -40,13 +41,14 @@ export default function PostSavedState( { forceIsDirty } ) {
 		isAutosaving,
 		isDirty,
 		isNew,
-		isPending,
 		isPublished,
 		isSaveable,
 		isSaving,
 		isScheduled,
 		hasPublishAction,
 		showIconLabels,
+		postStatus,
+		postStatusHasChanged,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -59,14 +61,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
+				getPostEdits,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
-
 			return {
 				isAutosaving: isAutosavingPost(),
 				isDirty: forceIsDirty || isEditedPostDirty(),
 				isNew: isEditedPostNew(),
-				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
 				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
@@ -74,11 +75,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 				showIconLabels: get( 'core', 'showIconLabels' ),
+				postStatus: getEditedPostAttribute( 'status' ),
+				postStatusHasChanged: !! getPostEdits()?.status,
 			};
 		},
 		[ forceIsDirty ]
 	);
-
+	const isPending = postStatus === 'pending';
 	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
@@ -102,7 +105,22 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return null;
 	}
 
-	if ( isPublished || isScheduled ) {
+	// We shouldn't render the button if the post has not one of the following statuses: pending, draft, auto-draft.
+	// The reason for this is that this button handles the `save as pending` and `save draft` actions.
+	// An exception for this is when the post has a custom status and there should be a way to save changes without
+	// having to publish. This should be handled better in the future when custom statuses have better support.
+	// @see https://github.com/WordPress/gutenberg/issues/3144.
+	const isIneligibleStatus =
+		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) &&
+		STATUS_OPTIONS.map( ( { value } ) => value ).includes( postStatus );
+
+	if (
+		isPublished ||
+		isScheduled ||
+		isIneligibleStatus ||
+		( postStatusHasChanged &&
+			[ 'pending', 'draft' ].includes( postStatus ) )
+	) {
 		return null;
 	}
 
@@ -115,7 +133,6 @@ export default function PostSavedState( { forceIsDirty } ) {
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;
 	const isDisabled = isSaving || isSaved || ! isSaveable;
-
 	let text;
 
 	if ( isSaving ) {
@@ -134,7 +151,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		<Button
 			className={
 				isSaveable || isSaving
-					? classnames( {
+					? clsx( {
 							'editor-post-save-draft': ! isSavedState,
 							'editor-post-saved-state': isSavedState,
 							'is-saving': isSaving,

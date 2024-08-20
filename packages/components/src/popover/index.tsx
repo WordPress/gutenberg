@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -13,10 +13,8 @@ import {
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
-// eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
-// eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -33,6 +31,7 @@ import {
 	createPortal,
 } from '@wordpress/element';
 import {
+	useReducedMotion,
 	useViewportMatch,
 	useMergeRefs,
 	__experimentalUseDialog as useDialog,
@@ -77,7 +76,7 @@ export const SLOT_NAME = 'Popover';
 const ArrowTriangle = () => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox={ `0 0 100 100` }
+		viewBox="0 0 100 100"
 		className="components-popover__triangle"
 		role="presentation"
 	>
@@ -114,8 +113,9 @@ const UnforwardedPopover = (
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
+		// props (except for `animate` and `children` which are re-defined in
+		// `PopoverProps`, and `style` which is merged safely).
+		keyof Omit< MotionProps, 'animate' | 'children' | 'style' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -140,6 +140,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
+		style: contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -225,8 +226,9 @@ const UnforwardedPopover = (
 					const { firstElementChild } = refs.floating.current ?? {};
 
 					// Only HTMLElement instances have the `style` property.
-					if ( ! ( firstElementChild instanceof HTMLElement ) )
+					if ( ! ( firstElementChild instanceof HTMLElement ) ) {
 						return;
+					}
 
 					// Reduce the height of the popover to the available space.
 					Object.assign( firstElementChild.style, {
@@ -370,6 +372,7 @@ const UnforwardedPopover = (
 	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
 		? {
 				style: {
+					...contentStyle,
 					...motionInlineStyles,
 					...style,
 				},
@@ -378,7 +381,10 @@ const UnforwardedPopover = (
 		  }
 		: {
 				animate: false,
-				style,
+				style: {
+					...contentStyle,
+					...style,
+				},
 		  };
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating
@@ -388,7 +394,7 @@ const UnforwardedPopover = (
 
 	let content = (
 		<motion.div
-			className={ classnames( className, {
+			className={ clsx( className, {
 				'is-expanded': isExpanded,
 				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.

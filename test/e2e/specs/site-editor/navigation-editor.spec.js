@@ -45,7 +45,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			const listView = page
 				.getByRole( 'region', {
-					name: 'List View',
+					name: 'Document Overview',
 				} )
 				.getByRole( 'treegrid', {
 					name: 'Block navigation structure',
@@ -62,18 +62,16 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( navBlockNode ).toBeVisible();
 
 			// The Navigation block description should contain the locked state information.
-			const navBlockNodeDescriptionId =
-				await navBlockNode.getAttribute( 'aria-describedby' );
-			await expect(
-				listView.locator( `id=${ navBlockNodeDescriptionId }` )
-			).toHaveText( /This block is locked./ );
+			await expect( navBlockNode ).toHaveAccessibleDescription(
+				/This block is locked./
+			);
 
-			// The block should have no actions menu.
+			// The block should have no options menu.
 			await expect(
 				navBlockNode
 					.locator( '..' ) // parent selector.
 					.getByRole( 'button', {
-						name: 'Actions',
+						name: 'Options',
 					} )
 			).toBeHidden();
 
@@ -99,7 +97,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			// Check the standard tabs are not present.
 			await expect(
-				sidebar.getByRole( 'tab', { name: 'List View' } )
+				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )

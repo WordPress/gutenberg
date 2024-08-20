@@ -14,8 +14,6 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 	$settings_label_map = array(
 		'blogname'               => __( 'Title' ),
 		'blogdescription'        => __( 'Tagline' ),
-		'site_logo'              => __( 'Logo' ),
-		'site_icon'              => __( 'Icon' ),
 		'show_on_front'          => __( 'Show on front' ),
 		'page_on_front'          => __( 'Page on front' ),
 		'posts_per_page'         => __( 'Maximum posts per page' ),
@@ -24,6 +22,11 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 
 	if ( isset( $settings_label_map[ $option_name ] ) ) {
 		$args['label'] = $settings_label_map[ $option_name ];
+	}
+
+	// Don't update schema when a setting isn't exposed via REST API.
+	if ( ! isset( $args['show_in_rest'] ) ) {
+		return $args;
 	}
 
 	// Don't update schema when label isn't provided.

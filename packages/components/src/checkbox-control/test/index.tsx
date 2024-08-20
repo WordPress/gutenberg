@@ -20,13 +20,20 @@ const noop = () => {};
 const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
 
 const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
-	return <BaseCheckboxControl onChange={ noop } { ...props } />;
+	return (
+		<BaseCheckboxControl
+			onChange={ noop }
+			{ ...props }
+			__nextHasNoMarginBottom
+		/>
+	);
 };
 
 const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
 	const [ isChecked, setChecked ] = useState( false );
 	return (
 		<BaseCheckboxControl
+			__nextHasNoMarginBottom
 			checked={ isChecked }
 			onChange={ ( value ) => {
 				setChecked( value );
@@ -85,6 +92,11 @@ describe( 'CheckboxControl', () => {
 			expect( containerDefault ).toMatchDiffSnapshot(
 				containerIndeterminate
 			);
+		} );
+
+		it( 'should associate the `help` text accessibly', () => {
+			render( <CheckboxControl help="Help text" /> );
+			expect( getInput() ).toHaveAccessibleDescription( 'Help text' );
 		} );
 	} );
 

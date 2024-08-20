@@ -73,7 +73,7 @@ declare module './base-entity-records' {
 	}
 }
 
-export type PluginStatus = 'active' | 'inactive';
+export type PluginStatus = 'active' | 'inactive' | 'network-active';
 export type Plugin< C extends Context = 'edit' > = OmitNevers<
 	_BaseEntityRecords.Plugin< C >
 >;
