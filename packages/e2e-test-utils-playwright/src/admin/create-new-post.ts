@@ -24,7 +24,7 @@ export async function createNewPost(
 	options: NewPostOptions = {}
 ) {
 	const query = new URLSearchParams();
-	const { postType, title, content, excerpt, renderingMode } = options;
+	const { postType, title, content, excerpt } = options;
 
 	if ( postType ) {
 		query.set( 'post_type', postType );
@@ -43,8 +43,7 @@ export async function createNewPost(
 	await this.visitAdminPage( 'post-new.php', query.toString() );
 
 	// Set rendering mode.
-	const postRenderingMode = renderingMode ?? 'post-only';
-	await this.editor.setRenderingMode( postRenderingMode );
+	await this.editor.setRenderingMode( 'post-only' );
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,

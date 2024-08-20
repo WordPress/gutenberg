@@ -63,10 +63,8 @@ test.describe( 'Site Editor Performance', () => {
 		let draftId = null;
 
 		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
-			await admin.createNewPost( {
-				postType: 'page',
-				renderingMode: 'template-lock',
-			} );
+			await admin.createNewPost( { postType: 'page' } );
+			await perfUtils.setRenderingMode( 'template-lock' );
 			await perfUtils.loadBlocksForLargePost();
 
 			draftId = await perfUtils.saveDraft();

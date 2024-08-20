@@ -66,6 +66,31 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Set the rendering mode of the post.
+	 *
+	 * @param renderingMode The rendering mode to set.
+	 */
+	async setRenderingMode( renderingMode: string = 'post-only' ) {
+		await this.page.waitForFunction( () => window?.wp?.data );
+
+		await this.page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		}, false );
+		await this.page.getByLabel( 'Template options' ).click();
+
+		let postRenderingModeLabel = 'Edit template';
+		if ( renderingMode !== 'post-only' ) {
+			postRenderingModeLabel = 'Show template';
+		}
+
+		await this.page
+			.getByRole( 'menuitemcheckbox', { name: postRenderingModeLabel } )
+			.click();
+	}
+
+	/**
 	 * Disables the editor autosave function.
 	 */
 	async disableAutosave() {
