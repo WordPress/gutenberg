@@ -41,7 +41,7 @@ const deprecatedStyles = ( { __next40pxDefaultSize = false } ) => {
 
 	return css`
 		// Vertical padding is to match the standard 40px control height when rows=1.
-		padding: 11.5px 12px;
+		padding: 9px 12px;
 	`;
 };
 
@@ -49,18 +49,15 @@ export const StyledTextarea = styled.textarea`
 	width: 100%;
 	display: block;
 	font-family: ${ font( 'default.fontFamily' ) };
+	line-height: 20px;
 	${ deprecatedStyles }
 	${ inputStyleNeutral };
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
 	font-size: ${ font( 'mobileTextMinFontSize' ) };
-	/* Override core line-height. To be reviewed. */
-	line-height: normal;
 
 	${ breakpoint( 'small' ) } {
 		font-size: ${ font( 'default.fontSize' ) };
-		/* Override core line-height. To be reviewed. */
-		line-height: normal;
 	}
 
 	&:focus {
