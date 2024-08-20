@@ -131,7 +131,6 @@ Each field is an object with the following properties:
 -   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
--   `enableMoving`: whether the field can be moved in the table layout. True by default.
 -   `enableGlobalSearch`: whether the field is searchable. False by default.
 -   `filterBy`: configuration for the filters enabled by the `elements` property.
     -   `operators`: the list of [operators](#operators) supported by the field.
