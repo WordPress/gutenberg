@@ -10,11 +10,6 @@
  *
  * @covers WP_REST_Block_Editor_Settings_Controller
  */
-
-if ( ! defined( 'REST_REQUEST' ) ) {
-	define( 'REST_REQUEST', true );
-}
-
 class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
@@ -53,7 +48,16 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		);
 	}
 
+	/**
+	 * @preserveGlobalState disabled
+	 * @runInSeparateProcess
+	 */
 	public function test_get_items() {
+		// See https://github.com/WordPress/gutenberg/pull/64743.
+		if ( ! defined( 'REST_REQUEST' ) ) {
+			define( 'REST_REQUEST', true );
+		}
+
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
 		// Set context for mobile settings.
