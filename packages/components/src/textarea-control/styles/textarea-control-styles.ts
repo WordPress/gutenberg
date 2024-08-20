@@ -38,8 +38,9 @@ export const StyledTextarea = styled.textarea`
 	font-family: ${ font( 'default.fontFamily' ) };
 	line-height: 20px;
 
-	// Vertical padding is to match the standard 40px control height when rows=1.
-	// Subtracts 1px each to account for the border width.
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
 	padding: 9px 11px;
 
 	${ inputStyleNeutral };
