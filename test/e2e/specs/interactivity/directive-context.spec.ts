@@ -379,5 +379,15 @@ test.describe( 'data-wp-context', () => {
 		expect( childContextAfter.obj2.prop5 ).toBe( 'child' );
 		expect( childContextAfter.obj2.prop6 ).toBe( 'child' );
 		expect( childContextAfter.obj2.overwritten ).toBeUndefined();
+
+		await page.getByTestId( 'child replace' ).click();
+		const childContextAfter2 = await parseContent(
+			page.getByTestId( 'child context' )
+		);
+
+		expect( childContextAfter2.obj2.prop4 ).toBeUndefined();
+		expect( childContextAfter2.obj2.prop5 ).toBeUndefined();
+		expect( childContextAfter2.obj2.prop6 ).toBeUndefined();
+		expect( childContextAfter2.obj2.overwritten ).toBe( true );
 	} );
 } );
