@@ -91,9 +91,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		!! field.elements?.length &&
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
-	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
-		return field.label;
-	}
+
 	return (
 		<DropdownMenu
 			align="start"
