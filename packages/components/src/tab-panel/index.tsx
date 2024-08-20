@@ -220,7 +220,6 @@ const UnforwardedTabPanel = (
 									showTooltip={ !! tab.icon }
 								/>
 							}
-							accessibleWhenDisabled
 						>
 							{ ! tab.icon && tab.title }
 						</Ariakit.Tab>
