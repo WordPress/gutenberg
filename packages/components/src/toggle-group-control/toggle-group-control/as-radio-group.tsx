@@ -3,6 +3,7 @@
  */
 import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -66,7 +67,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		setValue: wrappedOnChangeProp,
 	} );
 
-	const selectedValue = radio.useState( 'value' );
+	const selectedValue = useStoreState( radio, 'value' );
 	const setValue = radio.setValue;
 
 	const groupContextValue = useMemo(
