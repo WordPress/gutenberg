@@ -115,13 +115,28 @@ registerBlockType( /* ... */, {
 
 ## RichText.isEmpty
 
-Helper function to test if supplied variable (e.g. content of RichText) is empty. It tests if value of variable is empty or if variable is an empty array.
-
-### `value: String | Array`
+Helper function to test if supplied variable (e.g. content of RichText) is empty. Returns boolean, true if variable is empty.
 
 ### Example
 
-Some [attributes in paragraph block](https://github.com/WordPress/gutenberg/blob/59ed45e2d9db32e50b17b5801f0841f6d7489b0c/packages/block-library/src/paragraph/edit.js#L174) are set differrently if content of `RichText` is empty.
+```js
+// ...
+// set aria-label attribute differently if content of RichText is empty
+<RichText
+	value={ content }
+	onChange={ ( newContent ) =>
+		setAttributes( { content: newContent } )
+	}
+	aria-label={
+		RichText.isEmpty( content )
+			? __(
+				'Empty block; start writing or type forward slash to choose a block'
+			  )
+			: __( 'Block: Paragraph' )
+	}
+/>
+// ...
+```
 
 ## RichTextToolbarButton
 
