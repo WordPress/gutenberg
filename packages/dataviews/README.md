@@ -120,7 +120,7 @@ Each field is an object with the following properties:
 -   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
--   <code id="fields-elements">elements</code>: The list of options to pick from when using the field as a filter. It expects an array of objects with the following properties:
+-   <code id="fields-elements">elements</code>: The list of options to pick from when using the field as a filter or when editing (DataForm component). It expects an array of objects with the following properties:
 
     -   `value`: The id of the value to filter to (for internal use)
     -   `label`: The text that will be displayed in the UI for the item.
