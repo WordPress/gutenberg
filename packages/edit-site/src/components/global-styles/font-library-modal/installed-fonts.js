@@ -130,9 +130,11 @@ function InstalledFonts() {
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
-				message:
-					__( 'There was an error updating the font family. ' ) +
-					error.message,
+				message: sprintf(
+					/* translators: %s: error message */
+					__( 'There was an error updating the font family. %s' ),
+					error.message
+				),
 			} );
 		}
 	};
