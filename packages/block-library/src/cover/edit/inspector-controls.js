@@ -3,11 +3,9 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	Button,
 	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
-	PanelRow,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
@@ -93,7 +91,6 @@ export default function CoverInspectorControls( {
 	coverRef,
 	currentSettings,
 	updateDimRatio,
-	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -228,16 +225,6 @@ export default function CoverInspectorControls( {
 								}
 							/>
 						) }
-						<PanelRow>
-							<Button
-								variant="secondary"
-								size="small"
-								className="block-library-cover__reset-button"
-								onClick={ onClearMedia }
-							>
-								{ __( 'Clear Media' ) }
-							</Button>
-						</PanelRow>
 					</PanelBody>
 				) }
 			</InspectorControls>
