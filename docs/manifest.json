@@ -1554,6 +1554,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/create-block-interactive-typescript-template",
+		"slug": "packages-create-block-interactive-typescript-template",
+		"markdown_source": "../packages/create-block-interactive-typescript-template/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/create-block-tutorial-template",
 		"slug": "packages-create-block-tutorial-template",
 		"markdown_source": "../packages/create-block-tutorial-template/README.md",
