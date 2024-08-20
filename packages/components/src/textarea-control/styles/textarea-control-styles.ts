@@ -41,7 +41,8 @@ const deprecatedStyles = ( { __next40pxDefaultSize = false } ) => {
 
 	return css`
 		// Vertical padding is to match the standard 40px control height when rows=1.
-		padding: 9px 12px;
+		// Subtracts 1px each to account for the border width.
+		padding: 9px 11px;
 	`;
 };
 
