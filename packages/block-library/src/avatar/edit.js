@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -58,6 +58,7 @@ const AvatarInspectorControls = ( {
 			/>
 			{ attributes.isLink && (
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					onChange={ ( value ) =>
 						setAttributes( {
@@ -124,7 +125,7 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					className={ classnames(
+					className={ clsx(
 						'avatar',
 						'avatar-' + attributes.size,
 						'photo',

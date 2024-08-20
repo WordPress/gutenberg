@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,6 +19,21 @@ const {
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
+/**
+ * Checks if there is a current value in the background image block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background image value set.
+ */
+export function hasBackgroundImageValue( style ) {
+	return (
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url ||
+		typeof style?.background?.backgroundImage === 'string'
+	);
+}
+
 export default function BackgroundPanel() {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
@@ -29,22 +43,13 @@ export default function BackgroundPanel() {
 	} );
 	const [ settings ] = useGlobalSetting( '' );
 
-	const defaultControls = {
-		backgroundImage: true,
-		backgroundSize:
-			!! style?.background?.backgroundImage &&
-			!! inheritedStyle?.background?.backgroundImage,
-	};
-
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
-			headerLabel={ __( 'Image' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			defaultControls={ defaultControls }
 		/>
 	);
 }

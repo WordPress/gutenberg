@@ -14,11 +14,12 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
+import { Caption } from '../utils/caption';
 
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -249,7 +250,7 @@ const EmbedEdit = ( props ) => {
 		allowResponsive,
 		className: classFromPreview,
 	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const className = clsx( classFromPreview, props.className );
 
 	return (
 		<>
@@ -276,6 +277,14 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+				/>
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Embed caption text' ) }
+					showToolbarButton={ isSelected }
 				/>
 			</View>
 		</>

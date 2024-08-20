@@ -20,6 +20,7 @@ import {
 	useState,
 	useRef,
 	useEffect,
+	forwardRef,
 } from '@wordpress/element';
 import {
 	store as coreStore,
@@ -145,16 +146,19 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 	);
 }
 
-export function LinkUI( props ) {
+function UnforwardedLinkUI( props, ref ) {
+	const { label, url, opensInNewTab, type, kind } = props.link;
+	const postType = type || 'page';
+
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
+	const permissions = useResourcePermissions( {
+		kind: 'postType',
+		name: postType,
+	} );
 
 	async function handleCreate( pageTitle ) {
-		const postType = props.link.type || 'page';
-
 		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
 			status: 'draft',
@@ -177,15 +181,6 @@ export function LinkUI( props ) {
 			url: page.link,
 			kind: 'post-type',
 		};
-	}
-
-	const { label, url, opensInNewTab, type, kind } = props.link;
-
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
 	}
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
@@ -214,6 +209,7 @@ export function LinkUI( props ) {
 
 	return (
 		<Popover
+			ref={ ref }
 			placement="bottom"
 			onClose={ props.onClose }
 			anchor={ props.anchor }
@@ -239,7 +235,7 @@ export function LinkUI( props ) {
 						hasRichPreviews
 						value={ link }
 						showInitialSuggestions
-						withCreateSuggestion={ userCanCreate }
+						withCreateSuggestion={ permissions.canCreate }
 						createSuggestion={ handleCreate }
 						createSuggestionButtonText={ ( searchTerm ) => {
 							let format;
@@ -297,6 +293,8 @@ export function LinkUI( props ) {
 		</Popover>
 	);
 }
+
+export const LinkUI = forwardRef( UnforwardedLinkUI );
 
 const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 	const blockInserterAriaRole = 'listbox';

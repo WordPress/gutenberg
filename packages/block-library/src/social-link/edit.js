@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -42,18 +42,22 @@ const SocialLinkURLPopover = ( {
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
-			onClose={ () => setPopover( false ) }
+			aria-label={ __( 'Edit social link' ) }
+			onClose={ () => {
+				setPopover( false );
+				popoverAnchor?.focus();
+			} }
 		>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					setPopover( false );
+					popoverAnchor?.focus();
 				} }
 			>
 				<div className="block-editor-url-input">
 					<URLInput
-						__nextHasNoMarginBottom
 						value={ url }
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
@@ -102,7 +106,7 @@ const SocialLinkEdit = ( {
 		iconBackgroundColorValue,
 	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
+	const classes = clsx( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 		[ `has-${ iconColor }-color` ]: iconColor,
 		[ `has-${ iconBackgroundColor }-background-color` ]:
@@ -135,10 +139,11 @@ const SocialLinkEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Link text' ) }
+							label={ __( 'Text' ) }
 							help={ __(
-								'The link text is visible when enabled from the parent Social Icons block.'
+								'The text is visible when enabled from the parent Social Icons block.'
 							) }
 							value={ label }
 							onChange={ ( value ) =>
@@ -151,6 +156,7 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }
@@ -162,10 +168,11 @@ const SocialLinkEdit = ( {
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
+					aria-haspopup="dialog"
 				>
 					<IconComponent />
 					<span
-						className={ classNames( 'wp-block-social-link-label', {
+						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,
 						} ) }
 					>

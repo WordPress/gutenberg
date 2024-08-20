@@ -5,14 +5,10 @@ import { fireEvent, render, act } from 'test/helpers';
 import { Keyboard, Text } from 'react-native';
 
 /**
- * WordPress dependencies
- */
-import { SlotFillProvider } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import Tooltip from '../index';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 
 // Minimal tree to render tooltip.
 const TooltipSlot = ( { children } ) => (

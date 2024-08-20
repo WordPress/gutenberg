@@ -60,7 +60,7 @@ import { store as editorStore } from '../../store';
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
  * import { PanelBody } from '@wordpress/components';
- * import { PluginSidebar } from '@wordpress/edit-post';
+ * import { PluginSidebar } from '@wordpress/editor';
  * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (

@@ -136,11 +136,15 @@ export const usePostTypes = () => {
 export const useTaxonomies = ( postType ) => {
 	const taxonomies = useSelect(
 		( select ) => {
-			const { getTaxonomies } = select( coreStore );
-			return getTaxonomies( {
-				type: postType,
-				per_page: -1,
-			} );
+			const { getTaxonomies, getPostType } = select( coreStore );
+			// Does the post type have taxonomies?
+			if ( getPostType( postType )?.taxonomies?.length > 0 ) {
+				return getTaxonomies( {
+					type: postType,
+					per_page: -1,
+				} );
+			}
+			return [];
 		},
 		[ postType ]
 	);
@@ -213,6 +217,7 @@ export const getTransformedBlocksFromPattern = (
 ) => {
 	const {
 		query: { postType, inherit },
+		namespace,
 	} = queryBlockAttributes;
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 	const queryClientIds = [];
@@ -225,6 +230,9 @@ export const getTransformedBlocksFromPattern = (
 				postType,
 				inherit,
 			};
+			if ( namespace ) {
+				block.attributes.namespace = namespace;
+			}
 			queryClientIds.push( block.clientId );
 		}
 		block.innerBlocks?.forEach( ( innerBlock ) => {

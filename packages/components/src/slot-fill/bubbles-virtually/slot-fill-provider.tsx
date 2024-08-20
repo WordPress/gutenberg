@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { observableMap } from '@wordpress/compose';
 
@@ -98,7 +98,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 export default function SlotFillProvider( {
 	children,
 }: SlotFillProviderProps ) {
-	const registry = useMemo( createSlotRegistry, [] );
+	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>
 			{ children }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ export function SocialLinksEdit( props ) {
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
-	const className = classNames( size, {
+	const className = clsx( size, {
 		'has-visible-labels': showLabels,
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':

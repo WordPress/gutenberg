@@ -89,6 +89,15 @@ test.describe( 'Post Editor Performance', () => {
 							}
 						}
 					);
+
+					const serverTiming = await metrics.getServerTiming();
+
+					for ( const [ key, value ] of Object.entries(
+						serverTiming
+					) ) {
+						results[ key ] ??= [];
+						results[ key ].push( value );
+					}
 				}
 			} );
 		}
@@ -269,7 +278,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -318,7 +327,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -368,7 +377,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -430,7 +439,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -493,7 +502,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -647,7 +656,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				await globalInserterToggle.click();
@@ -659,7 +668,12 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByText( 'Test' ).click();
+				// This is the WP v6.5 and older locator.
+				const oldLocator = page.getByRole( 'button', { name: 'Test' } );
+				// This is the WP v6.6 and newer locator.
+				const newLocator = page.getByRole( 'tab', { name: 'Test' } );
+
+				await oldLocator.or( newLocator ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {

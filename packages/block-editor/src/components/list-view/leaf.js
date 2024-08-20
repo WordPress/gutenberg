@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { animated } from '@react-spring/web';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,10 +44,7 @@ const ListViewLeaf = forwardRef(
 		return (
 			<AnimatedTreeGridRow
 				ref={ mergedRef }
-				className={ classnames(
-					'block-editor-list-view-leaf',
-					className
-				) }
+				className={ clsx( 'block-editor-list-view-leaf', className ) }
 				level={ level }
 				positionInSet={ position }
 				setSize={ rowCount }

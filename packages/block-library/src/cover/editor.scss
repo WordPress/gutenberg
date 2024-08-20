@@ -123,10 +123,3 @@
 .color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
 	margin-top: $grid-unit-30;
 }
-
-
-// The frontend style.scss includes a min-height as an IE11 fix.
-// This fix causes extra spacing for the focus style in the editor, so we omit it here.
-.wp-block-cover::after {
-	min-height: auto;
-}

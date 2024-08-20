@@ -70,9 +70,9 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
-									'Opens the block list view sidebar by default.'
+									'Opens the List View sidebar by default.'
 								) }
-								label={ __( 'Always open list view' ) }
+								label={ __( 'Always open List View' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<PreferenceToggleControl
@@ -88,7 +88,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								scope="core"
 								featureName="allowRightClickOverrides"
 								help={ __(
-									'Allows contextual list view menus via right-click, overriding browser defaults.'
+									'Allows contextual List View menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
 									'Allow right-click contextual menus'

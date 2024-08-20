@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	getCategories,
+	getBlockType,
 	getBlockTypes,
 	getBlockFromExample,
 	createBlock,
@@ -24,6 +25,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, useState, memo, useContext } from '@wordpress/element';
@@ -34,7 +36,6 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -42,6 +43,7 @@ const {
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
 } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const {
 	CompositeV2: Composite,
@@ -127,37 +129,7 @@ function isObjectEmpty( object ) {
 }
 
 function getExamples() {
-	// Use our own example for the Heading block so that we can show multiple
-	// heading levels.
-	const headingsExample = {
-		name: 'core/heading',
-		title: __( 'Headings' ),
-		category: 'text',
-		blocks: [
-			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
-				level: 1,
-			} ),
-			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
-				level: 2,
-			} ),
-			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
-				level: 3,
-			} ),
-			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
-				level: 4,
-			} ),
-			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
-				level: 5,
-			} ),
-		],
-	};
-
-	const otherExamples = getBlockTypes()
+	const nonHeadingBlockExamples = getBlockTypes()
 		.filter( ( blockType ) => {
 			const { name, example, supports } = blockType;
 			return (
@@ -173,7 +145,31 @@ function getExamples() {
 			blocks: getBlockFromExample( blockType.name, blockType.example ),
 		} ) );
 
-	return [ headingsExample, ...otherExamples ];
+	const isHeadingBlockRegistered = !! getBlockType( 'core/heading' );
+
+	if ( ! isHeadingBlockRegistered ) {
+		return nonHeadingBlockExamples;
+	}
+
+	// Use our own example for the Heading block so that we can show multiple
+	// heading levels.
+	const headingsExample = {
+		name: 'core/heading',
+		title: __( 'Headings' ),
+		category: 'text',
+		blocks: [ 1, 2, 3, 4, 5, 6 ].map( ( level ) => {
+			return createBlock( 'core/heading', {
+				content: sprintf(
+					// translators: %d: heading level e.g: "1", "2", "3"
+					__( 'Heading %d' ),
+					level
+				),
+				level,
+			} );
+		} ),
+	};
+
+	return [ headingsExample, ...nonHeadingBlockExamples ];
 }
 
 function StyleBook( {
@@ -189,7 +185,7 @@ function StyleBook( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const examples = useMemo( getExamples, [] );
+	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
 			getCategories()
@@ -240,7 +236,7 @@ function StyleBook( {
 			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
 		>
 			<div
-				className={ classnames( 'edit-site-style-book', {
+				className={ clsx( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
 					'is-button': !! onClick,
 				} ) }
@@ -343,7 +339,7 @@ const StyleBookBody = ( {
 
 	return (
 		<Iframe
-			className={ classnames( 'edit-site-style-book__iframe', {
+			className={ clsx( 'edit-site-style-book__iframe', {
 				'is-focused': isFocused && !! onClick,
 				'is-button': !! onClick,
 			} ) }
@@ -363,7 +359,7 @@ const StyleBookBody = ( {
 				}
 			</style>
 			<Examples
-				className={ classnames( 'edit-site-style-book__examples', {
+				className={ clsx( 'edit-site-style-book__examples', {
 					'is-wide': sizes.width > 600,
 				} ) }
 				examples={ examples }
@@ -441,7 +437,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		<div role="row">
 			<div role="gridcell">
 				<CompositeItem
-					className={ classnames( 'edit-site-style-book__example', {
+					className={ clsx( 'edit-site-style-book__example', {
 						'is-selected': isSelected,
 					} ) }
 					id={ id }

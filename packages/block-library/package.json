@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "8.33.0",
+	"version": "9.5.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -65,7 +66,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
-		"classnames": "^2.3.1",
+		"clsx": "^2.1.1",
 		"colord": "^2.7.0",
 		"escape-html": "^1.0.3",
 		"fast-average-color": "^9.1.1",

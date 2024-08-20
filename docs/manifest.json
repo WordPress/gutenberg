@@ -102,7 +102,7 @@
 		"parent": "fundamentals"
 	},
 	{
-		"title": "Working with Javascript for the Block Editor",
+		"title": "Working with JavaScript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
 		"parent": "fundamentals"
@@ -498,6 +498,30 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "Core Concepts",
+		"slug": "core-concepts",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/README.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "The Reactive and Declarative mindset",
+		"slug": "the-reactive-and-declarative-mindset",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Understanding global state, local context and derived state",
+		"slug": "undestanding-global-state-local-context-and-derived-state",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Server-side rendering: Processing directives on the server",
+		"slug": "server-side-rendering",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
@@ -507,6 +531,18 @@
 		"title": "API Reference",
 		"slug": "api-reference",
 		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "About the Interactivity API",
+		"slug": "iapi-about",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-about.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "iapi-faq",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-faq.md",
 		"parent": "interactivity-api"
 	},
 	{
@@ -753,6 +789,12 @@
 		"title": "ComboboxControl",
 		"slug": "combobox-control",
 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Composite",
+		"slug": "composite",
+		"markdown_source": "../packages/components/src/composite/README.md",
 		"parent": "components"
 	},
 	{
@@ -1107,6 +1149,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressBar",
+		"slug": "progress-bar",
+		"markdown_source": "../packages/components/src/progress-bar/README.md",
 		"parent": "components"
 	},
 	{

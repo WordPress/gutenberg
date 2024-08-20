@@ -24,11 +24,12 @@ import {
 	Button,
 	DropdownMenu,
 	SearchControl,
-	privateApis as componentsPrivateApis,
+	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { moreVertical, chevronLeft } from '@wordpress/icons';
+import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -45,8 +46,6 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
-import { unlock } from '../../../lock-unlock';
-const { ProgressBar } = unlock( componentsPrivateApis );
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -64,20 +63,15 @@ function FontCollection( { slug } ) {
 	};
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ notice, setNotice ] = useState( false );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const {
-		collections,
-		getFontCollection,
-		installFonts,
-		isInstalling,
-		notice,
-		setNotice,
-	} = useContext( FontLibraryContext );
+	const { collections, getFontCollection, installFonts, isInstalling } =
+		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.slug === slug
 	);
@@ -117,8 +111,7 @@ function FontCollection( { slug } ) {
 
 	useEffect( () => {
 		setSelectedFont( null );
-		setNotice( null );
-	}, [ slug, setNotice ] );
+	}, [ slug ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
@@ -175,6 +168,25 @@ function FontCollection( { slug } ) {
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
+	};
+
+	const selectFontCount =
+		fontsToInstall.length > 0 ? fontsToInstall[ 0 ]?.fontFace?.length : 0;
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		selectFontCount > 0 &&
+		selectFontCount !== selectedFont?.fontFace?.length;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked =
+		selectFontCount === selectedFont?.fontFace?.length;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const newFonts = isSelectAllChecked ? [] : [ selectedFont ];
+
+		setFontsToInstall( newFonts );
 	};
 
 	const handleInstall = async () => {
@@ -303,6 +315,8 @@ function FontCollection( { slug } ) {
 								</FlexItem>
 								<FlexItem>
 									<SelectControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
 										label={ __( 'Category' ) }
 										value={ filters.category }
 										onChange={ handleCategoryFilter }
@@ -352,7 +366,7 @@ function FontCollection( { slug } ) {
 												font={
 													font.font_family_settings
 												}
-												navigatorPath={ '/fontFamily' }
+												navigatorPath="/fontFamily"
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -402,6 +416,14 @@ function FontCollection( { slug } ) {
 								{ __( 'Select font variants to install.' ) }
 							</Text>
 							<Spacer margin={ 4 } />
+							<CheckboxControl
+								className="font-library-modal__select-all"
+								label={ __( 'Select all' ) }
+								checked={ isSelectAllChecked }
+								onChange={ toggleSelectAll }
+								indeterminate={ isIndeterminate }
+								__nextHasNoMarginBottom
+							/>
 							<VStack spacing={ 0 }>
 								<Spacer margin={ 8 } />
 								{ getSortedFontFaces( selectedFont ).map(
@@ -431,7 +453,7 @@ function FontCollection( { slug } ) {
 					{ selectedFont && (
 						<Flex
 							justify="flex-end"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
 							<Button
 								variant="primary"
@@ -440,7 +462,7 @@ function FontCollection( { slug } ) {
 								disabled={
 									fontsToInstall.length === 0 || isInstalling
 								}
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								{ __( 'Install' ) }
 							</Button>
@@ -448,32 +470,26 @@ function FontCollection( { slug } ) {
 					) }
 
 					{ ! selectedFont && (
-						<Flex
+						<HStack
+							spacing={ 4 }
 							justify="center"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
-							<Button
-								label={ __( 'First page' ) }
-								size="compact"
-								onClick={ () => setPage( 1 ) }
-								disabled={ page === 1 }
-								__experimentalIsFocusable
-							>
-								<span>«</span>
-							</Button>
 							<Button
 								label={ __( 'Previous page' ) }
 								size="compact"
 								onClick={ () => setPage( page - 1 ) }
 								disabled={ page === 1 }
-								__experimentalIsFocusable
-							>
-								<span>‹</span>
-							</Button>
+								showTooltip
+								accessibleWhenDisabled
+								icon={ chevronLeft }
+								tooltipPosition="top"
+							/>
 							<HStack
 								justify="flex-start"
 								expanded={ false }
 								spacing={ 2 }
+								className="font-library-modal__page-selection"
 							>
 								{ createInterpolateElement(
 									sprintf(
@@ -504,7 +520,7 @@ function FontCollection( { slug } ) {
 														parseInt( newPage )
 													)
 												}
-												size={ 'compact' }
+												size="compact"
 												__nextHasNoMarginBottom
 											/>
 										),
@@ -516,20 +532,11 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
-								__experimentalIsFocusable
-							>
-								<span>›</span>
-							</Button>
-							<Button
-								label={ __( 'Last page' ) }
-								size="compact"
-								onClick={ () => setPage( totalPages ) }
-								disabled={ page === totalPages }
-								__experimentalIsFocusable
-							>
-								<span>»</span>
-							</Button>
-						</Flex>
+								accessibleWhenDisabled
+								icon={ chevronRight }
+								tooltipPosition="top"
+							/>
+						</HStack>
 					) }
 				</>
 			) }

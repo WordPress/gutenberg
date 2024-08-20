@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -31,6 +31,7 @@ import type { WordPressComponentProps } from '../context';
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <CheckboxControl
+ *       __nextHasNoMarginBottom
  *       label="Is author"
  *       help="Is the user a author or not?"
  *       checked={ isChecked }
@@ -94,6 +95,7 @@ export function CheckboxControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="CheckboxControl"
 			label={ heading }
 			id={ id }
 			help={
@@ -103,7 +105,7 @@ export function CheckboxControl(
 					</span>
 				)
 			}
-			className={ classnames( 'components-checkbox-control', className ) }
+			className={ clsx( 'components-checkbox-control', className ) }
 		>
 			<HStack spacing={ 0 } justify="start" alignment="top">
 				<span className="components-checkbox-control__input-container">

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -41,20 +42,34 @@ type ResourcePermissionsResolution< IdType > = [
 		( IdType extends void ? SpecificResourcePermissionsResolution : {} ),
 ];
 
+type EntityResource = { kind: string; name: string; id?: string | number };
+
+function useResourcePermissions< IdType = void >(
+	resource: string,
+	id?: IdType
+): ResourcePermissionsResolution< IdType >;
+
+function useResourcePermissions< IdType = void >(
+	resource: EntityResource,
+	id?: never
+): ResourcePermissionsResolution< IdType >;
+
 /**
  * Resolves resource permissions.
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param    resource The resource in question, e.g. media.
- * @param    id       ID of a specific resource entry, if needed, e.g. 10.
+ * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                    or REST base as a string - `media`.
+ * @param    id       Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged
+ *                    when using an entity object as a resource to check permissions and will be ignored.
  *
  * @example
  * ```js
  * import { useResourcePermissions } from '@wordpress/core-data';
  *
  * function PagesList() {
- *   const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+ *   const { canCreate, isResolving } = useResourcePermissions( { kind: 'postType', name: 'page' } );
  *
  *   if ( isResolving ) {
  *     return 'Loading ...';
@@ -82,7 +97,7 @@ type ResourcePermissionsResolution< IdType > = [
  *     canUpdate,
  *     canDelete,
  *     isResolving
- *   } = useResourcePermissions( 'pages', pageId );
+ *   } = useResourcePermissions( { kind: 'postType', name: 'page', id: pageId } );
  *
  *   if ( isResolving ) {
  *     return 'Loading ...';
@@ -109,15 +124,35 @@ type ResourcePermissionsResolution< IdType > = [
  * @return Entity records data.
  * @template IdType
  */
-export default function useResourcePermissions< IdType = void >(
-	resource: string,
+function useResourcePermissions< IdType = void >(
+	resource: string | EntityResource,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType > {
+	// Serialize `resource` to a string that can be safely used as a React dep.
+	// We can't just pass `resource` as one of the deps, because if it is passed
+	// as an object literal, then it will be a different object on each call even
+	// if the values remain the same.
+	const isEntity = typeof resource === 'object';
+	const resourceAsString = isEntity ? JSON.stringify( resource ) : resource;
+
+	if ( isEntity && typeof id !== 'undefined' ) {
+		warning(
+			`When 'resource' is an entity object, passing 'id' as a separate argument isn't supported.`
+		);
+	}
+
 	return useQuerySelect(
 		( resolve ) => {
+			const hasId = isEntity ? !! resource.id : !! id;
 			const { canUser } = resolve( coreStore );
-			const create = canUser( 'create', resource );
-			if ( ! id ) {
+			const create = canUser(
+				'create',
+				isEntity
+					? { kind: resource.kind, name: resource.name }
+					: resource
+			);
+
+			if ( ! hasId ) {
 				const read = canUser( 'read', resource );
 
 				const isResolving = create.isResolving || read.isResolving;
@@ -168,9 +203,11 @@ export default function useResourcePermissions< IdType = void >(
 				canDelete: hasResolved && _delete.data,
 			};
 		},
-		[ resource, id ]
+		[ resourceAsString, id ]
 	);
 }
+
+export default useResourcePermissions;
 
 export function __experimentalUseResourcePermissions(
 	resource: string,

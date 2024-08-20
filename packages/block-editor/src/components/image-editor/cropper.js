@@ -2,7 +2,7 @@
  * External dependencies
  */
 import Cropper from 'react-easy-crop';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -47,7 +47,7 @@ export default function ImageCropper( {
 
 	const area = (
 		<div
-			className={ classnames(
+			className={ clsx(
 				'wp-block-image__crop-area',
 				borderProps?.className,
 				{

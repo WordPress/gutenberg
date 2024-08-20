@@ -67,10 +67,10 @@ describe( 'AutocompleterUI', () => {
 				return (
 					<div>
 						<AutocompleterUI
-							className={ 'test' }
-							filterValue={ 'Apple' }
+							className="test"
+							filterValue="Apple"
 							instanceId={ 1 }
-							listBoxId={ '1' }
+							listBoxId="1"
 							selectedIndex={ 0 }
 							onChangeOptions={ () => {} }
 							onSelect={ () => {} }

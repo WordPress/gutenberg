@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -33,8 +33,8 @@ function ColumnInspectorControls( { width, setAttributes } ) {
 		<PanelBody title={ __( 'Settings' ) }>
 			<UnitControl
 				label={ __( 'Width' ) }
-				labelPosition="edge"
-				__unstableInputWidth="80px"
+				__unstableInputWidth="calc(50% - 8px)"
+				__next40pxDefaultSize
 				value={ width || '' }
 				onChange={ ( nextWidth ) => {
 					nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
@@ -51,7 +51,7 @@ function ColumnEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const classes = classnames( 'block-core-columns', {
+	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -202,12 +202,14 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
-						{ children }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form
-							className={ classnames(
+							className={ clsx(
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':

@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 7.5.0 (2024-08-07)
+
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.55.0 (2024-05-16)
+
+## 6.54.0 (2024-05-02)
+
 ## 6.53.0 (2024-04-19)
 
 ## 6.52.0 (2024-04-03)
@@ -110,9 +130,9 @@
 
 ## 6.0.0 (2022-01-27)
 
-### Breaking changes
+### Breaking Changes
 
-   `OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
+`OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
 
 ## 5.2.5 (2021-11-07)
 
@@ -122,7 +142,7 @@
 
 ## 5.2.0 (2021-07-21)
 
-### New feature
+### New Features
 
 -   `AbortError` being thrown by the default fetch handler can now be caught and handled separately in user-land. Add documentation about aborting a request ([#32530](https://github.com/WordPress/gutenberg/pull/32530)).
 
@@ -149,7 +169,7 @@
 
 ## 3.23.0 (2021-04-06)
 
-### New Feature
+### New Features
 
 -   Publish TypeScript definitions.
 
@@ -172,7 +192,7 @@
 
 -   A created nonce middleware will no longer automatically listen for `heartbeat.tick` actions. Assign to the new `nonce` middleware property instead.
 
-### New Feature
+### New Features
 
 -   The function returned by `createNonceMiddleware` includes an assignable `nonce` property corresponding to the active nonce to be used.
 -   Default fetch handler can be overridden with a custom fetch handler
@@ -191,18 +211,18 @@
 
 ## 2.2.0 (2018-10-29)
 
-### New Feature
+### New Features
 
 -   Always request data in the user's locale ([#10862](https://github.com/WordPress/gutenberg/pull/10862)).
 
 ## 2.1.0 (2018-10-22)
 
-### New Feature
+### New Features
 
 -   Support `per_page=-1` paginated requests.
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

@@ -27,7 +27,9 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
-function useResolveEditedEntityAndContext( { path, postId, postType } ) {
+const authorizedPostTypes = [ 'page', 'post' ];
+
+function useResolveEditedEntityAndContext( { postId, postType } ) {
 	const {
 		hasLoadedAllDependencies,
 		homepageId,
@@ -81,7 +83,15 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		( select ) => {
 			// If we're rendering a post type that doesn't have a template
 			// no need to resolve its template.
-			if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+			if (
+				postTypesWithoutParentTemplate.includes( postType ) &&
+				postId
+			) {
+				return undefined;
+			}
+
+			// Don't trigger resolution for multi-selected posts.
+			if ( postId && postId.includes( ',' ) ) {
 				return undefined;
 			}
 
@@ -168,14 +178,14 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 				return undefined;
 			}
 
-			// If we're rendering a specific page, post... we need to resolve its template.
-			if ( postType && postId ) {
+			// If we're rendering a specific page, we need to resolve its template.
+			// The site editor only supports pages for now, not other CPTs.
+			if (
+				postType &&
+				postId &&
+				authorizedPostTypes.includes( postType )
+			) {
 				return resolveTemplateForPostTypeAndId( postType, postId );
-			}
-
-			// Some URLs in list views are different
-			if ( path === '/page' && postId ) {
-				return resolveTemplateForPostTypeAndId( 'page', postId );
 			}
 
 			// If we're rendering the home page, and we have a static home page, resolve its template.
@@ -196,37 +206,28 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			url,
 			postId,
 			postType,
-			path,
 			frontPageTemplateId,
 		]
 	);
 
 	const context = useMemo( () => {
-		if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+		if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 			return {};
 		}
 
-		if ( postType && postId ) {
+		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
 		}
-
-		// Some URLs in list views are different
-		if ( path === '/page' && postId ) {
-			return { postType: 'page', postId };
-		}
-
+		// TODO: for post types lists we should probably not render the front page, but maybe a placeholder
+		// with a message like "Select a page" or something similar.
 		if ( homepageId ) {
 			return { postType: 'page', postId: homepageId };
 		}
 
 		return {};
-	}, [ homepageId, postType, postId, path ] );
+	}, [ homepageId, postType, postId ] );
 
-	if ( path === '/wp_template' && postId ) {
-		return { isReady: true, postType: 'wp_template', postId, context };
-	}
-
-	if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 		return { isReady: true, postType, postId, context };
 	}
 

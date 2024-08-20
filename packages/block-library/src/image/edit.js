@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -57,17 +57,6 @@ export const pickRelevantMediaFiles = ( image, size ) => {
 };
 
 /**
- * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
- * while the image is being uploaded and will not have an id yet allocated.
- *
- * @param {number=} id  The id of the image.
- * @param {string=} url The url of the image.
- *
- * @return {boolean} Is the URL a Blob URL
- */
-const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
-
-/**
  * Is the url for the image hosted externally. An externally hosted image has no
  * id and is not a blob url.
  *
@@ -103,6 +92,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -117,9 +107,7 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState( () => {
-		return isTemporaryImage( id, url ) ? url : undefined;
-	} );
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -144,7 +132,7 @@ export function ImageEdit( {
 				scale: undefined,
 			} );
 		}
-	}, [ align ] );
+	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
@@ -156,8 +144,8 @@ export function ImageEdit( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
+			blob: undefined,
 		} );
-		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -168,7 +156,9 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
 
 			return;
 		}
@@ -177,8 +167,6 @@ export function ImageEdit( {
 			setTemporaryURL( media.url );
 			return;
 		}
-
-		setTemporaryURL();
 
 		const { imageDefaultSize } = getSettings();
 
@@ -253,24 +241,28 @@ export function ImageEdit( {
 		mediaAttributes.href = href;
 
 		setAttributes( {
+			blob: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
 		} );
+		setTemporaryURL();
 	}
 
 	function onSelectURL( newURL ) {
 		if ( newURL !== url ) {
 			setAttributes( {
+				blob: undefined,
 				url: newURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
+			setTemporaryURL();
 		}
 	}
 
 	useUploadMediaFromBlobURL( {
-		url,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
@@ -282,7 +274,7 @@ export function ImageEdit( {
 		<img
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
+			className="edit-image-preview"
 			src={ url }
 		/>
 	);
@@ -290,8 +282,8 @@ export function ImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( className, {
-		'is-transient': temporaryURL,
+	const classes = clsx( className, {
+		'is-transient': !! temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -316,8 +308,11 @@ export function ImageEdit( {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+					! blockBindingsSource?.canUserEditValue?.( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -327,12 +322,12 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected ]
+		[ isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames( 'block-editor-media-placeholder', {
+				className={ clsx( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
@@ -358,9 +353,7 @@ export function ImageEdit( {
 				} }
 			>
 				{ lockUrlControls ? (
-					<span
-						className={ 'block-bindings-media-placeholder-message' }
-					>
+					<span className="block-bindings-media-placeholder-message">
 						{ lockUrlControlsMessage }
 					</span>
 				) : (
@@ -385,6 +378,7 @@ export function ImageEdit( {
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }

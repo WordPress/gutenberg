@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -28,7 +28,7 @@ function AlignmentMatrixControlIcon( {
 	const alignIndex = getAlignmentIndex( value );
 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 
-	const classes = classnames(
+	const classes = clsx(
 		'component-alignment-matrix-control-icon',
 		className
 	);

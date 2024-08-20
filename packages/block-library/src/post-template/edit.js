@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -29,7 +29,7 @@ const TEMPLATE = [
 
 function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: classnames( 'wp-block-post', classList ) },
+		{ className: clsx( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -45,7 +45,7 @@ function PostTemplateBlockPreview( {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: classnames( 'wp-block-post', classList ),
+			className: clsx( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -220,7 +220,7 @@ export default function PostTemplateEdit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
+		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
 		} ),
@@ -246,13 +246,13 @@ export default function PostTemplateEdit( {
 	const displayLayoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Post template block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {
 					type: 'grid',

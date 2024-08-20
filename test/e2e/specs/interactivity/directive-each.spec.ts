@@ -314,19 +314,14 @@ test.describe( 'data-wp-each', () => {
 			} )
 		);
 
-		await expect( elements ).toHaveText( [ 'beta', 'gamma', 'delta' ] );
+		await expect( elements ).toHaveText( [ 'b', 'c', 'd' ] );
 
 		await page
 			.getByTestId( 'navigation-updated list' )
 			.getByTestId( 'navigate' )
 			.click();
 
-		await expect( elements ).toHaveText( [
-			'alpha',
-			'beta',
-			'gamma',
-			'delta',
-		] );
+		await expect( elements ).toHaveText( [ 'a', 'b', 'c', 'd' ] );
 
 		// Get the tags. They should not have disappeared or changed,
 		// except for the newly created element.
@@ -491,5 +486,18 @@ test.describe( 'data-wp-each', () => {
 		await expect( cherimoya ).toHaveAttribute( 'data-tag', '2' );
 		await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
 		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
+	} );
+
+	test( 'directives inside elements with `wp-each-child` should not run', async ( {
+		page,
+	} ) => {
+		const element = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'item' );
+		const callbackRunCount = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'callbackRunCount' );
+		await expect( element ).toHaveText( 'beta' );
+		await expect( callbackRunCount ).toHaveText( '1' );
 	} );
 } );

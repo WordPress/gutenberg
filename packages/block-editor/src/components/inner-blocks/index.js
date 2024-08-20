@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -132,7 +132,10 @@ function UncontrolledInnerBlocks( props ) {
 		/>
 	);
 
-	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+	if (
+		! blockType?.providesContext ||
+		Object.keys( blockType.providesContext ).length === 0
+	) {
 		return items;
 	}
 
@@ -190,10 +193,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	} = useBlockEditContext();
 	const selected = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
-				return {};
-			}
-
 			const {
 				getBlockName,
 				isBlockSelected,
@@ -205,8 +204,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockSettings,
 				isDragging,
 				getSettings,
-				getBlockOrder,
 			} = unlock( select( blockEditorStore ) );
+			let _isDropZoneDisabled;
+
+			if ( ! clientId ) {
+				return { isDropZoneDisabled: _isDropZoneDisabled };
+			}
+
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
@@ -215,14 +219,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 
-			// In zoom out mode, we want to disable the drop zone for the sections.
-			// The inner blocks belonging to the section drop zone is
-			// already disabled by the blocks themselves being disabled.
-			let _isDropZoneDisabled = blockEditingMode === 'disabled';
+			_isDropZoneDisabled = blockEditingMode === 'disabled';
+
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				// In zoom out mode, we want to disable the drop zone for the sections.
+				// The inner blocks belonging to the section drop zone is
+				// already disabled by the blocks themselves being disabled.
 				const { sectionRootClientId } = unlock( getSettings() );
-				const sectionsClientIds = getBlockOrder( sectionRootClientId );
-				_isDropZoneDisabled = sectionsClientIds?.includes( clientId );
+
+				_isDropZoneDisabled = clientId !== sectionRootClientId;
 			}
 
 			return {
@@ -262,12 +267,16 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
-		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
+		__unstableDisableDropZone ||
+		isDropZoneDisabled ||
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
+			? null
+			: blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
@@ -287,7 +296,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
 			__unstableDisableLayoutClassNames ? '' : layoutClassNames,

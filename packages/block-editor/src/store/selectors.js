@@ -22,6 +22,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	withRootClientIdOptionKey,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -74,6 +75,8 @@ const EMPTY_ARRAY = [];
  * @type {Set}
  */
 const EMPTY_SET = new Set();
+
+const EMPTY_OBJECT = {};
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -331,8 +334,8 @@ export const getGlobalBlockCount = createSelector(
 /**
  * Returns all blocks that match a blockName. Results include nested blocks.
  *
- * @param {Object}  state     Global application state.
- * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ * @param {Object}   state     Global application state.
+ * @param {string[]} blockName Block name(s) for which clientIds are to be returned.
  *
  * @return {Array} Array of clientIds of blocks with name equal to blockName.
  */
@@ -359,8 +362,8 @@ export const getBlocksByName = createSelector(
  *
  * @deprecated
  *
- * @param {Object}  state     Global application state.
- * @param {?string} blockName Optional block name, if not specified, returns an empty array.
+ * @param {Object}   state     Global application state.
+ * @param {string[]} blockName Block name(s) for which clientIds are to be returned.
  *
  * @return {Array} Array of clientIds of blocks with name equal to blockName.
  */
@@ -1709,13 +1712,12 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 /**
  * Determines if the given block is allowed to be deleted.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean} Whether the given block is allowed to be removed.
  */
-export function canRemoveBlock( state, clientId, rootClientId = null ) {
+export function canRemoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1723,6 +1725,8 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.remove !== undefined ) {
 		return ! attributes.lock.remove;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
@@ -1733,28 +1737,24 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 /**
  * Determines if the given blocks are allowed to be removed.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be removed.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be removed.
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
-export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canRemoveBlock( state, clientId, rootClientId )
-	);
+export function canRemoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canRemoveBlock( state, clientId ) );
 }
 
 /**
  * Determines if the given block is allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
-export function canMoveBlock( state, clientId, rootClientId = null ) {
+export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1762,26 +1762,24 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
  * Determines if the given blocks are allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be moved.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be moved.
  *
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
-export function canMoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canMoveBlock( state, clientId, rootClientId )
-	);
+export function canMoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) );
 }
 
 /**
@@ -1996,7 +1994,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null ) => {
+		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2038,15 +2036,72 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				buildScope: 'inserter',
 			} );
 
-			const blockTypeInserterItems = getBlockTypes()
+			let blockTypeInserterItems = getBlockTypes()
 				.filter( ( blockType ) =>
-					canIncludeBlockTypeInInserter(
-						state,
-						blockType,
-						rootClientId
-					)
+					hasBlockSupport( blockType, 'inserter', true )
 				)
 				.map( buildBlockTypeInserterItem );
+
+			if ( options[ withRootClientIdOptionKey ] ) {
+				blockTypeInserterItems = blockTypeInserterItems.reduce(
+					( accumulator, item ) => {
+						item.rootClientId = rootClientId ?? '';
+
+						while (
+							! canInsertBlockTypeUnmemoized(
+								state,
+								item.name,
+								item.rootClientId
+							)
+						) {
+							if ( ! item.rootClientId ) {
+								let sectionRootClientId;
+								try {
+									sectionRootClientId = unlock(
+										getSettings( state )
+									).sectionRootClientId;
+								} catch ( e ) {}
+								if (
+									sectionRootClientId &&
+									canInsertBlockTypeUnmemoized(
+										state,
+										item.name,
+										sectionRootClientId
+									)
+								) {
+									item.rootClientId = sectionRootClientId;
+								} else {
+									delete item.rootClientId;
+								}
+								break;
+							} else {
+								const parentClientId = getBlockRootClientId(
+									state,
+									item.rootClientId
+								);
+								item.rootClientId = parentClientId;
+							}
+						}
+
+						// We could also add non insertable items and gray them out.
+						if ( item.hasOwnProperty( 'rootClientId' ) ) {
+							accumulator.push( item );
+						}
+
+						return accumulator;
+					},
+					[]
+				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems.filter(
+					( blockType ) =>
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						)
+				);
+			}
 
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
@@ -2755,6 +2810,16 @@ export function isBlockVisible( state, clientId ) {
 }
 
 /**
+ * Returns the currently hovered block.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Client Id of the hovered block.
+ */
+export function getHoveredBlockClientId( state ) {
+	return state.hoveredBlockClientId;
+}
+
+/**
  * Returns the list of all hidden blocks.
  *
  * @param {Object} state Global application state.
@@ -2982,10 +3047,7 @@ export const isGroupable = createRegistrySelector(
 				rootClientId
 			);
 			const _isGroupable = groupingBlockAvailable && _clientIds.length;
-			return (
-				_isGroupable &&
-				canRemoveBlocks( state, _clientIds, rootClientId )
-			);
+			return _isGroupable && canRemoveBlocks( state, _clientIds );
 		}
 );
 

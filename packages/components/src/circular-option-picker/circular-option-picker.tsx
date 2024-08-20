@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeStore } from '../composite/v2';
+import { Composite, useCompositeStore } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -102,7 +102,7 @@ function ListboxCircularOptionPicker(
 					{ ...additionalProps }
 					id={ baseId }
 					store={ compositeStore }
-					role={ 'listbox' }
+					role="listbox"
 				>
 					{ options }
 				</Composite>
@@ -156,7 +156,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	) : undefined;
 
 	const options = (
-		<div className={ 'components-circular-option-picker__swatches' }>
+		<div className="components-circular-option-picker__swatches">
 			{ optionsProp }
 		</div>
 	);
@@ -165,10 +165,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		<OptionPickerImplementation
 			{ ...additionalProps }
 			baseId={ baseId }
-			className={ classnames(
-				'components-circular-option-picker',
-				className
-			) }
+			className={ clsx( 'components-circular-option-picker', className ) }
 			actions={ actions }
 			options={ options }
 		>

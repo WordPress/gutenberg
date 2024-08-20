@@ -112,12 +112,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 
 			if ( event.type === 'cut' ) {
 				// Don't update the selection if the blocks cannot be deleted.
-				if (
-					! canRemoveBlocks(
-						selectedBlockClientIds,
-						firstBlockRootClientId
-					)
-				) {
+				if ( ! canRemoveBlocks( selectedBlockClientIds ) ) {
 					return;
 				}
 

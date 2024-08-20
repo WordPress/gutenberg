@@ -59,6 +59,7 @@ export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
 	{}
 );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	label: 'Is author',
 	help: 'Is the user an author or not?',
 };
@@ -142,6 +143,8 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
 					setChecked( v );
 					onChange( v );
 				} }
+				// Disable reason: For simplicity of the code snippet.
+				// eslint-disable-next-line no-restricted-syntax
 				id="my-checkbox-with-custom-label"
 				aria-describedby="my-custom-description"
 			/>
@@ -149,6 +152,7 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
 				<label htmlFor="my-checkbox-with-custom-label">
 					My custom label
 				</label>
+				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<div id="my-custom-description" style={ { fontSize: 13 } }>
 					A custom description.
 				</div>

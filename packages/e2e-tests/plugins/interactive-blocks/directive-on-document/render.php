@@ -24,4 +24,8 @@
 			<p data-wp-text="state.counter" data-testid="counter">0</p>
 		</div>
 	</div>
+	<div data-wp-on-document--keydown="actions.keydownHandler" data-wp-on-document--keydown--second="actions.keydownSecondHandler">
+		<p data-wp-text="state.keydownHandler" data-testid="keydownHandler">no</p>
+		<p data-wp-text="state.keydownSecondHandler" data-testid="keydownSecondHandler">no</p>
+	</div>
 </div>

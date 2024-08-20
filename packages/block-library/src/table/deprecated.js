@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -174,13 +174,9 @@ const v4 = {
 		const colorProps = getColorClassesAndStyles( attributes );
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames(
-			colorProps.className,
-			borderProps.className,
-			{
-				'has-fixed-layout': hasFixedLayout,
-			}
-		);
+		const classes = clsx( colorProps.className, borderProps.className, {
+			'has-fixed-layout': hasFixedLayout,
+		} );
 
 		const hasCaption = ! RichText.isEmpty( caption );
 
@@ -207,7 +203,7 @@ const v4 = {
 									},
 									cellIndex
 								) => {
-									const cellClasses = classnames( {
+									const cellClasses = clsx( {
 										[ `has-text-align-${ align }` ]: align,
 									} );
 
@@ -395,13 +391,9 @@ const v3 = {
 		const colorProps = getColorClassesAndStyles( attributes );
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames(
-			colorProps.className,
-			borderProps.className,
-			{
-				'has-fixed-layout': hasFixedLayout,
-			}
-		);
+		const classes = clsx( colorProps.className, borderProps.className, {
+			'has-fixed-layout': hasFixedLayout,
+		} );
 
 		const hasCaption = ! RichText.isEmpty( caption );
 
@@ -421,7 +413,7 @@ const v3 = {
 									{ content, tag, scope, align },
 									cellIndex
 								) => {
-									const cellClasses = classnames( {
+									const cellClasses = clsx( {
 										[ `has-text-align-${ align }` ]: align,
 									} );
 
@@ -570,7 +562,7 @@ const v2 = {
 			backgroundColor
 		);
 
-		const classes = classnames( backgroundClass, {
+		const classes = clsx( backgroundClass, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundClass,
 		} );
@@ -593,7 +585,7 @@ const v2 = {
 									{ content, tag, scope, align },
 									cellIndex
 								) => {
-									const cellClasses = classnames( {
+									const cellClasses = clsx( {
 										[ `has-text-align-${ align }` ]: align,
 									} );
 
@@ -746,7 +738,7 @@ const v1 = {
 			backgroundColor
 		);
 
-		const classes = classnames( backgroundClass, {
+		const classes = clsx( backgroundClass, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundClass,
 		} );

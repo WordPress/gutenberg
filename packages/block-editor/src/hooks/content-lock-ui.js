@@ -20,7 +20,6 @@ import { unlock } from '../lock-unlock';
 // also includes artifacts on the store (actions, reducers, and selector).
 
 function ContentLockControlsPure( { clientId, isSelected } ) {
-	const { getBlockListSettings, getSettings } = useSelect( blockEditorStore );
 	const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
 		( select ) => {
 			const {
@@ -37,16 +36,11 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 		[ clientId ]
 	);
 
-	const {
-		updateSettings,
-		updateBlockListSettings,
-		__unstableSetTemporarilyEditingAsBlocks,
-	} = useDispatch( blockEditorStore );
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+	const { stopEditingAsBlocks, modifyContentLockBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
-	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
 
 	const stopEditingAsBlockCallback = useCallback( () => {
 		stopEditingAsBlocks( clientId );
@@ -73,30 +67,19 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 			) }
 			{ showStartEditingAsBlocks && (
 				<BlockSettingsMenuControls>
-					{ ( { onClose } ) => (
-						<MenuItem
-							onClick={ () => {
-								__unstableMarkNextChangeAsNotPersistent();
-								updateBlockAttributes( clientId, {
-									templateLock: undefined,
-								} );
-								updateBlockListSettings( clientId, {
-									...getBlockListSettings( clientId ),
-									templateLock: false,
-								} );
-								const focusModeToRevert =
-									getSettings().focusMode;
-								updateSettings( { focusMode: true } );
-								__unstableSetTemporarilyEditingAsBlocks(
-									clientId,
-									focusModeToRevert
-								);
-								onClose();
-							} }
-						>
-							{ __( 'Modify' ) }
-						</MenuItem>
-					) }
+					{ ( { selectedClientIds, onClose } ) =>
+						selectedClientIds.length === 1 &&
+						selectedClientIds[ 0 ] === clientId && (
+							<MenuItem
+								onClick={ () => {
+									modifyContentLockBlock( clientId );
+									onClose();
+								} }
+							>
+								{ __( 'Modify' ) }
+							</MenuItem>
+						)
+					}
 				</BlockSettingsMenuControls>
 			) }
 		</>

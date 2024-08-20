@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -23,7 +23,7 @@ function UnforwardedColorIndicator(
 
 	return (
 		<span
-			className={ classnames( 'component-color-indicator', className ) }
+			className={ clsx( 'component-color-indicator', className ) }
 			style={ { background: colorValue } }
 			ref={ forwardedRef }
 			{ ...additionalProps }

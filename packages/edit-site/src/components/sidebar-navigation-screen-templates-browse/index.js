@@ -13,17 +13,18 @@ import DataviewsTemplatesSidebarContent from './content';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenTemplatesBrowse() {
+export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 	const {
 		params: { activeView = 'all' },
 	} = useLocation();
 
 	return (
 		<SidebarNavigationScreen
-			title={ __( 'Manage templates' ) }
+			title={ __( 'Templates' ) }
 			description={ __(
 				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 			) }
+			backPath={ backPath }
 			content={
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }

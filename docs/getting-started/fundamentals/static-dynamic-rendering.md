@@ -61,7 +61,7 @@ Dynamic blocks, which we'll explore in the following section, can specify an ini
 For a practical demonstration of how this works, refer to the [Building your first block](/docs/getting-started/tutorial.md) tutorial. Specifically, the [Adding static rendering](/docs/getting-started/tutorial.md#adding-static-rendering) section illustrates how a block can have both a saved HTML structure and dynamic rendering capabilities.
 
 <div class="callout callout-info">
-WordPress provides mechanisms like the <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> are the <code>$render_callback</code> function to alter the saved HTML of a block before it appears on the front end. These tools offer developers the capability to customize block output dynamically, catering to complex and interactive user experiences.
+WordPress provides mechanisms like the <a href="https://developer.wordpress.org/reference/functions/render_block/"><code>render_block</code></a> and the <a href="https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/"><code>render_callback</code></a> function to alter the saved HTML of a block before it appears on the front end. These tools offer developers the capability to customize block output dynamically, catering to complex and interactive user experiences.
 </div>
 
 Additional examples of WordPress blocks that use static rendering, meaning their output is fixed at the time of saving and doesn't rely on server-side processing, include:

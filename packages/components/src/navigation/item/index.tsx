@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -60,7 +60,7 @@ export function NavigationItem( props: NavigationItemProps ) {
 
 	const isActive = item && activeItem === item;
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-active': isActive,
 	} );
 

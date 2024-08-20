@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+## 1.5.0 (2024-08-07)
+
+## 1.4.0 (2024-07-24)
+
+## 1.3.0 (2024-07-10)
+
+## 1.2.0 (2024-06-26)
+
+## 1.1.0 (2024-06-15)
+
+## 1.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 0.29.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 0.28.0 (2024-05-02)
+
 ## 0.27.0 (2024-04-19)
 
 ## 0.26.0 (2024-04-03)
@@ -18,7 +42,7 @@
 
 ## 0.20.0 (2024-01-10)
 
-## Enhancements
+### Enhancements
 
 -   Support conditional commands and commands loaders using the "disabled" config.
 

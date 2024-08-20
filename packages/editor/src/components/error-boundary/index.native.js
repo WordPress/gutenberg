@@ -69,7 +69,7 @@ function CopyButton( {
 			activeOpacity={ 0.5 }
 			accessibilityLabel={ accessibilityLabel }
 			style={ [ containerStyle, secondary && containerSecondaryStyle ] }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ accessibilityHint }
 			onPress={ () => {
 				Clipboard.setString(

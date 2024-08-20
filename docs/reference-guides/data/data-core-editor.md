@@ -485,7 +485,7 @@ _Returns_
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into its three parts: the prefix, the postName, and the suffix.
 
 _Parameters_
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import {
 	useCallback,
 	forwardRef,
 	createContext,
+	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
@@ -20,6 +21,7 @@ import {
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -38,6 +40,7 @@ import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -108,12 +111,19 @@ export function RichTextWrapper(
 ) {
 	props = removeNativeProps( props );
 
-	const instanceId = useInstanceId( RichTextWrapper );
+	if ( onSplit ) {
+		deprecated( 'wp.blockEditor.RichText onSplit prop', {
+			since: '6.4',
+			alternative: 'block.json support key: "splitting"',
+		} );
+	}
 
+	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const blockContext = useContext( BlockContext );
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -163,7 +173,7 @@ export function RichTextWrapper(
 				const { getBlockBindingsSource } = unlock(
 					select( blocksStore )
 				);
-				for ( const [ attribute, args ] of Object.entries(
+				for ( const [ attribute, binding ] of Object.entries(
 					blockBindings
 				) ) {
 					if (
@@ -173,13 +183,16 @@ export function RichTextWrapper(
 						break;
 					}
 
-					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+					// If the source is not defined, or if its value of `canUserEditValue` is `false`, disable it.
 					const blockBindingsSource = getBlockBindingsSource(
-						args.source
+						binding.source
 					);
 					if (
-						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing
+						! blockBindingsSource?.canUserEditValue?.( {
+							select,
+							context: blockContext,
+							args: binding.args,
+						} )
 					) {
 						_disableBoundBlocks = true;
 						break;
@@ -419,7 +432,7 @@ export function RichTextWrapper(
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
-				className={ classnames(
+				className={ clsx(
 					'block-editor-rich-text__editable',
 					props.className,
 					'rich-text'

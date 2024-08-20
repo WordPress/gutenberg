@@ -18,12 +18,12 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {
@@ -41,7 +41,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		).toBeEnabled();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'region', { name: 'Editor publish' } )
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 

@@ -538,10 +538,8 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( editor.getBlocks, 'should paste mid-block' )
 			.toMatchObject( [
 				{ attributes: { content: 'first paragraph' } },
-				{ attributes: { content: 'second paragr' } },
-				{ attributes: { content: 'first paragraph' } },
-				{ attributes: { content: 'second paragraph|' } },
-				{ attributes: { content: 'aph' } },
+				{ attributes: { content: 'second paragrfirst paragraph' } },
+				{ attributes: { content: 'second paragraph|aph' } },
 			] );
 	} );
 

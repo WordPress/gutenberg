@@ -57,7 +57,13 @@ const DimensionControls = ( {
 	setAttributes,
 	media,
 } ) => {
-	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
+		useSettings(
+			'spacing.units',
+			'dimensions.aspectRatios.default',
+			'dimensions.aspectRatios.theme',
+			'dimensions.defaultAspectRatios'
+		);
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
@@ -93,6 +99,28 @@ const DimensionControls = ( {
 	const showScaleControl =
 		height || ( aspectRatio && aspectRatio !== 'auto' );
 
+	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const aspectRatioOptions = [
+		{
+			label: _x(
+				'Original',
+				'Aspect ratio option for dimensions control'
+			),
+			value: 'auto',
+		},
+		...( showDefaultRatios ? defaultOptions : [] ),
+		...( themeOptions ? themeOptions : [] ),
+	];
+
 	return (
 		<>
 			<ToolsPanelItem
@@ -106,44 +134,12 @@ const DimensionControls = ( {
 				panelId={ clientId }
 			>
 				<SelectControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					__nextHasNoMarginBottom
 					label={ __( 'Aspect ratio' ) }
 					value={ aspectRatio }
-					options={ [
-						// These should use the same values as AspectRatioDropdown in @wordpress/block-editor
-						{
-							label: __( 'Original' ),
-							value: 'auto',
-						},
-						{
-							label: __( 'Square' ),
-							value: '1',
-						},
-						{
-							label: __( '16:9' ),
-							value: '16/9',
-						},
-						{
-							label: __( '4:3' ),
-							value: '4/3',
-						},
-						{
-							label: __( '3:2' ),
-							value: '3/2',
-						},
-						{
-							label: __( '9:16' ),
-							value: '9/16',
-						},
-						{
-							label: __( '3:4' ),
-							value: '3/4',
-						},
-						{
-							label: __( '2:3' ),
-							value: '2/3',
-						},
-					] }
+					options={ aspectRatioOptions }
 					onChange={ ( nextAspectRatio ) =>
 						setAttributes( { aspectRatio: nextAspectRatio } )
 					}
@@ -209,6 +205,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
@@ -238,6 +235,8 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<SelectControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }

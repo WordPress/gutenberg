@@ -234,6 +234,11 @@ export default ( props ) => ( element ) => {
 
 		onSelectionChange( record.current.start, record.current.end );
 
+		// There is no selection change event when the element is focused, so
+		// we need to manually trigger it. The selection is also not available
+		// yet in this call stack.
+		window.queueMicrotask( handleSelectionChange );
+
 		ownerDocument.addEventListener(
 			'selectionchange',
 			handleSelectionChange

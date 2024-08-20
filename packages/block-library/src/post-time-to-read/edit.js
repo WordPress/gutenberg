@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -66,7 +66,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		const minutesToRead = Math.max(
 			1,
 			Math.round(
-				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+				wordCount( content || '', wordCountType ) / AVERAGE_READING_RATE
 			)
 		);
 
@@ -78,7 +78,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

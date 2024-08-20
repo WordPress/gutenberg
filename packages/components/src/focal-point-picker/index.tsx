@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -70,6 +70,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 	return (
  * 		<>
  * 			<FocalPointPicker
+ *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
@@ -84,7 +85,6 @@ const GRID_OVERLAY_TIMEOUT = 600;
  */
 export function FocalPointPicker( {
 	__nextHasNoMarginBottom,
-	__next40pxDefaultSize = false,
 	autoPlay = true,
 	className,
 	help,
@@ -232,10 +232,7 @@ export function FocalPointPicker( {
 		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = classnames(
-		'components-focal-point-picker-control',
-		className
-	);
+	const classes = clsx( 'components-focal-point-picker-control', className );
 
 	const instanceId = useInstanceId( FocalPointPicker );
 	const id = `inspector-focal-point-picker-control-${ instanceId }`;
@@ -253,6 +250,7 @@ export function FocalPointPicker( {
 		<BaseControl
 			{ ...restProps }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="FocalPointPicker"
 			label={ label }
 			id={ id }
 			help={ help }
@@ -287,7 +285,6 @@ export function FocalPointPicker( {
 			</MediaWrapper>
 			<Controls
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 				hasHelpText={ !! help }
 				point={ { x, y } }
 				onChange={ ( value ) => {

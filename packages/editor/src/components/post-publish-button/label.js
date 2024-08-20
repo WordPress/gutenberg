@@ -10,6 +10,11 @@ import { useViewportMatch } from '@wordpress/compose';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the label for the publish button.
+ *
+ * @return {string} The label for the publish button.
+ */
 export default function PublishButtonLabel() {
 	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	const {

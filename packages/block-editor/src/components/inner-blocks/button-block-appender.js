@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import BaseButtonBlockAppender from '../button-block-appender';
-import withClientId from './with-client-id';
+import { useBlockEditContext } from '../block-edit/context';
 
-export const ButtonBlockAppender = ( {
-	clientId,
+export default function ButtonBlockAppender( {
 	showSeparator,
 	isFloating,
 	onAddBlock,
 	isToggle,
-} ) => {
+} ) {
+	const { clientId } = useBlockEditContext();
 	return (
 		<BaseButtonBlockAppender
-			className={ classnames( {
+			className={ clsx( {
 				'block-list-appender__toggle': isToggle,
 			} ) }
 			rootClientId={ clientId }
@@ -27,6 +27,4 @@ export const ButtonBlockAppender = ( {
 			onAddBlock={ onAddBlock }
 		/>
 	);
-};
-
-export default withClientId( ButtonBlockAppender );
+}

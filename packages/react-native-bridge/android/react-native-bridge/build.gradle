@@ -39,7 +39,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -93,7 +93,7 @@ dependencies {
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
-    def reactNativeLibrariesPublisherVersion = "v5"
+    def reactNativeLibrariesPublisherVersion = "v6"
     def reactNativeLibrariesGroupId = "org.wordpress.react-native-libraries.$reactNativeLibrariesPublisherVersion"
     implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"

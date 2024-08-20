@@ -2,7 +2,8 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	border-radius: 3px 3px 0 0;
+	width: 100%;
+	border-radius: $radius-medium;
 
 	.page-templates-preview-field__button {
 		box-shadow: none;
@@ -13,7 +14,7 @@
 		cursor: pointer;
 		overflow: hidden;
 		height: 100%;
-		border-radius: 3px;
+		border-radius: $radius-medium;
 
 		&:focus-visible {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -22,25 +23,23 @@
 		}
 	}
 
-	&.is-viewtype-list {
+	.dataviews-view-list & {
 		.block-editor-block-preview__container {
 			height: 120px;
 		}
 	}
 
-	&.is-viewtype-grid {
+	.dataviews-view-grid & {
 		.block-editor-block-preview__container {
 			height: 100%;
 		}
-
-		.page-templates-preview-field__button {
-			border-radius: 3px 3px 0 0;
-		}
 	}
 
-	&.is-viewtype-table {
+	.dataviews-view-table & {
 		border-radius: $radius-block-ui;
 		position: relative;
+		width: 120px;
+		max-height: 160px;
 
 		&::after {
 			content: "";
@@ -56,7 +55,13 @@
 }
 
 .page-templates-description {
-	white-space: normal;
+	max-width: 50em;
+	text-wrap: balance; // Fallback for Safari
+	text-wrap: pretty;
+
+	.dataviews-view-table & {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .edit-site-page-templates {
@@ -72,12 +77,12 @@
 	width: $grid-unit-30;
 	height: $grid-unit-30;
 	align-items: center;
-	justify-content: center;
+	justify-content: left;
 	display: flex;
 
 	img {
-		width: 20px;
-		height: 20px;
+		width: $grid-unit-20;
+		height: $grid-unit-20;
 		object-fit: cover;
 		opacity: 0;
 		transition: opacity 0.1s linear;
@@ -99,6 +104,7 @@
 	height: $grid-unit-30;
 
 	svg {
+		margin-left: -$grid-unit-05;
 		fill: currentColor;
 	}
 }

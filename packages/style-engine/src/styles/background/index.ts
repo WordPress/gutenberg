@@ -8,11 +8,13 @@ const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const _backgroundImage = style?.background?.backgroundImage;
-		if (
-			typeof _backgroundImage === 'object' &&
-			_backgroundImage?.source === 'file' &&
-			_backgroundImage?.url
-		) {
+
+		/*
+		 * The background image can be a string or an object.
+		 * If the background image is a string, it could already contain a url() function,
+		 * or have a linear-gradient value.
+		 */
+		if ( typeof _backgroundImage === 'object' && _backgroundImage?.url ) {
 			return [
 				{
 					selector: options.selector,
@@ -25,25 +27,17 @@ const backgroundImage = {
 			];
 		}
 
-		/*
-		 * If the background image is a string, it could already contain a url() function,
-		 * or have a linear-gradient value.
-		 */
-		if ( typeof _backgroundImage === 'string' ) {
-			return generateRule(
-				style,
-				options,
-				[ 'background', 'backgroundImage' ],
-				'backgroundImage'
-			);
-		}
-
-		return [];
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundImage' ],
+			'backgroundImage'
+		);
 	},
 };
 
 const backgroundPosition = {
-	name: 'backgroundRepeat',
+	name: 'backgroundPosition',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,
@@ -78,9 +72,22 @@ const backgroundSize = {
 	},
 };
 
+const backgroundAttachment = {
+	name: 'backgroundAttachment',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundAttachment' ],
+			'backgroundAttachment'
+		);
+	},
+};
+
 export default [
 	backgroundImage,
 	backgroundPosition,
 	backgroundRepeat,
 	backgroundSize,
+	backgroundAttachment,
 ];

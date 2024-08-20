@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,35 +29,35 @@ export default function SidebarNavigationItem( {
 	icon,
 	withChevron = false,
 	suffix,
-	path,
+	uid,
+	params,
 	onClick,
 	children,
 	...props
 } ) {
 	const history = useHistory();
-	const navigate = useContext( SidebarNavigationContext );
-
-	// If there is no custom click handler, create one that navigates to `path`.
+	const { navigate } = useContext( SidebarNavigationContext );
+	// If there is no custom click handler, create one that navigates to `params`.
 	function handleClick( e ) {
 		if ( onClick ) {
 			onClick( e );
 			navigate( 'forward' );
-		} else if ( path ) {
+		} else if ( params ) {
 			e.preventDefault();
-			history.push( { path } );
-			navigate( 'forward', `[id="${ path }"]` );
+			history.push( params );
+			navigate( 'forward', `[id="${ uid }"]` );
 		}
 	}
 
 	return (
 		<Item
-			className={ classnames(
+			className={ clsx(
 				'edit-site-sidebar-navigation-item',
 				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
 			onClick={ handleClick }
-			id={ path }
+			id={ uid }
 			{ ...props }
 		>
 			<HStack justify="flex-start">

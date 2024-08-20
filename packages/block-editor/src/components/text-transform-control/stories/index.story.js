@@ -13,10 +13,6 @@ export default {
 	component: TextTransformControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		size: {
-			options: [ 'default', '__unstable-large' ],
-			control: { type: 'radio' },
-		},
 	},
 };
 

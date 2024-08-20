@@ -4,4 +4,3 @@
 		$( '.wp-block-test-iframed-block' ).test();
 	} );
 } )( window );
-

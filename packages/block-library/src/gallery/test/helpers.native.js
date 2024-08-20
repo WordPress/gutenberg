@@ -65,9 +65,9 @@ export const initializeWithGalleryBlock = async ( {
 /**
  * Gets a gallery item within a Gallery block.
  *
- * @param {HTMLElement} galleryBlock Gallery block instance.
- * @param {number}      rowIndex     Row position within the Gallery block.
- * @return {HTMLElement} Gallery item.
+ * @param {import('react-test-renderer').ReactTestInstance} galleryBlock Gallery block instance.
+ * @param {number}                                          rowIndex     Row position within the Gallery block.
+ * @return {import('react-test-renderer').ReactTestInstance} Gallery item.
  */
 export const getGalleryItem = ( galleryBlock, rowIndex ) =>
 	getInnerBlock( galleryBlock, 'Image', { rowIndex } );

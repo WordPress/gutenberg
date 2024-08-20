@@ -42,6 +42,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 					}
 				} )
 			}
+			accessibleWhenDisabled
 			disabled={ isInstallingBlock }
 			isBusy={ isInstallingBlock }
 			variant="primary"

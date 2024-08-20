@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
-function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
+export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
 		return {
 			blockSelectionStart:
@@ -49,7 +49,7 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 	return (
 		<>
 			<div
-				className={ classnames( 'editor-collapsible-block-toolbar', {
+				className={ clsx( 'editor-collapsible-block-toolbar', {
 					'is-collapsed': isCollapsed || ! hasBlockSelection,
 				} ) }
 			>
@@ -73,5 +73,3 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 		</>
 	);
 }
-
-export default CollapsableBlockToolbar;

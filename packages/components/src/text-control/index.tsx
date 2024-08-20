@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -41,6 +41,7 @@ function UnforwardedTextControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="TextControl"
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -48,7 +49,7 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className={ classnames( 'components-text-control__input', {
+				className={ clsx( 'components-text-control__input', {
 					'is-next-40px-default-size': __next40pxDefaultSize,
 				} ) }
 				type={ type }
@@ -75,6 +76,7 @@ function UnforwardedTextControl(
  *
  *   return (
  *     <TextControl
+ *       __nextHasNoMarginBottom
  *       label="Additional CSS Class"
  *       value={ className }
  *       onChange={ ( value ) => setClassName( value ) }

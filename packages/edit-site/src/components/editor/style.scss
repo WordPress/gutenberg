@@ -1,14 +1,10 @@
-.edit-site-editor__interface-skeleton {
+.edit-site-editor__editor-interface {
 	opacity: 1;
 	transition: opacity 0.1s ease-out;
-	@include reduce-motion("transition");
+	@include reduce-motion( "transition" );
 
 	&.is-loading {
 		opacity: 0;
-	}
-
-	.interface-interface-skeleton__header {
-		border: 0;
 	}
 }
 
@@ -22,17 +18,60 @@
 	justify-content: center;
 }
 
-// Adjust the position of the notices when breadcrumbs are present
-.edit-site .has-block-breadcrumbs.is-full-canvas .components-editor-notices__snackbar {
-	bottom: 40px;
+.edit-site-editor__view-mode-toggle {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable */
+	top: 0;
+	left: 0;
+	height: $header-height;
+	width: $header-height;
+	z-index: 100;
+
+	.components-button {
+		color: $white;
+		height: 100%;
+		width: 100%;
+		border-radius: 0;
+		overflow: hidden;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&:hover,
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.edit-site-editor__view-mode-toggle-icon {
+		svg,
+		img {
+			background: $gray-900;
+			display: block;
+		}
+	}
 }
 
-// Adjust the position of the notices
-.edit-site .components-editor-notices__snackbar {
+.edit-site-editor__back-icon {
 	position: absolute;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
+	top: 0;
+	left: 0;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: hsla(0, 0%, 80%);
+	pointer-events: none;
+
+	&.has-site-icon {
+		background-color: hsla(0, 0%, 100%, 0.6);
+		-webkit-backdrop-filter: saturate(180%) blur(15px);
+		backdrop-filter: saturate(180%) blur(15px);
+	}
 }
-@include editor-left(".edit-site .components-editor-notices__snackbar")

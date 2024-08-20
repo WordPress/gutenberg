@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -20,7 +20,7 @@ function UnforwardedButtonGroup(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { className, ...restProps } = props;
-	const classes = classnames( 'components-button-group', className );
+	const classes = clsx( 'components-button-group', className );
 
 	return (
 		<div ref={ ref } role="group" className={ classes } { ...restProps } />

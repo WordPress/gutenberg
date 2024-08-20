@@ -29,14 +29,6 @@ _Optional._ Placeholder text to show when the field is empty, similar to the
 
 _Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
 
-### `multiline: Boolean | String`
-
-_Optional._ By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
-
-### `onSplit( value: String ): Function`
-
-_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
-
 ### `onReplace( blocks: Array ): Function`
 
 _Optional._ Called when the `RichText` instance can be replaced with the given blocks.

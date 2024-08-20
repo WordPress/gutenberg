@@ -28,6 +28,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 		}
 	}
 	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
 
 	$supports_theme_json = wp_theme_has_theme_json();
 	if ( empty( $types ) && ! $supports_theme_json ) {
@@ -143,6 +144,7 @@ function gutenberg_get_global_settings( $path = array(), $context = array() ) {
  * @return string
  */
 function gutenberg_get_global_styles_custom_css() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_get_global_stylesheet' );
 	// Ignore cache when `WP_DEBUG` is enabled, so it doesn't interfere with the theme developers workflow.
 	$can_use_cached = ! WP_DEBUG;
 	$cache_key      = 'gutenberg_get_global_custom_css';
@@ -176,6 +178,7 @@ function gutenberg_get_global_styles_custom_css() {
  * @return string The global base custom CSS.
  */
 function gutenberg_get_global_styles_base_custom_css() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_get_global_stylesheet' );
 	if ( ! wp_theme_has_theme_json() ) {
 		return '';
 	}
@@ -210,6 +213,7 @@ function gutenberg_get_global_styles_base_custom_css() {
  * @global WP_Styles $wp_styles
  */
 function gutenberg_add_global_styles_block_custom_css() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 18.6.0', 'gutenberg_add_global_styles_for_blocks' );
 	global $wp_styles;
 
 	if ( ! wp_theme_has_theme_json() || ! wp_should_load_separate_core_block_assets() ) {
@@ -254,6 +258,7 @@ function gutenberg_add_global_styles_block_custom_css() {
 function gutenberg_add_global_styles_for_blocks() {
 	global $wp_styles;
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$tree        = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
 	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );

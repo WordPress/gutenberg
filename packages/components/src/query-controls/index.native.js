@@ -7,7 +7,8 @@ import { useCallback, memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl } from '../';
+import RangeControl from '../range-control';
+import SelectControl from '../select-control';
 import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;

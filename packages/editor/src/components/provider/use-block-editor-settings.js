@@ -24,8 +24,10 @@ import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { lock, unlock } from '../../lock-unlock';
+import { useGlobalStylesContext } from '../global-styles-provider';
 
 const EMPTY_BLOCKS_LIST = [];
+const EMPTY_OBJECT = {};
 
 function __experimentalReusableBlocksSelect( select ) {
 	return (
@@ -40,7 +42,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
@@ -82,9 +83,14 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
-	'__experimentalArchiveTitleTypeLabel',
-	'__experimentalArchiveTitleNameLabel',
 ];
+
+const {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} = unlock( privateApis );
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -127,7 +133,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
-			const siteSettings = canUser( 'read', 'settings' )
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
@@ -161,8 +170,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
-				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
-				userCanCreatePages: canUser( 'create', 'pages' ),
+				hasUploadPermissions:
+					canUser( 'create', {
+						kind: 'root',
+						name: 'media',
+					} ) ?? true,
+				userCanCreatePages: canUser( 'create', {
+					kind: 'postType',
+					name: 'page',
+				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
@@ -172,6 +188,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
+
+	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
+	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
+	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -259,6 +279,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			[ globalStylesDataKey ]: globalStylesData,
+			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -267,12 +289,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
-				unlock( select( coreStore ) ).getBlockPatternsForPostType(
-					postType
-				),
-			[ unlock( privateApis ).reusableBlocksSelectKey ]:
-				__experimentalReusableBlocksSelect,
+			[ selectBlockPatternsKey ]: ( select ) => {
+				const { hasFinishedResolution, getBlockPatternsForPostType } =
+					unlock( select( coreStore ) );
+				const patterns = getBlockPatternsForPostType( postType );
+				return hasFinishedResolution( 'getBlockPatterns' )
+					? patterns
+					: undefined;
+			},
+			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -286,7 +311,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalUndo: undo,
 			// Check whether we want all site editor frames to have outlines
 			// including the navigation / pattern / parts editors.
-			outlineMode: postType === 'wp_template',
+			outlineMode: ! isDistractionFree && postType === 'wp_template',
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
@@ -327,6 +352,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
+		globalStylesData,
+		globalStylesLinksData,
 	] );
 }
 

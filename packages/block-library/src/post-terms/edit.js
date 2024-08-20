@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -65,7 +65,7 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `taxonomy-${ term }` ]: term,
 		} ),
@@ -83,6 +83,7 @@ export default function PostTermsEdit( {
 			</BlockControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Separator' ) }

@@ -235,7 +235,7 @@ test.describe( 'Links', () => {
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
 		// Submit the link.
@@ -349,7 +349,7 @@ test.describe( 'Links', () => {
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
 		// Submit the link.
@@ -679,7 +679,7 @@ test.describe( 'Links', () => {
 		// Change the URL.
 		// Note: getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await linkPopover.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await linkPopover.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Save the link.

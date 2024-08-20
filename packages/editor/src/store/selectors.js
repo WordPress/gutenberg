@@ -983,7 +983,7 @@ export function getEditedPostSlug( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix,
+ * Returns the permalink for a post, split into its three parts: the prefix,
  * the postName, and the suffix.
  *
  * @param {Object} state Editor state.

@@ -111,10 +111,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	// displays based on the relationship between the selected block
 	// and its parent, and only enable it if the parent is controlling
 	// its children blocks.
-	const blockInspectorAnimationSettings = useBlockInspectorAnimationSettings(
-		blockType,
-		selectedBlockClientId
-	);
+	const blockInspectorAnimationSettings =
+		useBlockInspectorAnimationSettings( blockType );
 
 	const borderPanelLabel = useBorderPanelLabel( {
 		blockName: selectedBlockName,
@@ -133,6 +131,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 							group="color"
 							label={ __( 'Color' ) }
 							className="color-block-support-panel__inner-wrapper"
+						/>
+						<InspectorControls.Slot
+							group="background"
+							label={ __( 'Background image' ) }
 						/>
 						<InspectorControls.Slot
 							group="typography"
@@ -288,6 +290,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						className="color-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background image' ) }
+					/>
+					<InspectorControls.Slot
 						group="typography"
 						label={ __( 'Typography' ) }
 					/>
@@ -300,10 +306,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ borderPanelLabel }
 					/>
 					<InspectorControls.Slot group="styles" />
-					<InspectorControls.Slot
-						group="background"
-						label={ __( 'Background image' ) }
-					/>
 					<PositionControls />
 					<div>
 						<AdvancedControls />

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
@@ -48,13 +49,13 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
  *
  * export default function Edit() {
  *
- *   const blockProps = useBlockProps(
+ *   const blockProps = useBlockProps( {
  *     className: 'my-custom-class',
  *     style: {
  *       color: '#222222',
  *       backgroundColor: '#eeeeee'
  *     }
- *   )
+ *   } )
  *
  *   return (
  *	    <div { ...blockProps }>
@@ -114,7 +115,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered(),
+		useIsHovered( { clientId } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -122,6 +123,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
+		useScrollIntoView( { isSelected } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -164,7 +166,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classnames(
+		className: clsx(
 			'block-editor-block-list__block',
 			{
 				// The wp-block className is important for editor styles.

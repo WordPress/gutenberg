@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,7 @@ import { useCallback, useState, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -100,14 +100,13 @@ function useHasChildLayout( settings ) {
 }
 
 function useHasSpacingPresets( settings ) {
-	const {
-		custom,
-		theme,
-		default: defaultPresets,
-	} = settings?.spacing?.spacingSizes || {};
-	const presets = custom ?? theme ?? defaultPresets ?? [];
-
-	return presets.length > 0;
+	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
+	return (
+		( defaultSpacingSizes !== false &&
+			spacingSizes?.default?.length > 0 ) ||
+		spacingSizes?.theme?.length > 0 ||
+		spacingSizes?.custom?.length > 0
+	);
 }
 
 function filterValuesBySides( values, sides ) {
@@ -176,6 +175,7 @@ function DimensionsToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -186,7 +186,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -527,7 +527,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -567,7 +567,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -609,7 +609,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }

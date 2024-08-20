@@ -314,21 +314,21 @@ export const registerCoreBlocks = (
  * __experimentalRegisterExperimentalCoreBlocks( settings );
  * ```
  */
-export const __experimentalRegisterExperimentalCoreBlocks = process.env
-	.IS_GUTENBERG_PLUGIN
-	? ( { enableFSEBlocks } = {} ) => {
-			const enabledExperiments = [ enableFSEBlocks ? 'fse' : null ];
-			getAllBlocks()
-				.filter( ( { metadata } ) =>
-					isBlockMetadataExperimental( metadata )
-				)
-				.filter(
-					( { metadata: { __experimental } } ) =>
-						__experimental === true ||
-						enabledExperiments.includes( __experimental )
-				)
-				.forEach( ( { init } ) => init() );
-	  }
-	: undefined;
+export const __experimentalRegisterExperimentalCoreBlocks =
+	globalThis.IS_GUTENBERG_PLUGIN
+		? ( { enableFSEBlocks } = {} ) => {
+				const enabledExperiments = [ enableFSEBlocks ? 'fse' : null ];
+				getAllBlocks()
+					.filter( ( { metadata } ) =>
+						isBlockMetadataExperimental( metadata )
+					)
+					.filter(
+						( { metadata: { __experimental } } ) =>
+							__experimental === true ||
+							enabledExperiments.includes( __experimental )
+					)
+					.forEach( ( { init } ) => init() );
+		  }
+		: undefined;
 
 export { privateApis } from './private-apis';

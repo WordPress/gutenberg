@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -261,6 +261,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
+	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
 
 	// Change the label using inspector causes rich text to change focus on firefox.
@@ -403,7 +404,7 @@ export default function NavigationLinkEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -440,7 +441,7 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const classes = classnames( 'wp-block-navigation-item__content', {
+	const classes = clsx( 'wp-block-navigation-item__content', {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 
@@ -570,14 +571,27 @@ export default function NavigationLinkEdit( {
 					) }
 					{ isLinkOpen && (
 						<LinkUI
+							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
 							onClose={ () => {
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
-									// Select the previous block to keep focus nearby
-									selectPreviousBlock( clientId, true );
+									// Fixes https://github.com/WordPress/gutenberg/issues/61361
+									// There's a chance we're closing due to the user selecting the browse all button.
+									// Only move focus if the focus is still within the popover ui. If it's not within
+									// the popover, it's because something has taken the focus from the popover, and
+									// we don't want to steal it back.
+									if (
+										linkUIref.current.contains(
+											window.document.activeElement
+										)
+									) {
+										// Select the previous block to keep focus nearby
+										selectPreviousBlock( clientId, true );
+									}
+
 									// Remove the link.
 									onReplace( [] );
 									return;

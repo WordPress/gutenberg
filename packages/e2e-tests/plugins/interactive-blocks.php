@@ -29,11 +29,7 @@ add_action(
 			// Ensure the interactivity API is loaded.
 			wp_interactivity();
 			// But remove the server directive processing.
-			remove_filter(
-				'render_block_data',
-				'wp_interactivity_process_directives_of_interactive_blocks',
-				100
-			);
+			add_filter( 'interactivity_process_directives', '__return_false' );
 		}
 	}
 );

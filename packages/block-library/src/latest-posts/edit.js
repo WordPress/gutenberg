@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
-	BaseControl,
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -16,19 +15,28 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { pin, list, grid } from '@wordpress/icons';
+import {
+	pin,
+	list,
+	grid,
+	alignNone,
+	positionLeft,
+	positionCenter,
+	positionRight,
+} from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
@@ -197,11 +205,35 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		setAttributes( { categories: allCategories } );
 	};
 
+	const imageAlignmentOptions = [
+		{
+			value: 'none',
+			icon: alignNone,
+			label: __( 'None' ),
+		},
+		{
+			value: 'left',
+			icon: positionLeft,
+			label: __( 'Left' ),
+		},
+		{
+			value: 'center',
+			icon: positionCenter,
+			label: __( 'Center' ),
+		},
+		{
+			value: 'right',
+			icon: positionRight,
+			label: __( 'Right' ),
+		},
+	];
+
 	const hasPosts = !! latestPosts?.length;
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Post content' ) }>
 				<ToggleControl
+					__nextHasNoMarginBottom
 					label={ __( 'Post content' ) }
 					checked={ displayPostContent }
 					onChange={ ( value ) =>
@@ -210,6 +242,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				/>
 				{ displayPostContent && (
 					<RadioControl
+						className="wp-block-latest-posts__post-content-radio"
 						label={ __( 'Show:' ) }
 						selected={ displayPostContentRadio }
 						options={ [
@@ -302,21 +335,32 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								} )
 							}
 						/>
-						<BaseControl className="editor-latest-posts-image-alignment-control">
-							<BaseControl.VisualLabel>
-								{ __( 'Image alignment' ) }
-							</BaseControl.VisualLabel>
-							<BlockAlignmentToolbar
-								value={ featuredImageAlign }
-								onChange={ ( value ) =>
-									setAttributes( {
-										featuredImageAlign: value,
-									} )
+						<ToggleGroupControl
+							className="editor-latest-posts-image-alignment-control"
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Image alignment' ) }
+							value={ featuredImageAlign || 'none' }
+							onChange={ ( value ) =>
+								setAttributes( {
+									featuredImageAlign:
+										value !== 'none' ? value : undefined,
+								} )
+							}
+						>
+							{ imageAlignmentOptions.map(
+								( { value, icon, label } ) => {
+									return (
+										<ToggleGroupControlOptionIcon
+											key={ value }
+											value={ value }
+											icon={ icon }
+											label={ label }
+										/>
+									);
 								}
-								controls={ [ 'left', 'center', 'right' ] }
-								isCollapsed={ false }
-							/>
-						</BaseControl>
+							) }
+						</ToggleGroupControl>
 						<ToggleControl
 							__nextHasNoMarginBottom
 							label={ __( 'Add link to featured image' ) }
@@ -383,7 +427,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'wp-block-latest-posts__list': true,
 			'is-grid': postLayout === 'grid',
 			'has-dates': displayPostDate,
@@ -416,13 +460,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const layoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'list' } ),
 			isActive: postLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'grid' } ),
 			isActive: postLayout === 'grid',
 		},
@@ -454,7 +498,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 					const { url: imageSourceUrl, alt: featuredImageAlt } =
 						getFeaturedImageDetails( post, featuredImageSizeSlug );
-					const imageClasses = classnames( {
+					const imageClasses = clsx( {
 						'wp-block-latest-posts__featured-image': true,
 						[ `align${ featuredImageAlign }` ]:
 							!! featuredImageAlign,

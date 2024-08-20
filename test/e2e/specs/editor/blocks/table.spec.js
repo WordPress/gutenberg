@@ -275,10 +275,11 @@ test.describe( 'Table', () => {
 			.locator( 'role=button[name="Create Table"i]' )
 			.click();
 
-		// Click the first cell and add some text.
-		await editor.canvas
-			.locator( 'role=document[name="Block: Table"i] >> figcaption' )
-			.click();
+		await editor.clickBlockToolbarButton( 'Add caption' );
+		const caption = editor.canvas.locator(
+			'role=textbox[name="Table caption text"i]'
+		);
+		await expect( caption ).toBeFocused();
 		await page.keyboard.type( 'Caption!' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

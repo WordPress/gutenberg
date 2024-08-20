@@ -17,6 +17,7 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -28,7 +29,6 @@ import {
 	BottomSheetSelectControl,
 	CSS_UNITS,
 	filterUnitsWithSettings,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { link } from '@wordpress/icons';
 // eslint-disable-next-line no-restricted-imports

@@ -51,25 +51,19 @@ function FontLibraryProvider( { children } ) {
 		'globalStyles',
 		globalStylesId
 	);
-	const fontFamiliesHasChanges =
-		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
-	const [ notice, setNotice ] = useState( null );
 
 	const refreshLibrary = () => {
 		setRefreshKey( Date.now() );
 	};
 
-	const {
-		records: libraryPosts = [],
-		isResolving: isResolvingLibrary,
-		hasResolved: hasResolvedLibrary,
-	} = useEntityRecords( 'postType', 'wp_font_family', {
-		refreshKey,
-		_embed: true,
-	} );
+	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
+		useEntityRecords( 'postType', 'wp_font_family', {
+			refreshKey,
+			_embed: true,
+		} );
 
 	const libraryFonts =
 		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
@@ -86,12 +80,6 @@ function FontLibraryProvider( { children } ) {
 	// Global Styles (settings) font families
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
-	);
-	// theme.json file font families
-	const [ baseFontFamilies ] = useGlobalSetting(
-		'typography.fontFamilies',
-		undefined,
-		'base'
 	);
 
 	/*
@@ -131,24 +119,6 @@ function FontLibraryProvider( { children } ) {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 
-	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
-
-	/*
-	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
-	 *
-	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
-	 * Avoids inconsistencies with the fonts listed in the font library modal as base (inactivated).
-	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variation is applied.
-	 */
-	const baseThemeFonts = baseFontFamilies?.theme
-		? themeFonts.concat(
-				baseFontFamilies.theme
-					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
-					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		  )
-		: [];
-
 	const customFonts = fontFamilies?.custom
 		? fontFamilies.custom
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
@@ -168,8 +138,6 @@ function FontLibraryProvider( { children } ) {
 	}, [ modalTabOpen ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
-		setNotice( null );
-
 		// If font is null, reset the selected font
 		if ( ! font ) {
 			setLibraryFontSelected( null );
@@ -185,10 +153,6 @@ function FontLibraryProvider( { children } ) {
 			...( fontSelected || font ),
 			source: font.source,
 		} );
-	};
-
-	const toggleModal = ( tabName ) => {
-		setModalTabOpen( tabName || null );
 	};
 
 	// Demo
@@ -484,13 +448,13 @@ function FontLibraryProvider( { children } ) {
 		);
 
 		if ( isFaceActivated ) {
+			unloadFontFaceInBrowser( face, 'all' );
+		} else {
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
-		} else {
-			unloadFontFaceInBrowser( face, 'all' );
 		}
 	};
 
@@ -549,9 +513,6 @@ function FontLibraryProvider( { children } ) {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				fontFamilies,
-				themeFonts,
-				baseThemeFonts,
-				customFonts,
 				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
@@ -561,14 +522,10 @@ function FontLibraryProvider( { children } ) {
 				toggleActivateFont,
 				getAvailableFontsOutline,
 				modalTabOpen,
-				toggleModal,
+				setModalTabOpen,
 				refreshLibrary,
-				notice,
-				setNotice,
 				saveFontFamilies,
-				fontFamiliesHasChanges,
 				isResolvingLibrary,
-				hasResolvedLibrary,
 				isInstalling,
 				collections,
 				getFontCollection,

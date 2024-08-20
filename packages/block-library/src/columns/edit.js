@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -192,7 +192,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const classes = classnames( {
+	const classes = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
 	} );

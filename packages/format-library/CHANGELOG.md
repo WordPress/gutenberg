@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.35.0 (2024-05-16)
+
+## 4.34.0 (2024-05-02)
+
 ## 4.33.0 (2024-04-19)
 
 ## 4.32.0 (2024-04-03)
@@ -114,7 +134,7 @@
 
 ## 3.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/dom` and `@wordpress/keycodes` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -122,7 +142,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -161,7 +181,7 @@
 
 ## 1.2.3 (2018-11-20)
 
-### Bug fixes
+### Bug Fixes
 
 -   Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
 -   Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.
@@ -172,7 +192,7 @@
 
 ## 1.2.0 (2018-11-12)
 
-## New Feature
+### New Features
 
 -   Add URL validation to links.
 

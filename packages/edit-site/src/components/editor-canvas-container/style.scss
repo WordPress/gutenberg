@@ -1,4 +1,20 @@
 .edit-site-editor-canvas-container {
+	height: 100%;
+	background-color: $gray-300;
+
+	// Controls height of editor and editor canvas container (style book, global styles revisions previews etc.)
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.edit-site-layout.is-full-canvas & {
+		padding: $grid-unit-30 $grid-unit-30 0;
+	}
+}
+
+.edit-site-editor-canvas-container__section {
 	background: $white; // Fallback color, overridden by JavaScript.
 	border-radius: $radius-block-ui;
 	bottom: 0;
