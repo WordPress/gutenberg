@@ -10,12 +10,7 @@ module.exports = {
 			version: 'detect',
 		},
 	},
-	plugins: [
-		'@wordpress',
-		'react-compiler',
-		'react',
-		'react-hooks',
-	],
+	plugins: [ '@wordpress', 'react-compiler', 'react', 'react-hooks' ],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': [
 			'error',
