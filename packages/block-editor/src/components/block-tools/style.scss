@@ -63,7 +63,7 @@
 	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
 		background: $gray-900;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		color: $white;
 		padding: 0;
 
@@ -95,7 +95,7 @@
 	z-index: z-index(".block-editor-block-list__block-selection-button");
 
 	// Dark block UI appearance.
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background-color: $gray-900;
 
 	font-size: $default-font-size;
@@ -188,7 +188,7 @@
 
 	.block-editor-block-contextual-toolbar {
 		border: $border-width solid $gray-900;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		overflow: visible; // allow the parent selector to be visible
 		position: static;
 		width: auto;

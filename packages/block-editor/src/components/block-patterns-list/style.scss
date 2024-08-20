@@ -36,12 +36,12 @@
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 
 		&::after {
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 		}
 	}
 

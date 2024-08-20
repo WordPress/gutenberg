@@ -14,7 +14,7 @@
 		filter: none !important;
 
 		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 
 		> svg {
 			opacity: 0;

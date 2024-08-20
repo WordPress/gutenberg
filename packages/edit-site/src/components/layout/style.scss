@@ -120,7 +120,7 @@
 			overflow: hidden;
 
 			.edit-site-layout:not(.is-full-canvas) & {
-				border-radius: $radius-block-ui * 4;
+				border-radius: $radius-small * 4;
 			}
 		}
 	}
@@ -200,7 +200,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		right: 9px;
 		bottom: 9px;
 		left: 9px;
-		border-radius: $radius-block-ui + $border-width + $border-width;
+		border-radius: $radius-small + $border-width + $border-width;
 		box-shadow: none;
 	}
 

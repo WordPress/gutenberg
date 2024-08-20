@@ -100,7 +100,7 @@
 		width: 300px;
 		border: $border-width solid $gray-900;
 		background: $white;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		outline: none;
 		box-shadow: none;
 		overflow: auto;
@@ -162,7 +162,7 @@
 
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			transition: all 0.05s ease-in-out;
 			position: relative;
 			border: $border-width solid transparent;

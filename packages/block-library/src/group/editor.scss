@@ -43,7 +43,7 @@
 		pointer-events: none;
 		min-height: $grid-unit-60 - $border-width - $border-width;
 		border: $border-width dashed currentColor;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 	}
 
 	// Let the parent be selectable in the placeholder area.

@@ -39,7 +39,7 @@
 .block-editor-global-styles__shadow-indicator {
 	color: $gray-800;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	cursor: pointer;
 	padding: 0;
 
@@ -208,7 +208,7 @@
 	.components-focal-point-picker-wrapper {
 		background-color: $gray-100;
 		width: 100%;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		border: $border-width solid $gray-300;
 	}
 
