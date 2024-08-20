@@ -31,7 +31,7 @@ export const IndicatorStyled = styled( ColorIndicator )`
 export const NameInputControl = styled( InputControl )`
 	${ InputControlContainer } {
 		background: ${ COLORS.gray[ 100 ] };
-		border-radius: ${ CONFIG.controlBorderRadius };
+		border-radius: ${ CONFIG.radiusXSmall };
 		${ Input }${ Input }${ Input }${ Input } {
 			height: ${ space( 8 ) };
 		}
@@ -85,8 +85,8 @@ export const PaletteItem = styled( View )`
 		outline-offset: 0;
 	}
 
-	border-top-left-radius: ${ CONFIG.controlBorderRadius };
-	border-top-right-radius: ${ CONFIG.controlBorderRadius };
+	border-top-left-radius: ${ CONFIG.radiusSmall };
+	border-top-right-radius: ${ CONFIG.radiusSmall };
 
 	& + & {
 		border-top-left-radius: 0;
@@ -94,8 +94,8 @@ export const PaletteItem = styled( View )`
 	}
 
 	&:last-child {
-		border-bottom-left-radius: ${ CONFIG.controlBorderRadius };
-		border-bottom-right-radius: ${ CONFIG.controlBorderRadius };
+		border-bottom-left-radius: ${ CONFIG.radiusSmall };
+		border-bottom-right-radius: ${ CONFIG.radiusSmall };
 		border-bottom-color: ${ CONFIG.surfaceBorderColor };
 	}
 

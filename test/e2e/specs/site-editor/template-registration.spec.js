@@ -243,8 +243,13 @@ test.describe( 'Block template registration', () => {
 
 	test( 'WP default templates can be overridden by plugins', async ( {
 		page,
+		requestUtils,
 	} ) => {
-		await page.goto( '?page_id=2' );
+		const { id } = await requestUtils.createPage( {
+			title: 'Plugin override page',
+			status: 'publish',
+		} );
+		await page.goto( `?page_id=${ id }` );
 		await expect(
 			page.getByText( 'This is a plugin-registered page template.' )
 		).toBeVisible();

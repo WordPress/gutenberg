@@ -180,6 +180,8 @@ function PostFeaturedImage( {
 											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
 									aria-haspopup="dialog"
+									disabled={ isLoading }
+									accessibleWhenDisabled
 								>
 									{ !! featuredImageId && media && (
 										<img

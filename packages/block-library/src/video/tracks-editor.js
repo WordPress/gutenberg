@@ -99,8 +99,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</span>
 				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus
@@ -116,8 +115,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						help={ __( 'Title of track' ) }
 					/>
 					<TextControl
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						onChange={ ( newSrcLang ) =>
 							onChange( {
@@ -132,6 +130,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</Grid>
 				<VStack spacing="8">
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						className="block-library-video-tracks-editor__single-track-editor-kind-select"
 						options={ KIND_OPTIONS }
