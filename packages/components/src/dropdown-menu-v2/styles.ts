@@ -28,8 +28,8 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - those values are different from saved variables?
 // - should bring this into the config, and make themeable
 // - border color and divider color are different?
-const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
-const DIVIDER_COLOR = COLORS.gray[ 200 ];
+const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
+const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
@@ -194,7 +194,7 @@ const baseItem = css`
 
 	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: ${ COLORS.gray[ 100 ] };
+		background-color: ${ COLORS.theme.gray[ 100 ] };
 		color: ${ COLORS.theme.foreground };
 	}
 
