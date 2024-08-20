@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `BorderBoxControl`: Fix border styling direction for RTL environments ([#64513](https://github.com/WordPress/gutenberg/pull/64513)).
+
 ### Deprecations
 
 -   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
@@ -28,7 +30,6 @@
 -   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
 -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
 -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
-
 
 ### Bug Fixes
 
