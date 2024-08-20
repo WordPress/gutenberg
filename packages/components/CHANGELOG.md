@@ -2,19 +2,97 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
+    -   `BaseControl`
+    -   `CheckboxControl`
+    -   `ComboboxControl`
+    -   `DimensionControl`
+    -   `FocalPointPicker`
+    -   `RangeControl`
+    -   `SearchControl`
+    -   `SelectControl`
+    -   `TextControl`
+    -   `TextareaControl`
+    -   `ToggleControl`
+    -   `ToggleGroupControl`
+    -   `TreeSelect`
+-   Deprecate `NavigatorToParentButton` and `useNavigator().goToParent()` in favor of `NavigatorBackButton` and `useNavigator().goBack()` ([#63317](https://github.com/WordPress/gutenberg/pull/63317)).
+
+### Enhancements
+
+-   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+-   `Composite`: use internal context to forward the composite store to sub-components ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+-   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
+-   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
+-   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
+-   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+-   `AlignmentMatrixControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `AnglePickerControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `BorderControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ButtonGroup`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Button`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `CircularOptionPicker`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ColorIndicator`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ColorPalette`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `CustomGradientPicker`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `DropZone`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `DropdownMenuV2`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `FocalPointPicker`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Guide`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Modal`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Placeholder`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Popover`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ProgressBar`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `RadioControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Snackbar`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `TabPanel`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Text`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ToggleGroupControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `ToolbarGroup`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Toolbar`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Tooltip`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+-   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
+-   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
+
+### Bug Fixes
+
+-   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
+-   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
+-   `RadioGroup`: use fieldset and legend to group radio inputs ([#64582](https://github.com/WordPress/gutenberg/pull/64582)).
+
+### Internal
+
+-   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+-   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
+-   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+-   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
+-   Update `ariakit` to version `0.4.10` ([#64637](https://github.com/WordPress/gutenberg/pull/64637)).
+
+## 28.5.0 (2024-08-07)
+
 ### Bug Fixes
 
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
 -   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
 -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
+-   `Button`: Fix tertiary destructive hover style ([#64152](https://github.com/WordPress/gutenberg/pull/64152)).
+-   `Autocompleter UI`: Fix text color when hovering selected item ([#64294](https://github.com/WordPress/gutenberg/pull/64294)).
+-   `Heading`: Add the missing `size` prop to the component's props type ([#64299](https://github.com/WordPress/gutenberg/pull/64299)).
+-   `TextControl`: Fix the padding of the component to be consistent with the rest of the controls. ([#64326](https://github.com/WordPress/gutenberg/pull/64326)).
 
 ### Enhancements
 
+-   `ColorPalette`: partial support of `color-mix()` CSS colors ([#64224](https://github.com/WordPress/gutenberg/pull/64224)).
 -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
 -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
+-   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
 -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
 -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
+-   `DimensionControl`: Add `__nextHasNoMarginBottom` prop to remove bottom margin ([#64346](https://github.com/WordPress/gutenberg/pull/64346)).
 
 ### Internal
 

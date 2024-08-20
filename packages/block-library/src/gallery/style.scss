@@ -43,21 +43,43 @@ figure.wp-block-gallery.has-nested-images {
 			width: auto;
 		}
 
+		// Position caption and scrim at the bottom.
+		&:has(figcaption)::before,
 		figcaption {
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
-			bottom: 0;
-			color: $white;
-			font-size: $default-font-size;
-			left: 0;
-			margin-bottom: 0;
-			max-height: 60%;
-			overflow: auto;
-			padding: 0 8px 8px;
 			position: absolute;
+			bottom: 0;
+			right: 0;
+			left: 0;
+			max-height: 100%;
+		}
+
+		// Create a background blur layer.
+		&:has(figcaption)::before {
+			content: "";
+			height: 100%;
+			max-height: 40%;
+
+			// Blur the background under the gradient scrim.
+			backdrop-filter: blur(3px);
+
+			// Crop the caption so the blur is only on the edge.
+			mask-image: linear-gradient(0deg, $black 20%, transparent 100%);
+		}
+
+		// Place the caption at the bottom.
+		figcaption {
+			color: $white;
+			text-shadow: 0 0 1.5px $black;
+			font-size: $default-font-size;
+			margin: 0;
+			overflow: auto;
+			padding: 1em;
 			text-align: center;
-			width: 100%;
 			box-sizing: border-box;
 			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
+
+			// Dark gradient scrim.
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, transparent 100%);
 
 			img {
 				display: inline;
@@ -85,6 +107,10 @@ figure.wp-block-gallery.has-nested-images {
 				margin: 0;
 				padding: 10px 10px 9px;
 				position: relative;
+				text-shadow: none;
+			}
+			&::before {
+				content: none;
 			}
 		}
 	}

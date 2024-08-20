@@ -113,8 +113,9 @@ const UnforwardedPopover = (
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
+		// props (except for `animate` and `children` which are re-defined in
+		// `PopoverProps`, and `style` which is merged safely).
+		keyof Omit< MotionProps, 'animate' | 'children' | 'style' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
@@ -139,6 +140,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
+		style: contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -370,6 +372,7 @@ const UnforwardedPopover = (
 	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
 		? {
 				style: {
+					...contentStyle,
 					...motionInlineStyles,
 					...style,
 				},
@@ -378,7 +381,10 @@ const UnforwardedPopover = (
 		  }
 		: {
 				animate: false,
-				style,
+				style: {
+					...contentStyle,
+					...style,
+				},
 		  };
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating

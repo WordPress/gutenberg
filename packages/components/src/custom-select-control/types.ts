@@ -55,7 +55,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
-	onChange?: ( newValue: CustomSelectChangeObject< T > ) => void;
+	onChange?: ( newValue: CustomSelectChangeObject< NoInfer< T > > ) => void;
 	/**
 	 * A handler for `blur` events on the trigger button.
 	 *
@@ -83,7 +83,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * The list of options that can be chosen from.
 	 */
-	options: Array< T >;
+	options: ReadonlyArray< T >;
 	/**
 	 * The size of the control.
 	 *
@@ -93,7 +93,7 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: T;
+	value?: NoInfer< T >;
 	/**
 	 * Use the `showSelectedHint` property instead.
 	 * @deprecated

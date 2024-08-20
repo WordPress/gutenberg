@@ -8,7 +8,6 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PluginPostStatusInfo from '../plugin-post-status-info';
-import PostActions from '../post-actions';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
 import PostContentInformation from '../post-content-information';
@@ -36,16 +35,23 @@ import { PrivatePostLastRevision } from '../post-last-revision';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
-		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
-		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, getCurrentPostType } =
-			select( editorStore );
-		return {
-			isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
-			postType: getCurrentPostType(),
-		};
-	}, [] );
+	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
+		( select ) => {
+			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+			const {
+				isEditorPanelRemoved,
+				getCurrentPostType,
+				getCurrentPostId,
+			} = select( editorStore );
+			return {
+				isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
+				postType: getCurrentPostType(),
+				postId: getCurrentPostId(),
+			};
+		},
+		[]
+	);
 
 	return (
 		<PostPanelSection className="editor-post-summary">
@@ -54,11 +60,9 @@ export default function PostSummary( { onActionPerformed } ) {
 					<>
 						<VStack spacing={ 4 }>
 							<PostCardPanel
-								actions={
-									<PostActions
-										onActionPerformed={ onActionPerformed }
-									/>
-								}
+								postType={ postType }
+								postId={ postId }
+								onActionPerformed={ onActionPerformed }
 							/>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PostExcerptPanel />

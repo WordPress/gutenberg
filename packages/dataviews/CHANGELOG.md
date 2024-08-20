@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The "move left/move right" controls in the table layout (popup displayed on cliking header) are always visible. ([#64646](https://github.com/WordPress/gutenberg/pull/64646)). Before this, its visibility depending on filters, enableSorting, and enableHiding.
+
+## 4.1.0 (2024-08-07)
+
 ## Internal
 
 -   Upgraded `@ariakit/react` (v0.4.7) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
@@ -13,6 +17,12 @@
 -   `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
 -   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
 -   `header` field property has been renamed to `label`.
+-   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
+-   `DataForm`'s `onChange` prop has been update to receive as argument only the fields that have changed.
+
+### New features
+
+-   Support multiple layouts in `DataForm` component and introduce the `panel` layout.
 
 ## 3.0.0 (2024-07-10)
 
