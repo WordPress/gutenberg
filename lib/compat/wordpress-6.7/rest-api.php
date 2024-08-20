@@ -107,4 +107,4 @@ add_action( 'rest_api_init', 'gutenberg_register_wp_rest_templates_controller_pl
 function gutenberg_override_default_rest_server() {
 	return 'Gutenberg_REST_Server';
 }
-add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server' );
+add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
