@@ -80,6 +80,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
+	const isMovable = field.enableMoving !== false;
 	const isSorted = view.sort?.field === field.id;
 	const operators = sanitizeOperators( field );
 	// Filter can be added:
@@ -91,7 +92,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		!! field.elements?.length &&
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
-	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
+	if ( ! isSortable && ! isHidable && ! isMovable && ! canAddFilter ) {
 		return field.label;
 	}
 	return (
@@ -182,78 +183,91 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
 				) }
-				<DropdownMenuGroup>
-					<DropdownMenuItem
-						prefix={ <Icon icon={ arrowLeft } /> }
-						disabled={ index < 1 }
-						onClick={ () => {
-							if ( ! view.fields || index < 1 ) {
-								return;
-							}
-							onChangeView( {
-								...view,
-								fields: [
-									...( view.fields.slice( 0, index - 1 ) ??
-										[] ),
-									field.id,
-									view.fields[ index - 1 ],
-									...view.fields.slice( index + 1 ),
-								],
-							} );
-						} }
-					>
-						<DropdownMenuItemLabel>
-							{ __( 'Move left' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						prefix={ <Icon icon={ arrowRight } /> }
-						disabled={
-							! view.fields || index >= view.fields.length - 1
-						}
-						onClick={ () => {
-							if (
-								! view.fields ||
-								index >= view.fields.length - 1
-							) {
-								return;
-							}
-							onChangeView( {
-								...view,
-								fields: [
-									...( view.fields.slice( 0, index ) ?? [] ),
-									view.fields[ index + 1 ],
-									field.id,
-									...view.fields.slice( index + 2 ),
-								],
-							} );
-						} }
-					>
-						<DropdownMenuItemLabel>
-							{ __( 'Move right' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
-					{ isHidable && (
-						<DropdownMenuItem
-							prefix={ <Icon icon={ unseen } /> }
-							onClick={ () => {
-								const viewFields =
-									view.fields || fields.map( ( f ) => f.id );
-								onHide( field );
-								onChangeView( {
-									...view,
-									fields: viewFields.filter(
-										( id ) => id !== field.id
-									),
-								} );
-							} }
-						>
-							<DropdownMenuItemLabel>
-								{ __( 'Hide column' ) }
-							</DropdownMenuItemLabel>
-						</DropdownMenuItem>
-					) }
-				</DropdownMenuGroup>
+				{ ( isMovable || isHidable ) && (
+					<DropdownMenuGroup>
+						{ isMovable && (
+							<DropdownMenuItem
+								prefix={ <Icon icon={ arrowLeft } /> }
+								disabled={ index < 1 }
+								onClick={ () => {
+									if ( ! view.fields || index < 1 ) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index - 1
+											) ?? [] ),
+											field.id,
+											view.fields[ index - 1 ],
+											...view.fields.slice( index + 1 ),
+										],
+									} );
+								} }
+							>
+								<DropdownMenuItemLabel>
+									{ __( 'Move left' ) }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
+						) }
+						{ isMovable && (
+							<DropdownMenuItem
+								prefix={ <Icon icon={ arrowRight } /> }
+								disabled={
+									! view.fields ||
+									index >= view.fields.length - 1
+								}
+								onClick={ () => {
+									if (
+										! view.fields ||
+										index >= view.fields.length - 1
+									) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index
+											) ?? [] ),
+											view.fields[ index + 1 ],
+											field.id,
+											...view.fields.slice( index + 2 ),
+										],
+									} );
+								} }
+							>
+								<DropdownMenuItemLabel>
+									{ __( 'Move right' ) }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
+						) }
+						{ isHidable && (
+							<DropdownMenuItem
+								prefix={ <Icon icon={ unseen } /> }
+								onClick={ () => {
+									const viewFields =
+										view.fields ||
+										fields.map( ( f ) => f.id );
+									onHide( field );
+									onChangeView( {
+										...view,
+										fields: viewFields.filter(
+											( id ) => id !== field.id
+										),
+									} );
+								} }
+							>
+								<DropdownMenuItemLabel>
+									{ __( 'Hide column' ) }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
+						) }
+					</DropdownMenuGroup>
+				) }
 			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);

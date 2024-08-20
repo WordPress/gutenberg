@@ -133,6 +133,11 @@ export type Field< Item > = {
 	enableHiding?: boolean;
 
 	/**
+	 * Whether the field is movable.
+	 */
+	enableMoving?: boolean;
+
+	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
 	elements?: Option[];
