@@ -10,6 +10,7 @@ interface NewPostOptions {
 	excerpt?: string;
 	showWelcomeGuide?: boolean;
 	fullscreenMode?: boolean;
+	renderingMode?: string;
 }
 
 /**
@@ -23,7 +24,7 @@ export async function createNewPost(
 	options: NewPostOptions = {}
 ) {
 	const query = new URLSearchParams();
-	const { postType, title, content, excerpt } = options;
+	const { postType, title, content, excerpt, renderingMode } = options;
 
 	if ( postType ) {
 		query.set( 'post_type', postType );
@@ -41,7 +42,9 @@ export async function createNewPost(
 	// Navigate to the new post page.
 	await this.visitAdminPage( 'post-new.php', query.toString() );
 
-	await this.editor.setRenderingMode( 'post-only' );
+	// Set rendering mode.
+	const postRenderingMode = renderingMode ?? 'post-only';
+	await this.editor.setRenderingMode( postRenderingMode );
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
