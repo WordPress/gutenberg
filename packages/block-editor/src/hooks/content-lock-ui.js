@@ -66,21 +66,15 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 				</>
 			) }
 			{ showStartEditingAsBlocks && (
-				<BlockSettingsMenuControls>
-					{ ( { selectedClientIds, onClose } ) =>
-						selectedClientIds.length === 1 &&
-						selectedClientIds[ 0 ] === clientId && (
-							<MenuItem
-								onClick={ () => {
-									modifyContentLockBlock( clientId );
-									onClose();
-								} }
-							>
-								{ __( 'Modify' ) }
-							</MenuItem>
-						)
-					}
-				</BlockSettingsMenuControls>
+				<BlockControls group="other">
+					<ToolbarButton
+						onClick={ () => {
+							modifyContentLockBlock( clientId );
+						} }
+					>
+						{ __( 'Edit' ) }
+					</ToolbarButton>
+				</BlockControls>
 			) }
 		</>
 	);

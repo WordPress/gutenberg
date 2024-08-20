@@ -34,6 +34,7 @@ import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 import { unlock } from '../../lock-unlock';
+import { cloneBlock } from '@wordpress/blocks';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -122,6 +123,13 @@ function InserterMenu(
 
 	const onInsertPattern = useCallback(
 		( blocks, patternName ) => {
+			if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/group' ) {
+				blocks = [
+					cloneBlock( blocks[ 0 ], {
+						templateLock: 'contentOnly',
+					} ),
+				];
+			}
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName } );
 			onSelect();
@@ -334,18 +342,6 @@ function InserterMenu(
 					closeButtonLabel={ __( 'Close block inserter' ) }
 					tabs={ [
 						{
-							name: 'blocks',
-							title: __( 'Blocks' ),
-							panel: (
-								<>
-									{ inserterSearch }
-									{ selectedTab === 'blocks' &&
-										! delayedFilterValue &&
-										blocksTab }
-								</>
-							),
-						},
-						{
 							name: 'patterns',
 							title: __( 'Patterns' ),
 							panel: (
@@ -354,6 +350,18 @@ function InserterMenu(
 									{ selectedTab === 'patterns' &&
 										! delayedFilterValue &&
 										patternsTab }
+								</>
+							),
+						},
+						{
+							name: 'blocks',
+							title: __( 'Blocks' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'blocks' &&
+										! delayedFilterValue &&
+										blocksTab }
 								</>
 							),
 						},

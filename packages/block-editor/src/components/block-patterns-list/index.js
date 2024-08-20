@@ -72,6 +72,7 @@ function BlockPattern( {
 			) {
 				clonedBlock.attributes.metadata.categories = [ category ];
 			}
+			clonedBlock.attributes.templateLock = 'contentOnly';
 			return clonedBlock;
 		} );
 	}, [ blocks, isDraggable, category ] );

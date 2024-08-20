@@ -306,7 +306,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.is-root-container:not([inert]) .block-editor-block-list__block.is-reusable.is-selected .block-editor-block-list__block.has-editable-outline::after {
+.is-root-container:not([inert]) .block-editor-block-list__block.is-selected .block-editor-block-list__block.has-editable-outline::after {
 	animation-name: block-editor-is-editable__animation;
 	animation-duration: 0.8s;
 	animation-timing-function: ease-out;
