@@ -44,7 +44,7 @@ const getFuturePostUrl = ( post ) => {
 function CopyButton( { text, onCopy, children } ) {
 	const ref = useCopyToClipboard( text, onCopy );
 	return (
-		<Button variant="secondary" ref={ ref }>
+		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -122,8 +122,7 @@ class PostPublishPanelPostpublish extends Component {
 					</p>
 					<div className="post-publish-panel__postpublish-post-address-container">
 						<TextControl
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							className="post-publish-panel__postpublish-post-address"
 							readOnly
@@ -147,12 +146,17 @@ class PostPublishPanelPostpublish extends Component {
 
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button variant="primary" href={ link }>
+							<Button
+								variant="primary"
+								href={ link }
+								__next40pxDefaultSize
+							>
 								{ viewPostLabel }
 							</Button>
 						) }
 						<Button
 							variant={ isScheduled ? 'primary' : 'secondary' }
+							__next40pxDefaultSize
 							href={ addLink }
 						>
 							{ addNewPostLabel }

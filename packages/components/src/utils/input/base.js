@@ -11,7 +11,7 @@ import { CONFIG } from '../';
 
 export const inputStyleNeutral = css`
 	box-shadow: 0 0 0 transparent;
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusSmall };
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 
 	@media not ( prefers-reduced-motion ) {

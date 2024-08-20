@@ -120,7 +120,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
                   post address
                 </label>
                 <input
-                  class="components-text-control__input"
+                  class="components-text-control__input is-next-40px-default-size"
                   id="inspector-text-control-0"
                   readonly=""
                   type="text"
@@ -132,7 +132,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               class="post-publish-panel__postpublish-post-address__copy-button-wrap"
             >
               <button
-                class="components-button is-secondary"
+                class="components-button is-next-40px-default-size is-secondary"
                 type="button"
               >
                 Copy
@@ -143,11 +143,11 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-primary"
+              class="components-button is-next-40px-default-size is-primary"
               href="https://wordpress.local/sample-page/"
             />
             <a
-              class="components-button is-secondary"
+              class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
             />
           </div>
@@ -312,7 +312,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
                   post address
                 </label>
                 <input
-                  class="components-text-control__input"
+                  class="components-text-control__input is-next-40px-default-size"
                   id="inspector-text-control-1"
                   readonly=""
                   type="text"
@@ -324,7 +324,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
               class="post-publish-panel__postpublish-post-address__copy-button-wrap"
             >
               <button
-                class="components-button is-secondary"
+                class="components-button is-next-40px-default-size is-secondary"
                 type="button"
               >
                 Copy
@@ -335,11 +335,11 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             class="post-publish-panel__postpublish-buttons"
           >
             <a
-              class="components-button is-primary"
+              class="components-button is-next-40px-default-size is-primary"
               href="https://wordpress.local/sample-page/"
             />
             <a
-              class="components-button is-secondary"
+              class="components-button is-next-40px-default-size is-secondary"
               href="post-new.php?"
             />
           </div>
