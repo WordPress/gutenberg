@@ -85,27 +85,21 @@ function isElementVisible( element ) {
 		return false;
 	}
 
+	// Check for <VisuallyHidden> component.
+	if ( element.classList.contains( 'components-visually-hidden' ) ) {
+		return false;
+	}
+
+	const bounds = element.getBoundingClientRect();
+	if ( bounds.width === 0 || bounds.height === 0 ) {
+		return false;
+	}
+
 	const style = viewport.getComputedStyle( element );
 	if (
 		style.display === 'none' ||
 		style.visibility === 'hidden' ||
 		style.opacity === '0'
-	) {
-		return false;
-	}
-
-	const bounds = element.getBoundingClientRect();
-
-	if ( bounds.width === 0 || bounds.height === 0 ) {
-		return false;
-	}
-
-	// wp-components visually hides elements by setting their width and
-	// height to 1px and positioning them off-screen.
-	if (
-		bounds.width === 1 &&
-		bounds.height === 1 &&
-		( bounds.left < 0 || bounds.top < 0 )
 	) {
 		return false;
 	}
