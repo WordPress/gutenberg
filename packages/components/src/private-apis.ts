@@ -5,16 +5,7 @@ import { Composite } from './composite';
 import { useCompositeStore } from './composite/store';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
-import {
-	DropdownMenu as DropdownMenuV2,
-	DropdownMenuGroup as DropdownMenuGroupV2,
-	DropdownMenuItem as DropdownMenuItemV2,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
-	DropdownMenuSeparator as DropdownMenuSeparatorV2,
-	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
-} from './dropdown-menu-v2';
+import { DropdownMenuV2 } from './dropdown-menu-v2';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
@@ -34,12 +25,12 @@ lock( privateApis, {
 	Tabs,
 	Theme,
 	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpTextV2,
+	DropdownMenuGroupV2: DropdownMenuV2.Group,
+	DropdownMenuItemV2: DropdownMenuV2.Item,
+	DropdownMenuCheckboxItemV2: DropdownMenuV2.CheckboxItem,
+	DropdownMenuRadioItemV2: DropdownMenuV2.RadioItem,
+	DropdownMenuSeparatorV2: DropdownMenuV2.Separator,
+	DropdownMenuItemLabelV2: DropdownMenuV2.ItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuV2.ItemHelpText,
 	kebabCase,
 } );
