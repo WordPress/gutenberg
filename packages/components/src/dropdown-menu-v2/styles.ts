@@ -30,6 +30,7 @@ const ITEM_PADDING_INLINE = space( 3 );
 // - border color and divider color are different?
 const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.gray[ 200 ];
+const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
@@ -238,7 +239,7 @@ export const ItemPrefixWrapper = styled.span`
 	align-items: center;
 	justify-content: center;
 
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
 	* When the parent menu item is active, except when it's a non-focused/hovered
@@ -284,7 +285,7 @@ export const ItemSuffixWrapper = styled.span`
 	justify-content: center;
 	gap: ${ space( 3 ) };
 
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
 	 * When the parent menu item is active, except when it's a non-focused/hovered
@@ -343,7 +344,7 @@ export const DropdownMenuItemLabel = styled( Truncate )`
 export const DropdownMenuItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
 	word-break: break-all;
 
 	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
