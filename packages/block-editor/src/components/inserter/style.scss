@@ -44,12 +44,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
-				border-radius: $radius-block-ui $radius-block-ui 0 0;
+				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
-				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+				border-radius: 0 0 $radius-medium $radius-medium;
 			}
 
 			&.components-button {
