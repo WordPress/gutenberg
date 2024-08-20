@@ -32,26 +32,16 @@ const inputStyleFocus = css`
 	outline: 2px solid transparent;
 `;
 
-const deprecatedStyles = ( { __next40pxDefaultSize = false } ) => {
-	if ( ! __next40pxDefaultSize ) {
-		return css`
-			padding: 6px 8px;
-		`;
-	}
-
-	return css`
-		// Vertical padding is to match the standard 40px control height when rows=1.
-		// Subtracts 1px each to account for the border width.
-		padding: 9px 11px;
-	`;
-};
-
 export const StyledTextarea = styled.textarea`
 	width: 100%;
 	display: block;
 	font-family: ${ font( 'default.fontFamily' ) };
 	line-height: 20px;
-	${ deprecatedStyles }
+
+	// Vertical padding is to match the standard 40px control height when rows=1.
+	// Subtracts 1px each to account for the border width.
+	padding: 9px 11px;
+
 	${ inputStyleNeutral };
 
 	/* Fonts smaller than 16px causes mobile safari to zoom. */
