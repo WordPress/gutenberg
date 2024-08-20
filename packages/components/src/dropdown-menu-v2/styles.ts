@@ -27,9 +27,11 @@ const ITEM_PADDING_INLINE = space( 3 );
 // TODO:
 // - border color and divider color are different from COLORS.theme variables
 // - lighter text color is not defined in COLORS.theme, should it be?
+// - lighter background color is not defined in COLORS.theme, should it be?
 const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
+const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
 const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
@@ -193,7 +195,7 @@ const baseItem = css`
 
 	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: ${ COLORS.theme.gray[ 100 ] };
+		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
 
