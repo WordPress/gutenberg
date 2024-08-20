@@ -124,6 +124,7 @@ Each field is an object with the following properties:
 
     -   `value`: The id of the value to filter to (for internal use)
     -   `label`: The text that will be displayed in the UI for the item.
+    -    `description`: A longer description that describes the element, to also be displayed. Optional.
 
     To enable the filter by a field we just need to set a proper value to the `elements` property of the field we'd like to filter by.
 
