@@ -37,11 +37,12 @@ import type {
 } from './types';
 import * as Styled from './styles';
 
-export const DropdownMenuContext = createContext<
+const DropdownMenuContext = createContext<
 	DropdownMenuContextType | undefined
 >( undefined );
+DropdownMenuContext.displayName = 'DropdownMenuV2.Context';
 
-export const DropdownMenuItem = forwardRef<
+const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
 >( function DropdownMenuItem(
@@ -74,8 +75,9 @@ export const DropdownMenuItem = forwardRef<
 		</Styled.DropdownMenuItem>
 	);
 } );
+DropdownMenuItem.displayName = 'DropdownMenuV2.Item';
 
-export const DropdownMenuCheckboxItem = forwardRef<
+const DropdownMenuCheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
 >( function DropdownMenuCheckboxItem(
@@ -115,6 +117,7 @@ export const DropdownMenuCheckboxItem = forwardRef<
 		</Styled.DropdownMenuCheckboxItem>
 	);
 } );
+DropdownMenuCheckboxItem.displayName = 'DropdownMenuV2.CheckboxItem';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -122,7 +125,7 @@ const radioCheck = (
 	</SVG>
 );
 
-export const DropdownMenuRadioItem = forwardRef<
+const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
 >( function DropdownMenuRadioItem(
@@ -162,8 +165,9 @@ export const DropdownMenuRadioItem = forwardRef<
 		</Styled.DropdownMenuRadioItem>
 	);
 } );
+DropdownMenuRadioItem.displayName = 'DropdownMenuV2.RadioItem';
 
-export const DropdownMenuGroup = forwardRef<
+const DropdownMenuGroup = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
 >( function DropdownMenuGroup( props, ref ) {
@@ -176,6 +180,51 @@ export const DropdownMenuGroup = forwardRef<
 		/>
 	);
 } );
+DropdownMenuGroup.displayName = 'DropdownMenuV2.Group';
+
+const DropdownMenuSeparator = forwardRef<
+	HTMLHRElement,
+	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
+>( function DropdownMenuSeparator( props, ref ) {
+	const dropdownMenuContext = useContext( DropdownMenuContext );
+	return (
+		<Styled.DropdownMenuSeparator
+			ref={ ref }
+			{ ...props }
+			store={ dropdownMenuContext?.store }
+			variant={ dropdownMenuContext?.variant }
+		/>
+	);
+} );
+DropdownMenuSeparator.displayName = 'DropdownMenuV2.Separator';
+
+const DropdownMenuItemLabel = forwardRef<
+	HTMLSpanElement,
+	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+>( function DropdownMenuItemLabel( props, ref ) {
+	return (
+		<Styled.DropdownMenuItemLabel
+			numberOfLines={ 1 }
+			ref={ ref }
+			{ ...props }
+		/>
+	);
+} );
+DropdownMenuItemLabel.displayName = 'DropdownMenuV2.ItemLabel';
+
+const DropdownMenuItemHelpText = forwardRef<
+	HTMLSpanElement,
+	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+>( function DropdownMenuItemHelpText( props, ref ) {
+	return (
+		<Styled.DropdownMenuItemHelpText
+			numberOfLines={ 2 }
+			ref={ ref }
+			{ ...props }
+		/>
+	);
+} );
+DropdownMenuItemHelpText.displayName = 'DropdownMenuV2.ItemHelpText';
 
 const UnconnectedDropdownMenu = (
 	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
@@ -337,48 +386,17 @@ const UnconnectedDropdownMenu = (
 		</>
 	);
 };
-export const DropdownMenu = contextConnect(
-	UnconnectedDropdownMenu,
-	'DropdownMenu'
+export const DropdownMenuV2 = Object.assign(
+	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
+	{
+		displayName: 'DropdownMenuV2',
+		Context: DropdownMenuContext,
+		Item: DropdownMenuItem,
+		RadioItem: DropdownMenuRadioItem,
+		CheckboxItem: DropdownMenuCheckboxItem,
+		Group: DropdownMenuGroup,
+		Separator: DropdownMenuSeparator,
+		ItemLabel: DropdownMenuItemLabel,
+		ItemHelpText: DropdownMenuItemHelpText,
+	}
 );
-
-export const DropdownMenuSeparator = forwardRef<
-	HTMLHRElement,
-	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
->( function DropdownMenuSeparator( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-	return (
-		<Styled.DropdownMenuSeparator
-			ref={ ref }
-			{ ...props }
-			store={ dropdownMenuContext?.store }
-			variant={ dropdownMenuContext?.variant }
-		/>
-	);
-} );
-
-export const DropdownMenuItemLabel = forwardRef<
-	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemLabel( props, ref ) {
-	return (
-		<Styled.DropdownMenuItemLabel
-			numberOfLines={ 1 }
-			ref={ ref }
-			{ ...props }
-		/>
-	);
-} );
-
-export const DropdownMenuItemHelpText = forwardRef<
-	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemHelpText( props, ref ) {
-	return (
-		<Styled.DropdownMenuItemHelpText
-			numberOfLines={ 2 }
-			ref={ ref }
-			{ ...props }
-		/>
-	);
-} );
