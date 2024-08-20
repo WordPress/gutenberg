@@ -464,7 +464,7 @@ function ConfirmDeleteDialog( {
 			setNotice( {
 				type: 'error',
 				message:
-					__( 'There was an error uninstalling the font family. ' ) +
+					__( 'There was an error uninstalling the font family.' ) +
 					error.message,
 			} );
 		}

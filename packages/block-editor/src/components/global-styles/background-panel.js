@@ -451,7 +451,7 @@ function BackgroundImageControls( {
 							onResetImage();
 						} }
 					>
-						{ __( 'Reset ' ) }
+						{ __( 'Reset' ) }
 					</MenuItem>
 				) }
 			</MediaReplaceFlow>

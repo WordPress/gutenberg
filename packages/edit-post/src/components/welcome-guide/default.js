@@ -106,7 +106,7 @@ export default function WelcomeGuideDefault() {
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
-									'New to the block editor? Want to learn more about using it? '
+									'New to the block editor? Want to learn more about using it?'
 								) }
 								<ExternalLink
 									href={ __(
