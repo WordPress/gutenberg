@@ -25,9 +25,8 @@ const ITEM_PADDING_BLOCK = space( 2 );
 const ITEM_PADDING_INLINE = space( 3 );
 
 // TODO:
-// - those values are different from saved variables?
-// - should bring this into the config, and make themeable
-// - border color and divider color are different?
+// - border color and divider color are different from COLORS.theme variables
+// - lighter text color is not defined in COLORS.theme, should it be?
 const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
 const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
