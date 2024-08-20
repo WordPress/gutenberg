@@ -76,10 +76,10 @@ export default function useMultiSelection() {
 			node.contentEditable = true;
 
 			// For some browsers, like Safari, it is important that focus
-			// happens BEFORE selection removal.
+			// happens BEFORE updating the selection.
 			node.focus();
 
-			defaultView.getSelection().removeAllRanges();
+			defaultView.getSelection().setPosition( node );
 		},
 		[
 			hasMultiSelection,

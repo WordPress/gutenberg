@@ -44,7 +44,7 @@ export default function useSelectAll() {
 				if ( rootClientId ) {
 					node.ownerDocument.defaultView
 						.getSelection()
-						.removeAllRanges();
+						.setPosition( node );
 					selectBlock( rootClientId );
 				}
 				return;
