@@ -25,12 +25,5 @@ lock( privateApis, {
 	Tabs,
 	Theme,
 	DropdownMenuV2,
-	DropdownMenuGroupV2: DropdownMenuV2.Group,
-	DropdownMenuItemV2: DropdownMenuV2.Item,
-	DropdownMenuCheckboxItemV2: DropdownMenuV2.CheckboxItem,
-	DropdownMenuRadioItemV2: DropdownMenuV2.RadioItem,
-	DropdownMenuSeparatorV2: DropdownMenuV2.Separator,
-	DropdownMenuItemLabelV2: DropdownMenuV2.ItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuV2.ItemHelpText,
 	kebabCase,
 } );

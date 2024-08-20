@@ -27,11 +27,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import Subtitle from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
@@ -85,7 +81,7 @@ function FontSizeGroup( {
 							/>
 						) }
 						{ !! handleResetFontSizes && (
-							<DropdownMenu
+							<DropdownMenuV2
 								trigger={
 									<Button
 										size="small"
@@ -96,14 +92,16 @@ function FontSizeGroup( {
 									/>
 								}
 							>
-								<DropdownMenuItem onClick={ toggleResetDialog }>
-									<DropdownMenuItemLabel>
+								<DropdownMenuV2.Item
+									onClick={ toggleResetDialog }
+								>
+									<DropdownMenuV2.ItemLabel>
 										{ origin === 'custom'
 											? __( 'Remove font size presets' )
 											: __( 'Reset font size presets' ) }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
-							</DropdownMenu>
+									</DropdownMenuV2.ItemLabel>
+								</DropdownMenuV2.Item>
+							</DropdownMenuV2>
 						) }
 					</FlexItem>
 				</HStack>
