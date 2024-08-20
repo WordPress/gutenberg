@@ -12,7 +12,7 @@ module.exports = {
 	},
 	plugins: [
 		'@wordpress',
-		'eslint-plugin-react-compiler',
+		'react-compiler',
 		'react',
 		'react-hooks',
 	],
