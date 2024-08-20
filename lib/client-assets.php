@@ -489,14 +489,14 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  *
  * See: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
+ * @since 6.1
+ *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
  *
  *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
  *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
  * }
- *
- * @since 6.1
  *
  * @return void
  */
