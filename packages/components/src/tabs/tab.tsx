@@ -26,7 +26,6 @@ export const Tab = forwardRef<
 	const instancedTabId = `${ instanceId }-${ tabId }`;
 	return (
 		<StyledTab
-			accessibleWhenDisabled
 			ref={ ref }
 			store={ store }
 			id={ instancedTabId }
