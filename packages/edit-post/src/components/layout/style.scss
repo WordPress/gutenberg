@@ -1,5 +1,11 @@
 $shadow: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 
+// If all metaboxes are hidden hides the container.
+:is(.edit-post-layout__metaboxes-resizable-area, details.edit-post-layout__metaboxes)
+:not(:has(.postbox:not(.is-hidden))) {
+	display: none;
+}
+
 .edit-post-layout__metaboxes-resizable-area {
 	padding-top: 23px;
 	filter: $shadow;
