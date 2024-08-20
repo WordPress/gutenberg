@@ -102,7 +102,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation { ...innerBlocksProps }>
+			<BlockQuotation { ...innerBlocksProps } draggable="true">
 				{ innerBlocksProps.children }
 				<Caption
 					attributeKey="citation"

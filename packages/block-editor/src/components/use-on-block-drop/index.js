@@ -79,6 +79,7 @@ export function onBlockDrop(
 	getBlock
 ) {
 	return ( event ) => {
+		event.target.ownerDocument.defaultView.getSelection().removeAllRanges();
 		const {
 			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,

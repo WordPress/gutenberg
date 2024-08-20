@@ -85,7 +85,7 @@ export default function ListItemEdit( {
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
-			<li { ...innerBlocksProps }>
+			<li { ...innerBlocksProps } draggable="true">
 				<RichText
 					ref={ useMergeRefs( [ useEnterRef, useSpaceRef ] ) }
 					identifier="content"

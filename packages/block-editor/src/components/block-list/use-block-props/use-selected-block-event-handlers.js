@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { isTextField } from '@wordpress/dom';
+import { isTextField, isEntirelySelected } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -70,7 +70,20 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
-				event.preventDefault();
+				const selection = node.ownerDocument.defaultView.getSelection();
+
+				if ( selection.rangeCount && ! isEntirelySelected( node ) ) {
+					event.preventDefault();
+					return;
+				}
+
+				const data = JSON.stringify( {
+					type: 'block',
+					srcClientIds: [ clientId ],
+					srcRootClientId: getBlockRootClientId( clientId ),
+				} );
+				event.dataTransfer.clearData();
+				event.dataTransfer.setData( 'wp-blocks', data );
 			}
 
 			node.addEventListener( 'keydown', onKeyDown );
