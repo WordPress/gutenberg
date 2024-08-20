@@ -172,16 +172,20 @@ export default function WelcomeGuide() {
 								{ __( 'Learn how to use the block editor' ) }
 							</h1>
 							<p className="edit-widgets-welcome-guide__text">
-								{ __(
-									'New to the block editor? Want to learn more about using it?'
+								{ createInterpolateElement(
+									__(
+										"New to the block editor? Want to learn more about using it? <a>Here's a detailed guide.</a>"
+									),
+									{
+										a: (
+											<ExternalLink
+												href={ __(
+													'https://wordpress.org/documentation/article/wordpress-block-editor/'
+												) }
+											/>
+										),
+									}
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/wordpress-block-editor/'
-									) }
-								>
-									{ __( "Here's a detailed guide." ) }
-								</ExternalLink>
 							</p>
 						</>
 					),
