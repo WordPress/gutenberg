@@ -9,7 +9,7 @@
 }
 
 .editor-block-manager__disabled-blocks-count {
-	border: 1px solid $gray-300;
+	border: $border-width solid $gray-300;
 	border-width: 1px 0;
 	// Cover up horizontal areas off the sides of the box rectangle
 	box-shadow: -$grid-unit-40 0 0 0 $white, $grid-unit-40 0 0 0 $white;

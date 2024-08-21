@@ -11,7 +11,7 @@
 	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $gray-300;
+	border: $border-width dotted $gray-300;
 	height: auto !important; // Need to override the default sidebar positionnings
 	padding: $grid-unit-30;
 	display: flex;
