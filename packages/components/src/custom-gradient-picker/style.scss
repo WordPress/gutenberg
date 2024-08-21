@@ -1,7 +1,7 @@
 $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
 .components-custom-gradient-picker__gradient-bar {
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	width: 100%;
 	height: $grid-unit-60;
 	position: relative;
@@ -112,7 +112,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		&.is-pressed {
 			> svg {
 				background: $white;
-				border: 1px solid $gray-600;
+				border: $border-width solid $gray-600;
 				border-radius: 2px;
 			}
 		}

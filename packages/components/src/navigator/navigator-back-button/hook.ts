@@ -10,31 +10,27 @@ import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
-import type { NavigatorBackButtonHookProps } from '../types';
+import type { NavigatorBackButtonProps } from '../types';
 
 export function useNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonHookProps, 'button' >
+	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
 ) {
 	const {
 		onClick,
 		as = Button,
-		goToParent: goToParentProp = false,
+
 		...otherProps
 	} = useContextSystem( props, 'NavigatorBackButton' );
 
-	const { goBack, goToParent } = useNavigator();
+	const { goBack } = useNavigator();
 	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
 		useCallback(
 			( e ) => {
 				e.preventDefault();
-				if ( goToParentProp ) {
-					goToParent();
-				} else {
-					goBack();
-				}
+				goBack();
 				onClick?.( e );
 			},
-			[ goToParentProp, goToParent, goBack, onClick ]
+			[ goBack, onClick ]
 		);
 
 	return {

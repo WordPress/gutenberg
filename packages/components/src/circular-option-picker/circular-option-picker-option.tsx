@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { useStoreState } from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -16,9 +17,9 @@ import { Icon, check } from '@wordpress/icons';
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
-import { CompositeItem } from '../composite/v2';
+import { Composite } from '../composite';
 import Tooltip from '../tooltip';
-import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
+import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
 	props: {
@@ -45,19 +46,21 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
-		compositeStore: CircularOptionPickerCompositeStore;
+		compositeStore: NonNullable<
+			React.ComponentProps< typeof Composite >[ 'store' ]
+		>;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { id, isSelected, compositeStore, ...additionalProps } = props;
-	const activeId = compositeStore.useState( 'activeId' );
+	const activeId = useStoreState( compositeStore, 'activeId' );
 
 	if ( isSelected && ! activeId ) {
 		compositeStore.setActiveId( id );
 	}
 
 	return (
-		<CompositeItem
+		<Composite.Item
 			render={
 				<Button
 					{ ...additionalProps }
@@ -66,7 +69,6 @@ function UnforwardedOptionAsOption(
 					ref={ forwardedRef }
 				/>
 			}
-			store={ compositeStore }
 			id={ id }
 		/>
 	);

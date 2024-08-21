@@ -268,6 +268,34 @@ describe( 'sorting', () => {
 		expect( result[ 1 ].title ).toBe( 'Neptune' );
 	} );
 
+	it( 'should sort datetime field types', () => {
+		const { data: resultDesc } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'date', direction: 'desc' },
+			},
+			fields
+		);
+		expect( resultDesc ).toHaveLength( 11 );
+		expect( resultDesc[ 0 ].title ).toBe( 'NASA' );
+		expect( resultDesc[ 1 ].title ).toBe( 'Earth' );
+		expect( resultDesc[ 9 ].title ).toBe( 'Space' );
+		expect( resultDesc[ 10 ].title ).toBe( 'Jupiter' );
+
+		const { data: resultAsc } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: 'date', direction: 'asc' },
+			},
+			fields
+		);
+		expect( resultAsc ).toHaveLength( 11 );
+		expect( resultAsc[ 0 ].title ).toBe( 'Jupiter' );
+		expect( resultAsc[ 1 ].title ).toBe( 'Space' );
+		expect( resultAsc[ 9 ].title ).toBe( 'Earth' );
+		expect( resultAsc[ 10 ].title ).toBe( 'NASA' );
+	} );
+
 	it( 'should sort untyped fields if the value is a number', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,

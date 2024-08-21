@@ -73,6 +73,7 @@ export function TemplatePartAdvancedControls( {
 			{ isEntityAvailable && (
 				<>
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Title' ) }
 						value={ title }
@@ -83,6 +84,7 @@ export function TemplatePartAdvancedControls( {
 					/>
 
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Area' ) }
 						labelPosition="top"

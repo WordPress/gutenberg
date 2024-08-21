@@ -169,6 +169,7 @@ export default function ReusableBlockConvertButton( {
 					>
 						<VStack spacing="5">
 							<TextControl
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Name' ) }
 								value={ title }
