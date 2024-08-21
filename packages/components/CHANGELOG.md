@@ -56,6 +56,9 @@
 -   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
 -   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
+-   `Modal`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+-   `Popover`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+-   `Snackbar`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 
 ### Bug Fixes
 
