@@ -13,7 +13,7 @@
 .block-editor-block-list__insertion-point-indicator {
 	position: absolute;
 	background: var(--wp-admin-theme-color);
-	border-radius: 2px;
+	border-radius: $radius-small;
 	transform-origin: center;
 	opacity: 0;
 	will-change: transform, opacity;

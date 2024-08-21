@@ -100,25 +100,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	height: 20px;
 }
 
-.components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
-	border: none;
-
-	// Work-around to target the inner button containers rendered by <ToolbarGroup />
-	> div + div {
-		margin-left: 1px;
-	}
-
-	button {
-		&.is-pressed {
-			> svg {
-				background: $white;
-				border: $border-width solid $gray-600;
-				border-radius: 2px;
-			}
-		}
-	}
-}
-
 .components-custom-gradient-picker__ui-line {
 	position: relative;
 	z-index: 0;

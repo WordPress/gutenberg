@@ -285,7 +285,7 @@ $block-inserter-tabs-height: 44px;
 
 		&:focus-visible,
 		&:focus:not(:disabled) {
-			border-radius: 2px;
+			border-radius: $radius-small;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
@@ -604,7 +604,7 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: 2px;
+		border-radius: $radius-small;
 
 		> * {
 			margin: 0 auto;

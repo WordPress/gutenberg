@@ -43,7 +43,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 // This is the "visible" resize handle for side handles - the line
 .components-resizable-box__side-handle::before {
 	display: block;
-	border-radius: 2px;
+	border-radius: $radius-full;
 	content: "";
 	width: 3px;
 	height: 3px;
