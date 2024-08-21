@@ -174,7 +174,7 @@ export const fields = [
 		label: 'Image',
 		id: 'image',
 		header: (
-			<HStack justify="start">
+			<HStack spacing={ 1 } justify="start">
 				<Icon icon={ image } />
 				<span>Image</span>
 			</HStack>
@@ -224,7 +224,7 @@ export const fields = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<HStack justify="start">
+			<HStack spacing={ 1 } justify="start">
 				<Icon icon={ category } />
 				<span>Categories</span>
 			</HStack>
