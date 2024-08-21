@@ -78,10 +78,13 @@ function AddFilter(
 	{ filters, view, onChangeView, setOpenedFilter }: AddFilterProps,
 	ref: Ref< HTMLButtonElement >
 ) {
-	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
+	if (
+		! filters.length ||
+		filters.every( ( { isPrimary } ) => isPrimary ) ||
+		! filters.filter( ( filter ) => ! filter.isVisible ).length
+	) {
 		return null;
 	}
-	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
 		<AddFilterDropdownMenu
 			trigger={
@@ -90,7 +93,6 @@ function AddFilter(
 					size="compact"
 					className="dataviews-filters-button"
 					variant="tertiary"
-					disabled={ ! inactiveFilters.length }
 					ref={ ref }
 				>
 					{ __( 'Add filter' ) }
