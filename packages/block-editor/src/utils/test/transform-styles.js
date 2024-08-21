@@ -62,8 +62,63 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected =
+				':root :where(body) .my-namespace { color: pink; } :root :where(body) .my-namespace { color: orange; }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
+		} );
+	} );
+
+	describe( 'root selectors', () => {
+		it( 'should append prefix after body selectors', () => {
+			const input = `body, h1 { color: red; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected =
+				'body .my-namespace, .my-namespace h1 { color: red; }';
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should append prefix after :root selectors', () => {
+			const input = `
+			:root {
+				--my-color: #ff0000;
+			}`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = `
+			:root .my-namespace {
+				--my-color: #ff0000;
+			}`;
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should not double prefix a root selector', () => {
+			const input = 'body .my-namespace h1  { color: goldenrod; }';
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+
+			expect( output ).toEqual( [ input ] );
 		} );
 	} );
 
@@ -78,8 +133,9 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected = '.my-namespace h1 { color: red; }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should wrap multiple selectors', () => {
@@ -92,8 +148,10 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected =
+				'.my-namespace h1, .my-namespace h2 { color: red; }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should ignore ignored selectors', () => {
@@ -107,12 +165,13 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected = '.my-namespace h1, body { color: red; }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
-		it( 'should replace body selectors', () => {
-			const input = `body, h1 { color: red; }`;
+		it( `should not try to replace 'body' in the middle of a classname`, () => {
+			const input = '.has-body-text { color: red; }';
 			const output = transformStyles(
 				[
 					{
@@ -121,23 +180,9 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected = '.my-namespace .has-body-text { color: red; }';
 
-			expect( output ).toMatchSnapshot();
-		} );
-
-		it( `should not try to replace 'body' in the middle of a classname`, () => {
-			const prefix = '.my-namespace';
-			const input = `.has-body-text { color: red; }`;
-			const output = transformStyles(
-				[
-					{
-						css: input,
-					},
-				],
-				prefix
-			);
-
-			expect( output ).toEqual( [ `${ prefix } ${ input }` ] );
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should ignore keyframes', () => {
@@ -156,7 +201,7 @@ describe( 'transformStyles', () => {
 				'.my-namespace'
 			);
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ input ] );
 		} );
 
 		it( 'should wrap selectors inside container queries', () => {
@@ -172,8 +217,12 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected = `
+			@container (width > 400px) {
+				  .my-namespace h1 { color: red; }
+			}`;
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should ignore font-face selectors', () => {
@@ -191,30 +240,11 @@ describe( 'transformStyles', () => {
 				'.my-namespace'
 			);
 
-			expect( output ).toMatchSnapshot();
-		} );
-
-		it( 'should replace :root selectors', () => {
-			const input = `
-			:root {
-				--my-color: #ff0000;
-			}`;
-			const output = transformStyles(
-				[
-					{
-						css: input,
-					},
-				],
-				'.my-namespace'
-			);
-
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ input ] );
 		} );
 
 		it( 'should not double wrap selectors', () => {
 			const input = ` .my-namespace h1, .red { color: red; }`;
-			const expected = ` .my-namespace h1, .my-namespace .red { color: red; }`;
-
 			const output = transformStyles(
 				[
 					{
@@ -223,13 +253,14 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected = ` .my-namespace h1, .my-namespace .red { color: red; }`;
 
 			expect( output ).toEqual( [ expected ] );
 		} );
 
-		it( 'should not double prefix a root selector', () => {
-			const input = 'body .my-namespace h1  { color: goldenrod; }';
-
+		it( 'should not try to wrap items within `:where` selectors', () => {
+			const input =
+				':where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }';
 			const output = transformStyles(
 				[
 					{
@@ -238,44 +269,27 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
+			const expected =
+				'.my-namespace :where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }';
 
-			expect( output ).toEqual( [
-				'body .my-namespace h1  { color: goldenrod; }',
-			] );
-		} );
-
-		it( 'should not try to wrap items within `:where` selectors', () => {
-			const input = `:where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }`;
-			const prefix = '.my-namespace';
-			const expected = [ `${ prefix } ${ input }` ];
-
-			const output = transformStyles(
-				[
-					{
-						css: input,
-					},
-				],
-				prefix
-			);
-
-			expect( output ).toEqual( expected );
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should not try to prefix pseudo elements on `:where` selectors', () => {
-			const input = `:where(.wp-element-button, .wp-block-button__link)::before { color: blue; }`;
-			const prefix = '.my-namespace';
-			const expected = [ `${ prefix } ${ input }` ];
-
+			const input =
+				':where(.wp-element-button, .wp-block-button__link)::before { color: blue; }';
 			const output = transformStyles(
 				[
 					{
 						css: input,
 					},
 				],
-				prefix
+				'.my-namespace'
 			);
+			const expected =
+				'.my-namespace :where(.wp-element-button, .wp-block-button__link)::before { color: blue; }';
 
-			expect( output ).toEqual( expected );
+			expect( output ).toEqual( [ expected ] );
 		} );
 	} );
 
@@ -292,7 +306,7 @@ describe( 'transformStyles', () => {
 			},
 		] );
 
-		expect( output ).toMatchSnapshot();
+		expect( output ).toEqual( [ input ] );
 	} );
 
 	describe( 'URL rewrite', () => {
@@ -304,8 +318,10 @@ describe( 'transformStyles', () => {
 					baseURL: 'http://wp-site.local/themes/gut/css/',
 				},
 			] );
+			const expected =
+				'h1 { background: url(http://wp-site.local/themes/gut/css/images/test.png); }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should replace complex relative paths', () => {
@@ -316,8 +332,10 @@ describe( 'transformStyles', () => {
 					baseURL: 'http://wp-site.local/themes/gut/css/',
 				},
 			] );
+			const expected =
+				'h1 { background: url(http://wp-site.local/themes/gut/images/test.png); }';
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should not replace absolute paths', () => {
@@ -328,8 +346,7 @@ describe( 'transformStyles', () => {
 					baseURL: 'http://wp-site.local/themes/gut/css/',
 				},
 			] );
-
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ input ] );
 		} );
 
 		it( 'should not replace remote paths', () => {
@@ -341,7 +358,7 @@ describe( 'transformStyles', () => {
 				},
 			] );
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ input ] );
 		} );
 	} );
 } );
