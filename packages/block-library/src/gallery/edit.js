@@ -386,6 +386,7 @@ export default function GalleryEdit( props ) {
 				image,
 				value,
 				false,
+				block.attributes,
 				lightboxSetting
 			);
 		} );
