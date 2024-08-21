@@ -37,7 +37,7 @@ const EmbedPlaceholder = ( {
 					type="url"
 					value={ value || '' }
 					className="wp-block-embed__placeholder-input"
-					label={ __( 'Embed URL' ) }
+					label={ label }
 					hideLabelFromVision
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
