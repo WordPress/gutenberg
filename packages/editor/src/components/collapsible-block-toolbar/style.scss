@@ -14,7 +14,7 @@
 	.block-editor-block-toolbar {
 		height: 100%;
 		// Push down so that buttons are centered vertically.
-		// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+		// It should be 16px (64px header height - 32px compact button height = 32 / 2),
 		// but there is a -1px top-margin down the stack that affects this.
 		padding-top: math.div($header-height - $button-size-compact, 2) + 1;
 

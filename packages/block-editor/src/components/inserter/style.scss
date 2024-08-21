@@ -441,7 +441,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-block-patterns-explorer {
 	&__sidebar {
 		position: absolute;
-		top: $header-height + $grid-unit-15;
+		top: $header-height + $grid-unit-10;
 		left: 0;
 		bottom: 0;
 		width: $sidebar-width;
