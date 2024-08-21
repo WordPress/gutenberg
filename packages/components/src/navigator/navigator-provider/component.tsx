@@ -43,6 +43,14 @@ type RouterState = {
 };
 
 function addScreen( { screens }: RouterState, screen: Screen ) {
+	if ( screens.some( ( s ) => s.path === screen.path ) ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Navigator: a screen with path ${ screen.path } already exists.
+The screen with id ${ screen.id } will not be added.`
+		);
+		return screens;
+	}
 	return [ ...screens, screen ];
 }
 
