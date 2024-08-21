@@ -76,7 +76,6 @@ export const Composite = Object.assign(
 		);
 	} ),
 	{
-		displayName: 'Composite',
 		/**
 		 * Renders a group element for composite items.
 		 *
