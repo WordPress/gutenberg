@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## New features
+
+-   Support using a component for field headers or names by providing a `header` property in the field object. The string `label` property (or `id`) is still mandatory. ([#64642](https://github.com/WordPress/gutenberg/pull/64642)).
+
+## Internal
+
+-   The "move left/move right" controls in the table layout (popup displayed on cliking header) are always visible. ([#64646](https://github.com/WordPress/gutenberg/pull/64646)). Before this, its visibility depending on filters, enableSorting, and enableHiding.
+
 ## 4.1.0 (2024-08-07)
 
 ## Internal
