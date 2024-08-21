@@ -280,7 +280,7 @@ module.exports = {
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'packages/components/src/**/@(test|stories)/**',
+				'packages/*/src/**/@(test|stories)/**',
 				'**/*.@(native|ios|android).js',
 			],
 			rules: {
@@ -316,9 +316,12 @@ module.exports = {
 						'ComboboxControl',
 						'CustomSelectControl',
 						'DimensionControl',
+						'FontAppearanceControl',
+						'FontFamilyControl',
 						'FontSizePicker',
 						'FormTokenField',
 						'InputControl',
+						'LineHeightControl',
 						'NumberControl',
 						'RangeControl',
 						'TextControl',

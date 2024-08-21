@@ -71,8 +71,6 @@ export default function DataViews< Item >( {
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const [ density, setDensity ] = useState< number >( 0 );
-	const [ isShowingFilter, setIsShowingFilter ] =
-		useState< boolean >( false );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -95,6 +93,10 @@ export default function DataViews< Item >( {
 	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
+		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	);
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
