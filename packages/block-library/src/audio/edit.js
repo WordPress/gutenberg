@@ -13,6 +13,7 @@ import {
 	SelectControl,
 	Spinner,
 	ToggleControl,
+	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -128,6 +129,22 @@ function AudioEdit( {
 	} );
 
 	if ( ! src && ! temporaryURL ) {
+		const placeholder = ( content ) => {
+			return (
+				<Placeholder
+					className="block-editor-media-placeholder"
+					withIllustration
+					icon={ icon }
+					label={ __( 'Audio' ) }
+					instructions={ __(
+						'Upload a audio file, pick one from your media library, or add one with a URL.'
+					) }
+				>
+					{ content }
+				</Placeholder>
+			);
+		};
+
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -138,6 +155,7 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
+					placeholder={ placeholder }
 				/>
 			</div>
 		);
