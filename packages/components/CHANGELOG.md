@@ -59,6 +59,7 @@
 -   `Modal`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 -   `Popover`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 -   `Snackbar`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+-   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
 
 ### Bug Fixes
 
