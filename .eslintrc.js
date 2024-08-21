@@ -321,6 +321,7 @@ module.exports = {
 						'FontSizePicker',
 						'FormTokenField',
 						'InputControl',
+						'LetterSpacingControl',
 						'LineHeightControl',
 						'NumberControl',
 						'RangeControl',
