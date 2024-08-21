@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.0 (2024-08-21)
+
 ## New features
 
 -   Support using a component for field headers or names by providing a `header` property in the field object. The string `label` property (or `id`) is still mandatory. ([#64642](https://github.com/WordPress/gutenberg/pull/64642)).
