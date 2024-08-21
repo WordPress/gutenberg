@@ -81,6 +81,11 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 	} );
 
+	dispatch( preferencesStore ).setDefaults( 'core/media', {
+		requireApproval: true,
+		optimizeOnUpload: true,
+	} );
+
 	dispatch( editSiteStore ).updateSettings( settings );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,

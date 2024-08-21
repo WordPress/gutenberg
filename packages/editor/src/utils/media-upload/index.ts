@@ -27,15 +27,17 @@ const noop = () => {};
  * @param {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param {Function} $0.onError           Function called when an error happens.
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param            $0.signal
  */
-export default function mediaUpload( {
-	additionalData = {},
+export default function editorUploadMedia( {
 	allowedTypes,
+	additionalData = {},
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
-} ) {
+	signal,
+}: Parameters< typeof uploadMedia >[ 0 ] ) {
 	const { getCurrentPost, getEditorSettings } = select( editorStore );
 	const {
 		lockPostAutosaving,
@@ -44,24 +46,25 @@ export default function mediaUpload( {
 		unlockPostSaving,
 	} = dispatch( editorStore );
 
+	// @ts-ignore
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	const lockKey = `image-upload-${ uuid() }`;
 	let imageIsUploading = false;
-	maxUploadFileSize =
+	maxUploadFileSize = // @ts-ignore
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+
 	const currentPost = getCurrentPost();
 	// Templates and template parts' numerical ID is stored in `wp_id`.
 	const currentPostId =
-		typeof currentPost?.id === 'number'
-			? currentPost.id
-			: currentPost?.wp_id;
+		currentPost && 'wp_id' in currentPost
+			? currentPost.wp_id
+			: currentPost?.id;
+	const postData = currentPostId ? { post: currentPostId } : {};
 	const setSaveLock = () => {
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
 	};
-
-	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
@@ -71,23 +74,21 @@ export default function mediaUpload( {
 	uploadMedia( {
 		allowedTypes,
 		filesList,
-		onFileChange: ( file ) => {
+		onFileChange: ( media ) => {
 			if ( ! imageIsUploading ) {
 				setSaveLock();
 			} else {
 				clearSaveLock();
 			}
-			onFileChange( file );
+			onFileChange?.( media );
 		},
 		additionalData: {
 			...postData,
 			...additionalData,
 		},
 		maxUploadFileSize,
-		onError: ( { message } ) => {
-			clearSaveLock();
-			onError( message );
-		},
+		onError,
 		wpAllowedMimeTypes,
+		signal,
 	} );
 }

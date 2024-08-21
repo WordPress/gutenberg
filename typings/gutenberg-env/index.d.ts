@@ -23,3 +23,5 @@ declare var SCRIPT_DEBUG: undefined | boolean;
 declare var IS_GUTENBERG_PLUGIN: undefined | boolean;
 
 declare var IS_WORDPRESS_CORE: undefined | boolean;
+
+declare var VIPS_CDN_URL: undefined | boolean;

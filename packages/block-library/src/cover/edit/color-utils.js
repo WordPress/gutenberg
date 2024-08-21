@@ -77,7 +77,7 @@ export const getMediaColor = memoize( async ( url ) => {
 	try {
 		const imgCrossOrigin = applyFilters(
 			'media.crossOrigin',
-			undefined,
+			window.crossOriginIsolated ? 'anonymous' : undefined,
 			url
 		);
 		const color = await retrieveFastAverageColor().getColorAsync( url, {

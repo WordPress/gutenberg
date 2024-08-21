@@ -31,7 +31,7 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [ "node" ]
 	},
 	"exclude": [
 		"**/*.android.js",

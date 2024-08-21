@@ -33,6 +33,8 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean}       __experimentalBlockDirectory           Whether the user has enabled the Block Directory
  * @property {Array}         __experimentalBlockPatterns            Array of objects representing the block patterns
  * @property {Array}         __experimentalBlockPatternCategories   Array of objects representing the block pattern categories
+ * @property {Array}         __experimentalAvailableImageSizes      Array of available image sizes.
+ * @property {number}        __experimentalBigImageSizeThreshold    Big image size threshold.
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,

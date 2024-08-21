@@ -72,6 +72,10 @@ export function initializeEditor(
 		showListViewByDefault: false,
 		isPublishSidebarEnabled: true,
 	} );
+	dispatch( preferencesStore ).setDefaults( 'core/media', {
+		requireApproval: true,
+		optimizeOnUpload: true,
+	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 

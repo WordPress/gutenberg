@@ -5,6 +5,8 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
+const { readFileSync } = require( 'node:fs' );
+const { dirname } = require( 'node:path' );
 
 /**
  * WordPress dependencies
@@ -58,6 +60,19 @@ const baseConfig = {
 	devtool,
 };
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { version: vipsVersion } = JSON.parse(
+	readFileSync(
+		`${ dirname(
+			dirname( require.resolve( 'wasm-vips' ) )
+		) }/package.json`,
+		{
+			encoding: 'utf-8',
+		}
+	)
+);
+const vipsCdnUrl = `https://cdn.jsdelivr.net/npm/wasm-vips@${ vipsVersion }/lib`;
+
 const plugins = [
 	// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
 	// content as a convenient interactive zoomable treemap.
@@ -73,6 +88,7 @@ const plugins = [
 		),
 		// Inject the `SCRIPT_DEBUG` global, used for dev versions of JavaScript.
 		'globalThis.SCRIPT_DEBUG': JSON.stringify( mode === 'development' ),
+		VIPS_CDN_URL: JSON.stringify( vipsCdnUrl ),
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];

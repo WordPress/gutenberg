@@ -1,0 +1,43 @@
+{
+	"name": "@wordpress/upload-media",
+	"version": "1.0.0-prerelease",
+	"description": "Core media upload logic.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/upload-media/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/upload-media"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"types": "build-types",
+	"dependencies": {
+		"@shopify/web-worker": "^6.3.0",
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/mime": "file:../mime",
+		"@wordpress/preferences": "file:../preferences",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url",
+		"@wordpress/vips": "file:../vips",
+		"uuid": "^9.0.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -215,3 +215,54 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 	: never;
 
 export type combineReducers = typeof reduxCombineReducers;
+
+/**
+ * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
+ *
+ * @property {Function} registerGenericStore Given a namespace key and settings
+ *                                           object, registers a new generic
+ *                                           store.
+ * @property {Function} registerStore        Given a namespace key and settings
+ *                                           object, registers a new namespace
+ *                                           store.
+ * @property {Function} subscribe            Given a function callback, invokes
+ *                                           the callback on any change to state
+ *                                           within any registered store.
+ * @property {Function} select               Given a namespace key, returns an
+ *                                           object of the  store's registered
+ *                                           selectors.
+ * @property {Function} dispatch             Given a namespace key, returns an
+ *                                           object of the store's registered
+ *                                           action dispatchers.
+ */
+
+/**
+ * An isolated orchestrator of store registrations.
+ */
+export interface WPDataRegistry {
+	/**
+	 * Given a namespace key and settings object,
+	 * registers a new generic store.
+	 */
+	registerGenericStore: Function;
+	/**
+	 * Given a namespace key and settings object,
+	 * registers a new namespace store.
+	 */
+	registerStore: Function;
+	/**
+	 * Given a function callback, invokes the callback on any change to state
+	 * within any registered store.
+	 */
+	subscribe: Function;
+	/**
+	 * Given a namespace key, returns an object of the  store's registered
+	 * selectors.
+	 */
+	select: Function;
+	/**
+	 * Given a namespace key, returns an object of the store's registered
+	 * action dispatchers.
+	 */
+	dispatch: Function;
+}

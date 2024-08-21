@@ -500,6 +500,7 @@ _Parameters_
 -   _$0.maxUploadFileSize_ `?number`: Maximum upload size in bytes allowed for the site.
 -   _$0.onError_ `Function`: Function called when an error happens.
 -   _$0.onFileChange_ `Function`: Function called each time a file or a temporary representation of the file is available.
+-   _$0.signal_ `Parameters[ '0' ][ 'signal' ]`:
 
 ### MediaUploadCheck
 
@@ -1729,6 +1730,23 @@ A user mentions completer.
 _Type_
 
 -   `WPCompleter`
+
+### validateFileSize
+
+Verifies whether the file is within the file upload size limits for the site.
+
+_Parameters_
+
+-   _file_ `File`: File object.
+
+### validateMimeType
+
+Verifies if the caller (e.g. a block) supports this mime type.
+
+_Parameters_
+
+-   _file_ `File`: File object.
+-   _allowedTypes_ `string[]`: Array with the types of media that can be uploaded, if unset all types are allowed.
 
 ### VisualEditorGlobalKeyboardShortcuts
 

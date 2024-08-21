@@ -82,7 +82,7 @@ export default function useTransformImage( {
 
 		const imgCrossOrigin = applyFilters(
 			'media.crossOrigin',
-			undefined,
+			window.crossOriginIsolated ? 'anonymous' : undefined,
 			url
 		);
 		if ( typeof imgCrossOrigin === 'string' ) {
