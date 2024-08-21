@@ -22,6 +22,7 @@
 
 ### Enhancements
 
+-   `Placeholder`: Temporarily rewind radius scale ([#64672](https://github.com/WordPress/gutenberg/pull/64672)).
 -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
 -   `Composite`: use internal context to forward the composite store to sub-components ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
 -   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
