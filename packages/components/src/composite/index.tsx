@@ -210,6 +210,3 @@ export const Composite = Object.assign(
 		Context: CompositeContext,
 	}
 );
-
-// Works best with Storybook's prop extraction
-export default Composite;

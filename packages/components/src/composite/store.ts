@@ -49,6 +49,3 @@ export function useCompositeStore( {
 		...props,
 	} );
 }
-
-// Works best with Storybook's prop extraction
-export default useCompositeStore;
