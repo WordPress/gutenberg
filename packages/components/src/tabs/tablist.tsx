@@ -27,8 +27,8 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 
-	const tabStore = useStoreState( context?.store );
-	const selectedId = useStoreState( context?.store, 'selectedId' );
+	const tabStoreState = useStoreState( context?.store );
+	const selectedId = tabStoreState?.selectedId;
 	const indicatorPosition = useTrackElementOffsetRect(
 		context?.store.item( selectedId )?.element
 	);
@@ -39,12 +39,13 @@ export const TabList = forwardRef<
 		( { previousValue } ) => previousValue && setAnimationEnabled( true )
 	);
 
-	if ( ! context ) {
+	if ( ! context || ! tabStoreState ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
+
 	const { store } = context;
-	const { activeId, selectOnMove } = tabStore as Ariakit.TabStoreState;
+	const { activeId, selectOnMove } = tabStoreState;
 	const { setActiveId } = store;
 
 	const onBlur = () => {
