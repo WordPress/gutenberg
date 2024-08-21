@@ -1510,4 +1510,3 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 
 	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
 }
-
