@@ -38,11 +38,9 @@ type RouterAction =
 
 type RouterState = {
 	screens: Screen[];
-	locationHistory: NavigatorLocation[];
+	currentLocation?: NavigatorLocation;
 	matchedPath: MatchedPath;
 };
-
-const MAX_HISTORY_LENGTH = 50;
 
 function addScreen( { screens }: RouterState, screen: Screen ) {
 	return [ ...screens, screen ];
@@ -52,95 +50,48 @@ function removeScreen( { screens }: RouterState, screen: Screen ) {
 	return screens.filter( ( s ) => s.id !== screen.id );
 }
 
-function goBack( { locationHistory }: RouterState ) {
-	if ( locationHistory.length <= 1 ) {
-		return locationHistory;
-	}
-	return [
-		...locationHistory.slice( 0, -2 ),
-		{
-			...locationHistory[ locationHistory.length - 2 ],
-			isBack: true,
-			hasRestoredFocus: false,
-		},
-	];
-}
-
 function goTo(
 	state: RouterState,
 	path: string,
 	options: NavigateOptions = {}
 ) {
-	const { locationHistory } = state;
+	const { currentLocation } = state;
 	const {
-		focusTargetSelector,
+		// Default assignments
 		isBack = false,
 		skipFocus = false,
-		replace = false,
+		// Extract to avoid forwarding
+		replace,
+		focusTargetSelector,
+		// Rest
 		...restOptions
 	} = options;
 
-	const isNavigatingToSamePath =
-		locationHistory.length > 0 &&
-		locationHistory[ locationHistory.length - 1 ].path === path;
-	if ( isNavigatingToSamePath ) {
-		return locationHistory;
+	if ( currentLocation?.path === path ) {
+		return currentLocation;
 	}
 
-	const isNavigatingToPreviousPath =
-		isBack &&
-		locationHistory.length > 1 &&
-		locationHistory[ locationHistory.length - 2 ].path === path;
-
-	if ( isNavigatingToPreviousPath ) {
-		return goBack( state );
-	}
-
-	const newLocation = {
+	return {
 		...restOptions,
 		path,
 		isBack,
 		hasRestoredFocus: false,
 		skipFocus,
 	};
-
-	if ( locationHistory.length === 0 ) {
-		return replace ? [] : [ newLocation ];
-	}
-
-	const newLocationHistory = locationHistory.slice(
-		locationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
-		-1
-	);
-
-	if ( ! replace ) {
-		newLocationHistory.push(
-			// Assign `focusTargetSelector` to the previous location in history
-			// (the one we just navigated from).
-			{
-				...locationHistory[ locationHistory.length - 1 ],
-				focusTargetSelector,
-			}
-		);
-	}
-
-	newLocationHistory.push( newLocation );
-
-	return newLocationHistory;
 }
 
 function goToParent(
 	state: RouterState,
 	options: NavigateToParentOptions = {}
 ) {
-	const { locationHistory, screens } = state;
-	const currentPath = locationHistory[ locationHistory.length - 1 ].path;
+	const { currentLocation, screens } = state;
+	const currentPath = currentLocation?.path;
 	if ( currentPath === undefined ) {
-		return locationHistory;
+		return currentLocation;
 	}
 	const parentPath = findParent( currentPath, screens );
 	if ( parentPath === undefined ) {
-		return locationHistory;
+		return currentLocation;
 	}
 	return goTo( state, parentPath, {
 		...options,
@@ -152,7 +103,7 @@ function routerReducer(
 	state: RouterState,
 	action: RouterAction
 ): RouterState {
-	let { screens, locationHistory, matchedPath } = state;
+	let { screens, currentLocation, matchedPath } = state;
 	switch ( action.type ) {
 		case 'add':
 			screens = addScreen( state, action.screen );
@@ -161,26 +112,23 @@ function routerReducer(
 			screens = removeScreen( state, action.screen );
 			break;
 		case 'goto':
-			locationHistory = goTo( state, action.path, action.options );
+			currentLocation = goTo( state, action.path, action.options );
 			break;
 		case 'gotoparent':
-			locationHistory = goToParent( state, action.options );
+			currentLocation = goToParent( state, action.options );
 			break;
 	}
 
 	// Return early in case there is no change
 	if (
 		screens === state.screens &&
-		locationHistory === state.locationHistory
+		currentLocation === state.currentLocation
 	) {
 		return state;
 	}
 
 	// Compute the matchedPath
-	const currentPath =
-		locationHistory.length > 0
-			? locationHistory[ locationHistory.length - 1 ].path
-			: undefined;
+	const currentPath = currentLocation?.path;
 	matchedPath =
 		currentPath !== undefined
 			? patternMatch( currentPath, screens )
@@ -197,7 +145,7 @@ function routerReducer(
 		matchedPath = state.matchedPath;
 	}
 
-	return { screens, locationHistory, matchedPath };
+	return { screens, currentLocation, matchedPath };
 }
 
 function UnconnectedNavigatorProvider(
@@ -212,7 +160,7 @@ function UnconnectedNavigatorProvider(
 		initialPath,
 		( path ) => ( {
 			screens: [],
-			locationHistory: [ { path } ],
+			currentLocation: { path },
 			matchedPath: undefined,
 		} )
 	);
@@ -242,19 +190,19 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const { locationHistory, matchedPath } = routerState;
+	const { currentLocation, matchedPath } = routerState;
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
 			location: {
-				...locationHistory[ locationHistory.length - 1 ],
-				isInitial: locationHistory.length === 1,
+				...currentLocation,
+				isInitial: false, // TODO: find out an alternative to this
 			},
 			params: matchedPath?.params ?? {},
 			match: matchedPath?.id,
 			...methods,
 		} ),
-		[ locationHistory, matchedPath, methods ]
+		[ currentLocation, matchedPath, methods ]
 	);
 
 	const cx = useCx();
