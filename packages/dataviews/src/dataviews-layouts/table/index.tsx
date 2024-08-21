@@ -212,7 +212,7 @@ function TableRow< Item >( {
 	// Will be set to true if `onTouchStart` fires. This happens before
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
-	const isTouchDevice = useRef( false );
+	const isTouchDeviceRef = useRef( false );
 	const columns = view.fields || fields.map( ( f ) => f.id );
 
 	return (
@@ -225,14 +225,14 @@ function TableRow< Item >( {
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 			onTouchStart={ () => {
-				isTouchDevice.current = true;
+				isTouchDeviceRef.current = true;
 			} }
 			onClick={ () => {
 				if ( ! hasPossibleBulkAction ) {
 					return;
 				}
 				if (
-					! isTouchDevice.current &&
+					! isTouchDeviceRef.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
 					onChangeSelection(
