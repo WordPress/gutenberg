@@ -73,21 +73,9 @@ export class PerfUtils {
 	async setRenderingMode( renderingMode: string = 'post-only' ) {
 		await this.page.waitForFunction( () => window?.wp?.data );
 
-		await this.page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
-		}, false );
-		await this.page.getByLabel( 'Template options' ).click();
-
-		let postRenderingModeLabel = 'Edit template';
-		if ( renderingMode !== 'post-only' ) {
-			postRenderingModeLabel = 'Show template';
-		}
-
-		await this.page
-			.getByRole( 'menuitemcheckbox', { name: postRenderingModeLabel } )
-			.click();
+		await this.page.evaluate( ( mode ) => {
+			window.wp.data.dispatch( 'core/editor' ).setRenderingMode( mode );
+		}, renderingMode );
 	}
 
 	/**
