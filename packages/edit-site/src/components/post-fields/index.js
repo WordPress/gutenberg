@@ -284,16 +284,12 @@ function usePostFields( viewType ) {
 				label: __( 'Status' ),
 				id: 'status',
 				type: 'text',
-				elements: STATUSES.filter( ( { value } ) => value !== 'trash' ),
+				elements: STATUSES,
 				render: PostStatusField,
 				Edit: 'radio',
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
-					elements: STATUSES.map( ( { value, label } ) => ( {
-						value,
-						label,
-					} ) ),
 				},
 			},
 			{

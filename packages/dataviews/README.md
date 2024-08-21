@@ -120,11 +120,11 @@ Each field is an object with the following properties:
 -   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
--   <code id="fields-elements">elements</code>: The list of options to pick from when editing the field. It's also used as the fallback list when the field declares a filter if it doesn't provide a more specific one. It expects an array of objects with the following properties:
+-   <code id="fields-elements">elements</code>: The list of options to pick from when using the field as a filter or when editing (DataForm component). It expects an array of objects with the following properties:
 
     -   `value`: The id of the value to filter to (for internal use)
     -   `label`: The text that will be displayed in the UI for the item.
-    -   `description`: A longer description that describes the element, to also be displayed. Optional.
+    -    `description`: A longer description that describes the element, to also be displayed. Optional.
 
     To enable the filter by a field we just need to set a proper value to the `elements` property of the field we'd like to filter by.
 
@@ -134,7 +134,6 @@ Each field is an object with the following properties:
 -   `enableGlobalSearch`: whether the field is searchable. False by default.
 -   `filterBy`: configuration for the filters enabled by the `elements` property.
     -   `operators`: the list of [operators](#operators) supported by the field.
-    -   `elements`: the list of options to use in the filter. It'll fallback to `field.elements` if not provided.
     -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 ### `view`: `object`
