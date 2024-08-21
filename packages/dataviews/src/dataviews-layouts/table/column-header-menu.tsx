@@ -72,7 +72,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	);
 	const index = view.fields?.indexOf( fieldId ) as number;
 	if ( !! combinedField ) {
-		return combinedField.label;
+		return combinedField.header || combinedField.label;
 	}
 	const field = fields.find( ( f ) => f.id === fieldId );
 	if ( ! field ) {
@@ -102,7 +102,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					ref={ ref }
 					variant="tertiary"
 				>
-					{ field.label }
+					{ field.header }
 					{ view.sort && isSorted && (
 						<span aria-hidden="true">
 							{ sortArrows[ view.sort.direction ] }
