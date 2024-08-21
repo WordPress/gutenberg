@@ -14,7 +14,7 @@ import { useState, useMemo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { useCx } from '../../utils';
-import { DropdownMenuV2 } from '..';
+import DropdownMenuV2 from '..';
 import Icon from '../../icon';
 import Button from '../../button';
 import Modal from '../../modal';

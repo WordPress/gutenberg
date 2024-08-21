@@ -8,8 +8,6 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import {
-	forwardRef,
-	createContext,
 	useContext,
 	useMemo,
 	cloneElement,
@@ -17,214 +15,26 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-import { check, chevronRightSmall } from '@wordpress/icons';
-import { SVG, Circle } from '@wordpress/primitives';
+import { chevronRightSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../context';
 import type { WordPressComponentProps } from '../context';
-import Icon from '../icon';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
 	DropdownMenuProps,
-	DropdownMenuGroupProps,
-	DropdownMenuItemProps,
-	DropdownMenuCheckboxItemProps,
-	DropdownMenuRadioItemProps,
-	DropdownMenuSeparatorProps,
 } from './types';
 import * as Styled from './styles';
-
-const DropdownMenuContext = createContext<
-	DropdownMenuContextType | undefined
->( undefined );
-DropdownMenuContext.displayName = 'DropdownMenuV2.Context';
-
-const DropdownMenuItem = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
->( function DropdownMenuItem(
-	{ prefix, suffix, children, hideOnClick = true, ...props },
-	ref
-) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	return (
-		<Styled.DropdownMenuItem
-			ref={ ref }
-			{ ...props }
-			accessibleWhenDisabled
-			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
-		>
-			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
-
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
-					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
-
-				{ suffix && (
-					<Styled.ItemSuffixWrapper>
-						{ suffix }
-					</Styled.ItemSuffixWrapper>
-				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuItem>
-	);
-} );
-DropdownMenuItem.displayName = 'DropdownMenuV2.Item';
-
-const DropdownMenuCheckboxItem = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
->( function DropdownMenuCheckboxItem(
-	{ suffix, children, hideOnClick = false, ...props },
-	ref
-) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	return (
-		<Styled.DropdownMenuCheckboxItem
-			ref={ ref }
-			{ ...props }
-			accessibleWhenDisabled
-			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
-		>
-			<Ariakit.MenuItemCheck
-				store={ dropdownMenuContext?.store }
-				render={ <Styled.ItemPrefixWrapper /> }
-				// Override some ariakit inline styles
-				style={ { width: 'auto', height: 'auto' } }
-			>
-				<Icon icon={ check } size={ 24 } />
-			</Ariakit.MenuItemCheck>
-
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
-					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
-
-				{ suffix && (
-					<Styled.ItemSuffixWrapper>
-						{ suffix }
-					</Styled.ItemSuffixWrapper>
-				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuCheckboxItem>
-	);
-} );
-DropdownMenuCheckboxItem.displayName = 'DropdownMenuV2.CheckboxItem';
-
-const radioCheck = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-		<Circle cx={ 12 } cy={ 12 } r={ 3 }></Circle>
-	</SVG>
-);
-
-const DropdownMenuRadioItem = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
->( function DropdownMenuRadioItem(
-	{ suffix, children, hideOnClick = false, ...props },
-	ref
-) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-
-	return (
-		<Styled.DropdownMenuRadioItem
-			ref={ ref }
-			{ ...props }
-			accessibleWhenDisabled
-			hideOnClick={ hideOnClick }
-			store={ dropdownMenuContext?.store }
-		>
-			<Ariakit.MenuItemCheck
-				store={ dropdownMenuContext?.store }
-				render={ <Styled.ItemPrefixWrapper /> }
-				// Override some ariakit inline styles
-				style={ { width: 'auto', height: 'auto' } }
-			>
-				<Icon icon={ radioCheck } size={ 24 } />
-			</Ariakit.MenuItemCheck>
-
-			<Styled.DropdownMenuItemContentWrapper>
-				<Styled.DropdownMenuItemChildrenWrapper>
-					{ children }
-				</Styled.DropdownMenuItemChildrenWrapper>
-
-				{ suffix && (
-					<Styled.ItemSuffixWrapper>
-						{ suffix }
-					</Styled.ItemSuffixWrapper>
-				) }
-			</Styled.DropdownMenuItemContentWrapper>
-		</Styled.DropdownMenuRadioItem>
-	);
-} );
-DropdownMenuRadioItem.displayName = 'DropdownMenuV2.RadioItem';
-
-const DropdownMenuGroup = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
->( function DropdownMenuGroup( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-	return (
-		<Styled.DropdownMenuGroup
-			ref={ ref }
-			{ ...props }
-			store={ dropdownMenuContext?.store }
-		/>
-	);
-} );
-DropdownMenuGroup.displayName = 'DropdownMenuV2.Group';
-
-const DropdownMenuSeparator = forwardRef<
-	HTMLHRElement,
-	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
->( function DropdownMenuSeparator( props, ref ) {
-	const dropdownMenuContext = useContext( DropdownMenuContext );
-	return (
-		<Styled.DropdownMenuSeparator
-			ref={ ref }
-			{ ...props }
-			store={ dropdownMenuContext?.store }
-			variant={ dropdownMenuContext?.variant }
-		/>
-	);
-} );
-DropdownMenuSeparator.displayName = 'DropdownMenuV2.Separator';
-
-const DropdownMenuItemLabel = forwardRef<
-	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemLabel( props, ref ) {
-	return (
-		<Styled.DropdownMenuItemLabel
-			numberOfLines={ 1 }
-			ref={ ref }
-			{ ...props }
-		/>
-	);
-} );
-DropdownMenuItemLabel.displayName = 'DropdownMenuV2.ItemLabel';
-
-const DropdownMenuItemHelpText = forwardRef<
-	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
->( function DropdownMenuItemHelpText( props, ref ) {
-	return (
-		<Styled.DropdownMenuItemHelpText
-			numberOfLines={ 2 }
-			ref={ ref }
-			{ ...props }
-		/>
-	);
-} );
-DropdownMenuItemHelpText.displayName = 'DropdownMenuV2.ItemHelpText';
+import { DropdownMenuContext } from './context';
+import { DropdownMenuItem } from './item';
+import { DropdownMenuCheckboxItem } from './checkbox-item';
+import { DropdownMenuRadioItem } from './radio-item';
+import { DropdownMenuGroup } from './group';
+import { DropdownMenuSeparator } from './separator';
+import { DropdownMenuItemLabel } from './item-label';
+import { DropdownMenuItemHelpText } from './item-help-text';
 
 const UnconnectedDropdownMenu = (
 	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
@@ -386,10 +196,10 @@ const UnconnectedDropdownMenu = (
 		</>
 	);
 };
+
 export const DropdownMenuV2 = Object.assign(
 	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
 	{
-		displayName: 'DropdownMenuV2',
 		Context: DropdownMenuContext,
 		Item: DropdownMenuItem,
 		RadioItem: DropdownMenuRadioItem,
@@ -400,3 +210,5 @@ export const DropdownMenuV2 = Object.assign(
 		ItemHelpText: DropdownMenuItemHelpText,
 	}
 );
+
+export default DropdownMenuV2;
