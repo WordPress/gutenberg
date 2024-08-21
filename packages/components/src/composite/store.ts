@@ -8,16 +8,11 @@ import * as Ariakit from '@ariakit/react';
  */
 import type { CompositeStoreProps } from './types';
 
+// Props are already documented in TypeScript types.
+// eslint-disable-next-line jsdoc/require-param
 /**
  * Creates a composite store.
  *
- * @param root0
- * @param root0.focusLoop
- * @param root0.focusWrap
- * @param root0.focusShift
- * @param root0.virtualFocus
- * @param root0.orientation
- * @param root0.rtl
  * @example
  * ```jsx
  * import { Composite, useCompositeStore } from '@wordpress/components';
