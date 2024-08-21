@@ -1,0 +1,46 @@
+{
+	"name": "@wordpress/language-chooser",
+	"version": "1.0.0-prerelease",
+	"description": "Component for choosing multiple preferred languages.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"templates",
+		"reusable blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/language-chooser/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/language-chooser"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
+	"types": "build-types",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+		"@wordpress/keycodes": "file:../keycodes"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

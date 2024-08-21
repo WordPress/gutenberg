@@ -1,0 +1,128 @@
+.active-locales {
+	margin: 1em 0;
+}
+
+.active-locales-controls .button {
+	margin: 0;
+}
+
+.active-locales-list,
+.inactive-locales-list {
+	width: 25em;
+	clear: both;
+	float: left;
+}
+
+.active-locales-list {
+	height: 120px;
+	overflow-y: scroll;
+	list-style: none;
+	margin: 0 1em 0 0;
+	padding: 0;
+	background: #fff;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
+	border: 1px solid #ddd;
+	color: #32373c;
+	box-sizing: border-box;
+}
+
+.inactive-locales-list {
+	margin: 0 1em 0 0;
+}
+
+.active-locales-list.empty-list {
+	background: rgba(255, 255, 255, 0.5);
+	border-color: rgba(222, 222, 222, 0.75);
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+	display: flex;
+	align-items: center;
+}
+
+.active-locales-list li {
+	box-sizing: border-box;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	margin: 0;
+	padding: 0 0 0 8px;
+	cursor: pointer;
+	font-size: 13px;
+}
+
+.active-locales-controls {
+	clear: both;
+}
+
+@media screen and (min-width: 510px) {
+
+	.active-locales-controls {
+		clear: none;
+	}
+}
+
+
+.active-locales-controls ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.active-locales-controls li {
+	margin: 0;
+}
+
+.active-locales-controls li + li {
+	margin-top: 0.5em;
+}
+
+.active-locales-list li:hover {
+	background: rgba(0, 0, 0, 0.07);
+}
+
+.active-locales-list li[aria-selected="true"] {
+	background: rgba(0, 0, 0, 0.15);
+}
+
+.active-locales-empty-message {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	position: relative;
+	text-align: center;
+	width: 25em;
+	height: 120px;
+	margin-bottom: -120px;
+	box-sizing: border-box;
+	color: rgba(51, 51, 51, 0.5);
+}
+
+.active-locales-empty-message.hidden {
+	display: none;
+}
+
+.inactive-locales {
+	clear: both;
+}
+
+.inactive-locales select {
+	width: 100%;
+}
+
+.language-chooser .components-button {
+	height: 30px;
+}
+
+.language-chooser .components-notice {
+	display: inline-block;
+}
+
+.language-install-spinner {
+	display: inline-block;
+	float: none;
+	margin: -3px 5px 0;
+	vertical-align: middle;
+}
+
+.language-install-spinner:not(.language-chooser-spinner) {
+	display: none;
+}

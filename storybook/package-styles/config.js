@@ -13,6 +13,8 @@ import editSiteLtr from '../package-styles/edit-site-ltr.lazy.scss';
 import editSiteRtl from '../package-styles/edit-site-rtl.lazy.scss';
 import dataviewsLtr from '../package-styles/dataviews-ltr.lazy.scss';
 import dataviewsRtl from '../package-styles/dataviews-rtl.lazy.scss';
+import languageChooserLtr from '../package-styles/language-chooser-ltr.lazy.scss';
+import languageChooserRtl from '../package-styles/language-chooser-rtl.lazy.scss';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -57,6 +59,11 @@ const CONFIG = [
 		componentIdMatcher: /^dataviews-/,
 		ltr: [ dataviewsLtr, componentsLtr ],
 		rtl: [ dataviewsRtl, componentsRtl ],
+	},
+	{
+		componentIdMatcher: /^components-language-chooser/,
+		ltr: [ languageChooserLtr, componentsLtr ],
+		rtl: [ languageChooserRtl, componentsRtl ],
 	},
 ];
 
