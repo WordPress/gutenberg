@@ -984,11 +984,19 @@ export default function Image( {
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
 
-					let resizedWidth = `${ elt.offsetWidth }px`;
-					// Set width to 'auto' if the resized width is close to the max-content width.
-					if ( Math.abs( elt.offsetWidth - maxContentWidth ) < 10 ) {
-						resizedWidth = 'auto';
-						elt.style.width = 'auto';
+					// Clear hardcoded width if the resized width is close to the max-content width.
+					if (
+						// Only do this if the image is bigger than the container to prevent it from being squished.
+						// TODO: Remove this check if the image support setting 100% width.
+						naturalWidth >= maxContentWidth &&
+						Math.abs( elt.offsetWidth - maxContentWidth ) < 10
+					) {
+						setAttributes( {
+							width: undefined,
+							height: undefined,
+							aspectRatio: undefined,
+						} );
+						return;
 					}
 
 					// Since the aspect ratio is locked when resizing, we can
@@ -996,7 +1004,7 @@ export default function Image( {
 					// height in CSS to prevent stretching when the max-width
 					// is reached.
 					setAttributes( {
-						width: resizedWidth,
+						width: `${ elt.offsetWidth }px`,
 						height: 'auto',
 						aspectRatio:
 							ratio === naturalRatio
