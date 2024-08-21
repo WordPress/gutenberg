@@ -88,6 +88,13 @@ The value of the `ToggleGroupControl`.
 
 -   Required: No
 
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`
+
 ### `__nextHasNoMarginBottom`: `boolean`
 
 Start opting into the new margin-free styles that will become the default in a future version.

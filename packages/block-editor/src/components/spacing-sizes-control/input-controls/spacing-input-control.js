@@ -249,6 +249,7 @@ export default function SpacingInputControl( {
 						} }
 					/>
 					<RangeControl
+						__next40pxDefaultSize
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
 						onFocus={ onMouseOver }
@@ -270,6 +271,7 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					__next40pxDefaultSize
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					className="spacing-sizes-control__range-control"

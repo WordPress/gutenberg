@@ -2,15 +2,6 @@
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
 	margin: $grid-unit-10;
-
-	.components-radio-control__option {
-		align-items: flex-start;
-	}
-
-	.components-radio-control__label .components-text {
-		display: block;
-		margin-top: $grid-unit-05;
-	}
 }
 .editor-post-discussion__panel-toggle {
 

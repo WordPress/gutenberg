@@ -280,7 +280,7 @@ module.exports = {
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'packages/components/src/**/@(test|stories)/**',
+				'packages/*/src/**/@(test|stories)/**',
 				'**/*.@(native|ios|android).js',
 			],
 			rules: {
@@ -313,8 +313,18 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'ComboboxControl',
+						'CustomSelectControl',
 						'DimensionControl',
+						'FontAppearanceControl',
+						'FontFamilyControl',
 						'FontSizePicker',
+						'FormTokenField',
+						'InputControl',
+						'LineHeightControl',
+						'NumberControl',
+						'RangeControl',
+						'TextControl',
 						'ToggleGroupControl',
 						'UnitControl',
 					].map( ( componentName ) => ( {
@@ -324,16 +334,21 @@ module.exports = {
 							componentName +
 							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					} ) ),
+					{
+						// Falsy `__next40pxDefaultSize` without a `render` prop.
+						selector:
+							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+						message:
+							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					},
 					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'SelectControl', 'TextControl' ].map(
-						( componentName ) => ( {
-							// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-							message:
-								componentName +
-								' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-						} )
-					),
+					...[ 'SelectControl' ].map( ( componentName ) => ( {
+						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
+						message:
+							componentName +
+							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					} ) ),
 				],
 			},
 		},

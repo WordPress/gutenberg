@@ -242,6 +242,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				/>
 				{ displayPostContent && (
 					<RadioControl
+						className="wp-block-latest-posts__post-content-radio"
 						label={ __( 'Show:' ) }
 						selected={ displayPostContentRadio }
 						options={ [
