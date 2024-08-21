@@ -16,6 +16,13 @@ import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 
+// EditorStyles is a memoized component, so avoid passing a new
+// object reference on each render.
+const EDITOR_STYLE_TRANSFORM_OPTIONS = {
+	// Don't selectors that already specify `.editor-styles-wrapper`.
+	ignoredSelectors: [ /\.editor-styles-wrapper/gi ],
+};
+
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
 	height = '300px',
@@ -39,6 +46,7 @@ export function ExperimentalBlockCanvas( {
 				<EditorStyles
 					styles={ styles }
 					scope=":where(.editor-styles-wrapper)"
+					transformOptions={ EDITOR_STYLE_TRANSFORM_OPTIONS }
 				/>
 				<WritingFlow
 					ref={ contentRef }

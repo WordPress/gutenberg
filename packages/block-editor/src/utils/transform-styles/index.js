@@ -26,7 +26,8 @@ function replaceDoublePrefix( selector, prefix ) {
 
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
-	wrapperSelector = ''
+	wrapperSelector = '',
+	transformOptions
 ) {
 	// When there is no wrapper selector and no base URL, there is no need
 	// to transform the CSS. This is most cases because in the default
@@ -35,13 +36,18 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
+
 	try {
 		return postcss(
 			[
 				wrapperSelector &&
 					prefixSelector( {
 						prefix: wrapperSelector,
-						exclude: [ ...ignoredSelectors, wrapperSelector ],
+						exclude: [
+							...ignoredSelectors,
+							...( transformOptions?.ignoredSelectors ?? [] ),
+							wrapperSelector,
+						],
 						transform( prefix, selector, prefixedSelector ) {
 							const rootSelector = ROOT_SELECTORS.find(
 								( rootSelectorCandidate ) =>
@@ -92,18 +98,26 @@ function transformStyle(
 }
 
 /**
+ * @typedef {Object} EditorStyle
+ * @property {string}    css              the CSS block(s), as a single string.
+ * @property {?string}   baseURL          the base URL to be used as the reference when rewritting urls.
+ * @property {?string[]} ignoredSelectors the selectors not to wrap.
+ */
+
+/**
+ * @typedef {Object} TransformOptions
+ * @property {?string[]} ignoredSelectors the selectors not to wrap.
+ */
+
+/**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
  *
- * @typedef {Object} EditorStyle
- * @property {string}        css              the CSS block(s), as a single string.
- * @property {?string}       baseURL          the base URL to be used as the reference when rewritting urls.
- * @property {?string[]}     ignoredSelectors the selectors not to wrap.
- *
- * @param    {EditorStyle[]} styles           CSS rules.
- * @param    {string}        wrapperSelector  Wrapper selector.
+ * @param {EditorStyle[]}    styles           CSS rules.
+ * @param {string}           wrapperSelector  Wrapper selector.
+ * @param {TransformOptions} transformOptions Additional options for style transformation.
  * @return {Array} converted rules.
  */
-const transformStyles = ( styles, wrapperSelector = '' ) => {
+const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
 	let cache = cacheByWrapperSelector.get( wrapperSelector );
 	if ( ! cache ) {
 		cache = new WeakMap();
@@ -112,7 +126,7 @@ const transformStyles = ( styles, wrapperSelector = '' ) => {
 	return styles.map( ( style ) => {
 		let css = cache.get( style );
 		if ( ! css ) {
-			css = transformStyle( style, wrapperSelector );
+			css = transformStyle( style, wrapperSelector, transformOptions );
 			cache.set( style, css );
 		}
 		return css;
