@@ -212,7 +212,5 @@ export const Composite = Object.assign(
 	}
 );
 
-export { useCompositeStore } from './subcomponents/store';
-
 // Works best with Storybook's prop extraction
 export default Composite;
