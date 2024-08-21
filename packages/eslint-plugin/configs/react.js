@@ -34,7 +34,14 @@ module.exports = {
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
-		'react-compiler/react-compiler': 'error',
+		'react-compiler/react-compiler': [
+			'error',
+			{
+				environment: {
+					enableTreatRefLikeIdentifiersAsRefs: true,
+				},
+			},
+		],
 		'react-hooks/exhaustive-deps': [
 			'warn',
 			{
