@@ -54,7 +54,10 @@ const navigationMode: 'regionBased' | 'fullPage' =
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map< string, Promise< Page | false > >();
-const headElements = new Map< string, { tag: HTMLElement; text: string } >();
+export const headElements = new Map<
+	string,
+	{ tag: HTMLElement; text?: string }
+>();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -87,7 +90,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 	let head: HTMLElement[];
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		if ( navigationMode === 'fullPage' ) {
-			head = await fetchHeadAssets( dom, headElements );
+			head = await fetchHeadAssets( dom );
 			regions.body = vdom
 				? vdom.get( document.body )
 				: toVdom( dom.body );
@@ -110,12 +113,12 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page: Page ) => {
-	batch( () => {
+	batch( async () => {
 		populateInitialData( page.initialData );
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			if ( navigationMode === 'fullPage' ) {
 				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
-				updateHead( page.head );
+				await updateHead( page.head );
 				const fragment = getRegionRootFragment( document.body );
 				render( page.regions.body, fragment );
 			}
@@ -172,13 +175,15 @@ window.addEventListener( 'popstate', async () => {
 if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Cache the scripts. Has to be called before fetching the assets.
-		[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-			headElements.set( script.getAttribute( 'src' ), {
-				tag: script,
-				text: script.textContent,
-			} );
-		} );
-		await fetchHeadAssets( document, headElements );
+		[].map.call(
+			document.querySelectorAll( 'script[type="module"][src]' ),
+			( script ) => {
+				headElements.set( script.getAttribute( 'src' ), {
+					tag: script,
+				} );
+			}
+		);
+		await fetchHeadAssets( document );
 	}
 }
 pages.set(

@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { headElements } from '.';
+
+/**
  * Helper to update only the necessary tags in the head.
  *
  * @async
@@ -29,6 +34,14 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 		}
 	}
 
+	await Promise.all(
+		[ ...headElements.entries() ]
+			.filter( ( [ , { tag } ] ) => tag.nodeName === 'SCRIPT' )
+			.map( async ( [ url ] ) => {
+				await import( /* webpackIgnore: true */ url );
+			} )
+	);
+
 	// Prepare new assets.
 	const toAppend = [ ...newHeadMap.values() ];
 
@@ -41,71 +54,59 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
  * Fetches and processes head assets (stylesheets and scripts) from a specified document.
  *
  * @async
- * @param doc               The document from which to fetch head assets. It should support standard DOM querying methods.
- * @param headElements      A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
- * @param headElements.tag
- * @param headElements.text
+ * @param doc The document from which to fetch head assets. It should support standard DOM querying methods.
  *
  * @return Returns an array of HTML elements representing the head assets.
  */
 export const fetchHeadAssets = async (
-	doc: Document,
-	headElements: Map< string, { tag: HTMLElement; text: string } >
+	doc: Document
 ): Promise< HTMLElement[] > => {
 	const headTags = [];
-	const assets = [
-		{
-			tagName: 'style',
-			selector: 'link[rel=stylesheet]',
-			attribute: 'href',
-		},
-		{ tagName: 'script', selector: 'script[src]', attribute: 'src' },
-	];
-	for ( const asset of assets ) {
-		const { tagName, selector, attribute } = asset;
-		const tags = doc.querySelectorAll<
-			HTMLScriptElement | HTMLStyleElement
-		>( selector );
 
-		// Use Promise.all to wait for fetch to complete
-		await Promise.all(
-			Array.from( tags ).map( async ( tag ) => {
-				const attributeValue = tag.getAttribute( attribute );
-				if ( ! headElements.has( attributeValue ) ) {
-					try {
-						const response = await fetch( attributeValue );
-						const text = await response.text();
-						headElements.set( attributeValue, {
-							tag,
-							text,
-						} );
-					} catch ( e ) {
-						// eslint-disable-next-line no-console
-						console.error( e );
-					}
+	const scripts = doc.querySelectorAll< HTMLScriptElement >(
+		'script[type="module"][src]'
+	);
+
+	Array.from( scripts ).forEach( ( script ) => {
+		const src = script.getAttribute( 'src' );
+		if ( ! headElements.has( src ) ) {
+			// add the <link> elements to prefetch the module scripts
+			const link = doc.createElement( 'link' );
+			link.rel = 'modulepreload';
+			link.href = src;
+			document.head.append( link );
+			headElements.set( src, { tag: script } );
+		}
+	} );
+
+	const stylesheets = doc.querySelectorAll< HTMLScriptElement >(
+		'link[rel=stylesheet]'
+	);
+
+	await Promise.all(
+		Array.from( stylesheets ).map( async ( tag ) => {
+			const href = tag.getAttribute( 'href' );
+			if ( ! headElements.has( href ) ) {
+				try {
+					const response = await fetch( href );
+					const text = await response.text();
+					headElements.set( href, {
+						tag,
+						text,
+					} );
+				} catch ( e ) {
+					// eslint-disable-next-line no-console
+					console.error( e );
 				}
+			}
 
-				const headElement = headElements.get( attributeValue );
-				const element = doc.createElement( tagName );
-				element.textContent = headElement.text;
+			const headElement = headElements.get( href );
+			const styleElement = doc.createElement( 'style' );
+			styleElement.textContent = headElement.text;
 
-				for ( const attr of headElement.tag.attributes ) {
-					// don't copy the src or href attribute
-					if ( attr.name !== 'src' && attr.name !== 'href' ) {
-						element.setAttribute( attr.name, attr.value );
-					}
-				}
-
-				headTags.push( element );
-
-				// wait for the `load` event to fire before appending the element
-				return new Promise( ( resolve, reject ) => {
-					element.onload = resolve;
-					element.onerror = reject;
-				} );
-			} )
-		);
-	}
+			headTags.push( styleElement );
+		} )
+	);
 
 	return [
 		doc.querySelector( 'title' ),
