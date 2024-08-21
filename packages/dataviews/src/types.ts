@@ -32,11 +32,6 @@ interface FilterByConfig {
 	 * except for the list layout where it behaves like a secondary filter.
 	 */
 	isPrimary?: boolean;
-
-	/**
-	 * The list of options to pick from when using the field as a filter.
-	 */
-	elements?: Option[];
 }
 
 export type Operator =
@@ -144,8 +139,7 @@ export type Field< Item > = {
 	enableHiding?: boolean;
 
 	/**
-	 * The list of options to pick from when editing.
-	 * Also used as a fallback for filter if it doesn't provide a more specific one.
+	 * The list of options to pick from when using the field as a filter.
 	 */
 	elements?: Option[];
 
