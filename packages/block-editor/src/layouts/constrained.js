@@ -75,7 +75,7 @@ export default {
 						<div className="block-editor-hooks__layout-controls">
 							<div className="block-editor-hooks__layout-controls-unit">
 								<UnitControl
-									// TODO: Switch to `true` (40px size) if possible
+									// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
 									__next40pxDefaultSize={ false }
 									className="block-editor-hooks__layout-controls-unit-input"
 									label={ __( 'Content' ) }

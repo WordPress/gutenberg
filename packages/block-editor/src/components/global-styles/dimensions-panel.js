@@ -476,7 +476,7 @@ export default function DimensionsPanel( {
 				>
 					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
-							// TODO: Switch to `true` (40px size) if possible
+							// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
 							__next40pxDefaultSize={ false }
 							label={ __( 'Content' ) }
 							labelPosition="top"
