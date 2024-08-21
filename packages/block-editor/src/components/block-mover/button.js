@@ -40,6 +40,21 @@ const getArrowIcon = ( direction, orientation ) => {
 	return null;
 };
 
+const getDirection = ( direction, orientation ) => {
+	if ( direction === 'up' ) {
+		if ( orientation === 'horizontal' ) {
+			return isRTL() ? 'right' : 'left';
+		}
+		return 'up';
+	} else if ( direction === 'down' ) {
+		if ( orientation === 'horizontal' ) {
+			return isRTL() ? 'left' : 'right';
+		}
+		return 'down';
+	}
+	return null;
+};
+
 const getMovementDirectionLabel = ( moveDirection, orientation ) => {
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
@@ -139,6 +154,7 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
+					tooltipPosition={ getDirection( direction, orientation ) }
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }

@@ -53,7 +53,7 @@ function UnforwardedTooltip(
 		position,
 		shortcut,
 		text,
-
+		direction,
 		...restProps
 	} = props;
 
@@ -93,6 +93,16 @@ function UnforwardedTooltip(
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
+
+	const getGutterValue = () => {
+		if ( direction === 'up' ) {
+			return 28;
+		} else if ( direction === 'down' ) {
+			return 8;
+		}
+		return 4;
+	};
+
 	const mounted = tooltipStore.useState( 'mounted' );
 
 	if ( isNestedInTooltip ) {
@@ -130,7 +140,7 @@ function UnforwardedTooltip(
 					{ ...restProps }
 					className={ clsx( 'components-tooltip', className ) }
 					unmountOnHide
-					gutter={ 4 }
+					gutter={ getGutterValue() }
 					id={ describedById }
 					overflowPadding={ 0.5 }
 					store={ tooltipStore }

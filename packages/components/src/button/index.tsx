@@ -272,6 +272,7 @@ export function UnforwardedButton(
 					tooltipPosition &&
 					// Convert legacy `position` values to be used with the new `placement` prop
 					positionToPlacement( tooltipPosition ),
+				direction: tooltipPosition,
 		  }
 		: {};
 
