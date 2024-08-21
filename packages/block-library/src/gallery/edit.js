@@ -643,9 +643,6 @@ export default function GalleryEdit( props ) {
 					<ToolbarDropdownMenu
 						icon={ linkIcon }
 						label={ __( 'Link' ) }
-						toggleProps={ {
-							isPressed: hasLinkTo,
-						} }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup className="blocks-gallery__link-to-control">
