@@ -37,6 +37,7 @@ type RouterAction =
 	| { type: 'gotoparent'; options?: NavigateToParentOptions };
 
 type RouterState = {
+	initialPath: string;
 	screens: Screen[];
 	currentLocation?: NavigatorLocation;
 	matchedPath: MatchedPath;
@@ -176,17 +177,22 @@ function UnconnectedNavigatorProvider(
 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { initialPath, children, className, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
+	const {
+		initialPath: initialPathProp,
+		children,
+		className,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorProvider' );
 
 	const [ routerState, dispatch ] = useReducer(
 		routerReducer,
-		initialPath,
+		initialPathProp,
 		( path ) => ( {
 			screens: [],
 			currentLocation: { path },
 			matchedPath: undefined,
 			focusSelectors: new Map(),
+			initialPath: initialPathProp,
 		} )
 	);
 
@@ -215,19 +221,19 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const { currentLocation, matchedPath } = routerState;
+	const { currentLocation, matchedPath, initialPath } = routerState;
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
 			location: {
 				...currentLocation,
-				isInitial: false, // TODO: find out an alternative to this
+				isInitial: currentLocation?.path === initialPath,
 			},
 			params: matchedPath?.params ?? {},
 			match: matchedPath?.id,
 			...methods,
 		} ),
-		[ currentLocation, matchedPath, methods ]
+		[ currentLocation, matchedPath, methods, initialPath ]
 	);
 
 	const cx = useCx();
