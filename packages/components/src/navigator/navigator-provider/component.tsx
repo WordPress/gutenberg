@@ -92,7 +92,7 @@ function goTo(
 	let currentFocusSelector;
 	if ( isBack ) {
 		currentFocusSelector = focusSelectors.get( path );
-		focusSelectors.delete( path );
+		// focusSelectors.delete( path );
 	}
 
 	return {
