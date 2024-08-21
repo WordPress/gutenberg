@@ -72,7 +72,6 @@ The available options are:
 -   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back;
 -   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too);
 -   `skipFocus`: `boolean`. An optional property used to opt out of `Navigator`'s focus management, useful when the consumer of the component wants to manage focus themselves;
--   `replace`: `boolean`. An optional property used to cause the new location to replace the current location in the stack.
 
 ### `goBack`: `( path: string, options: NavigateOptions ) => void`
 
@@ -87,8 +86,8 @@ The available options are the same as for the `goTo` method, except for the `isB
 The `location` object represent the current location, and has a few properties:
 
 -   `path`: `string`. The path associated to the location.
--   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location history.
--   `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location history.
+-   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards.
+-   `isInitial`: `boolean`. A flag that is `true` only for the initial location.
 
 ### `params`: `Record< string, string | string[] >`
 
