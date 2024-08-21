@@ -11,21 +11,21 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
-import type { CompositeHoverProps } from '../types';
+import type { CompositeGroupProps } from './types';
 
-export const CompositeHover = forwardRef<
+export const CompositeGroup = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< CompositeHoverProps, 'div', false >
->( function CompositeHover( props, ref ) {
+	WordPressComponentProps< CompositeGroupProps, 'div', false >
+>( function CompositeGroup( props, ref ) {
 	const context = useCompositeContext();
 	return (
-		<Ariakit.CompositeHover
+		<Ariakit.CompositeGroup
 			store={ context?.store }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeHover.displayName = 'Composite.Hover';
+CompositeGroup.displayName = 'Composite.Group';

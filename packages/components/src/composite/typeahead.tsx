@@ -11,21 +11,21 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
-import type { CompositeGroupLabelProps } from '../types';
+import type { CompositeTypeaheadProps } from './types';
 
-export const CompositeGroupLabel = forwardRef<
+export const CompositeTypeahead = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
->( function CompositeGroupLabel( props, ref ) {
+	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
+>( function CompositeTypeahead( props, ref ) {
 	const context = useCompositeContext();
 	return (
-		<Ariakit.CompositeGroupLabel
+		<Ariakit.CompositeTypeahead
 			store={ context?.store }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeGroupLabel.displayName = 'Composite.GroupLabel';
+CompositeTypeahead.displayName = 'Composite.Typeahead';

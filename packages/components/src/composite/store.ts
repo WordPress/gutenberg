@@ -6,7 +6,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import type { CompositeStoreProps } from '../types';
+import type { CompositeStoreProps } from './types';
 
 /**
  * Creates a composite store.

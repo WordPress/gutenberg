@@ -11,9 +11,9 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
-import type { CompositeRowProps } from '../types';
+import type { CompositeRowProps } from './types';
 
 export const CompositeRow = forwardRef<
 	HTMLDivElement,

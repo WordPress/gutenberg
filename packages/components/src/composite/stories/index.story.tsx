@@ -12,7 +12,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Composite from '..';
-import useCompositeStore from '../subcomponents/store';
+import useCompositeStore from '../store';
 import { UseCompositeStorePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStorePlaceholder > = {

@@ -11,21 +11,21 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
-import type { CompositeTypeaheadProps } from '../types';
+import type { CompositeHoverProps } from './types';
 
-export const CompositeTypeahead = forwardRef<
+export const CompositeHover = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
->( function CompositeTypeahead( props, ref ) {
+	WordPressComponentProps< CompositeHoverProps, 'div', false >
+>( function CompositeHover( props, ref ) {
 	const context = useCompositeContext();
 	return (
-		<Ariakit.CompositeTypeahead
+		<Ariakit.CompositeHover
 			store={ context?.store }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeTypeahead.displayName = 'Composite.Typeahead';
+CompositeHover.displayName = 'Composite.Hover';

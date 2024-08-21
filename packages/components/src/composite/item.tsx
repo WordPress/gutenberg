@@ -11,9 +11,9 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressComponentProps } from '../context';
 import { useCompositeContext } from './context';
-import type { CompositeItemProps } from '../types';
+import type { CompositeItemProps } from './types';
 
 export const CompositeItem = forwardRef<
 	HTMLButtonElement,

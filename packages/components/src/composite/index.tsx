@@ -22,13 +22,13 @@ import { useMemo, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { CompositeContext } from './subcomponents/context';
-import { CompositeGroup } from './subcomponents/group';
-import { CompositeGroupLabel } from './subcomponents/group-label';
-import { CompositeHover } from './subcomponents/hover';
-import { CompositeItem } from './subcomponents/item';
-import { CompositeRow } from './subcomponents/row';
-import { CompositeTypeahead } from './subcomponents/typeahead';
+import { CompositeContext } from './context';
+import { CompositeGroup } from './group';
+import { CompositeGroupLabel } from './group-label';
+import { CompositeHover } from './hover';
+import { CompositeItem } from './item';
+import { CompositeRow } from './row';
+import { CompositeTypeahead } from './typeahead';
 import type { CompositeProps } from './types';
 
 /**
