@@ -236,6 +236,7 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+				'react-compiler/react-compiler': 'off',
 			},
 		},
 		{
@@ -565,12 +566,6 @@ module.exports = {
 			rules: {
 				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
-			},
-		},
-		{
-			files: [ ...developmentFiles ],
-			rules: {
-				'react-compiler/react-compiler': 'off',
 			},
 		},
 	],
