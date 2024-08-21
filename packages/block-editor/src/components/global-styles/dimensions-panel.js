@@ -11,9 +11,10 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
+	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	Flex,
+	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
@@ -473,21 +474,23 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<UnitControl
-						__next40pxDefaultSize
-						label={ __( 'Content' ) }
-						labelPosition="top"
-						value={ contentSizeValue || '' }
-						onChange={ ( nextContentSize ) => {
-							setContentSizeValue( nextContentSize );
-						} }
-						units={ units }
-						prefix={
-							<Flex className="block-editor-global-styles__dimensions-panel-input-prefix-wrapper">
-								<Icon icon={ positionCenter } />
-							</Flex>
-						}
-					/>
+					<HStack alignment="flex-end" justify="flex-start">
+						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							label={ __( 'Content' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ contentSizeValue || '' }
+							onChange={ ( nextContentSize ) => {
+								setContentSizeValue( nextContentSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ positionCenter } />
+						</View>
+					</HStack>
 				</ToolsPanelItem>
 			) }
 			{ showWideSizeControl && (
@@ -501,21 +504,23 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<UnitControl
-						__next40pxDefaultSize
-						label={ __( 'Wide' ) }
-						labelPosition="top"
-						value={ wideSizeValue || '' }
-						onChange={ ( nextWideSize ) => {
-							setWideSizeValue( nextWideSize );
-						} }
-						units={ units }
-						prefix={
-							<Flex className="block-editor-global-styles__dimensions-panel-input-prefix-wrapper">
-								<Icon icon={ stretchWide } />
-							</Flex>
-						}
-					/>
+					<HStack alignment="flex-end" justify="flex-start">
+						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							label={ __( 'Wide' ) }
+							labelPosition="top"
+							__unstableInputWidth="80px"
+							value={ wideSizeValue || '' }
+							onChange={ ( nextWideSize ) => {
+								setWideSizeValue( nextWideSize );
+							} }
+							units={ units }
+						/>
+						<View>
+							<Icon icon={ stretchWide } />
+						</View>
+					</HStack>
 				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
