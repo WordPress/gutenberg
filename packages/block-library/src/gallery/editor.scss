@@ -198,11 +198,3 @@
 	justify-content: flex-end;
 	gap: $grid-unit-15;
 }
-
-.blocks-gallery__link-to-control {
-	.components-menu-item__item {
-		.components-menu-item__info {
-			white-space: nowrap;
-		}
-	}
-}
