@@ -44,6 +44,7 @@ export function ZoomOutSeparator( {
 	}, [] );
 
 	const isReducedMotion = useReducedMotion();
+
 	if ( ! clientId ) {
 		return;
 	}
@@ -61,6 +62,11 @@ export function ZoomOutSeparator( {
 	}
 
 	if ( ! isSectionBlock ) {
+		return null;
+	}
+
+	// Only allow insertion and not grouping in Zoom Out mode.
+	if ( blockInsertionPoint?.operation !== 'insert' ) {
 		return null;
 	}
 
