@@ -88,7 +88,7 @@ const HANDLE_STYLES = {
 };
 
 type ResizableBoxProps = ResizableProps & {
-	children: ReactNode;
+	children?: ReactNode;
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;
 	__experimentalTooltipProps?: Parameters< typeof ResizeTooltip >[ 0 ];
