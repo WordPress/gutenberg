@@ -22,6 +22,7 @@
 
 ### Enhancements
 
+-   `Placeholder`: Temporarily rewind radius scale ([#64672](https://github.com/WordPress/gutenberg/pull/64672)).
 -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
 -   `Composite`: use internal context to forward the composite store to sub-components ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
 -   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
@@ -56,6 +57,9 @@
 -   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
 -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
 -   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
+-   `Modal`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+-   `Popover`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+-   `Snackbar`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 -   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
 
 ### Bug Fixes
@@ -69,8 +73,10 @@
 -   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
 -   `Composite` v2: add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
 -   `Composite` v2: add `Context` subcomponent ([#64493](https://github.com/WordPress/gutenberg/pull/64493)).
+-   `DropdownMenu` v2: use themed color variables ([#64647](https://github.com/WordPress/gutenberg/pull/64647)).
 -   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
 -   Update `ariakit` to version `0.4.10` ([#64637](https://github.com/WordPress/gutenberg/pull/64637)).
+-   Ariakit: Use `useStoreState()` instead of `store.useState()` ([#64648](https://github.com/WordPress/gutenberg/pull/64648)).
 
 ## 28.5.0 (2024-08-07)
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -48,7 +49,7 @@ function Tabs( {
 
 	const isControlled = selectedTabId !== undefined;
 
-	const { items, selectedId, activeId } = store.useState();
+	const { items, selectedId, activeId } = useStoreState( store );
 	const { setSelectedId, setActiveId } = store;
 
 	// Keep track of whether tabs have been populated. This is used to prevent

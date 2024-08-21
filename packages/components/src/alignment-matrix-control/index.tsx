@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -68,7 +69,7 @@ export function AlignmentMatrixControl( {
 		rtl: isRTL(),
 	} );
 
-	const activeId = compositeStore.useState( 'activeId' );
+	const activeId = useStoreState( compositeStore, 'activeId' );
 
 	const classes = clsx( 'component-alignment-matrix-control', className );
 
