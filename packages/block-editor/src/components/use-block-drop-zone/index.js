@@ -422,6 +422,10 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
+				if ( isZoomOutMode() && operation !== 'insert' ) {
+					return;
+				}
+
 				if ( operation === 'group' ) {
 					const targetBlock = blocks[ targetIndex ];
 					const areAllImages = [
