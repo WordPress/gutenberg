@@ -599,7 +599,7 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					>
-						<MenuItem onClick={ () => onSelectImage( false ) }>
+						<MenuItem onClick={ () => onSelectImage( undefined ) }>
 							{ __( 'Reset' ) }
 						</MenuItem>
 					</MediaReplaceFlow>
