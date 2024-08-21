@@ -45,10 +45,11 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps, getResolvedValue } from './utils';
+import { getResolvedValue } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 
 import {
 	globalStylesDataKey,

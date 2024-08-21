@@ -27,11 +27,8 @@ import {
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
-<<<<<<< HEAD
-import { useBlockBindingsUtils } from '../utils/block-bindings';
-=======
 import { useToolsPanelDropdownMenuProps } from '../utils/use-tools-panel-dropdown-menu-props';
->>>>>>> fcd2c19c62 (Remove old utils)
+import { useBlockBindingsUtils } from '../utils/block-bindings';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -42,32 +39,10 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-<<<<<<< HEAD
-const useToolsPanelDropdownMenuProps = () => {
-	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-		  }
-		: {};
-};
-
 function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
-=======
-function BlockBindingsPanelDropdown( {
-	fieldsList,
-	addConnection,
-	attribute,
-	binding,
-} ) {
->>>>>>> fcd2c19c62 (Remove old utils)
 	const currentKey = binding?.args?.key;
 	return (
 		<>

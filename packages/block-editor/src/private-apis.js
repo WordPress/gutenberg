@@ -95,4 +95,5 @@ lock( privateApis, {
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	useBlockBindingsUtils,
+	useToolsPanelDropdownMenuProps,
 } );
