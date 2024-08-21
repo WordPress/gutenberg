@@ -9,6 +9,8 @@
 ## Internal
 
 -   The "move left/move right" controls in the table layout (popup displayed on cliking header) are always visible. ([#64646](https://github.com/WordPress/gutenberg/pull/64646)). Before this, its visibility depending on filters, enableSorting, and enableHiding.
+- Filters no longer display the elements' description. ([#64674](https://github.com/WordPress/gutenberg/pull/64674))
+
 
 ## 4.1.0 (2024-08-07)
 
