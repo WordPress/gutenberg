@@ -1626,15 +1626,6 @@ if (
 	add_filter( 'rest_pre_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta' );
 }
 
-/*
- * Previous versions of Gutenberg were attaching the block_core_navigation_update_ignore_hooked_blocks_meta
- * function to the `rest_insert_wp_navigation` _action_ (rather than the `rest_pre_insert_wp_navigation` _filter_).
- * To avoid collisions, we need to remove the filter from that action if it's present.
- */
-if ( has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
-	remove_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback );
-}
-
 /**
  * Hooks into the REST API response for the core/navigation block and adds the first and last inner blocks.
  *
