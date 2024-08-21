@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { v4 as createId } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
@@ -30,14 +35,29 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 		return output;
 	}
 
-	const newFootnotes = newOrder.map(
-		( fnId ) =>
-			footnotes.find( ( fn ) => fn.id === fnId ) ||
-			oldFootnotes[ fnId ] || {
-				id: fnId,
-				content: '',
+	const newFootnotes = newOrder
+		.map(
+			( fnId ) =>
+				footnotes.find( ( fn ) => fn.id === fnId ) ||
+				oldFootnotes[ fnId ] || {
+					id: fnId,
+					content: '',
+				}
+		)
+		.reduce( ( acc, fn ) => {
+			if ( acc.map( ( { id } ) => id ).includes( fn.id ) ) {
+				acc.push( { ...fn, id: createId() } );
+			} else {
+				acc.push( fn );
 			}
-	);
+			return acc;
+		}, [] );
+
+	const idMap = newOrder.map( ( currentValue, i ) => ( {
+		currentValue,
+		newValue: newFootnotes[ i ].id,
+		used: false,
+	} ) );
 
 	function updateAttributes( attributes ) {
 		// Only attempt to update attributes, if attributes is an object.
@@ -75,10 +95,18 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
 					const id = replacement.attributes[ 'data-fn' ];
-					const index = newOrder.indexOf( id );
+					const index = idMap.findIndex(
+						( { currentValue, used } ) => {
+							return currentValue === id && ! used;
+						}
+					);
+					idMap[ index ].used = true;
 					// The innerHTML contains the count wrapped in a link.
 					const countValue = create( {
-						html: replacement.innerHTML,
+						html: replacement.innerHTML.replace(
+							idMap[ index ].currentValue,
+							idMap[ index ].newValue
+						),
 					} );
 					countValue.text = String( index + 1 );
 					countValue.formats = Array.from(
@@ -89,9 +117,14 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 						{ length: countValue.text.length },
 						() => countValue.replacements[ 0 ]
 					);
+					replacement.attributes[ 'data-fn' ] =
+						idMap[ index ].newValue;
 					replacement.innerHTML = toHTMLString( {
 						value: countValue,
-					} );
+					} ).replace(
+						idMap[ index ].currentValue,
+						idMap[ index ].newValue
+					);
 				}
 			} );
 
