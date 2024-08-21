@@ -40,6 +40,7 @@ type RouterState = {
 	screens: Screen[];
 	currentLocation?: NavigatorLocation;
 	matchedPath: MatchedPath;
+	focusSelectors: Map< string, string >;
 };
 
 function addScreen( { screens }: RouterState, screen: Screen ) {
@@ -63,7 +64,8 @@ function goTo(
 	path: string,
 	options: NavigateOptions = {}
 ) {
-	const { currentLocation } = state;
+	const { currentLocation, focusSelectors } = state;
+
 	const {
 		// Default assignments
 		isBack = false,
@@ -79,11 +81,25 @@ function goTo(
 		return currentLocation;
 	}
 
+	// Set a focus selector that will be used when navigating
+	// back to the current location.
+	if ( focusTargetSelector && currentLocation?.path ) {
+		focusSelectors.set( currentLocation.path, focusTargetSelector );
+	}
+
+	// Get the focus selector for the new location.
+	let currentFocusSelector;
+	if ( isBack ) {
+		currentFocusSelector = focusSelectors.get( path );
+		focusSelectors.delete( path );
+	}
+
 	return {
 		...restOptions,
 		path,
 		isBack,
 		hasRestoredFocus: false,
+		focusTargetSelector: currentFocusSelector,
 		skipFocus,
 	};
 }
@@ -111,7 +127,7 @@ function routerReducer(
 	state: RouterState,
 	action: RouterAction
 ): RouterState {
-	let { screens, currentLocation, matchedPath } = state;
+	let { screens, currentLocation, matchedPath, ...restState } = state;
 	switch ( action.type ) {
 		case 'add':
 			screens = addScreen( state, action.screen );
@@ -153,7 +169,7 @@ function routerReducer(
 		matchedPath = state.matchedPath;
 	}
 
-	return { screens, currentLocation, matchedPath };
+	return { ...restState, screens, currentLocation, matchedPath };
 }
 
 function UnconnectedNavigatorProvider(
@@ -170,6 +186,7 @@ function UnconnectedNavigatorProvider(
 			screens: [],
 			currentLocation: { path },
 			matchedPath: undefined,
+			focusSelectors: new Map(),
 		} )
 	);
 
