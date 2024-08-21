@@ -19,7 +19,7 @@ import { useBlockCommands } from '../use-block-commands';
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
 const EDITOR_STYLE_TRANSFORM_OPTIONS = {
-	// Don't selectors that already specify `.editor-styles-wrapper`.
+	// Don't transform selectors that already specify `.editor-styles-wrapper`.
 	ignoredSelectors: [ /\.editor-styles-wrapper/gi ],
 };
 
