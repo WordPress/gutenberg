@@ -380,4 +380,19 @@ test.describe( 'data-wp-context', () => {
 		expect( childContextAfter.obj2.prop6 ).toBe( 'child' );
 		expect( childContextAfter.obj2.overwritten ).toBeUndefined();
 	} );
+
+	test( 'properties from other namespaces defined in a parent context are inherited', async ( {
+		page,
+	} ) => {
+		const childProp = page
+			.getByTestId( 'inheritance from other namespaces' )
+			.getByTestId( 'child' );
+
+		const parentProp = page
+			.getByTestId( 'inheritance from other namespaces' )
+			.getByTestId( 'parent' );
+
+		await expect( childProp ).toHaveText( 'fromChildNs' );
+		await expect( parentProp ).toHaveText( 'fromParentNs' );
+	} );
 } );
