@@ -89,7 +89,6 @@
 	}
 
 	&:focus-visible {
-		border-radius: $radius-medium;
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows high contrast mode.
