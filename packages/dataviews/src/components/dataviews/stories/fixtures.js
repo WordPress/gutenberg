@@ -238,11 +238,6 @@ export const fields = [
 		],
 		filterBy: {
 			operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ],
-			elements: [
-				{ value: 'Planet', label: 'Planet' },
-				{ value: 'Solar system', label: 'Solar system' },
-				{ value: 'Ice giant', label: 'Ice giant' },
-			],
 		},
 		getValue: ( { item } ) => {
 			return item.categories;
