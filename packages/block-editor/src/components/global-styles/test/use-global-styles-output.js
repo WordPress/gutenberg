@@ -1008,9 +1008,23 @@ describe( 'global styles renderer', () => {
 						ref: 'styles.elements.h1.typography.letterSpacing',
 					},
 				},
+				background: {
+					backgroundImage: {
+						ref: 'styles.background.backgroundImage',
+					},
+					backgroundSize: {
+						ref: 'styles.background.backgroundSize',
+					},
+				},
 			};
 			const tree = {
 				styles: {
+					background: {
+						backgroundImage: {
+							url: 'http://my-image.org/image.gif',
+						},
+						backgroundSize: 'cover',
+					},
 					elements: {
 						h1: {
 							typography: {
@@ -1026,6 +1040,8 @@ describe( 'global styles renderer', () => {
 			).toEqual( [
 				'font-size: var(--wp--preset--font-size--xx-large)',
 				'letter-spacing: 2px',
+				"background-image: url( 'http://my-image.org/image.gif' )",
+				'background-size: cover',
 			] );
 		} );
 		it( 'should set default values for block background styles', () => {

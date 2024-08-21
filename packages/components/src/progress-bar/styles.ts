@@ -40,7 +40,7 @@ export const Track = styled.div`
 		${ COLORS.theme.foreground },
 		transparent 90%
 	);
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusFull };
 
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
@@ -58,7 +58,7 @@ export const Indicator = styled.div< {
 	position: absolute;
 	top: 0;
 	height: 100%;
-	border-radius: ${ CONFIG.radiusBlockUi };
+	border-radius: ${ CONFIG.radiusFull };
 	/* Text color at 90% opacity */
 	background-color: color-mix(
 		in srgb,
