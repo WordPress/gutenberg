@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+
 ### Enhancements
 
 -   `ColorPicker`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
@@ -16,6 +20,7 @@
 -   `TabPanel`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
 -   `Tabs`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
 -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+-   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
     -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
