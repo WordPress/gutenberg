@@ -55,7 +55,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive="myPlugin"
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -66,7 +66,7 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
   data-wp-interactive='{ "namespace": "myPlugin" }'
   data-wp-context='{ "myColor" : "red", "myBgColor": "yellow" }'
 >
-  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">>and I can use directives!</span></p>
+  <p>I'm interactive now, <span data-wp-style--background-color="context.myBgColor">and I can use directives!</span></p>
   <div>
     <p>I'm also interactive, <span data-wp-style--color="context.myColor">and I can also use directives!</span></p>
   </div>
@@ -776,7 +776,7 @@ Actions are just regular JavaScript functions. Usually triggered by the `data-wp
 ```ts
 const { state, actions } = store("myPlugin", {
   actions: {
-    selectItem: (id?: number) => {
+    selectItem: ( id ) => {
       const context = getContext();
       // `id` is optional here, so this action can be used in a directive.
       state.selected = id || context.id;
@@ -840,7 +840,7 @@ const { state } = store("myPlugin", {
 });
 ```
 
-As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is reqired whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
+As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is required whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
 
 ```js
 // Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.
@@ -1152,7 +1152,7 @@ store('mySliderPlugin', {
 
 ## Server functions
 
-The Interactivity API comes with handy functions on the PHP part. Apart from [setting the store via server](#on-the-server-side), there is also a function to get and set Interactivity related config variables.
+The Interactivity API comes with handy functions that allow you to initialize and reference configuration options on the server. This is necessary to feed the initial data that the Server Directive Processing will use to modify the HTML markup before it's send to the browser. It is also a great way to leverage many of WordPress's APIs, like nonces, AJAX, and translations.
 
 ### wp_interactivity_config
 
@@ -1179,6 +1179,53 @@ This config can be retrieved on the client:
 // view.js
 
 const { showLikeButton } = getConfig();
+```
+
+### wp_interactivity_state
+
+`wp_interactivity_state` allows the initialization of the global state on the server, which will be used to process the directives on the server and then will be merged with any global state defined in the client.
+
+Initializing the global state on the server also allows you to use many critical WordPress APIs, including [AJAX](https://developer.wordpress.org/plugins/javascript/ajax/), or [nonces](https://developer.wordpress.org/plugins/javascript/enqueuing/#nonce).
+
+The `wp_interactivity_state` function receives two arguments, a string with the namespace that will be used as a reference and an associative array containing the values.
+
+Here is an example of passing the WP Admin AJAX endpoint with a nonce.
+
+```php
+// render.php
+
+wp_interactivity_state(
+	'myPlugin',
+	array(
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'myPlugin_nonce' ),
+	),
+);
+```
+
+```js
+// view.js
+
+const { state } = store( 'myPlugin', {
+	actions: {
+		*doSomething() {
+			try {
+				const formData = new FormData();
+				formData.append( 'action', 'do_something' );
+				formData.append( '_ajax_nonce', state.nonce );
+
+				const data = yield fetch( state.ajaxUrl, {
+					method: 'POST',
+					body: formData,
+				} ).then( ( response ) => response.json() );
+					console.log( 'Server data!', data );
+				} catch ( e ) {
+					// Something went wrong!
+				}
+			},
+		},
+	}
+);
 ```
 
 ### wp_interactivity_process_directives

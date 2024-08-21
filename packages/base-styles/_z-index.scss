@@ -208,6 +208,9 @@ $z-layers: (
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
+	// Ensure selection checkbox stays above the preview field.
+	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
+
 	// Ensure quick actions toolbar appear above pagination
 	".dataviews-bulk-actions-toolbar": 2,
 );

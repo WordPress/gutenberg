@@ -13,7 +13,7 @@ import {
 	toStyles,
 	getBlockSelectors,
 } from '../components/global-styles';
-import { useStyleOverride } from './utils';
+import { usePrivateStyleOverride } from './utils';
 import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
@@ -63,7 +63,7 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
 
 // A helper component to apply a style override using the useStyleOverride hook.
 function OverrideStyles( { override } ) {
-	useStyleOverride( override );
+	usePrivateStyleOverride( override );
 }
 
 /**
@@ -351,7 +351,7 @@ function useBlockProps( { name, className, clientId } ) {
 		);
 	}, [ variation, settings, styles, getBlockStyles, clientId ] );
 
-	useStyleOverride( {
+	usePrivateStyleOverride( {
 		id: `variation-${ clientId }`,
 		css: variationStyles,
 		__unstableType: 'variation',

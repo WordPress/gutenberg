@@ -125,6 +125,21 @@ describe( 'transformStyles', () => {
 			expect( output ).toMatchSnapshot();
 		} );
 
+		it( `should not try to replace 'body' in the middle of a classname`, () => {
+			const prefix = '.my-namespace';
+			const input = `.has-body-text { color: red; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				prefix
+			);
+
+			expect( output ).toEqual( [ `${ prefix } ${ input }` ] );
+		} );
+
 		it( 'should ignore keyframes', () => {
 			const input = `
 			@keyframes edit-post__fade-in-animation {
@@ -209,6 +224,40 @@ describe( 'transformStyles', () => {
 			);
 
 			expect( output ).toMatchSnapshot();
+		} );
+
+		it( 'should not try to wrap items within `:where` selectors', () => {
+			const input = `:where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }`;
+			const prefix = '.my-namespace';
+			const expected = [ `${ prefix } ${ input }` ];
+
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				prefix
+			);
+
+			expect( output ).toEqual( expected );
+		} );
+
+		it( 'should not try to prefix pseudo elements on `:where` selectors', () => {
+			const input = `:where(.wp-element-button, .wp-block-button__link)::before { color: blue; }`;
+			const prefix = '.my-namespace';
+			const expected = [ `${ prefix } ${ input }` ];
+
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				prefix
+			);
+
+			expect( output ).toEqual( expected );
 		} );
 	} );
 

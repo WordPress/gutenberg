@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity-router",
-	"version": "2.3.0",
+	"version": "2.5.0",
 	"description": "Package that exposes state and actions from the `core/router` store, part of the Interactivity API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

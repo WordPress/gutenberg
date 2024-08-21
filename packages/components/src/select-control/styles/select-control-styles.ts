@@ -158,6 +158,7 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
+		color: currentColor; // Overrides hover/focus styles in forms.css
 		cursor: inherit;
 		display: block;
 		font-family: inherit;

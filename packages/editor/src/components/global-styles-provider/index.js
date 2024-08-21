@@ -23,34 +23,41 @@ const { GlobalStylesContext, cleanEmptyObject } = unlock(
 
 export function mergeBaseAndUserConfigs( base, user ) {
 	return deepmerge( base, user, {
-		// We only pass as arrays the presets,
-		// in which case we want the new array of values
-		// to override the old array (no merging).
+		/*
+		 * We only pass as arrays the presets,
+		 * in which case we want the new array of values
+		 * to override the old array (no merging).
+		 */
 		isMergeableObject: isPlainObject,
+		/*
+		 * Exceptions to the above rule.
+		 * Background images should be replaced, not merged,
+		 * as they themselves are specific object definitions for the style.
+		 */
+		customMerge: ( key ) => {
+			if ( key === 'backgroundImage' ) {
+				return ( baseConfig, userConfig ) => userConfig;
+			}
+			return undefined;
+		},
 	} );
 }
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const {
-				getEditedEntityRecord,
-				hasFinishedResolution,
-				getUser,
-				getCurrentUser,
-			} = select( coreStore );
+			const { getEditedEntityRecord, hasFinishedResolution, canUser } =
+				select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 
-			// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
-			// See: https://github.com/WordPress/gutenberg/issues/63438
-			// So we need to check the user capabilities directly.
-			const userId = getCurrentUser()?.id;
-			const canEditThemeOptions =
-				userId && getUser( userId )?.capabilities?.edit_theme_options;
-
 			const record =
-				_globalStylesId && canEditThemeOptions
+				_globalStylesId &&
+				canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: _globalStylesId,
+				} )
 					? getEditedEntityRecord(
 							'root',
 							'globalStyles',
@@ -139,21 +146,11 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		const {
-			getCurrentUser,
-			getUser,
-			__experimentalGetCurrentThemeBaseGlobalStyles,
-		} = select( coreStore );
-
-		// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
-		// See: https://github.com/WordPress/gutenberg/issues/63438
-		// So we need to check the user capabilities directly.
-		const userId = getCurrentUser()?.id;
-		const canEditThemeOptions =
-			userId && getUser( userId )?.capabilities?.edit_theme_options;
+		const { __experimentalGetCurrentThemeBaseGlobalStyles, canUser } =
+			select( coreStore );
 
 		return (
-			canEditThemeOptions &&
+			canUser( 'read', { kind: 'root', name: 'theme' } ) &&
 			__experimentalGetCurrentThemeBaseGlobalStyles()
 		);
 	}, [] );

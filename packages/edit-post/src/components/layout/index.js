@@ -37,6 +37,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -327,6 +328,12 @@ function Layout( {
 			id: initialPostId,
 		};
 	}, [ initialPostType, initialPostId ] );
+
+	const backButton =
+		useViewportMatch( 'medium' ) && isFullscreenActive ? (
+			<BackButton initialPost={ initialPost } />
+		) : null;
+
 	return (
 		<SlotFillProvider>
 			<ErrorBoundary>
@@ -373,7 +380,7 @@ function Layout( {
 					<InitPatternModal />
 					<PluginArea onError={ onPluginAreaError } />
 					<PostEditorMoreMenu />
-					<BackButton initialPost={ initialPost } />
+					{ backButton }
 					<EditorSnackbars />
 				</Editor>
 			</ErrorBoundary>

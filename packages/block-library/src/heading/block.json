@@ -21,6 +21,9 @@
 			"type": "number",
 			"default": 2
 		},
+		"levelOptions": {
+			"type": "array"
+		},
 		"placeholder": {
 			"type": "string"
 		}

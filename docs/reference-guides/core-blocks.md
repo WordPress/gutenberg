@@ -237,7 +237,7 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 -	**Category:** theme
 -	**Ancestor:** core/comments
 -	**Supports:** align, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
+-	**Attributes:** level, levelOptions, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
@@ -360,7 +360,7 @@ Introduce new sections and organize content to help visitors (and search engines
 -	**Name:** core/heading
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
--	**Attributes:** content, level, placeholder, textAlign
+-	**Attributes:** content, level, levelOptions, placeholder, textAlign
 
 ## Home Link
 
@@ -396,7 +396,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 
 -	**Name:** core/latest-comments
 -	**Category:** widgets
--	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** commentsToShow, displayAvatar, displayDate, displayExcerpt
 
 ## Latest Posts
@@ -410,7 +410,7 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 
 ## List
 
-Create a bulleted or numbered list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
+An organized collection of items displayed in a specific order. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
 
 -	**Name:** core/list
 -	**Category:** text
@@ -420,13 +420,13 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 
 ## List item
 
-Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+An individual item within a list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
 
 -	**Name:** core/list-item
 -	**Category:** text
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -435,7 +435,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 
 -	**Name:** core/loginout
 -	**Category:** theme
--	**Supports:** className, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** className, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayLoginAsForm, redirectToCurrent
 
 ## Media & Text
@@ -689,7 +689,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 -	**Name:** core/post-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, linkTarget, rel, textAlign
+-	**Attributes:** isLink, level, levelOptions, linkTarget, rel, textAlign
 
 ## Preformatted
 
@@ -775,7 +775,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/query-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, showPrefix, showSearchTerm, textAlign, type
+-	**Attributes:** level, levelOptions, showPrefix, showSearchTerm, textAlign, type
 
 ## Quote
 
@@ -783,7 +783,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More
@@ -847,7 +847,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, textAlign
+-	**Attributes:** level, levelOptions, textAlign
 
 ## Site Title
 
@@ -856,7 +856,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Name:** core/site-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, linkTarget, textAlign
+-	**Attributes:** isLink, level, levelOptions, linkTarget, textAlign
 
 ## Social Icon
 
@@ -908,7 +908,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 
 ## Tag Cloud
 
-A cloud of your most used tags. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
+A cloud of popular keywords, each sized by how often it appears. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
 
 -	**Name:** core/tag-cloud
 -	**Category:** widgets

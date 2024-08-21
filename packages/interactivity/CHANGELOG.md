@@ -2,12 +2,30 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix context inheritance from namespaces different than the current one ([#64677](https://github.com/WordPress/gutenberg/pull/64677)).
+
+## 6.5.0 (2024-08-07)
+
+### Enhancements
+
+-   Refactor internal proxy and signals system ([#62734](https://github.com/WordPress/gutenberg/pull/62734)).
+
+### Bug Fixes
+
+-   Prevent overriding of existing properties on state and context after a client-side navigation ([#62734](https://github.com/WordPress/gutenberg/pull/62734)).
+
+## 6.4.0 (2024-07-24)
+
 ## 6.3.0 (2024-07-10)
 
 ## 6.2.0 (2024-06-26)
+
 ### Enhancements
 
 -   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/api-reference.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
+
 ## 6.1.0 (2024-06-15)
 
 ## 6.0.0 (2024-05-31)

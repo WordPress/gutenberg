@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.3.0",
+	"version": "14.5.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,7 +75,8 @@
 		"is-plain-object": "^5.0.0",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"remove-accents": "^0.5.0"
+		"remove-accents": "^0.5.0",
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

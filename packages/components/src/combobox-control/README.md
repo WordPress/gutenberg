@@ -118,6 +118,14 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 -   Type: `( args: { item: object } ) => ReactNode`
 -   Required: No
 
+#### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
 #### __nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.

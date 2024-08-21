@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
@@ -10,7 +15,11 @@ import { useMemo, useState } from '@wordpress/element';
 import { default as DataViewsBulkActions } from '../dataviews-bulk-actions';
 import DataViewsBulkActionsToolbar from '../dataviews-bulk-actions-toolbar';
 import DataViewsContext from '../dataviews-context';
-import DataViewsFilters from '../dataviews-filters';
+import {
+	default as DataViewsFilters,
+	useFilters,
+	FilterVisibilityToggle,
+} from '../dataviews-filters';
 import DataViewsLayout from '../dataviews-layout';
 import DataviewsPagination from '../dataviews-pagination';
 import DataViewsSearch from '../dataviews-search';
@@ -37,6 +46,7 @@ type DataViewsProps< Item > = {
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
+	header?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -57,8 +67,10 @@ export default function DataViews< Item >( {
 	defaultLayouts,
 	selection: selectionProperty,
 	onChangeSelection,
+	header,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const [ density, setDensity ] = useState< number >( 0 );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -80,6 +92,11 @@ export default function DataViews< Item >( {
 		);
 	}, [ selection, data, getItemId ] );
 
+	const filters = useFilters( _fields, view );
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
+		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	);
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -95,6 +112,7 @@ export default function DataViews< Item >( {
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
+				density,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -102,18 +120,34 @@ export default function DataViews< Item >( {
 					alignment="top"
 					justify="start"
 					className="dataviews__view-actions"
+					spacing={ 1 }
 				>
-					<HStack
-						justify="start"
-						className="dataviews-filters__container"
-						wrap
-					>
+					<HStack justify="start" wrap>
 						{ search && <DataViewsSearch label={ searchLabel } /> }
-						<DataViewsFilters />
+						<FilterVisibilityToggle
+							filters={ filters }
+							view={ view }
+							onChangeView={ onChangeView }
+							setOpenedFilter={ setOpenedFilter }
+							setIsShowingFilter={ setIsShowingFilter }
+							isShowingFilter={ isShowingFilter }
+						/>
 					</HStack>
 					<DataViewsBulkActions />
-					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						<DataViewsViewConfig
+							defaultLayouts={ defaultLayouts }
+							density={ density }
+							setDensity={ setDensity }
+						/>
+						{ header }
+					</HStack>
 				</HStack>
+				{ isShowingFilter && <DataViewsFilters /> }
 				<DataViewsLayout />
 				<DataviewsPagination />
 				<DataViewsBulkActionsToolbar />

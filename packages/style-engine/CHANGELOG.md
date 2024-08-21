@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   Style engine: export util to compile CSS custom var from preset string. ([#64490](https://github.com/WordPress/gutenberg/pull/64490))
+
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
 ## 2.3.0 (2024-07-10)
 
 ## 2.2.0 (2024-06-26)
