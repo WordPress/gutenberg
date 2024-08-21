@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 export function ZoomOutSeparator( {
 	clientId,
-	rootClientId,
+	rootClientId = '',
 	position = 'top',
 } ) {
 	const {
@@ -49,24 +49,14 @@ export function ZoomOutSeparator( {
 		return;
 	}
 
-	let isSectionBlock = false;
 	let isVisible = false;
 
-	if (
-		( sectionRootClientId &&
-			sectionClientIds &&
-			sectionClientIds.includes( clientId ) ) ||
-		( clientId && ! rootClientId )
-	) {
-		isSectionBlock = true;
-	}
+	const isSectionBlock =
+		rootClientId === sectionRootClientId &&
+		sectionClientIds &&
+		sectionClientIds.includes( clientId );
 
 	if ( ! isSectionBlock ) {
-		return null;
-	}
-
-	// Only allow insertion and not grouping in Zoom Out mode.
-	if ( blockInsertionPoint?.operation !== 'insert' ) {
 		return null;
 	}
 
