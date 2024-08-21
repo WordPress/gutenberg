@@ -248,6 +248,7 @@ To meet the above requirements, we recommend:
 
 -   using `Object.assign()` to add subcomponents as properties of the top-level component;
 -   using named functions for all components;
+-   using a separate files for each component, context and hook;
 -   setting explicitly the `displayName` on all subcomponents;
 -   adding the top-level JSDoc to the result of the `Object.assign` call;
 -   adding inline subcomponent JSDocs inside the `Object.assign` call.
@@ -256,35 +257,54 @@ The following example implements all of the above recommendations.
 
 ```tsx
 //=======================
-// Component.tsx
+// subcomponent.tsx
 //=======================
-import { forwardRef, createContext } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
-function UnforwardedTopLevelComponent( props, ref ) {
-	/* ... */
-}
-const TopLevelComponent = forwardRef( UnforwardedTopLevelComponent );
-
-function UnforwardedSubComponent( props, ref ) {
-	/* ... */
-}
-const SubComponent = forwardRef( UnforwardedSubComponent );
+export const SubComponent = forwardRef(
+	function UnforwardedSubComponent( props, ref ) {
+		/* ... */
+	}
+);
 SubComponent.displayName = 'Component.SubComponent';
 
-const Context = createContext();
+//=======================
+// context.ts
+//=======================
+import { createContext } from '@wordpress/element';
 
-/** The top-level component's JSDoc. */
-export const Component = Object.assign( TopLevelComponent, {
-	/** The subcomponent's JSDoc. */
-	SubComponent,
-	/** The context's JSDoc. */
-	Context,
-} );
+export const Context = createContext();
+
+//=======================
+// hook.ts
+//=======================
 
 /** The hook's JSDoc. */
 export function useComponent() {
 	/* ... */
 }
+
+//=======================
+// component.tsx
+//=======================
+import { forwardRef } from '@wordpress/element';
+import { SubComponent } from './subcomponent';
+import { Context } from './context';
+
+/** The top-level component's JSDoc. */
+export const Component = Object.assign(
+	forwardRef( function UnforwardedTopLevelComponent( props, ref ) {
+		/* ... */
+	} ),
+	{
+		/** The subcomponent's JSDoc. */
+		SubComponent,
+		/** The context's JSDoc. */
+		Context,
+	}
+);
+
+export default Component;
 
 //=======================
 // App.tsx
