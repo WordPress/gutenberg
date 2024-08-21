@@ -263,12 +263,11 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$parent_page_id = $attributes['parentPageID'];
 	$is_nested      = $attributes['isNested'];
 
-	$all_pages = get_posts(
+	$all_pages = get_pages(
 		array(
-			'post_type'   => 'page',
 			'sort_column' => 'menu_order,post_title',
 			'order'       => 'asc',
-			'fields'      => 'ID, post_author, post_date, post_date_gmt, post_title, post_name, post_status, post_type, post_author, post_parent'
+			'fields'      => 'ID, post_author, post_date, post_date_gmt, post_title, post_name, post_status, post_type, post_author, post_parent',
 		)
 	);
 
