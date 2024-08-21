@@ -15,15 +15,6 @@ const ROOT_SELECTORS = [
 	'body',
 ];
 
-function replaceDoublePrefix( selector, prefix ) {
-	// Avoid prefixing an already prefixed selector.
-	const doublePrefix = `${ prefix } ${ prefix }`;
-	if ( selector.includes( doublePrefix ) ) {
-		return selector.replace( doublePrefix, prefix );
-	}
-	return selector;
-}
-
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
 	wrapperSelector = '',
@@ -38,17 +29,30 @@ function transformStyle(
 	}
 
 	try {
+		const excludedSelectors = [
+			...ignoredSelectors,
+			...( transformOptions?.ignoredSelectors ?? [] ),
+			wrapperSelector,
+		];
+
 		return postcss(
 			[
 				wrapperSelector &&
 					prefixSelector( {
 						prefix: wrapperSelector,
-						exclude: [
-							...ignoredSelectors,
-							...( transformOptions?.ignoredSelectors ?? [] ),
-							wrapperSelector,
-						],
 						transform( prefix, selector, prefixedSelector ) {
+							// For backwards compatibility, don't use the `exclude` option
+							// of postcss-prefix-selector, instead handle it here to match
+							// the behavior of the old library (postcss-prefix-wrap) that
+							// `transformStyle` previously used.
+							if (
+								excludedSelectors.some( ( excludedSelector ) =>
+									selector.match( excludedSelector )
+								)
+							) {
+								return selector;
+							}
+
 							const rootSelector = ROOT_SELECTORS.find(
 								( rootSelectorCandidate ) =>
 									selector.startsWith( rootSelectorCandidate )
@@ -63,16 +67,10 @@ function transformStyle(
 								const updatedRootSelector =
 									`${ rootSelector } ${ prefix } ${ selectorWithoutRootPart }`.trim();
 
-								return replaceDoublePrefix(
-									updatedRootSelector,
-									prefix
-								);
+								return updatedRootSelector;
 							}
 
-							return replaceDoublePrefix(
-								prefixedSelector,
-								prefix
-							);
+							return prefixedSelector;
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
