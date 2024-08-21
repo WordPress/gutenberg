@@ -70,8 +70,8 @@ describe( 'transformStyles', () => {
 	} );
 
 	describe( 'root selectors', () => {
-		it( 'should append prefix after body selectors', () => {
-			const input = `body, h1 { color: red; }`;
+		it( 'should append prefix after `:root :where(body)` selectors', () => {
+			const input = ':root :where(body) { color: red; }';
 			const output = transformStyles(
 				[
 					{
@@ -80,17 +80,58 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
-			const expected =
-				'body .my-namespace, .my-namespace h1 { color: red; }';
+			const expected = ':root :where(body) .my-namespace { color: red; }';
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should append prefix after `:where(body)` selectors', () => {
+			const input = ':where(body) { color: red; }';
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = ':where(body) .my-namespace { color: red; }';
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should append prefix after body selectors', () => {
+			const input = `body { color: red; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = 'body .my-namespace { color: red; }';
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should append prefix after html selectors', () => {
+			const input = `html { color: red; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = 'html .my-namespace { color: red; }';
 
 			expect( output ).toEqual( [ expected ] );
 		} );
 
 		it( 'should append prefix after :root selectors', () => {
-			const input = `
-			:root {
-				--my-color: #ff0000;
-			}`;
+			const input = ':root { color: red; }';
 			const output = transformStyles(
 				[
 					{
@@ -99,10 +140,7 @@ describe( 'transformStyles', () => {
 				],
 				'.my-namespace'
 			);
-			const expected = `
-			:root .my-namespace {
-				--my-color: #ff0000;
-			}`;
+			const expected = ':root .my-namespace { color: red; }';
 
 			expect( output ).toEqual( [ expected ] );
 		} );
@@ -244,7 +282,7 @@ describe( 'transformStyles', () => {
 		} );
 
 		it( 'should not double wrap selectors', () => {
-			const input = ` .my-namespace h1, .red { color: red; }`;
+			const input = ' .my-namespace h1, .red { color: red; }';
 			const output = transformStyles(
 				[
 					{
@@ -256,6 +294,44 @@ describe( 'transformStyles', () => {
 			const expected = ` .my-namespace h1, .my-namespace .red { color: red; }`;
 
 			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'should allow specification of ignoredSelectors per css input', () => {
+			const input = '.ignored { color: red; }';
+			const output = transformStyles(
+				[
+					{
+						css: input,
+						ignoredSelectors: [ '.ignored' ],
+					},
+					{
+						css: input,
+					},
+				],
+				'.not'
+			);
+			const expected1 = input;
+			const expected2 = '.not .ignored { color: red; }';
+
+			expect( output ).toEqual( [ expected1, expected2 ] );
+		} );
+
+		it( 'allows specification of ignoredSelectors globally via the transformOptions param', () => {
+			const input = '.ignored { color: red; }';
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+					{
+						css: input,
+					},
+				],
+				'.not',
+				{ ignoredSelectors: '.ignored' }
+			);
+
+			expect( output ).toEqual( [ input, input ] );
 		} );
 
 		it( 'should not try to wrap items within `:where` selectors', () => {
