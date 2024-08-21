@@ -8,6 +8,7 @@ import {
 	ExternalLink,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
@@ -31,15 +32,17 @@ const EmbedPlaceholder = ( {
 			) }
 		>
 			<form onSubmit={ onSubmit }>
-				<input
+				<InputControl
+					__next40pxDefaultSize
 					type="url"
 					value={ value || '' }
-					className="components-placeholder__input"
-					aria-label={ label }
+					className="wp-block-embed__placeholder-input"
+					label={ __( 'Embed URL' ) }
+					hideLabelFromVision
 					placeholder={ __( 'Enter URL to embed here…' ) }
 					onChange={ onChange }
 				/>
-				<Button variant="primary" type="submit">
+				<Button __next40pxDefaultSize variant="primary" type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>
