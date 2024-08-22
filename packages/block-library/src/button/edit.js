@@ -380,6 +380,7 @@ function ButtonEdit( props ) {
 			<InspectorControls group="advanced">
 				{ isLinkTag && (
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Link rel' ) }
 						value={ rel || '' }

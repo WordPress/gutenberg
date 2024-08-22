@@ -184,14 +184,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 								<Icon icon={ check } />
 							) }
 					</span>
-					<span>
-						{ element.label }
-						{ !! element.description && (
-							<span className="dataviews-filters__search-widget-listitem-description">
-								{ element.description }
-							</span>
-						) }
-					</span>
+					<span>{ element.label }</span>
 				</Ariakit.CompositeHover>
 			) ) }
 		</Composite>

@@ -313,6 +313,8 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
+		getSettings,
+		isZoomOutMode,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -343,6 +345,7 @@ export default function useBlockDropZone( {
 				const targetBlockName = getBlockNamesByClientId( [
 					targetRootClientId,
 				] )[ 0 ];
+
 				const draggedBlockNames = getBlockNamesByClientId(
 					getDraggedBlockClientIds()
 				);
@@ -352,7 +355,20 @@ export default function useBlockDropZone( {
 					draggedBlockNames,
 					targetBlockName
 				);
+
 				if ( ! isBlockDroppingAllowed ) {
+					return;
+				}
+
+				const { sectionRootClientId } = unlock( getSettings() );
+
+				// In Zoom Out mode, if the target is not the section root provided by settings then
+				// do not allow dropping as the drop target is not within the root (that which is
+				// treated as "the content" by Zoom Out Mode).
+				if (
+					isZoomOutMode() &&
+					sectionRootClientId !== targetRootClientId
+				) {
 					return;
 				}
 
@@ -470,6 +486,7 @@ export default function useBlockDropZone( {
 				} );
 			},
 			[
+				isDragging,
 				getAllowedBlocks,
 				targetRootClientId,
 				getBlockNamesByClientId,
@@ -481,13 +498,14 @@ export default function useBlockDropZone( {
 				parentBlockClientId,
 				getBlockIndex,
 				registry,
-				showInsertionPoint,
-				isDragging,
 				startDragging,
+				showInsertionPoint,
 				canInsertBlockType,
+				isGroupable,
 				getBlockVariations,
 				getGroupingBlockName,
-				isGroupable,
+				getSettings,
+				isZoomOutMode,
 			]
 		),
 		200

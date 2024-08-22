@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -123,6 +123,12 @@ const transforms = {
 						anchor,
 					}
 				);
+
+				if ( isBlobURL( attributes.url ) ) {
+					attributes.blob = attributes.url;
+					delete attributes.url;
+				}
+
 				return createBlock( 'core/image', attributes );
 			},
 		},

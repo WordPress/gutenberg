@@ -134,6 +134,8 @@ const DimensionControls = ( {
 				panelId={ clientId }
 			>
 				<SelectControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					__nextHasNoMarginBottom
 					label={ __( 'Aspect ratio' ) }
 					value={ aspectRatio }
@@ -203,6 +205,7 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
@@ -232,6 +235,8 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<SelectControl
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						__nextHasNoMarginBottom
 						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }

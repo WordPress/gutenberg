@@ -88,6 +88,12 @@ export type Field< Item > = {
 	label?: string;
 
 	/**
+	 * The header of the field. Defaults to the label.
+	 * It allows the usage of a React Element to render the field labels.
+	 */
+	header?: string | ReactElement;
+
+	/**
 	 * A description of the field.
 	 */
 	description?: string;
@@ -151,6 +157,7 @@ export type Field< Item > = {
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
+	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	Edit: ComponentType< DataFormControlProps< Item > >;
@@ -289,6 +296,8 @@ export interface CombinedField {
 
 	label: string;
 
+	header?: string | ReactElement;
+
 	/**
 	 * The fields to use as columns.
 	 */
@@ -426,6 +435,12 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
 }
 
 export interface RenderModalProps< Item > {

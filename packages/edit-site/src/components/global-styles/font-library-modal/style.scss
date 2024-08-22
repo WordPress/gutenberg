@@ -92,7 +92,7 @@ $footer-height: 70px;
 }
 
 .font-library-modal__font-card {
-	border: 1px solid $gray-200;
+	border: $border-width solid $gray-200;
 	width: 100%;
 	height: auto;
 	padding: $grid-unit-20;

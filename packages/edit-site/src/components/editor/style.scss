@@ -12,7 +12,7 @@
 	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $gray-300;
+	border: $border-width dotted $gray-300;
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;

@@ -45,7 +45,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-sync-collaboration',
-		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		__( 'Live Collaboration and offline persistence', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -93,7 +93,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-form-blocks',
-		__( 'Form and input blocks ', 'gutenberg' ),
+		__( 'Form and input blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -105,7 +105,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-grid-interactivity',
-		__( 'Grid interactivity ', 'gutenberg' ),
+		__( 'Grid interactivity', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
