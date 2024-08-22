@@ -25,6 +25,10 @@
     -   `TreeSelect`
     -   `UnitControl`
 
+### Internal
+
+-   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
+
 ## 28.6.0 (2024-08-21)
 
 ### Deprecations

@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { Composite, useCompositeStore } from './composite';
+import { Composite } from './composite';
+import { useCompositeStore } from './composite/store';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
 import {
