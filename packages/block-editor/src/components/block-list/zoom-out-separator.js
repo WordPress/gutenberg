@@ -87,6 +87,8 @@ export function ZoomOutSeparator( {
 						ease: [ 0.6, 0, 0.4, 1 ],
 					} }
 					className="block-editor-block-list__zoom-out-separator"
+					// Indicate that this is an insertion point and should not trigger
+					// dropleave events for any parent drop zone.
 					data-is-insertion-point="true"
 				></motion.div>
 			) }
