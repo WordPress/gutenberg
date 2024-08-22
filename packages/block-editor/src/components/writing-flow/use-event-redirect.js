@@ -30,7 +30,7 @@ export default function useEventRedirect() {
 			const Constructor = defaultView[ constructorName ];
 			const root = getSelectionRoot( ownerDocument );
 
-			if ( ! root ) {
+			if ( ! root || root === node ) {
 				return;
 			}
 
