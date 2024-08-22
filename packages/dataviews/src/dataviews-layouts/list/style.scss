@@ -73,6 +73,7 @@
 				color: $gray-900;
 			}
 			&:hover,
+			&.is-hovered,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
 				background-color: #f8f8f8;

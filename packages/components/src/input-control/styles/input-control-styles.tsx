@@ -14,7 +14,6 @@ import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
-import { space } from '../../utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -188,29 +187,29 @@ export const getSizeConfig = ( {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
 		},
 		compact: {
 			height: 32,
 			lineHeight: 1,
 			minHeight: 32,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
 		},
 		'__unstable-large': {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
 		},
 	};
 

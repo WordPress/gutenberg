@@ -3,11 +3,10 @@
  */
 import { HStack } from '../h-stack';
 import { Text } from '../text';
-import { Spacer } from '../spacer';
-import { space } from '../utils/space';
 import { RangeControl, NumberControlWrapper } from './styles';
 import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const InputWithSlider = ( {
 	min,
@@ -39,14 +38,11 @@ export const InputWithSlider = ( {
 				value={ value }
 				onChange={ onNumberControlChange }
 				prefix={
-					<Spacer
-						as={ Text }
-						paddingLeft={ space( 4 ) }
-						color={ COLORS.theme.accent }
-						lineHeight={ 1 }
-					>
-						{ abbreviation }
-					</Spacer>
+					<InputControlPrefixWrapper>
+						<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+							{ abbreviation }
+						</Text>
+					</InputControlPrefixWrapper>
 				}
 				spinControls="none"
 				size="__unstable-large"
