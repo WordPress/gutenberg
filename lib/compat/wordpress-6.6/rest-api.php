@@ -170,6 +170,7 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 			$comment_data = array(
 				'comment_ID' => $comment->comment_ID,
 				'comment_type' => $request['comment_type'],
+				'comment_approved' => isset( $request['comment_approved'] ) ? $request['comment_approved'] : 0,
 			);
 
 			wp_update_comment( $comment_data );

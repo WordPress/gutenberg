@@ -96,11 +96,11 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 			data: {
 				post: postID,
 				content: newComment.comment,
-				author_name: currentUser,
 				comment_date: newComment.createdAt,
 				comment_type: 'block_comment',
 				meta: updatedComments,
-				author_email: 'rishi.shah@multidots.com',
+				comment_author: currentUser,
+				comment_approved: 0,
 			},
 		} ).then( () => {
 			onClose();
