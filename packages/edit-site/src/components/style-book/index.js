@@ -66,17 +66,17 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example {
-		border-radius: 2px;
 		cursor: pointer;
 		display: flex;
 		flex-direction: column;
 		gap: 40px;
 		margin-bottom: 40px;
-		padding: 16px;
+		padding: 16px 0;
 		width: 100%;
 		box-sizing: border-box;
 		scroll-margin-top: 32px;
 		scroll-margin-bottom: 32px;
+		border-top: 1px solid var(--wp--preset--color--contrast);
 	}
 
 	.edit-site-style-book__example.is-selected {
@@ -89,21 +89,20 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example {
-		flex-direction: row;
+		flex-direction: column;
 	}
 
 	.edit-site-style-book__example-title {
 		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-		font-size: 11px;
+		font-size: 13px;
 		font-weight: 500;
+		color: var(--wp--preset--color--contrast);
 		line-height: normal;
 		margin: 0;
 		text-align: left;
-		text-transform: uppercase;
 	}
 
 	.edit-site-style-book__examples.is-wide .edit-site-style-book__example-title {
-		text-align: right;
 		width: 120px;
 	}
 
@@ -413,6 +412,18 @@ const Examples = memo(
 	}
 );
 
+/**
+ * Example component.
+ *
+ * @param {{
+ *  id: string;
+ *  title: string;
+ *  blocks: WPBlock[];
+ *  isSelected: boolean;
+ *  onClick: () => void;
+ * }} ExampleProps
+ * @return {JSX.Element} The rendered Example component.
+ */
 const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
