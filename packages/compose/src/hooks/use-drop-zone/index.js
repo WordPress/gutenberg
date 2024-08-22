@@ -31,18 +31,6 @@ function useFreshRef( value ) {
 }
 
 /**
- * Checks if the given element is a zoom out separator.
- *
- * @param {EventTarget} maybeZoomOutSeparator - The element to check.
- * @return {boolean} True if the element is a zoom out separator, false otherwise.
- */
-const isZoomOutSeparator = ( maybeZoomOutSeparator ) =>
-	maybeZoomOutSeparator &&
-	maybeZoomOutSeparator?.classList.contains(
-		'block-editor-block-list__zoom-out-separator'
-	);
-
-/**
  * A hook to facilitate drag and drop handling.
  *
  * @param {Object}                  props                   Named parameters.
@@ -119,6 +107,24 @@ export default function useDropZone( {
 				return false;
 			}
 
+			/**
+			 * Checks if the given element is a zoom out separator.
+			 *
+			 * @param {EventTarget|null} maybeZoomOutSeparator - The element to check.
+			 * @return {boolean} True if the element is a zoom out separator, false otherwise.
+			 */
+			function isZoomOutSeparator( maybeZoomOutSeparator ) {
+				const { defaultView } = ownerDocument;
+
+				return !! (
+					defaultView &&
+					maybeZoomOutSeparator instanceof defaultView.HTMLElement &&
+					maybeZoomOutSeparator.classList.contains(
+						'block-editor-block-list__zoom-out-separator'
+					)
+				);
+			}
+
 			function maybeDragStart( /** @type {DragEvent} */ event ) {
 				if ( isDragging ) {
 					return;
@@ -183,7 +189,9 @@ export default function useDropZone( {
 				}
 
 				// If we're moving in/out of a ZoomOutSeparator, don't trigger
-				// the onDragLeave event.
+				// the onDragLeave event. This is to prevent the dropzone from
+				// being hidden when the user is dragging a block in/over/around
+				// a block and the separator.
 				if (
 					isZoomOutSeparator( event.relatedTarget ) ||
 					isZoomOutSeparator( event.target )
