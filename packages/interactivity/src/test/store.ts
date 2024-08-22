@@ -64,6 +64,8 @@ describe( 'Interactivity API', () => {
 					const myStore = store< Store >( 'test', {
 						state: {
 							clientValue: 1,
+							// @ts-expect-error
+							nonExistent: 2,
 							get derived(): number {
 								return myStore.state.serverValue;
 							},
@@ -146,6 +148,9 @@ describe( 'Interactivity API', () => {
 							sync: ( n: number ) => number;
 							async: ( n: number ) => Promise< number >;
 						};
+						callbacks: {
+							existent: number;
+						};
 					}
 
 					const myStore = store< Store >( 'test', {
@@ -159,6 +164,11 @@ describe( 'Interactivity API', () => {
 								return n1 + n;
 							},
 						},
+						callbacks: {
+							existent: 1,
+							// @ts-expect-error
+							nonExistent: 1,
+						},
 					} );
 
 					// @ts-expect-error
@@ -166,8 +176,63 @@ describe( 'Interactivity API', () => {
 					const n2: number = myStore.actions.sync( 1 );
 					const n3: Promise< number > = myStore.actions.async( 1 );
 					const n4: number = await myStore.actions.async( 1 );
+					const n5: number = myStore.callbacks.existent;
+					// @ts-expect-error
+					const n6: number = myStore.callbacks.nonExistent;
 					// @ts-expect-error
 					myStore.actions.nonExistent();
+				};
+			} );
+
+			describe( 'the store can be divided into multiple parts', () => {
+				async () => {
+					type ServerState = {
+						state: {
+							serverValue: number;
+						};
+					};
+
+					const firstStorePart = {
+						state: {
+							clientValue1: 1,
+						},
+						actions: {
+							incrementValue1( n = 1 ) {
+								myStore.state.clientValue1 += n;
+							},
+						},
+					};
+
+					type FirstStorePart = typeof firstStorePart;
+
+					const secondStorePart = {
+						state: {
+							clientValue2: 'test',
+						},
+						actions: {
+							*asyncAction() {
+								return (
+									myStore.state.clientValue1 +
+									myStore.state.serverValue
+								);
+							},
+						},
+					};
+
+					type Store = ServerState &
+						FirstStorePart &
+						typeof secondStorePart;
+
+					const myStore = store< Store >( 'test', firstStorePart );
+					store( 'test', secondStorePart );
+
+					const n1: number = myStore.state.clientValue1;
+					const s1: string = myStore.state.clientValue2;
+					myStore.actions.incrementValue1( 1 );
+					const n2: Promise< number > = myStore.actions.asyncAction();
+					const n3: number = await myStore.actions.asyncAction();
+					// @ts-expect-error
+					myStore.state.nonExistent;
 				};
 			} );
 		} );
