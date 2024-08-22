@@ -91,9 +91,11 @@ function ColumnInspectorControls( {
 			<>
 				<ToggleGroupControl
 					help={ help }
+					isBlock
 					label={ __( 'Columns' ) }
 					onChange={ updateColumns }
 					value={ count }
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 				>
 					{ optionList }
