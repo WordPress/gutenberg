@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+	queryByRole,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
@@ -107,7 +113,7 @@ function addLocale() {
 	} );
 }
 
-describe( 'PreferredLanguages', () => {
+describe( 'LanguageChooser', () => {
 	it( 'shows missing translations notice', () => {
 		render(
 			<LanguageChooser
@@ -147,12 +153,16 @@ describe( 'PreferredLanguages', () => {
 			/>
 		);
 
+		const dropdown = screen.getByRole( 'combobox' );
+		expect( dropdown ).toBeEnabled();
+		expect( dropdown ).toHaveValue( 'en_GB' );
+
 		const add = screen.getByRole( 'button', { name: /Add/ } );
 		await userEvent.click( add );
 
 		await waitFor( () => {
 			expect(
-				screen.getByRole( 'option', { name: /Deutsch/ } )
+				screen.getByRole( 'option', { name: /English \(UK\)/ } )
 			).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 	} );
@@ -275,7 +285,9 @@ describe( 'PreferredLanguages', () => {
 		removeLocale();
 
 		expect(
-			screen.queryByRole( 'option', { name: /Deutsch/ } )
+			// We want to explicitly check if it's within the container.
+			// eslint-disable-next-line testing-library/prefer-screen-queries
+			queryByRole( listbox, 'option', { name: /Deutsch/ } )
 		).not.toBeInTheDocument();
 		expect(
 			screen.getByRole( 'option', { name: /Deutsch/ } )
@@ -327,11 +339,11 @@ describe( 'PreferredLanguages', () => {
 
 		addLocale();
 
-		expect( dropdown ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( dropdown ).toBeDisabled();
 
 		addLocale();
 
-		expect( dropdown ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( dropdown ).toBeDisabled();
 	} );
 
 	it( 'adds a spinner when saving new translations', async () => {
