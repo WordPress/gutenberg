@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+// eslint-disable-next-line no-restricted-imports
+import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
-	Popover,
 	TextControl,
 	Button,
 	CheckboxControl,
@@ -11,76 +13,47 @@ import {
 	__experimentalVStack as VStack,
 	Modal,
 } from '@wordpress/components';
-import { useAnchor } from '@wordpress/rich-text';
+import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	commentAuthorAvatar as userIcon,
 	Icon,
 	trash as deleteIcon,
 	edit as editIcon,
 } from '@wordpress/icons';
+
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
-import { dateI18n, format, getSettings } from '@wordpress/date';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+//import { store as coreStore } from '@wordpress/core-data';
+//import { useEntityProp } from '@wordpress/core-data';
 
-/**
- * Represents a collaborative comment board component.
- *
- * @param {Object}   props - The component props.
- * @param {String}   props.threadId - The ID of the comment thread.
- * @param {Function} props.setThreadId - The function to set the comment thread ID.
- * @param {Object}   props.contentRef - The reference to the content element.
- * @param {Function} props.onClose - The function to close the comment board.
- * 
- * @return {Component} CollabBoard component.
- */
-const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
-	// Get the anchor for the popover.
-	const popoverAnchor = useAnchor( {
-		editableContentElement: contentRef.current,
-	} );
-
+export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
+	const curruntUserData = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core' ).getCurrentUser();
+	}, [] );
 
-	// Get the dispatch functions to save the comment and update the block attributes.
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const userAvatar = curruntUserData.avatar_urls[ 48 ] || null;
+	const currentUser = curruntUserData?.name || null;
 
-	// Add border to the block if threadId exists.
-	useEffect( () => {
-		if ( threadId ) {
-			addBorder();
-		}
-	}, [ threadId ] );
-
-	// Fetch the current post, current user, and the selected block clientId.
-	const { postType, currentUser, clientId } = useSelect(
-		( select ) => {
-			return {
-				postType: select( editorStore ).getCurrentPostType(),
-				currentUser: select( coreStore ).getCurrentUser()?.name || null,
-				clientId:
-					select( blockEditorStore ).getSelectedBlockClientId() ||
-					null,
-			};
-		},
-		[ threadId ]
-	);
-
-	const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
-
-	const allThreads = meta?.collab ? JSON.parse( meta.collab ) : [];
+	const allThreads = [];
 	const currentThread = allThreads[ threadId ] ?? {};
 	const isCurrentThreadResolved = currentThread.threadIsResolved || false;
 	const commentsCount = isCurrentThreadResolved
 		? 0
 		: currentThread.comments?.length || 0;
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const postID = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/editor' ).getCurrentPostId();
+	}, [] );
 
+	// Get the dispatch functions to save the comment and update the block attributes.
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	// Helper function to generate a new comment.
 	const generateNewComment = () => ( {
 		commentId: Date.now(),
@@ -88,6 +61,13 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 		comment: inputComment,
 		createdAt: new Date().toISOString(),
 	} );
+
+	// // Function to add a border class to the content reference.
+	const setAttributes = () => {
+		updateBlockAttributes( clientId, {
+			className: `block-editor-collab__${ threadId }`,
+		} );
+	};
 
 	// Helper function to get updated comments structure
 	const getUpdatedComments = ( newComment, threadKey ) => ( {
@@ -104,17 +84,28 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 		},
 	} );
 
-	const updateCommentMeta = ( updatedComments ) => {
-		setMeta( { ...meta, collab: JSON.stringify( updatedComments ) } );
-	};
-
 	// Function to save the comment.
 	const saveComment = () => {
 		const newComment = generateNewComment();
+		threadId = newComment?.commentId;
 		const updatedComments = getUpdatedComments( newComment, threadId );
 
-		updateCommentMeta( updatedComments );
-		setInputComment( '' );
+		apiFetch( {
+			path: '/wp/v2/comments',
+			method: 'POST',
+			data: {
+				post: postID,
+				content: newComment.comment,
+				author_name: currentUser,
+				comment_date: newComment.createdAt,
+				comment_type: 'block_comment',
+				meta: updatedComments,
+				author_email: 'rishi.shah@multidots.com',
+			},
+		} ).then( () => {
+			onClose();
+		} );
+		setAttributes( clientId, threadId );
 	};
 
 	// Function to edit the comment.
@@ -134,7 +125,6 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 			} );
 		}
 
-		updateCommentMeta( editedComments );
 		setInputComment( '' );
 		setIsEditing( null );
 	};
@@ -152,10 +142,6 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 			resolvedAt: new Date().toISOString(),
 		};
 
-		// Save the updated comments.
-		updateCommentMeta( updatedComments );
-		removeBorder();
-		setThreadId( null );
 		onClose();
 	};
 
@@ -171,19 +157,12 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 		// If there are no comments, delete the thread.
 		if ( currentComments.length === 0 ) {
 			delete updatedComments[ threadId ];
-
-			// Remove the className from the block.
-			removeBorder();
-			setThreadId( null );
 		} else {
 			updatedComments[ threadId ] = {
 				...allThreads[ threadId ],
 				comments: currentComments,
 			};
 		}
-
-		// Save the updated comments.
-		updateCommentMeta( updatedComments );
 	};
 
 	// Function to show the confirmation overlay.
@@ -198,44 +177,16 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 		hideConfirmationOverlay();
 	};
 
-	// Function to add a border class to the content reference.
-	const addBorder = () => {
-		if ( contentRef.current ) {
-			updateBlockAttributes( clientId, {
-				className: `block-editor-collab__${ threadId }`,
-			} );
-		}
-	};
-
-	// Function to remove the border class from the content reference.
-	const removeBorder = () => {
-		if ( contentRef.current ) {
-			updateBlockAttributes( clientId, {
-				className: clientId.replace(
-					`block-editor-collab__${ threadId }`,
-					''
-				),
-			} );
-		}
-	};
-
 	// On cancel, remove the border if no comments are present.
 	const handleCancel = () => {
-		if ( 0 === commentsCount ) {
-			removeBorder();
-		}
 		onClose();
 	};
 
 	// Get the date time format from WordPress settings.
 	const dateTimeFormat = getSettings().formats.datetime;
-
 	return (
 		<>
-			<Popover
-				className="block-editor-format-toolbar__comment-board"
-				anchor={ popoverAnchor }
-			>
+			<Modal overlayClassName="block-editor-format-toolbar__comment-board">
 				<VStack spacing="3">
 					{ 0 < commentsCount && ! isCurrentThreadResolved && (
 						<>
@@ -271,13 +222,13 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 														setInputComment( val )
 													}
 													placeholder={ __(
-														'Comment or add others with @'
+														'Add comment'
 													) }
 													className="block-editor-format-toolbar__comment-input"
 												/>
 												<HStack
 													alignment="right"
-													spacing="1"
+													spacing="2"
 												>
 													<Button
 														className="block-editor-format-toolbar__cancel-button"
@@ -423,10 +374,10 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 						<VStack spacing="2">
 							{ 0 === commentsCount && (
 								<HStack alignment="left" spacing="3">
-									<Icon
-										icon={ userIcon }
+									<img
+										src={ userAvatar }
+										alt={ __( 'User Icon' ) }
 										className="comment-board__userIcon"
-										size={ 45 }
 									/>
 									<span className="comment-board__userName">
 										{ currentUser }
@@ -436,15 +387,13 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 							<TextControl
 								value={ inputComment }
 								onChange={ ( val ) => setInputComment( val ) }
-								placeholder={ __(
-									'Comment or add others with @'
-								) }
+								placeholder={ __( 'Add comment' ) }
 								className="block-editor-format-toolbar__comment-input"
 							/>
-							<HStack alignment="right" spacing="1">
+							<HStack alignment="right" spacing="3">
 								<Button
 									className="block-editor-format-toolbar__cancel-button"
-									variant="secondary"
+									variant="tertiary"
 									text={ __( 'Cancel' ) }
 									onClick={ () => handleCancel() }
 								/>
@@ -464,7 +413,7 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 						</VStack>
 					) }
 				</VStack>
-			</Popover>
+			</Modal>
 			{ showConfirmation && (
 				<Modal
 					title={ __( 'Confirm' ) }
@@ -489,6 +438,4 @@ const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 			) }
 		</>
 	);
-};
-
-export default CollabBoard;
+}
