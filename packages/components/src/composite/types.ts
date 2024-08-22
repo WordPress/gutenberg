@@ -6,13 +6,13 @@ import type * as Ariakit from '@ariakit/react';
 export type CompositeContextProps =
 	| {
 			/**
-			 * Object returned by the `useCompositeStore` hook.
+			 * The component store, used for advanced usage of the component.
 			 */
 			store: Ariakit.CompositeStore;
 	  }
 	| undefined;
 
-export type CompositeStoreProps = {
+type CompositeStoreProps = {
 	/**
 	 * The current active item `id`. The active item is the element within the
 	 * composite widget that has either DOM or virtual focus (in case
