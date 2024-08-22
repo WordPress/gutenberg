@@ -324,19 +324,6 @@ export default function CoverInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
-						<ToolsPanelItem
-							hasValue={ () => !! url }
-							isShownByDefault
-						>
-							<Button
-								variant="secondary"
-								size="small"
-								className="block-library-cover__reset-button"
-								onClick={ onClearMedia }
-							>
-								{ __( 'Clear Media' ) }
-							</Button>
-						</ToolsPanelItem>
 						{ ! useFeaturedImage && !! imageSizeOptions.length && (
 							<ResolutionTool
 								value={ sizeSlug }
