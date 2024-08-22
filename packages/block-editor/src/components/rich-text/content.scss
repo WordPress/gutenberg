@@ -13,10 +13,6 @@
 	&:focus {
 		// Removes outline added by the browser.
 		outline: none;
-
-		[data-rich-text-format-boundary] {
-			border-radius: 2px;
-		}
 	}
 }
 
@@ -38,5 +34,19 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	&::before {
 		content: "</>";
 		background: rgb(255, 255, 0);
+	}
+}
+
+[data-rich-text-comment],
+[data-rich-text-format-boundary] {
+	border-radius: 2px;
+}
+
+[data-rich-text-comment] {
+	background-color: currentColor;
+
+	span {
+		filter: invert(100%);
+		color: currentColor;
 	}
 }
