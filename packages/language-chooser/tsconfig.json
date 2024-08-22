@@ -11,7 +11,6 @@
 		{ "path": "../data" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
-		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../keycodes" }
 	],
 	"include": [ "src/**/*" ]
