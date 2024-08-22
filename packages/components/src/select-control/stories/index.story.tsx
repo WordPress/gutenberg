@@ -66,7 +66,10 @@ Default.args = {
 	__nextHasNoMarginBottom: true,
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
-		{ value: 'a', label: 'Option A' },
+		{
+			value: 'a',
+			label: 'Lorem ipsum dolor sit amet consectetur adipiscing',
+		},
 		{ value: 'b', label: 'Option B' },
 		{ value: 'c', label: 'Option C' },
 	],
