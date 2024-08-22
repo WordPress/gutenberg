@@ -19,7 +19,7 @@ import { getSelectionRoot } from './utils';
 export default function useEventRedirect() {
 	return useRefEffect( ( node ) => {
 		function onInput( event ) {
-			if ( event.target !== node || event.__isRedirected ) {
+			if ( event.target !== node ) {
 				return;
 			}
 
@@ -43,7 +43,6 @@ export default function useEventRedirect() {
 			init.bubbles = false;
 
 			const newEvent = new Constructor( event.type, init );
-			newEvent.__isRedirected = true;
 			const cancelled = ! root.dispatchEvent( newEvent );
 
 			if ( cancelled ) {
