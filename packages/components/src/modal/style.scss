@@ -25,7 +25,7 @@
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.2s cubic-bezier(0.29, 0, 0, 1);
+	animation: components-modal__appear-animation 0.26s cubic-bezier(0.29, 0, 0, 1);
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 
