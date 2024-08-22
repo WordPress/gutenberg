@@ -118,7 +118,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	flex-direction: column;
 
 	background-color: ${ COLORS.theme.background };
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	border: 1px solid ${ COLORS.theme.foreground };
 
 	/* z-index(".components-popover") */

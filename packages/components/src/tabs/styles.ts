@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 
 export const TabListWrapper = styled.div`
@@ -107,7 +107,7 @@ export const Tab = styled( Ariakit.Tab )`
 			// Outline works for Windows high contrast mode as well.
 			outline: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
-			border-radius: 2px;
+			border-radius: ${ CONFIG.radiusSmall };
 
 			// Animation
 			opacity: 0;

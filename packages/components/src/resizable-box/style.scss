@@ -28,7 +28,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	content: "";
 	width: $resize-handler-size;
 	height: $resize-handler-size;
-	border-radius: 50%;
+	border-radius: $radius-round;
 	background: $white;
 	cursor: inherit;
 	position: absolute;

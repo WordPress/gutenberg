@@ -78,7 +78,7 @@ export const BackdropUI = styled.div< BackdropProps >`
 export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
 
 	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
