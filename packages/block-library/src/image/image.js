@@ -994,7 +994,6 @@ export default function Image( {
 						setAttributes( {
 							width: undefined,
 							height: undefined,
-							aspectRatio: undefined,
 						} );
 						return;
 					}
