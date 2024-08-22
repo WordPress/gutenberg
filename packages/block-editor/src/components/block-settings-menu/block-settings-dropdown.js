@@ -19,12 +19,16 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
+import BlockCommentMenuItem from '../collab/block-comment-menu-item';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+const isBlockCommentExperimentEnabled =
+	window?.__experimentalEnableBlockComment;
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -217,6 +221,13 @@ export function BlockSettingsDropdown( {
 				>
 					{ ( { onClose } ) => (
 						<>
+							{ isBlockCommentExperimentEnabled && (
+								<MenuGroup>
+									<BlockCommentMenuItem
+										clientId={ clientIds }
+									/>
+								</MenuGroup>
+							) }
 							<MenuGroup>
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }

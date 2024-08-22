@@ -1,12 +1,20 @@
 .editor-collab-sidebar {
 	&__activities {
-		background-color: #f3f5f6;
+		padding: 16px;
+		background-color: #f9f9f9;
 	}
 
 	&__thread {
-		padding: 20px;
-		&:not(:last-child) {
-			border-bottom: 1px solid $gray-300;
+		position: relative;
+		padding: 16px;
+		border-radius: 8px;
+		border: 1px solid $gray-300;
+		background-color: $gray-100;
+		margin-bottom: 16px;
+
+		&__focus {
+			border: 1.5px solid #3858e9;
+			background-color: $white;
 		}
 	}
 
@@ -15,16 +23,72 @@
 		border: 1px solid $gray-300;
 		border-radius: 5px;
 		padding: 10px 15px;
-		background-color: #fff;
+		background-color: $white;
 	}
 
 	&__userName {
-		font-size: 14px;
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 16px;
+		text-align: left;
+		color: $gray-700;
 		text-transform: capitalize;
 	}
 
+	&__usertime {
+		font-size: 12px;
+		font-weight: 400;
+		line-height: 16px;
+		text-align: left;
+		color: $gray-700;
+	}
+
+	&__usercomment {
+		font-size: 13px;
+		font-weight: 400;
+		line-height: 20px;
+		text-align: left;
+		color: $gray-900;
+		p {
+			margin-bottom: 0;
+		}
+	}
+
 	&__userIcon {
-		border: 1px solid #c5c5c5;
+		border-radius: 50%;
+	}
+
+	&__userstatus {
+		button {
+			font-size: 12px;
+			font-weight: 400;
+			line-height: 16px;
+			padding: 0;
+			height: auto;
+			box-shadow: none;
+			outline: none;
+		}
+	}
+
+
+	&__useroverlay {
+		background-color: rgba(0, 0, 0, 0.7);
+		width: 100%;
+		height: 100%;
+		text-align: center;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 1;
+		padding: 20px;
+		border-radius: 8px;
+		color: $white;
+
+		button {
+			padding: 8px;
+			height: 30px;
+			color: $white;
+		}
 	}
 
 	&__resolvedIcon {
