@@ -8,19 +8,23 @@ import {
 	waitFor,
 	queryByRole,
 } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
 import { BACKSPACE, DOWN, END, HOME, UP } from '@wordpress/keycodes';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import type { Language } from '.././types';
-import LanguageChooser from '../language-chooser';
+import type { Language } from '../types';
+import LanguageChooser from '../';
+
+jest.mock( '@wordpress/a11y', () => ( {
+	speak: jest.fn(),
+} ) );
 
 /* eslint-disable camelcase */
 
@@ -112,6 +116,10 @@ function addLocale() {
 }
 
 describe( 'LanguageChooser', () => {
+	afterEach( () => {
+		jest.resetAllMocks();
+	} );
+
 	it( 'shows missing translations notice', () => {
 		render(
 			<LanguageChooser
@@ -163,6 +171,18 @@ describe( 'LanguageChooser', () => {
 				screen.getByRole( 'option', { name: /English \(UK\)/ } )
 			).toHaveAttribute( 'aria-selected', 'true' );
 		} );
+
+		expect( speak ).toHaveBeenCalledWith( 'Locale added to list' );
+
+		await userEvent.click( add );
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'option', { name: /Español/ } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		expect( speak ).toHaveBeenCalledWith( 'Locale added to list' );
 	} );
 
 	it( 're-populates selected locale when empty dropdown is filled again', async () => {
@@ -229,7 +249,6 @@ describe( 'LanguageChooser', () => {
 
 		listbox.focus();
 
-		moveDown();
 		moveDown();
 		moveDown();
 
@@ -394,6 +413,205 @@ describe( 'LanguageChooser', () => {
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
 		const spinner = container.querySelector( '.language-install-spinner' );
 		expect( spinner ).not.toBeInTheDocument();
+	} );
+
+	it( 'announces site default fallback message if list is empty', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE ] }
+				showOptionSiteDefault
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		);
+
+		expect( speak ).toHaveBeenNthCalledWith(
+			1,
+			'Locale removed from list'
+		);
+		expect( speak ).toHaveBeenNthCalledWith(
+			2,
+			expect.stringMatching( /Falling back to Site Default/ )
+		);
+	} );
+
+	it( 'announces locale moving up and down', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE, fr_FR, it_IT ] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Move down/ } )
+		);
+
+		expect( speak ).toHaveBeenCalledWith( 'Locale moved down' );
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Move up/ } )
+		);
+
+		expect( speak ).toHaveBeenCalledWith( 'Locale moved up' );
+	} );
+
+	it( 'prevents selection if list is empty', () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR ] }
+				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+			/>
+		);
+
+		expect( screen.getByRole( 'button', { name: /Add/ } ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+		expect( screen.getByRole( 'combobox' ) ).toBeDisabled();
+	} );
+
+	it( 'displays fallback message if list is empty', () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [] }
+			/>
+		);
+
+		expect(
+			screen.getByText( /Falling back to English/ )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /Move up/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Move down/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'displays site default fallback message if list is empty', () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [] }
+				showOptionSiteDefault
+			/>
+		);
+
+		expect(
+			screen.getByText( /Falling back to Site Default/ )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /Move up/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Move down/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'prevents moving a single item', () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE ] }
+			/>
+		);
+		expect( screen.queryByText( /Falling back/ ) ).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: /Move up/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Move down/ } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		expect(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		).toBeEnabled();
+	} );
+
+	it( 'selects next locale when removing one', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE, en_GB ] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'option', { name: /English \(UK\)/ } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+
+		expect( speak ).toHaveBeenCalledWith( 'Locale removed from list' );
+	} );
+
+	it( 'selects previous locale when removing one', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE, en_GB ] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Move down/ } )
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Remove/ } )
+		);
+
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'option', { name: /English \(UK\)/ } )
+			).toHaveAttribute( 'aria-selected', 'true' );
+		} );
+	} );
+
+	it( 'changes selection when clicking on locale', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'option', { name: /Français/ } )
+		);
+
+		expect(
+			screen.getByRole( 'option', { name: /Français/ } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+	} );
+
+	it( 'scrolls to newly selected locale', async () => {
+		render(
+			<LanguageChooser
+				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
+				preferredLanguages={ [ de_DE, en_GB ] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'option', { name: /Français/ } )
+		);
+
+		expect( scrollIntoView ).toHaveBeenCalled();
 	} );
 } );
 

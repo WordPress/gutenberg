@@ -8,7 +8,6 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../components" },
-		{ "path": "../data" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../keycodes" }

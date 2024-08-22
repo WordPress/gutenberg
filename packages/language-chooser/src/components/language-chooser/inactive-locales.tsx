@@ -1,11 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
-import { speak } from '@wordpress/a11y';
-
-/**
  * Internal dependencies
  */
 import type { Language } from './types';
@@ -14,68 +7,27 @@ import InactiveLocalesSelect from './inactive-locales-select';
 
 interface InactiveLocalesProps {
 	languages: Language[];
-	onAddLanguage: ( language: Language ) => void;
+	onAdd: () => void;
+	selectedInactiveLanguage: Language;
+	setSelectedInactiveLanguage: ( locale: Language ) => void;
+	installedLanguages: Language[];
+	availableLanguages: Language[];
 }
 
-function InactiveLocales( { languages, onAddLanguage }: InactiveLocalesProps ) {
-	const [ selectedInactiveLanguage, setSelectedInactiveLanguage ] = useState(
-		languages[ 0 ]
-	);
-
-	useEffect( () => {
-		if ( ! selectedInactiveLanguage ) {
-			setSelectedInactiveLanguage( languages[ 0 ] );
-		}
-	}, [ selectedInactiveLanguage, languages ] );
-
-	const installedLanguages = languages.filter( ( { installed } ) =>
-		Boolean( installed )
-	);
-	const availableLanguages = languages.filter(
-		( { installed } ) => ! installed
-	);
-
+function InactiveLocales( {
+	languages,
+	onAdd,
+	selectedInactiveLanguage,
+	setSelectedInactiveLanguage,
+	installedLanguages,
+	availableLanguages,
+}: InactiveLocalesProps ) {
 	const onChange = ( locale: string ) => {
 		setSelectedInactiveLanguage(
 			languages.find(
 				( language ) => locale === language.locale
 			) as Language
 		);
-	};
-
-	const onClick = () => {
-		onAddLanguage( selectedInactiveLanguage );
-
-		const installedIndex = installedLanguages.findIndex(
-			( { locale } ) => locale === selectedInactiveLanguage.locale
-		);
-
-		const availableIndex = availableLanguages.findIndex(
-			( { locale } ) => locale === selectedInactiveLanguage.locale
-		);
-
-		let newSelected: Language | undefined;
-
-		newSelected = installedLanguages[ installedIndex + 1 ];
-
-		if (
-			! newSelected &&
-			installedLanguages[ 0 ] !== selectedInactiveLanguage
-		) {
-			newSelected = installedLanguages[ 0 ];
-		}
-
-		if ( ! newSelected ) {
-			newSelected = availableLanguages[ availableIndex + 1 ];
-
-			if ( availableLanguages[ 0 ] !== selectedInactiveLanguage ) {
-				newSelected = availableLanguages[ 0 ];
-			}
-		}
-
-		setSelectedInactiveLanguage( newSelected );
-
-		speak( __( 'Locale added to list' ) );
 	};
 
 	return (
@@ -89,7 +41,7 @@ function InactiveLocales( { languages, onAddLanguage }: InactiveLocalesProps ) {
 				/>
 			</div>
 			<InactiveControls
-				onClick={ onClick }
+				onAdd={ onAdd }
 				disabled={ ! selectedInactiveLanguage }
 			/>
 		</div>

@@ -34,10 +34,8 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
-		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"publishConfig": {

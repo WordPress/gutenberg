@@ -3,14 +3,10 @@
  */
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
-// @ts-ignore
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
-import { reorder } from '../utils';
 import type { Language } from './types';
 import ActiveControls from './active-controls';
 
@@ -20,18 +16,29 @@ interface ActiveLocalesProps {
 	showOptionSiteDefault?: boolean;
 	setLanguages: ( cb: ( languages: Language[] ) => Language[] ) => void;
 	setSelectedLanguage: ( language: Language ) => void;
+	onMoveUp: () => void;
+	onMoveDown: () => void;
+	onRemove: () => void;
+	isEmpty: boolean;
+	isMoveUpDisabled: boolean;
+	isMoveDownDisabled: boolean;
+	isRemoveDisabled: boolean;
 }
 
 export function ActiveLocales( {
 	languages,
-	setLanguages,
 	showOptionSiteDefault = false,
 	selectedLanguage,
 	setSelectedLanguage,
+	onMoveUp,
+	onMoveDown,
+	onRemove,
+	isEmpty,
+	isMoveUpDisabled,
+	isMoveDownDisabled,
+	isRemoveDisabled,
 }: ActiveLocalesProps ) {
 	const listRef = useRef< HTMLUListElement | null >( null );
-
-	const isEmpty = languages.length === 0;
 
 	useLayoutEffect( () => {
 		const selectedEl = listRef.current?.querySelector(
@@ -47,90 +54,6 @@ export function ActiveLocales( {
 			block: 'nearest',
 		} );
 	}, [ selectedLanguage, languages ] );
-
-	useShortcut( 'language-chooser/select-first', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( isEmpty ) {
-			return;
-		}
-
-		setSelectedLanguage( languages.at( 0 ) as Language );
-	} );
-
-	useShortcut( 'language-chooser/select-last', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( isEmpty ) {
-			return;
-		}
-
-		setSelectedLanguage( languages.at( -1 ) as Language );
-	} );
-
-	const onRemove = () => {
-		const foundIndex = languages.findIndex(
-			( { locale } ) => locale === selectedLanguage?.locale
-		);
-
-		setSelectedLanguage(
-			languages[ foundIndex + 1 ] || languages[ foundIndex - 1 ]
-		);
-
-		setLanguages( ( prevLanguages ) =>
-			prevLanguages.filter(
-				( { locale } ) => locale !== selectedLanguage?.locale
-			)
-		);
-
-		speak( __( 'Locale removed from list' ) );
-
-		if ( languages.length === 1 ) {
-			let emptyMessageA11y = sprintf(
-				/* translators: %s: English (United States) */
-				__( 'No languages selected. Falling back to %s.' ),
-				'English (United States)'
-			);
-
-			if ( showOptionSiteDefault ) {
-				emptyMessageA11y = __(
-					'No languages selected. Falling back to Site Default.'
-				);
-			}
-
-			speak( emptyMessageA11y );
-		}
-	};
-
-	const onMoveUp = () => {
-		setLanguages( ( prevLanguages ) => {
-			const srcIndex = prevLanguages.findIndex(
-				( { locale } ) => locale === selectedLanguage?.locale
-			);
-			return reorder(
-				Array.from( prevLanguages ),
-				srcIndex,
-				srcIndex - 1
-			);
-		} );
-
-		speak( __( 'Locale moved up' ) );
-	};
-
-	const onMoveDown = () => {
-		setLanguages( ( prevLanguages ) => {
-			const srcIndex = prevLanguages.findIndex(
-				( { locale } ) => locale === selectedLanguage?.locale
-			);
-			return reorder< Language[] >(
-				Array.from( prevLanguages ),
-				srcIndex,
-				srcIndex + 1
-			);
-		} );
-
-		speak( __( 'Locale moved down' ) );
-	};
 
 	const activeDescendant = isEmpty ? '' : selectedLanguage?.locale;
 
@@ -186,11 +109,12 @@ export function ActiveLocales( {
 				} ) }
 			</ul>
 			<ActiveControls
-				languages={ languages }
-				selectedLanguage={ selectedLanguage }
 				onMoveUp={ onMoveUp }
 				onMoveDown={ onMoveDown }
 				onRemove={ onRemove }
+				isMoveUpDisabled={ isMoveUpDisabled }
+				isMoveDownDisabled={ isMoveDownDisabled }
+				isRemoveDisabled={ isRemoveDisabled }
 			/>
 		</div>
 	);

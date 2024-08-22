@@ -3,66 +3,23 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-// @ts-ignore
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
-
-/**
- * Internal dependencies
- */
-import type { Language } from './types';
 
 interface ActiveControlsProps {
-	languages: Language[];
-	selectedLanguage?: Language;
 	onMoveUp: () => void;
 	onMoveDown: () => void;
 	onRemove: () => void;
+	isMoveUpDisabled: boolean;
+	isMoveDownDisabled: boolean;
+	isRemoveDisabled: boolean;
 }
 function ActiveControls( {
-	languages,
-	selectedLanguage,
 	onMoveUp,
 	onMoveDown,
 	onRemove,
+	isMoveUpDisabled,
+	isMoveDownDisabled,
+	isRemoveDisabled,
 }: ActiveControlsProps ) {
-	const isMoveUpDisabled =
-		! selectedLanguage ||
-		languages[ 0 ]?.locale === selectedLanguage?.locale;
-	const isMoveDownDisabled =
-		! selectedLanguage ||
-		languages[ languages.length - 1 ]?.locale === selectedLanguage?.locale;
-	const isRemoveDisabled = ! selectedLanguage;
-
-	useShortcut( 'language-chooser/move-up', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( isMoveUpDisabled ) {
-			return;
-		}
-
-		onMoveUp();
-	} );
-
-	useShortcut( 'language-chooser/move-down', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( isMoveDownDisabled ) {
-			return;
-		}
-
-		onMoveDown();
-	} );
-
-	useShortcut( 'language-chooser/remove', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( isRemoveDisabled ) {
-			return;
-		}
-
-		onRemove();
-	} );
-
 	return (
 		<div className="active-locales-controls">
 			<ul>

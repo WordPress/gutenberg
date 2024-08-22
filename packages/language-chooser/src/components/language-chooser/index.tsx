@@ -1,15 +1,15 @@
 /**
+ * External dependencies
+ */
+import type { KeyboardEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
-import {
-	ShortcutProvider,
-	store as keyboardShortcutsStore,
-	// @ts-ignore
-} from '@wordpress/keyboard-shortcuts';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import {
 import ActiveLocales from './active-locales';
 import InactiveLocales from './inactive-locales';
 import type { Language } from './types';
+import { reorder } from './utils';
 
 function MissingTranslationsNotice() {
 	return (
@@ -55,68 +56,9 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		showOptionSiteDefault = false,
 	} = props;
 
-	// @ts-ignore
-	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	useEffect( () => {
-		registerShortcut( {
-			name: 'language-chooser/move-up',
-			category: 'global',
-			description: __( 'Move language up' ),
-			keyCombination: {
-				character: 'ArrowUp',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'language-chooser/move-down',
-			category: 'global',
-			description: __( 'Move language down' ),
-			keyCombination: {
-				character: 'ArrowDown',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'language-chooser/select-first',
-			category: 'global',
-			description: __( 'Select first language' ),
-			keyCombination: {
-				character: 'Home',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'language-chooser/select-last',
-			category: 'global',
-			description: __( 'Select last language' ),
-			keyCombination: {
-				character: 'End',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'language-chooser/remove',
-			category: 'global',
-			description: __( 'Remove from list' ),
-			keyCombination: {
-				character: 'Backspace',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'language-chooser/add',
-			category: 'global',
-			description: _x( 'Add to list', 'language' ),
-			keyCombination: {
-				modifier: 'alt',
-				character: 'a',
-			},
-		} );
-	} );
-
-	const [ preferredLanguages, setPreferredLanguages ] = useState<
-		Language[]
-	>( props.preferredLanguages );
+	const [ languages, setLanguages ] = useState< Language[] >(
+		props.preferredLanguages
+	);
 
 	const [ selectedLanguage, setSelectedLanguage ] = useState< Language >(
 		props.preferredLanguages[ 0 ]
@@ -124,12 +66,28 @@ function LanguageChooser( props: LanguageChooserProps ) {
 
 	const inactiveLocales = allLanguages.filter(
 		( language ) =>
-			! preferredLanguages.find(
-				( { locale } ) => locale === language.locale
-			)
+			! languages.find( ( { locale } ) => locale === language.locale )
 	);
 
-	const hasUninstalledPreferredLanguages = preferredLanguages.some(
+	const [ selectedInactiveLanguage, setSelectedInactiveLanguage ] = useState(
+		inactiveLocales[ 0 ]
+	);
+
+	useEffect( () => {
+		if ( ! selectedInactiveLanguage ) {
+			setSelectedInactiveLanguage( inactiveLocales[ 0 ] );
+		}
+	}, [ selectedInactiveLanguage, inactiveLocales ] );
+
+	const installedLanguages = inactiveLocales.filter( ( { installed } ) =>
+		Boolean( installed )
+	);
+
+	const availableLanguages = inactiveLocales.filter(
+		( { installed } ) => ! installed
+	);
+
+	const hasUninstalledPreferredLanguages = languages.some(
 		( { installed } ) => ! installed
 	);
 
@@ -166,34 +124,198 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	}, [ hasUninstalledPreferredLanguages ] );
 
 	const onAddLanguage = ( locale: Language ) => {
-		setPreferredLanguages( ( current ) => [ ...current, locale ] );
+		setLanguages( ( current ) => [ ...current, locale ] );
 		setSelectedLanguage( locale );
 	};
 
+	const isEmpty = languages.length === 0;
+	const isMoveUpDisabled =
+		! selectedLanguage ||
+		languages[ 0 ]?.locale === selectedLanguage?.locale;
+	const isMoveDownDisabled =
+		! selectedLanguage ||
+		languages[ languages.length - 1 ]?.locale === selectedLanguage?.locale;
+	const isRemoveDisabled = ! selectedLanguage;
+
+	const onAdd = () => {
+		onAddLanguage( selectedInactiveLanguage );
+
+		const installedIndex = installedLanguages.findIndex(
+			( { locale } ) => locale === selectedInactiveLanguage.locale
+		);
+
+		const availableIndex = availableLanguages.findIndex(
+			( { locale } ) => locale === selectedInactiveLanguage.locale
+		);
+
+		let newSelected: Language | undefined;
+
+		newSelected = installedLanguages[ installedIndex + 1 ];
+
+		if (
+			! newSelected &&
+			installedLanguages[ 0 ] !== selectedInactiveLanguage
+		) {
+			newSelected = installedLanguages[ 0 ];
+		}
+
+		if ( ! newSelected ) {
+			newSelected = availableLanguages[ availableIndex + 1 ];
+
+			if ( availableLanguages[ 0 ] !== selectedInactiveLanguage ) {
+				newSelected = availableLanguages[ 0 ];
+			}
+		}
+
+		setSelectedInactiveLanguage( newSelected );
+
+		speak( __( 'Locale added to list' ) );
+	};
+
+	const onRemove = () => {
+		const foundIndex = languages.findIndex(
+			( { locale } ) => locale === selectedLanguage?.locale
+		);
+
+		setSelectedLanguage(
+			languages[ foundIndex + 1 ] || languages[ foundIndex - 1 ]
+		);
+
+		setLanguages( ( prevLanguages ) =>
+			prevLanguages.filter(
+				( { locale } ) => locale !== selectedLanguage?.locale
+			)
+		);
+
+		speak( __( 'Locale removed from list' ) );
+
+		if ( languages.length === 1 ) {
+			let emptyMessageA11y = sprintf(
+				/* translators: %s: English (United States) */
+				__( 'No languages selected. Falling back to %s.' ),
+				'English (United States)'
+			);
+
+			if ( showOptionSiteDefault ) {
+				emptyMessageA11y = __(
+					'No languages selected. Falling back to Site Default.'
+				);
+			}
+
+			speak( emptyMessageA11y );
+		}
+	};
+
+	const onMoveUp = () => {
+		setLanguages( ( prevLanguages ) => {
+			const srcIndex = prevLanguages.findIndex(
+				( { locale } ) => locale === selectedLanguage?.locale
+			);
+			return reorder(
+				Array.from( prevLanguages ),
+				srcIndex,
+				srcIndex - 1
+			);
+		} );
+
+		speak( __( 'Locale moved up' ) );
+	};
+
+	const onMoveDown = () => {
+		setLanguages( ( prevLanguages ) => {
+			const srcIndex = prevLanguages.findIndex(
+				( { locale } ) => locale === selectedLanguage?.locale
+			);
+			return reorder< Language[] >(
+				Array.from( prevLanguages ),
+				srcIndex,
+				srcIndex + 1
+			);
+		} );
+
+		speak( __( 'Locale moved down' ) );
+	};
+
+	const onKeyDown = ( event: KeyboardEvent< HTMLElement > ) => {
+		switch ( event.code ) {
+			// Move item up.
+			case 'ArrowUp':
+				if ( ! isMoveUpDisabled ) {
+					onMoveUp();
+					event.preventDefault();
+				}
+				break;
+			// Move item down.
+			case 'ArrowDown':
+				if ( ! isMoveDownDisabled ) {
+					onMoveDown();
+					event.preventDefault();
+				}
+				break;
+			// Select first item.
+			case 'Home':
+				if ( ! isEmpty ) {
+					setSelectedLanguage( languages.at( 0 ) as Language );
+					event.preventDefault();
+				}
+				break;
+			// Select last item.
+			case 'End':
+				if ( ! isEmpty ) {
+					setSelectedLanguage( languages.at( -1 ) as Language );
+					event.preventDefault();
+				}
+				break;
+			// Remove item.
+			case 'Backspace':
+				if ( ! isRemoveDisabled ) {
+					onRemove();
+					event.preventDefault();
+				}
+				break;
+			// Add item.
+			case 'KeyA':
+				if ( event.altKey ) {
+					onAdd();
+					event.preventDefault();
+				}
+				break;
+		}
+	};
+
 	return (
-		// @ts-ignore
-		<ShortcutProvider>
-			<div className="language-chooser">
-				<HiddenFormField preferredLanguages={ preferredLanguages } />
-				<p>
-					{ __(
-						'Choose languages for displaying WordPress in, in order of preference.'
-					) }
-				</p>
-				<ActiveLocales
-					languages={ preferredLanguages }
-					setLanguages={ setPreferredLanguages }
-					showOptionSiteDefault={ showOptionSiteDefault }
-					selectedLanguage={ selectedLanguage }
-					setSelectedLanguage={ setSelectedLanguage }
-				/>
-				<InactiveLocales
-					languages={ inactiveLocales }
-					onAddLanguage={ onAddLanguage }
-				/>
-				{ hasMissingTranslations && <MissingTranslationsNotice /> }
-			</div>
-		</ShortcutProvider>
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div className="language-chooser" onKeyDown={ onKeyDown }>
+			<HiddenFormField preferredLanguages={ languages } />
+			<p>
+				{ __(
+					'Choose languages for displaying WordPress in, in order of preference.'
+				) }
+			</p>
+			<ActiveLocales
+				languages={ languages }
+				setLanguages={ setLanguages }
+				showOptionSiteDefault={ showOptionSiteDefault }
+				selectedLanguage={ selectedLanguage }
+				setSelectedLanguage={ setSelectedLanguage }
+				onMoveUp={ onMoveUp }
+				onMoveDown={ onMoveDown }
+				onRemove={ onRemove }
+				isEmpty={ isEmpty }
+				isMoveUpDisabled={ isMoveUpDisabled }
+				isMoveDownDisabled={ isMoveDownDisabled }
+				isRemoveDisabled={ isRemoveDisabled }
+			/>
+			<InactiveLocales
+				languages={ inactiveLocales }
+				onAdd={ onAdd }
+				selectedInactiveLanguage={ selectedInactiveLanguage }
+				setSelectedInactiveLanguage={ setSelectedInactiveLanguage }
+				installedLanguages={ installedLanguages }
+				availableLanguages={ availableLanguages }
+			/>
+			{ hasMissingTranslations && <MissingTranslationsNotice /> }
+		</div>
 	);
 }
 

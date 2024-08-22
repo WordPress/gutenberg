@@ -3,26 +3,14 @@
  */
 import { _x, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-// @ts-ignore
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { shortcutAriaLabel, displayShortcut } from '@wordpress/keycodes';
 
 interface InactiveControlsProps {
 	disabled: boolean;
-	onClick: () => void;
+	onAdd: () => void;
 }
 
-function InactiveControls( { disabled, onClick }: InactiveControlsProps ) {
-	useShortcut( 'language-chooser/add', ( event: Event ) => {
-		event.preventDefault();
-
-		if ( disabled ) {
-			return;
-		}
-
-		onClick();
-	} );
-
+function InactiveControls( { disabled, onAdd }: InactiveControlsProps ) {
 	return (
 		<div className="inactive-locales-controls">
 			<Button
@@ -37,7 +25,7 @@ function InactiveControls( { disabled, onClick }: InactiveControlsProps ) {
 				label={ displayShortcut.alt( 'A' ) }
 				disabled={ disabled }
 				accessibleWhenDisabled
-				onClick={ onClick }
+				onClick={ onAdd }
 			>
 				{ _x( 'Add', 'language' ) }
 			</Button>

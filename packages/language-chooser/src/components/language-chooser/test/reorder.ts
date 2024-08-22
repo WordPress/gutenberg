@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { reorder } from '../';
+import { reorder } from '../utils';
 
 describe( 'reorder', () => {
 	it.each( [ [ [ 1, 2, 3, 4 ], 0, 3, [ 2, 3, 4, 1 ] ] ] )(
