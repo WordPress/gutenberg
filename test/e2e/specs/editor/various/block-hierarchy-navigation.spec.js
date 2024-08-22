@@ -66,20 +66,20 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		await expect( listView ).toBeVisible();
 		await listView
-			.getByRole( 'gridcell', { name: 'Columns', exact: true } )
+			.getByRole( 'gridcell', { name: 'Column', exact: true } )
+			.last()
 			.click();
 
-		// Tweak the columns count.
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '3' );
+		// Add another column block.
+		await pageUtils.pressKeys( 'primary+Alt+Y' );
 
 		// Wait for the new column block to appear in the list view
-		const column = listView.getByRole( 'gridcell', {
-			name: 'Column',
-			exact: true,
-		} );
-		await expect( column ).toHaveCount( 3 );
-
-		await column.last().click();
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Column',
+				exact: true,
+			} )
+		).toHaveCount( 3 );
 
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
@@ -123,18 +123,12 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 		await page.keyboard.press( 'Enter' );
 
-		// Move focus to the sidebar area.
-		await pageUtils.pressKeys( 'ctrl+`' );
-
-		// Navigate to the block settings sidebar and tweak the column count.
-		await pageUtils.pressKeys( 'Tab', { times: 5 } );
-		await expect(
-			page.getByRole( 'slider', { name: 'Columns' } )
-		).toBeFocused();
-		await page.keyboard.press( 'ArrowRight' );
+		// Add another column block.
+		await page.keyboard.press( 'ArrowDown' );
+		await pageUtils.pressKeys( 'primary+Alt+Y' );
 
 		// Navigate to the third column in the columns block via List View.
-		await pageUtils.pressKeys( 'ctrlShift+`', { times: 2 } );
+		await pageUtils.pressKeys( 'access+o' );
 		await pageUtils.pressKeys( 'Tab', { times: 3 } );
 		await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 
