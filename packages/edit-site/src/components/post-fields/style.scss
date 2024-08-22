@@ -1,0 +1,53 @@
+.edit-site-post-featured-image {
+	width: 20px;
+	height: 20px;
+}
+
+.edit-site-dataviews-controls__featured-image {
+	.edit-side-dataviews-controls__featured-image-container {
+		border: var(--wp-admin-border-width-focus) solid $gray-300;
+		&:hover {
+			background-color: $gray-300;
+		}
+	}
+
+	img {
+		width: 20px;
+		height: 20px;
+	}
+
+	span {
+		text-align: start;
+		margin-left: $grid-unit-15;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		width: 200px;
+		white-space: nowrap;
+	}
+
+	.edit-site-dataviews-controls__featured-image-filename {
+		color: $gray-700;
+		font-size: 10px;
+	}
+
+	.edit-site-dataviews-controls__featured-image-upload-button {
+		height: fit-content;
+		&:hover,
+		&:focus {
+			border: 0;
+			color: unset;
+		}
+	}
+
+	.edit-site-dataviews-controls__featured-image-element {
+		align-self: baseline;
+	}
+
+	.edit-site-dataviews-controls__featured-image-remove-button {
+		align-self: baseline;
+	}
+}
+
+.components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
+	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+}

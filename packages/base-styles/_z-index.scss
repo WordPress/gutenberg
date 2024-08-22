@@ -213,6 +213,9 @@ $z-layers: (
 
 	// Ensure quick actions toolbar appear above pagination
 	".dataviews-bulk-actions-toolbar": 2,
+
+	// Needs to be below media library (.media-model) that has a z-index of 160000.
+	".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown": 160000 - 10,
 );
 
 @function z-index( $key ) {

@@ -12,6 +12,7 @@ import {
 	createInterpolateElement,
 	useMemo,
 	useState,
+	useCallback,
 } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
@@ -22,8 +23,16 @@ import {
 	pending,
 	notAllowed,
 	commentAuthorAvatar as authorIcon,
+	lineSolid,
 } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	Icon,
+	Placeholder,
+	Button,
+	FlexItem,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 
@@ -37,8 +46,7 @@ import {
 } from '../../utils/constants';
 import { default as Link, useLink } from '../routes/link';
 import Media from '../media';
-import { isBlobURL } from '@wordpress/blob';
-import { PostFeaturedImage } from '@wordpress/editor';
+import { MediaUpload } from '@wordpress/block-editor';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -81,48 +89,6 @@ const getFormattedDate = ( dateToDisplay ) =>
 		getSettings().formats.datetimeAbbreviated,
 		getDate( dateToDisplay )
 	);
-
-function FeaturedImage( { item, viewType } ) {
-	const isDisabled = item.status === 'trash';
-	const { onClick } = useLink( {
-		postId: item.id,
-		postType: item.type,
-		canvas: 'edit',
-	} );
-
-	const size =
-		viewType === LAYOUT_GRID
-			? [ 'large', 'full', 'medium', 'thumbnail' ]
-			: [ 'thumbnail', 'medium', 'large', 'full' ];
-
-	const renderButton = viewType === LAYOUT_GRID && ! isDisabled;
-	return (
-		<div
-			className={ `edit-site-post-list__featured-image-wrapper is-layout-${ viewType }` }
-		>
-			{ renderButton ? (
-				<button
-					className="edit-site-post-list__featured-image-button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || __( '(no title)' ) }
-				>
-					<Media
-						className="edit-site-post-list__featured-image"
-						id={ item.featured_media }
-						size={ size }
-					/>
-					;
-				</button>
-			) : (
-				<PostFeaturedImage
-					media={ item.featured_media }
-					id={ item.id }
-				/>
-			) }
-		</div>
-	);
-}
 
 function PostStatusField( { item } ) {
 	const status = STATUSES.find( ( { value } ) => value === item.status );
@@ -198,24 +164,6 @@ function usePostFields( viewType ) {
 
 	const fields = useMemo(
 		() => [
-			{
-				id: 'featured_media',
-				label: __( 'Featured Image' ),
-				type: 'image',
-				getValue: ( { item } ) => {
-					const mediaUrl = isBlobURL( item.featured_media )
-						? item.featured_media
-						: getFeaturedMediaUrl( item.featured_media )
-								?.source_url;
-					return mediaUrl;
-				},
-				render: ( { item } ) => {
-					return (
-						<FeaturedImage item={ item } viewType={ viewType } />
-					);
-				},
-				enableSorting: false,
-			},
 			{
 				label: __( 'Title' ),
 				id: 'title',
@@ -411,6 +359,177 @@ function usePostFields( viewType ) {
 						),
 					},
 				],
+			},
+			{
+				id: 'featured_media',
+				label: __( 'Featured Image' ),
+				type: 'image',
+				render: ( { item } ) => {
+					const mediaId = item.featured_media;
+
+					const media = getFeaturedMediaUrl( mediaId );
+
+					const url = media?.source_url;
+					const title = media?.title?.rendered;
+
+					// This is a false positive
+					// eslint-disable-next-line react-hooks/rules-of-hooks
+					const { onClick } = useLink( {
+						postId: item.id,
+						postType: item.type,
+						canvas: 'edit',
+					} );
+
+					if ( viewType === LAYOUT_GRID && item.status !== 'trash' ) {
+						if ( ! url ) {
+							return null;
+						}
+						return (
+							<button
+								className="edit-site-post-list__featured-image-button"
+								type="button"
+								onClick={ onClick }
+								aria-label={
+									item.title?.rendered || __( '(no title)' )
+								}
+							>
+								<Media
+									className="edit-site-post-list__featured-image"
+									id={ item.featured_media }
+									size={ [
+										'large',
+										'full',
+										'medium',
+										'thumbnail',
+									] }
+								/>
+							</button>
+						);
+					}
+
+					if ( ! url ) {
+						return (
+							<div
+								style={ {
+									backgroundColor:
+										'rgba(var(--wp-admin-theme-color--rgb), 0.08)',
+									width: '20px',
+									height: '20px',
+								} }
+							/>
+						);
+					}
+
+					return (
+						<HStack>
+							<img
+								className="edit-site-post-featured-image"
+								src={ url }
+								alt=""
+							/>
+							<span>{ title }</span>
+						</HStack>
+					);
+				},
+				Edit: ( { field, onChange, data } ) => {
+					const { id } = field;
+
+					const value = field.getValue( { item: data } ) ?? '';
+
+					const onChangeControl = useCallback(
+						( newValue ) =>
+							onChange( {
+								[ id ]: newValue,
+							} ),
+						[ id, onChange ]
+					);
+
+					const media = getFeaturedMediaUrl( value );
+
+					const url = media?.source_url;
+					const title = media?.title?.rendered;
+					const filename =
+						media?.media_details?.file?.match( '([^/]+$)' )[ 0 ];
+
+					return (
+						<fieldset className="edit-site-dataviews-controls__featured-image">
+							<div className="edit-side-dataviews-controls__featured-image-container">
+								<HStack>
+									<MediaUpload
+										onSelect={ ( selectedMedia ) =>
+											onChangeControl( selectedMedia.id )
+										}
+										allowedTypes={ [ 'image' ] }
+										render={ ( { open } ) => {
+											return (
+												<Button
+													className="edit-site-dataviews-controls__featured-image-upload-button"
+													onClick={ () => open() }
+												>
+													{ url && (
+														<HStack justify="space-between">
+															<FlexItem className="edit-site-dataviews-controls__featured-image-element">
+																<img
+																	alt=""
+																	src={ url }
+																/>
+															</FlexItem>
+															<FlexItem>
+																<VStack>
+																	<span>
+																		{
+																			title
+																		}
+																	</span>
+																	<span className="edit-site-dataviews-controls__featured-image-filename">
+																		{
+																			filename
+																		}
+																	</span>
+																</VStack>
+															</FlexItem>
+														</HStack>
+													) }
+													{ ! url && (
+														<HStack
+															justify="flex-start"
+															className="dataviews-controls__featured-image-placeholder-container"
+														>
+															<FlexItem>
+																<Placeholder
+																	className="dataviews-controls__featured-image-placeholder"
+																	withIllustration
+																/>
+															</FlexItem>
+															<FlexItem>
+																<span>
+																	{ __(
+																		'Choose an image…'
+																	) }
+																</span>
+															</FlexItem>
+														</HStack>
+													) }
+												</Button>
+											);
+										} }
+									/>
+
+									{ url && (
+										<Button
+											className="edit-site-dataviews-controls__featured-image-remove-button"
+											icon={ lineSolid }
+											onClick={ () =>
+												onChangeControl( 0 )
+											}
+										/>
+									) }
+								</HStack>
+							</div>
+						</fieldset>
+					);
+				},
+				enableSorting: false,
 			},
 		],
 		[ authors, getFeaturedMediaUrl, viewType, frontPageId, postsPageId ]
