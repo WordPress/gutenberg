@@ -41,6 +41,7 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
  */
 import {
 	LAYOUT_GRID,
+	LAYOUT_LIST,
 	LAYOUT_TABLE,
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
@@ -404,6 +405,20 @@ function usePostFields( viewType ) {
 									] }
 								/>
 							</button>
+						);
+					}
+
+					if ( viewType === LAYOUT_LIST ) {
+						if ( ! url ) {
+							return null;
+						}
+
+						return (
+							<img
+								className="edit-site-post-featured-image"
+								src={ url }
+								alt=""
+							/>
 						);
 					}
 
