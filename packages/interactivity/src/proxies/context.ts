@@ -47,9 +47,6 @@ const contextHandlers: ProxyHandler< object > = {
  * that don't exist in the given context. Also, updated properties are modified
  * where they are defined, or added to the main context when they don't exist.
  *
- * By default, all plain objects inside the context are wrapped, unless it is
- * listed in the `ignore` option.
- *
  * @param current   Current context.
  * @param inherited Inherited context, used as fallback.
  *
