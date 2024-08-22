@@ -164,8 +164,7 @@ export default function PostTemplateEdit( {
 				query.parent = parents;
 			}
 			if ( postFormat?.length ) {
-				// Convert postFormat to a comma-separated string.
-				query.format = postFormat.join( ',' );
+				query.format = postFormat;
 			}
 
 			// If sticky is not set, it will return all posts in the results.
