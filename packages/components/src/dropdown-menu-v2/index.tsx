@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -248,9 +249,10 @@ const UnconnectedDropdownMenu = (
 	);
 
 	// Extract the side from the applied placement — useful for animations.
-	const appliedPlacementSide = dropdownMenuStore
-		.useState( 'placement' )
-		.split( '-' )[ 0 ];
+	const appliedPlacementSide = useStoreState(
+		dropdownMenuStore,
+		'placement'
+	).split( '-' )[ 0 ];
 
 	if (
 		dropdownMenuStore.parent &&
