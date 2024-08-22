@@ -92,7 +92,7 @@ export function rectUnion( rect1, rect2, containerRect ) {
 	 * horizontal limits of the container in which an element is supposed to be "visible".
 	 * For example, if an element is positioned -10px to the left of the window x value (0),
 	 * this function discounts the negative overhang because it's not visible and
-	 * therefore to be counted in the visible calculations.
+	 * therefore not to be counted in the visibility calculations.
 	 * Top and bottom values are not accounted for to accommodate vertical scroll.
 	 */
 	if ( containerRect ) {
