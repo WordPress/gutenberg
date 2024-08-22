@@ -158,7 +158,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 
 .emotion-21 {
   margin-bottom: 0;
-  padding-right: calc(4px * 2);
+  padding-right: 8px;
   position: absolute;
   pointer-events: none;
   right: 0;
@@ -440,7 +440,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 
 .emotion-21 {
   margin-bottom: 0;
-  padding-right: calc(4px * 2);
+  padding-right: 8px;
   position: absolute;
   pointer-events: none;
   right: 0;
@@ -732,7 +732,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 
 .emotion-21 {
   margin-bottom: 0;
-  padding-right: calc(4px * 2);
+  padding-right: 8px;
   position: absolute;
   pointer-events: none;
   right: 0;
@@ -1036,7 +1036,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 
 .emotion-21 {
   margin-bottom: 0;
-  padding-right: calc(4px * 2);
+  padding-right: 8px;
   position: absolute;
   pointer-events: none;
   right: 0;
