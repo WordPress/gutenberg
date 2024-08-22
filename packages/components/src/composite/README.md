@@ -9,10 +9,9 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { Composite, useCompositeStore } from '@wordpress/components';
+import { Composite } from '@wordpress/components';
 
-const store = useCompositeStore();
-<Composite store={store}>
+<Composite>
   <Composite.Group>
     <Composite.GroupLabel>Label</Composite.GroupLabel>
     <Composite.Item>Item 1</Composite.Item>
