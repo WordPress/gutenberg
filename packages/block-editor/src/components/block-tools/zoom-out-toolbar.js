@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { dragHandle, trash } from '@wordpress/icons';
+import { dragHandle, trash, edit } from '@wordpress/icons';
 import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -77,7 +77,8 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 		canMove,
 	} = selected;
 
-	const { removeBlock } = useDispatch( blockEditorStore );
+	const { removeBlock, __unstableSetEditorMode } =
+		useDispatch( blockEditorStore );
 
 	const classNames = clsx( 'zoom-out-toolbar', {
 		'is-block-moving-mode': !! blockMovingMode,
@@ -124,6 +125,18 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			{ canMove && canRemove && (
 				<Shuffle clientId={ clientId } as={ ToolbarButton } />
 			) }
+
+			{ ! isBlockTemplatePart && (
+				<ToolbarButton
+					className="zoom-out-toolbar-button"
+					icon={ edit }
+					label={ __( 'Edit' ) }
+					onClick={ () => {
+						__unstableSetEditorMode( 'edit' );
+					} }
+				/>
+			) }
+
 			{ canRemove && ! isBlockTemplatePart && (
 				<ToolbarButton
 					className="zoom-out-toolbar-button"

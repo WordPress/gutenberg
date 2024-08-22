@@ -21,9 +21,9 @@ const ANIMATION_PARAMS = {
 };
 
 const INLINE_PADDING = {
-	compact: 8, // space(2)
-	small: 8, // space(2)
-	default: 16, // space(4)
+	compact: CONFIG.controlPaddingXSmall,
+	small: CONFIG.controlPaddingXSmall,
+	default: CONFIG.controlPaddingX,
 };
 
 const getSelectSize = (

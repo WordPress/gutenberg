@@ -20,16 +20,6 @@
 		.components-border-radius-control__range-control {
 			flex: 1;
 			margin-right: $grid-unit-15;
-
-			> div {
-				height: 40px;
-				display: flex;
-				align-items: center;
-			}
-		}
-
-		> span {
-			flex: 0 0 auto;
 		}
 	}
 

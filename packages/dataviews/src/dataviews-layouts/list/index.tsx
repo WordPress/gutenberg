@@ -3,6 +3,8 @@
  */
 import clsx from 'clsx';
 // TODO: use the @wordpress/components one once public
+// eslint-disable-next-line no-restricted-imports
+import { useStoreState } from '@ariakit/react';
 // Import CompositeStore type, which is not exported from @wordpress/components.
 // eslint-disable-next-line no-restricted-imports
 import type { CompositeStore } from '@ariakit/react';
@@ -359,10 +361,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 
 	const store = useCompositeStore( {
 		defaultActiveId: getItemDomId( selectedItem ),
-	} );
+	} ) as CompositeStore; // TODO, remove once composite APIs are public
 
 	// Manage focused item, when the active one is removed from the list.
-	const isActiveIdInList = store.useState(
+	const isActiveIdInList = useStoreState(
+		store,
 		( state: { items: any[]; activeId: any } ) =>
 			state.items.some(
 				( item: { id: any } ) => item.id === state.activeId

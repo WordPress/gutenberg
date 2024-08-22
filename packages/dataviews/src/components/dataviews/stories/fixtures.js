@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { trash } from '@wordpress/icons';
+import { trash, image, Icon, category } from '@wordpress/icons';
 import {
 	Button,
 	__experimentalText as Text,
@@ -173,6 +173,12 @@ export const fields = [
 	{
 		label: 'Image',
 		id: 'image',
+		header: (
+			<HStack spacing={ 1 } justify="start">
+				<Icon icon={ image } />
+				<span>Image</span>
+			</HStack>
+		),
 		render: ( { item } ) => {
 			return (
 				<img src={ item.image } alt="" style={ { width: '100%' } } />
@@ -185,6 +191,9 @@ export const fields = [
 		id: 'title',
 		enableHiding: false,
 		enableGlobalSearch: true,
+		render: ( { item } ) => {
+			return <a href="#nothing">{ item.title }</a>;
+		},
 	},
 	{
 		id: 'date',
@@ -217,6 +226,12 @@ export const fields = [
 	{
 		label: 'Categories',
 		id: 'categories',
+		header: (
+			<HStack spacing={ 1 } justify="start">
+				<Icon icon={ category } />
+				<span>Categories</span>
+			</HStack>
+		),
 		elements: [
 			{ value: 'Space', label: 'Space' },
 			{ value: 'NASA', label: 'NASA' },

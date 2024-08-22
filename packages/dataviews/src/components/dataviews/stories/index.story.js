@@ -8,7 +8,7 @@ import { useState, useMemo } from '@wordpress/element';
  */
 import DataViews from '../index';
 import { DEFAULT_VIEW, actions, data, fields } from './fixtures';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../../../constants';
+import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
 
 const meta = {
@@ -56,6 +56,12 @@ Default.args = {
 			},
 		},
 		[ LAYOUT_GRID ]: {
+			layout: {
+				mediaField: 'image',
+				primaryField: 'title',
+			},
+		},
+		[ LAYOUT_LIST ]: {
 			layout: {
 				mediaField: 'image',
 				primaryField: 'title',

@@ -274,16 +274,20 @@ export function ParentRow() {
 								}
 							) }
 							<p>
-								{ __(
-									'They also show up as sub-items in the default navigation menu. '
+								{ createInterpolateElement(
+									__(
+										'They also show up as sub-items in the default navigation menu. <a>Learn more.</a>'
+									),
+									{
+										a: (
+											<ExternalLink
+												href={ __(
+													'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
+												) }
+											/>
+										),
+									}
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
-									) }
-								>
-									{ __( 'Learn more' ) }
-								</ExternalLink>
 							</p>
 						</div>
 						<PageAttributesParent />

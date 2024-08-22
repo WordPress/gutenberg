@@ -3,6 +3,7 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
+	MenuItem,
 	ExternalLink,
 	ResizableBox,
 	Spinner,
@@ -597,7 +598,11 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-					/>
+					>
+						<MenuItem onClick={ () => onSelectImage( undefined ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (
@@ -690,8 +695,7 @@ export default function Image( {
 						) }
 						renderContent={ () => (
 							<TextControl
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								className="wp-block-image__toolbar_content_textarea"
 								__nextHasNoMarginBottom
 								label={ __( 'Title attribute' ) }

@@ -144,7 +144,7 @@
 	border: $border-width solid $gray-900;
 
 	&:hover {
-		box-shadow: $shadow-popover;
+		box-shadow: $elevation-x-small;
 	}
 
 	@include break-small() {
