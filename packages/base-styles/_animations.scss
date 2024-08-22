@@ -1,5 +1,5 @@
 @mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
-	animation: edit-post__fade-in-animation $speed ease-out $delay;
+	animation: edit-post__fade-in-animation $speed linear $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 }
