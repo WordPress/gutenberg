@@ -110,18 +110,16 @@ export default function useDropZone( {
 			/**
 			 * Checks if the given element is a zoom out separator.
 			 *
-			 * @param {EventTarget|null} maybeZoomOutSeparator - The element to check.
+			 * @param {EventTarget|null} targetToCheck - The element to check.
 			 * @return {boolean} True if the element is a zoom out separator, false otherwise.
 			 */
-			function isZoomOutSeparator( maybeZoomOutSeparator ) {
+			function isZoomOutSeparator( targetToCheck ) {
 				const { defaultView } = ownerDocument;
 
 				return !! (
 					defaultView &&
-					maybeZoomOutSeparator instanceof defaultView.HTMLElement &&
-					maybeZoomOutSeparator.classList.contains(
-						'block-editor-block-list__zoom-out-separator'
-					)
+					targetToCheck instanceof defaultView.HTMLElement &&
+					targetToCheck.dataset.isZoomOutSeparator
 				);
 			}
 
