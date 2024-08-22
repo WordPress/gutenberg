@@ -36,15 +36,15 @@ export default function BlockToolbarPopover( {
 	}, [ clientId ] );
 
 	const { stopTyping } = useDispatch( blockEditorStore );
-	const isToolbarForced = useRef( false );
+	const isToolbarForcedRef = useRef( false );
 
 	useShortcut( 'core/block-editor/focus-toolbar', () => {
-		isToolbarForced.current = true;
+		isToolbarForcedRef.current = true;
 		stopTyping( true );
 	} );
 
 	useEffect( () => {
-		isToolbarForced.current = false;
+		isToolbarForcedRef.current = false;
 	} );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
@@ -66,7 +66,7 @@ export default function BlockToolbarPopover( {
 				<PrivateBlockToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
+					focusOnMount={ isToolbarForcedRef.current }
 					__experimentalInitialIndex={
 						initialToolbarItemIndexRef.current
 					}
