@@ -166,28 +166,28 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 			}
 		}
 
-		if( isset( $request['comment_type'] ) && !empty( $request['comment_type'] ) ){
+		if ( isset( $request['comment_type'] ) && ! empty( $request['comment_type'] ) ) {
 			$comment_data = array(
-				'comment_ID'      => $comment->comment_ID,
-				'comment_type' => $request['comment_type'],
+				'comment_ID'	=> $comment->comment_ID,
+				'comment_type'	=> $request['comment_type'],
 			);
-		
-			wp_update_comment($comment_data);
+
+			wp_update_comment( $comment_data );
 		}
 
-		$author = get_user_by('login', $response->data['author_name']);
+		$author = get_user_by( 'login', $response->data['author_name'] );
 		if ($author) {
-			$avatar_url = get_avatar_url($author->ID);
+			$avatar_url = get_avatar_url( $author->ID );
 			$response->data['author_avatar_urls'] = array(
-				'default' => $avatar_url,
-				'48'      => add_query_arg( 's', 48, $avatar_url ),
-				'96'      => add_query_arg( 's', 96, $avatar_url ),
+				'default'	=> $avatar_url,
+				'48'		=> add_query_arg( 's', 48, $avatar_url ),
+				'96'		=> add_query_arg( 's', 96, $avatar_url ),
 			);
 		}
 
 		$comment_id = $comment->comment_ID;
 		$meta_key = 'block_comment';
-		$meta_value = get_comment_meta($comment_id, $meta_key, true);
+		$meta_value = get_comment_meta( $comment_id, $meta_key, true );
 
 		if( !empty( $meta_value ) ){
 			$response->data['meta'] = $meta_value;

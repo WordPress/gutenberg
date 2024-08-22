@@ -10,32 +10,33 @@
  */
 function gutenberg_enable_experiments() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableSync = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-custom-dataviews', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalCustomViews = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-grid-interactivity', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGridInteractivity = true', 'before' );
-}
-if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-	wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
-}
-if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
-	wp_add_inline_script( 'wp-block-library', 'window.__experimentalFullPageClientSideNavigation = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-patterns-tab', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutPatternsTab = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-block-comment', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockComment = true', 'before' );
-}
-if ( $gutenberg_experiments && array_key_exists( 'gutenberg-quick-edit-dataviews', $gutenberg_experiments ) ) {
-	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalQuickEditDataViews = true', 'before' );
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableSync = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-custom-dataviews', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalCustomViews = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-grid-interactivity', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableGridInteractivity = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalFullPageClientSideNavigation = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-patterns-tab', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutPatternsTab = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-block-comment', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockComment = true', 'before' );
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-quick-edit-dataviews', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalQuickEditDataViews = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
