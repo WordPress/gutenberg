@@ -643,26 +643,12 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			),
 		);
 
-		/*
 		$schema['properties']['format'] = array(
 			'description' => __( 'The format for the post.' ),
-			'type'        => 'array',
+			'type'        => 'string',
 			'context'     => array( 'view', 'edit' ),
-			'anyOf'       => array(
-				array(
-					'type' => 'string',
-					'enum' => array_values( get_post_format_slugs() ),
-				),
-				array(
-					'type'  => 'array',
-					'items' => array(
-						'type' => 'string',
-						'enum' => array_values( get_post_format_slugs() ),
-					),
-				),
-			),
+			'enum'        => array_values( get_post_format_slugs() ),
 		);
-		*/
 
 		$taxonomies = wp_list_filter( get_object_taxonomies( $this->post_type, 'objects' ), array( 'show_in_rest' => true ) );
 
