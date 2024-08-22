@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createRoot, StrictMode } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -14,7 +15,7 @@ export type * from './types';
  * Initializes the site editor screen.
  *
  * @param {string} id       ID of the root element to render the screen in.
- * @param {Object} settings Editor settings.
+ * @param {Object} settings Language chooser settings.
  */
 export function initializeLanguageChooser(
 	id: string,

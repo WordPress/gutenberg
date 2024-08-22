@@ -77,10 +77,7 @@ describe( 'InactiveLocales', () => {
 			'aria-disabled',
 			'true'
 		);
-		expect( screen.getByRole( 'combobox' ) ).toHaveAttribute(
-			'aria-disabled',
-			'true'
-		);
+		expect( screen.getByRole( 'combobox' ) ).toBeDisabled();
 	} );
 
 	it( 'adds selected locale and updates dropdown', async () => {

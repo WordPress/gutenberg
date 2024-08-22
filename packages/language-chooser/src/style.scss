@@ -116,13 +116,9 @@
 	display: inline-block;
 }
 
-.language-install-spinner {
+.language-chooser-spinner {
 	display: inline-block;
 	float: none;
 	margin: -3px 5px 0;
 	vertical-align: middle;
-}
-
-.language-install-spinner:not(.language-chooser-spinner) {
-	display: none;
 }
