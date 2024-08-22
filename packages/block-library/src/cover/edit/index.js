@@ -204,10 +204,10 @@ function CoverEdit( {
 			// otherwise try the default image size or fallback full size.
 			if ( sizeSlug && newMedia?.sizes?.[ sizeSlug ] ) {
 				mediaAttributes.sizeSlug = sizeSlug;
-				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ].url;
+				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ]?.url;
 			} else if ( newMedia?.sizes?.[ imageDefaultSize ] ) {
 				mediaAttributes.sizeSlug = imageDefaultSize;
-				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ].url;
+				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ]?.url;
 			} else {
 				mediaAttributes.sizeSlug = 'full';
 			}

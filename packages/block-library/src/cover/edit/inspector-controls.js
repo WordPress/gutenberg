@@ -6,13 +6,12 @@ import {
 	Button,
 	ExternalLink,
 	FocalPointPicker,
-	PanelBody,
-	PanelRow,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -36,6 +35,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 
 const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -197,72 +197,137 @@ export default function CoverInspectorControls( {
 		),
 	};
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	const flag = true;
 	return (
 		<>
 			<InspectorControls>
-				{ !! url && (
-					<PanelBody title={ __( 'Settings' ) }>
+				{ flag && !! url && (
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								hasParallax: undefined,
+								focalPoint: undefined,
+								isRepeated: false,
+								alt: '',
+								sizeSlug: undefined,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ isImageBackground && (
 							<>
-								<ToggleControl
-									__nextHasNoMarginBottom
+								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
-									checked={ hasParallax }
-									onChange={ toggleParallax }
-								/>
+									isShownByDefault
+									hasValue={ () => !! hasParallax }
+									onDeselect={ () =>
+										setAttributes( {
+											hasParallax: undefined,
+											focalPoint: undefined,
+										} )
+									}
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Fixed background' ) }
+										checked={ hasParallax }
+										onChange={ toggleParallax }
+									/>
+								</ToolsPanelItem>
 
-								<ToggleControl
-									__nextHasNoMarginBottom
+								<ToolsPanelItem
 									label={ __( 'Repeated background' ) }
-									checked={ isRepeated }
-									onChange={ toggleIsRepeated }
-								/>
+									isShownByDefault
+									hasValue={ () => !! isRepeated }
+									onDeselect={ () =>
+										setAttributes( {
+											isRepeated: false,
+										} )
+									}
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Repeated background' ) }
+										checked={ isRepeated }
+										onChange={ toggleIsRepeated }
+									/>
+								</ToolsPanelItem>
 							</>
 						) }
+
 						{ showFocalPointPicker && (
-							<FocalPointPicker
-								__nextHasNoMarginBottom
+							<ToolsPanelItem
 								label={ __( 'Focal point' ) }
-								url={ url }
-								value={ focalPoint }
-								onDragStart={ imperativeFocalPointPreview }
-								onDrag={ imperativeFocalPointPreview }
-								onChange={ ( newFocalPoint ) =>
+								isShownByDefault
+								hasValue={ () => !! focalPoint }
+								onDeselect={ () =>
 									setAttributes( {
-										focalPoint: newFocalPoint,
+										focalPoint: undefined,
 									} )
 								}
-							/>
+							>
+								<FocalPointPicker
+									__nextHasNoMarginBottom
+									label={ __( 'Focal point' ) }
+									url={ url }
+									value={ focalPoint }
+									onDragStart={ imperativeFocalPointPreview }
+									onDrag={ imperativeFocalPointPreview }
+									onChange={ ( newFocalPoint ) =>
+										setAttributes( {
+											focalPoint: newFocalPoint,
+										} )
+									}
+								/>
+							</ToolsPanelItem>
 						) }
+
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
-							<TextareaControl
-								__nextHasNoMarginBottom
+							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }
-								value={ alt }
-								onChange={ ( newAlt ) =>
-									setAttributes( { alt: newAlt } )
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: '' } )
 								}
-								help={
-									<>
-										<ExternalLink
-											href={
-												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-												__(
-													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-												)
-											}
-										>
+							>
+								<TextareaControl
+									__nextHasNoMarginBottom
+									label={ __( 'Alternative text' ) }
+									value={ alt }
+									onChange={ ( newAlt ) =>
+										setAttributes( { alt: newAlt } )
+									}
+									help={
+										<>
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
+												{ __(
+													'Describe the purpose of the image.'
+												) }
+											</ExternalLink>
+											<br />
 											{ __(
-												'Describe the purpose of the image.'
+												'Leave empty if decorative.'
 											) }
-										</ExternalLink>
-										<br />
-										{ __( 'Leave empty if decorative.' ) }
-									</>
-								}
-							/>
+										</>
+									}
+								/>
+							</ToolsPanelItem>
 						) }
-						<PanelRow>
+						<ToolsPanelItem
+							hasValue={ () => !! url }
+							isShownByDefault
+						>
 							<Button
 								variant="secondary"
 								size="small"
@@ -271,8 +336,15 @@ export default function CoverInspectorControls( {
 							>
 								{ __( 'Clear Media' ) }
 							</Button>
-						</PanelRow>
-					</PanelBody>
+						</ToolsPanelItem>
+						{ ! useFeaturedImage && !! imageSizeOptions.length && (
+							<ResolutionTool
+								value={ sizeSlug }
+								onChange={ updateImage }
+								options={ imageSizeOptions }
+							/>
+						) }
+					</ToolsPanel>
 				) }
 			</InspectorControls>
 			{ colorGradientSettings.hasColorsOrGradients && (
