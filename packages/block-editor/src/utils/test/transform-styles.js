@@ -145,6 +145,58 @@ describe( 'transformStyles', () => {
 			expect( output ).toEqual( [ expected ] );
 		} );
 
+		it( 'should append prefix after root selector when the selector contains a combinator without spaces around it', () => {
+			const input = `
+				body> .some-style { color: red; }
+				body>.some-style { color: blue; }
+				body >.some-style { color: yellow; }
+				html body > .some-style { color: purple; }
+				html body.with-class+.some-style { color: silver; }
+				html body.with-class~.some-style { color: goldenrod; }
+			`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = `
+				body .my-namespace > .some-style { color: red; }
+				body .my-namespace > .some-style { color: blue; }
+				body .my-namespace > .some-style { color: yellow; }
+				html body .my-namespace > .some-style { color: purple; }
+				html body.with-class .my-namespace + .some-style { color: silver; }
+				html body.with-class .my-namespace ~ .some-style { color: goldenrod; }
+			`;
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
+		it( 'appends after multiple root selectors', () => {
+			const input = `
+			    :root html[lang="th"] body { color: red; }
+			    :root html[lang="th"] { color: orange; }
+			    :root html[lang="th"] body .some-class { color: green; }
+			`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected = `
+			    :root html[lang="th"] body .my-namespace { color: red; }
+			    :root html[lang="th"] .my-namespace { color: orange; }
+			    :root html[lang="th"] body .my-namespace .some-class { color: green; }
+			`;
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
 		it( 'should not double prefix a root selector', () => {
 			const input = 'body .my-namespace h1  { color: goldenrod; }';
 			const output = transformStyles(

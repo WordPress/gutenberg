@@ -53,21 +53,37 @@ function transformStyle(
 								return selector;
 							}
 
-							const rootSelector = ROOT_SELECTORS.find(
-								( rootSelectorCandidate ) =>
-									selector.startsWith( rootSelectorCandidate )
+							const hasRootSelector = ROOT_SELECTORS.some(
+								( rootSelector ) =>
+									selector.startsWith( rootSelector )
 							);
 
 							// Reorganize root selectors such that the root part comes before the prefix,
 							// but the prefix still comes before the remaining part of the selector.
-							if ( rootSelector ) {
-								const selectorWithoutRootPart = selector
-									.replace( rootSelector, '' )
-									.trim();
-								const updatedRootSelector =
-									`${ rootSelector } ${ prefix } ${ selectorWithoutRootPart }`.trim();
+							if ( hasRootSelector ) {
+								// Split the selector into its parts.
+								// Take into account combinators, which don't need a space around them to form a valid selector.
+								const selectorParts = selector
+									.split( /(\s|>|\+|~)/g )
+									.filter( ( part ) => part.trim() !== '' );
 
-								return updatedRootSelector;
+								// Walk backwards and find the last 'root' part.
+								const lastRootIndex =
+									selectorParts.findLastIndex( ( part ) =>
+										ROOT_SELECTORS.some( ( rootSelector ) =>
+											part.includes( rootSelector )
+										)
+									);
+
+								// Insert the prefix after the root part of the selector, but before non-root parts.
+								selectorParts.splice(
+									lastRootIndex + 1,
+									0,
+									prefix
+								);
+
+								// Join back up.
+								return selectorParts.join( ' ' );
 							}
 
 							return prefixedSelector;
