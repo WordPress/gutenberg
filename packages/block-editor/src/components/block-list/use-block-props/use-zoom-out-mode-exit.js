@@ -32,7 +32,7 @@ export function useZoomOutModeExit( clientId ) {
 					// Prevent focus from moving to the block.
 					event.preventDefault();
 
-					// When clicking on a selected block, exit navigation mode.
+					// When double clicking on a selected block, exit zoom out mode.
 					if ( isBlockSelected( clientId ) ) {
 						setZoomOutMode( false );
 					} else {
