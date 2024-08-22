@@ -306,32 +306,46 @@ describe( 'transformStyles', () => {
 					},
 					{
 						css: input,
+						ignoredSelectors: [ /^\.ignored/ ],
+					},
+					{
+						css: input,
 					},
 				],
 				'.not'
 			);
 			const expected1 = input;
-			const expected2 = '.not .ignored { color: red; }';
+			const expected2 = input;
+			const expected3 = '.not .ignored { color: red; }';
 
-			expect( output ).toEqual( [ expected1, expected2 ] );
+			expect( output ).toEqual( [ expected1, expected2, expected3 ] );
 		} );
 
 		it( 'allows specification of ignoredSelectors globally via the transformOptions param', () => {
-			const input = '.ignored { color: red; }';
+			const input1 = '.ignored { color: red; }';
+			const input2 = '.modified { color: red; }';
+			const input3 = '.regexed { color: red; }';
 			const output = transformStyles(
 				[
 					{
-						css: input,
+						css: input1,
 					},
 					{
-						css: input,
+						css: input2,
+					},
+					{
+						css: input3,
 					},
 				],
-				'.not',
-				{ ignoredSelectors: '.ignored' }
+				'.prefix',
+				{ ignoredSelectors: [ '.ignored', /\.regexed/ ] }
 			);
 
-			expect( output ).toEqual( [ input, input ] );
+			expect( output ).toEqual( [
+				input1,
+				'.prefix .modified { color: red; }',
+				input3,
+			] );
 		} );
 
 		it( 'should not try to wrap items within `:where` selectors', () => {
