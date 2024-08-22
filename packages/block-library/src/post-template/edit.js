@@ -109,6 +109,7 @@ export default function PostTemplateEdit( {
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -186,7 +187,6 @@ export default function PostTemplateEdit( {
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
-			const { getBlocks } = select( blockEditorStore );
 			return {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
