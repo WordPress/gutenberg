@@ -248,7 +248,7 @@ To meet the above requirements, we recommend:
 
 -   using `Object.assign()` to add subcomponents as properties of the top-level component;
 -   using named functions for all components;
--   using a separate files for each component, context and hook;
+-   using a separate file for each component, context and hook;
 -   setting explicitly the `displayName` on all subcomponents;
 -   adding the top-level JSDoc to the result of the `Object.assign` call;
 -   adding inline subcomponent JSDocs inside the `Object.assign` call.
