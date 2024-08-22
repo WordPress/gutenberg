@@ -134,8 +134,7 @@ const DimensionControls = ( {
 				panelId={ clientId }
 			>
 				<SelectControl
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Aspect ratio' ) }
 					value={ aspectRatio }
@@ -157,6 +156,7 @@ const DimensionControls = ( {
 				panelId={ clientId }
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Height' ) }
 					labelPosition="top"
 					value={ height || '' }
@@ -179,6 +179,7 @@ const DimensionControls = ( {
 				panelId={ clientId }
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Width' ) }
 					labelPosition="top"
 					value={ width || '' }
