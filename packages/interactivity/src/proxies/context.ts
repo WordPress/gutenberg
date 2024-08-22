@@ -1,3 +1,5 @@
+// TODO: Use the proxy registry to avoid multiple proxies on the same object.
+
 // Store the context proxy and fallback for each object in the context.
 const contextObjectToProxy = new WeakMap();
 const contextProxyToObject = new WeakMap();
