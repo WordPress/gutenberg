@@ -10,6 +10,25 @@
 			"registerReference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional"
 		}
 	},
+	"dependencies": {
+		"category": {
+			"oneOf": [
+				{
+					"properties": {
+						"category": { "enum": [ "theme" ] },
+						"subcategory": {
+							"enum": [
+								"site identity",
+								"design",
+								"posts",
+								"comments"
+							]
+						}
+					}
+				}
+			]
+		}
+	},
 	"type": "object",
 	"properties": {
 		"$schema": {
@@ -60,29 +79,33 @@
 				}
 			]
 		},
+		"subcategory": {
+			"description": "Blocks can be further categorized by subcategories, which is helpful to add granularity to the block categories, and to help users discover blocks via groupings.",
+			"type": "string"
+		},
 		"parent": {
-			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an ‘Add to Cart’ block to only be available within a ‘Product’ block.",
+			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.",
 			"type": "array",
 			"items": {
 				"type": "string"
 			}
 		},
 		"ancestor": {
-			"description": "The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a ‘Comment Content’ block inside a ‘Column’ block, as long as ‘Column’ is somewhere within a ‘Comment Template’ block.",
+			"description": "The `ancestor` property makes a block available inside the specified block types at any position of the ancestor block subtree. That allows, for example, to place a 'Comment Content' block inside a 'Column' block, as long as 'Column' is somewhere within a 'Comment Template' block.",
 			"type": "array",
 			"items": {
 				"type": "string"
 			}
 		},
 		"allowedBlocks": {
-			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a ‘List’ block allows only ‘List Item’ blocks as direct children.",
+			"description": "The `allowedBlocks` property specifies that only the listed block types can be the children of this block. For example, a 'List' block allows only 'List Item' blocks as direct children.",
 			"type": "array",
 			"items": {
 				"type": "string"
 			}
 		},
 		"icon": {
-			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts).",
+			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).",
 			"type": "string"
 		},
 		"description": {
