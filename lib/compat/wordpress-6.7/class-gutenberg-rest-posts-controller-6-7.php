@@ -153,19 +153,49 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			// If format is not an array, convert it to an array so that the
 			// required prefix can be added to all items.
 			$formats = is_array( $request['format'] ) ? $request['format'] : array( $request['format'] );
-			// Add the post-format- prefix.
-			$terms = array_map(
-				function ( $format ) {
-					return 'post-format-' . $format;
-				},
-				$formats
-			);
-			// Add the formats to the tax_query as post format taxonomies.
-			$args['tax_query'][] = array(
-				'taxonomy' => 'post_format',
-				'field'    => 'slug',
-				'terms'    => $terms,
-			);
+
+			$tax_query = array( 'relation' => 'OR' );
+
+			// The default post format, 'standard', is not saved in the database.
+			// If 'standard' is part of the request, the query needs to exclude the formats.
+			if ( in_array( 'standard', $formats, true ) ) {
+				$tax_query[] = array(
+					'taxonomy' => 'post_format',
+					'field'    => 'slug',
+					'terms'    => array(),
+					'operator' => 'NOT EXISTS',
+				);
+				// Remove the standard format:
+				$formats = array_diff( $formats, array( 'standard' ) );
+			}
+
+			// Add any remaining formats to the tax query.
+			if ( ! empty( $formats ) ) {
+				// Add the post-format- prefix.
+				$terms = array_map(
+					function ( $format ) {
+						return 'post-format-' . $format;
+					},
+					$formats
+				);
+
+				$tax_query[] = array(
+					'taxonomy' => 'post_format',
+					'field'    => 'slug',
+					'terms'    => $terms,
+					'operator' => 'IN',
+				);
+			}
+
+			// Enable filtering by both post formats and other taxonomies by combining them with AND.
+			if ( isset( $args['tax_query'] ) ) {
+				$args['tax_query'][] = array(
+					'relation' => 'AND',
+					$tax_query,
+				);
+			} else {
+				$args['tax_query'] = $tax_query;
+			}
 		}
 
 		// Force the post_type argument, since it's not a user input variable.
