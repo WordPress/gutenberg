@@ -31,7 +31,7 @@ function render_block_core_tag_cloud( $attributes ) {
 
 	if ( empty( $tag_cloud ) ) {
 		// Display placeholder content when there are no tags only in editor.
-		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || is_admin() ) {
+		if ( wp_is_serving_rest_request() ) {
 			$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
 		} else {
 			return '';
