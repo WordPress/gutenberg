@@ -58,19 +58,53 @@ export function getBlockClientId( node ) {
 	return blockNode.id.slice( 'block-'.length );
 }
 
+/*
+ * Cache for rectUnion() return values.
+ * When popovers are present on the canvas,
+ * this calculation function is called
+ * multiple times with the same values.
+ */
+const rectUnionCache = new Map();
 /**
- * Returns the union of two DOMRect objects.
+ * Calculates the union of two rectangles, and optionally constrains this union within a containerRect's
+ * left and right values.
+ * The function returns a new DOMRect object representing this union.
  *
- * @param {DOMRect} rect1 First rectangle.
- * @param {DOMRect} rect2 Second rectangle.
+ * @param {DOMRect}          rect1         First rectangle.
+ * @param {DOMRect}          rect2         Second rectangle.
+ * @param {DOMRectReadOnly?} containerRect An optional container rectangle. The union will be clipped to this rectangle.
  * @return {DOMRect} Union of the two rectangles.
  */
-export function rectUnion( rect1, rect2 ) {
-	const left = Math.min( rect1.left, rect2.left );
-	const top = Math.min( rect1.top, rect2.top );
-	const right = Math.max( rect1.right, rect2.right );
+export function rectUnion( rect1, rect2, containerRect ) {
+	const cacheKey = JSON.stringify( { rect1, rect2, containerRect } );
+
+	if ( rectUnionCache.has( cacheKey ) ) {
+		return rectUnionCache.get( cacheKey );
+	}
+
+	let left = Math.min( rect1.left, rect2.left );
+	let right = Math.max( rect1.right, rect2.right );
 	const bottom = Math.max( rect1.bottom, rect2.bottom );
-	return new window.DOMRect( left, top, right - left, bottom - top );
+	const top = Math.min( rect1.top, rect2.top );
+
+	/*
+	 * To calculate visible bounds using rectUnion, take into account the outer
+	 * horizontal limits of the container in which an element is supposed to be "visible".
+	 * For example, if an element is positioned -10px to the left of the window x value (0),
+	 * this function discounts the negative overhang because it's not visible and
+	 * therefore to be counted in the visible calculations.
+	 * Top and bottom values are not accounted for to accommodate vertical scroll.
+	 */
+	if ( containerRect ) {
+		left = Math.max( left, containerRect.left );
+		right = Math.min( right, containerRect.right );
+	}
+
+	const result = new window.DOMRect( left, top, right - left, bottom - top );
+
+	rectUnionCache.set( cacheKey, result );
+
+	return result;
 }
 
 /**
@@ -130,6 +164,12 @@ export function getVisibleElementBounds( element ) {
 	}
 
 	let bounds = element.getBoundingClientRect();
+	const viewportRect = new window.DOMRectReadOnly(
+		0,
+		0,
+		viewport.innerWidth,
+		viewport.innerHeight
+	);
 
 	const stack = [ element ];
 	let currentElement;
@@ -138,7 +178,7 @@ export function getVisibleElementBounds( element ) {
 		for ( const child of currentElement.children ) {
 			if ( isElementVisible( child ) ) {
 				const childBounds = child.getBoundingClientRect();
-				bounds = rectUnion( bounds, childBounds );
+				bounds = rectUnion( bounds, childBounds, viewportRect );
 				stack.push( child );
 			}
 		}
