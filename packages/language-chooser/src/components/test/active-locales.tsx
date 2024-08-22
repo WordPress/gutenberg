@@ -18,8 +18,6 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import ActiveLocales from '../active-locales';
 import type { Language } from '../../types';
 
-jest.mock( 'uuid', () => ( {} ) );
-
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
 } ) );

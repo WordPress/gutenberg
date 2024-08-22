@@ -22,8 +22,6 @@ import { BACKSPACE, DOWN, END, HOME, UP } from '@wordpress/keycodes';
 import type { Language } from '../../types';
 import LanguageChooser from '../language-chooser';
 
-jest.mock( 'uuid', () => ( {} ) );
-
 /* eslint-disable camelcase */
 
 const de_DE: Language = {
