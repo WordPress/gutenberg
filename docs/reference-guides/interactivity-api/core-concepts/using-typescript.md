@@ -24,7 +24,15 @@ If you haven't done so already, you need to install the package `@wordpress/inte
 
 It is also a good practice to keep that package updated.
 
-## Inferring types from an existing store
+## Typing the store
+
+Depending on the structure of your store and your preference, there are three options you can choose from to generate your store's types:
+
+1.  Infer the types from your client store definition.
+2.  Manually type the server state, but infer the rest from your client store definition.
+3.  Manually write all the types.
+
+### 1. Infer the types from your client store definition
 
 When you create a store using the `store` function, TypeScript automatically infers the types of the store's properties (`state`, `actions`, `callbacks`, etc.). This means that you can often get away with just writing plain JavaScript objects, and TypeScript will figure out the types for you.
 
@@ -72,19 +80,22 @@ const { state, actions } = store( 'myCounterPlugin', {
 } );
 ```
 
-There is a caveat to this approach though, which is that TypeScript is not able to infer the types when they have circular references. For example, if we add a derived state using a getter that refers to the `state`, TypeScript will no longer be able to infer the types of the `state`.
+There is a caveat though, which is that TypeScript is not able to infer the types when they have circular references. For example, if we add a derived state using a getter that refers to the `state`, TypeScript will no longer be able to infer the types of the `state`.
+
+For example, in this case, TypeScript cannot infer the type of `state.double` because it depends on `state.counter`, and the type of `state` is not completed until the type of `state.double` is defined, creating a circular reference.
 
 ```ts
 const { state } = store( 'myCounterPlugin', {
 	state: {
 		counter: 0,
 		get double() {
+			// TypeScript can't infer this return type because it depends on `state`.
 			return state.counter * 2;
 		},
 	},
 	actions: {
 		increment() {
-			state.counter += 1; // TypeScript can't infer this type.
+			state.counter += 1; // This type is now unknown.
 		},
 	},
 } );
@@ -92,7 +103,7 @@ const { state } = store( 'myCounterPlugin', {
 
 In this case, depending on our TypeScript configuration, TypeScript will either warn us about a circular reference or simply add the `any` type to the `state` property.
 
-However, solving this problem is easy; we simply need to manually provide TypeScript with the information about the return type of that getter. Once we do that, the circular reference disappears, and TypeScript can once again infer all the `state` types.
+However, solving this problem is easy; we simply need to manually provide TypeScript with the return type of that getter. Once we do that, the circular reference disappears, and TypeScript can once again infer all the `state` types.
 
 ```ts
 const { state } = store( 'myCounterPlugin', {
@@ -124,11 +135,9 @@ const myStore: {
 };
 ```
 
-Using inferred types is useful when you have a simple store defined in a single call to the `store` function.
+Another thing to keep in mind is that, when using the Interactivity API, asynchronous actions must be defined with generators instead of async/await functions.
 
-## Inferred types of async actions
-
-In the Interactivity API, due to how the scope is transferred from some actions and derived states to others, asynchronous actions have to be defined with generators instead of async/await functions.
+The reason for using generators in the Interactivity API's asynchronous actions is to be able to restore the scope from the initially triggered action once the asynchronous function continues its execution after yielding. But this is a syntax change only, otherwise, **these functions operate just like regular async/await functions**, and the inferred types from the `store` function reflect this.
 
 Following our previous example, let's add an asynchronous action to the store.
 
@@ -152,8 +161,6 @@ const { state, actions } = store( 'myCounterPlugin', {
 } );
 ```
 
-The reason for using generators in the Interactivity API's asynchronous actions is to be able to restore the scope once the asynchronous function continues its execution after yielding. Otherwise, **these functions operate just like regular async/await functions**, and the return types from the `store` function reflect this.
-
 ```ts
 const myStore: {
 	state: {
@@ -167,6 +174,118 @@ const myStore: {
 	};
 };
 ```
+
+This also means that you can use your async actions in external functions, and TypeScript will correctly use the async/await types.
+
+```ts
+const someAsyncFunction = async () => {
+	// This works fine and it's correctly typed.
+	await actions.delayedIncrement( 2000 );
+};
+```
+
+In conclusion, inferring the types is useful when you have a simple store defined in a single call to the store function and you do not need to type any global or derived state that has been initialized on the server. Just remember to:
+
+-   Manually type the return type of your derived state.
+-   Use generators for asynchronous actions.
+
+### 2. Manually type the server state, but infer the rest from your client store definition
+
+The global state that is initialized on the server with the `wp_interactivity_state` function doesn't exist on your client store definition and, therefore, needs to be manually typed.
+
+Following our previous example, let's move our `counter` state initialization to the server. Remember that you also have to define the initial state of the derived state (`double` in this case) in the server.
+
+_Please, visit [the Server-side Rendering guide](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md) to learn more about `wp_interactivity_state` and how directives are processed on the server._
+
+```php
+wp_interactivity_state( 'myCounterPlugin', array(
+	'counter' => 1,
+	'double'  => 2,
+));
+```
+
+If you don't want to define all the types of your store, you can use `typeof` to infer the types of your client store definition, and merge those types with your `ServerState` type.
+
+```ts
+// Manually type the server state.
+type ServerState = {
+	state: {
+		counter: number;
+	};
+};
+
+// Define the store in a variable to be able to extract its type using `typeof` later.
+const storeDef = {
+	state: {
+		get double(): number {
+			return state.counter * 2;
+		},
+	},
+	actions: {
+		increment() {
+			state.counter += 1;
+		},
+	},
+};
+
+// Merge the types of the server state and the store.
+type Store = ServerState & typeof storeDef;
+
+// Inject the final types when calling the `store` function.
+const { state, actions } = store< Store >( 'myCounterPlugin', storeDef );
+```
+
+That's it!
+
+Keep in mind that you don't need to manually define the types of the derived state (like `state.double`) that you initialize on the server, because they do exist in your client's store definition.
+
+In conclusion, this approach is useful when you have a simple store defined in a single call to the store function, but you need to type the global or derived state that has been initialized on the server.
+
+Keep in mind that you must consider these caveats:
+
+-   You need to manually type the return of your derived state.
+-   You need to use generators for asynchronous actions.
+
+### 3. Manually write all the types
+
+If you prefer to define all the types of the store manually instead of letting TypeScript infer them from your store definition, you can do that too. You simply need to pass them to the `store` function.
+
+```ts
+interface Store {
+	state: {
+		counter: number; // Initial server state
+		readonly double: number;
+	};
+	actions: {
+		increment(): void;
+		delayedIncrement(): Promise< void >;
+	};
+}
+
+// Pass the types when calling the `store` function.
+const { state, actions } = store< Store >( 'myCounterPlugin', {
+	state: {
+		get double(): number {
+			return state.counter * 2;
+		},
+	},
+	actions: {
+		increment() {
+			state.counter += 1;
+		},
+		*delayedIncrement( delay = 1000 ) {
+			yield new Promise( ( r ) => setTimeout( r, delay ) );
+			state.counter += 1;
+		},
+	},
+} );
+```
+
+As you can see, even though we are using generators for our asynchronous actions, when it comes to typing them, we can type them as if they were async/await functions using `Promise< ReturnType >`.
+
+Again, as in the other approaches, keep in mind that you need to manually type the return of your derived state when its `return` depends on other parts of the `state`.
+
+In conclusion, this approach is useful when you want to control all the types of your store and you don't mind writing them by hand.
 
 ## Typing the local context
 
@@ -219,84 +338,7 @@ store( 'myCounterPlugin', {
 } );
 ```
 
-## Typing the global state initialized on the server when inferring types
-
-Just like the local context, the global state that is initialized on the server with the `wp_interactivity_state` function needs to be manually typed.
-
-Following our previous example, let's move our `counter` state initialization to the server. Remember that you also have to define the initial state of the derived state (`double` in this case).
-
-```php
-wp_interactivity_state( 'myCounterPlugin', array(
-	'counter' => 1,
-	'double'  => 2,
-));
-```
-
-If you are inferring the types and you don't want to define all the types of your store, you can use `typeof` and merge it with the server state types. Keep in mind that you don't need to define the types of the derived state, because they do exist in the client's store.
-
-```ts
-// Manually type the server state.
-type ServerState = {
-	state: {
-		counter: number;
-	};
-};
-
-// Define the store in a variable to be able to extract its type using `typeof`.
-const storeDef = {
-	state: {
-		get double(): number {
-			return state.counter * 2;
-		},
-	},
-	actions: {
-		increment() {
-			state.counter += 1;
-		},
-	},
-};
-
-// Merge the types of the server state and the store.
-type Store = ServerState & typeof storeDef;
-
-// Inject the final types when calling the `store` function.
-const { state, actions } = store< Store >( 'myCounterPlugin', storeDef );
-```
-
-## Explicit store typing
-
-If you prefer to define all the types of the store manually instead of letting TypeScript infer them from your store definition, you can do that too. You simply need to pass them to the `store` function.
-
-```ts
-interface Store {
-	state: {
-		counter: number; // Initial server state
-		readonly double: number;
-	};
-	actions: {
-		increment(): void;
-		delayedIncrement(): Promise< void >;
-	};
-}
-
-// Pass the types when calling the `store` function.
-const { state, actions } = store< Store >( 'myCounterPlugin', {
-	state: {
-		get double(): number {
-			return state.counter * 2;
-		},
-	},
-	actions: {
-		increment() {
-			state.counter += 1;
-		},
-		*delayedIncrement() {
-			yield new Promise( ( r ) => setTimeout( r, 1000 ) );
-			state.counter += 1;
-		},
-	},
-} );
-```
+That's it! Now you can access the context properties with the correct types.
 
 ## Typing stores that are divided into multiple parts
 
@@ -445,9 +487,3 @@ const { state, actions } = store< Store >( 'myFavoritesPlugin', {
 	// Everything is correctly typed here.
 } );
 ```
-
-## List of tasks
-
--   [ ] Create a new template for `create-block` with a typed block.
--   [ ] Make sure `@wordpress/interactivity-router` is properly typed so it can be used as an example of importing a typed store via `import`.
--   [ ] Finish the Generator -> Promise fix [PR](https://github.com/WordPress/gutenberg/pull/62400).
