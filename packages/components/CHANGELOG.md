@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
+    -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
     -   `CustomSelectControl`
     -   `CustomSelectControlV2`
