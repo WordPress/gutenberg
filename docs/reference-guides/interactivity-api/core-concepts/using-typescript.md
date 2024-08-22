@@ -342,128 +342,136 @@ That's it! Now you can access the context properties with the correct types.
 
 ## Typing stores that are divided into multiple parts
 
-Sometimes, the stores can be divided into different files. For instance, when a part doesn't need to be loaded initially and can be placed in a module that is conditionally loaded, or when the same namespace is shared between different blocks, and each of those blocks loads the part of the store it needs.
+Sometimes, stores can be divided into different files. This can happen when different blocks share the same namespace, with each block loading the part of the store it needs.
 
-Take, for example, these two stores enqueued by two different blocks:
+Let's look at an example of two blocks:
 
-```ts
-// The view.ts file of the first block.
-const { state } = store( 'myFavoritesPlugin', {
-	state: {
-		favorited: [],
-		showFavorited: false,
-	},
-	actions: {
-		showFavorited() {
-			state.showFavorited; // Correctly inferred type: boolean
-		},
-		addToFavorited( id ) {
-			state.favorited.push( id ); // Correctly inferred type: array
-		},
-	},
-} );
+-   `todo-list`: A block that displays a list of todos.
+-   `add-post-to-todo`: A block that adds a todo to read the current post when the user clicks a button.
+
+First, let's initialize the global and derived state of the `todo-list` block on the server.
+
+```php
+<?php
+// todo-list-block/render.php
+$todos = array( 'Buy milk', 'Walk the dog' );
+wp_interactivity_state( 'myTodoPlugin', array(
+  'todos'    => $todos,
+  'filter'   => 'all',
+  'filtered' => $todos,
+) );
+?>
+
+<!-- HTML markup... -->
 ```
 
-```ts
-// The view.ts file of the second block.
-const { state, actions } = store( 'myFavoritesPlugin', {
-	state: {
-		selected: '',
-	},
-	actions: {
-		selectFavorite() {
-			const { id } = getContext();
-
-			// Error: state.favorited doesn't exist.
-			if ( ! state.favorited.includes( id ) ) {
-				// Error: action.addToFavorited doesn't exist.
-				actions.addToFavorited( id );
-			}
-
-			state.selected = id; // Correctly inferred type: string
-		},
-	},
-} );
-```
-
-In this example, the action `selectFavorite` of the second block is trying to access `state.favorited` and `action.addToFavorited`, which have been defined in the store of the first block, and therefore, TypeScript does not have their types.
-
-To solve it, you must share the inferred types of each store part with the other store part. One way to do it would be using `typeof` to export the type.
+Now, let's type the server state and add the client store definition.
 
 ```ts
-// The view.ts file of the first block.
-
-// Define the store in a variable to be able to extract its type using `typeof`.
-const storeDef = {
+// todo-list-block/view.ts
+type ServerState = {
 	state: {
-		favorited: [],
-		showFavorited: false,
+		todos: string[];
+		filter: 'all' | 'completed';
+	};
+};
+
+const todoList = {
+	state: {
+		get filtered(): string[] {
+			return state.filter === 'completed'
+				? state.todos.filter( ( todo ) => todo.includes( '✅' ) )
+				: state.todos;
+		},
 	},
 	actions: {
-		showFavorited() {
-			state.showFavorited;
-		},
-		addToFavorited( id ) {
-			state.favorited.push( id );
+		addTodo( todo ) {
+			state.todos.push( todo );
 		},
 	},
 };
 
-// Pass the store part definition to the `store` function.
-const { state, actions } = store( 'myFavoritesPlugin', storeDef );
+// Merge the types of this store part and the server state.
+export type TodoList = ServerState & typeof todoList;
 
-// Export the type of this store part.
-export type FirstBlockStore = typeof storeDef;
+// Inject the final types when calling the `store` function
+const { state, actions } = store< TodoList >( 'myTodoPlugin', todoList );
 ```
 
+So far, so good. Now let's create our `add-post-to-todo` block.
+
+First, let's add the current post ID to the server state.
+
+```php
+<?php
+// add-post-to-todo-block/render.php
+wp_interactivity_state( 'myTodoPlugin', array(
+  'postTitle' => get_the_title(),
+) );
+?>
+
+<!-- HTML markup... -->
+```
+
+Now, let's type that server state and add the client store definition.
+
 ```ts
-// The view.ts file of the second block.
-
-// Import the type of the other store part from the first block.
-import type { FirstBlockStore } from '../first-block/view.ts';
-
-// Define the store in a variable to be able to extract its type using `typeof`.
-const storeDef = {
+// add-post-to-todo-block/view.ts
+type ServerState = {
 	state: {
-		selected: '',
-	},
+		postTitle: string;
+	};
+};
+
+const addPostToTodo = {
 	actions: {
-		selectFavorite() {
-			const { id } = getContext();
-
-			// Correctly typed now.
-			if ( ! state.favorited.includes( id ) ) {
-				// Correctly typed now.
-				actions.addToFavorited( id );
+		addPostToTodo() {
+			const todo = `Read: ${ state.postTitle }`.trim();
+			if ( ! state.todos.includes( todo ) ) {
+				actions.addTodo( todo );
 			}
-
-			state.selected = id;
 		},
 	},
 };
 
-// Merge the types of both store parts together.
-type Store = FirstBlockStore & typeof storeDef;
+// Merge the types of the store part and the server state.
+type Store = ServerState & typeof addPostToTodo;
 
-// Inject the final types when calling the `store` function.
-const { state, actions } = store< Store >( 'myFavoritesPlugin', storeDef );
+// Inject the final types when calling the `store` function
+const { state, actions } = store< Store >( 'myTodoPlugin', addPostToTodo );
 ```
 
-That's it! If you need to use the types from the second block in the store part of the first block, you have to do the same but in the other direction.
+This works fine in the browser, but TypeScript will complain that, in this block, `state` and `actions` do not include `state.todos` and `actions.addtodo`. To fix this, we need to import the `TodoList` type from the `todo-list` block and merge it with the `addPostToTodo` type.
 
-If you don't want to infer the types and prefer to define them manually, you just need to define them in a separate file and import that definition into each of your store parts.
+```ts
+import type { TodoList } from '../todo-list-block/view';
+
+// ...
+
+// Merge the types of both store parts and the server state.
+type Store = TodoList & ServerState & typeof addPostToTodo;
+```
+
+That's it! Now TypeScript will know that `state.todos` and `actions.addTodo` are available in the `add-post-to-todo` block.
+
+This approach allows the `add-post-to-todo` block to interact with the existing todo list while maintaining type safety and adding its own functionality to the shared store.
+
+If you need to use the `add-post-to-todo` types in the `todo-list` block, you simply have to export its types and import them in the other `view.ts` file.
+
+Finally, if you prefer to define all types manually instead of inferring them, you can define them in a separate file and import that definition into each of your store parts. Here's how you could do that for our todo list example:
 
 ```ts
 // types.ts
 interface Store {
 	state: {
-		favorited: string[];
-		showFavorited: boolean;
-		selected: string;
+		todos: string[];
+		filter: 'all' | 'completed';
+		filtered: string[];
+		postTitle: string;
 	};
 	actions: {
-		addToFavorited( id: string ): void;
-		selectFavorite(): void;
+		addTodo( todo: string ): void;
+		addPostToTodo(): void;
 	};
 }
 
@@ -471,19 +479,21 @@ export default Store;
 ```
 
 ```ts
-// The view.ts file of the first block.
-import type Store from '../types.ts';
+// todo-list-block/view.ts
+import type Store from '../types';
 
-const { state, actions } = store< Store >( 'myFavoritesPlugin', {
-	// Everything is correctly typed here.
+const { state, actions } = store< Store >( 'myTodoPlugin', {
+	// Everything is correctly typed here
 } );
 ```
 
 ```ts
-// The view.ts file of the second block.
-import type Store from '../types.ts';
+// add-post-to-todo-block/view.ts
+import type Store from '../types';
 
-const { state, actions } = store< Store >( 'myFavoritesPlugin', {
-	// Everything is correctly typed here.
+const { state, actions } = store< Store >( 'myTodoPlugin', {
+	// Everything is correctly typed here
 } );
 ```
+
+This approach allows you to have full control over your types and ensures consistency across all parts of your store. It's particularly useful when you have a complex store structure or when you want to enforce a specific interface across multiple blocks or components.
