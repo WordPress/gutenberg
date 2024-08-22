@@ -31,6 +31,18 @@ function useFreshRef( value ) {
 }
 
 /**
+ * Checks if the given element is a zoom out separator.
+ *
+ * @param {EventTarget} maybeZoomOutSeparator - The element to check.
+ * @return {boolean} True if the element is a zoom out separator, false otherwise.
+ */
+const isZoomOutSeparator = ( maybeZoomOutSeparator ) =>
+	maybeZoomOutSeparator &&
+	maybeZoomOutSeparator?.classList.contains(
+		'block-editor-block-list__zoom-out-separator'
+	);
+
+/**
  * A hook to facilitate drag and drop handling.
  *
  * @param {Object}                  props                   Named parameters.
@@ -165,7 +177,17 @@ export default function useDropZone( {
 				// zone.
 				// Note: This is not entirely reliable in Safari due to this bug
 				// https://bugs.webkit.org/show_bug.cgi?id=66547
+
 				if ( isElementInZone( event.relatedTarget ) ) {
+					return;
+				}
+
+				// If we're moving in/out of a ZoomOutSeparator, don't trigger
+				// the onDragLeave event.
+				if (
+					isZoomOutSeparator( event.relatedTarget ) ||
+					isZoomOutSeparator( event.target )
+				) {
 					return;
 				}
 
