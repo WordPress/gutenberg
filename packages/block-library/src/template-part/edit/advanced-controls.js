@@ -35,7 +35,6 @@ const htmlElementMessages = {
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
-	isEntityAvailable,
 	templatePartId,
 	defaultWrapper,
 	hasInnerBlocks,
@@ -70,30 +69,25 @@ export function TemplatePartAdvancedControls( {
 
 	return (
 		<>
-			{ isEntityAvailable && (
-				<>
-					<TextControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Title' ) }
-						value={ title }
-						onChange={ ( value ) => {
-							setTitle( value );
-						} }
-						onFocus={ ( event ) => event.target.select() }
-					/>
-
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Area' ) }
-						labelPosition="top"
-						options={ areaOptions }
-						value={ area }
-						onChange={ setArea }
-					/>
-				</>
-			) }
+			<TextControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Title' ) }
+				value={ title }
+				onChange={ ( value ) => {
+					setTitle( value );
+				} }
+				onFocus={ ( event ) => event.target.select() }
+			/>
+			<SelectControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Area' ) }
+				labelPosition="top"
+				options={ areaOptions }
+				value={ area }
+				onChange={ setArea }
+			/>
 			<SelectControl
 				__nextHasNoMarginBottom
 				__next40pxDefaultSize
