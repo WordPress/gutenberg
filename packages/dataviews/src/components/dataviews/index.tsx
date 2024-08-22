@@ -27,8 +27,6 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
-import DensityPicker from '../../layouts/grid/density-picker';
-import { LAYOUT_GRID } from '../../constants';
 
 type ItemWithId = { id: string };
 
@@ -73,8 +71,6 @@ export default function DataViews< Item >( {
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const [ density, setDensity ] = useState< number >( 0 );
-	const [ isShowingFilter, setIsShowingFilter ] =
-		useState< boolean >( false );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -97,6 +93,10 @@ export default function DataViews< Item >( {
 	}, [ selection, data, getItemId ] );
 
 	const filters = useFilters( _fields, view );
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
+		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	);
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -118,11 +118,15 @@ export default function DataViews< Item >( {
 			<div className="dataviews-wrapper">
 				<HStack
 					alignment="top"
-					justify="start"
+					justify="space-between"
 					className="dataviews__view-actions"
 					spacing={ 1 }
 				>
-					<HStack justify="start" wrap>
+					<HStack
+						justify="start"
+						expanded={ false }
+						className="dataviews__search"
+					>
 						{ search && <DataViewsSearch label={ searchLabel } /> }
 						<FilterVisibilityToggle
 							filters={ filters }
@@ -133,20 +137,16 @@ export default function DataViews< Item >( {
 							isShowingFilter={ isShowingFilter }
 						/>
 					</HStack>
-					{ view.type === LAYOUT_GRID && (
-						<DensityPicker
-							density={ density }
-							setDensity={ setDensity }
-						/>
-					) }
-					<DataViewsBulkActions />
 					<HStack
 						spacing={ 1 }
 						expanded={ false }
 						style={ { flexShrink: 0 } }
 					>
+						<DataViewsBulkActions />
 						<DataViewsViewConfig
 							defaultLayouts={ defaultLayouts }
+							density={ density }
+							setDensity={ setDensity }
 						/>
 						{ header }
 					</HStack>

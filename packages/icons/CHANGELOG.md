@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
 ### New Features
 
 -   Add new `send` icon.

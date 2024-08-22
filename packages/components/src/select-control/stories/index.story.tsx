@@ -63,6 +63,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
+	__nextHasNoMarginBottom: true,
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
 		{ value: 'a', label: 'Option A' },
@@ -82,9 +83,11 @@ WithLabelAndHelpText.args = {
  * As an alternative to the `options` prop, `optgroup`s and `options` can be
  * passed in as `children` for more customizeability.
  */
-export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
-	return (
-		<SelectControlWithState { ...args }>
+export const WithCustomChildren = SelectControlWithState.bind( {} );
+WithCustomChildren.args = {
+	__nextHasNoMarginBottom: true,
+	children: (
+		<>
 			<option value="option-1">Option 1</option>
 			<option value="option-2" disabled>
 				Option 2 - Disabled
@@ -97,8 +100,8 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
 					Option Group 1 - Option 2 - Disabled
 				</option>
 			</optgroup>
-		</SelectControlWithState>
-	);
+		</>
+	),
 };
 
 export const Minimal = SelectControlWithState.bind( {} );

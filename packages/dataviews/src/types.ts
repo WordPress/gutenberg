@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import type {
-	ReactElement,
-	ComponentType,
-	Dispatch,
-	SetStateAction,
-} from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -47,12 +42,30 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type ItemRecord = Record< string, unknown >;
-
-export type FieldType = 'text' | 'integer';
+export type FieldType = 'text' | 'integer' | 'datetime';
 
 export type ValidationContext = {
 	elements?: Option[];
+};
+
+/**
+ * An abstract interface for Field based on the field type.
+ */
+export type FieldTypeDefinition< Item > = {
+	/**
+	 * Callback used to sort the field.
+	 */
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Callback used to validate the field.
+	 */
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+
+	/**
+	 * Callback used to render an edit control for the field or control name.
+	 */
+	Edit: ComponentType< DataFormControlProps< Item > > | string;
 };
 
 /**
@@ -75,6 +88,12 @@ export type Field< Item > = {
 	label?: string;
 
 	/**
+	 * The header of the field. Defaults to the label.
+	 * It allows the usage of a React Element to render the field labels.
+	 */
+	header?: string | ReactElement;
+
+	/**
 	 * A description of the field.
 	 */
 	description?: string;
@@ -92,7 +111,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render an edit control for the field.
 	 */
-	Edit?: ComponentType< DataFormControlProps< Item > >;
+	Edit?: ComponentType< DataFormControlProps< Item > > | string;
 
 	/**
 	 * Callback used to sort the field.
@@ -128,24 +147,17 @@ export type Field< Item > = {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-} & ( Item extends ItemRecord
-	? {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue?: ( args: { item: Item } ) => any;
-	  }
-	: {
-			/**
-			 * Callback used to retrieve the value of the field from the item.
-			 * Defaults to `item[ field.id ]`.
-			 */
-			getValue: ( args: { item: Item } ) => any;
-	  } );
+
+	/**
+	 * Callback used to retrieve the value of the field from the item.
+	 * Defaults to `item[ field.id ]`.
+	 */
+	getValue?: ( args: { item: Item } ) => any;
+};
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
+	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	Edit: ComponentType< DataFormControlProps< Item > >;
@@ -164,13 +176,15 @@ export type Data< Item > = Item[];
  * The form configuration.
  */
 export type Form = {
-	visibleFields?: string[];
+	type?: 'regular' | 'panel';
+	fields?: string[];
 };
 
 export type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onChange: Dispatch< SetStateAction< Item > >;
+	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
 };
 
 /**
@@ -281,6 +295,8 @@ export interface CombinedField {
 	id: string;
 
 	label: string;
+
+	header?: string | ReactElement;
 
 	/**
 	 * The fields to use as columns.
@@ -419,6 +435,18 @@ interface ActionBase< Item > {
 	 * Whether the action can be used as a bulk action.
 	 */
 	supportsBulk?: boolean;
+
+	/**
+	 * The context in which the action is visible.
+	 * This is only a "meta" information for now.
+	 */
+	context?: 'list' | 'single';
+}
+
+export interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
 }
 
 export interface ActionModal< Item > extends ActionBase< Item > {
@@ -429,11 +457,7 @@ export interface ActionModal< Item > extends ActionBase< Item > {
 		items,
 		closeModal,
 		onActionPerformed,
-	}: {
-		items: Item[];
-		closeModal?: () => void;
-		onActionPerformed?: ( items: Item[] ) => void;
-	} ) => ReactElement;
+	}: RenderModalProps< Item > ) => ReactElement;
 
 	/**
 	 * Whether to hide the modal header.
@@ -496,4 +520,11 @@ export interface SupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;
+}
+
+export interface DataFormProps< Item > {
+	data: Item;
+	fields: Field< Item >[];
+	form: Form;
+	onChange: ( value: Record< string, any > ) => void;
 }

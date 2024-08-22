@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { trash } from '@wordpress/icons';
+import { trash, image, Icon, category } from '@wordpress/icons';
 import {
 	Button,
 	__experimentalText as Text,
@@ -23,6 +23,7 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'Space', 'NASA' ],
 		satellites: 0,
+		date: '2021-01-01T00:00:00Z',
 	},
 	{
 		id: 2,
@@ -32,6 +33,7 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'Space' ],
 		satellites: 0,
+		date: '2019-01-02T00:00:00Z',
 	},
 	{
 		id: 3,
@@ -41,6 +43,7 @@ export const data = [
 		type: 'Not a planet',
 		categories: [ 'NASA' ],
 		satellites: 0,
+		date: '2025-01-03T00:00:00Z',
 	},
 	{
 		id: 4,
@@ -50,6 +53,7 @@ export const data = [
 		type: 'Ice giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 14,
+		date: '2020-01-01T00:00:00Z',
 	},
 	{
 		id: 5,
@@ -59,6 +63,7 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 0,
+		date: '2020-01-02T01:00:00Z',
 	},
 	{
 		id: 6,
@@ -68,6 +73,7 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 0,
+		date: '2020-01-02T00:00:00Z',
 	},
 	{
 		id: 7,
@@ -77,6 +83,7 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 1,
+		date: '2023-01-03T00:00:00Z',
 	},
 	{
 		id: 8,
@@ -86,6 +93,7 @@ export const data = [
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 2,
+		date: '2020-01-01T00:00:00Z',
 	},
 	{
 		id: 9,
@@ -95,6 +103,7 @@ export const data = [
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 95,
+		date: '2017-01-01T00:01:00Z',
 	},
 	{
 		id: 10,
@@ -104,6 +113,7 @@ export const data = [
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
 		satellites: 146,
+		date: '2020-02-01T00:02:00Z',
 	},
 	{
 		id: 11,
@@ -113,6 +123,7 @@ export const data = [
 		type: 'Ice giant',
 		categories: [ 'Space', 'Ice giant', 'Solar system' ],
 		satellites: 28,
+		date: '2020-03-01T00:00:00Z',
 	},
 ];
 
@@ -162,6 +173,12 @@ export const fields = [
 	{
 		label: 'Image',
 		id: 'image',
+		header: (
+			<HStack spacing={ 1 } justify="start">
+				<Icon icon={ image } />
+				<span>Image</span>
+			</HStack>
+		),
 		render: ( { item } ) => {
 			return (
 				<img src={ item.image } alt="" style={ { width: '100%' } } />
@@ -174,6 +191,11 @@ export const fields = [
 		id: 'title',
 		enableHiding: false,
 		enableGlobalSearch: true,
+	},
+	{
+		id: 'date',
+		label: 'Date',
+		type: 'datetime',
 	},
 	{
 		label: 'Type',
@@ -201,6 +223,12 @@ export const fields = [
 	{
 		label: 'Categories',
 		id: 'categories',
+		header: (
+			<HStack spacing={ 1 } justify="start">
+				<Icon icon={ category } />
+				<span>Categories</span>
+			</HStack>
+		),
 		elements: [
 			{ value: 'Space', label: 'Space' },
 			{ value: 'NASA', label: 'NASA' },

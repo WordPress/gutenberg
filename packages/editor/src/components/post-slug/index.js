@@ -24,6 +24,7 @@ function PostSlugControl() {
 
 	return (
 		<TextControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Slug' ) }
 			autoComplete="off"

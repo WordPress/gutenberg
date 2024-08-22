@@ -36,6 +36,7 @@ export default function EnhancedPaginationControl( {
 	return (
 		<>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Force page reload' ) }
 				help={ help }
 				checked={

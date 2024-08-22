@@ -7,9 +7,3 @@
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
 	margin: $grid-unit-10;
 }
-
-.editor-post-format__options {
-	.components-base-control__field > .components-v-stack {
-		gap: $grid-unit-15;
-	}
-}

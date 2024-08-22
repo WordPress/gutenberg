@@ -192,7 +192,6 @@ function PostTitle( _, forwardedRef ) {
 				onFocus={ onSelect }
 				onBlur={ onUnselect }
 				onKeyDown={ onKeyDown }
-				onKeyPress={ onUnselect }
 				onPaste={ onPaste }
 			/>
 		</PostTypeSupportCheck>

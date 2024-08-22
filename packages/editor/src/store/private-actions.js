@@ -269,7 +269,7 @@ export const revertTemplate =
 
 			const fileTemplatePath = addQueryArgs(
 				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
+				{ context: 'edit', source: template.origin }
 			);
 
 			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
@@ -393,10 +393,14 @@ export const removeTemplates =
 			if ( items.length === 1 ) {
 				// Depending on how the entity was retrieved its title might be
 				// an object or simple string.
-				const title =
-					typeof items[ 0 ].title === 'string'
-						? items[ 0 ].title
-						: items[ 0 ].title?.rendered;
+				let title;
+				if ( typeof items[ 0 ].title === 'string' ) {
+					title = items[ 0 ].title;
+				} else if ( typeof items[ 0 ].title?.rendered === 'string' ) {
+					title = items[ 0 ].title?.rendered;
+				} else if ( typeof items[ 0 ].title?.raw === 'string' ) {
+					title = items[ 0 ].title?.raw;
+				}
 				successMessage = isResetting
 					? sprintf(
 							/* translators: The template/part's name. */
