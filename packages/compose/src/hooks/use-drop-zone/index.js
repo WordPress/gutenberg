@@ -189,8 +189,8 @@ export default function useDropZone( {
 
 				// If we're moving in/out of an insertion point then don't trigger
 				// the onDragLeave event. This is to prevent the dropzone from
-				// being hidden when the user is dragging a block in/over/around
-				// a block and a nearby insertion point.
+				// trigger any unwanted side effects when the user is likely to
+				// be moving the cursor quickly over the insertion point.
 				if (
 					isInsertionPoint( event.relatedTarget ) ||
 					isInsertionPoint( event.target )
