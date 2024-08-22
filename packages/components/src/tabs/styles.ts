@@ -136,7 +136,6 @@ export const TabPanel = styled( Ariakit.TabPanel )`
 	}
 
 	&:focus-visible {
-		border-radius: 2px;
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			${ COLORS.theme.accent };
 		// Windows high contrast mode.
