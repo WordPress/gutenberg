@@ -49,7 +49,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 	};
 
 	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
-	const timerId = useRef();
+	const timerIdRef = useRef();
 
 	useEffect( () => {
 		focusOnMountRef.current = focusOnMount;
@@ -65,7 +65,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		}
 
 		if ( focusOnMountRef.current === 'firstElement' ) {
-			timerId.current = setTimeout( () => {
+			timerIdRef.current = setTimeout( () => {
 				const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 				if ( firstTabbable ) {
@@ -79,8 +79,8 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		setFocus( node );
 
 		return () => {
-			if ( timerId.current ) {
-				clearTimeout( timerId.current );
+			if ( timerIdRef.current ) {
+				clearTimeout( timerIdRef.current );
 			}
 		};
 	}, [] );

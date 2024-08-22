@@ -60,46 +60,48 @@ export function useRichText( {
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
-	const _value = useRef( value );
-	const record = useRef();
+	const _valueRef = useRef( value );
+	const recordRef = useRef();
 
 	function setRecordFromProps() {
-		_value.current = value;
-		record.current = value;
+		_valueRef.current = value;
+		recordRef.current = value;
 		if ( ! ( value instanceof RichTextData ) ) {
-			record.current = value
+			recordRef.current = value
 				? RichTextData.fromHTMLString( value, { preserveWhiteSpace } )
 				: RichTextData.empty();
 		}
 		// To do: make rich text internally work with RichTextData.
-		record.current = {
-			text: record.current.text,
-			formats: record.current.formats,
-			replacements: record.current.replacements,
+		recordRef.current = {
+			text: recordRef.current.text,
+			formats: recordRef.current.formats,
+			replacements: recordRef.current.replacements,
 		};
 		if ( disableFormats ) {
-			record.current.formats = Array( value.length );
-			record.current.replacements = Array( value.length );
+			recordRef.current.formats = Array( value.length );
+			recordRef.current.replacements = Array( value.length );
 		}
 		if ( __unstableAfterParse ) {
-			record.current.formats = __unstableAfterParse( record.current );
+			recordRef.current.formats = __unstableAfterParse(
+				recordRef.current
+			);
 		}
-		record.current.start = selectionStart;
-		record.current.end = selectionEnd;
+		recordRef.current.start = selectionStart;
+		recordRef.current.end = selectionEnd;
 	}
 
-	const hadSelectionUpdate = useRef( false );
+	const hadSelectionUpdateRef = useRef( false );
 
-	if ( ! record.current ) {
-		hadSelectionUpdate.current = isSelected;
+	if ( ! recordRef.current ) {
+		hadSelectionUpdateRef.current = isSelected;
 		setRecordFromProps();
 	} else if (
-		selectionStart !== record.current.start ||
-		selectionEnd !== record.current.end
+		selectionStart !== recordRef.current.start ||
+		selectionEnd !== recordRef.current.end
 	) {
-		hadSelectionUpdate.current = isSelected;
-		record.current = {
-			...record.current,
+		hadSelectionUpdateRef.current = isSelected;
+		recordRef.current = {
+			...recordRef.current,
 			start: selectionStart,
 			end: selectionEnd,
 			activeFormats: undefined,
@@ -113,34 +115,34 @@ export function useRichText( {
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
 	function handleChange( newRecord ) {
-		record.current = newRecord;
+		recordRef.current = newRecord;
 		applyRecord( newRecord );
 
 		if ( disableFormats ) {
-			_value.current = newRecord.text;
+			_valueRef.current = newRecord.text;
 		} else {
 			const newFormats = __unstableBeforeSerialize
 				? __unstableBeforeSerialize( newRecord )
 				: newRecord.formats;
 			newRecord = { ...newRecord, formats: newFormats };
 			if ( typeof value === 'string' ) {
-				_value.current = toHTMLString( {
+				_valueRef.current = toHTMLString( {
 					value: newRecord,
 					preserveWhiteSpace,
 				} );
 			} else {
-				_value.current = new RichTextData( newRecord );
+				_valueRef.current = new RichTextData( newRecord );
 			}
 		}
 
-		const { start, end, formats, text } = record.current;
+		const { start, end, formats, text } = recordRef.current;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
 		// We batch both calls to only attempt to rerender once.
 		registry.batch( () => {
 			onSelectionChange( start, end );
-			onChange( _value.current, {
+			onChange( _valueRef.current, {
 				__unstableFormats: formats,
 				__unstableText: text,
 			} );
@@ -150,14 +152,14 @@ export function useRichText( {
 
 	function applyFromProps() {
 		setRecordFromProps();
-		applyRecord( record.current );
+		applyRecord( recordRef.current );
 	}
 
-	const didMount = useRef( false );
+	const didMountRef = useRef( false );
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( didMount.current && value !== _value.current ) {
+		if ( didMountRef.current && value !== _valueRef.current ) {
 			applyFromProps();
 			forceRender();
 		}
@@ -165,7 +167,7 @@ export function useRichText( {
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdate.current ) {
+		if ( ! hadSelectionUpdateRef.current ) {
 			return;
 		}
 
@@ -173,16 +175,16 @@ export function useRichText( {
 			ref.current.focus();
 		}
 
-		applyRecord( record.current );
-		hadSelectionUpdate.current = false;
-	}, [ hadSelectionUpdate.current ] );
+		applyRecord( recordRef.current );
+		hadSelectionUpdateRef.current = false;
+	}, [ hadSelectionUpdateRef.current ] );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
-		useBoundaryStyle( { record } ),
+		useBoundaryStyle( { record: recordRef } ),
 		useEventListeners( {
-			record,
+			record: recordRef,
 			handleChange,
 			applyRecord,
 			createRecord,
@@ -192,18 +194,18 @@ export function useRichText( {
 		} ),
 		useRefEffect( () => {
 			applyFromProps();
-			didMount.current = true;
+			didMountRef.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
 
 	return {
-		value: record.current,
+		value: recordRef.current,
 		// A function to get the most recent value so event handlers in
 		// useRichText implementations have access to it. For example when
 		// listening to input events, we internally update the state, but this
 		// state is not yet available to the input event handler because React
 		// may re-render asynchronously.
-		getValue: () => record.current,
+		getValue: () => recordRef.current,
 		onChange: handleChange,
 		ref: mergedRefs,
 	};

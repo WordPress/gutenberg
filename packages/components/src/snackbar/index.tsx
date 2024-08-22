@@ -96,17 +96,17 @@ function UnforwardedSnackbar(
 
 	// The `onDismiss/onRemove` can have unstable references,
 	// trigger side-effect cleanup, and reset timers.
-	const callbackRefs = useRef( { onDismiss, onRemove } );
+	const callbacksRef = useRef( { onDismiss, onRemove } );
 	useLayoutEffect( () => {
-		callbackRefs.current = { onDismiss, onRemove };
+		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
 	useEffect( () => {
 		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				callbackRefs.current.onDismiss?.();
-				callbackRefs.current.onRemove?.();
+				callbacksRef.current.onDismiss?.();
+				callbacksRef.current.onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
