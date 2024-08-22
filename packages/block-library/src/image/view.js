@@ -445,11 +445,21 @@ const { state, actions, callbacks } = store(
 			},
 			setScreenReaderText() {
 				const { ref } = getElement();
-				ref.textContent = state.overlayEnabled
-					? `Image ${ state.currentImageIndex + 1 } of ${
-							state.images.length
-					  }`
-					: '';
+				if ( ! state.overlayEnabled ) {
+					ref.textContent = '';
+				} else if ( state.images.length === 1 ) {
+					ref.textContent = state.currentImage.alt
+						? `Enlarged image: ${ state.currentImage.alt }`
+						: 'Enlarged image';
+				} else {
+					ref.textContent = state.currentImage.alt
+						? `Enlarged image ${ state.currentImageIndex + 1 } of ${
+								state.images.length
+						  }: ${ state.currentImage.alt }`
+						: `Enlarged image ${ state.currentImageIndex + 1 } of ${
+								state.images.length
+						  }`;
+				}
 			},
 			setButtonStyles() {
 				const { imageId } = getContext();
