@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.6.0 (2024-08-21)
+
 ### Deprecations
 
 -   Deprecate bottom margin on the following `BaseControl`-based components. Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version ([#64408](https://github.com/WordPress/gutenberg/pull/64408)).
@@ -61,6 +63,8 @@
 -   `Popover`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 -   `Snackbar`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
 -   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
+-   `CircularOptionPicker`: Update hard-coded border-width value ([#64680](https://github.com/WordPress/gutenberg/pull/64680)).
+-   `CustomGradientPicker`: Update hard-coded border-width value ([#64680](https://github.com/WordPress/gutenberg/pull/64680)).
 
 ### Bug Fixes
 

@@ -112,7 +112,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		&.is-pressed {
 			> svg {
 				background: $white;
-				border: 1px solid $gray-600;
+				border: $border-width solid $gray-600;
 				border-radius: 2px;
 			}
 		}
