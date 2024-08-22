@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
+// @ts-ignore
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 
 /**

@@ -3,6 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+// @ts-ignore
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**

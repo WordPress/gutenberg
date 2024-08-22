@@ -4,6 +4,7 @@
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+// @ts-ignore
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**

@@ -7,7 +7,7 @@ export interface Language {
 	installed: boolean;
 }
 
-export interface PreferredLanguagesConfig {
+export interface LanguageChooserConfig {
 	currentLocale: Locale;
 	preferredLanguages: Language[];
 	allLanguages: Language[];

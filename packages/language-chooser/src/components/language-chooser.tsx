@@ -8,6 +8,7 @@ import { Notice } from '@wordpress/components';
 import {
 	ShortcutProvider,
 	store as keyboardShortcutsStore,
+	// @ts-ignore
 } from '@wordpress/keyboard-shortcuts';
 
 /**
