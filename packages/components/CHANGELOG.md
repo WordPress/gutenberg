@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+
 ## 28.6.0 (2024-08-21)
 
 ### Deprecations
