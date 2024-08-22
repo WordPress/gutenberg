@@ -8,7 +8,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import type { Language } from '../types';
+import type { Language } from './types';
 import InactiveControls from './inactive-controls';
 import InactiveLocalesSelect from './inactive-locales-select';
 

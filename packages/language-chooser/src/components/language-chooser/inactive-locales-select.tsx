@@ -7,7 +7,7 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { Language, Locale } from '../types';
+import type { Language, Locale } from './types';
 
 interface InactiveLocalesSelectProps {
 	installedLanguages: Language[];

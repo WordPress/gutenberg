@@ -6,10 +6,8 @@ import { createRoot, StrictMode } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { LanguageChooserConfig } from './types';
+import type { LanguageChooserConfig } from './components/language-chooser/types';
 import LanguageChooser from './components/language-chooser';
-
-export type * from './types';
 
 /**
  * Initializes the site editor screen.

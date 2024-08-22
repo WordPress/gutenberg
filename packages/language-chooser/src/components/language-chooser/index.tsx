@@ -16,7 +16,7 @@ import {
  */
 import ActiveLocales from './active-locales';
 import InactiveLocales from './inactive-locales';
-import type { Language } from '../types';
+import type { Language } from './types';
 
 function MissingTranslationsNotice() {
 	return (

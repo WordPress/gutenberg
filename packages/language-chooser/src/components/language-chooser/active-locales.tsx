@@ -11,7 +11,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { reorder } from '../utils';
-import type { Language } from '../types';
+import type { Language } from './types';
 import ActiveControls from './active-controls';
 
 interface ActiveLocalesProps {

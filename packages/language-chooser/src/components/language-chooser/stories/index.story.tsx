@@ -6,8 +6,8 @@ import type { Meta } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import LanguageChooser from '../language-chooser';
-import type { Language } from '../../types';
+import LanguageChooser from '../';
+import type { Language } from '../types';
 
 const meta: Meta< typeof LanguageChooser > = {
 	title: 'Components/Language Chooser',

@@ -16,7 +16,7 @@ import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import InactiveLocales from '../inactive-locales';
-import type { Language } from '../../types';
+import type { Language } from '.././types';
 
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),

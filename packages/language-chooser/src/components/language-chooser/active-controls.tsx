@@ -9,7 +9,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
 /**
  * Internal dependencies
  */
-import type { Language } from '../types';
+import type { Language } from './types';
 
 interface ActiveControlsProps {
 	languages: Language[];

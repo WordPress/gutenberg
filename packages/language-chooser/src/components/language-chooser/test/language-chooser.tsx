@@ -19,7 +19,7 @@ import { BACKSPACE, DOWN, END, HOME, UP } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import type { Language } from '../../types';
+import type { Language } from '.././types';
 import LanguageChooser from '../language-chooser';
 
 /* eslint-disable camelcase */
