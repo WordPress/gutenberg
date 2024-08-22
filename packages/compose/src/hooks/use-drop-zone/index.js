@@ -86,6 +86,7 @@ export default function useDropZone( {
 			 */
 			function isElementInZone( targetToCheck ) {
 				const { defaultView } = ownerDocument;
+
 				if (
 					! targetToCheck ||
 					! defaultView ||
@@ -108,18 +109,18 @@ export default function useDropZone( {
 			}
 
 			/**
-			 * Checks if the given element is a zoom out separator.
+			 * Checks if the given element is an insertion point.
 			 *
 			 * @param {EventTarget|null} targetToCheck - The element to check.
-			 * @return {boolean} True if the element is a zoom out separator, false otherwise.
+			 * @return {boolean} True if the element is a insertion point, false otherwise.
 			 */
-			function isZoomOutSeparator( targetToCheck ) {
+			function isInsertionPoint( targetToCheck ) {
 				const { defaultView } = ownerDocument;
 
 				return !! (
 					defaultView &&
 					targetToCheck instanceof defaultView.HTMLElement &&
-					targetToCheck.dataset.isZoomOutSeparator
+					targetToCheck.dataset.isInsertionPoint
 				);
 			}
 
@@ -186,13 +187,13 @@ export default function useDropZone( {
 					return;
 				}
 
-				// If we're moving in/out of a ZoomOutSeparator, don't trigger
+				// If we're moving in/out of an insertion point then don't trigger
 				// the onDragLeave event. This is to prevent the dropzone from
 				// being hidden when the user is dragging a block in/over/around
-				// a block and the separator.
+				// a block and a nearby insertion point.
 				if (
-					isZoomOutSeparator( event.relatedTarget ) ||
-					isZoomOutSeparator( event.target )
+					isInsertionPoint( event.relatedTarget ) ||
+					isInsertionPoint( event.target )
 				) {
 					return;
 				}
