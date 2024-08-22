@@ -1,11 +1,3 @@
-/**
- * Internal dependencies
- */
-import { isPlainObject } from '../utils';
-
-// Assigned objects should be ignored during proxification.
-const contextAssignedObjects = new WeakMap();
-
 // Store the context proxy and fallback for each object in the context.
 const contextObjectToProxy = new WeakMap();
 const contextProxyToObject = new WeakMap();
@@ -24,20 +16,6 @@ const contextHandlers: ProxyHandler< object > = {
 			return fallback[ k ];
 		}
 
-		// Proxify plain objects that were not directly assigned.
-		if (
-			k in target &&
-			! contextAssignedObjects.get( target )?.has( k ) &&
-			isPlainObject( currentProp )
-		) {
-			return proxifyContext( currentProp );
-		}
-
-		// Return the stored proxy for `currentProp` when it exists.
-		if ( contextObjectToProxy.has( currentProp ) ) {
-			return contextObjectToProxy.get( currentProp );
-		}
-
 		/*
 		 * For other cases, return the value from target, also
 		 * subscribing to changes in the parent context when the current
@@ -48,29 +26,7 @@ const contextHandlers: ProxyHandler< object > = {
 	set: ( target, k, value ) => {
 		const fallback = contextObjectToFallback.get( target );
 		const obj = k in target || ! ( k in fallback ) ? target : fallback;
-
-		/*
-		 * Assigned object values should not be proxified so they point
-		 * to the original object and don't inherit unexpected
-		 * properties.
-		 */
-		if ( value && typeof value === 'object' ) {
-			if ( ! contextAssignedObjects.has( obj ) ) {
-				contextAssignedObjects.set( obj, new Set() );
-			}
-			contextAssignedObjects.get( obj ).add( k );
-		}
-
-		/*
-		 * When the value is a proxy, it's because it comes from the
-		 * context, so the inner value is assigned instead.
-		 */
-		if ( contextProxyToObject.has( value ) ) {
-			const innerValue = contextProxyToObject.get( value );
-			obj[ k ] = innerValue;
-		} else {
-			obj[ k ] = value;
-		}
+		obj[ k ] = value;
 
 		return true;
 	},
