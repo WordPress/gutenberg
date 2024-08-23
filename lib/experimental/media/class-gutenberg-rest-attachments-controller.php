@@ -90,7 +90,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if (
 			rest_is_field_included( 'missing_image_sizes', $fields ) &&
-			! isset( $data['missing_image_sizes'] )
+			empty( $data['missing_image_sizes'] )
 		) {
 			$mime_type = get_post_mime_type( $item );
 
