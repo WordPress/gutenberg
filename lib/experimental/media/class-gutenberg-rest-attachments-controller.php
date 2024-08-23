@@ -183,29 +183,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if the request has access to update the item, WP_Error object otherwise.
 	 */
 	public function sideload_item_permissions_check( $request ) {
-		$post = $this->get_post( $request['id'] );
-
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
-		if ( ! $this->check_update_permission( $post ) ) {
-			return new WP_Error(
-				'rest_cannot_edit',
-				__( 'Sorry, you are not allowed to edit this post.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		if ( ! current_user_can( 'upload_files' ) ) {
-			return new WP_Error(
-				'rest_cannot_create',
-				__( 'Sorry, you are not allowed to upload media on this site.', 'gutenberg' ),
-				array( 'status' => 400 )
-			);
-		}
-
-		return true;
+		return $this->edit_media_item_permissions_check( $request );
 	}
 
 	/**
