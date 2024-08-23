@@ -137,7 +137,7 @@ export default function ZoomOutToolbar( {
 					label={ __( 'Edit' ) }
 					onClick={ () => {
 						__unstableSetEditorMode( 'edit' );
-						__unstableContentRef.current.focus();
+						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }
