@@ -254,11 +254,12 @@ export default function TemplatePartEdit( {
 							</ToolbarButton>
 						</BlockControls>
 					) }
-				{ isEntityAvailable && canUserEdit && (
+				{ canUserEdit && (
 					<InspectorControls group="advanced">
 						<TemplatePartAdvancedControls
 							tagName={ tagName }
 							setAttributes={ setAttributes }
+							isEntityAvailable={ isEntityAvailable }
 							templatePartId={ templatePartId }
 							defaultWrapper={ areaObject.tagName }
 							hasInnerBlocks={ hasInnerBlocks }
