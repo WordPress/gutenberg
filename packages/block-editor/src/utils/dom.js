@@ -112,16 +112,11 @@ function isElementVisible( element ) {
 		return false;
 	}
 
-	const style = viewport.getComputedStyle( element );
-	if (
-		style.display === 'none' ||
-		style.visibility === 'hidden' ||
-		style.opacity === '0'
-	) {
-		return false;
-	}
-
-	return true;
+	return element.checkVisibility( {
+		opacityProperty: true,
+		contentVisibilityAuto: true,
+		visibilityProperty: true,
+	} );
 }
 
 /**
