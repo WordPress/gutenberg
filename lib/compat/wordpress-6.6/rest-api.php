@@ -161,7 +161,7 @@ add_action( 'rest_api_init', 'gutenberg_register_wp_rest_themes_template_directo
 if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 	function update_comment_meta_from_rest_request( $response, $comment, $request ) {
 		if ( isset( $request['meta'] ) && is_array( $request['meta'] ) ) {
-			foreach ( $request['meta'] as $key => $value ) {
+			foreach ( $request['meta'] as $key => $value ) { //phpcs:ignore
 				update_comment_meta( $comment->comment_ID, 'block_comment', $value );
 			}
 		}
