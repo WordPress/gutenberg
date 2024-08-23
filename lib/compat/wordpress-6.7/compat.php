@@ -27,11 +27,15 @@ function _gutenberg_add_block_templates_from_registry( $query_result, $query, $t
 	foreach ( $query_result as $key => $value ) {
 		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $query_result[ $key ]->slug );
 		if ( $registered_template ) {
-			$query_result[ $key ]->plugin = $registered_template->plugin;
-			$query_result[ $key ]->origin =
+			$query_result[ $key ]->plugin      = $registered_template->plugin;
+			$query_result[ $key ]->origin      =
 				'theme' !== $query_result[ $key ]->origin && 'theme' !== $query_result[ $key ]->source ?
 				'plugin' :
 				$query_result[ $key ]->origin;
+			$query_result[ $key ]->title       =
+				empty( $query_result[ $key ]->title ) || $query_result[ $key ]->title === $query_result[ $key ]->slug ?
+				$registered_template->title : $query_result[ $key ]->title;
+			$query_result[ $key ]->description = empty( $query_result[ $key ]->description ) ? $registered_template->description : $query_result[ $key ]->description;
 		}
 	}
 
@@ -70,11 +74,13 @@ function _gutenberg_add_block_template_plugin_attribute( $block_template ) {
 	if ( $block_template ) {
 		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
 		if ( $registered_template ) {
-			$block_template->plugin = $registered_template->plugin;
-			$block_template->origin =
+			$block_template->plugin      = $registered_template->plugin;
+			$block_template->origin      =
 				'theme' !== $block_template->origin && 'theme' !== $block_template->source ?
 				'plugin' :
 				$block_template->origin;
+			$block_template->title       = empty( $block_template->title ) || $block_template->title === $block_template->slug ? $registered_template->title : $block_template->title;
+			$block_template->description = empty( $block_template->description ) ? $registered_template->description : $block_template->description;
 		}
 	}
 

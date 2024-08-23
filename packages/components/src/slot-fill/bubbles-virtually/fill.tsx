@@ -12,17 +12,17 @@ import type { FillComponentProps } from '../types';
 
 function useForceUpdate() {
 	const [ , setState ] = useState( {} );
-	const mounted = useRef( true );
+	const mountedRef = useRef( true );
 
 	useEffect( () => {
-		mounted.current = true;
+		mountedRef.current = true;
 		return () => {
-			mounted.current = false;
+			mountedRef.current = false;
 		};
 	}, [] );
 
 	return () => {
-		if ( mounted.current ) {
+		if ( mountedRef.current ) {
 			setState( {} );
 		}
 	};

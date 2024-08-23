@@ -77,7 +77,7 @@ $block-editor-link-control-number-of-actions: 1;
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
 		display: block;
-		border: 1px solid $gray-600;
+		border: $border-width solid $gray-600;
 		border-radius: $radius-block-ui;
 		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
 		margin: 0;

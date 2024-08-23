@@ -59,10 +59,10 @@ export function SocialLinksEdit( props ) {
 
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
-	const backgroundBackup = useRef( {} );
+	const backgroundBackupRef = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
-			backgroundBackup.current = {
+			backgroundBackupRef.current = {
 				iconBackgroundColor,
 				iconBackgroundColorValue,
 				customIconBackgroundColor,
@@ -73,7 +73,7 @@ export function SocialLinksEdit( props ) {
 				iconBackgroundColorValue: undefined,
 			} );
 		} else {
-			setAttributes( { ...backgroundBackup.current } );
+			setAttributes( { ...backgroundBackupRef.current } );
 		}
 	}, [ logosOnly ] );
 

@@ -48,7 +48,7 @@
 
 	.dataviews-filters__summary-chip {
 		border-radius: $grid-unit-20;
-		border: 1px solid transparent;
+		border: $border-width solid transparent;
 		cursor: pointer;
 		padding: $grid-unit-05 $grid-unit-15;
 		min-height: $grid-unit-40;
