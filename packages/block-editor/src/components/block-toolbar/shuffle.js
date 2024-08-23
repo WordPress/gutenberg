@@ -34,6 +34,10 @@ export default function Shuffle( { clientId, as = Container } ) {
 			const _categories = attributes?.metadata?.categories || EMPTY_ARRAY;
 			const _patternName = attributes?.metadata?.patternName;
 			const rootBlock = getBlockRootClientId( clientId );
+
+			// Calling `__experimentalGetAllowedPatterns` is expensive.
+			// Checking if the block can be shuffled prevents unnecessary selector calls.
+			// See: https://github.com/WordPress/gutenberg/pull/64736.
 			const _patterns =
 				_categories.length > 0
 					? __experimentalGetAllowedPatterns( rootBlock )
