@@ -45,6 +45,7 @@ function ActiveControls( {
 						disabled={ isMoveUpDisabled }
 						accessibleWhenDisabled
 						onClick={ onMoveUp }
+						__next40pxDefaultSize
 					>
 						{ __( 'Move Up' ) }
 					</Button>
@@ -67,6 +68,7 @@ function ActiveControls( {
 						disabled={ isMoveDownDisabled }
 						accessibleWhenDisabled
 						onClick={ onMoveDown }
+						__next40pxDefaultSize
 					>
 						{ __( 'Move Down' ) }
 					</Button>
@@ -89,6 +91,7 @@ function ActiveControls( {
 						disabled={ isRemoveDisabled }
 						accessibleWhenDisabled
 						onClick={ onRemove }
+						__next40pxDefaultSize
 					>
 						{ __( 'Remove' ) }
 					</Button>

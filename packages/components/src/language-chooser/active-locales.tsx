@@ -23,6 +23,7 @@ interface ActiveLocalesProps {
 	isMoveUpDisabled: boolean;
 	isMoveDownDisabled: boolean;
 	isRemoveDisabled: boolean;
+	labelId: string;
 }
 
 export function ActiveLocales( {
@@ -37,6 +38,7 @@ export function ActiveLocales( {
 	isMoveUpDisabled,
 	isMoveDownDisabled,
 	isRemoveDisabled,
+	labelId,
 }: ActiveLocalesProps ) {
 	const listRef = useRef< HTMLUListElement | null >( null );
 
@@ -58,7 +60,7 @@ export function ActiveLocales( {
 	const activeDescendant = isEmpty ? '' : selectedLanguage?.locale;
 
 	const className = isEmpty
-		? 'components-language-chooser__active-locales-list empty-list'
+		? 'components-language-chooser__active-locales-list components-language-chooser__active-locales-list--empty'
 		: 'components-language-chooser__active-locales-list';
 
 	let emptyMessage = sprintf(
@@ -74,7 +76,7 @@ export function ActiveLocales( {
 	return (
 		<div className="components-language-chooser__active-locales wp-clearfix">
 			{ isEmpty && (
-				<div className="active-locales-empty-message">
+				<div className="components-language-chooser__active-locales-empty-message">
 					{ __( 'Nothing set.' ) }
 					<br />
 					{ emptyMessage }
@@ -82,7 +84,7 @@ export function ActiveLocales( {
 			) }
 			<ul
 				role="listbox"
-				aria-labelledby="language-chooser-label"
+				aria-labelledby={ labelId }
 				tabIndex={ 0 }
 				aria-activedescendant={ activeDescendant }
 				className={ className }
@@ -100,7 +102,7 @@ export function ActiveLocales( {
 							}
 							id={ locale }
 							lang={ lang }
-							className="active-locale"
+							className="components-language-chooser__active-locale"
 							onClick={ () => setSelectedLanguage( language ) }
 						>
 							{ nativeName }

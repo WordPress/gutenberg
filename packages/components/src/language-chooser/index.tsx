@@ -18,6 +18,7 @@ import ActiveLocales from './active-locales';
 import InactiveLocales from './inactive-locales';
 import type { Language } from './types';
 import { reorder } from './utils';
+import { useInstanceId } from '@wordpress/compose';
 
 function MissingTranslationsNotice() {
 	return (
@@ -283,11 +284,16 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		}
 	};
 
+	const instanceId = useInstanceId(
+		LanguageChooser,
+		'components-language-chooser'
+	);
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div className="components-language-chooser" onKeyDown={ onKeyDown }>
 			<HiddenFormField preferredLanguages={ languages } />
-			<p>
+			<p id={ instanceId }>
 				{ __(
 					'Choose languages for displaying WordPress in, in order of preference.'
 				) }
@@ -305,6 +311,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 				isMoveUpDisabled={ isMoveUpDisabled }
 				isMoveDownDisabled={ isMoveDownDisabled }
 				isRemoveDisabled={ isRemoveDisabled }
+				labelId={ instanceId }
 			/>
 			<InactiveLocales
 				languages={ inactiveLocales }

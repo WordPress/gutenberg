@@ -30,6 +30,7 @@ function InactiveControls( { disabled, onAdd }: InactiveControlsProps ) {
 				disabled={ disabled }
 				accessibleWhenDisabled
 				onClick={ onAdd }
+				__next40pxDefaultSize
 			>
 				{ _x( 'Add', 'language' ) }
 			</Button>
