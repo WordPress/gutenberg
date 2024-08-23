@@ -9,9 +9,9 @@ In order to use them, we must leverage the [@wordpress/plugins](/packages/plugin
 
 In order to access the SlotFills, we need to do four things:
 
-1. Import the `registerPlugin` method from `wp.plugins`.
-2. Import the SlotFill we want from `wp.editor`.
-3. Define a method to render our changes. Our changes/additions will be wrapped in the SlotFill component we imported.
+1. Import the `registerPlugin` method from the `@wordpress/plugins` package.
+2. Import the SlotFill we want from the `@wordpress/editor'` package.
+3. Define a component to render our changes. Our changes/additions will be wrapped in the SlotFill component we imported.
 4. Register the plugin.
 
 Here is an example using the `PluginPostStatusInfo` slotFill:
@@ -70,8 +70,7 @@ export default function PostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved } =
-			select( editorStore );
+		const { isEditorPanelRemoved } = select( editorStore );
 		return {
 			isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
 		};

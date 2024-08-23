@@ -254,7 +254,7 @@ function ButtonEdit( props ) {
 					} ),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ context, isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
