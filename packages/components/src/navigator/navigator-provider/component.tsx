@@ -39,7 +39,7 @@ type RouterAction =
 type RouterState = {
 	initialPath: string;
 	screens: Screen[];
-	currentLocation?: NavigatorLocation;
+	currentLocation: NavigatorLocation;
 	matchedPath: MatchedPath;
 	focusSelectors: Map< string, string >;
 };
@@ -165,6 +165,10 @@ function routerReducer(
 			break;
 	}
 
+	if ( currentLocation?.path === state.initialPath ) {
+		currentLocation = { ...currentLocation, isInitial: true };
+	}
+
 	// Return early in case there is no change
 	if (
 		screens === state.screens &&
@@ -248,19 +252,16 @@ function UnconnectedNavigatorProvider(
 		[]
 	);
 
-	const { currentLocation, matchedPath, initialPath } = routerState;
+	const { currentLocation, matchedPath } = routerState;
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
-			location: {
-				...currentLocation,
-				isInitial: currentLocation?.path === initialPath,
-			},
+			location: currentLocation,
 			params: matchedPath?.params ?? {},
 			match: matchedPath?.id,
 			...methods,
 		} ),
-		[ currentLocation, matchedPath, methods, initialPath ]
+		[ currentLocation, matchedPath, methods ]
 	);
 
 	const cx = useCx();
