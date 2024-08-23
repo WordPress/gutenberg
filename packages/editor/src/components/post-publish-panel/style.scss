@@ -54,6 +54,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	word-break: break-word;
 }
 
 .editor-post-publish-panel__header-publish-button,
