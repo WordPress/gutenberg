@@ -87,12 +87,18 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $item, $request ): WP_REST_Response {
-		$fields   = $this->get_fields_for_response( $request );
 		$response = parent::prepare_item_for_response( $item, $request );
 
 		$data = $response->get_data();
 
-		if ( rest_is_field_included( 'missing_image_sizes', $fields ) ) {
+		// Handle missing image sizes for PDFs.
+
+		$fields = $this->get_fields_for_response( $request );
+
+		if (
+			rest_is_field_included( 'missing_image_sizes', $fields ) &&
+			! isset( $data['missing_image_sizes'] )
+		) {
 			$mime_type = get_post_mime_type( $item );
 
 			if ( 'application/pdf' === $mime_type ) {
