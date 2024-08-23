@@ -219,7 +219,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 */
 
 		$attachment_filename = get_attached_file( $attachment_id, true );
-		$attachment_filename = $attachment_filename ? basename( $attachment_filename ) : null;
+		$attachment_filename = $attachment_filename ? wp_basename( $attachment_filename ) : null;
 
 		/**
 		 * Filters the result when generating a unique file name.
@@ -295,7 +295,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		if ( 'original' === $image_size ) {
-			$metadata['original_image'] = basename( $path );
+			$metadata['original_image'] = wp_basename( $path );
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 
@@ -304,7 +304,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$metadata['sizes'][ $image_size ] = array(
 				'width'     => $size ? $size[0] : 0,
 				'height'    => $size ? $size[1] : 0,
-				'file'      => basename( $path ),
+				'file'      => wp_basename( $path ),
 				'mime-type' => $type,
 				'filesize'  => wp_filesize( $path ),
 			);
