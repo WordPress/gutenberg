@@ -195,10 +195,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function sideload_item( WP_REST_Request $request ) {
 		$attachment_id = $request['id'];
 
+		$post = $this->get_post( $attachment_id );
+
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
 		if (
-			'attachment' !== get_post_type( $attachment_id ) ||
-			! wp_attachment_is_image( $attachment_id ) ||
-			! wp_attachment_is( 'pdf', $attachment_id )
+			! wp_attachment_is_image( $post ) ||
+			! wp_attachment_is( 'pdf', $post )
 		) {
 			return new WP_Error(
 				'rest_invalid_param',
