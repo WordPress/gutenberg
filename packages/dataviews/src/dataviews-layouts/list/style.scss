@@ -73,6 +73,7 @@
 				color: $gray-900;
 			}
 			&:hover,
+			&.is-hovered,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
 				background-color: #f8f8f8;
@@ -100,6 +101,7 @@
 	}
 
 	.dataviews-view-list__item {
+		box-sizing: border-box;
 		padding: $grid-unit-20 $grid-unit-30;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;

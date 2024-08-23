@@ -15,7 +15,6 @@ import { pasteHandler } from '@wordpress/blocks';
 import {
 	__unstableUseRichText as useRichText,
 	create,
-	toHTMLString,
 	insert,
 } from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
@@ -50,9 +49,35 @@ function PostTitle( _, forwardedRef ) {
 	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
 		useDispatch( blockEditorStore );
 
-	function onChange( value ) {
-		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
-	}
+	const decodedPlaceholder =
+		decodeEntities( placeholder ) || __( 'Add title' );
+
+	const {
+		value,
+		onChange,
+		ref: richTextRef,
+	} = useRichText( {
+		value: title,
+		onChange( newValue ) {
+			onUpdate( newValue.replace( REGEXP_NEWLINES, ' ' ) );
+		},
+		placeholder: decodedPlaceholder,
+		selectionStart: selection.start,
+		selectionEnd: selection.end,
+		onSelectionChange( newStart, newEnd ) {
+			setSelection( ( sel ) => {
+				const { start, end } = sel;
+				if ( start === newStart && end === newEnd ) {
+					return sel;
+				}
+				return {
+					start: newStart,
+					end: newEnd,
+				};
+			} );
+		},
+		__unstableDisableFormats: false,
+	} );
 
 	function onInsertBlockAfter( blocks ) {
 		insertBlocks( blocks, 0 );
@@ -130,48 +155,13 @@ function PostTitle( _, forwardedRef ) {
 				onInsertBlockAfter( content );
 			}
 		} else {
-			const value = {
-				...create( { html: title } ),
-				...selection,
-			};
-
 			// Strip HTML to avoid unwanted HTML being added to the title.
 			// In the majority of cases it is assumed that HTML in the title
 			// is undesirable.
 			const contentNoHTML = stripHTML( content );
-
-			const newValue = insert( value, create( { html: contentNoHTML } ) );
-			onUpdate( toHTMLString( { value: newValue } ) );
-			setSelection( {
-				start: newValue.start,
-				end: newValue.end,
-			} );
+			onChange( insert( value, create( { html: contentNoHTML } ) ) );
 		}
 	}
-
-	const decodedPlaceholder =
-		decodeEntities( placeholder ) || __( 'Add title' );
-
-	const { ref: richTextRef } = useRichText( {
-		value: title,
-		onChange,
-		placeholder: decodedPlaceholder,
-		selectionStart: selection.start,
-		selectionEnd: selection.end,
-		onSelectionChange( newStart, newEnd ) {
-			setSelection( ( sel ) => {
-				const { start, end } = sel;
-				if ( start === newStart && end === newEnd ) {
-					return sel;
-				}
-				return {
-					start: newStart,
-					end: newEnd,
-				};
-			} );
-		},
-		__unstableDisableFormats: false,
-	} );
 
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
