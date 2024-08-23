@@ -19,7 +19,7 @@ export function useZoomOutModeExit( clientId ) {
 	const { isZoomOutMode, isBlockSelected } = unlock(
 		useSelect( blockEditorStore )
 	);
-	const { setZoomOutMode, selectBlock } = unlock(
+	const { __unstableSetEditorMode, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -32,7 +32,7 @@ export function useZoomOutModeExit( clientId ) {
 					// Prevent focus from moving to the block.
 					event.preventDefault();
 
-					setZoomOutMode( false );
+					__unstableSetEditorMode( 'edit' );
 					selectBlock( clientId );
 				}
 			}
@@ -43,6 +43,6 @@ export function useZoomOutModeExit( clientId ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ clientId, isZoomOutMode, isBlockSelected, setZoomOutMode ]
+		[ clientId, isZoomOutMode, isBlockSelected, __unstableSetEditorMode ]
 	);
 }
