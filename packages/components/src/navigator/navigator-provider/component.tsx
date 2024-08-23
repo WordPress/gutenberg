@@ -82,17 +82,23 @@ function goTo(
 		return { currentLocation, focusSelectors };
 	}
 
-	const focusSelectorsCopy = new Map( state.focusSelectors );
+	let focusSelectorsCopy;
 
 	// Set a focus selector that will be used when navigating
 	// back to the current location.
 	if ( focusTargetSelector && currentLocation?.path ) {
+		if ( ! focusSelectorsCopy ) {
+			focusSelectorsCopy = new Map( state.focusSelectors );
+		}
 		focusSelectorsCopy.set( currentLocation.path, focusTargetSelector );
 	}
 
 	// Get the focus selector for the new location.
 	let currentFocusSelector;
 	if ( isBack ) {
+		if ( ! focusSelectorsCopy ) {
+			focusSelectorsCopy = new Map( state.focusSelectors );
+		}
 		currentFocusSelector = focusSelectorsCopy.get( path );
 		focusSelectorsCopy.delete( path );
 	}
@@ -106,7 +112,7 @@ function goTo(
 			focusTargetSelector: currentFocusSelector,
 			skipFocus,
 		},
-		focusSelectors: focusSelectorsCopy,
+		focusSelectors: focusSelectorsCopy ?? focusSelectors,
 	};
 }
 
