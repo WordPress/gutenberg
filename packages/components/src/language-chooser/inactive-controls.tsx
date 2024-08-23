@@ -12,7 +12,7 @@ interface InactiveControlsProps {
 
 function InactiveControls( { disabled, onAdd }: InactiveControlsProps ) {
 	return (
-		<div className="inactive-locales-controls">
+		<div className="components-language-chooser__inactive-locales-controls">
 			<Button
 				variant="secondary"
 				showTooltip

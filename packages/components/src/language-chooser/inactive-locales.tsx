@@ -31,8 +31,8 @@ function InactiveLocales( {
 	};
 
 	return (
-		<div className="inactive-locales wp-clearfix">
-			<div className="inactive-locales-list">
+		<div className="components-language-chooser__inactive-locales wp-clearfix">
+			<div className="components-language-chooser__inactive-locales-list">
 				<InactiveLocalesSelect
 					installedLanguages={ installedLanguages }
 					availableLanguages={ availableLanguages }

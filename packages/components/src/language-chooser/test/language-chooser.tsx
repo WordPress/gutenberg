@@ -13,7 +13,6 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
-import { BACKSPACE, DOWN, END, HOME, UP } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -75,42 +74,42 @@ window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
 function moveUp() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'ArrowUp',
-		keyCode: UP,
+		code: 'ArrowUp',
 	} );
 }
 
 function moveDown() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'ArrowDown',
-		keyCode: DOWN,
+		code: 'ArrowDown',
 	} );
 }
 
 function selectFirst() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'Home',
-		keyCode: HOME,
+		code: 'Home',
 	} );
 }
 
 function selectLast() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'End',
-		keyCode: END,
+		code: 'End',
 	} );
 }
 
 function removeLocale() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'Backspace',
-		keyCode: BACKSPACE,
+		code: 'Backspace',
 	} );
 }
 
 function addLocale() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
-		key: 'A',
-		keyCode: 65,
+		key: 'a',
+		code: 'KeyA',
 		altKey: true,
 	} );
 }
@@ -249,6 +248,8 @@ describe( 'LanguageChooser', () => {
 
 		listbox.focus();
 
+		// Move de_DE all the way to the bottom, after fr_FR and it_IT.
+
 		moveDown();
 		moveDown();
 
@@ -291,7 +292,8 @@ describe( 'LanguageChooser', () => {
 			screen.getByRole( 'button', { name: /Move down/ } )
 		).toHaveAttribute( 'aria-disabled', 'true' );
 
-		moveUp();
+		// Move de_DE to top again.
+
 		moveUp();
 		moveUp();
 
@@ -313,6 +315,8 @@ describe( 'LanguageChooser', () => {
 		removeLocale();
 		removeLocale();
 
+		// Now list is empty, none of the following shortcuts will do anything.
+
 		expect(
 			screen.getByRole( 'button', { name: /Remove/ } )
 		).toHaveAttribute( 'aria-disabled', 'true' );
@@ -330,6 +334,8 @@ describe( 'LanguageChooser', () => {
 		expect(
 			screen.getByRole( 'button', { name: /Remove/ } )
 		).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Add en_GB to the list.
 
 		fireEvent.change( dropdown, { target: { value: 'en_GB' } } );
 		expect( dropdown ).toHaveValue( 'en_GB' );

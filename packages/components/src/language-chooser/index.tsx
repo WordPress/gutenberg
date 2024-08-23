@@ -275,7 +275,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 				break;
 			// Add item.
 			case 'KeyA':
-				if ( event.altKey ) {
+				if ( event.altKey && selectedInactiveLanguage ) {
 					onAdd();
 					event.preventDefault();
 				}
@@ -285,7 +285,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div className="language-chooser" onKeyDown={ onKeyDown }>
+		<div className="components-language-chooser" onKeyDown={ onKeyDown }>
 			<HiddenFormField preferredLanguages={ languages } />
 			<p>
 				{ __(

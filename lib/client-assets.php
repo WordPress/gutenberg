@@ -477,15 +477,6 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-preferences', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-language-chooser',
-		gutenberg_url( 'build/language-chooser/style.css' ),
-		array( 'wp-components' ),
-		$version
-	);
-	$styles->add_data( 'wp-language-chooser', 'rtl', 'replace' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
 

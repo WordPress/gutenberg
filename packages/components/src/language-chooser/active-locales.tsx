@@ -58,8 +58,8 @@ export function ActiveLocales( {
 	const activeDescendant = isEmpty ? '' : selectedLanguage?.locale;
 
 	const className = isEmpty
-		? 'active-locales-list empty-list'
-		: 'active-locales-list';
+		? 'components-language-chooser__active-locales-list empty-list'
+		: 'components-language-chooser__active-locales-list';
 
 	let emptyMessage = sprintf(
 		/* translators: %s: English (United States) */
@@ -72,7 +72,7 @@ export function ActiveLocales( {
 	}
 
 	return (
-		<div className="active-locales wp-clearfix">
+		<div className="components-language-chooser__active-locales wp-clearfix">
 			{ isEmpty && (
 				<div className="active-locales-empty-message">
 					{ __( 'Nothing set.' ) }
