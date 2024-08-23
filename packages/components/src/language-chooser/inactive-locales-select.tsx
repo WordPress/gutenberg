@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { SelectControl } from '../select-control';
 import type { Language, Locale } from './types';
 
 interface InactiveLocalesSelectProps {

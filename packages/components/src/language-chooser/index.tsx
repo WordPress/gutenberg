@@ -8,12 +8,12 @@ import type { KeyboardEvent } from 'react';
  */
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
+import Notice from '../notice';
 import ActiveLocales from './active-locales';
 import InactiveLocales from './inactive-locales';
 import type { Language } from './types';
