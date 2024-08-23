@@ -186,7 +186,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'image', $data['media_type'] );
 		$this->assertArrayHasKey( 'missing_image_sizes', $data );
 		$this->assertEmpty( $data['missing_image_sizes'] );
@@ -241,7 +241,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 
 		update_option( 'uploads_use_yearmonth_folders', 0 );
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
 
 		$attachment = get_post( $data['id'] );
 
@@ -301,7 +301,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$m      = substr( $time, 5, 2 );
 		$subdir = "/$y/$m";
 
-		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 200, $response->get_status() );
 
 		$attachment = get_post( $data['id'] );
 
