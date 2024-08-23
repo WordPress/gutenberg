@@ -27,10 +27,11 @@ import {
 } from '@wordpress/icons';
 import {
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
+	__experimentalText as Text,
+	__experimentalGrid as Grid,
 	Icon,
-	Placeholder,
 	Button,
+	Flex,
 	FlexItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -424,14 +425,14 @@ function usePostFields( viewType ) {
 
 					if ( ! url ) {
 						return (
-							<div
-								style={ {
-									backgroundColor:
-										'rgba(var(--wp-admin-theme-color--rgb), 0.08)',
-									width: '20px',
-									height: '20px',
-								} }
-							/>
+							<Flex gap={ 8 }>
+								<FlexItem>
+									<span className="edit-site-post-featured-image-placeholder" />
+								</FlexItem>
+								<FlexItem>
+									<span>{ __( 'Choose an image…' ) }</span>
+								</FlexItem>
+							</Flex>
 						);
 					}
 
@@ -469,77 +470,96 @@ function usePostFields( viewType ) {
 					return (
 						<fieldset className="edit-site-dataviews-controls__featured-image">
 							<div className="edit-side-dataviews-controls__featured-image-container">
-								<HStack>
-									<MediaUpload
-										onSelect={ ( selectedMedia ) =>
-											onChangeControl( selectedMedia.id )
-										}
-										allowedTypes={ [ 'image' ] }
-										render={ ( { open } ) => {
-											return (
-												<Button
-													className="edit-site-dataviews-controls__featured-image-upload-button"
-													onClick={ () => open() }
+								<MediaUpload
+									onSelect={ ( selectedMedia ) =>
+										onChangeControl( selectedMedia.id )
+									}
+									allowedTypes={ [ 'image' ] }
+									render={ ( { open } ) => {
+										return (
+											<div
+												role="button"
+												tabIndex={ 0 }
+												onClick={ ( event ) => {
+													const element =
+														event.target.tagName.toLowerCase();
+													// Prevent opening the media modal when clicking on the button/icon.
+													if (
+														element !== 'button' &&
+														element !== 'svg'
+													) {
+														open();
+													}
+												} }
+												onKeyDown={ open }
+											>
+												<Grid
+													rowGap={ 0 }
+													columnGap={ 8 }
+													templateColumns="24px 1fr 0.5fr"
+													rows={ url ? 2 : 0 }
 												>
 													{ url && (
-														<HStack justify="space-between">
-															<FlexItem className="edit-site-dataviews-controls__featured-image-element">
-																<img
-																	alt=""
-																	src={ url }
-																/>
-															</FlexItem>
-															<FlexItem>
-																<VStack>
-																	<span>
-																		{
-																			title
-																		}
-																	</span>
-																	<span className="edit-site-dataviews-controls__featured-image-filename">
-																		{
-																			filename
-																		}
-																	</span>
-																</VStack>
-															</FlexItem>
-														</HStack>
+														<>
+															<img
+																alt=""
+																src={ url }
+																className="edit-site-dataviews-controls__featured-image-element"
+															/>
+															<Text
+																as="span"
+																truncate
+																numberOfLines={
+																	0
+																}
+															>
+																{ title }
+															</Text>
+														</>
 													) }
 													{ ! url && (
-														<HStack
-															justify="flex-start"
-															className="dataviews-controls__featured-image-placeholder-container"
-														>
-															<FlexItem>
-																<Placeholder
-																	className="dataviews-controls__featured-image-placeholder"
-																	withIllustration
-																/>
-															</FlexItem>
-															<FlexItem>
-																<span>
-																	{ __(
-																		'Choose an image…'
-																	) }
-																</span>
-															</FlexItem>
-														</HStack>
+														<>
+															<span className="edit-site-post-featured-image-placeholder" />
+															<span>
+																{ __(
+																	'Choose an image…'
+																) }
+															</span>
+														</>
 													) }
-												</Button>
-											);
-										} }
-									/>
-
-									{ url && (
-										<Button
-											className="edit-site-dataviews-controls__featured-image-remove-button"
-											icon={ lineSolid }
-											onClick={ () =>
-												onChangeControl( 0 )
-											}
-										/>
-									) }
-								</HStack>
+													{ url && (
+														<>
+															<Button
+																size="small"
+																className="edit-site-dataviews-controls__featured-image-remove-button"
+																icon={
+																	lineSolid
+																}
+																onClick={ () =>
+																	onChangeControl(
+																		0
+																	)
+																}
+															/>
+															<Text
+																className="edit-site-dataviews-controls__featured-image-filename"
+																as="span"
+																ellipsizeMode="middle"
+																limit={ 35 }
+																truncate
+																numberOfLines={
+																	0
+																}
+															>
+																{ filename }
+															</Text>
+														</>
+													) }
+												</Grid>
+											</div>
+										);
+									} }
+								/>
 							</div>
 						</fieldset>
 					);
