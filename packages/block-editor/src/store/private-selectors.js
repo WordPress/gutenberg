@@ -512,10 +512,6 @@ export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
 
-export function getInserterSearchInputRef( state ) {
-	return state.inserterSearchInputRef;
-}
-
 /**
  * Returns the style attributes of multiple blocks.
  *
