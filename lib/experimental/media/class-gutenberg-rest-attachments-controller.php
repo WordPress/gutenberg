@@ -195,7 +195,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function sideload_item( WP_REST_Request $request ) {
 		$attachment_id = $request['id'];
 
-		if ( 'attachment' !== get_post_type( $attachment_id ) ) {
+		if (
+			'attachment' !== get_post_type( $attachment_id ) ||
+			! wp_attachment_is_image( $attachment_id ) ||
+			! wp_attachment_is( 'pdf', $attachment_id )
+		) {
 			return new WP_Error(
 				'rest_invalid_param',
 				__( 'Invalid parent type.', 'gutenberg' ),
