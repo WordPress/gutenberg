@@ -54,7 +54,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
 		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
 
-		if ( $method === WP_REST_Server::CREATABLE ) {
+		if ( WP_REST_Server::CREATABLE === $method ) {
 			$args['generate_sub_sizes'] = array(
 				'type'        => 'boolean',
 				'default'     => true,
@@ -251,7 +251,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		) {
 			return new WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID.' ),
+				__( 'Invalid post ID.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}
