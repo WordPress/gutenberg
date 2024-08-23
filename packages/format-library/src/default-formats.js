@@ -15,12 +15,10 @@ import { keyboard } from './keyboard';
 import { unknown } from './unknown';
 import { language } from './language';
 import { nonBreakingSpace } from './non-breaking-space';
-import { collabComment } from './collab-comment';
 
 export default [
 	bold,
 	code,
-	collabComment,
 	image,
 	italic,
 	link,

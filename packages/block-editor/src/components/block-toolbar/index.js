@@ -28,6 +28,7 @@ import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
+import BlockCommentToolbar from '../collab/toolbar';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
@@ -65,6 +66,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		blockClassName,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -96,6 +98,12 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const className = select( 'core/block-editor' ).getBlock(
+			selectedBlockClientId
+		)?.attributes?.className;
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -115,6 +123,7 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
+			blockClassName: className,
 		};
 	}, [] );
 
@@ -191,6 +200,13 @@ export function PrivateBlockToolbar( {
 											hideDragHandle={ hideDragHandle }
 										/>
 									</>
+								) }
+
+								{ blockClassName && (
+									<BlockCommentToolbar
+										clientId={ blockClientId }
+										blockClassName={ blockClassName }
+									/>
 								) }
 							</ToolbarGroup>
 						</div>
