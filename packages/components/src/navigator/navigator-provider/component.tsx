@@ -79,29 +79,34 @@ function goTo(
 	} = options;
 
 	if ( currentLocation?.path === path ) {
-		return currentLocation;
+		return { currentLocation, focusSelectors };
 	}
+
+	const focusSelectorsCopy = new Map( state.focusSelectors );
 
 	// Set a focus selector that will be used when navigating
 	// back to the current location.
 	if ( focusTargetSelector && currentLocation?.path ) {
-		focusSelectors.set( currentLocation.path, focusTargetSelector );
+		focusSelectorsCopy.set( currentLocation.path, focusTargetSelector );
 	}
 
 	// Get the focus selector for the new location.
 	let currentFocusSelector;
 	if ( isBack ) {
-		currentFocusSelector = focusSelectors.get( path );
-		// focusSelectors.delete( path );
+		currentFocusSelector = focusSelectorsCopy.get( path );
+		focusSelectorsCopy.delete( path );
 	}
 
 	return {
-		...restOptions,
-		path,
-		isBack,
-		hasRestoredFocus: false,
-		focusTargetSelector: currentFocusSelector,
-		skipFocus,
+		currentLocation: {
+			...restOptions,
+			path,
+			isBack,
+			hasRestoredFocus: false,
+			focusTargetSelector: currentFocusSelector,
+			skipFocus,
+		},
+		focusSelectors: focusSelectorsCopy,
 	};
 }
 
@@ -109,14 +114,14 @@ function goToParent(
 	state: RouterState,
 	options: NavigateToParentOptions = {}
 ) {
-	const { currentLocation, screens } = state;
+	const { currentLocation, screens, focusSelectors } = state;
 	const currentPath = currentLocation?.path;
 	if ( currentPath === undefined ) {
-		return currentLocation;
+		return { currentLocation, focusSelectors };
 	}
 	const parentPath = findParent( currentPath, screens );
 	if ( parentPath === undefined ) {
-		return currentLocation;
+		return { currentLocation, focusSelectors };
 	}
 	return goTo( state, parentPath, {
 		...options,
@@ -128,7 +133,13 @@ function routerReducer(
 	state: RouterState,
 	action: RouterAction
 ): RouterState {
-	let { screens, currentLocation, matchedPath, ...restState } = state;
+	let {
+		screens,
+		currentLocation,
+		matchedPath,
+		focusSelectors,
+		...restState
+	} = state;
 	switch ( action.type ) {
 		case 'add':
 			screens = addScreen( state, action.screen );
@@ -137,10 +148,14 @@ function routerReducer(
 			screens = removeScreen( state, action.screen );
 			break;
 		case 'goto':
-			currentLocation = goTo( state, action.path, action.options );
+			const goToNewState = goTo( state, action.path, action.options );
+			currentLocation = goToNewState.currentLocation;
+			focusSelectors = goToNewState.focusSelectors;
 			break;
 		case 'gotoparent':
-			currentLocation = goToParent( state, action.options );
+			const goToParentNewState = goToParent( state, action.options );
+			currentLocation = goToParentNewState.currentLocation;
+			focusSelectors = goToParentNewState.focusSelectors;
 			break;
 	}
 
@@ -170,7 +185,13 @@ function routerReducer(
 		matchedPath = state.matchedPath;
 	}
 
-	return { ...restState, screens, currentLocation, matchedPath };
+	return {
+		...restState,
+		screens,
+		currentLocation,
+		matchedPath,
+		focusSelectors,
+	};
 }
 
 function UnconnectedNavigatorProvider(
