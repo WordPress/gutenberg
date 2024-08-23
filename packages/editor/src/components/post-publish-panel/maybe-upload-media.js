@@ -14,11 +14,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-
 function flattenBlocks( blocks ) {
 	const result = [];
 
@@ -67,7 +62,7 @@ export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { editorBlocks, mediaUpload } = useSelect(
 		( select ) => ( {
-			editorBlocks: select( editorStore ).getEditorBlocks(),
+			editorBlocks: select( blockEditorStore ).getBlocks(),
 			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[]
