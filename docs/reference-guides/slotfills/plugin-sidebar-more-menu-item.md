@@ -60,7 +60,7 @@ const PluginSidebarMoreMenuItemTest = () => {
 						onChange={ ( newSelect ) => setSelect( newSelect ) }
 					/>
 					<Button variant="primary">
-						{ __( 'Primary Button', 'gutenberg-slot-fill-system' ) }{ ' ' }
+						{ __( 'Primary Button' ) }{ ' ' }
 					</Button>
 				</PanelBody>
 			</PluginSidebar>
