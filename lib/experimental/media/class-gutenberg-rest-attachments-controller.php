@@ -187,6 +187,57 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
+	 * Returns a closure for filtering {@see 'wp_unique_filename'} during sideloads.
+	 *
+	 * {@see wp_unique_filename()} will always add numeric suffix if the name looks like a sub-size to avoid conflicts.
+	 *
+	 * See https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
+	 *
+	 * With adding this closure to the filter we can work around this safeguard.
+	 *
+	 * @param string $attachment_filename Attachment file name.
+	 * @return callable Function to add to the filter.
+	 */
+	private function get_wp_unique_filename_filter( $attachment_filename ) {
+		/**
+		 * Filters the result when generating a unique file name.
+		 *
+		 * @param string        $filename                 Unique file name.
+		 * @param string        $ext                      File extension. Example: ".png".
+		 * @param string        $dir                      Directory path.
+		 * @param callable|null $unique_filename_callback Callback function that generates the unique file name.
+		 * @param string[]      $alt_filenames            Array of alternate file names that were checked for collisions.
+		 * @param int|string    $number                   The highest number that was used to make the file name unique
+		 *                                                or an empty string if unused.
+		 *
+		 * @return string Filtered file name.
+		 */
+		return static function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
+			if ( empty( $number ) || ! $attachment_filename ) {
+				return $filename;
+			}
+
+			$ext       = pathinfo( $filename, PATHINFO_EXTENSION );
+			$name      = pathinfo( $filename, PATHINFO_FILENAME );
+			$orig_name = pathinfo( $attachment_filename, PATHINFO_FILENAME );
+
+			if ( ! $ext || ! $name ) {
+				return $filename;
+			}
+
+			$matches = array();
+			if ( preg_match( '/(.*)(-\d+x\d+)-' . $number . '$/', $name, $matches ) ) {
+				$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
+				if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
+					return $filename_without_suffix;
+				}
+			}
+
+			return $filename;
+		};
+	}
+
+	/**
 	 * Side-loads a media file without creating an attachment.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -230,42 +281,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$attachment_filename = get_attached_file( $attachment_id, true );
 		$attachment_filename = $attachment_filename ? wp_basename( $attachment_filename ) : null;
 
-		/**
-		 * Filters the result when generating a unique file name.
-		 *
-		 * @param string        $filename                 Unique file name.
-		 * @param string        $ext                      File extension. Example: ".png".
-		 * @param string        $dir                      Directory path.
-		 * @param callable|null $unique_filename_callback Callback function that generates the unique file name.
-		 * @param string[]      $alt_filenames            Array of alternate file names that were checked for collisions.
-		 * @param int|string    $number                   The highest number that was used to make the file name unique
-		 *                                                or an empty string if unused.
-		 *
-		 * @return string Filtered file name.
-		 */
-		$filter_filename = static function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
-			if ( empty( $number ) || ! $attachment_filename ) {
-				return $filename;
-			}
-
-			$ext       = pathinfo( $filename, PATHINFO_EXTENSION );
-			$name      = pathinfo( $filename, PATHINFO_FILENAME );
-			$orig_name = pathinfo( $attachment_filename, PATHINFO_FILENAME );
-
-			if ( ! $ext || ! $name ) {
-				return $filename;
-			}
-
-			$matches = array();
-			if ( preg_match( '/(.*)(-\d+x\d+)-' . $number . '$/', $name, $matches ) ) {
-				$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
-				if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
-					return $filename_without_suffix;
-				}
-			}
-
-			return $filename;
-		};
+		$filter_filename = $this->get_wp_unique_filename_filter( $attachment_filename );
 
 		add_filter( 'wp_unique_filename', $filter_filename, 10, 6 );
 
