@@ -341,7 +341,8 @@ export const autosave =
 		const post = select.getCurrentPost();
 
 		// Currently template autosaving is not supported.
-		if ( post.type === 'wp_template' ) {
+		// Remove the hardcoded check when the minimum required is WP 6.6.
+		if ( [ 'wp_template', 'wp_template_part' ].includes( post.type ) ) {
 			return;
 		}
 

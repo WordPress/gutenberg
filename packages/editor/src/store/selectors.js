@@ -365,7 +365,8 @@ export const getAutosaveAttribute = createRegistrySelector(
 		const postType = getCurrentPostType( state );
 
 		// Currently template autosaving is not supported.
-		if ( postType === 'wp_template' ) {
+		// Remove the hardcoded check when the minimum required is WP 6.6.
+		if ( [ 'wp_template', 'wp_template_part' ].includes( postType ) ) {
 			return false;
 		}
 
@@ -590,7 +591,8 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		const postType = getCurrentPostType( state );
 
 		// Currently template autosaving is not supported.
-		if ( postType === 'wp_template' ) {
+		// Remove the hardcoded check when the minimum required is WP 6.6.
+		if ( [ 'wp_template', 'wp_template_part' ].includes( postType ) ) {
 			return false;
 		}
 
