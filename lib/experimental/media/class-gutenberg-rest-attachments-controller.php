@@ -160,7 +160,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		if ( false === $request['convert_format'] ) {
-			// Prevent image conversion as that is done client-side.
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
