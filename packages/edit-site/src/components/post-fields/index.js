@@ -504,7 +504,6 @@ function usePostFields( viewType ) {
 															<img
 																alt=""
 																src={ url }
-																className="edit-site-dataviews-controls__featured-image-element"
 															/>
 															<Text
 																as="span"

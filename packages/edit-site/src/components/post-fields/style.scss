@@ -1,9 +1,3 @@
-.edit-site-post-featured-image {
-	width: 24px;
-	height: 24px;
-	border: $radius-small;
-}
-
 .edit-site-post-featured-image-placeholder {
 	width: 24px;
 	height: 24px;
@@ -54,13 +48,8 @@
 		}
 	}
 
-	.edit-site-dataviews-controls__featured-image-element {
-		align-self: baseline;
-	}
-
 	.edit-site-dataviews-controls__featured-image-remove-button {
 		place-self: end;
-		align-self: baseline;
 	}
 }
 
