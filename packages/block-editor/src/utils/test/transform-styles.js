@@ -130,6 +130,22 @@ describe( 'transformStyles', () => {
 			expect( output ).toEqual( [ expected ] );
 		} );
 
+		it( 'should append prefix after html selectors, but before selectors that contain the word html', () => {
+			const input = `html [data-type="core/html"] .test { color: red; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+			const expected =
+				'html .my-namespace [data-type="core/html"] .test { color: red; }';
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
 		it( 'should append prefix after :root selectors', () => {
 			const input = ':root { color: red; }';
 			const output = transformStyles(
@@ -163,12 +179,12 @@ describe( 'transformStyles', () => {
 				'.my-namespace'
 			);
 			const expected = `
-				body .my-namespace > .some-style { color: red; }
-				body .my-namespace > .some-style { color: blue; }
-				body .my-namespace > .some-style { color: yellow; }
-				html body .my-namespace > .some-style { color: purple; }
-				html body.with-class .my-namespace + .some-style { color: silver; }
-				html body.with-class .my-namespace ~ .some-style { color: goldenrod; }
+				body .my-namespace>.some-style { color: red; }
+				body .my-namespace>.some-style { color: blue; }
+				body .my-namespace>.some-style { color: yellow; }
+				html body .my-namespace>.some-style { color: purple; }
+				html body.with-class .my-namespace+.some-style { color: silver; }
+				html body.with-class .my-namespace~.some-style { color: goldenrod; }
 			`;
 
 			expect( output ).toEqual( [ expected ] );

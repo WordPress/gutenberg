@@ -1,19 +1,76 @@
 /**
  * External dependencies
  */
+import * as parsel from 'parsel-js';
 import postcss, { CssSyntaxError } from 'postcss';
 import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
 
 const cacheByWrapperSelector = new Map();
 
-const ROOT_SELECTORS = [
-	':root :where(body)',
-	':where(body)',
-	':root',
-	'html',
-	'body',
+const ROOT_SELECTOR_TOKENS = [
+	{ type: 'type', content: 'body' },
+	{ type: 'type', content: 'html' },
+	{ type: 'pseudo-class', content: ':root' },
+	{ type: 'pseudo-class', content: ':where(body)' },
+	{ type: 'pseudo-class', content: ':where(:root)' },
+	{ type: 'pseudo-class', content: ':where(html)' },
 ];
+
+/**
+ * Prefixes root selectors in a way that ensures consistent specificity.
+ * This requires special handling, since prefixing a classname before
+ * html, body, or :root will generally result in an invalid selector.
+ *
+ * Some libraries will simply replace the root selector with the prefix
+ * instead, but this results in inconsistent specificity.
+ *
+ * This function instead inserts the prefix after the root tags but before
+ * any other part of the selector.
+ *
+ * @param {string} prefix   The prefix.
+ * @param {string} selector The selector.
+ *
+ * @return {string} The prefixed root selector.
+ */
+function prefixRootSelector( prefix, selector ) {
+	// Use a tokenizer, since regular expressions are unreliable.
+	const tokenized = parsel.tokenize( selector );
+
+	// Find the last token that contains a root selector by walking back
+	// through the tokens.
+	const lastRootIndex = tokenized.findLastIndex( ( { content, type } ) => {
+		return ROOT_SELECTOR_TOKENS.some(
+			( rootSelector ) =>
+				content === rootSelector.content && type === rootSelector.type
+		);
+	} );
+
+	// Walk forwards to find the combinator after the last root.
+	// This is where the root ends and the rest of the selector begins,
+	// and the index to insert before.
+	// Doing it this way takes into account that a root selector like
+	// 'body' may have additional id/class/pseudo-class/attribute-selector
+	// parts chained to it, which is difficult to quantify using a regex.
+	const insertionPoint = tokenized.findIndex( ( { type }, index ) => {
+		return index > lastRootIndex && type === 'combinator';
+	} );
+
+	// Tokenize and insert the prefix with a ' ' combinator before it.
+	const tokenizedPrefix = parsel.tokenize( prefix );
+	tokenized.splice(
+		// Insert at the insertion point, or the end.
+		insertionPoint === -1 ? tokenized.length : insertionPoint,
+		0,
+		{
+			type: 'combinator',
+			content: ' ',
+		},
+		...tokenizedPrefix
+	);
+
+	return parsel.stringify( tokenized );
+}
 
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
@@ -53,37 +110,15 @@ function transformStyle(
 								return selector;
 							}
 
-							const hasRootSelector = ROOT_SELECTORS.some(
+							const hasRootSelector = ROOT_SELECTOR_TOKENS.some(
 								( rootSelector ) =>
-									selector.startsWith( rootSelector )
+									selector.startsWith( rootSelector.content )
 							);
 
 							// Reorganize root selectors such that the root part comes before the prefix,
 							// but the prefix still comes before the remaining part of the selector.
 							if ( hasRootSelector ) {
-								// Split the selector into its parts.
-								// Take into account combinators, which don't need a space around them to form a valid selector.
-								const selectorParts = selector
-									.split( /(\s|>|\+|~)/g )
-									.filter( ( part ) => part.trim() !== '' );
-
-								// Walk backwards and find the last 'root' part.
-								const lastRootIndex =
-									selectorParts.findLastIndex( ( part ) =>
-										ROOT_SELECTORS.some( ( rootSelector ) =>
-											part.includes( rootSelector )
-										)
-									);
-
-								// Insert the prefix after the root part of the selector, but before non-root parts.
-								selectorParts.splice(
-									lastRootIndex + 1,
-									0,
-									prefix
-								);
-
-								// Join back up.
-								return selectorParts.join( ' ' );
+								return prefixRootSelector( prefix, selector );
 							}
 
 							return prefixedSelector;
@@ -137,7 +172,7 @@ const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
 		cache = new WeakMap();
 		cacheByWrapperSelector.set( wrapperSelector, cache );
 	}
-	return styles.map( ( style ) => {
+	const transformed = styles.map( ( style ) => {
 		let css = cache.get( style );
 		if ( ! css ) {
 			css = transformStyle( style, wrapperSelector, transformOptions );
@@ -145,6 +180,8 @@ const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
 		}
 		return css;
 	} );
+
+	return transformed;
 };
 
 export default transformStyles;
