@@ -68,6 +68,7 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
+		blockClassName,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -88,6 +89,11 @@ export function BlockSettingsDropdown( {
 			const parentBlockName =
 				_firstParentClientId && getBlockName( _firstParentClientId );
 
+			const className =
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				select( 'core/block-editor' ).getBlock( firstBlockClientId )
+					?.attributes?.className;
+
 			return {
 				firstParentClientId: _firstParentClientId,
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
@@ -104,6 +110,7 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+				blockClassName: className,
 			};
 		},
 		[ firstBlockClientId ]
@@ -221,13 +228,14 @@ export function BlockSettingsDropdown( {
 				>
 					{ ( { onClose } ) => (
 						<>
-							{ isBlockCommentExperimentEnabled && (
-								<MenuGroup>
-									<BlockCommentMenuItem
-										clientId={ clientIds }
-									/>
-								</MenuGroup>
-							) }
+							{ isBlockCommentExperimentEnabled &&
+								! blockClassName && (
+									<MenuGroup>
+										<BlockCommentMenuItem
+											clientId={ clientIds }
+										/>
+									</MenuGroup>
+								) }
 							<MenuGroup>
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }

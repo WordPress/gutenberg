@@ -102,10 +102,11 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 				comment_author: currentUser,
 				comment_approved: 0,
 			},
-		} ).then( () => {
+		} ).then( ( response ) => {
+			threadId = response?.id;
+			setAttributes( clientId, threadId );
 			onClose();
 		} );
-		setAttributes( clientId, threadId );
 	};
 
 	// Function to edit the comment.
@@ -202,10 +203,10 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 								) => (
 									<>
 										{ isEditing === commentId && (
-											<VStack spacing="2">
+											<VStack spacing="4">
 												<HStack
 													alignment="left"
-													spacing="3"
+													spacing="4"
 												>
 													<Icon
 														icon={ userIcon }
@@ -371,7 +372,7 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 						</>
 					) }
 					{ ! isEditing && (
-						<VStack spacing="2">
+						<VStack spacing="4">
 							{ 0 === commentsCount && (
 								<HStack alignment="left" spacing="3">
 									<img
