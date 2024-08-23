@@ -53,9 +53,9 @@ const PluginSidebarMoreMenuItemTest = () => {
 						label={ __( 'Select Control' ) }
 						value={ select }
 						options={ [
-							{ value: 'a', label: 'Option A' },
-							{ value: 'b', label: 'Option B' },
-							{ value: 'c', label: 'Option C' },
+							{ value: 'a', label: __( 'Option A' ) },
+							{ value: 'b', label: __( 'Option B' ) },
+							{ value: 'c', label: __( 'Option C' ) },
 						] }
 						onChange={ ( newSelect ) => setSelect( newSelect ) }
 					/>
