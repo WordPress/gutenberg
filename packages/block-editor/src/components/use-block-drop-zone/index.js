@@ -515,6 +515,23 @@ export default function useBlockDropZone( {
 		200
 	);
 
+	/**
+	 * Checks if the given element is an insertion point.
+	 *
+	 * @param {EventTarget|null} targetToCheck - The element to check.
+	 * @param {Document}         ownerDocument - The owner document of the element.
+	 * @return {boolean} True if the element is a insertion point, false otherwise.
+	 */
+	function isInsertionPoint( targetToCheck, ownerDocument ) {
+		const { defaultView } = ownerDocument;
+
+		return !! (
+			defaultView &&
+			targetToCheck instanceof defaultView.HTMLElement &&
+			targetToCheck.dataset.isInsertionPoint
+		);
+	}
+
 	return useDropZone( {
 		dropZoneElement,
 		isDisabled,
@@ -525,7 +542,18 @@ export default function useBlockDropZone( {
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget.ownerDocument );
 		},
-		onDragLeave() {
+		onDragLeave( event ) {
+			const { ownerDocument } = event.currentTarget;
+
+			// If the drag event is leaving the drop zone and entering an insertion point,
+			// do not hide the insertion point as it is conceptually within the dropzone.
+			if (
+				isInsertionPoint( event.relatedTarget, ownerDocument ) ||
+				isInsertionPoint( event.target, ownerDocument )
+			) {
+				return;
+			}
+
 			throttled.cancel();
 			hideInsertionPoint();
 		},

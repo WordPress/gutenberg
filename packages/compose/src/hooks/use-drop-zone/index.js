@@ -108,22 +108,6 @@ export default function useDropZone( {
 				return false;
 			}
 
-			/**
-			 * Checks if the given element is an insertion point.
-			 *
-			 * @param {EventTarget|null} targetToCheck - The element to check.
-			 * @return {boolean} True if the element is a insertion point, false otherwise.
-			 */
-			function isInsertionPoint( targetToCheck ) {
-				const { defaultView } = ownerDocument;
-
-				return !! (
-					defaultView &&
-					targetToCheck instanceof defaultView.HTMLElement &&
-					targetToCheck.dataset.isInsertionPoint
-				);
-			}
-
 			function maybeDragStart( /** @type {DragEvent} */ event ) {
 				if ( isDragging ) {
 					return;
@@ -184,17 +168,6 @@ export default function useDropZone( {
 				// https://bugs.webkit.org/show_bug.cgi?id=66547
 
 				if ( isElementInZone( event.relatedTarget ) ) {
-					return;
-				}
-
-				// If we're moving in/out of an insertion point then don't trigger
-				// the onDragLeave event. This is to prevent the dropzone from
-				// trigger any unwanted side effects when the user is likely to
-				// be moving the cursor quickly over the insertion point.
-				if (
-					isInsertionPoint( event.relatedTarget ) ||
-					isInsertionPoint( event.target )
-				) {
 					return;
 				}
 
