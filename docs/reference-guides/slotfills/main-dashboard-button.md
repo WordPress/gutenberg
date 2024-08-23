@@ -3,6 +3,10 @@
 This slot allows replacing the default main dashboard button in the post editor. It is no longer available in the site editor as of WordPress 6.2.
 It's used for returning back to main wp-admin dashboard when editor is in fullscreen mode.
 
+<div class="callout callout-warning">
+	Please note that this SlotFill is still considered experimental and may change
+</div>
+
 ## Examples
 
 ### Change the icon
