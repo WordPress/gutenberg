@@ -26,7 +26,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$args['convert_format']     = array(
 			'type'        => 'boolean',
 			'default'     => true,
-			'description' => __( 'Whether to support server-side format conversion.', 'gutenberg' ),
+			'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
 		);
 
 		register_rest_route(
