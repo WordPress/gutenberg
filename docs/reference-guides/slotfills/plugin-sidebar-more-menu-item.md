@@ -1,6 +1,6 @@
 # PluginSidebarMoreMenuItem
 
-This slot is used to allow opening of a `<PluginSidebar>` panel from the Options dropdown.
+This slot is used to allow the opening of a `<PluginSidebar />` panel from the Options dropdown.
 When a `<PluginSidebar />` is registered, a `<PluginSidebarMoreMenuItem />` is automatically registered using the title prop from the `<PluginSidebar />` and so it's not required to use this slot to create the menu item.
 
 ## Example
