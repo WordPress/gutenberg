@@ -383,14 +383,3 @@ export const modifyContentLockBlock =
 			focusModeToRevert
 		);
 	};
-
-/**
- * Action that enables or disables Zoom Out mode.
- *
- * @param {boolean} isZoomOutMode Enable/Disable Zoom Out mode.
- */
-export const setZoomOutMode =
-	( isZoomOutMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode( isZoomOutMode ? 'zoom-out' : 'edit' );
-	};
