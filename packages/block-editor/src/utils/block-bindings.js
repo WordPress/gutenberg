@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -9,10 +9,14 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { useBlockEditContext } from '../components/block-edit';
 
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
+
 export function useBlockBindingsUtils() {
 	const { clientId } = useBlockEditContext();
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { getBlockAttributes } = useRegistry().select( blockEditorStore );
 
 	/**
 	 * Updates the value of the bindings connected to block attributes.
@@ -44,8 +48,11 @@ export function useBlockBindingsUtils() {
 	 * ```
 	 */
 	const updateBlockBindings = ( bindings ) => {
-		const { metadata } = getBlockAttributes( clientId );
-		const newBindings = { ...metadata?.bindings };
+		const {
+			metadata: { bindings: currentBindings, ...metadata },
+		} = getBlockAttributes( clientId );
+		const newBindings = { ...currentBindings };
+
 		Object.entries( bindings ).forEach( ( [ attribute, binding ] ) => {
 			if ( ! binding && newBindings[ attribute ] ) {
 				delete newBindings[ attribute ];
@@ -59,15 +66,12 @@ export function useBlockBindingsUtils() {
 			bindings: newBindings,
 		};
 
-		if ( Object.keys( newMetadata.bindings ).length === 0 ) {
+		if ( isObjectEmpty( newMetadata.bindings ) ) {
 			delete newMetadata.bindings;
 		}
 
 		updateBlockAttributes( clientId, {
-			metadata:
-				Object.keys( newMetadata ).length === 0
-					? undefined
-					: newMetadata,
+			metadata: isObjectEmpty( newMetadata ) ? undefined : newMetadata,
 		} );
 	};
 
@@ -83,14 +87,11 @@ export function useBlockBindingsUtils() {
 	 * ```
 	 */
 	const removeAllBlockBindings = () => {
-		const { metadata } = getBlockAttributes( clientId );
-		const newMetadata = { ...metadata };
-		delete newMetadata.bindings;
+		const {
+			metadata: { bindings, ...metadata },
+		} = getBlockAttributes( clientId );
 		updateBlockAttributes( clientId, {
-			metadata:
-				Object.keys( newMetadata ).length === 0
-					? undefined
-					: newMetadata,
+			metadata: isObjectEmpty( metadata ) ? undefined : metadata,
 		} );
 	};
 
