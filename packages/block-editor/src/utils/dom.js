@@ -58,13 +58,6 @@ export function getBlockClientId( node ) {
 	return blockNode.id.slice( 'block-'.length );
 }
 
-/*
- * Cache for rectUnion() return values.
- * When popovers are present on the canvas,
- * this calculation function is called
- * multiple times with the same values.
- */
-const rectUnionCache = new Map();
 /**
  * Calculates the union of two rectangles, and optionally constrains this union within a containerRect's
  * left and right values.
@@ -76,12 +69,6 @@ const rectUnionCache = new Map();
  * @return {DOMRect} Union of the two rectangles.
  */
 export function rectUnion( rect1, rect2, containerRect ) {
-	const cacheKey = JSON.stringify( { rect1, rect2, containerRect } );
-
-	if ( rectUnionCache.has( cacheKey ) ) {
-		return rectUnionCache.get( cacheKey );
-	}
-
 	let left = Math.min( rect1.left, rect2.left );
 	let right = Math.max( rect1.right, rect2.right );
 	const bottom = Math.max( rect1.bottom, rect2.bottom );
@@ -100,11 +87,7 @@ export function rectUnion( rect1, rect2, containerRect ) {
 		right = Math.min( right, containerRect.right );
 	}
 
-	const result = new window.DOMRect( left, top, right - left, bottom - top );
-
-	rectUnionCache.set( cacheKey, result );
-
-	return result;
+	return new window.DOMRect( left, top, right - left, bottom - top );
 }
 
 /**
