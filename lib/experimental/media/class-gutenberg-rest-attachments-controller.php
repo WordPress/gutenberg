@@ -17,40 +17,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		$args                       = $this->get_endpoint_args_for_item_schema();
-		$args['generate_sub_sizes'] = array(
-			'type'        => 'boolean',
-			'default'     => true,
-			'description' => __( 'Whether to generate image sub sizes.', 'gutenberg' ),
-		);
-		$args['convert_format']     = array(
-			'type'        => 'boolean',
-			'default'     => true,
-			'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base,
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this, 'get_items_permissions_check' ),
-					'args'                => $this->get_collection_params(),
-				),
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'create_item' ),
-					'permission_callback' => array( $this, 'create_item_permissions_check' ),
-					'args'                => $args,
-				),
-				'allow_batch' => $this->allow_batch,
-				'schema'      => array( $this, 'get_public_item_schema' ),
-			),
-			true
-		);
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
@@ -75,6 +41,33 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
+	}
+
+	/**
+	 * Retrieves an array of endpoint arguments from the item schema for the controller.
+	 *
+	 * @param string $method Optional. HTTP method of the request. The arguments for `CREATABLE` requests are
+	 *                       checked for required values and may fall-back to a given default, this is not done
+	 *                       on `EDITABLE` requests. Default WP_REST_Server::CREATABLE.
+	 * @return array Endpoint arguments.
+	 */
+	public function get_endpoint_args_for_item_schema( $method = WP_REST_Server::CREATABLE ) {
+		$args = rest_get_endpoint_args_for_schema( $this->get_item_schema(), $method );
+
+		if ( $method === WP_REST_Server::CREATABLE ) {
+			$args['generate_sub_sizes'] = array(
+				'type'        => 'boolean',
+				'default'     => true,
+				'description' => __( 'Whether to generate image sub sizes.', 'gutenberg' ),
+			);
+			$args['convert_format']     = array(
+				'type'        => 'boolean',
+				'default'     => true,
+				'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
+			);
+		}
+
+		return $args;
 	}
 
 	/**
