@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added a new `LanguageChooser` component ([#64686](https://github.com/WordPress/gutenberg/pull/64686)).
+
 ### Enhancements
 
 -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
