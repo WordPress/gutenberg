@@ -194,7 +194,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Add ability and UI for client-side media processing.', 'gutenberg' ),
+			'label' => __( 'Enable client-side media processing.', 'gutenberg' ),
 			'id'    => 'gutenberg-media-processing',
 		)
 	);
