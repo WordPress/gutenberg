@@ -325,7 +325,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
 
-		$response->set_status( 201 );
 		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $attachment_id ) ) );
 
 		return $response;
