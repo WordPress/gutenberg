@@ -58,10 +58,6 @@ function gutenberg_get_default_image_output_formats() {
  * @param WP_REST_Response $response Response data.
  */
 function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-		return $response;
-	}
-
 	/** This filter is documented in wp-admin/includes/images.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
@@ -97,10 +93,6 @@ add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
  * @param string $post_type Post type key.
  */
 function gutenberg_filter_attachment_post_type_args( array $args, string $post_type ): array {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-		return $args;
-	}
-
 	if ( 'attachment' === $post_type ) {
 		require_once __DIR__ . '/class-gutenberg-rest-attachments-controller.php';
 
@@ -117,10 +109,6 @@ add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_ar
  * Registers additional REST fields for attachments.
  */
 function gutenberg_media_processing_register_rest_fields(): void {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-		return;
-	}
-
 	register_rest_field(
 		'attachment',
 		'filename',
@@ -206,10 +194,6 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
  * @link https://web.dev/coop-coep/
  */
 function gutenberg_set_up_cross_origin_isolation() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-		return;
-	}
-
 	$screen = get_current_screen();
 
 	if ( ! $screen ) {
@@ -336,10 +320,6 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
  * could have assets loaded from a different domain.
  */
 function gutenberg_override_media_templates(): void {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-		return;
-	}
-
 	remove_action( 'admin_footer', 'wp_print_media_templates' );
 	add_action(
 		'admin_footer',
