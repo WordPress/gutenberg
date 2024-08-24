@@ -74,7 +74,10 @@ const navigatorScreenAnimation = ( {
 	return css`
 		position: ${ isAnimatingOut ? 'absolute' : 'relative' };
 		z-index: ${ isAnimatingOut ? 0 : 1 };
-		inset: 0;
+		${ isAnimatingOut &&
+		css`
+			inset: 0;
+		` }
 
 		animation: ${ skipInitialAnimation
 			? 'none'
