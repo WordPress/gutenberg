@@ -22,9 +22,23 @@ test.describe( 'Templates', () => {
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
-		// Descending by title.
+		// Wait for the template list to be visible
+		await page.waitForSelector( '[aria-label="Templates"]' );
+
+		// Descending by title
 		await page.getByRole( 'button', { name: 'View options' } ).click();
 		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
+
+		// Wait for the sorting to take effect
+		await page.waitForFunction( () => {
+			const firstTitle = document.querySelector(
+				'[aria-label="Templates"] a'
+			);
+			return (
+				firstTitle && firstTitle.textContent.trim() === 'Tag Archives'
+			);
+		} );
+
 		const firstTitle = page
 			.getByRole( 'region', {
 				name: 'Template',
@@ -34,8 +48,17 @@ test.describe( 'Templates', () => {
 			.first();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
-		// Ascending by title.
+		// Ascending by title
 		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
+
+		// Wait for the sorting to take effect
+		await page.waitForFunction( () => {
+			const first = document.querySelector(
+				'[aria-label="Templates"] a'
+			);
+			return first && first.textContent.trim() === 'Category Archives';
+		} );
+
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 
