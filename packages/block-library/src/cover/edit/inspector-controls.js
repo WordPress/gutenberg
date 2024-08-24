@@ -388,20 +388,6 @@ export default function CoverInspectorControls( {
 				</InspectorControls>
 			) }
 			<InspectorControls group="dimensions">
-				{ ! useFeaturedImage && !! imageSizeOptions.length && (
-					<ToolsPanelItem
-						hasValue={ () => !! sizeSlug }
-						label={ __( 'Resolution' ) }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<ResolutionTool
-							value={ sizeSlug }
-							onChange={ updateImage }
-							options={ imageSizeOptions }
-						/>
-					</ToolsPanelItem>
-				) }
 				<ToolsPanelItem
 					className="single-column"
 					hasValue={ () => !! minHeight }
