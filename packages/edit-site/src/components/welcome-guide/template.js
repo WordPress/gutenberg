@@ -7,11 +7,6 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
-
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
@@ -24,13 +19,14 @@ export default function WelcomeGuideTemplate() {
 			'core/edit-site',
 			'welcomeGuide'
 		);
-		const { isPage } = select( editSiteStore );
-		const { getCurrentPostType } = select( editorStore );
+		const { getCurrentPostType, getEditorSettings } = select( editorStore );
+		const hasBackNavigation =
+			!! getEditorSettings().onNavigateToPreviousEntityRecord;
 		return (
 			isTemplateActive &&
 			! isEditorActive &&
-			isPage() &&
-			getCurrentPostType() === 'wp_template'
+			getCurrentPostType() === 'wp_template' &&
+			hasBackNavigation
 		);
 	}, [] );
 
