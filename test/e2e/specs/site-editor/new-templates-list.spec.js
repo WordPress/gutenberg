@@ -23,21 +23,9 @@ test.describe( 'Templates', () => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Wait for the template list to be visible
-		await page.waitForSelector( '[aria-label="Templates"]' );
-
-		// Descending by title
-		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
-
-		// Wait for the sorting to take effect
-		await page.waitForFunction( () => {
-			const firstTitle = document.querySelector(
-				'[aria-label="Templates"] a'
-			);
-			return (
-				firstTitle && firstTitle.textContent.trim() === 'Tag Archives'
-			);
-		} );
+		await expect(
+			page.locator( '[aria-label="Templates"]' )
+		).toBeVisible();
 
 		const firstTitle = page
 			.getByRole( 'region', {
@@ -46,19 +34,18 @@ test.describe( 'Templates', () => {
 			} )
 			.getByRole( 'link', { includeHidden: true } )
 			.first();
+
+		// Descending by title
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
+
+		// Assert the first title is 'Tag Archives'
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
 		// Ascending by title
 		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
 
-		// Wait for the sorting to take effect
-		await page.waitForFunction( () => {
-			const first = document.querySelector(
-				'[aria-label="Templates"] a'
-			);
-			return first && first.textContent.trim() === 'Category Archives';
-		} );
-
+		// Assert the first title is 'Category Archives'
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 
