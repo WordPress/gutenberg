@@ -56,14 +56,39 @@ type NavigatorScreenAnimationProps = {
 	isAnimatingOut: boolean;
 };
 
+const FADE = {
+	DURATION: '70ms',
+	EASING: 'linear',
+	DELAY: {
+		IN: '70ms',
+		OUT: '40ms',
+	},
+};
+const SLIDE = {
+	DURATION: '300ms',
+	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
+};
+
 const ANIMATION = {
 	forwards: {
-		in: css`70ms cubic-bezier(0, 0, 0.2, 1) 70ms both ${ fadeIn }, 300ms cubic-bezier(0.4, 0, 0.2, 1) both ${ slideFromRight }`,
-		out: css`70ms cubic-bezier(0.4, 0, 1, 1) 40ms forwards ${ fadeOut }, 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards ${ slideToLeft }`,
+		in: css`
+			${ FADE.DURATION } ${ FADE.EASING } ${ FADE.DELAY
+				.IN } both ${ fadeIn }, ${ SLIDE.DURATION } ${ SLIDE.EASING } both ${ slideFromRight }
+		`,
+		out: css`
+			${ FADE.DURATION } ${ FADE.EASING } ${ FADE.DELAY
+				.IN } both ${ fadeOut }, ${ SLIDE.DURATION } ${ SLIDE.EASING } both ${ slideToLeft }
+		`,
 	},
 	backwards: {
-		in: css`70ms cubic-bezier(0, 0, 0.2, 1) 70ms both ${ fadeIn }, 300ms cubic-bezier(0.4, 0, 0.2, 1) both ${ slideFromLeft }`,
-		out: css`70ms cubic-bezier(0.4, 0, 1, 1) 40ms forwards ${ fadeOut }, 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards ${ slideToRight }`,
+		in: css`
+			${ FADE.DURATION } ${ FADE.EASING } ${ FADE.DELAY
+				.IN } both ${ fadeIn }, ${ SLIDE.DURATION } ${ SLIDE.EASING } both ${ slideFromLeft }
+		`,
+		out: css`
+			${ FADE.DURATION } ${ FADE.EASING } ${ FADE.DELAY
+				.OUT } both ${ fadeOut }, ${ SLIDE.DURATION } ${ SLIDE.EASING } both ${ slideToRight }
+		`,
 	},
 };
 const navigatorScreenAnimation = ( {
