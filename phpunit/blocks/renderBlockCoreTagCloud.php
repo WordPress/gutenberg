@@ -6,7 +6,7 @@
  * @subpackage Blocks
  *
  * @covers ::render_block_core_tag_cloud
- * @group blocks-tag-cloud
+ * @group blocks
  */
 class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 	/**
@@ -146,7 +146,7 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'<a',
 			$rendered,
-			'Failed to assert that $rendered contain the contain a html anchor tag.'
+			'Failed to assert that $rendered contain a html anchor tag.'
 		);
 		$this->assertStringContainsString(
 			'tag-cloud-link',
@@ -156,12 +156,38 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			get_term_link( self::$tags[0] ),
 			$rendered,
-			'Failed to assert that $rendered contain the contain the tag link.'
+			'Failed to assert that $rendered contain the tag link.'
 		);
 		$this->assertStringContainsString(
 			get_term( self::$tags[0] )->name,
 			$rendered,
-			'Failed to assert that $rendered contain the contain the tag name.'
+			'Failed to assert that $rendered contain the tag name.'
+		);
+		$this->assertStringContainsString(
+			'font-size:',
+			$rendered,
+			'Failed to assert that $rendered contain the `font-size` style for tags.'
+		);
+
+		// Test if the tag cloud is rendered with the category taxonomy.
+		wp_set_object_terms( self::$post->ID, self::$categories, 'category' );
+		self::$attributes['taxonomy'] = 'category';
+		$rendered                     = render_block_core_tag_cloud( self::$attributes );
+
+		$this->assertStringContainsString(
+			'wp-block-tag-cloud',
+			$rendered,
+			'Failed to assert that $rendered contain the `wp-block-tag-cloud` class.'
+		);
+		$this->assertStringContainsString(
+			get_term_link( self::$categories[0] ),
+			$rendered,
+			'Failed to assert that $rendered contain the category link.'
+		);
+		$this->assertStringContainsString(
+			get_term( self::$categories[0] )->name,
+			$rendered,
+			'Failed to assert that $rendered contain the category name.'
 		);
 	}
 }
