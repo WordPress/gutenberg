@@ -3,7 +3,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	Button,
 	ExternalLink,
 	FocalPointPicker,
 	RangeControl,
@@ -96,7 +95,6 @@ export default function CoverInspectorControls( {
 	coverRef,
 	currentSettings,
 	updateDimRatio,
-	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -284,7 +282,6 @@ export default function CoverInspectorControls( {
 								/>
 							</ToolsPanelItem>
 						) }
-
 						{ ! useFeaturedImage && url && ! isVideoBackground && (
 							<ToolsPanelItem
 								label={ __( 'Alternative text' ) }

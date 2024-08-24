@@ -416,6 +416,7 @@ function CoverEdit( {
 			onSelectMedia={ onSelectMedia }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			onClearMedia={ onClearMedia }
 		/>
 	);
 
