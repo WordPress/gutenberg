@@ -22,7 +22,7 @@ test.describe( 'Templates', () => {
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
-		// Wait for the template list to be visible
+		// Wait for the template list to be visible.
 		await expect(
 			page.locator( '[aria-label="Templates"]' )
 		).toBeVisible();
@@ -35,17 +35,13 @@ test.describe( 'Templates', () => {
 			.getByRole( 'link', { includeHidden: true } )
 			.first();
 
-		// Descending by title
+		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
 		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
-
-		// Assert the first title is 'Tag Archives'
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
-		// Ascending by title
+		// Ascending by title.
 		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
-
-		// Assert the first title is 'Category Archives'
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 
