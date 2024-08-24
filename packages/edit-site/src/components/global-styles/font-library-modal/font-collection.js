@@ -15,7 +15,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
@@ -382,7 +382,7 @@ function FontCollection( { slug } ) {
 
 						<NavigatorScreen path="/fontFamily">
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
+								<NavigatorBackButton
 									icon={ chevronLeft }
 									size="small"
 									onClick={ () => {
