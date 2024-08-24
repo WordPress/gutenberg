@@ -41,14 +41,23 @@ function UnconnectedNavigatorScreen(
 	}
 
 	const screenId = useId();
+
+	// Read props and components context.
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
 	);
 
+	// Read navigator context, destructure location props.
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
+	const { isInitial, isBack, focusTargetSelector, skipFocus } = location;
+
+	// Determine if the screen is currently selected.
 	const isMatch = match === screenId;
+
+	const skipAnimationAndFocusRestoration = !! isInitial && ! isBack;
+
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
 	useEffect( () => {
@@ -76,14 +85,11 @@ function UnconnectedNavigatorScreen(
 		[ className, cx, isInitial, isBack, isRTL ]
 	);
 
+	// Focus restoration
 	const locationRef = useRef( location );
-
 	useEffect( () => {
 		locationRef.current = location;
 	}, [ location ] );
-
-	// Focus restoration
-	const isInitialLocation = location.isInitial && ! location.isBack;
 	useEffect( () => {
 		// Only attempt to restore focus:
 		// - if the current location is not the initial one (to avoid moving focus on page load)
@@ -92,11 +98,11 @@ function UnconnectedNavigatorScreen(
 		// - if focus hasn't already been restored for the current location
 		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
-			isInitialLocation ||
+			skipAnimationAndFocusRestoration ||
 			! isMatch ||
 			! wrapperRef.current ||
 			locationRef.current.hasRestoredFocus ||
-			location.skipFocus
+			skipFocus
 		) {
 			return;
 		}
@@ -113,10 +119,9 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location.focusTargetSelector ) {
-			elementToFocus = wrapperRef.current.querySelector(
-				location.focusTargetSelector
-			);
+		if ( isBack && focusTargetSelector ) {
+			elementToFocus =
+				wrapperRef.current.querySelector( focusTargetSelector );
 		}
 
 		// If the previous query didn't run or find any element to focus, fallback
@@ -129,11 +134,11 @@ function UnconnectedNavigatorScreen(
 		locationRef.current.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
-		isInitialLocation,
+		skipAnimationAndFocusRestoration,
 		isMatch,
-		location.isBack,
-		location.focusTargetSelector,
-		location.skipFocus,
+		isBack,
+		focusTargetSelector,
+		skipFocus,
 	] );
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
