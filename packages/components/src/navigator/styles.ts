@@ -4,6 +4,7 @@
 import { css, keyframes } from '@emotion/react';
 
 export const navigatorProviderWrapper = css`
+	position: relative;
 	/* Prevents horizontal overflow while animating screen transitions */
 	overflow-x: hidden;
 	/* Mark this subsection of the DOM as isolated, providing performance benefits
@@ -13,50 +14,74 @@ export const navigatorProviderWrapper = css`
 	contain: content;
 `;
 
-const fadeInFromRight = keyframes( {
-	'0%': {
+const fadeIn = keyframes( {
+	from: {
 		opacity: 0,
-		transform: `translateX( 50px )`,
 	},
-	'100%': { opacity: 1, transform: 'none' },
 } );
 
-const fadeInFromLeft = keyframes( {
-	'0%': {
+const fadeOut = keyframes( {
+	to: {
 		opacity: 0,
-		transform: `translateX( -50px )`,
 	},
-	'100%': { opacity: 1, transform: 'none' },
+} );
+
+const slideFromRight = keyframes( {
+	from: {
+		transform: 'translateX(100px)',
+	},
+} );
+
+export const slideToLeft = keyframes( {
+	to: {
+		transform: 'translateX(-80px)',
+	},
+} );
+
+const slideFromLeft = keyframes( {
+	from: {
+		transform: 'translateX(-100px)',
+	},
+} );
+
+export const slideToRight = keyframes( {
+	to: {
+		transform: 'translateX(80px)',
+	},
 } );
 
 type NavigatorScreenAnimationProps = {
-	isInitial?: boolean;
-	isBack?: boolean;
-	isRTL: boolean;
+	skipInitialAnimation: boolean;
+	direction: 'forwards' | 'backwards';
+	isAnimatingOut: boolean;
 };
 
+const ANIMATION = {
+	forwards: {
+		in: css`70ms cubic-bezier(0, 0, 0.2, 1) 70ms both ${ fadeIn }, 300ms cubic-bezier(0.4, 0, 0.2, 1) both ${ slideFromRight }`,
+		out: css`70ms cubic-bezier(0.4, 0, 1, 1) 40ms forwards ${ fadeOut }, 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards ${ slideToLeft }`,
+	},
+	backwards: {
+		in: css`70ms cubic-bezier(0, 0, 0.2, 1) 70ms both ${ fadeIn }, 300ms cubic-bezier(0.4, 0, 0.2, 1) both ${ slideFromLeft }`,
+		out: css`70ms cubic-bezier(0.4, 0, 1, 1) 40ms forwards ${ fadeOut }, 300ms cubic-bezier(0.4, 0, 0.2, 1) forwards ${ slideToRight }`,
+	},
+};
 const navigatorScreenAnimation = ( {
-	isInitial,
-	isBack,
-	isRTL,
+	direction,
+	skipInitialAnimation,
+	isAnimatingOut,
 }: NavigatorScreenAnimationProps ) => {
-	if ( isInitial && ! isBack ) {
-		return;
-	}
-
-	const animationName =
-		( isRTL && isBack ) || ( ! isRTL && ! isBack )
-			? fadeInFromRight
-			: fadeInFromLeft;
-
 	return css`
-		animation-duration: 0.14s;
-		animation-timing-function: ease-in-out;
-		will-change: transform, opacity;
-		animation-name: ${ animationName };
+		position: ${ isAnimatingOut ? 'absolute' : 'relative' };
+		z-index: ${ isAnimatingOut ? 0 : 1 };
+		inset: 0;
+
+		animation: ${ skipInitialAnimation
+			? 'none'
+			: ANIMATION[ direction ][ isAnimatingOut ? 'out' : 'in' ] };
 
 		@media ( prefers-reduced-motion ) {
-			animation-duration: 0s;
+			animation: none;
 		}
 	`;
 };

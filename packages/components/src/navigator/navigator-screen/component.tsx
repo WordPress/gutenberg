@@ -13,8 +13,10 @@ import {
 	useMemo,
 	useRef,
 	useId,
+	useState,
+	useLayoutEffect,
 } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, usePrevious } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 import warning from '@wordpress/warning';
@@ -29,6 +31,12 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
 import type { NavigatorScreenProps } from '../types';
+
+const isReducedMotion = ( w: Window | null | undefined ) =>
+	!! w && w.matchMedia( `(prefers-reduced-motion)` ).matches === true;
+
+const isExitAnimation = ( e: AnimationEvent ) =>
+	e.animationName === styles.slideToLeft.name || styles.slideToRight.name;
 
 function UnconnectedNavigatorScreen(
 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
@@ -55,10 +63,20 @@ function UnconnectedNavigatorScreen(
 
 	// Determine if the screen is currently selected.
 	const isMatch = match === screenId;
+	const wasMatch = usePrevious( isMatch );
 
 	const skipAnimationAndFocusRestoration = !! isInitial && ! isBack;
 
 	const wrapperRef = useRef< HTMLDivElement >( null );
+
+	// Possible values:
+	// - idle: first value assigned to the screen when added to the React tree
+	// - armed: will start an exit animation when deselected
+	// - animating: the exit animation is happening
+	// - animated: the exit animation has ended
+	const [ exitAnimationStatus, setExitAnimationStatus ] = useState<
+		'idle' | 'armed' | 'animating' | 'animated'
+	>( 'idle' );
 
 	useEffect( () => {
 		const screen = {
@@ -69,20 +87,56 @@ function UnconnectedNavigatorScreen(
 		return () => removeScreen( screen );
 	}, [ screenId, path, addScreen, removeScreen ] );
 
+	// Update animation status.
+	useLayoutEffect( () => {
+		if ( ! wasMatch && isMatch ) {
+			// When the screen becomes selected, set it to 'armed',
+			// meaning that it will start an exit animation when deselected.
+			setExitAnimationStatus( 'armed' );
+		} else if ( wasMatch && ! isMatch ) {
+			// When the screen becomes deselected, set it to:
+			// - 'animating' (if animations are enabled)
+			// - 'animated' (causing the animation to end and the screen to stop
+			//    rendering its contents in the DOM, without the need to wait for
+			//    the `animationend` event)
+			setExitAnimationStatus(
+				skipAnimationAndFocusRestoration ||
+					isReducedMotion(
+						wrapperRef.current?.ownerDocument?.defaultView
+					)
+					? 'animated'
+					: 'animating'
+			);
+		}
+	}, [ isMatch, wasMatch, skipAnimationAndFocusRestoration ] );
+
+	// Styles
 	const isRTL = isRTLFn();
-	const { isInitial, isBack } = location;
 	const cx = useCx();
+	const animationDirection =
+		( isRTL && isBack ) || ( ! isRTL && ! isBack )
+			? 'forwards'
+			: 'backwards';
+	const isAnimatingOut =
+		exitAnimationStatus === 'animating' ||
+		exitAnimationStatus === 'animated';
 	const classes = useMemo(
 		() =>
 			cx(
 				styles.navigatorScreen( {
-					isInitial,
-					isBack,
-					isRTL,
+					skipInitialAnimation: skipAnimationAndFocusRestoration,
+					direction: animationDirection,
+					isAnimatingOut,
 				} ),
 				className
 			),
-		[ className, cx, isInitial, isBack, isRTL ]
+		[
+			className,
+			cx,
+			skipAnimationAndFocusRestoration,
+			animationDirection,
+			isAnimatingOut,
+		]
 	);
 
 	// Focus restoration
@@ -143,11 +197,31 @@ function UnconnectedNavigatorScreen(
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
-	return isMatch ? (
-		<View ref={ mergedWrapperRef } className={ classes } { ...otherProps }>
+	// Remove the screen contents from the DOM only when it not selected
+	// and its exit animation has ended.
+	if (
+		! isMatch &&
+		( exitAnimationStatus === 'idle' || exitAnimationStatus === 'animated' )
+	) {
+		return null;
+	}
+
+	return (
+		<View
+			ref={ mergedWrapperRef }
+			className={ classes }
+			onAnimationEnd={ ( e: AnimationEvent ) => {
+				if ( ! isMatch && isExitAnimation( e ) ) {
+					// When the exit animation ends on an unselected screen, set the
+					// status to 'animated' to remove the screen contents from the DOM.
+					setExitAnimationStatus( 'animated' );
+				}
+			} }
+			{ ...otherProps }
+		>
 			{ children }
 		</View>
-	) : null;
+	);
 }
 
 /**
