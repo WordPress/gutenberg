@@ -1,11 +1,11 @@
 <?php
 /**
- * Tests for the render_block_core_tag_cloud() function.
+ * Tests for the gutenberg_render_block_core_post_excerpt() function.
  *
  * @package WordPress
  * @subpackage Blocks
  *
- * @covers ::render_block_core_tag_cloud
+ * @covers ::gutenberg_render_block_core_post_excerpt
  * @group blocks
  */
 class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
@@ -15,13 +15,6 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 	 * @var array
 	 */
 	protected static $attributes;
-
-	/**
-	 * Block object.
-	 *
-	 * @var WP_Block
-	 */
-	protected static $block;
 
 	/**
 	 * An array of category term object.
@@ -50,14 +43,14 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$categories = self::factory()->term->create_many(
+		self::$categories = $factory->term->create_many(
 			3,
 			array(
 				'taxonomy' => 'category',
 			)
 		);
 
-		self::$tags = self::factory()->term->create_many(
+		self::$tags = $factory->term->create_many(
 			3,
 			array(
 				'taxonomy' => 'post_tag',
@@ -74,8 +67,6 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 			'smallestFontSize' => '8pt',
 			'largestFontSize'  => '22pt',
 		);
-
-		self::$block = new stdClass();
 
 		$block_args = array(
 			'blockName'    => 'core/tag-cloud',
@@ -101,6 +92,7 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 		foreach ( self::$tags as $tag ) {
 			wp_delete_term( $tag, 'post_tag' );
 		}
+		wp_delete_post( self::$post->ID, true );
 	}
 
 	/**
@@ -108,7 +100,7 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 	 */
 	public function test_should_render_empty_string_when_no_tags_available() {
 
-		$rendered = render_block_core_tag_cloud( self::$attributes );
+		$rendered = gutenberg_render_block_core_tag_cloud( self::$attributes );
 		$this->assertStringContainsString(
 			'wp-block-tag-cloud',
 			$rendered,
@@ -128,7 +120,7 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 	public function test_should_render_tag_cloud() {
 		wp_set_object_terms( self::$post->ID, self::$tags, 'post_tag' );
 
-		$rendered = render_block_core_tag_cloud( self::$attributes );
+		$rendered = gutenberg_render_block_core_tag_cloud( self::$attributes );
 		$this->assertNotEmpty(
 			$rendered,
 			'Failed to assert that $rendered is an non-empty string.'
@@ -172,7 +164,7 @@ class Tests_Blocks_RenderBlockCoreTagCloud extends WP_UnitTestCase {
 		// Test if the tag cloud is rendered with the category taxonomy.
 		wp_set_object_terms( self::$post->ID, self::$categories, 'category' );
 		self::$attributes['taxonomy'] = 'category';
-		$rendered                     = render_block_core_tag_cloud( self::$attributes );
+		$rendered                     = gutenberg_render_block_core_tag_cloud( self::$attributes );
 
 		$this->assertStringContainsString(
 			'wp-block-tag-cloud',
