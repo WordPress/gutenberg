@@ -332,7 +332,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
-			rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $attachment_id ) )
+			rest_url( rest_get_route_for_post( $attachment_id ) )
 		);
 
 		$response_request->set_param( 'context', 'edit' );
@@ -343,7 +343,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
 
-		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $attachment_id ) ) );
+		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
 
 		return $response;
 	}
