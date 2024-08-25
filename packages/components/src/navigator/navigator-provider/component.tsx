@@ -155,18 +155,20 @@ function routerReducer(
 			break;
 		case 'goto':
 			const goToNewState = goTo( state, action.path, action.options );
-			currentLocation = goToNewState.currentLocation;
+			currentLocation = {
+				...goToNewState.currentLocation,
+				isInitial: false,
+			};
 			focusSelectors = goToNewState.focusSelectors;
 			break;
 		case 'gotoparent':
 			const goToParentNewState = goToParent( state, action.options );
-			currentLocation = goToParentNewState.currentLocation;
+			currentLocation = {
+				...goToParentNewState.currentLocation,
+				isInitial: false,
+			};
 			focusSelectors = goToParentNewState.focusSelectors;
 			break;
-	}
-
-	if ( currentLocation?.path === state.initialPath ) {
-		currentLocation = { ...currentLocation, isInitial: true };
 	}
 
 	// Return early in case there is no change
@@ -220,7 +222,7 @@ function UnconnectedNavigatorProvider(
 		initialPathProp,
 		( path ) => ( {
 			screens: [],
-			currentLocation: { path },
+			currentLocation: { path, isInitial: true },
 			matchedPath: undefined,
 			focusSelectors: new Map(),
 			initialPath: initialPathProp,
