@@ -83,25 +83,32 @@ function goTo(
 		return { currentLocation, focusSelectors };
 	}
 
-	let focusSelectorsCopy;
+	let focusSelectorsCopy: typeof focusSelectors | undefined;
+	function getFocusSelectorsCopy() {
+		focusSelectorsCopy =
+			focusSelectorsCopy ?? new Map( state.focusSelectors );
+		return focusSelectorsCopy;
+	}
 
 	// Set a focus selector that will be used when navigating
 	// back to the current location.
 	if ( focusTargetSelector && currentLocation?.path ) {
-		if ( ! focusSelectorsCopy ) {
-			focusSelectorsCopy = new Map( state.focusSelectors );
-		}
-		focusSelectorsCopy.set( currentLocation.path, focusTargetSelector );
+		getFocusSelectorsCopy().set(
+			currentLocation.path,
+			focusTargetSelector
+		);
 	}
 
 	// Get the focus selector for the new location.
 	let currentFocusSelector;
-	if ( isBack ) {
-		if ( ! focusSelectorsCopy ) {
-			focusSelectorsCopy = new Map( state.focusSelectors );
+	if ( focusSelectors.get( path ) ) {
+		if ( isBack ) {
+			// Use the found focus selector only when navigating back.
+			currentFocusSelector = focusSelectors.get( path );
 		}
-		currentFocusSelector = focusSelectorsCopy.get( path );
-		focusSelectorsCopy.delete( path );
+		// Make a copy of the focusSelectors map to remove the focus selector
+		// only if necessary (ie. a focus selector was found).
+		getFocusSelectorsCopy().delete( path );
 	}
 
 	return {
