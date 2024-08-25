@@ -25,7 +25,7 @@ class Gutenberg_REST_Server_Test extends WP_Test_REST_TestCase {
 		$response = rest_do_request( '/wp/v2/posts' );
 		$post     = $response->get_data()[0];
 
-		$link = $post['_links'][0]['self'];
+		$link = $post['_links']['self'][0];
 		$this->assertArrayHasKey( 'targetHints', $link );
 		$this->assertArrayHasKey( 'allow', $link['targetHints'] );
 		$this->assertSame( array( 'GET', 'PUT', 'DELETE' ), $link['targetHints']['allow'] );
@@ -35,7 +35,7 @@ class Gutenberg_REST_Server_Test extends WP_Test_REST_TestCase {
 		$response = rest_do_request( '/wp/v2/posts' );
 		$post     = $response->get_data()[0];
 
-		$link = $post['_links'][0]['self'];
+		$link = $post['_links']['self'][0];
 		$this->assertArrayHasKey( 'targetHints', $link );
 		$this->assertArrayHasKey( 'allow', $link['targetHints'] );
 		$this->assertSame( array( 'GET' ), $link['targetHints']['allow'] );
