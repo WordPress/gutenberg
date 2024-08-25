@@ -163,12 +163,12 @@ html :where(img[class*="wp-image-"]) {
 }
 
 /**
- * Applies box-sizing: border-box; to elements with a class containing 'wp-block-' 
+ * Applies box-sizing: border-box; to elements with a class containing 'wp-block-'
  * and a style attribute containing 'border'.
  * This ensures consistent box-sizing behavior and makes layout calculations more predictable.
  */
 [class*="wp-block-"][style*="border"] {
-   box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 // Set the admin bar offset for sticky positioned blocks to the height of the admin bar.
