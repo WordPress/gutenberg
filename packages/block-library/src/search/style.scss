@@ -112,7 +112,6 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 :where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
 	padding: $grid-unit-05;
 	border: 1px solid $gray-600;
-	box-sizing: border-box;
 
 	.wp-block-search__input {
 		border-radius: 0;
