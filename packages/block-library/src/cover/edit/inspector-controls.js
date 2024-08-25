@@ -197,11 +197,10 @@ export default function CoverInspectorControls( {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const flag = true;
 	return (
 		<>
 			<InspectorControls>
-				{ flag && !! url && (
+				{ !! url && (
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
