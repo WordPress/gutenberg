@@ -33,6 +33,7 @@ function UserControl( { value, onChange } ) {
 
 	return (
 		<ComboboxControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'User' ) }
 			help={ __(

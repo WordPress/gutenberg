@@ -30,17 +30,19 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	LAYOUT_GRID,
+	sortIcons,
+	sortLabels,
+} from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
 import type { SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
+import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
@@ -56,7 +58,7 @@ function ViewTypeMenu( {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			trigger={
 				<Button
 					size="compact"
@@ -71,7 +73,7 @@ function ViewTypeMenu( {
 					return null;
 				}
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuV2.RadioItem
 						key={ layout }
 						value={ layout }
 						name="view-actions-available-view"
@@ -91,18 +93,14 @@ function ViewTypeMenu( {
 							warning( 'Invalid dataview' );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ config.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.RadioItem>
 				);
 			} ) }
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
-}
-
-interface ViewActionsProps {
-	defaultLayouts?: SupportedLayouts;
 }
 
 function SortFieldControl() {
@@ -140,7 +138,11 @@ function SortFieldControl() {
 }
 
 function SortDirectionControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
+	let value = view.sort?.direction;
+	if ( ! value && view.sort?.field ) {
+		value = 'desc';
+	}
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
@@ -148,18 +150,20 @@ function SortDirectionControl() {
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
-			value={ view.sort?.direction || 'desc' }
-			disabled={ ! view?.sort?.field }
+			value={ value }
 			onChange={ ( newDirection ) => {
-				if ( ! view?.sort?.field ) {
-					return;
-				}
 				if ( newDirection === 'asc' || newDirection === 'desc' ) {
 					onChangeView( {
 						...view,
 						sort: {
 							direction: newDirection,
-							field: view.sort.field,
+							field:
+								view.sort?.field ||
+								// If there is no field assigned as the sorting field assign the first sortable field.
+								fields.find(
+									( field ) => field.enableSorting !== false
+								)?.id ||
+								'',
 						},
 					} );
 					return;
@@ -303,7 +307,14 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent() {
+function DataviewsViewConfigContent( {
+	density,
+	setDensity,
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+} ) {
+	const { view } = useContext( DataViewsContext );
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection title={ __( 'Appearance' ) }>
@@ -311,6 +322,12 @@ function DataviewsViewConfigContent() {
 					<SortFieldControl />
 					<SortDirectionControl />
 				</HStack>
+				{ view.type === LAYOUT_GRID && (
+					<DensityPicker
+						density={ density }
+						setDensity={ setDensity }
+					/>
+				) }
 				<ItemsPerPageControl />
 			</SettingsSection>
 			<SettingsSection title={ __( 'Properties' ) }>
@@ -321,8 +338,14 @@ function DataviewsViewConfigContent() {
 }
 
 function _DataViewsViewConfig( {
+	density,
+	setDensity,
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+	defaultLayouts?: SupportedLayouts;
+} ) {
 	const [ isShowingViewPopover, setIsShowingViewPopover ] =
 		useState< boolean >( false );
 
@@ -344,7 +367,10 @@ function _DataViewsViewConfig( {
 						} }
 						focusOnMount
 					>
-						<DataviewsViewConfigContent />
+						<DataviewsViewConfigContent
+							density={ density }
+							setDensity={ setDensity }
+						/>
 					</Popover>
 				) }
 			</div>

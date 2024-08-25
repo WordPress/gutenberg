@@ -491,17 +491,22 @@ export function MediaPlaceholder( {
 				<>
 					{ renderDropZone() }
 					<FormFileUpload
-						variant="primary"
-						className={ clsx(
-							'block-editor-media-placeholder__button',
-							'block-editor-media-placeholder__upload-button'
+						render={ ( { openFileDialog } ) => (
+							<Button
+								onClick={ openFileDialog }
+								variant="primary"
+								className={ clsx(
+									'block-editor-media-placeholder__button',
+									'block-editor-media-placeholder__upload-button'
+								) }
+							>
+								{ __( 'Upload' ) }
+							</Button>
 						) }
 						onChange={ onUpload }
 						accept={ accept }
 						multiple={ !! multiple }
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
+					/>
 					{ uploadMediaLibraryButton }
 					{ renderUrlSelectionUI() }
 					{ renderFeaturedImageToggle() }

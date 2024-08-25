@@ -55,11 +55,7 @@ import {
 } from './shadow-utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 const customShadowMenuItems = [
 	{
@@ -151,7 +147,7 @@ export default function ShadowsEditPanel() {
 				<ScreenHeader title={ selectedShadow.name } />
 				<FlexItem>
 					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
-						<DropdownMenu
+						<DropdownMenuV2
 							trigger={
 								<Button
 									size="small"
@@ -164,7 +160,7 @@ export default function ShadowsEditPanel() {
 								? customShadowMenuItems
 								: presetShadowMenuItems
 							).map( ( item ) => (
-								<DropdownMenuItem
+								<DropdownMenuV2.Item
 									key={ item.action }
 									onClick={ () => onMenuClick( item.action ) }
 									disabled={
@@ -173,12 +169,12 @@ export default function ShadowsEditPanel() {
 											baseSelectedShadow.shadow
 									}
 								>
-									<DropdownMenuItemLabel>
+									<DropdownMenuV2.ItemLabel>
 										{ item.label }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
+									</DropdownMenuV2.ItemLabel>
+								</DropdownMenuV2.Item>
 							) ) }
-						</DropdownMenu>
+						</DropdownMenuV2>
 					</Spacer>
 				</FlexItem>
 			</HStack>
@@ -223,6 +219,7 @@ export default function ShadowsEditPanel() {
 						} }
 					>
 						<InputControl
+							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Name' ) }
 							placeholder={ __( 'Shadow name' ) }

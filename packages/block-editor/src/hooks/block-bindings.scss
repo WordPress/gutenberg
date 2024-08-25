@@ -1,5 +1,5 @@
 div.block-editor-bindings__panel {
-	grid-template-columns: auto;
+	grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
 	button:hover .block-editor-bindings__item-explanation {
 		color: inherit;
 	}

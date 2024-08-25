@@ -48,7 +48,7 @@ function UnconnectedNavigatorBackButton(
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
  *       <NavigatorBackButton>
- *         Go back
+ *         Go back (to parent)
  *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>

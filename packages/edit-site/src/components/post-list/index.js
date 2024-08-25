@@ -366,11 +366,7 @@ export default function PostList( { postType } ) {
 							size="compact"
 							isPressed={ quickEdit }
 							icon={ drawerRight }
-							label={
-								! quickEdit
-									? __( 'Show quick edit sidebar' )
-									: __( 'Close quick edit sidebar' )
-							}
+							label={ __( 'Toggle details panel' ) }
 							onClick={ () => {
 								history.push( {
 									...location.params,

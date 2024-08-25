@@ -88,10 +88,10 @@ export default {
 			return null;
 		}
 
-		// Remove footnotes from the list of fields
+		// Remove footnotes or private keys from the list of fields.
 		return Object.fromEntries(
 			Object.entries( metaFields ).filter(
-				( [ key ] ) => key !== 'footnotes'
+				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
 			)
 		);
 	},
