@@ -1,6 +1,6 @@
 <?php
 
-class Gutenberg_REST_Server_Test extends WP_Test_REST_Controller_Testcase {
+class Gutenberg_REST_Server_Test extends WP_Test_REST_TestCase {
 
 	protected static $admin_id;
 	protected static $post_id;
