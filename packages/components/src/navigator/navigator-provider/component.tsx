@@ -8,6 +8,7 @@ import type { ForwardedRef } from 'react';
  */
 import { useMemo, useReducer } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -46,8 +47,7 @@ type RouterState = {
 
 function addScreen( { screens }: RouterState, screen: Screen ) {
 	if ( screens.some( ( s ) => s.path === screen.path ) ) {
-		// eslint-disable-next-line no-console
-		console.warn(
+		warning(
 			`Navigator: a screen with path ${ screen.path } already exists.
 The screen with id ${ screen.id } will not be added.`
 		);
