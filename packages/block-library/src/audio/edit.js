@@ -133,7 +133,7 @@ function AudioEdit( {
 			return (
 				<Placeholder
 					className="block-editor-media-placeholder"
-					withIllustration
+					withIllustration={ ! isSingleSelected }
 					icon={ icon }
 					label={ __( 'Audio' ) }
 					instructions={ __(
