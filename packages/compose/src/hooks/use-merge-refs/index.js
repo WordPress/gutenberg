@@ -71,28 +71,28 @@ function assignRef( ref, value ) {
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
-	const isAttached = useRef( false );
-	const didElementChange = useRef( false );
+	const isAttachedRef = useRef( false );
+	const didElementChangeRef = useRef( false );
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {import('react').MutableRefObject<TRef[]>} */
 	/* eslint-enable jsdoc/no-undefined-types */
-	const previousRefs = useRef( [] );
-	const currentRefs = useRef( refs );
+	const previousRefsRef = useRef( [] );
+	const currentRefsRef = useRef( refs );
 
 	// Update on render before the ref callback is called, so the ref callback
 	// always has access to the current refs.
-	currentRefs.current = refs;
+	currentRefsRef.current = refs;
 
 	// If any of the refs change, call the previous ref with `null` and the new
 	// ref with the node, except when the element changes in the same cycle, in
 	// which case the ref callbacks will already have been called.
 	useLayoutEffect( () => {
 		if (
-			didElementChange.current === false &&
-			isAttached.current === true
+			didElementChangeRef.current === false &&
+			isAttachedRef.current === true
 		) {
 			refs.forEach( ( ref, index ) => {
-				const previousRef = previousRefs.current[ index ];
+				const previousRef = previousRefsRef.current[ index ];
 				if ( ref !== previousRef ) {
 					assignRef( previousRef, null );
 					assignRef( ref, element.current );
@@ -100,13 +100,13 @@ export default function useMergeRefs( refs ) {
 			} );
 		}
 
-		previousRefs.current = refs;
+		previousRefsRef.current = refs;
 	}, refs );
 
 	// No dependencies, must be reset after every render so ref callbacks are
 	// correctly called after a ref change.
 	useLayoutEffect( () => {
-		didElementChange.current = false;
+		didElementChangeRef.current = false;
 	} );
 
 	// There should be no dependencies so that `callback` is only called when
@@ -116,12 +116,14 @@ export default function useMergeRefs( refs ) {
 		// dependency change.
 		assignRef( element, value );
 
-		didElementChange.current = true;
-		isAttached.current = value !== null;
+		didElementChangeRef.current = true;
+		isAttachedRef.current = value !== null;
 
 		// When an element changes, the current ref callback should be called
 		// with the new element and the previous one with `null`.
-		const refsToAssign = value ? currentRefs.current : previousRefs.current;
+		const refsToAssign = value
+			? currentRefsRef.current
+			: previousRefsRef.current;
 
 		// Update the latest refs.
 		for ( const ref of refsToAssign ) {

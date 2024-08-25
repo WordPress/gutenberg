@@ -18,12 +18,7 @@ import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal } from '../../types';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface ActionWithModalProps< Item > {
 	action: ActionModal< Item >;
@@ -129,7 +124,7 @@ function BulkActionItem< Item >( {
 	const shouldShowModal = 'RenderModal' in action;
 
 	return (
-		<DropdownMenuItem
+		<DropdownMenuV2.Item
 			key={ action.id }
 			hideOnClick={ ! shouldShowModal }
 			onClick={ async () => {
@@ -142,7 +137,7 @@ function BulkActionItem< Item >( {
 			suffix={ eligibleItems.length }
 		>
 			{ action.label }
-		</DropdownMenuItem>
+		</DropdownMenuV2.Item>
 	);
 }
 
@@ -163,7 +158,7 @@ function ActionsMenuGroup< Item >( {
 	}
 	return (
 		<>
-			<DropdownMenuGroup>
+			<DropdownMenuV2.Group>
 				{ elligibleActions.map( ( action ) => (
 					<BulkActionItem
 						key={ action.id }
@@ -172,8 +167,8 @@ function ActionsMenuGroup< Item >( {
 						setActionWithModal={ setActionWithModal }
 					/>
 				) ) }
-			</DropdownMenuGroup>
-			<DropdownMenuSeparator />
+			</DropdownMenuV2.Group>
+			<DropdownMenuV2.Separator />
 		</>
 	);
 }
@@ -219,7 +214,7 @@ function _BulkActions() {
 	}
 	return (
 		<>
-			<DropdownMenu
+			<DropdownMenuV2
 				open={ isMenuOpen }
 				onOpenChange={ onMenuOpenChange }
 				label={ __( 'Bulk actions' ) }
@@ -250,8 +245,8 @@ function _BulkActions() {
 					setActionWithModal={ setActionWithModal }
 					selectedItems={ selectedItems }
 				/>
-				<DropdownMenuGroup>
-					<DropdownMenuItem
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.Item
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
@@ -264,8 +259,8 @@ function _BulkActions() {
 						suffix={ numberSelectableItems }
 					>
 						{ __( 'Select all' ) }
-					</DropdownMenuItem>
-					<DropdownMenuItem
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item
 						disabled={ selection.length === 0 }
 						hideOnClick={ false }
 						onClick={ () => {
@@ -273,9 +268,9 @@ function _BulkActions() {
 						} }
 					>
 						{ __( 'Deselect' ) }
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-			</DropdownMenu>
+					</DropdownMenuV2.Item>
+				</DropdownMenuV2.Group>
+			</DropdownMenuV2>
 			{ actionWithModal && (
 				<ActionWithModal
 					action={ actionWithModal }

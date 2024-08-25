@@ -322,7 +322,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected, metadata?.bindings?.url ]
+		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (

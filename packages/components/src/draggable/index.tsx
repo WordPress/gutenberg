@@ -71,7 +71,7 @@ export function Draggable( {
 	__experimentalDragComponent: dragComponent,
 }: DraggableProps ) {
 	const dragComponentRef = useRef< HTMLDivElement >( null );
-	const cleanup = useRef( () => {} );
+	const cleanupRef = useRef( () => {} );
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
@@ -80,7 +80,7 @@ export function Draggable( {
 	 */
 	function end( event: DragEvent ) {
 		event.preventDefault();
-		cleanup.current();
+		cleanupRef.current();
 
 		if ( onDragEnd ) {
 			onDragEnd( event );
@@ -216,7 +216,7 @@ export function Draggable( {
 			onDragStart( event );
 		}
 
-		cleanup.current = () => {
+		cleanupRef.current = () => {
 			// Remove drag clone.
 			if ( cloneWrapper && cloneWrapper.parentNode ) {
 				cloneWrapper.parentNode.removeChild( cloneWrapper );
@@ -235,7 +235,7 @@ export function Draggable( {
 
 	useEffect(
 		() => () => {
-			cleanup.current();
+			cleanupRef.current();
 		},
 		[]
 	);

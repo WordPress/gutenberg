@@ -121,7 +121,7 @@ $input-size: 300px;
 
 .block-editor-url-input__button-modal {
 	box-shadow: $elevation-x-small;
-	border: 1px solid $gray-300;
+	border: $border-width solid $gray-300;
 	background: $white;
 }
 

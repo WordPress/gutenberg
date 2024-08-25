@@ -28,7 +28,9 @@ export type NavigateOptions = {
 	 */
 	skipFocus?: boolean;
 	/**
-	 * Whether the navigation should replace the current location in the stack.
+	 * Note: this option is deprecated and currently doesn't have any effect.
+	 * @deprecated
+	 * @ignore
 	 */
 	replace?: boolean;
 };

@@ -23,14 +23,20 @@ import { getFontFamilies } from './utils';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import { unlock } from '../../lock-unlock';
-import { filterObjectByProperties } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import {
+	filterObjectByProperties,
+	useCurrentMergeThemeStyleVariationsWithUserConfig,
+} from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function TypesetButton() {
-	const { base } = useContext( GlobalStylesContext );
-	const { user: userConfig } = useContext( GlobalStylesContext );
+	const propertiesToFilter = [ 'typography' ];
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
+	const hasTypographyVariations = typographyVariations?.length > 1;
+	const { base, user: userConfig } = useContext( GlobalStylesContext );
 	const config = mergeBaseAndUserConfigs( base, userConfig );
 	const allFontFamilies = getFontFamilies( config );
 	const hasFonts =
@@ -63,6 +69,7 @@ function TypesetButton() {
 	}, [ allFontFamilies, userTypographyConfig, variations ] );
 
 	return (
+		hasTypographyVariations &&
 		hasFonts && (
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">

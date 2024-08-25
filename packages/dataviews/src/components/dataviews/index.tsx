@@ -118,11 +118,15 @@ export default function DataViews< Item >( {
 			<div className="dataviews-wrapper">
 				<HStack
 					alignment="top"
-					justify="start"
+					justify="space-between"
 					className="dataviews__view-actions"
 					spacing={ 1 }
 				>
-					<HStack justify="start" wrap>
+					<HStack
+						justify="start"
+						expanded={ false }
+						className="dataviews__search"
+					>
 						{ search && <DataViewsSearch label={ searchLabel } /> }
 						<FilterVisibilityToggle
 							filters={ filters }
@@ -133,12 +137,12 @@ export default function DataViews< Item >( {
 							isShowingFilter={ isShowingFilter }
 						/>
 					</HStack>
-					<DataViewsBulkActions />
 					<HStack
 						spacing={ 1 }
 						expanded={ false }
 						style={ { flexShrink: 0 } }
 					>
+						<DataViewsBulkActions />
 						<DataViewsViewConfig
 							defaultLayouts={ defaultLayouts }
 							density={ density }

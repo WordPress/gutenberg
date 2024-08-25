@@ -180,10 +180,10 @@ function LinkControl( {
 	// Therefore a local state is used as a fallback.
 	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
 
-	const isMounting = useRef( true );
+	const isMountingRef = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
-	const isEndingEditWithFocus = useRef( false );
+	const isEndingEditWithFocusRef = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
@@ -219,7 +219,7 @@ function LinkControl( {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
-		if ( isMounting.current ) {
+		if ( isMountingRef.current ) {
 			return;
 		}
 
@@ -234,16 +234,16 @@ function LinkControl( {
 
 		nextFocusTarget.focus();
 
-		isEndingEditWithFocus.current = false;
+		isEndingEditWithFocusRef.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
 
 	// The component mounting reference is maintained separately
 	// to correctly reset values in `StrictMode`.
 	useEffect( () => {
-		isMounting.current = false;
+		isMountingRef.current = false;
 
 		return () => {
-			isMounting.current = true;
+			isMountingRef.current = true;
 		};
 	}, [] );
 
@@ -254,7 +254,7 @@ function LinkControl( {
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	const stopEditing = () => {
-		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
+		isEndingEditWithFocusRef.current = !! wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
