@@ -65,7 +65,8 @@ function goTo(
 	path: string,
 	options: NavigateOptions = {}
 ) {
-	const { currentLocation, focusSelectors } = state;
+	const { focusSelectors } = state;
+	const currentLocation = { ...state.currentLocation, isInitial: false };
 
 	const {
 		// Default assignments
@@ -120,7 +121,8 @@ function goToParent(
 	state: RouterState,
 	options: NavigateToParentOptions = {}
 ) {
-	const { currentLocation, screens, focusSelectors } = state;
+	const { screens, focusSelectors } = state;
+	const currentLocation = { ...state.currentLocation, isInitial: false };
 	const currentPath = currentLocation?.path;
 	if ( currentPath === undefined ) {
 		return { currentLocation, focusSelectors };
@@ -154,20 +156,17 @@ function routerReducer(
 			screens = removeScreen( state, action.screen );
 			break;
 		case 'goto':
-			const goToNewState = goTo( state, action.path, action.options );
-			currentLocation = {
-				...goToNewState.currentLocation,
-				isInitial: false,
-			};
-			focusSelectors = goToNewState.focusSelectors;
+			( { currentLocation, focusSelectors } = goTo(
+				state,
+				action.path,
+				action.options
+			) );
 			break;
 		case 'gotoparent':
-			const goToParentNewState = goToParent( state, action.options );
-			currentLocation = {
-				...goToParentNewState.currentLocation,
-				isInitial: false,
-			};
-			focusSelectors = goToParentNewState.focusSelectors;
+			( { currentLocation, focusSelectors } = goToParent(
+				state,
+				action.options
+			) );
 			break;
 	}
 
