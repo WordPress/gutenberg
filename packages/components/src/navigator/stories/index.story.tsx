@@ -15,7 +15,6 @@ import {
 	NavigatorScreen,
 	NavigatorButton,
 	NavigatorBackButton,
-	NavigatorToParentButton,
 	useNavigator,
 } from '..';
 
@@ -261,9 +260,9 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					<Card>
 						<CardBody>
 							This is the first child
-							<NavigatorToParentButton variant="secondary">
+							<NavigatorBackButton variant="secondary">
 								Go back to parent
-							</NavigatorToParentButton>
+							</NavigatorBackButton>
 						</CardBody>
 					</Card>
 				</NavigatorScreen>
@@ -271,9 +270,9 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					<Card>
 						<CardBody>
 							This is the second child
-							<NavigatorToParentButton variant="secondary">
+							<NavigatorBackButton variant="secondary">
 								Go back to parent
-							</NavigatorToParentButton>
+							</NavigatorBackButton>
 							<NavigatorButton
 								variant="secondary"
 								path="/child2/grandchild"
@@ -287,9 +286,9 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					<Card>
 						<CardBody>
 							This is the grand child
-							<NavigatorToParentButton variant="secondary">
+							<NavigatorBackButton variant="secondary">
 								Go back to parent
-							</NavigatorToParentButton>
+							</NavigatorBackButton>
 						</CardBody>
 					</Card>
 				</NavigatorScreen>
@@ -345,9 +344,9 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						} }
 					>
 						<h2>Child screen</h2>
-						<NavigatorToParentButton variant="secondary">
+						<NavigatorBackButton variant="secondary">
 							Go to parent screen.
-						</NavigatorToParentButton>
+						</NavigatorBackButton>
 					</NavigatorScreen>
 				</div>
 
