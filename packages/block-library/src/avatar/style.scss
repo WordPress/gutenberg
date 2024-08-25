@@ -1,6 +1,10 @@
 .wp-block-avatar {
 	line-height: 0;
 
+	img {
+		box-sizing: border-box;
+	}
+
 	&.aligncenter {
 		text-align: center;
 	}
