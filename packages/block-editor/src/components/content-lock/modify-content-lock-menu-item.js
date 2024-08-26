@@ -1,17 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
-import { BlockControls } from '../components';
-import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 // The implementation of content locking is mainly in this file, although the mechanism
 // to stop temporarily editing as blocks when an outside block is selected is on component StopEditingAsBlocksOnOutsideSelect
@@ -19,7 +17,7 @@ import { unlock } from '../lock-unlock';
 // Besides the components on this file and the file referenced above the implementation
 // also includes artifacts on the store (actions, reducers, and selector).
 
-function ContentLockControlsPure( { clientId } ) {
+export function ModifyContentLockMenuItem( { clientId, onClose } ) {
 	const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
 		( select ) => {
 			const {
@@ -35,35 +33,26 @@ function ContentLockControlsPure( { clientId } ) {
 		},
 		[ clientId ]
 	);
-
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+	const blockEditorActions = useDispatch( blockEditorStore );
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
-
-	const stopEditingAsBlockCallback = useCallback( () => {
-		stopEditingAsBlocks( clientId );
-	}, [ clientId, stopEditingAsBlocks ] );
-
 	if ( ! isContentLocked && ! isEditingAsBlocks ) {
 		return null;
 	}
 
-	const showStopEditingAsBlocks = isEditingAsBlocks && ! isContentLocked;
+	const { modifyContentLockBlock } = unlock( blockEditorActions );
+	const showStartEditingAsBlocks = ! isEditingAsBlocks && isContentLocked;
 
 	return (
-		showStopEditingAsBlocks && (
-			<BlockControls group="other">
-				<ToolbarButton onClick={ stopEditingAsBlockCallback }>
-					{ __( 'Done' ) }
-				</ToolbarButton>
-			</BlockControls>
+		showStartEditingAsBlocks && (
+			<MenuItem
+				onClick={ () => {
+					modifyContentLockBlock( clientId );
+					onClose();
+				} }
+			>
+				{ _x( 'Modify', 'Unlock content locked blocks' ) }
+			</MenuItem>
 		)
 	);
 }
-
-export default {
-	edit: ContentLockControlsPure,
-	hasSupport() {
-		return true;
-	},
-};

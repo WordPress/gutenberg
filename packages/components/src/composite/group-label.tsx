@@ -28,4 +28,3 @@ export const CompositeGroupLabel = forwardRef<
 		/>
 	);
 } );
-CompositeGroupLabel.displayName = 'Composite.GroupLabel';
