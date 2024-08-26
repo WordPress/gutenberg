@@ -10,6 +10,7 @@ import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { VStack } from '../../v-stack';
 import Dropdown from '../../dropdown';
+import MenuItem from '../../menu-item';
 import {
 	NavigatorProvider,
 	NavigatorScreen,
@@ -79,10 +80,6 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 									renderToggle={ ( {
 										isOpen,
 										onToggle,
-									}: {
-										// TODO: remove once `Dropdown` is refactored to TypeScript
-										isOpen: boolean;
-										onToggle: () => void;
 									} ) => (
 										<Button
 											onClick={ onToggle }
@@ -93,15 +90,15 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 										</Button>
 									) }
 									renderContent={ () => (
-										<Card>
-											<CardHeader>Go</CardHeader>
-											<CardBody>Stuff</CardBody>
-										</Card>
 									) }
 								/>
 							</VStack>
 						</CardBody>
 					</Card>
+								<>
+									<MenuItem>Item 2</MenuItem>
+									<MenuItem>Item 1</MenuItem>
+								</>
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/child">
