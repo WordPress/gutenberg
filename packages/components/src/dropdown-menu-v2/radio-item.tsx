@@ -64,4 +64,3 @@ export const DropdownMenuRadioItem = forwardRef<
 		</Styled.DropdownMenuRadioItem>
 	);
 } );
-DropdownMenuRadioItem.displayName = 'DropdownMenuV2.RadioItem';
