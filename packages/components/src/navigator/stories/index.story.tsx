@@ -35,13 +35,22 @@ const meta: Meta< typeof NavigatorProvider > = {
 };
 export default meta;
 
+const StyledNavigatorScreen = (
+	props: React.ComponentProps< typeof NavigatorScreen >
+) => (
+	<NavigatorScreen
+		{ ...props }
+		style={ { paddingInline: '8px', height: '100%', ...props.style } }
+	/>
+);
+
 export const Default: StoryObj< typeof NavigatorProvider > = {
 	args: {
 		initialPath: '/',
 		style: { height: '100vh', maxHeight: '450px' },
 		children: (
 			<>
-				<NavigatorScreen path="/">
+				<StyledNavigatorScreen path="/">
 					<p>This is the home screen.</p>
 
 					<VStack alignment="left">
@@ -82,16 +91,16 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 							) }
 						/>
 					</VStack>
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 
-				<NavigatorScreen path="/child">
+				<StyledNavigatorScreen path="/child">
 					<p>This is the child screen.</p>
 					<NavigatorBackButton variant="secondary">
 						Go back
 					</NavigatorBackButton>
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 
-				<NavigatorScreen path="/overflow-child">
+				<StyledNavigatorScreen path="/overflow-child">
 					<NavigatorBackButton variant="secondary">
 						Go back
 					</NavigatorBackButton>
@@ -111,9 +120,9 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 							¯\_(ツ)_/¯
 						</span>
 					</div>
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 
-				<NavigatorScreen path="/stickies">
+				<StyledNavigatorScreen path="/stickies">
 					<div
 						style={ {
 							...getStickyStyles( {
@@ -158,11 +167,11 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 					>
 						<Button variant="primary">Primary noop</Button>
 					</div>
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 
-				<NavigatorScreen path="/product/:id">
+				<StyledNavigatorScreen path="/product/:id">
 					<ProductDetails />
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 			</>
 		),
 	},
@@ -222,21 +231,21 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 		initialPath: '/child2/grandchild',
 		children: (
 			<>
-				<NavigatorScreen path="/">
+				<StyledNavigatorScreen path="/">
 					<NavigatorButton variant="secondary" path="/child1">
 						Go to first child.
 					</NavigatorButton>
 					<NavigatorButton variant="secondary" path="/child2">
 						Go to second child.
 					</NavigatorButton>
-				</NavigatorScreen>
-				<NavigatorScreen path="/child1">
+				</StyledNavigatorScreen>
+				<StyledNavigatorScreen path="/child1">
 					This is the first child
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
 					</NavigatorBackButton>
-				</NavigatorScreen>
-				<NavigatorScreen path="/child2">
+				</StyledNavigatorScreen>
+				<StyledNavigatorScreen path="/child2">
 					This is the second child
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
@@ -247,13 +256,13 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					>
 						Go to grand child.
 					</NavigatorButton>
-				</NavigatorScreen>
-				<NavigatorScreen path="/child2/grandchild">
+				</StyledNavigatorScreen>
+				<StyledNavigatorScreen path="/child2/grandchild">
 					This is the grand child
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
 					</NavigatorBackButton>
-				</NavigatorScreen>
+				</StyledNavigatorScreen>
 			</>
 		),
 	},
@@ -288,7 +297,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						border: '1px solid black',
 					} }
 				>
-					<NavigatorScreen
+					<StyledNavigatorScreen
 						path="/"
 						style={ {
 							height: '100%',
@@ -298,8 +307,8 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						<NavigatorButton variant="secondary" path="/child">
 							Go to child screen.
 						</NavigatorButton>
-					</NavigatorScreen>
-					<NavigatorScreen
+					</StyledNavigatorScreen>
+					<StyledNavigatorScreen
 						path="/child"
 						style={ {
 							height: '100%',
@@ -309,7 +318,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						<NavigatorBackButton variant="secondary">
 							Go to parent screen.
 						</NavigatorBackButton>
-					</NavigatorScreen>
+					</StyledNavigatorScreen>
 				</div>
 
 				<NavigatorButtonWithSkipFocus
