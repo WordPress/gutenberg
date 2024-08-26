@@ -62,6 +62,7 @@
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
 		"@wordpress/keycodes": "file:packages/keycodes",
+		"@wordpress/language-chooser": "file:packages/language-chooser",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
 		"@wordpress/media-utils": "file:packages/media-utils",
 		"@wordpress/notices": "file:packages/notices",

@@ -3,11 +3,7 @@
  */
 import { _x, sprintf } from '@wordpress/i18n';
 import { shortcutAriaLabel, displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import { Button } from '../button';
+import { Button } from '@wordpress/components';
 
 interface InactiveControlsProps {
 	disabled: boolean;

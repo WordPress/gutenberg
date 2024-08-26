@@ -9,16 +9,16 @@ import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import { Notice } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import Notice from '../notice';
 import ActiveLocales from './active-locales';
 import InactiveLocales from './inactive-locales';
 import type { Language } from './types';
 import { reorder } from './utils';
-import { useInstanceId } from '@wordpress/compose';
 
 function MissingTranslationsNotice() {
 	return (

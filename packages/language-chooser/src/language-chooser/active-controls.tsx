@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { Button } from '../button';
+import { Button } from '@wordpress/components';
 
 interface ActiveControlsProps {
 	onMoveUp: () => void;
