@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
--   Added a new `LanguageChooser` component ([#64686](https://github.com/WordPress/gutenberg/pull/64686)).
-
 ### Deprecations
 
 -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
