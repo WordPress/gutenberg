@@ -3,14 +3,12 @@
  */
 import type * as Ariakit from '@ariakit/react';
 
-export type CompositeContextProps =
-	| {
-			/**
-			 * The component store, used for advanced usage of the component.
-			 */
-			store: Ariakit.CompositeStore;
-	  }
-	| undefined;
+export type CompositeContextProps = {
+	/**
+	 * The component store, used for advanced usage of the component.
+	 */
+	store?: unknown;
+};
 
 type CompositeStoreProps = {
 	/**
