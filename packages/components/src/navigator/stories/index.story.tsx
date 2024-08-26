@@ -306,7 +306,9 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 				<div
 					style={ {
 						height: 250,
-						border: '1px solid black',
+						outline: '1px solid black',
+						outlineOffset: '-1px',
+						marginBlockEnd: '1rem',
 					} }
 				>
 					<StyledNavigatorScreen
@@ -333,11 +335,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 					</StyledNavigatorScreen>
 				</div>
 
-				<NavigatorButtonWithSkipFocus
-					variant="secondary"
-					path="/child"
-					style={ { margin: '1rem 2rem' } }
-				>
+				<NavigatorButtonWithSkipFocus variant="secondary" path="/child">
 					Go to child screen, but keep focus on this button
 				</NavigatorButtonWithSkipFocus>
 			</>
