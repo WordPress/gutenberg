@@ -13,7 +13,6 @@ export { useNavigator } from './use-navigator';
  * view (via the `Navigator.Button` and `Navigator.BackButton` components or the
  * `useNavigator` hook).
  *
- * @example
  * ```jsx
  * import { Navigator } from '@wordpress/components';
  *
