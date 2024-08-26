@@ -37,7 +37,6 @@ export { useNavigator } from './use-navigator';
  * ```
  */
 export const Navigator = Object.assign( TopLevelNavigator, {
-	dislayName: 'Navigator',
 	/**
 	 * The `Navigator.Screen` component represents a single view/screen/panel and
 	 * should be used in combination with the `Navigator`, the `Navigator.Button`
