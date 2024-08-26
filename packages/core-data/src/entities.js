@@ -182,7 +182,7 @@ export const rootEntitiesConfig = [
 		name: 'globalStyles',
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
-		baseURLParams: { context: 'edit' },
+		baseURLParams: {},
 		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
 		getRevisionsUrl: ( parentId, revisionId ) =>
@@ -190,6 +190,17 @@ export const rootEntitiesConfig = [
 				revisionId ? '/' + revisionId : ''
 			}`,
 		supportsPagination: true,
+		getPath: ( path, query, baseURL, id ) => {
+			const context =
+				query.context ||
+				( query.operation === 'read' ? 'view' : 'edit' );
+			const contextQuery = context ? `?context=${ context }` : '';
+			return `${ baseURL }${ id ? '/' + id : '' }${ contextQuery }`;
+		},
+		capabilities: {
+			read: 'edit_posts',
+			update: 'edit_theme_options',
+		},
 	},
 	{
 		label: __( 'Themes' ),
