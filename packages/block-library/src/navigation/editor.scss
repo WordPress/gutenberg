@@ -3,9 +3,9 @@
  */
 
 // Undo default editor styles.
-// These need extra specificity.
-// This seems to be partly necessary because the `ul` element has a `wp-block` class
-// applied to it, even though it's not a block, meaning it receives alignment styles.
+// These need extra specificity to do two things in classic themes
+// 1. Override the auto margin left from alignment styles.
+// 2. Override list style indentation.
 .editor-styles-wrapper .wp-block-navigation {
 	ul {
 		margin-top: 0;
