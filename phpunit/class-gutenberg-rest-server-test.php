@@ -20,6 +20,16 @@ class Gutenberg_REST_Server_Test extends WP_Test_REST_TestCase {
 		wp_delete_post( self::$post_id );
 	}
 
+	public function set_up() {
+		parent::set_up();
+		add_filter(
+			'wp_rest_server_class',
+			function () {
+				return 'Gutenberg_REST_Server';
+			}
+		);
+	}
+
 	public function test_populates_target_hints_for_administrator() {
 		wp_set_current_user( self::$admin_id );
 		$response = rest_do_request( '/wp/v2/posts' );
@@ -28,7 +38,7 @@ class Gutenberg_REST_Server_Test extends WP_Test_REST_TestCase {
 		$link = $post['_links']['self'][0];
 		$this->assertArrayHasKey( 'targetHints', $link );
 		$this->assertArrayHasKey( 'allow', $link['targetHints'] );
-		$this->assertSame( array( 'GET', 'PUT', 'DELETE' ), $link['targetHints']['allow'] );
+		$this->assertSame( array( 'GET', 'POST', 'PUT', 'PATCH', 'DELETE' ), $link['targetHints']['allow'] );
 	}
 
 	public function test_populates_target_hints_for_logged_out_user() {
