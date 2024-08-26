@@ -21,6 +21,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Special case to set 'original_image' in attachment metadata.
 		$valid_image_sizes[] = 'original';
+		// Used for PDF thumbnails.
+		$valid_image_sizes[] = 'full';
 
 		register_rest_route(
 			$this->namespace,
