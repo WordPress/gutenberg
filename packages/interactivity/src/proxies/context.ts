@@ -1,34 +1,27 @@
-// TODO: Use the proxy registry to avoid multiple proxies on the same object.
-
-// Store the context proxy and fallback for each object in the context.
 const contextObjectToProxy = new WeakMap();
-const contextProxyToObject = new WeakMap();
 const contextObjectToFallback = new WeakMap();
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
+// TODO: Use the proxy registry to avoid multiple proxies on the same object.
 const contextHandlers: ProxyHandler< object > = {
-	get: ( target: object, k: string ) => {
+	get: ( target, key ) => {
 		const fallback = contextObjectToFallback.get( target );
 		// Always subscribe to prop changes in the current context.
-		const currentProp = target[ k ];
-
-		// Return the inherited prop when missing in target.
-		if ( ! ( k in target ) && k in fallback ) {
-			return fallback[ k ];
-		}
+		const currentProp = target[ key ];
 
 		/*
-		 * For other cases, return the value from target, also
-		 * subscribing to changes in the parent context when the current
-		 * prop is not defined.
+		 * Return the value from `target` if it exists, or from `fallback`
+		 * otherwise. This way, in the case the property doesn't exist either in
+		 * `target` or `fallback`, it also subscribes to changes in the parent
+		 * context.
 		 */
-		return k in target ? currentProp : fallback[ k ];
+		return key in target ? currentProp : fallback[ key ];
 	},
-	set: ( target, k, value ) => {
+	set: ( target, key, value ) => {
 		const fallback = contextObjectToFallback.get( target );
-		const obj = k in target || ! ( k in fallback ) ? target : fallback;
-		obj[ k ] = value;
+		const obj = key in target || ! ( key in fallback ) ? target : fallback;
+		obj[ key ] = value;
 
 		return true;
 	},
@@ -38,9 +31,9 @@ const contextHandlers: ProxyHandler< object > = {
 			...Object.keys( target ),
 		] ),
 	],
-	getOwnPropertyDescriptor: ( target, k ) =>
-		descriptor( target, k ) ||
-		descriptor( contextObjectToFallback.get( target ), k ),
+	getOwnPropertyDescriptor: ( target, key ) =>
+		descriptor( target, key ) ||
+		descriptor( contextObjectToFallback.get( target ), key ),
 };
 
 /**
@@ -63,7 +56,6 @@ export const proxifyContext = (
 	if ( ! contextObjectToProxy.has( current ) ) {
 		const proxy = new Proxy( current, contextHandlers );
 		contextObjectToProxy.set( current, proxy );
-		contextProxyToObject.set( proxy, current );
 	}
 	return contextObjectToProxy.get( current );
 };
