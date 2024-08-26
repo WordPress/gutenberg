@@ -191,9 +191,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * {@see wp_unique_filename()} will always add numeric suffix if the name looks like a sub-size to avoid conflicts.
 	 *
-	 * See https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
+	 * Adding this closure to the filter helps work around this safeguard.
 	 *
-	 * With adding this closure to the filter we can work around this safeguard.
+	 * Example: when uploading myphoto.jpeg, WordPress normally creates myphoto-150x150.jpeg,
+	 * and when uploading myphoto-150x150.jpeg, it will be renamed to myphoto-150x150-1.jpeg
+	 * However, here it is desired not to add the suffix in order to maintain the same
+	 * naming convention as if the file was uploaded regularly.
+	 *
+	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
 	 *
 	 * @param string $attachment_filename Attachment file name.
 	 * @return callable Function to add to the filter.
