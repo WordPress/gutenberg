@@ -28,4 +28,3 @@ export const CompositeItem = forwardRef<
 		/>
 	);
 } );
-CompositeItem.displayName = 'Composite.Item';
