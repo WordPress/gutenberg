@@ -115,6 +115,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'large',
 				);
 
+				// The filter might have been added by ::create_item().
 				remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 
 				/** This filter is documented in wp-admin/includes/image.php */
