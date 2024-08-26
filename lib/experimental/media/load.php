@@ -41,6 +41,7 @@ function gutenberg_get_default_image_output_formats() {
 	$output_formats = array();
 
 	foreach ( $input_formats as $mime_type ) {
+		/** This filter is documented in wp-includes/media.php */
 		$output_formats = apply_filters(
 			'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			$output_formats,
