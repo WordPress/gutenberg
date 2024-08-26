@@ -31,11 +31,11 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 ## Conditionally rendering SlotFill content
 
-With the exception of [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md), every available SlotFill is exposed on both the post edit and site edit screens and any Fill that is registered will be rendered in both contexts. There are a number of approaches that can be implemented to conditionally render Fills.
+With the exception of [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md), every available SlotFill is exposed in both the Post Editor and Site Editor and any Fill that is registered will be rendered in both contexts. There are a number of approaches that can be implemented to conditionally render Fills.
 
-### Restricting fills to the edit post screen.
+### Restricting fills to the Post Editor
 
-A fill can be restricted to the edit post screen by checking to see if the current post type object property viewable is set to `true`. Any post type not set to viewable, does not have an associated edit post screen and is a good indicator that the user is not in the edit post screen. The example below will render its content on the edit post screen for any registered post type.
+A fill can be restricted to the Post Editor by checking to see if the current post type object property `viewable` is set to `true`. Any post type not set to `viewable`, does not have an associated edit post screen and is a good indicator that the user is not in the Post Editor. The example below will render its content on the edit post screen for any registered post type.
 
 ```js
 /**
@@ -144,9 +144,9 @@ registerPlugin( 'example-restrict-post-types', {
 } );
 ```
 
-### Restricting fills to the Side editor.
+### Restricting fills to the Side Editor
 
-To restrict fills to the Site editor, the reverse logic is true. If the post type object’s viewable property is set to true, then the fill should not be rendered. The example below will render its content on any Site editor screen.
+To restrict fills to the Site Editor, the reverse logic is true. If the post type object’s `viewable` property is set to `true`, then the fill should not be rendered. The example below will render its content on any Site Editor screen.
 
 ```js
 /**
@@ -195,9 +195,9 @@ registerPlugin( 'example-site-editor', {
 } );
 ```
 
-### Restricting fills to certain screens in the Site editor.
+### Restricting fills to certain screens in the Site Editor.
 
-This example builds on the example above by providing an allow list to control which screens a fill can be rendered within the Site editor.
+This example builds on the example above by providing an allow list to control which screens a fill can be rendered within the Site Editor.
 
 ```js
 /**
