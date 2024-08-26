@@ -51,7 +51,7 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 		children: (
 			<>
 				<StyledNavigatorScreen path="/">
-					<p>This is the home screen.</p>
+					<h2>This is the home screen.</h2>
 
 					<VStack alignment="left">
 						<NavigatorButton variant="secondary" path="/child">
@@ -62,7 +62,7 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 							variant="secondary"
 							path="/overflow-child"
 						>
-							Navigate to screen with horizontal overflow.
+							Navigate to screen with overflowing content
 						</NavigatorButton>
 
 						<NavigatorButton variant="secondary" path="/stickies">
@@ -94,13 +94,15 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 				</StyledNavigatorScreen>
 
 				<StyledNavigatorScreen path="/child">
-					<p>This is the child screen.</p>
+					<h2>This is the child screen.</h2>
 					<NavigatorBackButton variant="secondary">
 						Go back
 					</NavigatorBackButton>
 				</StyledNavigatorScreen>
 
 				<StyledNavigatorScreen path="/overflow-child">
+					<h2>This is a screen with overflowing content</h2>
+
 					<NavigatorBackButton variant="secondary">
 						Go back
 					</NavigatorBackButton>
@@ -216,10 +218,11 @@ function ProductDetails() {
 
 	return (
 		<div>
+			<h2>This is the product details screen</h2>
+			<p>The current product id is: { params.id }</p>
 			<NavigatorBackButton variant="secondary">
 				Go back
 			</NavigatorBackButton>
-			<p>This is the screen for the product with id: { params.id }</p>
 		</div>
 	);
 }
@@ -232,6 +235,8 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 		children: (
 			<>
 				<StyledNavigatorScreen path="/">
+					<h2>Home screen</h2>
+
 					<NavigatorButton variant="secondary" path="/child1">
 						Go to first child.
 					</NavigatorButton>
@@ -240,13 +245,15 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					</NavigatorButton>
 				</StyledNavigatorScreen>
 				<StyledNavigatorScreen path="/child1">
-					This is the first child
+					<h2>First child screen</h2>
+
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
 					</NavigatorBackButton>
 				</StyledNavigatorScreen>
 				<StyledNavigatorScreen path="/child2">
-					This is the second child
+					<h2>Second child screen</h2>
+
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
 					</NavigatorBackButton>
@@ -258,7 +265,8 @@ export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
 					</NavigatorButton>
 				</StyledNavigatorScreen>
 				<StyledNavigatorScreen path="/child2/grandchild">
-					This is the grand child
+					<h2>Grand-child screen</h2>
+
 					<NavigatorBackButton variant="secondary">
 						Go back to parent
 					</NavigatorBackButton>
@@ -303,7 +311,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 							height: '100%',
 						} }
 					>
-						<h1>Home screen</h1>
+						<h2>Home screen</h2>
 						<NavigatorButton variant="secondary" path="/child">
 							Go to child screen.
 						</NavigatorButton>
