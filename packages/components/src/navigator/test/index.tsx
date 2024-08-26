@@ -15,13 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import Button from '../../button';
 import { Navigator, useNavigator } from '..';
-import {
-	// NavigatorProvider,
-	// NavigatorScreen,
-	// NavigatorButton,
-	// NavigatorBackButton,
-	NavigatorToParentButton,
-} from '../legacy';
+import { NavigatorToParentButton } from '../legacy';
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
