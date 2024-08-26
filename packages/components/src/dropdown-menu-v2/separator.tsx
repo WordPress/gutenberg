@@ -25,4 +25,3 @@ export const DropdownMenuSeparator = forwardRef<
 		/>
 	);
 } );
-DropdownMenuSeparator.displayName = 'DropdownMenuV2.Separator';
