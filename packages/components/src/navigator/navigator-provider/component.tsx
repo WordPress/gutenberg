@@ -79,7 +79,7 @@ function goTo(
 		...restOptions
 	} = options;
 
-	if ( currentLocation?.path === path ) {
+	if ( currentLocation.path === path ) {
 		return { currentLocation, focusSelectors };
 	}
 
@@ -92,7 +92,7 @@ function goTo(
 
 	// Set a focus selector that will be used when navigating
 	// back to the current location.
-	if ( focusTargetSelector && currentLocation?.path ) {
+	if ( focusTargetSelector && currentLocation.path ) {
 		getFocusSelectorsCopy().set(
 			currentLocation.path,
 			focusTargetSelector
@@ -130,7 +130,7 @@ function goToParent(
 ) {
 	const { screens, focusSelectors } = state;
 	const currentLocation = { ...state.currentLocation, isInitial: false };
-	const currentPath = currentLocation?.path;
+	const currentPath = currentLocation.path;
 	if ( currentPath === undefined ) {
 		return { currentLocation, focusSelectors };
 	}
@@ -186,7 +186,7 @@ function routerReducer(
 	}
 
 	// Compute the matchedPath
-	const currentPath = currentLocation?.path;
+	const currentPath = currentLocation.path;
 	matchedPath =
 		currentPath !== undefined
 			? patternMatch( currentPath, screens )
