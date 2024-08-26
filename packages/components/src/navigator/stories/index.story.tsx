@@ -73,6 +73,10 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 							Navigate to product screen with id 1.
 						</NavigatorButton>
 
+						<NavigatorButton variant="secondary" path="/product/14">
+							Navigate to product screen with id 14.
+						</NavigatorButton>
+
 						<Dropdown
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<Button
