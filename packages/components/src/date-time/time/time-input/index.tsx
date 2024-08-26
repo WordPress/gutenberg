@@ -167,7 +167,6 @@ export function TimeInput( {
 				</TimeWrapper>
 				{ is12Hour && (
 					<ToggleGroupControl
-						className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						isBlock
@@ -181,12 +180,10 @@ export function TimeInput( {
 						} }
 					>
 						<ToggleGroupControlOption
-							className="components-datetime__time-am-button" // Unused, for backwards compatibility.
 							value="AM"
 							label={ __( 'AM' ) }
 						/>
 						<ToggleGroupControlOption
-							className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
 							value="PM"
 							label={ __( 'PM' ) }
 						/>
