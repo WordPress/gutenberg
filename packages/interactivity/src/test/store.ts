@@ -5,7 +5,7 @@
 /**
  * Internal dependencies
  */
-import { store } from '../store';
+import { store, typed } from '../store';
 
 describe( 'Interactivity API', () => {
 	describe( 'store', () => {
@@ -74,9 +74,8 @@ describe( 'Interactivity API', () => {
 							sync( n ) {
 								return n;
 							},
-							*async( n ): Generator< unknown, number, number > {
-								const n1: number =
-									yield myStore.actions.sync( n );
+							*async( n ): Generator< unknown, number, unknown > {
+								const n1 = myStore.actions.sync( n );
 								return myStore.state.derived + n1 + n;
 							},
 						},
@@ -233,6 +232,36 @@ describe( 'Interactivity API', () => {
 					const n3: number = await myStore.actions.asyncAction();
 					// @ts-expect-error
 					myStore.state.nonExistent;
+				};
+			} );
+
+			describe( 'generators can use the `type` function to type promises.', () => {
+				async () => {
+					const myPromise = async ( n: number ) => {
+						return n;
+					};
+
+					const myStore = store( 'test', {
+						actions: {
+							*asyncAction( n: number ) {
+								const n1 = yield* typed( myPromise( 1 ) );
+								const n2: number = n1;
+								return n2;
+							},
+							*anotherAsyncAction() {
+								const n1 = yield* typed(
+									myStore.actions.asyncAction( 1 )
+								);
+								const n2: number = n1;
+								// @ts-expect-error
+								const s1: string = n1;
+							},
+						},
+					} );
+
+					const n1: Promise< number > =
+						myStore.actions.asyncAction( 1 );
+					const n2: number = await myStore.actions.asyncAction( 1 );
 				};
 			} );
 		} );

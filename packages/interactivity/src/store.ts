@@ -85,6 +85,13 @@ type ConvertPromisesToGenerators< T > = {
 		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
 		: T[ K ];
 };
+export function typed< T >(
+	cb: Promise< T >
+): Generator< Promise< T >, T, T > {
+	return ( function* () {
+		return yield cb;
+	} )();
+}
 
 export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
