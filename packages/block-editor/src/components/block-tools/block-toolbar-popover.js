@@ -47,15 +47,19 @@ export default function BlockToolbarPopover( {
 		isToolbarForcedRef.current = false;
 	} );
 
+	// If the block has a parent with __experimentalCaptureToolbars enabled,
+	// the toolbar should be positioned over the topmost capturing parent.
+	const clientIdToPositionOver = capturingClientId || clientId;
+
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
-		clientId,
+		clientId: clientIdToPositionOver,
 	} );
 
 	return (
 		! isTyping && (
 			<BlockPopover
-				clientId={ capturingClientId || clientId }
+				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
 				className={ clsx( 'block-editor-block-list__block-popover', {
 					'is-insertion-point-visible': isInsertionPointVisible,
