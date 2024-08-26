@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -108,6 +109,9 @@ export function ImageEdit( {
 		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const [ contentResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -364,35 +368,43 @@ export function ImageEdit( {
 	};
 
 	return (
-		<figure { ...blockProps }>
-			<Image
-				temporaryURL={ temporaryURL }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSingleSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				onReplace={ onReplace }
-				onSelectImage={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onUploadError={ onUploadError }
-				context={ context }
-				clientId={ clientId }
-				blockEditingMode={ blockEditingMode }
-				parentLayoutType={ parentLayout?.type }
-			/>
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
-		</figure>
+		<>
+			<figure { ...blockProps }>
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ parentLayout?.type }
+					containerWidth={ containerWidth }
+				/>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				contentResizeListener
+			}
+		</>
 	);
 }
 
