@@ -66,13 +66,13 @@ const toggleHomeIconVariants = {
 
 const siteIconVariants = {
 	edit: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 	hover: {
 		clipPath: 'inset( 22% round 2px )',
 	},
 	tap: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 };
 
