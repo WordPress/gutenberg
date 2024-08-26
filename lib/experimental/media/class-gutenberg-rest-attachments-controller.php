@@ -335,7 +335,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			rest_url( rest_get_route_for_post( $attachment_id ) )
 		);
 
-		$response_request->set_param( 'context', 'edit' );
+		$response_request['context'] = 'edit';
 
 		if ( isset( $request['_fields'] ) ) {
 			$response_request['_fields'] = $request['_fields'];
