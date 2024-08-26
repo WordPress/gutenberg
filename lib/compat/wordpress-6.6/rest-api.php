@@ -170,6 +170,7 @@ function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
 		$paths[] = '/wp/v2/global-styles/themes/' . get_stylesheet();
 		$paths[] = '/wp/v2/themes?context=edit&status=active';
 		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() . '?context=edit';
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	}
 	return $paths;
 }
