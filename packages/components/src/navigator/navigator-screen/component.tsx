@@ -49,6 +49,7 @@ function UnconnectedNavigatorScreen(
 	}
 
 	const screenId = useId();
+	const animationTimeoutRef = useRef< number >();
 
 	// Read props and components context.
 	const { children, className, path, ...otherProps } = useContextSystem(
@@ -138,6 +139,19 @@ function UnconnectedNavigatorScreen(
 			isAnimatingOut,
 		]
 	);
+	// Fallback timeout to ensure the screen is removed from the DOM in case the
+	// `animationend` event is not triggered.
+	useEffect( () => {
+		if ( exitAnimationStatus === 'animating' ) {
+			animationTimeoutRef.current = window.setTimeout( () => {
+				setExitAnimationStatus( 'animated' );
+				animationTimeoutRef.current = undefined;
+			}, styles.TOTAL_ANIMATION_DURATION_OUT );
+		} else if ( animationTimeoutRef.current ) {
+			window.clearTimeout( animationTimeoutRef.current );
+			animationTimeoutRef.current = undefined;
+		}
+	}, [ exitAnimationStatus ] );
 
 	// Focus restoration
 	const locationRef = useRef( location );
