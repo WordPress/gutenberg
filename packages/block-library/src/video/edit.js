@@ -150,15 +150,13 @@ function VideoEdit( {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
-				withIllustration
+				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
 				instructions={ __(
 					'Upload a video file, pick one from your media library, or add one with a URL.'
 				) }
-				style={ {
-					...borderProps.style,
-				} }
+				style={ borderProps.style }
 			>
 				{ content }
 			</Placeholder>
