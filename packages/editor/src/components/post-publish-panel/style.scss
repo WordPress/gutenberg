@@ -39,6 +39,7 @@
 	border: none;
 	border-radius: $radius-block-ui;
 	margin-right: $grid-unit-15;
+	flex-shrink: 0;
 
 	// Same size as in the Site menu.
 	height: 36px;
