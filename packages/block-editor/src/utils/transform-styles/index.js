@@ -52,9 +52,13 @@ function prefixRootSelector( prefix, selector ) {
 	// Doing it this way takes into account that a root selector like
 	// 'body' may have additional id/class/pseudo-class/attribute-selector
 	// parts chained to it, which is difficult to quantify using a regex.
-	const insertionPoint = tokenized.findIndex( ( { type }, index ) => {
-		return index > lastRootIndex && type === 'combinator';
-	} );
+	let insertionPoint = -1;
+	for ( let i = lastRootIndex + 1; i < tokenized.length; i++ ) {
+		if ( tokenized[ i ].type === 'combinator' ) {
+			insertionPoint = i;
+			break;
+		}
+	}
 
 	// Tokenize and insert the prefix with a ' ' combinator before it.
 	const tokenizedPrefix = parsel.tokenize( prefix );
