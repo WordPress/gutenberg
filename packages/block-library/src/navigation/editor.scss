@@ -4,6 +4,8 @@
 
 // Undo default editor styles.
 // These need extra specificity.
+// This seems to be partly necessary because the `ul` element has a `wp-block` class
+// applied to it, even though it's not a block, meaning it receives alignment styles.
 .editor-styles-wrapper .wp-block-navigation {
 	ul {
 		margin-top: 0;
