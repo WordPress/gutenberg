@@ -480,7 +480,7 @@ $color-control-label-height: 20px;
 	}
 }
 
-// The iframe makes these rules a lot simpler.
+// `body.editor-styles-wrapper` ensures this only applies to the iframed editor.
 body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-open {
 	top: 0;
 	right: 0;
