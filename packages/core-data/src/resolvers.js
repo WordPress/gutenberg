@@ -407,7 +407,6 @@ export const canUser =
 			resourcePath =
 				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
 		} else {
-			// @todo: Maybe warn when detecting a legacy usage.
 			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
 		}
 
@@ -464,9 +463,9 @@ export const canUser =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {string} recordId Record's id.
+ * @param {string}        kind     Entity kind.
+ * @param {string}        name     Entity name.
+ * @param {number|string} recordId Record's id.
  */
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>

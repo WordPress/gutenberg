@@ -4,13 +4,14 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useContext } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import BlockContext from '../components/block-context';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -90,13 +91,18 @@ export function canBindAttribute( blockName, attributeName ) {
 	);
 }
 
+export function getBindableAttributes( blockName ) {
+	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+}
+
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
+		const blockContext = useContext( BlockContext );
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const { name, clientId, context } = props;
+		const { name, clientId } = props;
 		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
@@ -145,6 +151,15 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 			if ( blockBindingsBySource.size ) {
 				for ( const [ source, bindings ] of blockBindingsBySource ) {
+					// Populate context.
+					const context = {};
+
+					if ( source.usesContext?.length ) {
+						for ( const key of source.usesContext ) {
+							context[ key ] = blockContext[ key ];
+						}
+					}
+
 					// Get values in batch if the source supports it.
 					const values = source.getValues( {
 						registry,
@@ -177,7 +192,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ blockBindings, name, clientId, context, registry, sources ] );
+		}, [ blockBindings, name, clientId, blockContext, registry, sources ] );
 
 		const { setAttributes } = props;
 
@@ -223,6 +238,15 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							source,
 							bindings,
 						] of blockBindingsBySource ) {
+							// Populate context.
+							const context = {};
+
+							if ( source.usesContext?.length ) {
+								for ( const key of source.usesContext ) {
+									context[ key ] = blockContext[ key ];
+								}
+							}
+
 							source.setValues( {
 								registry,
 								context,
@@ -255,7 +279,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				blockBindings,
 				name,
 				clientId,
-				context,
+				blockContext,
 				setAttributes,
 				sources,
 				hasPatternOverridesDefaultBinding,

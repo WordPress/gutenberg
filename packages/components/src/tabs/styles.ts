@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 
 export const TabListWrapper = styled.div`
@@ -76,13 +76,14 @@ export const Tab = styled( Ariakit.Tab )`
 		font-weight: 500;
 		text-align: inherit;
 		hyphens: auto;
+		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
 			cursor: default;
-			opacity: 0.3;
+			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:hover {
+		&:not( [aria-disabled='true'] ):hover {
 			color: ${ COLORS.theme.accent };
 		}
 
@@ -106,7 +107,7 @@ export const Tab = styled( Ariakit.Tab )`
 			// Outline works for Windows high contrast mode as well.
 			outline: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
-			border-radius: 2px;
+			border-radius: ${ CONFIG.radiusSmall };
 
 			// Animation
 			opacity: 0;
@@ -135,7 +136,6 @@ export const TabPanel = styled( Ariakit.TabPanel )`
 	}
 
 	&:focus-visible {
-		border-radius: 2px;
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			${ COLORS.theme.accent };
 		// Windows high contrast mode.

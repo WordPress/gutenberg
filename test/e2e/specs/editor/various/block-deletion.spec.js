@@ -287,15 +287,16 @@ test.describe( 'Block deletion', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
-			{ name: 'core/paragraph', attributes: { content: '' } },
 		] );
 
 		// Ensure that the newly created empty block is focused.
-		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
+		await expect.poll( editor.getBlocks ).toHaveLength( 2 );
 		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Empty block',
-			} )
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.nth( 1 )
 		).toBeFocused();
 	} );
 

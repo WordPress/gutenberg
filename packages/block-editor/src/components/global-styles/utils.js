@@ -7,6 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
+import { getCSSValueFromRawStyle } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -524,4 +525,93 @@ export function getBlockStyleVariationSelector( variation, blockSelector ) {
 		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
 
 	return result.join( ',' );
+}
+
+/**
+ * Looks up a theme file URI based on a relative path.
+ *
+ * @param {string}        file          A relative path.
+ * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
+ * @return {string} A resolved theme file URI, if one is found in the themeFileURIs collection.
+ */
+export function getResolvedThemeFilePath( file, themeFileURIs ) {
+	if ( ! file || ! themeFileURIs || ! Array.isArray( themeFileURIs ) ) {
+		return file;
+	}
+
+	const uri = themeFileURIs.find(
+		( themeFileUri ) => themeFileUri?.name === file
+	);
+
+	if ( ! uri?.href ) {
+		return file;
+	}
+
+	return uri?.href;
+}
+
+/**
+ * Resolves ref values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedRefValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	/*
+	 * Where the rule value is an object with a 'ref' property pointing
+	 * to a path, this converts that path into the value at that path.
+	 * For example: { "ref": "style.color.background" } => "#fff".
+	 */
+	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+		const refPath = ruleValue.ref.split( '.' );
+		const resolvedRuleValue = getCSSValueFromRawStyle(
+			getValueFromObjectPath( tree, refPath )
+		);
+
+		/*
+		 * Presence of another ref indicates a reference to another dynamic value.
+		 * Pointing to another dynamic value is not supported.
+		 */
+		if ( resolvedRuleValue?.ref ) {
+			return undefined;
+		}
+
+		if ( ! resolvedRuleValue ) {
+			return ruleValue;
+		}
+
+		return resolvedRuleValue;
+	}
+	return ruleValue;
+}
+
+/**
+ * Resolves ref and relative path values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	// Resolve ref values.
+	const resolvedValue = getResolvedRefValue( ruleValue, tree );
+
+	// Resolve relative paths.
+	if ( resolvedValue?.url ) {
+		resolvedValue.url = getResolvedThemeFilePath(
+			resolvedValue.url,
+			tree?._links?.[ 'wp:theme-file' ]
+		);
+	}
+
+	return resolvedValue;
 }

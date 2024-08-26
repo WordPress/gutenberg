@@ -1624,6 +1624,8 @@ export function insertionPoint( state = null, action ) {
 		}
 
 		case 'HIDE_INSERTION_POINT':
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
 			return null;
 	}
 

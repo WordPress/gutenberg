@@ -18,22 +18,22 @@ export function useZoomOut( zoomOut = true ) {
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 
-	const originalEditingMode = useRef( null );
+	const originalEditingModeRef = useRef( null );
 	const mode = __unstableGetEditorMode();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
-		if ( ! originalEditingMode.current ) {
-			originalEditingMode.current = mode;
+		if ( ! originalEditingModeRef.current ) {
+			originalEditingModeRef.current = mode;
 		}
 
 		return () => {
 			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
 			if (
 				__unstableGetEditorMode() === 'zoom-out' &&
-				__unstableGetEditorMode() !== originalEditingMode.current
+				__unstableGetEditorMode() !== originalEditingModeRef.current
 			) {
-				__unstableSetEditorMode( originalEditingMode.current );
+				__unstableSetEditorMode( originalEditingModeRef.current );
 			}
 		};
 	}, [] );
@@ -45,9 +45,9 @@ export function useZoomOut( zoomOut = true ) {
 		} else if (
 			! zoomOut &&
 			__unstableGetEditorMode() === 'zoom-out' &&
-			originalEditingMode.current !== mode
+			originalEditingModeRef.current !== mode
 		) {
-			__unstableSetEditorMode( originalEditingMode.current );
+			__unstableSetEditorMode( originalEditingModeRef.current );
 		}
-	}, [ __unstableSetEditorMode, zoomOut, mode ] );
+	}, [ __unstableGetEditorMode, __unstableSetEditorMode, zoomOut ] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
 }

@@ -35,33 +35,21 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/experimental/class-wp-rest-block-editor-settings-controller.php';
 	}
 
-	// WordPress 6.4 compat.
-	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-templates-controller-6-4.php';
-	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-global-styles-revisions-controller-6-4.php';
-	require_once __DIR__ . '/compat/wordpress-6.4/class-gutenberg-rest-block-patterns-controller.php';
-	require_once __DIR__ . '/compat/wordpress-6.4/rest-api.php';
-	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
-
-	// WordPress 6.5 compat.
-	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
-	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
-
 	// WordPress 6.6 compat.
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-global-styles-revisions-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
+
+	// WordPress 6.7 compat.
+	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-templates-controller-6-7.php';
+	require __DIR__ . '/compat/wordpress-6.7/rest-api.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
-	// Experimental.
-	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
-		require_once __DIR__ . '/experimental/class-wp-rest-customizer-nonces.php';
-	}
 	require_once __DIR__ . '/experimental/rest-api.php';
-
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
@@ -74,24 +62,11 @@ require __DIR__ . '/experimental/editor-settings.php';
 
 // Gutenberg plugin compat.
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
-require __DIR__ . '/compat/plugin/footnotes.php';
+require __DIR__ . '/compat/plugin/fonts.php';
 
 // The Token Map was created during 6.6 in order to support the HTML API. It must be loaded before it.
 require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-token-map-6-6.php';
-
-/*
- * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
- * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
- * always be loaded so that Gutenberg code can run the newest version of the Tag Processor.
- */
-require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-attribute-token-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-span-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-text-replacement-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-open-elements-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-state-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-tag-processor-6-5.php';
-require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-6-5.php';
+require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-token-map-6-7.php';
 
 require __DIR__ . '/compat/wordpress-6.6/html-api/gutenberg-html5-named-character-references-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-decoder-6-6.php';
@@ -101,45 +76,19 @@ require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-stack-eve
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-state-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-6-6.php';
 
-/*
- * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
- * WordPress before it was introduced, these verbatim Core files will be missing.
- */
-if ( ! class_exists( 'WP_HTML_Processor' ) ) {
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-active-formatting-elements.php';
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-open-elements.php';
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor-state.php';
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-token.php';
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-unsupported-exception.php';
-	require __DIR__ . '/compat/wordpress-6.4/html-api/class-wp-html-processor.php';
-}
-
-// WordPress 6.4 compat.
-require __DIR__ . '/compat/wordpress-6.4/blocks.php';
-require __DIR__ . '/compat/wordpress-6.4/block-hooks.php';
-require __DIR__ . '/compat/wordpress-6.4/script-loader.php';
-require __DIR__ . '/compat/wordpress-6.4/kses.php';
-
-// WordPress 6.5 compat.
-require __DIR__ . '/compat/wordpress-6.5/compat.php';
-require __DIR__ . '/compat/wordpress-6.5/blocks.php';
-require __DIR__ . '/compat/wordpress-6.5/block-patterns.php';
-require __DIR__ . '/compat/wordpress-6.5/kses.php';
-require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api.php';
-require __DIR__ . '/compat/wordpress-6.5/interactivity-api/class-wp-interactivity-api-directives-processor.php';
-require __DIR__ . '/compat/wordpress-6.5/interactivity-api/interactivity-api.php';
-require __DIR__ . '/compat/wordpress-6.5/class-wp-script-modules.php';
-require __DIR__ . '/compat/wordpress-6.5/scripts-modules.php';
-require __DIR__ . '/compat/wordpress-6.5/navigation-block-variations.php';
-if ( ! class_exists( 'WP_Block_Bindings_Source' ) ) {
-	require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings-source.php';
-}
-if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
-	require __DIR__ . '/compat/wordpress-6.5/block-bindings/class-wp-block-bindings-registry.php';
-}
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
-require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
+// Type annotations were added in 6.7 so every file is updated.
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-active-formatting-elements-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-attribute-token-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-decoder-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-open-elements-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-span-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-stack-event-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-text-replacement-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-token-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-unsupported-exception-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-tag-processor-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor-state-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor-6-7.php';
 
 // WordPress 6.6 compat.
 require __DIR__ . '/compat/wordpress-6.6/admin-bar.php';
@@ -153,7 +102,12 @@ require __DIR__ . '/compat/wordpress-6.6/option.php';
 require __DIR__ . '/compat/wordpress-6.6/post.php';
 
 // WordPress 6.7 compat.
+require __DIR__ . '/compat/wordpress-6.7/block-templates.php';
 require __DIR__ . '/compat/wordpress-6.7/blocks.php';
+require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
+require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
+require __DIR__ . '/compat/wordpress-6.7/class-wp-block-templates-registry.php';
+require __DIR__ . '/compat/wordpress-6.7/compat.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -168,31 +122,6 @@ require __DIR__ . '/experimental/posts/load.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
-
-// Fonts API / Font Face.
-remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
-
-// Loads the Font Library.
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-collection.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-library.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-font-utils.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-families-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-faces-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-collections-controller.php';
-require __DIR__ . '/compat/wordpress-6.5/fonts/fonts.php';
-
-// Load the Font Face and Font Face Resolver, if not already loaded by WordPress Core.
-if ( ! class_exists( 'WP_Font_Face' ) ) {
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face.php';
-	require __DIR__ . '/compat/wordpress-6.4/fonts/font-face/class-wp-font-face-resolver.php';
-}
-
-/*
- * As _gutenberg_get_iframed_editor_assets_6_4() overrides Core's _wp_get_iframed_editor_assets(),
- * load this file to ensure wp_print_font_faces() is invoked to load the styles into the
- * iframed editor.
- */
-require __DIR__ . '/compat/wordpress-6.4/fonts/fonts.php';
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.

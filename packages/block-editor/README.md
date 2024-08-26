@@ -547,7 +547,7 @@ _Returns_
 
 > **Deprecated**
 
-This function was accidentially exposed for mobile/native usage.
+This function was accidentally exposed for mobile/native usage.
 
 _Returns_
 
@@ -920,20 +920,15 @@ _Usage_
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
+	const blockProps = useBlockProps( {
+		className: 'my-custom-class',
+		style: {
+			color: '#222222',
+			backgroundColor: '#eeeeee',
+		},
+	} );
 
-  const blockProps = useBlockProps(
-    className: 'my-custom-class',
-    style: {
-      color: '#222222',
-      backgroundColor: '#eeeeee'
-    }
-  )
-
-  return (
-    <div { ...blockProps }>
-
-    </div>
-  )
+	return <div { ...blockProps }></div>;
 }
 ```
 
@@ -1028,6 +1023,16 @@ _Parameters_
 _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
+
+### useStyleOverride
+
+Override a block editor settings style. Leave the ID blank to create a new style.
+
+_Parameters_
+
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
 
 ### useZoomOut
 

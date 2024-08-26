@@ -6,7 +6,6 @@ import {
 	TextControl,
 	SelectControl,
 	RangeControl,
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
@@ -28,6 +27,9 @@ import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
 import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
+import PerPageControl from './per-page-control';
+import OffsetControl from './offset-controls';
+import PagesControl from './pages-control';
 import { unlock } from '../../../lock-unlock';
 import {
 	usePostTypes,
@@ -48,7 +50,10 @@ export default function QueryInspectorControls( props ) {
 		order,
 		orderBy,
 		author: authorIds,
+		pages,
 		postType,
+		perPage,
+		offset,
 		sticky,
 		inherit,
 		taxQuery,
@@ -103,9 +108,9 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const postTypeControlLabel = __( 'Content type' );
+	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
-		'WordPress contains different types of content you can filter by. Posts and pages are the default types, but plugins could add more.'
+		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
@@ -136,6 +141,16 @@ export default function QueryInspectorControls( props ) {
 		showParentControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const showPostCountControl = isControlAllowed(
+		allowedControls,
+		'postCount'
+	);
+	const showOffSetControl = isControlAllowed( allowedControls, 'offset' );
+	const showPagesControl = isControlAllowed( allowedControls, 'pages' );
+
+	const showDisplayPanel =
+		showPostCountControl || showOffSetControl || showPagesControl;
+
 	return (
 		<>
 			{ !! postType && (
@@ -146,17 +161,34 @@ export default function QueryInspectorControls( props ) {
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
-						<ToggleControl
+						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Inherit query from template' ) }
-							help={ __(
-								'Enable to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-							) }
-							checked={ !! inherit }
-							onChange={ ( value ) =>
-								setQuery( { inherit: !! value } )
+							label={ __( 'Query type' ) }
+							isBlock
+							onChange={ ( value ) => {
+								setQuery( { inherit: !! value } );
+							} }
+							help={
+								inherit
+									? __(
+											'Display a list of posts or custom post types based on the current template.'
+									  )
+									: __(
+											'Display a list of posts or custom post types based on specific criteria.'
+									  )
 							}
-						/>
+							value={ !! inherit }
+						>
+							<ToggleGroupControlOption
+								value
+								label={ __( 'Default' ) }
+							/>
+							<ToggleGroupControlOption
+								value={ false }
+								label={ __( 'Custom' ) }
+							/>
+						</ToggleGroupControl>
 					) }
 					{ showPostTypeControl &&
 						( postTypesSelectOptions.length > 2 ? (
@@ -236,6 +268,47 @@ export default function QueryInspectorControls( props ) {
 						clientId={ clientId }
 					/>
 				</PanelBody>
+			) }
+			{ ! inherit && showDisplayPanel && (
+				<ToolsPanel
+					className="block-library-query-toolspanel__display"
+					label={ __( 'Display' ) }
+					resetAll={ () => {
+						setQuery( {
+							offset: 0,
+							pages: 0,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Items' ) }
+						hasValue={ () => perPage > 0 }
+					>
+						<PerPageControl
+							perPage={ perPage }
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Offset' ) }
+						hasValue={ () => offset > 0 }
+						onDeselect={ () => setQuery( { offset: 0 } ) }
+					>
+						<OffsetControl
+							offset={ offset }
+							onChange={ setQuery }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Max Pages to Show' ) }
+						hasValue={ () => pages > 0 }
+						onDeselect={ () => setQuery( { pages: 0 } ) }
+					>
+						<PagesControl pages={ pages } onChange={ setQuery } />
+					</ToolsPanelItem>
+				</ToolsPanel>
 			) }
 			{ ! inherit && showFiltersPanel && (
 				<ToolsPanel

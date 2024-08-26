@@ -8,6 +8,12 @@ const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const _backgroundImage = style?.background?.backgroundImage;
+
+		/*
+		 * The background image can be a string or an object.
+		 * If the background image is a string, it could already contain a url() function,
+		 * or have a linear-gradient value.
+		 */
 		if ( typeof _backgroundImage === 'object' && _backgroundImage?.url ) {
 			return [
 				{
@@ -21,20 +27,12 @@ const backgroundImage = {
 			];
 		}
 
-		/*
-		 * If the background image is a string, it could already contain a url() function,
-		 * or have a linear-gradient value.
-		 */
-		if ( typeof _backgroundImage === 'string' ) {
-			return generateRule(
-				style,
-				options,
-				[ 'background', 'backgroundImage' ],
-				'backgroundImage'
-			);
-		}
-
-		return [];
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundImage' ],
+			'backgroundImage'
+		);
 	},
 };
 

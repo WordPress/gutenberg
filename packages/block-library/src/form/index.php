@@ -92,7 +92,7 @@ function block_core_form_send_email() {
 	// Start building the email content.
 	$content = sprintf(
 		/* translators: %s: The request URI. */
-		__( 'Form submission from %1$s', 'gutenberg' ) . '</br>',
+		__( 'Form submission from %1$s' ) . '</br>',
 		'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
 	);
 
@@ -110,7 +110,7 @@ function block_core_form_send_email() {
 	// Send the email.
 	$result = wp_mail(
 		str_replace( 'mailto:', '', $params['formAction'] ),
-		__( 'Form submission', 'gutenberg' ),
+		__( 'Form submission' ),
 		$content
 	);
 

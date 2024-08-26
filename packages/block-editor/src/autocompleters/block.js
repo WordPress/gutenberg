@@ -60,7 +60,8 @@ function createBlockCompleter() {
 				}, [] );
 			const [ items, categories, collections ] = useBlockTypesState(
 				rootClientId,
-				noop
+				noop,
+				true
 			);
 
 			const filteredItems = useMemo( () => {

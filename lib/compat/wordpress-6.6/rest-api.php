@@ -33,7 +33,7 @@ add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 
 /**
  * Adds the post classes to the REST API response.
  *
- * @param  array  $post  The response object data.
+ * @param  array $post The response object data.
  *
  * @return array
  */
@@ -169,7 +169,7 @@ function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
 	if ( 'core/edit-post' === $context->name ) {
 		$paths[] = '/wp/v2/global-styles/themes/' . get_stylesheet();
 		$paths[] = '/wp/v2/themes?context=edit&status=active';
-		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver::get_user_global_styles_post_id() . '?context=edit';
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() . '?context=edit';
 	}
 	return $paths;
 }

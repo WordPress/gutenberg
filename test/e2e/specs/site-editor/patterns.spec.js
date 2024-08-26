@@ -148,6 +148,7 @@ test.describe( 'Patterns', () => {
 		await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 		await expect( patterns.item ).toHaveCount( 3 );
+
 		const searchBox = patterns.content.getByRole( 'searchbox', {
 			name: 'Search',
 		} );
