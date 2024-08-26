@@ -251,7 +251,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		) {
 			return new WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID.', 'gutenberg' ),
+				__( 'Invalid post ID, only images and PDFs can be sideloaded.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}
