@@ -261,19 +261,18 @@ The following example implements all of the above recommendations.
 //=======================
 import { forwardRef } from '@wordpress/element';
 
-export const SubComponent = forwardRef(
-	function UnforwardedSubComponent( props, ref ) {
+export const ComponentSubcomponent = forwardRef(
+	function UnforwardedComponentSubcomponent( props, ref ) {
 		/* ... */
 	}
 );
-SubComponent.displayName = 'Component.SubComponent';
 
 //=======================
 // context.ts
 //=======================
 import { createContext } from '@wordpress/element';
 
-export const Context = createContext();
+export const ComponentContext = createContext();
 
 //=======================
 // hook.ts
@@ -288,8 +287,8 @@ export function useComponent() {
 // component.tsx
 //=======================
 import { forwardRef } from '@wordpress/element';
-import { SubComponent } from './subcomponent';
-import { Context } from './context';
+import { ComponentSubcomponent } from './subcomponent';
+import { ComponentContext } from './context';
 
 /** The top-level component's JSDoc. */
 export const Component = Object.assign(
@@ -298,9 +297,13 @@ export const Component = Object.assign(
 	} ),
 	{
 		/** The subcomponent's JSDoc. */
-		SubComponent,
+		Subcomponent: Object.assign(ComponentSubcomponent, {
+			displayName: 'Component.SubComponent';,
+		}),
 		/** The context's JSDoc. */
-		Context,
+		Context: Object.assign(ComponentContext, {
+			displayName: 'Component.Context'
+		}),
 	}
 );
 
