@@ -40,6 +40,7 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	return (
 		<>
 			<SelectControl
+				__next40pxDefaultSize
 				label={ labelComponent }
 				options={ sizeOptions }
 				__nextHasNoMarginBottom

@@ -227,12 +227,14 @@ const ImageURLInputUI = ( {
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Link rel' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
 			/>
 			<TextControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }

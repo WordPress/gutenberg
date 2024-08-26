@@ -183,10 +183,10 @@ function ToolbarContent< Item >( {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
-	const buttons = useRef< JSX.Element | null >( null );
+	const buttonsRef = useRef< JSX.Element | null >( null );
 	if ( ! actionInProgress ) {
-		if ( buttons.current ) {
-			buttons.current = null;
+		if ( buttonsRef.current ) {
+			buttonsRef.current = null;
 		}
 		return renderToolbarContent(
 			selection,
@@ -196,8 +196,8 @@ function ToolbarContent< Item >( {
 			setActionInProgress,
 			onChangeSelection
 		);
-	} else if ( ! buttons.current ) {
-		buttons.current = renderToolbarContent(
+	} else if ( ! buttonsRef.current ) {
+		buttonsRef.current = renderToolbarContent(
 			selection,
 			actionsToShow,
 			selectedItems,
@@ -206,7 +206,7 @@ function ToolbarContent< Item >( {
 			onChangeSelection
 		);
 	}
-	return buttons.current;
+	return buttonsRef.current;
 }
 
 function _BulkActionsToolbar() {
