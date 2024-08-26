@@ -59,7 +59,10 @@ export default function TemplateContentPanel() {
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
-	if ( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
+	if (
+		( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) ||
+		clientIds.length === 0
+	) {
 		return null;
 	}
 

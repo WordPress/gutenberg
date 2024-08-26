@@ -42,6 +42,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 			{ ...props }
 		>
 			<ZoomOutToolbar
+				__unstableContentRef={ __unstableContentRef }
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/>

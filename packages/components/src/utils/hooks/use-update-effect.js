@@ -12,12 +12,12 @@ import { useRef, useEffect } from '@wordpress/element';
  * @param {import('react').DependencyList} deps
  */
 function useUpdateEffect( effect, deps ) {
-	const mounted = useRef( false );
+	const mountedRef = useRef( false );
 	useEffect( () => {
-		if ( mounted.current ) {
+		if ( mountedRef.current ) {
 			return effect();
 		}
-		mounted.current = true;
+		mountedRef.current = true;
 		return undefined;
 		// Disable reasons:
 		// 1. This hook needs to pass a dep list that isn't an array literal
@@ -28,7 +28,7 @@ function useUpdateEffect( effect, deps ) {
 
 	useEffect(
 		() => () => {
-			mounted.current = false;
+			mountedRef.current = false;
 		},
 		[]
 	);

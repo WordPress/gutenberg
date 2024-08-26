@@ -3,11 +3,9 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	Button,
 	ExternalLink,
 	FocalPointPicker,
 	PanelBody,
-	PanelRow,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
@@ -73,13 +71,13 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			label={ __( 'Minimum height of cover' ) }
+			__next40pxDefaultSize
+			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>
@@ -93,7 +91,6 @@ export default function CoverInspectorControls( {
 	coverRef,
 	currentSettings,
 	updateDimRatio,
-	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -188,7 +185,6 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								__next40pxDefaultSize
 								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
@@ -229,16 +225,6 @@ export default function CoverInspectorControls( {
 								}
 							/>
 						) }
-						<PanelRow>
-							<Button
-								variant="secondary"
-								size="small"
-								className="block-library-cover__reset-button"
-								onClick={ onClearMedia }
-							>
-								{ __( 'Clear Media' ) }
-							</Button>
-						</PanelRow>
 					</PanelBody>
 				) }
 			</InspectorControls>
@@ -300,6 +286,7 @@ export default function CoverInspectorControls( {
 			) }
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ () =>

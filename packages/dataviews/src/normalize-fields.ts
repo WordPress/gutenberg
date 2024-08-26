@@ -3,7 +3,7 @@
  */
 import getFieldTypeDefinition from './field-types';
 import type { Field, NormalizedField } from './types';
-import { getControl } from './components/dataform-controls';
+import { getControl } from './dataform-controls';
 
 /**
  * Apply default values and normalize the fields config.
@@ -55,6 +55,7 @@ export function normalizeFields< Item >(
 		return {
 			...field,
 			label: field.label || field.id,
+			header: field.header || field.label || field.id,
 			getValue,
 			render,
 			sort,

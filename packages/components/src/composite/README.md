@@ -1,5 +1,9 @@
 # `Composite`
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 `Composite` provides a single tab stop on the page and allows navigation through the focusable descendants with arrow keys. This abstract component is based on the [WAI-ARIA Composite Role⁠](https://w3c.github.io/aria/#composite).
 
 ## Usage
@@ -147,6 +151,55 @@ Allows the component to be rendered as a different HTML element or React compone
 
 -   Required: no
 
+##### `focusable`: `boolean`
+
+Makes the component a focusable element. When this element gains keyboard focus, it gets a `data-focus-visible` attribute and triggers the `onFocusVisible` prop.
+
+The component supports the `disabled` prop even for those elements not supporting the native `disabled` attribute. Disabled elements may be still accessible via keyboard by using the the `accessibleWhenDisabled` prop.
+
+Non-native focusable elements will lose their focusability entirely. However, native focusable elements will retain their inherent focusability.
+
+-   Required: no
+
+##### `disabled`: `boolean`
+
+Determines if the element is disabled. This sets the `aria-disabled` attribute accordingly, enabling support for all elements, including those that don't support the native `disabled` attribute.
+
+This feature can be combined with the `accessibleWhenDisabled` prop to
+make disabled elements still accessible via keyboard.
+
+**Note**: For this prop to work, the `focusable` prop must be set to
+`true`, if it's not set by default.
+
+-   Required: no
+-   Default: `false`
+
+##### `accessibleWhenDisabled`: `boolean`
+
+Indicates whether the element should be focusable even when it is
+`disabled`.
+
+This is important when discoverability is a concern. For example:
+
+> A toolbar in an editor contains a set of special smart paste functions
+> that are disabled when the clipboard is empty or when the function is not
+> applicable to the current content of the clipboard. It could be helpful to
+> keep the disabled buttons focusable if the ability to discover their
+> functionality is primarily via their presence on the toolbar.
+
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
+
+-   Required: no
+
+##### `onFocusVisible`: `(event: SyntheticEvent<HTMLElement>) => void`
+
+Custom event handler invoked when the element gains focus through keyboard interaction or a key press occurs while the element is in focus. This is the programmatic equivalent of the `data-focus-visible` attribute.
+
+**Note**: For this prop to work, the `focusable` prop must be set to `true` if it's not set by default.
+
+-   Required: no
+
 ##### `children`: `React.ReactNode`
 
 The contents of the component.
@@ -188,6 +241,24 @@ The contents of the component.
 ### `Composite.Item`
 
 Renders a composite item.
+
+##### `accessibleWhenDisabled`: `boolean`
+
+Indicates whether the element should be focusable even when it is
+`disabled`.
+
+This is important when discoverability is a concern. For example:
+
+> A toolbar in an editor contains a set of special smart paste functions
+> that are disabled when the clipboard is empty or when the function is not
+> applicable to the current content of the clipboard. It could be helpful to
+> keep the disabled buttons focusable if the ability to discover their
+> functionality is primarily via their presence on the toolbar.
+
+Learn more on [Focusability of disabled
+controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
+
+-   Required: no
 
 ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
 
@@ -248,3 +319,7 @@ Allows the component to be rendered as a different HTML element or React compone
 The contents of the component.
 
 -   Required: no
+
+### `Composite.Context`
+
+The React context used by the composite components. It can be used by to access the composite store, and to forward the context when composite sub-components are rendered across portals (ie. `SlotFill` components) that would not otherwise forward the context to the `Fill` children.

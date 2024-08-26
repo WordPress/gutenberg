@@ -626,10 +626,11 @@ function Navigation( {
 								</div>
 							</>
 						) }
-						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Configure overlay menu' ) }
+							label={ __( 'Overlay Menu' ) }
+							aria-label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
 								'Collapses the navigation options in a menu icon opening an overlay.'
@@ -638,7 +639,6 @@ function Navigation( {
 								setAttributes( { overlayMenu: value } )
 							}
 							isBlock
-							hideLabelFromVision
 						>
 							<ToggleGroupControlOption
 								value="never"

@@ -501,7 +501,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
 
 ```html
 <div data-wp-init="callbacks.logTimeInit">
-  <p>Hi!</>
+  <p>Hi!</p>
 </div>
 ```
 
@@ -776,7 +776,7 @@ Actions are just regular JavaScript functions. Usually triggered by the `data-wp
 ```ts
 const { state, actions } = store("myPlugin", {
   actions: {
-    selectItem: (id?: number) => {
+    selectItem: ( id ) => {
       const context = getContext();
       // `id` is optional here, so this action can be used in a directive.
       state.selected = id || context.id;

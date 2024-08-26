@@ -225,7 +225,7 @@ function VideoEdit( {
 						attributes={ attributes }
 					/>
 					<MediaUploadCheck>
-						<BaseControl className="editor-video-poster-control">
+						<div className="editor-video-poster-control">
 							<BaseControl.VisualLabel>
 								{ __( 'Poster image' ) }
 							</BaseControl.VisualLabel>
@@ -271,7 +271,7 @@ function VideoEdit( {
 									{ __( 'Remove' ) }
 								</Button>
 							) }
-						</BaseControl>
+						</div>
 					</MediaUploadCheck>
 				</PanelBody>
 			</InspectorControls>
