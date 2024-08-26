@@ -1782,6 +1782,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/language-chooser",
+		"slug": "packages-language-chooser",
+		"markdown_source": "../packages/language-chooser/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/lazy-import",
 		"slug": "packages-lazy-import",
 		"markdown_source": "../packages/lazy-import/README.md",
