@@ -33,6 +33,7 @@ export default function CategoriesEdit( {
 		showEmpty,
 		label,
 		showLabel,
+		taxonomy,
 	},
 	setAttributes,
 	className,
@@ -45,7 +46,7 @@ export default function CategoriesEdit( {
 
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
-		'category',
+		taxonomy,
 		query
 	);
 

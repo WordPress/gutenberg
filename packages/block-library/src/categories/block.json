@@ -7,6 +7,10 @@
 	"description": "Display a list of all categories.",
 	"textdomain": "default",
 	"attributes": {
+		"taxonomy": {
+			"type": "string",
+			"default": "category"
+		},
 		"displayAsDropdown": {
 			"type": "boolean",
 			"default": false
