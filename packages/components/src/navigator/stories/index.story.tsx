@@ -47,7 +47,7 @@ const StyledNavigatorScreen = (
 export const Default: StoryObj< typeof NavigatorProvider > = {
 	args: {
 		initialPath: '/',
-		style: { height: '100vh', maxHeight: '450px' },
+		style: { height: 'calc(100vh - 2rem)' }, // take storybook's padding into account
 		children: (
 			<>
 				<StyledNavigatorScreen path="/">
