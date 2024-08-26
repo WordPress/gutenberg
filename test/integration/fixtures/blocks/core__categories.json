@@ -3,6 +3,7 @@
 		"name": "core/categories",
 		"isValid": true,
 		"attributes": {
+			"taxonomy": "category",
 			"displayAsDropdown": false,
 			"showHierarchy": false,
 			"showPostCounts": false,
