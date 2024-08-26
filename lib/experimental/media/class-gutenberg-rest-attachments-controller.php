@@ -17,6 +17,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
+		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
+
+		// Special case to set 'original_image' in attachment metadata.
+		$valid_image_sizes[] = 'original';
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
@@ -33,6 +38,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 						'image_size' => array(
 							'description' => __( 'Image size.', 'gutenberg' ),
 							'type'        => 'string',
+							'enum'        => $valid_image_sizes,
 							'required'    => true,
 						),
 					),
