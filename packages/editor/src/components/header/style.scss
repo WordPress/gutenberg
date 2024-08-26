@@ -228,7 +228,7 @@
 }
 
 .editor-header__post-preview-button {
-	@include break-small {
+	@include break-mobile {
 		display: none;
 	}
 }
@@ -240,9 +240,12 @@
 
 	.editor-header {
 		background-color: $white;
-		border-bottom: 1px solid #e0e0e0;
-		position: absolute;
 		width: 100%;
+
+		@include break-medium {
+			border-bottom: 1px solid #e0e0e0;
+			position: absolute;
+		}
 
 
 		// hide some parts

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.6.0 (2024-08-21)
+
 ### Bug Fixes
 
 -   Fix context inheritance from namespaces different than the current one ([#64677](https://github.com/WordPress/gutenberg/pull/64677)).
