@@ -26,6 +26,7 @@
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
 		{ "path": "../notices" },
+		{ "path": "../preferences" },
 		{ "path": "../plugins" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
