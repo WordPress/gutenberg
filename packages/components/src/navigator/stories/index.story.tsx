@@ -150,9 +150,9 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 						>
 							<h2>A wild sticky element appears</h2>
 						</div>
+						<MetaphorIpsum quantity={ 3 } />
 					</div>
 					<div style={ { padding: '1rem' } }>
-						<MetaphorIpsum quantity={ 3 } />
 						<div
 							style={ getStickyStyles( {
 								top: 68,
