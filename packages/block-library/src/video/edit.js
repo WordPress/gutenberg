@@ -287,9 +287,7 @@ function VideoEdit( {
 						controls={ controls }
 						poster={ poster }
 						src={ src || temporaryURL }
-						style={ {
-							...borderProps.style,
-						} }
+						style={ borderProps.style }
 						ref={ videoPlayer }
 					>
 						<Tracks tracks={ tracks } />
