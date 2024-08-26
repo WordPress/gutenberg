@@ -152,13 +152,13 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		if ( false === $request['generate_sub_sizes'] ) {
+		if ( ! $request['generate_sub_sizes'] ) {
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 
 		}
 
-		if ( false === $request['convert_format'] ) {
+		if ( ! $request['convert_format'] ) {
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
@@ -262,7 +262,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			);
 		}
 
-		if ( false === $request['convert_format'] ) {
+		if ( ! $request['convert_format'] ) {
 			// Prevent image conversion as that is done client-side.
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
