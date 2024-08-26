@@ -114,26 +114,33 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/stickies">
-					<div style={ getStickyStyles( { zIndex: 2 } ) }>
+					<div
+						style={ {
+							...getStickyStyles( {
+								zIndex: 2,
+							} ),
+							padding: '1rem',
+						} }
+					>
 						<NavigatorBackButton variant="secondary">
 							Go back
 						</NavigatorBackButton>
 					</div>
-					<div>
+					<div style={ { padding: '1rem' } }>
 						<div
 							style={ getStickyStyles( {
-								top: 69,
+								top: 68,
 								bgColor: 'peachpuff',
 							} ) }
 						>
 							<h2>A wild sticky element appears</h2>
 						</div>
 					</div>
-					<div>
+					<div style={ { padding: '1rem' } }>
 						<MetaphorIpsum quantity={ 3 } />
 						<div
 							style={ getStickyStyles( {
-								top: 69,
+								top: 68,
 								bgColor: 'paleturquoise',
 							} ) }
 						>
@@ -142,9 +149,12 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 						<MetaphorIpsum quantity={ 3 } />
 					</div>
 					<div
-						style={ getStickyStyles( {
-							bgColor: 'mistyrose',
-						} ) }
+						style={ {
+							...getStickyStyles( {
+								bgColor: 'mistyrose',
+							} ),
+							padding: '1rem',
+						} }
 					>
 						<Button variant="primary">Primary noop</Button>
 					</div>
