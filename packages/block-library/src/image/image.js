@@ -3,6 +3,7 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
+	MenuItem,
 	ExternalLink,
 	ResizableBox,
 	Spinner,
@@ -108,6 +109,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
+	containerWidth,
 } ) {
 	const {
 		url = '',
@@ -597,7 +599,11 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-					/>
+					>
+						<MenuItem onClick={ () => onSelectImage( undefined ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (
@@ -923,6 +929,7 @@ export default function Image( {
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
+		const maxContentWidth = containerWidth || maxWidthBuffer;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
@@ -968,9 +975,9 @@ export default function Image( {
 				} }
 				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
+				maxWidth={ maxContentWidth }
 				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
+				maxHeight={ maxContentWidth / ratio }
 				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
@@ -981,6 +988,21 @@ export default function Image( {
 				onResizeStart={ onResizeStart }
 				onResizeStop={ ( event, direction, elt ) => {
 					onResizeStop();
+
+					// Clear hardcoded width if the resized width is close to the max-content width.
+					if (
+						// Only do this if the image is bigger than the container to prevent it from being squished.
+						// TODO: Remove this check if the image support setting 100% width.
+						naturalWidth >= maxContentWidth &&
+						Math.abs( elt.offsetWidth - maxContentWidth ) < 10
+					) {
+						setAttributes( {
+							width: undefined,
+							height: undefined,
+						} );
+						return;
+					}
+
 					// Since the aspect ratio is locked when resizing, we can
 					// use the width of the resized element to calculate the
 					// height in CSS to prevent stretching when the max-width

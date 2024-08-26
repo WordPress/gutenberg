@@ -273,12 +273,11 @@ export default () => {
 			const inheritedValue = useContext( inheritedContext );
 
 			const ns = defaultEntry!.namespace;
-			const currentValue = useRef( {
-				[ ns ]: proxifyState( ns, {} ),
-			} );
+			const currentValue = useRef( proxifyState( ns, {} ) );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
+				const result = { ...inheritedValue };
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
@@ -288,15 +287,16 @@ export default () => {
 						);
 					}
 					updateContext(
-						currentValue.current[ namespace ],
+						currentValue.current,
 						deepClone( value ) as object
 					);
-					currentValue.current[ namespace ] = proxifyContext(
-						currentValue.current[ namespace ],
+					currentValue.current = proxifyContext(
+						currentValue.current,
 						inheritedValue[ namespace ]
 					);
+					result[ namespace ] = currentValue.current;
 				}
-				return currentValue.current;
+				return result;
 			}, [ defaultEntry, inheritedValue ] );
 
 			return createElement( Provider, { value: contextStack }, children );

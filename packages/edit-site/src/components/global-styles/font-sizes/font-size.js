@@ -21,17 +21,14 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import ScreenHeader from '../header';
 import FontSizePreview from './font-size-preview';
 import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
 import RenameFontSizeDialog from './rename-font-size-dialog';
 import SizeControl from '../size-control';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontSize() {
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
@@ -160,7 +157,7 @@ function FontSize() {
 								marginBottom={ 0 }
 								paddingX={ 4 }
 							>
-								<DropdownMenu
+								<DropdownMenuV2
 									trigger={
 										<Button
 											size="small"
@@ -169,21 +166,21 @@ function FontSize() {
 										/>
 									}
 								>
-									<DropdownMenuItem
+									<DropdownMenuV2.Item
 										onClick={ toggleRenameDialog }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Rename' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-									<DropdownMenuItem
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+									<DropdownMenuV2.Item
 										onClick={ toggleDeleteConfirm }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Delete' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-								</DropdownMenu>
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+								</DropdownMenuV2>
 							</Spacer>
 						</FlexItem>
 					) }

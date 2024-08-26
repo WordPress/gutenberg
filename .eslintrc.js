@@ -177,6 +177,8 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
@@ -280,7 +282,7 @@ module.exports = {
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'packages/components/src/**/@(test|stories)/**',
+				'packages/*/src/**/@(test|stories)/**',
 				'**/*.@(native|ios|android).js',
 			],
 			rules: {
@@ -316,9 +318,13 @@ module.exports = {
 						'ComboboxControl',
 						'CustomSelectControl',
 						'DimensionControl',
+						'FontAppearanceControl',
+						'FontFamilyControl',
 						'FontSizePicker',
 						'FormTokenField',
 						'InputControl',
+						'LetterSpacingControl',
+						'LineHeightControl',
 						'NumberControl',
 						'RangeControl',
 						'TextControl',
@@ -338,13 +344,15 @@ module.exports = {
 							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					},
 					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'SelectControl' ].map( ( componentName ) => ( {
-						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					} ) ),
+					...[ 'SelectControl', 'UnitControl' ].map(
+						( componentName ) => ( {
+							// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
+							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
+							message:
+								componentName +
+								' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+						} )
+					),
 				],
 			},
 		},

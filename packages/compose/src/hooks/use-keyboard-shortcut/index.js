@@ -42,9 +42,9 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useRef( callback );
+	const currentCallbackRef = useRef( callback );
 	useEffect( () => {
-		currentCallback.current = callback;
+		currentCallbackRef.current = callback;
 	}, [ callback ] );
 
 	useEffect( () => {
@@ -93,7 +93,7 @@ function useKeyboardShortcut(
 					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
 				) =>
 					/* eslint-enable jsdoc/valid-types */
-					currentCallback.current( ...args ),
+					currentCallbackRef.current( ...args ),
 				eventName
 			);
 		} );
