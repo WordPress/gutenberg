@@ -332,7 +332,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,
-			rest_url( rest_get_route_for_post( $attachment_id ) )
+			rest_get_route_for_post( $attachment_id ),
 		);
 
 		$response_request['context'] = 'edit';
