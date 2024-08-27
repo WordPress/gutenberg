@@ -32,15 +32,19 @@ function MissingTranslationsNotice() {
 
 interface HiddenFormFieldProps {
 	preferredLanguages: Language[];
+	inputName: string;
 }
 
-function HiddenFormField( { preferredLanguages }: HiddenFormFieldProps ) {
+function HiddenFormField( {
+	preferredLanguages,
+	inputName,
+}: HiddenFormFieldProps ) {
 	const value = preferredLanguages
 		.filter( ( language ) => Boolean( language ) )
 		.map( ( { locale } ) => locale )
 		.join( ',' );
 
-	return <input type="hidden" name="preferred_languages" value={ value } />;
+	return <input type="hidden" name={ inputName } value={ value } />;
 }
 
 interface LanguageChooserProps {
@@ -48,6 +52,7 @@ interface LanguageChooserProps {
 	preferredLanguages: Language[];
 	hasMissingTranslations?: boolean;
 	showOptionSiteDefault?: boolean;
+	inputName?: string;
 }
 
 function LanguageChooser( props: LanguageChooserProps ) {
@@ -55,6 +60,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		allLanguages,
 		hasMissingTranslations = false,
 		showOptionSiteDefault = false,
+		inputName,
 	} = props;
 
 	const [ languages, setLanguages ] = useState< Language[] >(
@@ -292,7 +298,10 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div className="components-language-chooser" onKeyDown={ onKeyDown }>
-			<HiddenFormField preferredLanguages={ languages } />
+			<HiddenFormField
+				preferredLanguages={ languages }
+				inputName={ inputName || `${ instanceId }-languages` }
+			/>
 			<p id={ instanceId }>
 				{ __(
 					'Choose languages for displaying WordPress in, in order of preference.'
