@@ -17,7 +17,7 @@
 				"inherit": true,
 				"taxQuery": null,
 				"parents": [],
-				"postFormat": []
+				"format": []
 			},
 			"tagName": "div",
 			"enhancedPagination": false

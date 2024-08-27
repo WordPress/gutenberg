@@ -26,7 +26,7 @@ import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
-import PostFormatControls from './post-format-controls';
+import FormatControls from './format-controls';
 import StickyControl from './sticky-control';
 import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
@@ -61,7 +61,7 @@ export default function QueryInspectorControls( props ) {
 		inherit,
 		taxQuery,
 		parents,
-		postFormat,
+		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -141,12 +141,12 @@ export default function QueryInspectorControls( props ) {
 	// Check if post formats are supported.
 	// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
 	// and in this case the control should not be shown since the user has no other formats to choose from.
-	const showPostFormatControl = useSelect( ( select ) => {
+	const showFormatControl = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
 		return (
 			themeSupports.formats &&
 			themeSupports.formats.length > 0 &&
-			themeSupports.formats.some( ( format ) => format !== 'standard' )
+			themeSupports.formats.some( ( type ) => type !== 'standard' )
 		);
 	}, [] );
 
@@ -155,7 +155,7 @@ export default function QueryInspectorControls( props ) {
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl ||
-		showPostFormatControl;
+		showFormatControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
@@ -337,7 +337,7 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
-							postFormat: [],
+							format: [],
 						} );
 						setQuerySearch( '' );
 					} }
@@ -399,13 +399,13 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ showPostFormatControl && (
+					{ showFormatControl && (
 						<ToolsPanelItem
-							hasValue={ () => !! postFormat?.length }
+							hasValue={ () => !! format?.length }
 							label={ __( 'Formats' ) }
-							onDeselect={ () => setQuery( { postFormat: [] } ) }
+							onDeselect={ () => setQuery( { format: [] } ) }
 						>
-							<PostFormatControls
+							<FormatControls
 								onChange={ setQuery }
 								query={ query }
 							/>

@@ -31,8 +31,8 @@ const POST_FORMATS = [
 	return 0;
 } );
 
-export default function PostFormatControls( { onChange, query } ) {
-	const { postFormat } = query;
+export default function FormatControls( { onChange, query } ) {
+	const { format } = query;
 
 	const { supportedFormats } = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
@@ -41,28 +41,27 @@ export default function PostFormatControls( { onChange, query } ) {
 		};
 	}, [] );
 
-	const postFormats = POST_FORMATS.filter( ( format ) =>
-		supportedFormats.includes( format.slug )
+	const formats = POST_FORMATS.filter( ( item ) =>
+		supportedFormats.includes( item.slug )
 	);
 
-	const postFormatOptions = [
-		...( postFormats || [] ).map( ( format ) => ( {
-			value: format.slug,
-			label: format.name,
+	const formatOptions = [
+		...( formats || [] ).map( ( item ) => ( {
+			value: item.slug,
+			label: item.name,
 		} ) ),
 	];
 
-	// TODO: the multiple selection is lacking design.
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			multiple
 			label={ __( 'Formats' ) }
-			value={ postFormat }
-			options={ postFormatOptions }
+			value={ format }
+			options={ formatOptions }
 			onChange={ ( value ) => {
-				onChange( { postFormat: value } );
+				onChange( { format: value } );
 			} }
 		/>
 	);

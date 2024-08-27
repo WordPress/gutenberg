@@ -90,7 +90,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			pages,
-			postFormat,
+			format,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -164,8 +164,8 @@ export default function PostTemplateEdit( {
 			if ( parents?.length ) {
 				query.parent = parents;
 			}
-			if ( postFormat?.length ) {
-				query.format = postFormat;
+			if ( format?.length ) {
+				query.format = format;
 			}
 
 			// If sticky is not set, it will return all posts in the results.
@@ -210,7 +210,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
-			postFormat,
+			format,
 			restQueryArgs,
 			previewPostType,
 		]
