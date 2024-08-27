@@ -1,115 +1,22 @@
 /**
  * External dependencies
  */
-import type { ReactElement, RefCallback, RefObject } from 'react';
+import type { ReactElement } from 'react';
 
 /**
  * WordPress dependencies
  */
 import {
-	useMemo,
-	useRef,
 	useCallback,
-	useEffect,
+	useLayoutEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 
-type SubscriberCleanup = () => void;
-type SubscriberResponse = SubscriberCleanup | void;
-
-// This of course could've been more streamlined with internal state instead of
-// refs, but then host hooks / components could not opt out of renders.
-// This could've been exported to its own module, but the current build doesn't
-// seem to work with module imports and I had no more time to spend on this...
-function useResolvedElement< T extends HTMLElement >(
-	subscriber: ( element: T ) => SubscriberResponse,
-	refOrElement?: T | RefObject< T > | null
-): RefCallback< T > {
-	const callbackElementRef = useRef< T | null >( null );
-	const lastReportRef = useRef< {
-		reporter: () => void;
-		element: T | null;
-	} | null >( null );
-	const cleanupRef = useRef< SubscriberResponse | null >();
-
-	const callSubscriber = useCallback( () => {
-		let element = null;
-		if ( callbackElementRef.current ) {
-			element = callbackElementRef.current;
-		} else if ( refOrElement ) {
-			if ( refOrElement instanceof HTMLElement ) {
-				element = refOrElement;
-			} else {
-				element = refOrElement.current;
-			}
-		}
-
-		if (
-			lastReportRef.current &&
-			lastReportRef.current.element === element &&
-			lastReportRef.current.reporter === callSubscriber
-		) {
-			return;
-		}
-
-		if ( cleanupRef.current ) {
-			cleanupRef.current();
-			// Making sure the cleanup is not called accidentally multiple times.
-			cleanupRef.current = null;
-		}
-		lastReportRef.current = {
-			reporter: callSubscriber,
-			element,
-		};
-
-		// Only calling the subscriber, if there's an actual element to report.
-		if ( element ) {
-			cleanupRef.current = subscriber( element );
-		}
-	}, [ refOrElement, subscriber ] );
-
-	// On each render, we check whether a ref changed, or if we got a new raw
-	// element.
-	useEffect( () => {
-		// With this we're *technically* supporting cases where ref objects' current value changes, but only if there's a
-		// render accompanying that change as well.
-		// To guarantee we always have the right element, one must use the ref callback provided instead, but we support
-		// RefObjects to make the hook API more convenient in certain cases.
-		callSubscriber();
-	}, [ callSubscriber ] );
-
-	return useCallback< RefCallback< T > >(
-		( element ) => {
-			callbackElementRef.current = element;
-			callSubscriber();
-		},
-		[ callSubscriber ]
-	);
-}
-
 type ObservedSize = {
-	width: number | undefined;
-	height: number | undefined;
+	width: number | null;
+	height: number | null;
 };
-
-type ResizeHandler = ( size: ObservedSize ) => void;
-
-type HookResponse< T extends HTMLElement > = {
-	ref: RefCallback< T >;
-} & ObservedSize;
-
-// Declaring my own type here instead of using the one provided by TS (available since 4.2.2), because this way I'm not
-// forcing consumers to use a specific TS version.
-type ResizeObserverBoxOptions =
-	| 'border-box'
-	| 'content-box'
-	| 'device-pixel-content-box';
-
-declare global {
-	interface ResizeObserverEntry {
-		readonly devicePixelContentBoxSize: ReadonlyArray< ResizeObserverSize >;
-	}
-}
 
 // We're only using the first element of the size sequences, until future versions of the spec solidify on how
 // exactly it'll be used for fragments in multi-column scenarios:
@@ -136,187 +43,86 @@ declare global {
 // even though it seems we have access to results for all box types.
 // This also means that we get to keep the current api, being able to return a simple { width, height } pair,
 // regardless of box option.
-const extractSize = (
-	entry: ResizeObserverEntry,
-	boxProp: 'borderBoxSize' | 'contentBoxSize' | 'devicePixelContentBoxSize',
-	sizeType: keyof ResizeObserverSize
-): number | undefined => {
-	if ( ! entry[ boxProp ] ) {
-		if ( boxProp === 'contentBoxSize' ) {
-			// The dimensions in `contentBoxSize` and `contentRect` are equivalent according to the spec.
-			// See the 6th step in the description for the RO algorithm:
-			// https://drafts.csswg.org/resize-observer/#create-and-populate-resizeobserverentry-h
-			// > Set this.contentRect to logical this.contentBoxSize given target and observedBox of "content-box".
-			// In real browser implementations of course these objects differ, but the width/height values should be equivalent.
-			return entry.contentRect[
-				sizeType === 'inlineSize' ? 'width' : 'height'
-			];
-		}
-
-		return undefined;
+const extractSize = ( entry: ResizeObserverEntry ): ObservedSize => {
+	let entrySize;
+	if ( ! entry.contentBoxSize ) {
+		// The dimensions in `contentBoxSize` and `contentRect` are equivalent according to the spec.
+		// See the 6th step in the description for the RO algorithm:
+		// https://drafts.csswg.org/resize-observer/#create-and-populate-resizeobserverentry-h
+		// > Set this.contentRect to logical this.contentBoxSize given target and observedBox of "content-box".
+		// In real browser implementations of course these objects differ, but the width/height values should be equivalent.
+		entrySize = [ entry.contentRect.width, entry.contentRect.height ];
+	} else if ( entry.contentBoxSize[ 0 ] ) {
+		const contentBoxSize = entry.contentBoxSize[ 0 ];
+		entrySize = [ contentBoxSize.inlineSize, contentBoxSize.blockSize ];
+	} else {
+		// TS complains about this, because the RO entry type follows the spec and does not reflect Firefox's buggy
+		// behaviour of returning objects instead of arrays for `borderBoxSize` and `contentBoxSize`.
+		const contentBoxSize =
+			entry.contentBoxSize as unknown as ResizeObserverSize;
+		entrySize = [ contentBoxSize.inlineSize, contentBoxSize.blockSize ];
 	}
 
-	// A couple bytes smaller than calling Array.isArray() and just as effective here.
-	return entry[ boxProp ][ 0 ]
-		? entry[ boxProp ][ 0 ][ sizeType ]
-		: // TS complains about this, because the RO entry type follows the spec and does not reflect Firefox's current
-		  // behaviour of returning objects instead of arrays for `borderBoxSize` and `contentBoxSize`.
-		  // @ts-ignore
-		  entry[ boxProp ][ sizeType ];
+	const [ width, height ] = entrySize.map( ( d ) => Math.round( d ) );
+	return { width, height };
 };
 
-type RoundingFunction = ( n: number ) => number;
+const RESIZE_ELEMENT_STYLES = {
+	position: 'absolute',
+	top: 0,
+	left: 0,
+	right: 0,
+	bottom: 0,
+	pointerEvents: 'none',
+	opacity: 0,
+	overflow: 'hidden',
+	zIndex: -1,
+} as const;
 
-function useResizeObserver< T extends HTMLElement >(
-	opts: {
-		ref?: RefObject< T > | T | null | undefined;
-		onResize?: ResizeHandler;
-		box?: ResizeObserverBoxOptions;
-		round?: RoundingFunction;
-	} = {}
-): HookResponse< T > {
-	// Saving the callback as a ref. With this, I don't need to put onResize in the
-	// effect dep array, and just passing in an anonymous function without memoising
-	// will not reinstantiate the hook's ResizeObserver.
-	const onResize = opts.onResize;
-	const onResizeRef = useRef< ResizeHandler | undefined >( undefined );
-	onResizeRef.current = onResize;
-	const round = opts.round || Math.round;
+type ResizeElementProps = {
+	onResize: ( s: ObservedSize ) => void;
+};
 
-	// Using a single instance throughout the hook's lifetime
-	const resizeObserverRef = useRef< {
-		box?: ResizeObserverBoxOptions;
-		round?: RoundingFunction;
-		instance: ResizeObserver;
-	} >();
+function ResizeElement( { onResize }: ResizeElementProps ) {
+	const resizeElementRef = useRef< HTMLDivElement >( null );
+	const resizeCallbackRef = useRef( onResize );
 
-	const [ size, setSize ] = useState< {
-		width?: number;
-		height?: number;
-	} >( {
-		width: undefined,
-		height: undefined,
-	} );
+	useLayoutEffect( () => {
+		resizeCallbackRef.current = onResize;
+	}, [ onResize ] );
 
-	// In certain edge cases the RO might want to report a size change just after
-	// the component unmounted.
-	const didUnmountRef = useRef( false );
-	useEffect( () => {
-		didUnmountRef.current = false;
+	useLayoutEffect( () => {
+		const resizeElement = resizeElementRef.current as HTMLDivElement;
+		const resizeObserver = new ResizeObserver( ( entries ) => {
+			const newSize = extractSize( entries[ 0 ] );
+			resizeCallbackRef.current( newSize );
+		} );
+
+		resizeObserver.observe( resizeElement );
+
 		return () => {
-			didUnmountRef.current = true;
+			resizeObserver.unobserve( resizeElement );
 		};
 	}, [] );
 
-	// Using a ref to track the previous width / height to avoid unnecessary renders.
-	const previousRef: {
-		current: {
-			width?: number;
-			height?: number;
-		};
-	} = useRef( {
-		width: undefined,
-		height: undefined,
-	} );
-
-	// This block is kinda like a useEffect, only it's called whenever a new
-	// element could be resolved based on the ref option. It also has a cleanup
-	// function.
-	const refCallback = useResolvedElement< T >(
-		useCallback(
-			( element ) => {
-				// We only use a single Resize Observer instance, and we're instantiating it on demand, only once there's something to observe.
-				// This instance is also recreated when the `box` option changes, so that a new observation is fired if there was a previously observed element with a different box option.
-				if (
-					! resizeObserverRef.current ||
-					resizeObserverRef.current.box !== opts.box ||
-					resizeObserverRef.current.round !== round
-				) {
-					resizeObserverRef.current = {
-						box: opts.box,
-						round,
-						instance: new ResizeObserver( ( entries ) => {
-							const entry = entries[ 0 ];
-
-							let boxProp:
-								| 'borderBoxSize'
-								| 'contentBoxSize'
-								| 'devicePixelContentBoxSize' = 'borderBoxSize';
-							if ( opts.box === 'border-box' ) {
-								boxProp = 'borderBoxSize';
-							} else {
-								boxProp =
-									opts.box === 'device-pixel-content-box'
-										? 'devicePixelContentBoxSize'
-										: 'contentBoxSize';
-							}
-
-							const reportedWidth = extractSize(
-								entry,
-								boxProp,
-								'inlineSize'
-							);
-							const reportedHeight = extractSize(
-								entry,
-								boxProp,
-								'blockSize'
-							);
-
-							const newWidth = reportedWidth
-								? round( reportedWidth )
-								: undefined;
-							const newHeight = reportedHeight
-								? round( reportedHeight )
-								: undefined;
-
-							if (
-								previousRef.current.width !== newWidth ||
-								previousRef.current.height !== newHeight
-							) {
-								const newSize = {
-									width: newWidth,
-									height: newHeight,
-								};
-								previousRef.current.width = newWidth;
-								previousRef.current.height = newHeight;
-								if ( onResizeRef.current ) {
-									onResizeRef.current( newSize );
-								} else if ( ! didUnmountRef.current ) {
-									setSize( newSize );
-								}
-							}
-						} ),
-					};
-				}
-
-				resizeObserverRef.current.instance.observe( element, {
-					box: opts.box,
-				} );
-
-				return () => {
-					if ( resizeObserverRef.current ) {
-						resizeObserverRef.current.instance.unobserve( element );
-					}
-				};
-			},
-			[ opts.box, round ]
-		),
-		opts.ref
-	);
-
-	return useMemo(
-		() => ( {
-			ref: refCallback,
-			width: size.width,
-			height: size.height,
-		} ),
-		[ refCallback, size ? size.width : null, size ? size.height : null ]
+	return (
+		<div
+			ref={ resizeElementRef }
+			style={ RESIZE_ELEMENT_STYLES }
+			aria-hidden="true"
+		/>
 	);
 }
 
+function sizeEquals( a: ObservedSize, b: ObservedSize ) {
+	return a.width === b.width && a.height === b.height;
+}
+
+const NULL_SIZE: ObservedSize = { width: null, height: null };
+
 /**
- * Hook which allows to listen the resize event of any target element when it changes sizes.
- * _Note: `useResizeObserver` will report `null` until after first render.
+ * Hook which allows to listen to the resize event of any target element when it changes size.
+ * _Note: `useResizeObserver` will report `null` sizes until after first render.
  *
  * @example
  *
@@ -333,30 +139,19 @@ function useResizeObserver< T extends HTMLElement >(
  * };
  * ```
  */
-export default function useResizeAware(): [
-	ReactElement,
-	{ width: number | null; height: number | null },
-] {
-	const { ref, width, height } = useResizeObserver();
-	const sizes = useMemo( () => {
-		return { width: width ?? null, height: height ?? null };
-	}, [ width, height ] );
-	const resizeListener = (
-		<div
-			style={ {
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				right: 0,
-				bottom: 0,
-				pointerEvents: 'none',
-				opacity: 0,
-				overflow: 'hidden',
-				zIndex: -1,
-			} }
-			aria-hidden="true"
-			ref={ ref }
-		/>
-	);
-	return [ resizeListener, sizes ];
+export default function useResizeObserver(): [ ReactElement, ObservedSize ] {
+	const [ size, setSize ] = useState( NULL_SIZE );
+
+	// Using a ref to track the previous width / height to avoid unnecessary renders.
+	const previousSizeRef = useRef( NULL_SIZE );
+
+	const handleResize = useCallback( ( newSize: ObservedSize ) => {
+		if ( ! sizeEquals( previousSizeRef.current, newSize ) ) {
+			previousSizeRef.current = newSize;
+			setSize( newSize );
+		}
+	}, [] );
+
+	const resizeElement = <ResizeElement onResize={ handleResize } />;
+	return [ resizeElement, size ];
 }
