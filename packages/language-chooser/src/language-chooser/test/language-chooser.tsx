@@ -139,6 +139,7 @@ describe( 'LanguageChooser', () => {
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES ] }
 				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+				inputName="preferred_languages"
 			/>
 		);
 
