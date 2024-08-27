@@ -254,7 +254,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	}
 
 	return (
-		<InspectorControls>
+		<InspectorControls group="bindings">
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
