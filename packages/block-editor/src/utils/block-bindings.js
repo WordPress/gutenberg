@@ -48,9 +48,8 @@ export function useBlockBindingsUtils() {
 	 * ```
 	 */
 	const updateBlockBindings = ( bindings ) => {
-		const {
-			metadata: { bindings: currentBindings, ...metadata },
-		} = getBlockAttributes( clientId );
+		const { metadata: { bindings: currentBindings, ...metadata } = {} } =
+			getBlockAttributes( clientId );
 		const newBindings = { ...currentBindings };
 
 		Object.entries( bindings ).forEach( ( [ attribute, binding ] ) => {
@@ -87,9 +86,8 @@ export function useBlockBindingsUtils() {
 	 * ```
 	 */
 	const removeAllBlockBindings = () => {
-		const {
-			metadata: { bindings, ...metadata },
-		} = getBlockAttributes( clientId );
+		const { metadata: { bindings, ...metadata } = {} } =
+			getBlockAttributes( clientId );
 		updateBlockAttributes( clientId, {
 			metadata: isObjectEmpty( metadata ) ? undefined : metadata,
 		} );
