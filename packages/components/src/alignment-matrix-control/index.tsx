@@ -14,7 +14,8 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, useCompositeStore } from '../composite';
+import { Composite } from '../composite';
+import { useCompositeStore } from '../composite/store';
 import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';

@@ -93,7 +93,7 @@ The following are the necessary steps to ensure that the directives are correctl
     </ul>
     ```
 
-That's it! Once you've set up your interctive block with `supports.interactivity`, initialized your global state or local context, and added the directives to the HTML markup, the Interactivity API will take care of the rest. There's no additional code required from the developer to process these directives on the server side.
+That's it! Once you've set up your interactive block with `supports.interactivity`, initialized your global state or local context, and added the directives to the HTML markup, the Interactivity API will take care of the rest. There's no additional code required from the developer to process these directives on the server side.
 
 Behind the scenes, WordPress uses the `wp_interactivity_process_directives` function to find and process the directives in the HTML markup of your block. This function uses the HTML API to make the necessary changes to the markup, based on the found directives and the initial global state and/or local context.
 

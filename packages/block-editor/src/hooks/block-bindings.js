@@ -29,14 +29,7 @@ import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -60,7 +53,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 		<>
 			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
 				<Fragment key={ name }>
-					<DropdownMenuGroup>
+					<DropdownMenuV2.Group>
 						{ Object.keys( fieldsList ).length > 1 && (
 							<Text
 								className="block-editor-bindings__source-label"
@@ -72,7 +65,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 							</Text>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
-							<DropdownMenuRadioItem
+							<DropdownMenuV2.RadioItem
 								key={ key }
 								onChange={ () =>
 									updateBlockBindings( {
@@ -86,17 +79,17 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								value={ key }
 								checked={ key === currentKey }
 							>
-								<DropdownMenuItemLabel>
+								<DropdownMenuV2.ItemLabel>
 									{ key }
-								</DropdownMenuItemLabel>
-								<DropdownMenuItemHelpText>
+								</DropdownMenuV2.ItemLabel>
+								<DropdownMenuV2.ItemHelpText>
 									{ value }
-								</DropdownMenuItemHelpText>
-							</DropdownMenuRadioItem>
+								</DropdownMenuV2.ItemHelpText>
+							</DropdownMenuV2.RadioItem>
 						) ) }
-					</DropdownMenuGroup>
+					</DropdownMenuV2.Group>
 					{ i !== Object.keys( fieldsList ).length - 1 && (
-						<DropdownMenuSeparator />
+						<DropdownMenuV2.Separator />
 					) }
 				</Fragment>
 			) ) }
@@ -162,7 +155,7 @@ function EditableBlockBindingsPanelItems( {
 							} );
 						} }
 					>
-						<DropdownMenu
+						<DropdownMenuV2
 							placement={
 								isMobile ? 'bottom-start' : 'left-start'
 							}
@@ -182,7 +175,7 @@ function EditableBlockBindingsPanelItems( {
 								attribute={ attribute }
 								binding={ binding }
 							/>
-						</DropdownMenu>
+						</DropdownMenuV2>
 					</ToolsPanelItem>
 				);
 			} ) }

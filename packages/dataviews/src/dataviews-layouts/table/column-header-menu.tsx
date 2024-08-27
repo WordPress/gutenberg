@@ -27,14 +27,7 @@ import type {
 	ViewTable as ViewTableType,
 } from '../../types';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -50,7 +43,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 		.filter( Boolean )
 		.map( ( child, i ) => (
 			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
+				{ i > 0 && <DropdownMenuV2.Separator /> }
 				{ child }
 			</Fragment>
 		) );
@@ -93,7 +86,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		! field.filterBy?.isPrimary;
 
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			align="start"
 			trigger={
 				<Button
@@ -114,7 +107,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		>
 			<WithDropDownMenuSeparators>
 				{ isSortable && (
-					<DropdownMenuGroup>
+					<DropdownMenuV2.Group>
 						{ SORTING_DIRECTIONS.map(
 							( direction: SortDirection ) => {
 								const isChecked =
@@ -125,7 +118,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								const value = `${ field.id }-${ direction }`;
 
 								return (
-									<DropdownMenuRadioItem
+									<DropdownMenuV2.RadioItem
 										key={ value }
 										// All sorting radio items share the same name, so that
 										// selecting a sorting option automatically deselects the
@@ -145,18 +138,18 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 											} );
 										} }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ sortLabels[ direction ] }
-										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.RadioItem>
 								);
 							}
 						) }
-					</DropdownMenuGroup>
+					</DropdownMenuV2.Group>
 				) }
 				{ canAddFilter && (
-					<DropdownMenuGroup>
-						<DropdownMenuItem
+					<DropdownMenuV2.Group>
+						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
 								setOpenedFilter( field.id );
@@ -174,14 +167,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<DropdownMenuItemLabel>
+							<DropdownMenuV2.ItemLabel>
 								{ __( 'Add filter' ) }
-							</DropdownMenuItemLabel>
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2.Group>
 				) }
-				<DropdownMenuGroup>
-					<DropdownMenuItem
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.Item
 						prefix={ <Icon icon={ arrowLeft } /> }
 						disabled={ index < 1 }
 						onClick={ () => {
@@ -200,11 +193,11 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ __( 'Move left' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
-					<DropdownMenuItem
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item
 						prefix={ <Icon icon={ arrowRight } /> }
 						disabled={
 							! view.fields || index >= view.fields.length - 1
@@ -227,12 +220,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ __( 'Move right' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
 					{ isHidable && (
-						<DropdownMenuItem
+						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ unseen } /> }
 							onClick={ () => {
 								const viewFields =
@@ -246,14 +239,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<DropdownMenuItemLabel>
+							<DropdownMenuV2.ItemLabel>
 								{ __( 'Hide column' ) }
-							</DropdownMenuItemLabel>
-						</DropdownMenuItem>
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.Item>
 					) }
-				</DropdownMenuGroup>
+				</DropdownMenuV2.Group>
 			</WithDropDownMenuSeparators>
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 } );
 

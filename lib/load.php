@@ -43,6 +43,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// WordPress 6.7 compat.
 	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-posts-controller-6-7.php';
 	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-templates-controller-6-7.php';
+	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-server.php';
 	require __DIR__ . '/compat/wordpress-6.7/rest-api.php';
 
 	// Plugin specific code.

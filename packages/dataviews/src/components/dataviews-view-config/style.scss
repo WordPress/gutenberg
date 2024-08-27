@@ -29,6 +29,10 @@
 	}
 }
 
+.dataviews-settings-section:has(.dataviews-settings-section__content:empty) {
+	display: none;
+}
+
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 500px) {
 	.dataviews-settings-section.dataviews-settings-section {

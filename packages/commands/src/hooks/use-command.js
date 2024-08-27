@@ -32,9 +32,9 @@ import { store as commandsStore } from '../store';
  */
 export default function useCommand( command ) {
 	const { registerCommand, unregisterCommand } = useDispatch( commandsStore );
-	const currentCallback = useRef( command.callback );
+	const currentCallbackRef = useRef( command.callback );
 	useEffect( () => {
-		currentCallback.current = command.callback;
+		currentCallbackRef.current = command.callback;
 	}, [ command.callback ] );
 
 	useEffect( () => {
@@ -47,7 +47,7 @@ export default function useCommand( command ) {
 			label: command.label,
 			searchLabel: command.searchLabel,
 			icon: command.icon,
-			callback: ( ...args ) => currentCallback.current( ...args ),
+			callback: ( ...args ) => currentCallbackRef.current( ...args ),
 		} );
 		return () => {
 			unregisterCommand( command.name );
