@@ -36,9 +36,10 @@ const {
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isActive, showBlockBreadcrumbsOption } = useSelect(
+	const { isActive, showBlockBreadcrumbsOption, isTemplate } = useSelect(
 		( select ) => {
-			const { getEditorSettings } = select( editorStore );
+			const { getEditorSettings, getEditedPostAttribute } =
+				select( editorStore );
 			const { get } = select( preferencesStore );
 			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
@@ -49,6 +50,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 					isLargeViewport &&
 					isRichEditingEnabled,
 				isActive: isModalActive( 'editor/preferences' ),
+				isTemplate: getEditedPostAttribute( 'type' ) === 'wp_template',
 			};
 		},
 		[ isLargeViewport ]
@@ -253,18 +255,21 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								label={ __( 'Show most used blocks' ) }
 							/>
 						</PreferencesModalSection>
-						<PreferencesModalSection
-							title={ __( 'Block settings' ) }
-							description={ __(
-								'Select what settings are shown in the block panel.'
-							) }
-						>
-							<PreferenceToggleControl
-								scope="core"
-								featureName="showBlockBindingsUI"
-								label={ __( 'Block bindings UI' ) }
-							/>
-						</PreferencesModalSection>
+						{ /* Don't show preference in templates until connecting attributes there is supported */ }
+						{ ! isTemplate && (
+							<PreferencesModalSection
+								title={ __( 'Block settings' ) }
+								description={ __(
+									'Select what settings are shown in the block panel.'
+								) }
+							>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showBlockBindingsUI"
+									label={ __( 'Block bindings UI' ) }
+								/>
+							</PreferencesModalSection>
+						) }
 						<PreferencesModalSection
 							title={ __( 'Manage block visibility' ) }
 							description={ __(
