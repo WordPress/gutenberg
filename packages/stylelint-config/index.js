@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	extends: [ 'stylelint-config-recommended', '@stylistic/stylelint-config' ],
+	extends: [ 'stylelint-config-recommended' ],
 	plugins: [ '@stylistic/stylelint-plugin' ],
 	rules: {
 		'at-rule-empty-line-before': [
@@ -128,5 +128,15 @@ module.exports = {
 		'@stylistic/value-list-comma-newline-after': 'always-multi-line',
 		'@stylistic/value-list-comma-space-after': 'always-single-line',
 		'@stylistic/value-list-comma-space-before': 'never',
+
+		/* Disable new rules from stylelint-config-recommended 7 > 14 */
+		'function-no-unknown': null,
+		'keyframe-block-no-duplicate-selectors': null,
+		'annotation-no-unknown': null,
+		'selector-anb-no-unmatchable': null,
+		'media-query-no-invalid': null,
+
+		/* Add back deprecated rule */
+		'@stylistic/no-extra-semicolons': true,
 	},
 };
