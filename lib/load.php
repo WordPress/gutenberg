@@ -185,3 +185,8 @@ require __DIR__ . '/block-supports/block-style-variations.php';
 
 // Data views.
 require_once __DIR__ . '/experimental/data-views.php';
+
+// Client-side media processing.
+if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
+	require_once __DIR__ . '/experimental/media/load.php';
+}
