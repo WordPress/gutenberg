@@ -32,5 +32,12 @@ module.exports = {
 		'scss/at-if-closing-brace-newline-after': 'always-last-in-chain',
 		'scss/at-if-closing-brace-space-after': 'always-intermediate',
 		'scss/selector-no-redundant-nesting-selector': true,
+		/* This value gets overwritten by stylelint-config-recommended-scss so we need to set it again. */
+		'declaration-block-no-duplicate-properties': [
+			true,
+			{
+				ignore: [ 'consecutive-duplicates' ],
+			},
+		],
 	},
 };
