@@ -128,7 +128,29 @@ type Store = ServerState & typeof storeDef;
 const { state, actions } = store< Store >( 'myCounterPlugin', storeDef );
 ```
 
-That's it!
+Alternatively, if you don't mind typing the entire state, you can cast the `state` property and let TypeScript infer the rest of the store.
+
+Let's imagine you have an additional property in the client global state called `product`.
+
+```ts
+type State = {
+	counter: number; // The server state.
+	product: number; // The client state.
+};
+
+const { state, actions } = store( 'myCounterPlugin', {
+	state: {
+		product: 2,
+	} as State, // Casts the whole state manually.
+	actions: {
+		increment() {
+			state.counter * state.product;
+		},
+	},
+} );
+```
+
+That's it. Now, TypeScript will infer the types of the `actions` and `callbacks` properties, and you can use the `state` property with the correct types from both the client and server definitions.
 
 In conclusion, this approach is useful when you have a server state that needs to be manually typed, but you still want to infer the types of the rest of the store.
 
