@@ -599,7 +599,7 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onReset={ onSelectImage( undefined ) }
+						onReset={ () => onSelectImage( undefined ) }
 					/>
 				</BlockControls>
 			) }
