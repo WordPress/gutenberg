@@ -140,6 +140,20 @@ module.exports = {
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
+	module: {
+		rules: [
+			...baseConfig.module.rules,
+			{
+				test: /\.wasm$/,
+				type: 'asset/resource',
+				generator: {
+					// FIXME: Do not hardcode path.
+					filename: './build/vips/[name].wasm',
+					publicPath: '',
+				},
+			},
+		],
+	},
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},

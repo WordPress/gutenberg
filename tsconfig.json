@@ -51,6 +51,7 @@
 		{ "path": "packages/token-list" },
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/url" },
+		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" }
 	],

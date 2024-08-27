@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { TextDecoder, TextEncoder } from 'node:util';
+import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 
 jest.mock( '@wordpress/compose', () => {
 	return {
@@ -44,3 +45,6 @@ if ( ! global.TextDecoder ) {
 if ( ! global.TextEncoder ) {
 	global.TextEncoder = TextEncoder;
 }
+
+global.Blob = BlobPolyfill;
+global.File = FilePolyfill;

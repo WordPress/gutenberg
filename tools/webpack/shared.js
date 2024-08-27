@@ -48,6 +48,13 @@ const baseConfig = {
 			},
 		],
 	},
+	resolve: {
+		// Ensure "require" has a higher priority when matching export conditions.
+		// Needed for wasm-vips which is used by the @wordpress/vips package.
+		// https://webpack.js.org/configuration/resolve/#resolveconditionnames
+		// https://github.com/kleisauke/wasm-vips/issues/50#issuecomment-1664118137
+		conditionNames: [ 'require', 'import' ],
+	},
 	watchOptions: {
 		ignored: [
 			'**/node_modules',
