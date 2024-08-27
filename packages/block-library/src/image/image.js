@@ -357,7 +357,11 @@ export default function Image( {
 	}, [ isSingleSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop = isSingleSelected && canEditImage && ! isEditingImage;
+	const allowCrop =
+		isSingleSelected &&
+		canEditImage &&
+		! isEditingImage &&
+		! isContentOnlyMode;
 
 	function switchToCover() {
 		replaceBlocks(
