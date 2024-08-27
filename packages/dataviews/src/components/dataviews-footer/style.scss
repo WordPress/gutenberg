@@ -23,7 +23,6 @@
 @container (max-width: 560px) {
 	.dataviews-footer {
 		flex-direction: column !important;
-		bottom: $grid-unit-80;
 
 		.dataviews-bulk-actions-footer__container {
 			width: 100%;
