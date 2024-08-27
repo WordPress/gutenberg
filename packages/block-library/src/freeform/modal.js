@@ -25,6 +25,8 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
 
 	return (
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			onClick={ onClick }
 			icon={ fullscreen }
 			isPressed={ isModalFullScreen }
@@ -120,12 +122,19 @@ export default function ModalEdit( props ) {
 						expanded={ false }
 					>
 						<FlexItem>
-							<Button variant="tertiary" onClick={ onClose }>
+							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
+								variant="tertiary"
+								onClick={ onClose }
+							>
 								{ __( 'Cancel' ) }
 							</Button>
 						</FlexItem>
 						<FlexItem>
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								variant="primary"
 								onClick={ () => {
 									setAttributes( {

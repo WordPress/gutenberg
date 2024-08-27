@@ -65,10 +65,20 @@ const EmbedPlaceholder = ( {
 						spacing={ 3 }
 						justify="flex-start"
 					>
-						<Button variant="secondary" onClick={ tryAgain }>
+						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							variant="secondary"
+							onClick={ tryAgain }
+						>
 							{ _x( 'Try again', 'button label' ) }
 						</Button>{ ' ' }
-						<Button variant="secondary" onClick={ fallback }>
+						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							variant="secondary"
+							onClick={ fallback }
+						>
 							{ _x( 'Convert to link', 'button label' ) }
 						</Button>
 					</HStack>

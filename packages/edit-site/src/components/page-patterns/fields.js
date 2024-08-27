@@ -133,6 +133,8 @@ function TitleField( { item } ) {
 					title
 				) : (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="link"
 						onClick={ onClick }
 						// Required for the grid's roving tab index system.

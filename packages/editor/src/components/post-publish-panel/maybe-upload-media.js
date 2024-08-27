@@ -149,7 +149,12 @@ export default function PostFormatPanel() {
 				{ isUploading || isAnimating ? (
 					<Spinner />
 				) : (
-					<Button variant="primary" onClick={ uploadImages }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ uploadImages }
+					>
 						{ __( 'Upload' ) }
 					</Button>
 				) }

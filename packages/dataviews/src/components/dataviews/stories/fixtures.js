@@ -148,13 +148,21 @@ export const actions = [
 			return (
 				<VStack spacing="5">
 					<Text>
-						{ `Are you sure you want to delete "${ item.title }"?` }
+						{ `Are you sure you want to delete "${ item?.title }"?` }
 					</Text>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ closeModal }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ closeModal }
+						>
 							Cancel
 						</Button>
-						<Button variant="primary" onClick={ closeModal }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ closeModal }
+						>
 							Delete
 						</Button>
 					</HStack>
