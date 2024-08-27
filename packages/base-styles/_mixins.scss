@@ -512,7 +512,7 @@
 @mixin gradient-colors-deprecated() {
 	// Our classes uses the same values we set for gradient value attributes.
 
-	/* stylelint-disable function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
+	/* stylelint-disable @stylistic/function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
 	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
 		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}
@@ -540,7 +540,7 @@
 	.has-midnight-gradient-background {
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
-	/* stylelint-enable function-comma-space-after */
+	/* stylelint-enable @stylistic/function-comma-space-after */
 }
 
 @mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover) {
