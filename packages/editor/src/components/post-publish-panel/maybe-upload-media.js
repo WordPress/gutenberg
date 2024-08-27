@@ -157,11 +157,7 @@ export default function PostFormatPanel() {
 					</Button>
 				) }
 			</div>
-			{ hadUploadError && (
-				<p className="post-publish-panel__error">
-					{ __( 'Upload failed, try again.' ) }
-				</p>
-			) }
+			{ hadUploadError && <p>{ __( 'Upload failed, try again.' ) }</p> }
 		</PanelBody>
 	);
 }
