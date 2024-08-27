@@ -140,7 +140,6 @@ export default function DataViews< Item >( {
 						expanded={ false }
 						style={ { flexShrink: 0 } }
 					>
-						<DataViewsBulkActions />
 						<DataViewsViewConfig
 							defaultLayouts={ defaultLayouts }
 							density={ density }
