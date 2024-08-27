@@ -40,6 +40,8 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
  * Returns a font-size value based on a given font-size preset.
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
+ * The Core PHP equivalent is wp_get_typography_font_size_value().
+ *
  * @param {Preset}                     preset
  * @param {Object}                     settings
  * @param {boolean|TypographySettings} settings.typography.fluid  Whether fluid typography is enabled, and, optionally, fluid font size options.
@@ -50,15 +52,25 @@ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights
 export function getTypographyFontSizeValue( preset, settings ) {
 	const { size: defaultSize } = preset;
 
-	if ( ! isFluidTypographyEnabled( settings?.typography ) ) {
-		return defaultSize;
-	}
 	/*
-	 * Checks whether a font size has explicitly bypassed fluid calculations.
-	 * Also catches falsy values and 0/'0'.
-	 * Fluid calculations cannot be performed on `0`.
+	 * Catch falsy values and 0/'0'. Fluid calculations cannot be performed on `0`.
+	 * Also return early when a preset font size explicitly disables fluid typography with `false`.
 	 */
 	if ( ! defaultSize || '0' === defaultSize || false === preset?.fluid ) {
+		return defaultSize;
+	}
+
+	/*
+	 * Return early when fluid typography is disabled in the settings, and there
+	 * are no local settings to enable it for the individual preset.
+	 *
+	 * If this condition isn't met, either the settings or individual preset settings
+	 * have enabled fluid typography.
+	 */
+	if (
+		! isFluidTypographyEnabled( settings?.typography ) &&
+		! isFluidTypographyEnabled( preset )
+	) {
 		return defaultSize;
 	}
 

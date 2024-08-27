@@ -72,6 +72,7 @@ function UnconnectedToggleGroupControl(
 		<BaseControl
 			help={ help }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="ToggleGroupControl"
 		>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
@@ -115,7 +116,12 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __nextHasNoMarginBottom
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>

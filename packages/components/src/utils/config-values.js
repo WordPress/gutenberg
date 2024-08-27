@@ -5,16 +5,17 @@ import { space } from './space';
 import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '36px';
-const CONTROL_PADDING_X = '12px';
 
 const CONTROL_PROPS = {
 	controlSurfaceColor: COLORS.white,
 	controlTextActiveColor: COLORS.theme.accent,
-	controlPaddingX: CONTROL_PADDING_X,
-	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
-	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+
+	// These values should be shared with TextControl.
+	controlPaddingX: 12,
+	controlPaddingXSmall: 8,
+	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
+
 	controlBackgroundColor: COLORS.white,
-	controlBorderRadius: '2px',
 	controlBoxShadow: 'transparent',
 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
 	controlDestructiveBorderColor: COLORS.alert.red,
@@ -48,7 +49,6 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	radiusLarge: '8px',
 	radiusFull: '9999px',
 	radiusRound: '50%',
-	radiusBlockUi: '2px',
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
@@ -73,7 +73,10 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	cardPaddingSmall: `${ space( 4 ) }`,
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
-	popoverShadow: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+	elevationXSmall: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+	elevationSmall: `0 0.7px 1px 0 rgba(0, 0, 0, 0.12), 0 2.2px 3.7px -0.2px rgba(0, 0, 0, 0.12), 0 5.3px 7.3px -0.5px rgba(0, 0, 0, 0.12)`,
+	elevationMedium: `0 0.7px 1px 0 rgba(0, 0, 0, 0.14), 0 4.2px 5.7px -0.2px rgba(0, 0, 0, 0.14), 0 7.3px 9.3px -0.5px rgba(0, 0, 0, 0.14)`,
+	elevationLarge: `0 0.7px 1px rgba(0, 0, 0, 0.15), 0 2.7px 3.8px -0.2px rgba(0, 0, 0, 0.15), 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.15), 0.1px 11.5px 16.4px -0.5px rgba(0, 0, 0, 0.15)`,
 	surfaceBackgroundColor: COLORS.white,
 	surfaceBackgroundSubtleColor: '#F3F3F3',
 	surfaceBackgroundTintColor: '#F5F5F5',

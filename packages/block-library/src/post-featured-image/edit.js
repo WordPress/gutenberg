@@ -230,6 +230,7 @@ export default function PostFeaturedImageEdit( {
 								checked={ linkTarget === '_blank' }
 							/>
 							<TextControl
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }

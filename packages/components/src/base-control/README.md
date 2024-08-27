@@ -15,7 +15,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
 			<textarea { ...controlProps }>
 			  { children }
 			</textarea>
@@ -92,7 +92,10 @@ It should only be used in cases where the children being rendered inside BaseCon
 import { BaseControl } from '@wordpress/components';
 
 const MyBaseControl = () => (
-	<BaseControl help="This button is already accessibly labeled.">
+	<BaseControl
+		__nextHasNoMarginBottom
+		help="This button is already accessibly labeled."
+	>
 		<BaseControl.VisualLabel>Author</BaseControl.VisualLabel>
 		<Button>Select an author</Button>
 	</BaseControl>

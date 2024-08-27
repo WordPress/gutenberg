@@ -15,7 +15,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
@@ -315,6 +315,8 @@ function FontCollection( { slug } ) {
 								</FlexItem>
 								<FlexItem>
 									<SelectControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
 										label={ __( 'Category' ) }
 										value={ filters.category }
 										onChange={ handleCategoryFilter }
@@ -380,7 +382,7 @@ function FontCollection( { slug } ) {
 
 						<NavigatorScreen path="/fontFamily">
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
+								<NavigatorBackButton
 									icon={ chevronLeft }
 									size="small"
 									onClick={ () => {

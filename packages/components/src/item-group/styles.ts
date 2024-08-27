@@ -70,7 +70,7 @@ export const separated = css`
 	}
 `;
 
-const borderRadius = CONFIG.controlBorderRadius;
+const borderRadius = CONFIG.radiusSmall;
 
 export const spacedAround = css`
 	border-radius: ${ borderRadius };
@@ -105,12 +105,12 @@ const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight 
 
 export const itemSizes = {
 	small: css`
-		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
+		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall }px;
 	`,
 	medium: css`
-		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
+		padding: ${ paddingY } ${ CONFIG.controlPaddingX }px;
 	`,
 	large: css`
-		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
+		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge }px;
 	`,
 };
