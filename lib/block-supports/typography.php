@@ -502,7 +502,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	 * Return early when fluid typography is disabled in the settings, and there
 	 * are no local settings to enable it for the individual preset.
 	 *
-	 * If this condition isn't met, either the settings or individual prest settings
+	 * If this condition isn't met, either the settings or individual preset settings
 	 * have enabled fluid typography.
 	 */
 	if ( empty( $typography_settings['fluid'] ) && empty( $fluid_font_size_settings ) ) {
