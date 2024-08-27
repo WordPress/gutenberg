@@ -101,30 +101,6 @@ interface DirectivesProps {
 // Main context.
 const context = createContext< any >( {} );
 
-// Wrap the element props to prevent modifications.
-const immutableMap = new WeakMap();
-const immutableError = () => {
-	throw new Error(
-		'Please use `data-wp-bind` to modify the attributes of an element.'
-	);
-};
-const immutableHandlers: ProxyHandler< object > = {
-	get( target, key, receiver ) {
-		const value = Reflect.get( target, key, receiver );
-		return !! value && typeof value === 'object'
-			? deepImmutable( value )
-			: value;
-	},
-	set: immutableError,
-	deleteProperty: immutableError,
-};
-const deepImmutable = < T extends object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) ) {
-		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
-	}
-	return immutableMap.get( target );
-};
-
 // Store stacks for the current scope and the default namespaces and export APIs
 // to interact with them.
 const scopeStack: Scope[] = [];
@@ -158,7 +134,7 @@ export const getElement = () => {
 	const { ref, attributes } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		attributes: deepImmutable( attributes ),
+		attributes: Object.freeze( { ...attributes } ),
 	} );
 };
 
