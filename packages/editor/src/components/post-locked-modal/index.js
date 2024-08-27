@@ -254,11 +254,21 @@ export default function PostLockedModal() {
 						justify="flex-end"
 					>
 						{ ! isTakeover && (
-							<Button variant="tertiary" href={ unlockUrl }>
+							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
+								variant="tertiary"
+								href={ unlockUrl }
+							>
 								{ __( 'Take over' ) }
 							</Button>
 						) }
-						<Button variant="primary" href={ allPostsUrl }>
+						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							variant="primary"
+							href={ allPostsUrl }
+						>
 							{ allPostsLabel }
 						</Button>
 					</HStack>
