@@ -13,20 +13,6 @@
 
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
-@container (max-width: 782px) {
-	.dataviews-footer {
-		bottom: $grid-unit-80;
-	}
-}
-
-/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
-@container (max-width: 600px) {
-	.dataviews-footer.dataviews-footer {
-		bottom: 0;
-	}
-}
-
-/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.dataviews-footer {
 		padding: $grid-unit-15 $grid-unit-30;
