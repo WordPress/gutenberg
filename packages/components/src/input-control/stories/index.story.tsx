@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { seen, unseen } from '@wordpress/icons';
+import { close, Icon, link, seen, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -75,6 +75,29 @@ WithSuffix.args = {
 	suffix: <InputControlSuffixWrapper>%</InputControlSuffixWrapper>,
 };
 
+/**
+ * `<InputControlPrefixWrapper>` and `<InputControlSuffixWrapper>` have a `variant` prop that can be used to
+ * adjust the wrapper based on the prefix or suffix content.
+ *
+ * - `'default'`: Standard padding for text content.
+ * - `'icon'`: For icons.
+ * - `'control'`: For controls, like buttons or selects.
+ */
+export const WithIconOrControl = Template.bind( {} );
+WithIconOrControl.args = {
+	...Default.args,
+	prefix: (
+		<InputControlPrefixWrapper variant="icon">
+			<Icon icon={ link } />
+		</InputControlPrefixWrapper>
+	),
+	suffix: (
+		<InputControlSuffixWrapper variant="control">
+			<Button icon={ close } size="small" label="Clear" />
+		</InputControlSuffixWrapper>
+	),
+};
+
 export const WithSideLabel = Template.bind( {} );
 WithSideLabel.args = {
 	...Default.args,
@@ -95,17 +118,13 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
 			type={ visible ? 'text' : 'password' }
 			label="Password"
 			suffix={
-				<InputControlSuffixWrapper>
-					<div style={ { display: 'flex' } }>
-						<Button
-							size="small"
-							icon={ visible ? unseen : seen }
-							onClick={ () => setVisible( ( value ) => ! value ) }
-							label={
-								visible ? 'Hide password' : 'Show password'
-							}
-						/>
-					</div>
+				<InputControlSuffixWrapper variant="control">
+					<Button
+						size="small"
+						icon={ visible ? unseen : seen }
+						onClick={ () => setVisible( ( value ) => ! value ) }
+						label={ visible ? 'Hide password' : 'Show password' }
+					/>
 				</InputControlSuffixWrapper>
 			}
 			{ ...args }
