@@ -108,7 +108,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
-	containerWidth,
+	maxContentWidth,
 } ) {
 	const {
 		url = '',
@@ -934,7 +934,7 @@ export default function Image( {
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
-		const maxContentWidth = containerWidth || maxWidthBuffer;
+		const maxResizeWidth = maxContentWidth || maxWidthBuffer;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
@@ -980,9 +980,9 @@ export default function Image( {
 				} }
 				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
-				maxWidth={ maxContentWidth }
+				maxWidth={ maxResizeWidth }
 				minHeight={ minHeight }
-				maxHeight={ maxContentWidth / ratio }
+				maxHeight={ maxResizeWidth / ratio }
 				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
@@ -996,6 +996,7 @@ export default function Image( {
 
 					// Clear hardcoded width if the resized width is close to the max-content width.
 					if (
+						maxContentWidth &&
 						// Only do this if the image is bigger than the container to prevent it from being squished.
 						// TODO: Remove this check if the image support setting 100% width.
 						naturalWidth >= maxContentWidth &&
