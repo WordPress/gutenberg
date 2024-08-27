@@ -28,4 +28,3 @@ export const CompositeGroup = forwardRef<
 		/>
 	);
 } );
-CompositeGroup.displayName = 'Composite.Group';

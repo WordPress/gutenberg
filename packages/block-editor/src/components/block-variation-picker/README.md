@@ -19,9 +19,9 @@ Renders the variations of a block.
 ```jsx
 import { useSelect } from '@wordpress/data';
 import {
-	__experimentalBlockVariationPicker as BlockVariationPicker,
-	store as blockEditorStore,
+	__experimentalBlockVariationPicker as BlockVariationPicker
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 
 const MyBlockVariationPicker = ( { blockName } ) => {
 	const variations = useSelect(
