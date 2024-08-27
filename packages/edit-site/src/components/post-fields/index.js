@@ -425,7 +425,7 @@ function usePostFields( viewType ) {
 
 					if ( ! url ) {
 						return (
-							<Flex gap={ 8 }>
+							<Flex>
 								<FlexItem>
 									<span className="edit-site-post-featured-image-placeholder" />
 								</FlexItem>
@@ -480,16 +480,8 @@ function usePostFields( viewType ) {
 											<div
 												role="button"
 												tabIndex={ 0 }
-												onClick={ ( event ) => {
-													const element =
-														event.target.tagName.toLowerCase();
-													// Prevent opening the media modal when clicking on the button/icon.
-													if (
-														element !== 'button' &&
-														element !== 'svg'
-													) {
-														open();
-													}
+												onClick={ () => {
+													open();
 												} }
 												onKeyDown={ open }
 											>
@@ -534,11 +526,14 @@ function usePostFields( viewType ) {
 																icon={
 																	lineSolid
 																}
-																onClick={ () =>
+																onClick={ (
+																	event
+																) => {
+																	event.stopPropagation();
 																	onChangeControl(
 																		0
-																	)
-																}
+																	);
+																} }
 															/>
 															<Text
 																className="edit-site-dataviews-controls__featured-image-filename"
