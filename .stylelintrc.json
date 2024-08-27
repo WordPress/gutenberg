@@ -1,5 +1,5 @@
 {
-	"extends": "@wordpress/stylelint-config/scss",
+	"extends": "@wordpress/stylelint-config/scss-stylistic",
 	"rules": {
 		"at-rule-empty-line-before": null,
 		"at-rule-no-unknown": null,
