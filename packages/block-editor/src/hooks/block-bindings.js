@@ -245,7 +245,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
-	// Lock the UI when the experiment is not enabled or there are no fields to connect to.
+	// Lock the UI when the preference to create bindings is not enabled or there are no fields to connect to.
 	const readOnly =
 		! showBlockBindingsUI || ! Object.keys( fieldsList ).length;
 
