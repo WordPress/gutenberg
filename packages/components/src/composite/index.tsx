@@ -52,9 +52,44 @@ export const Composite = Object.assign(
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
 	>( function Composite(
-		{ children, store, disabled = false, ...props },
+		{
+			// Composite store props
+			activeId,
+			defaultActiveId,
+			setActiveId,
+			focusLoop = false,
+			focusWrap = false,
+			focusShift = false,
+			virtualFocus = false,
+			orientation = 'both',
+			rtl = false,
+
+			// Composite component props
+			children,
+			disabled = false,
+
+			// To be removed
+			store: storeProp,
+
+			// Rest props
+			...props
+		},
 		ref
 	) {
+		const newStore = Ariakit.useCompositeStore( {
+			activeId,
+			defaultActiveId,
+			setActiveId,
+			focusLoop,
+			focusWrap,
+			focusShift,
+			virtualFocus,
+			orientation,
+			rtl,
+		} );
+
+		const store = storeProp || newStore;
+
 		const contextValue = useMemo(
 			() => ( {
 				store,
