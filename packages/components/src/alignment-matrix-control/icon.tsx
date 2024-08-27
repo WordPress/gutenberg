@@ -31,15 +31,12 @@ function AlignmentMatrixControlIcon( {
 	value = 'center',
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlIconProps, 'svg', false > ) {
-	const computedWidth = size ?? width ?? BASE_SIZE;
-	const computedHeight = size ?? height ?? BASE_SIZE;
-
 	return (
 		<SVG
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox={ `0 0 ${ BASE_SIZE } ${ BASE_SIZE }` }
-			width={ computedWidth }
-			height={ computedHeight }
+			width={ size ?? width ?? BASE_SIZE }
+			height={ size ?? height ?? BASE_SIZE }
 			role="presentation"
 			className={ clsx(
 				'component-alignment-matrix-control-icon',
