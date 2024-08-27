@@ -579,7 +579,7 @@ export function getResolvedRefValue( ruleValue, tree ) {
 			return undefined;
 		}
 
-		if ( ! resolvedRuleValue ) {
+		if ( resolvedRuleValue === undefined ) {
 			return ruleValue;
 		}
 
