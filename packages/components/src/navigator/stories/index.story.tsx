@@ -41,10 +41,11 @@ const meta: Meta< typeof NavigatorProvider > = {
 						  Navigator component. Do not use outside of its source code. */
 						[data-wp-component="NavigatorProvider"] {
 							height: calc(100vh - 2rem);
+							max-height: 250px;
+
 						}
-						[data-wp-component="NavigatorScreen"] {
-							padding-inline: 8px;
-							height: 100%;
+						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
+							padding: 8px;
 						}
 					` }</style>
 					<Story />
@@ -138,7 +139,7 @@ export const Default: StoryObj< typeof NavigatorProvider > = {
 					</div>
 				</NavigatorScreen>
 
-				<NavigatorScreen path="/stickies">
+				<NavigatorScreen path="/stickies" data-sticky>
 					<div
 						style={ {
 							...getStickyStyles( {
@@ -300,6 +301,10 @@ const NavigatorButtonWithSkipFocus = ( {
 	return (
 		<Button
 			{ ...props }
+			style={ {
+				marginInline: '8px',
+				...props.style,
+			} }
 			onClick={ ( e: React.MouseEvent< HTMLButtonElement > ) => {
 				goTo( path, { skipFocus: true } );
 				onClick?.( e );
@@ -315,29 +320,20 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 			<>
 				<div
 					style={ {
-						height: 250,
+						height: 150,
 						outline: '1px solid black',
 						outlineOffset: '-1px',
 						marginBlockEnd: '1rem',
 					} }
 				>
-					<NavigatorScreen
-						path="/"
-						style={ {
-							height: '100%',
-						} }
-					>
+					<NavigatorScreen path="/">
 						<h2>Home screen</h2>
 						<NavigatorButton variant="secondary" path="/child">
 							Go to child screen.
 						</NavigatorButton>
 					</NavigatorScreen>
-					<NavigatorScreen
-						path="/child"
-						style={ {
-							height: '100%',
-						} }
-					>
+
+					<NavigatorScreen path="/child">
 						<h2>Child screen</h2>
 						<NavigatorBackButton variant="secondary">
 							Go to parent screen.
