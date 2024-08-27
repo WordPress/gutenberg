@@ -8,6 +8,12 @@
 	flex-shrink: 0;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
+	@include break-small() {
+		bottom: $grid-unit-70 + $border-width;
+	}
+	@include break-medium() {
+		bottom: 0;
+	}
 }
 
 .dataviews-pagination__page-select {
