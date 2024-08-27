@@ -1396,7 +1396,7 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				// Activate the block bindings UI preference.
 				await editor.setPreferences( 'core', {
-					showBlockBindingsUI: true,
+					connectBlockAttributesUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1414,7 +1414,7 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				// Activate the block bindings UI preference.
 				await editor.setPreferences( 'core', {
-					showBlockBindingsUI: true,
+					connectBlockAttributesUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1531,7 +1531,7 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				// Activate the block bindings UI preference.
 				await editor.setPreferences( 'core', {
-					showBlockBindingsUI: true,
+					connectBlockAttributesUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1726,7 +1726,7 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				// Activate the block bindings UI preference.
 				await editor.setPreferences( 'core', {
-					showBlockBindingsUI: true,
+					connectBlockAttributesUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -2061,7 +2061,7 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				// Activate the block bindings UI preference.
 				await editor.setPreferences( 'core', {
-					showBlockBindingsUI: true,
+					connectBlockAttributesUI: true,
 				} );
 
 				await editor.insertBlock( {
