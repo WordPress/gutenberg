@@ -122,6 +122,9 @@ export default function PostFormatPanel() {
 							} );
 						} ).then( () => setIsAnimating( true ) )
 					)
+					.catch( () => {
+						setHadUploadError( true );
+					} )
 			)
 		).finally( () => {
 			setIsUploading( false );
