@@ -32,7 +32,7 @@ function AlignmentMatrixControlIcon( {
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlIconProps, 'svg', false > ) {
 	const computedWidth = size ?? width ?? BASE_SIZE;
-	const computedHeight = size ?? width ?? BASE_SIZE;
+	const computedHeight = size ?? height ?? BASE_SIZE;
 
 	return (
 		<SVG
