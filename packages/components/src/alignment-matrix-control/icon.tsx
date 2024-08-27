@@ -11,7 +11,7 @@ import { Rect, SVG } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { ALIGNMENTS } from './utils';
+import { ALIGNMENTS, getAlignmentIndex } from './utils';
 import type { AlignmentMatrixControlIconProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -49,7 +49,10 @@ function AlignmentMatrixControlIcon( {
 			{ ...props }
 		>
 			{ ALIGNMENTS.map( ( align, index ) => {
-				const dotSize = align === value ? DOT_SIZE_SELECTED : DOT_SIZE;
+				const dotSize =
+					getAlignmentIndex( value ) === index
+						? DOT_SIZE_SELECTED
+						: DOT_SIZE;
 
 				return (
 					<Rect
