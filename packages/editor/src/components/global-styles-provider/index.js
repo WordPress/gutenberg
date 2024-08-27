@@ -158,6 +158,10 @@ function useGlobalStylesBaseConfig() {
 		}
 
 		const currentTheme = getCurrentTheme();
+		if ( ! currentTheme?.stylesheet ) {
+			return;
+		}
+
 		const canUserReadBaseGlobalStyles = canUser(
 			'read',
 			`global-styles/themes/${ currentTheme.stylesheet }`
