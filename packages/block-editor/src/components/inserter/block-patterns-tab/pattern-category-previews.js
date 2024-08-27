@@ -40,7 +40,7 @@ export function PatternCategoryPreviews( {
 	onInsert,
 	onHover = noop,
 	category,
-	showTitlesAsTooltip,
+	showTitle,
 } ) {
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
@@ -175,7 +175,7 @@ export function PatternCategoryPreviews( {
 					orientation="vertical"
 					category={ category.name }
 					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
+					showTitle={ showTitle }
 					patternFilter={ patternSourceFilter }
 					pagingProps={ pagingProps }
 				/>

@@ -250,7 +250,7 @@ function InserterMenu(
 						onInsert={ onInsertPattern }
 						category={ selectedPatternCategory }
 						patternFilter={ patternFilter }
-						showTitlesAsTooltip
+						showTitle={ false }
 					/>
 				) }
 			</BlockPatternsTab>
