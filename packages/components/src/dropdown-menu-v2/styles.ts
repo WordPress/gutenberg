@@ -304,6 +304,19 @@ export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
 	display: contents;
 `;
 
+export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+	/* Occupy the width of all grid columns (ie. full width) */
+	grid-column: 1 / -1;
+
+	padding-block: ${ ITEM_PADDING_BLOCK };
+	padding-inline: ${ ITEM_PADDING_INLINE };
+
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.4;
+	text-transform: uppercase;
+`;
+
 export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
 	Pick< DropdownMenuContext, 'variant' >
 >`
