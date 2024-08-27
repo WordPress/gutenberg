@@ -26,7 +26,7 @@ function AlignmentMatrixControlIcon( {
 	disablePointerEvents = true,
 	size,
 	width,
-	height, // extracted so that it doesn't apply to the DOM
+	height,
 	style = {},
 	value = 'center',
 	...props
@@ -37,7 +37,6 @@ function AlignmentMatrixControlIcon( {
 	return (
 		<SVG
 			xmlns="http://www.w3.org/2000/svg"
-			// TODO: should we keep the viewbox?
 			viewBox={ `0 0 ${ BASE_SIZE } ${ BASE_SIZE }` }
 			width={ computedWidth }
 			height={ computedHeight }
@@ -47,7 +46,6 @@ function AlignmentMatrixControlIcon( {
 				className
 			) }
 			style={ {
-				// TODO: move to emotion?
 				pointerEvents: disablePointerEvents ? 'none' : undefined,
 				...style,
 			} }
