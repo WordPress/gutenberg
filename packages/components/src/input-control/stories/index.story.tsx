@@ -5,7 +5,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { close, Icon, link, seen, unseen } from '@wordpress/icons';
+import { closeSmall, Icon, link, seen, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -93,7 +93,7 @@ WithIconOrControl.args = {
 	),
 	suffix: (
 		<InputControlSuffixWrapper variant="control">
-			<Button icon={ close } size="small" label="Clear" />
+			<Button icon={ closeSmall } size="small" label="Clear" />
 		</InputControlSuffixWrapper>
 	),
 };
