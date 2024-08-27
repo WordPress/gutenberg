@@ -9,6 +9,12 @@
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
 	z-index: z-index(".dataviews-footer");
+	@include break-small() {
+		bottom: $grid-unit-70 + $border-width;
+	}
+	@include break-medium() {
+		bottom: 0;
+	}
 }
 
 
