@@ -599,11 +599,8 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => onSelectImage( undefined ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
+						onReset={ onSelectImage( undefined ) }
+					/>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (

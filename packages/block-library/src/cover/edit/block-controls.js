@@ -103,16 +103,8 @@ export default function CoverBlockControls( {
 					onToggleFeaturedImage={ toggleUseFeaturedImage }
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
-				>
-					{ !! url && (
-						<MenuItem
-							className="block-library-cover__reset-button"
-							onClick={ onClearMedia }
-						>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					) }
-				</MediaReplaceFlow>
+					onReset={ onClearMedia }
+				/>
 			</BlockControls>
 		</>
 	);
