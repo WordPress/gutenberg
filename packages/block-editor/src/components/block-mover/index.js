@@ -69,7 +69,11 @@ function BlockMover( {
 		[ clientIds ]
 	);
 
-	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if (
+		! canMove ||
+		( isFirst && isLast && ! rootClientId ) ||
+		( hideDragHandle && isManualGrid )
+	) {
 		return null;
 	}
 
@@ -85,7 +89,6 @@ function BlockMover( {
 						<Button
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
-							aria-hidden="true"
 							label={ __( 'Drag' ) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.

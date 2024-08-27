@@ -63,6 +63,8 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Name' ) }
 					value={ name }

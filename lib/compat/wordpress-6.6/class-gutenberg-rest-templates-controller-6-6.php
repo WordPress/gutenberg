@@ -12,7 +12,7 @@
  * `edit_theme_options` capability. In order to allow other roles to also view the templates,
  * we need to override the permissions check for the REST API endpoints.
  */
-class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_Controller_6_4 {
+class Gutenberg_REST_Templates_Controller_6_6 extends WP_REST_Templates_Controller {
 
 	/**
 	 * Checks if a given request has access to read templates.

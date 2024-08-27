@@ -19,13 +19,7 @@ const SPIN = STEP * SPIN_FACTOR;
 
 const ControlledLineHeightControl = () => {
 	const [ value, setValue ] = useState();
-	return (
-		<LineHeightControl
-			value={ value }
-			onChange={ setValue }
-			__nextHasNoMarginBottom
-		/>
-	);
+	return <LineHeightControl value={ value } onChange={ setValue } />;
 };
 
 describe( 'LineHeightControl', () => {

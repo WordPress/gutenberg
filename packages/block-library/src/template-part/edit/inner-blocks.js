@@ -129,15 +129,17 @@ export default function TemplatePartInnerBlocks( {
 			return {
 				canViewTemplatePart: !! select( coreStore ).canUser( 'read', {
 					kind: 'postType',
-					name: 'wp_template',
+					name: 'wp_template_part',
+					id,
 				} ),
-				canEditTemplatePart: !! select( coreStore ).canUser( 'create', {
+				canEditTemplatePart: !! select( coreStore ).canUser( 'update', {
 					kind: 'postType',
-					name: 'wp_template',
+					name: 'wp_template_part',
+					id,
 				} ),
 			};
 		},
-		[]
+		[ id ]
 	);
 
 	if ( ! canViewTemplatePart ) {

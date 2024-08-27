@@ -54,7 +54,7 @@ $transition-duration: 0.2s;
 		left: math.div($toggle-thumb-size, 6);
 		width: $toggle-thumb-size;
 		height: $toggle-thumb-size;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		transition:
 			$transition-duration transform ease,
 			$transition-duration background-color ease-out;

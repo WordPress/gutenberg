@@ -2,17 +2,48 @@
 
 ## Unreleased
 
+## 4.2.0 (2024-08-21)
+
+## New features
+
+-   Support using a component for field headers or names by providing a `header` property in the field object. The string `label` property (or `id`) is still mandatory. ([#64642](https://github.com/WordPress/gutenberg/pull/64642)).
+
+## Internal
+
+-   The "move left/move right" controls in the table layout (popup displayed on cliking header) are always visible. ([#64646](https://github.com/WordPress/gutenberg/pull/64646)). Before this, its visibility depending on filters, enableSorting, and enableHiding.
+- Filters no longer display the elements' description. ([#64674](https://github.com/WordPress/gutenberg/pull/64674))
+
+
+## Enhancements
+
+-   Adjust layout of filter / actions row, increase width of search control when the container is narrower. ([#64681](https://github.com/WordPress/gutenberg/pull/64681)).
+
+## 4.1.0 (2024-08-07)
+
+## Internal
+
+-   Upgraded `@ariakit/react` (v0.4.7) ([#64066](https://github.com/WordPress/gutenberg/pull/64066)).
+
+## 4.0.0 (2024-07-24)
+
 ### Breaking Changes
 
-- `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
-- `setSelection` prop has been removed. Please use `onChangeSelection` instead.
+-   `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
+-   `setSelection` prop has been removed. Please use `onChangeSelection` instead.
+-   `header` field property has been renamed to `label`.
+-   `DataForm`'s `visibleFields` prop has been renamed to `fields`.
+-   `DataForm`'s `onChange` prop has been update to receive as argument only the fields that have changed.
+
+### New features
+
+-   Support multiple layouts in `DataForm` component and introduce the `panel` layout.
 
 ## 3.0.0 (2024-07-10)
 
 ### Breaking Changes
 
-- Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
-- Replace the `supportedLayouts` prop in the `DataViews` component with a `defaultLayouts` prop that accepts an object whose keys are the layout names and values are the default view objects for these layouts.
+-   Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
+-   Replace the `supportedLayouts` prop in the `DataViews` component with a `defaultLayouts` prop that accepts an object whose keys are the layout names and values are the default view objects for these layouts.
 
 ### New features
 

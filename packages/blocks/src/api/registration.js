@@ -770,10 +770,12 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  * @param {Object}   source                    Properties of the source to be registered.
  * @param {string}   source.name               The unique and machine-readable name.
  * @param {string}   [source.label]            Human-readable label.
+ * @param {Array}    [source.usesContext]      Array of context needed by the source only in the editor.
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
  * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
  * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ * @param {Function} [source.getFieldsList]    Function to get the lists of fields to expose in the connections panel.
  *
  * @example
  * ```js
@@ -794,10 +796,12 @@ export const registerBlockBindingsSource = ( source ) => {
 	const {
 		name,
 		label,
+		usesContext,
 		getValues,
 		setValues,
 		getPlaceholder,
 		canUserEditValue,
+		getFieldsList,
 	} = source;
 
 	const existingSource = unlock(
@@ -867,6 +871,12 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
+	// Check the `usesContext` property is correct.
+	if ( usesContext && ! Array.isArray( usesContext ) ) {
+		warning( 'Block bindings source usesContext must be an array.' );
+		return;
+	}
+
 	// Check the `getValues` property is correct.
 	if ( getValues && typeof getValues !== 'function' ) {
 		warning( 'Block bindings source getValues must be a function.' );
@@ -888,6 +898,13 @@ export const registerBlockBindingsSource = ( source ) => {
 	// Check the `getPlaceholder` property is correct.
 	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
 		warning( 'Block bindings source canUserEditValue must be a function.' );
+		return;
+	}
+
+	// Check the `getFieldsList` property is correct.
+	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
+		// eslint-disable-next-line no-console
+		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}
 

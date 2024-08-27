@@ -94,16 +94,16 @@ export function useToolsPanel(
 		...otherProps
 	} = useContextSystem( props, 'ToolsPanel' );
 
-	const isResetting = useRef( false );
-	const wasResetting = isResetting.current;
+	const isResettingRef = useRef( false );
+	const wasResetting = isResettingRef.current;
 
-	// `isResetting` is cleared via this hook to effectively batch together
+	// `isResettingRef` is cleared via this hook to effectively batch together
 	// the resetAll task. Without this, the flag is cleared after the first
 	// control updates and forces a rerender with subsequent controls then
 	// believing they need to reset, unfortunately using stale data.
 	useEffect( () => {
 		if ( wasResetting ) {
-			isResetting.current = false;
+			isResettingRef.current = false;
 		}
 	}, [ wasResetting ] );
 
@@ -303,7 +303,7 @@ export function useToolsPanel(
 	// Resets display of children and executes resetAll callback if available.
 	const resetAllItems = useCallback( () => {
 		if ( typeof resetAll === 'function' ) {
-			isResetting.current = true;
+			isResettingRef.current = true;
 			resetAll( resetAllFilters );
 		}
 
@@ -340,7 +340,7 @@ export function useToolsPanel(
 			firstDisplayedItem,
 			flagItemCustomization,
 			hasMenuItems: !! panelItems.length,
-			isResetting: isResetting.current,
+			isResetting: isResettingRef.current,
 			lastDisplayedItem,
 			menuItems,
 			panelId,

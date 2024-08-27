@@ -25,7 +25,7 @@ function useResolvedElement< T extends HTMLElement >(
 	subscriber: ( element: T ) => SubscriberResponse,
 	refOrElement?: T | RefObject< T > | null
 ): RefCallback< T > {
-	const callbackRefElement = useRef< T | null >( null );
+	const callbackElementRef = useRef< T | null >( null );
 	const lastReportRef = useRef< {
 		reporter: () => void;
 		element: T | null;
@@ -34,8 +34,8 @@ function useResolvedElement< T extends HTMLElement >(
 
 	const callSubscriber = useCallback( () => {
 		let element = null;
-		if ( callbackRefElement.current ) {
-			element = callbackRefElement.current;
+		if ( callbackElementRef.current ) {
+			element = callbackElementRef.current;
 		} else if ( refOrElement ) {
 			if ( refOrElement instanceof HTMLElement ) {
 				element = refOrElement;
@@ -80,7 +80,7 @@ function useResolvedElement< T extends HTMLElement >(
 
 	return useCallback< RefCallback< T > >(
 		( element ) => {
-			callbackRefElement.current = element;
+			callbackElementRef.current = element;
 			callSubscriber();
 		},
 		[ callSubscriber ]
@@ -200,16 +200,16 @@ function useResizeObserver< T extends HTMLElement >(
 
 	// In certain edge cases the RO might want to report a size change just after
 	// the component unmounted.
-	const didUnmount = useRef( false );
+	const didUnmountRef = useRef( false );
 	useEffect( () => {
-		didUnmount.current = false;
+		didUnmountRef.current = false;
 		return () => {
-			didUnmount.current = true;
+			didUnmountRef.current = true;
 		};
 	}, [] );
 
 	// Using a ref to track the previous width / height to avoid unnecessary renders.
-	const previous: {
+	const previousRef: {
 		current: {
 			width?: number;
 			height?: number;
@@ -270,18 +270,18 @@ function useResizeObserver< T extends HTMLElement >(
 								: undefined;
 
 							if (
-								previous.current.width !== newWidth ||
-								previous.current.height !== newHeight
+								previousRef.current.width !== newWidth ||
+								previousRef.current.height !== newHeight
 							) {
 								const newSize = {
 									width: newWidth,
 									height: newHeight,
 								};
-								previous.current.width = newWidth;
-								previous.current.height = newHeight;
+								previousRef.current.width = newWidth;
+								previousRef.current.height = newHeight;
 								if ( onResizeRef.current ) {
 									onResizeRef.current( newSize );
-								} else if ( ! didUnmount.current ) {
+								} else if ( ! didUnmountRef.current ) {
 									setSize( newSize );
 								}
 							}

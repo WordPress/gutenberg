@@ -26,7 +26,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
-import cloneDeep from '../../utils/clone-deep';
 import setNestedValue from '../../utils/set-nested-value';
 
 const { cleanEmptyObject, GlobalStylesContext } = unlock(
@@ -259,8 +258,8 @@ function PushChangesToGlobalStylesControl( {
 		if ( changes.length > 0 ) {
 			const { style: blockStyles } = attributes;
 
-			const newBlockStyles = cloneDeep( blockStyles );
-			const newUserConfig = cloneDeep( userConfig );
+			const newBlockStyles = structuredClone( blockStyles );
+			const newUserConfig = structuredClone( userConfig );
 
 			for ( const { path, value } of changes ) {
 				setNestedValue( newBlockStyles, path, undefined );
@@ -324,6 +323,7 @@ function PushChangesToGlobalStylesControl( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className="edit-site-push-changes-to-global-styles-control"
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.

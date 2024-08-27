@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { CompositeItem } from '../composite/v2';
+import { Composite } from '../composite';
 import Tooltip from '../tooltip';
 import { VisuallyHidden } from '../visually-hidden';
 
@@ -26,7 +26,7 @@ export default function Cell( {
 
 	return (
 		<Tooltip text={ tooltipText }>
-			<CompositeItem
+			<Composite.Item
 				id={ id }
 				render={ <CellView { ...props } role="gridcell" /> }
 			>
@@ -35,7 +35,7 @@ export default function Cell( {
 			hidden element instead of aria-label. */ }
 				<VisuallyHidden>{ value }</VisuallyHidden>
 				<Point isActive={ isActive } role="presentation" />
-			</CompositeItem>
+			</Composite.Item>
 		</Tooltip>
 	);
 }

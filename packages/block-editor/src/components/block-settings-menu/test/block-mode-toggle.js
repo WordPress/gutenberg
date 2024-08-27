@@ -4,15 +4,31 @@
 import { render, screen } from '@testing-library/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { BlockModeToggle } from '../block-mode-toggle';
+import BlockModeToggle from '../block-mode-toggle';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupUseSelectMock( mode, blockType, codeEditingEnabled = true ) {
+	useSelect.mockImplementation( () => {
+		return {
+			mode,
+			blockType,
+			isCodeEditingEnabled: codeEditingEnabled,
+		};
+	} );
+}
 
 describe( 'BlockModeToggle', () => {
 	it( "should not render the HTML mode button if the block doesn't support it", () => {
-		render(
-			<BlockModeToggle blockType={ { supports: { html: false } } } />
-		);
+		setupUseSelectMock( undefined, { supports: { html: false } } );
+		render( <BlockModeToggle /> );
 
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Edit as HTML' } )
@@ -20,12 +36,8 @@ describe( 'BlockModeToggle', () => {
 	} );
 
 	it( 'should render the HTML mode button', () => {
-		render(
-			<BlockModeToggle
-				blockType={ { supports: { html: true } } }
-				mode="visual"
-			/>
-		);
+		setupUseSelectMock( 'visual', { supports: { html: true } } );
+		render( <BlockModeToggle /> );
 
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Edit as HTML' } )
@@ -33,12 +45,8 @@ describe( 'BlockModeToggle', () => {
 	} );
 
 	it( 'should render the Visual mode button', () => {
-		render(
-			<BlockModeToggle
-				blockType={ { supports: { html: true } } }
-				mode="html"
-			/>
-		);
+		setupUseSelectMock( 'html', { supports: { html: true } } );
+		render( <BlockModeToggle /> );
 
 		expect(
 			screen.getByRole( 'menuitem', { name: 'Edit visually' } )
@@ -46,13 +54,8 @@ describe( 'BlockModeToggle', () => {
 	} );
 
 	it( 'should not render the Visual mode button if code editing is disabled', () => {
-		render(
-			<BlockModeToggle
-				blockType={ { supports: { html: true } } }
-				mode="html"
-				isCodeEditingEnabled={ false }
-			/>
-		);
+		setupUseSelectMock( 'html', { supports: { html: true } }, false );
+		render( <BlockModeToggle /> );
 
 		expect(
 			screen.queryByRole( 'menuitem', { name: 'Edit visually' } )

@@ -75,4 +75,24 @@ export default {
 
 		return true;
 	},
+	getFieldsList( { registry, context } ) {
+		const metaFields = registry
+			.select( coreDataStore )
+			.getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta;
+
+		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
+			return null;
+		}
+
+		// Remove footnotes or private keys from the list of fields.
+		return Object.fromEntries(
+			Object.entries( metaFields ).filter(
+				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
+			)
+		);
+	},
 };
