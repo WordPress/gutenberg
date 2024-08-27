@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	extends: [ 'stylelint-config-recommended' ],
+	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
 	rules: {
 		'at-rule-empty-line-before': [
 			'always',
