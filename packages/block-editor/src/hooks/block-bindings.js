@@ -202,11 +202,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
-	const { showBlockBindingsUI } = useSelect( ( select ) => {
+	const { isConnectingEnabled } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 
 		return {
-			showBlockBindingsUI: get( 'core', 'showBlockBindingsUI' ),
+			isConnectingEnabled: get( 'core', 'connectBlockAttributesUI' ),
 		};
 	}, [] );
 
@@ -247,7 +247,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Lock the UI when the preference to create bindings is not enabled or there are no fields to connect to.
 	const readOnly =
-		! showBlockBindingsUI || ! Object.keys( fieldsList ).length;
+		! isConnectingEnabled || ! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;

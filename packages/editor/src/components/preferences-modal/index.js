@@ -4,6 +4,7 @@
 
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
@@ -36,7 +37,12 @@ const {
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isActive, showBlockBreadcrumbsOption, isTemplate } = useSelect(
+	const {
+		isActive,
+		showBlockBreadcrumbsOption,
+		isTemplate,
+		canUpdateSettings,
+	} = useSelect(
 		( select ) => {
 			const { getEditorSettings, getEditedPostAttribute } =
 				select( editorStore );
@@ -44,6 +50,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
+			const { canUser } = select( coreStore );
 			return {
 				showBlockBreadcrumbsOption:
 					! isDistractionFreeEnabled &&
@@ -51,6 +58,10 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 					isRichEditingEnabled,
 				isActive: isModalActive( 'editor/preferences' ),
 				isTemplate: getEditedPostAttribute( 'type' ) === 'wp_template',
+				canUpdateSettings: canUser( 'update', {
+					kind: 'root',
+					name: 'site',
+				} ),
 			};
 		},
 		[ isLargeViewport ]
@@ -256,17 +267,17 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 							/>
 						</PreferencesModalSection>
 						{ /* Don't show preference in templates until connecting attributes there is supported */ }
-						{ ! isTemplate && (
-							<PreferencesModalSection
-								title={ __( 'Block settings' ) }
-								description={ __(
-									'Select what settings are shown in the block panel.'
-								) }
-							>
+						{ ! isTemplate && canUpdateSettings && (
+							<PreferencesModalSection title={ __( 'Advanced' ) }>
 								<PreferenceToggleControl
 									scope="core"
-									featureName="showBlockBindingsUI"
-									label={ __( 'Block bindings UI' ) }
+									featureName="connectBlockAttributesUI"
+									label={ __(
+										'Enable connecting block attributes'
+									) }
+									help={ __(
+										'Allows connecting block attributes to custom fields or other dynamic data.'
+									) }
 								/>
 							</PreferencesModalSection>
 						) }
