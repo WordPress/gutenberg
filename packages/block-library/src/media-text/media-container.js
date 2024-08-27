@@ -78,6 +78,7 @@ function ToolbarEditButton( {
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
 	);
