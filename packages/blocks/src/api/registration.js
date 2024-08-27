@@ -726,7 +726,11 @@ export const getBlockVariations = ( blockName, scope ) => {
  * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
-	if ( typeof variation.name !== 'string' ) {
+	if (
+		Array.isArray( variation )
+			? variation.some( ( item ) => typeof item.name !== 'string' )
+			: typeof variation.name !== 'string'
+	) {
 		warning( 'Variation names must be unique strings.' );
 	}
 

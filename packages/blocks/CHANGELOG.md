@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Now `registerBlockVariation` won't warn `'Variation names must be unique strings.'` when registering multiple variations in an array. ([#TODO](https://github.com/WordPress/gutenberg/pull/TODO))
+
 ## 13.6.0 (2024-08-21)
 
 ## 13.5.0 (2024-08-07)
