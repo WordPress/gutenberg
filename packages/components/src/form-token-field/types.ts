@@ -157,6 +157,7 @@ export interface FormTokenFieldProps
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
