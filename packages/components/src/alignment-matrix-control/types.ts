@@ -50,18 +50,8 @@ export type AlignmentMatrixControlIconProps = Pick<
 	 */
 	disablePointerEvents?: boolean;
 	/**
-	 * The width of the icon
-	 * @default 24
-	 */
-	width?: number;
-	/**
-	 * The height of the icon
-	 * @default 24
-	 */
-	height?: number;
-	/**
-	 * _Note: this prop is deprecated. Use the `width` and `height` props, or the
-	 * `size` prop on the parent `Icon` component instead_
+	 * _Note: this prop is deprecated. Use the `size` prop on the parent `Icon`
+	 * component instead_
 	 *
 	 * The size of the icon.
 	 * @ignore
