@@ -364,6 +364,22 @@ describe( 'transformStyles', () => {
 			expect( output ).toEqual( [ expected ] );
 		} );
 
+		it( 'should not double wrap selectors when the prefix can be misinterpreted as a regular expression', () => {
+			const input =
+				' :where(.editor-styles-wrapper) h1, .red { color: red; }';
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				':where(.editor-styles-wrapper)'
+			);
+			const expected = ` :where(.editor-styles-wrapper) h1, :where(.editor-styles-wrapper) .red { color: red; }`;
+
+			expect( output ).toEqual( [ expected ] );
+		} );
+
 		it( 'should allow specification of ignoredSelectors per css input', () => {
 			const input = '.ignored { color: red; }';
 			const output = transformStyles(

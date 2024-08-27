@@ -108,7 +108,9 @@ function transformStyle(
 							// `transformStyle` previously used.
 							if (
 								excludedSelectors.some( ( excludedSelector ) =>
-									selector.match( excludedSelector )
+									excludedSelector instanceof RegExp
+										? selector.match( excludedSelector )
+										: selector.includes( excludedSelector )
 								)
 							) {
 								return selector;
