@@ -85,7 +85,6 @@
 
 .block-library-video-tracks-editor > .components-popover__content {
 	width: 360px;
-	padding: 0;
 }
 
 .block-library-video-tracks-editor__track-list,
@@ -94,10 +93,3 @@
 		padding: 0;
 	}
 }
-
-.block-library-video-tracks-editor__single-track-editor,
-.block-library-video-tracks-editor__track-list,
-.block-library-video-tracks-editor__add-tracks-container {
-	padding: $grid-unit-15;
-}
-
