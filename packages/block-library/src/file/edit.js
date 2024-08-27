@@ -230,6 +230,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					accept="*"
 					onSelect={ onSelectFile }
 					onError={ onUploadError }
+					onReset={ () => onSelectFile( undefined ) }
 				/>
 				<ClipboardToolbarButton
 					text={ href }

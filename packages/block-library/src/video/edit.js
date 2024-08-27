@@ -208,6 +208,7 @@ function VideoEdit( {
 							onSelect={ onSelectVideo }
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
+							onReset={ () => onSelectVideo( undefined ) }
 						/>
 					</BlockControls>
 				</>
