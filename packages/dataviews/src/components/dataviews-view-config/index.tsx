@@ -143,6 +143,14 @@ function SortFieldControl() {
 
 function SortDirectionControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
+	if ( sortableFields.length === 0 ) {
+		return null;
+	}
+
 	let value = view.sort?.direction;
 	if ( ! value && view.sort?.field ) {
 		value = 'desc';
