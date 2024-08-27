@@ -116,7 +116,6 @@ export default function PostFormatPanel() {
 									resolve();
 								},
 								onError() {
-									setHadUploadError( true );
 									reject();
 								},
 							} );
