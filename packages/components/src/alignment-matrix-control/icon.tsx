@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import { ALIGNMENTS, getAlignmentIndex } from './utils';
+import { ALIGNMENTS } from './utils';
 import {
 	Root,
 	Cell,
@@ -25,7 +25,6 @@ function AlignmentMatrixControlIcon( {
 	value = 'center',
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div', false > ) {
-	const alignIndex = getAlignmentIndex( value );
 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 
 	const classes = clsx(
@@ -46,15 +45,11 @@ function AlignmentMatrixControlIcon( {
 			role="presentation"
 			style={ styles }
 		>
-			{ ALIGNMENTS.map( ( align, index ) => {
-				const isActive = alignIndex === index;
-
-				return (
-					<Cell key={ align }>
-						<Point isActive={ isActive } />
-					</Cell>
-				);
-			} ) }
+			{ ALIGNMENTS.map( ( align ) => (
+				<Cell key={ align }>
+					<Point isActive={ value === align } />
+				</Cell>
+			) ) }
 		</Root>
 	);
 }

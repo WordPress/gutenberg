@@ -84,22 +84,3 @@ export function getItemValue( prefixId: string, id?: string | null ) {
 	const value = id?.replace( prefixId + '-', '' );
 	return normalize( value );
 }
-
-/**
- * Retrieves the alignment index from a value.
- *
- * @param alignment Value to check.
- *
- * @return The index of a matching alignment.
- */
-export function getAlignmentIndex(
-	alignment: AlignmentMatrixControlValue = 'center'
-) {
-	const normalized = normalize( alignment );
-	if ( ! normalized ) {
-		return undefined;
-	}
-
-	const index = ALIGNMENTS.indexOf( normalized );
-	return index > -1 ? index : undefined;
-}
