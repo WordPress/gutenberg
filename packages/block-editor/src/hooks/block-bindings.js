@@ -16,6 +16,7 @@ import {
 import { useRegistry } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -201,6 +202,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
+	const { showBlockBindingsUI } = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+
+		return {
+			showBlockBindingsUI: get( 'core', 'showBlockBindingsUI' ),
+		};
+	}, [] );
+
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
@@ -238,8 +247,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Lock the UI when the experiment is not enabled or there are no fields to connect to.
 	const readOnly =
-		! window.__experimentalBlockBindingsUI ||
-		! Object.keys( fieldsList ).length;
+		! showBlockBindingsUI || ! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;

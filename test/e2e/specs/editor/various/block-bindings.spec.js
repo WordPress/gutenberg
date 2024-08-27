@@ -1394,9 +1394,9 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
+				// Activate the block bindings UI preference.
+				await editor.setPreferences( 'core', {
+					showBlockBindingsUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1417,9 +1417,9 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
+				// Activate the block bindings UI preference.
+				await editor.setPreferences( 'core', {
+					showBlockBindingsUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1539,9 +1539,9 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
+				// Activate the block bindings UI preference.
+				await editor.setPreferences( 'core', {
+					showBlockBindingsUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -1739,9 +1739,9 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
+				// Activate the block bindings UI preference.
+				await editor.setPreferences( 'core', {
+					showBlockBindingsUI: true,
 				} );
 
 				await editor.insertBlock( {
@@ -2074,9 +2074,9 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
+				// Activate the block bindings UI preference.
+				await editor.setPreferences( 'core', {
+					showBlockBindingsUI: true,
 				} );
 
 				await editor.insertBlock( {

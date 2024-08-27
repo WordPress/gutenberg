@@ -254,6 +254,18 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 							/>
 						</PreferencesModalSection>
 						<PreferencesModalSection
+							title={ __( 'Block settings' ) }
+							description={ __(
+								'Select what settings are shown in the block panel.'
+							) }
+						>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="showBlockBindingsUI"
+								label={ __( 'Block bindings UI' ) }
+							/>
+						</PreferencesModalSection>
+						<PreferencesModalSection
 							title={ __( 'Manage block visibility' ) }
 							description={ __(
 								"Disable blocks that you don't want to appear in the inserter. They can always be toggled back on later."
