@@ -178,7 +178,7 @@ const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
 		cache = new WeakMap();
 		cacheByWrapperSelector.set( wrapperSelector, cache );
 	}
-	const transformed = styles.map( ( style ) => {
+	return styles.map( ( style ) => {
 		let css = cache.get( style );
 		if ( ! css ) {
 			css = transformStyle( style, wrapperSelector, transformOptions );
@@ -186,8 +186,6 @@ const transformStyles = ( styles, wrapperSelector = '', transformOptions ) => {
 		}
 		return css;
 	} );
-
-	return transformed;
 };
 
 export default transformStyles;
