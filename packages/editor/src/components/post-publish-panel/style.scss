@@ -185,6 +185,10 @@
 	color: $alert-yellow;
 }
 
+.post-publish-panel__error {
+	color: $alert-red;
+}
+
 @media screen and (max-width: 782px) {
 	.post-publish-panel__postpublish-post-address__button-wrap {
 		// match copy button height to the address field height in smaller screens
