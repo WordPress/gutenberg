@@ -119,7 +119,6 @@ export type OptionProps< T extends Color | Gradient > = {
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
-	slugPrefix: string;
 };
 
 export type PaletteEditListViewProps< T extends Color | Gradient > = {
@@ -131,5 +130,4 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	editingElement?: EditingElement;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
-	slugPrefix: string;
 };

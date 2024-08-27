@@ -349,7 +349,7 @@ describe( 'PaletteEdit', () => {
 				{
 					...colors[ 0 ],
 					name: 'Primary Updated',
-					slug: 'primary-updated',
+					slug: 'primary',
 				},
 				colors[ 1 ],
 			] );

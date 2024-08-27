@@ -45,7 +45,6 @@ import {
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
-import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,
@@ -173,7 +172,6 @@ function Option< T extends Color | Gradient >( {
 	onChange,
 	onRemove,
 	popoverProps: receivedPopoverProps,
-	slugPrefix,
 	isGradient,
 }: OptionProps< T > ) {
 	const value = isGradient ? element.gradient : element.color;
@@ -220,9 +218,7 @@ function Option< T extends Color | Gradient >( {
 								onChange( {
 									...element,
 									name: nextName,
-									slug:
-										slugPrefix +
-										kebabCase( nextName ?? '' ),
+									slug: element.slug,
 								} )
 							}
 						/>
@@ -269,7 +265,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	elements,
 	onChange,
 	canOnlyChangeValues,
-	slugPrefix,
 	isGradient,
 	popoverProps,
 	addColorRef,
@@ -317,7 +312,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							);
 							addColorRef.current?.focus();
 						} }
-						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
 					/>
 				) ) }
@@ -540,7 +534,6 @@ export function PaletteEdit( {
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							slugPrefix={ slugPrefix }
 							isGradient={ isGradient }
 							popoverProps={ popoverProps }
 							addColorRef={ addColorRef }
