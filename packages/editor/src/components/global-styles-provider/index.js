@@ -146,30 +146,10 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		const {
-			__experimentalGetCurrentThemeBaseGlobalStyles,
-			getCurrentTheme,
-			canUser,
-		} = select( coreStore );
+		const { __experimentalGetCurrentThemeBaseGlobalStyles } =
+			select( coreStore );
 
-		const canReadActiveTheme = canUser( 'read', 'themes?status=active' );
-		if ( ! canReadActiveTheme ) {
-			return;
-		}
-
-		const currentTheme = getCurrentTheme();
-		if ( ! currentTheme?.stylesheet ) {
-			return;
-		}
-
-		const canUserReadBaseGlobalStyles = canUser(
-			'read',
-			`global-styles/themes/${ currentTheme.stylesheet }`
-		);
-
-		return canUserReadBaseGlobalStyles
-			? __experimentalGetCurrentThemeBaseGlobalStyles()
-			: undefined;
+		return __experimentalGetCurrentThemeBaseGlobalStyles();
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];
