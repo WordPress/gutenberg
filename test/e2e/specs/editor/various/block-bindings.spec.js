@@ -1402,12 +1402,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByLabel( 'Attributes options' )
-					.click();
+				await page.getByLabel( 'Attributes options' ).click();
 				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
 					name: 'Show content',
 				} );
@@ -1436,12 +1431,7 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByRole( 'button', { name: 'content' } )
-					.click();
+				await page.getByRole( 'button', { name: 'content' } ).click();
 
 				await page
 					.getByRole( 'menuitemradio' )
@@ -1547,12 +1537,7 @@ test.describe( 'Block bindings', () => {
 				await editor.insertBlock( {
 					name: 'core/heading',
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByLabel( 'Attributes options' )
-					.click();
+				await page.getByLabel( 'Attributes options' ).click();
 				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
 					name: 'Show content',
 				} );
