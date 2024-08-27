@@ -45,10 +45,12 @@ export type AlignmentMatrixControlIconProps = Pick<
 	'value'
 > & {
 	disablePointerEvents?: boolean;
+	// Should deprecate
 	size?: number;
+	width?: number;
+	height?: number;
 };
 
 export type AlignmentMatrixControlCellProps = {
-	isActive?: boolean;
 	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
 };

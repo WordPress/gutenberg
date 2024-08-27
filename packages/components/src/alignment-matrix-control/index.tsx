@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -16,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
 import Cell from './cell';
 import { Composite } from '../composite';
 import { useCompositeStore } from '../composite/store';
-import { Root, Row } from './styles/alignment-matrix-control-styles';
+import { GridContainer, GridRow } from './styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
@@ -70,15 +69,13 @@ export function AlignmentMatrixControl( {
 		rtl: isRTL(),
 	} );
 
-	const activeId = useStoreState( compositeStore, 'activeId' );
-
 	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite
 			store={ compositeStore }
 			render={
-				<Root
+				<GridContainer
 					{ ...props }
 					aria-label={ label }
 					className={ classes }
@@ -89,20 +86,14 @@ export function AlignmentMatrixControl( {
 			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<Composite.Row render={ <Row role="row" /> } key={ index }>
-					{ cells.map( ( cell ) => {
-						const cellId = getItemId( baseId, cell );
-						const isActive = cellId === activeId;
-
-						return (
-							<Cell
-								id={ cellId }
-								isActive={ isActive }
-								key={ cell }
-								value={ cell }
-							/>
-						);
-					} ) }
+				<Composite.Row render={ <GridRow role="row" /> } key={ index }>
+					{ cells.map( ( cell ) => (
+						<Cell
+							id={ getItemId( baseId, cell ) }
+							key={ cell }
+							value={ cell }
+						/>
+					) ) }
 				</Composite.Row>
 			) ) }
 		</Composite>
