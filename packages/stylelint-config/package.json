@@ -32,7 +32,7 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@stylistic/stylelint-config": "^2.0.0",
+		"@stylistic/stylelint-plugin": "^3.0.1",
 		"stylelint-config-recommended": "^14.0.1",
 		"stylelint-config-recommended-scss": "^14.1.0"
 	},
