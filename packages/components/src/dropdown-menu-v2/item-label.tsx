@@ -21,4 +21,3 @@ export const DropdownMenuItemLabel = forwardRef<
 		/>
 	);
 } );
-DropdownMenuItemLabel.displayName = 'DropdownMenuV2.ItemLabel';

@@ -14,11 +14,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-
 function flattenBlocks( blocks ) {
 	const result = [];
 
@@ -65,9 +60,10 @@ function Image( block ) {
 
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
+	const [ isAnimating, setIsAnimating ] = useState( false );
 	const { editorBlocks, mediaUpload } = useSelect(
 		( select ) => ( {
-			editorBlocks: select( editorStore ).getEditorBlocks(),
+			editorBlocks: select( blockEditorStore ).getBlocks(),
 			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[]
@@ -102,27 +98,26 @@ export default function PostFormatPanel() {
 							: image.attributes.url + '?'
 					)
 					.then( ( response ) => response.blob() )
-					.then(
-						( blob ) =>
-							new Promise( ( resolve, reject ) => {
-								mediaUpload( {
-									filesList: [ blob ],
-									onFileChange: ( [ media ] ) => {
-										if ( isBlobURL( media.url ) ) {
-											return;
-										}
+					.then( ( blob ) =>
+						new Promise( ( resolve, reject ) => {
+							mediaUpload( {
+								filesList: [ blob ],
+								onFileChange: ( [ media ] ) => {
+									if ( isBlobURL( media.url ) ) {
+										return;
+									}
 
-										updateBlockAttributes( image.clientId, {
-											id: media.id,
-											url: media.url,
-										} );
-										resolve();
-									},
-									onError() {
-										reject();
-									},
-								} );
-							} )
+									updateBlockAttributes( image.clientId, {
+										id: media.id,
+										url: media.url,
+									} );
+									resolve();
+								},
+								onError() {
+									reject();
+								},
+							} );
+						} ).then( () => setIsAnimating( true ) )
 					)
 			)
 		).finally( () => {
@@ -144,12 +139,14 @@ export default function PostFormatPanel() {
 					gap: '8px',
 				} }
 			>
-				<AnimatePresence>
+				<AnimatePresence
+					onExitComplete={ () => setIsAnimating( false ) }
+				>
 					{ externalImages.map( ( image ) => {
 						return <Image key={ image.clientId } { ...image } />;
 					} ) }
 				</AnimatePresence>
-				{ isUploading ? (
+				{ isUploading || isAnimating ? (
 					<Spinner />
 				) : (
 					<Button variant="primary" onClick={ uploadImages }>

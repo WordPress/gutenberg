@@ -11,4 +11,3 @@ import type { DropdownMenuContext as DropdownMenuContextType } from './types';
 export const DropdownMenuContext = createContext<
 	DropdownMenuContextType | undefined
 >( undefined );
-DropdownMenuContext.displayName = 'DropdownMenuV2.Context';
