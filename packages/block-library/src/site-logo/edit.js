@@ -356,22 +356,11 @@ function SiteLogoReplaceFlow( {
 	return (
 		<MediaReplaceFlow
 			{ ...mediaReplaceProps }
+			mediaURL={ mediaURL }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			accept={ ACCEPT_MEDIA_STRING }
-		>
-			{ ( { onClose } ) =>
-				mediaURL && (
-					<MenuItem
-						onClick={ () => {
-							onRemoveLogo();
-							onClose();
-						} }
-					>
-						{ __( 'Reset' ) }
-					</MenuItem>
-				)
-			}
-		</MediaReplaceFlow>
+			onReset={ onRemoveLogo }
+		/>
 	);
 }
 
