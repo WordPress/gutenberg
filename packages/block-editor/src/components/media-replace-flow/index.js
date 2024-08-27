@@ -48,6 +48,7 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onReset,
 	onToggleFeaturedImage,
 	useFeaturedImage,
 	onFilesUpload = noop,
@@ -200,6 +201,16 @@ const MediaReplaceFlow = ( {
 								isPressed={ useFeaturedImage }
 							>
 								{ __( 'Use featured image' ) }
+							</MenuItem>
+						) }
+						{ mediaURL && onReset && (
+							<MenuItem
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+							>
+								{ __( 'Reset' ) }
 							</MenuItem>
 						) }
 						{ typeof children === 'function'
