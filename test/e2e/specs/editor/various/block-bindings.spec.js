@@ -2352,11 +2352,9 @@ test.describe( 'Block bindings', () => {
 				},
 			} );
 
-			const bindingsPanel = page
-				.getByRole( 'tabpanel', {
-					name: 'Settings',
-				} )
-				.locator( '.block-editor-bindings__panel' );
+			const bindingsPanel = page.locator(
+				'.block-editor-bindings__panel'
+			);
 			await expect( bindingsPanel ).toContainText( 'Server Source' );
 		} );
 	} );
