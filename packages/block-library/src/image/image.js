@@ -636,7 +636,7 @@ export default function Image( {
 								} }
 							>
 								{ _x(
-									'Alt',
+									'Altternative text',
 									'Alternative text for an image. Block toolbar label, a low character count is preferred.'
 								) }
 							</ToolbarButton>
