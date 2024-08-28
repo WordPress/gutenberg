@@ -25,7 +25,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
-import { isURL, isEmail } from '@wordpress/url';
+import { isEmail, prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -35,6 +35,8 @@ import {
 	getNameBySite,
 	getMatchingService,
 } from './social-list';
+
+import isURLLike from './is-url-like';
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -50,6 +52,11 @@ const SocialLinkURLPopover = ( {
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
+
+					if ( isURLLike( url ) ) {
+						// Append https if user did not include it.
+						setAttributes( { url: prependHTTPS( url ) } );
+					}
 					popoverAnchor?.focus();
 					onClose( false );
 				} }
@@ -63,10 +70,12 @@ const SocialLinkURLPopover = ( {
 								service: undefined,
 							};
 
-							if ( isURL( nextURL ) || isEmail( nextURL ) ) {
+							if ( isURLLike( nextURL ) || isEmail( nextURL ) ) {
 								const matchingService = isEmail( nextURL )
 									? 'mail'
-									: getMatchingService( nextURL );
+									: getMatchingService(
+											prependHTTPS( nextURL )
+									  );
 
 								nextAttributes.service =
 									matchingService ?? 'chain';
