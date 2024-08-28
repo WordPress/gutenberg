@@ -171,8 +171,8 @@ const baseItem = css`
 		cursor: not-allowed;
 	}
 
-	/* Hover */
-	&[data-active-item]:not( [data-focus-visible] ):not(
+	/* Active item (including hover) */
+	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
 			[aria-disabled='true']
 		) {
 		background-color: ${ COLORS.theme.accent };
@@ -180,7 +180,8 @@ const baseItem = css`
 	}
 
 	/* Keyboard focus (focus-visible) */
-	&[data-focus-visible] {
+	&[data-focus-visible],
+	&:focus-visible {
 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
 
 		/* Only visible in Windows High Contrast mode */
