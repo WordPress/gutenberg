@@ -18,9 +18,6 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
-	MediaReplaceFlow,
-	BlockControls,
-	__experimentalLinkControl as LinkControl,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -375,34 +372,6 @@ export function ImageEdit( {
 	return (
 		<>
 			<figure { ...blockProps }>
-				{ ! ( temporaryURL || url ) && ! lockUrlControls && (
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*"
-							name={ __( 'Add image' ) }
-							onSelect={ onSelectImage }
-							onError={ onUploadError }
-						>
-							<form className="block-editor-media-flow__url-input has-siblings">
-								<span className="block-editor-media-replace-flow__image-url-label">
-									{ __( 'Insert from URL:' ) }
-								</span>
-
-								<LinkControl
-									value={ { url } }
-									settings={ [] }
-									showSuggestions={ false }
-									onChange={ ( value ) => {
-										onSelectURL( value.url );
-									} }
-								/>
-							</form>
-						</MediaReplaceFlow>
-					</BlockControls>
-				) }
 				<Image
 					temporaryURL={ temporaryURL }
 					attributes={ attributes }

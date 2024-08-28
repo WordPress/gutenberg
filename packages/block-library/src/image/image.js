@@ -551,6 +551,23 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
+	const mediaReplaceFlow = isSingleSelected &&
+		! isEditingImage &&
+		! lockUrlControls && (
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
+				/>
+			</BlockControls>
+		);
+
 	const controls = (
 		<>
 			{ showBlockControls && (
@@ -585,19 +602,6 @@ export default function Image( {
 							onClick={ switchToCover }
 						/>
 					) }
-				</BlockControls>
-			) }
-			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-					/>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (
@@ -1002,12 +1006,18 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		// Add all controls if the image attributes are connected.
-		return metadata?.bindings ? controls : sizeControls;
+		return (
+			<>
+				{ mediaReplaceFlow }
+				{ /* Add all controls if the image attributes are connected. */ }
+				{ metadata?.bindings ? controls : sizeControls }
+			</>
+		);
 	}
 
 	return (
 		<>
+			{ mediaReplaceFlow }
 			{ controls }
 			{ img }
 
