@@ -17,6 +17,7 @@ import {
 	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -27,6 +28,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
@@ -46,6 +48,22 @@ export function SocialLinksEdit( props ) {
 		setIconBackgroundColor,
 		setIconColor,
 	} = props;
+
+	const hasAnySelected = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockOrder } =
+				select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const innerBlockClientIds = getBlockOrder( clientId );
+
+			// Check if the selected block is the main block or any of its inner blocks
+			return (
+				selectedBlockClientId === clientId ||
+				innerBlockClientIds.includes( selectedBlockClientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const {
 		iconBackgroundColorValue,
@@ -109,7 +127,7 @@ export function SocialLinksEdit( props ) {
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
-		renderAppender: isSelected && InnerBlocks.ButtonBlockAppender,
+		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const POPOVER_PROPS = {
