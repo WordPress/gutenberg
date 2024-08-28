@@ -1,5 +1,6 @@
 'use strict';
 
+/** @type {import('stylelint').Config} */
 module.exports = {
 	extends: [ './' ].map( require.resolve ),
 	plugins: [ '@stylistic/stylelint-plugin' ],
