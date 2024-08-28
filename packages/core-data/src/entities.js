@@ -190,17 +190,6 @@ export const rootEntitiesConfig = [
 				revisionId ? '/' + revisionId : ''
 			}`,
 		supportsPagination: true,
-		getPath: ( path, query, baseURL, id ) => {
-			const context =
-				query.context ||
-				( query.operation === 'read' ? 'view' : 'edit' );
-			const contextQuery = context ? `?context=${ context }` : '';
-			return `${ baseURL }${ id ? '/' + id : '' }${ contextQuery }`;
-		},
-		capabilities: {
-			read: 'edit_posts',
-			update: 'edit_theme_options',
-		},
 	},
 	{
 		label: __( 'Themes' ),
