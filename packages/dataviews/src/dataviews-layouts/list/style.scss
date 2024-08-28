@@ -1,3 +1,7 @@
+ul.dataviews-view-list {
+	list-style-type: none;
+}
+
 .dataviews-view-list {
 	margin: 0 0 auto;
 
@@ -153,8 +157,8 @@
 	}
 
 	.dataviews-view-list__media-placeholder {
-		min-width: $grid-unit-40;
-		height: $grid-unit-40;
+		width: $grid-unit-05 * 13;
+		height: $grid-unit-05 * 13;
 		background-color: $gray-200;
 	}
 
