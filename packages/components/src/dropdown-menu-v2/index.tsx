@@ -109,9 +109,11 @@ const UnconnectedDropdownMenu = (
 	);
 
 	// Extract the side from the applied placement — useful for animations.
+	// Using `currentPlacement` instead of `placement` to make sure that we
+	// use the final computed placement (including "flips" etc).
 	const appliedPlacementSide = useStoreState(
 		dropdownMenuStore,
-		'placement'
+		'currentPlacement'
 	).split( '-' )[ 0 ];
 
 	if (
