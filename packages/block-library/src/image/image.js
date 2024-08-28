@@ -570,7 +570,13 @@ export default function Image( {
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
-				/>
+				>
+					{ url && (
+						<MenuItem onClick={ () => onSelectImage( undefined ) }>
+							{ __( 'Reset' ) }
+						</MenuItem>
+					) }
+				</MediaReplaceFlow>
 			</BlockControls>
 		);
 
@@ -608,23 +614,6 @@ export default function Image( {
 							onClick={ switchToCover }
 						/>
 					) }
-				</BlockControls>
-			) }
-			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => onSelectImage( undefined ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (
