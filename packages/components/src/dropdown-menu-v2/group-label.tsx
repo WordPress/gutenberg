@@ -9,12 +9,12 @@ import { forwardRef, useContext } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { DropdownMenuContext } from './context';
 import { Text } from '../text';
-import type { DropdownMenuGroupProps } from './types';
+import type { DropdownMenuGroupLabelProps } from './types';
 import * as Styled from './styles';
 
 export const DropdownMenuGroupLabel = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
+	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
 >( function DropdownMenuGroup( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
