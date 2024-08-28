@@ -306,7 +306,6 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			</p>
 			<ActiveLocales
 				languages={ languages }
-				setLanguages={ setLanguages }
 				showOptionSiteDefault={ showOptionSiteDefault }
 				selectedLanguage={ selectedLanguage }
 				setSelectedLanguage={ setSelectedLanguage }

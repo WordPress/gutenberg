@@ -14,7 +14,6 @@ interface ActiveLocalesProps {
 	languages: Language[];
 	selectedLanguage?: Language;
 	showOptionSiteDefault?: boolean;
-	setLanguages: ( cb: ( languages: Language[] ) => Language[] ) => void;
 	setSelectedLanguage: ( language: Language ) => void;
 	onMoveUp: () => void;
 	onMoveDown: () => void;
