@@ -2,7 +2,8 @@
 // @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
 	// Show Placeholder style on-select.
-	&.is-selected .block-editor-media-placeholder:not(.is-small) {
+	&.is-selected .block-editor-media-placeholder.is-medium,
+	&.is-selected .block-editor-media-placeholder.is-large {
 		// Block UI appearance.
 		color: $gray-900;
 		background-color: $white;
@@ -36,12 +37,19 @@
 		min-height: 60px;
 	}
 
-	.block-editor-media-placeholder:not(.is-small) {
+	.block-editor-media-placeholder.is-medium,
+	.block-editor-media-placeholder.is-large {
 		.components-placeholder__fieldset,
 		.components-placeholder__label {
 			display: flex;
 		}
 	}
+
+	.block-editor-media-placeholder.is-large
+	.components-placeholder__instructions {
+		display: flex;
+	}
+
 	.block-bindings-media-placeholder-message {
 		opacity: 0;
 	}
@@ -56,7 +64,8 @@
 	}
 
 	.components-placeholder__fieldset,
-	.components-placeholder__label {
+	.components-placeholder__label,
+	.components-placeholder__instructions {
 		display: none;
 	}
 }
@@ -116,7 +125,9 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
+.block-editor-block-list__block[data-type="core/image"]
+.block-editor-block-toolbar
+.block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
 	right: 0;
