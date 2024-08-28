@@ -47,11 +47,6 @@ interface UploadMediaArgs {
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
  *
- * Performs some client-side file processing before eventually
- * uploading the media to WordPress.
- *
- * Similar to the mediaUpload() function from `@wordpress/editor`.
- *
  * @param $0                    Parameters object passed to the function.
  * @param $0.allowedTypes       Array with the types of media that can be uploaded, if unset all types are allowed.
  * @param $0.additionalData     Additional data to include in the request.
