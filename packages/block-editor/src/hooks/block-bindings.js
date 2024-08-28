@@ -55,14 +55,9 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 				<Fragment key={ name }>
 					<DropdownMenuV2.Group>
 						{ Object.keys( fieldsList ).length > 1 && (
-							<Text
-								className="block-editor-bindings__source-label"
-								upperCase
-								variant="muted"
-								aria-hidden
-							>
+							<DropdownMenuV2.GroupLabel>
 								{ registeredSources[ name ].label }
-							</Text>
+							</DropdownMenuV2.GroupLabel>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
 							<DropdownMenuV2.RadioItem

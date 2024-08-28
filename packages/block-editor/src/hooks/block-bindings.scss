@@ -4,11 +4,3 @@ div.block-editor-bindings__panel {
 		color: inherit;
 	}
 }
-
-.block-editor-bindings__popover {
-	// This won't be needed if `DropdownMenuGroup` component handles the label.
-	.block-editor-bindings__source-label {
-		grid-column: 2;
-		margin: $grid-unit-10 0;
-	}
-}
