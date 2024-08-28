@@ -36,8 +36,13 @@ function parsePattern( pattern ) {
 }
 
 export function getParsedPattern( pattern ) {
-	const parsedPattern = parsedPatternCache.has( pattern );
-	return parsedPattern ? parsedPattern : parsePattern( pattern );
+	let parsedPattern = parsedPatternCache.get( pattern );
+	if ( parsedPattern ) {
+		return parsedPattern;
+	}
+	parsedPattern = parsePattern( pattern );
+	parsedPatternCache.set( pattern, parsedPattern );
+	return parsedPattern;
 }
 
 export const checkAllowList = ( list, item, defaultResult = null ) => {
