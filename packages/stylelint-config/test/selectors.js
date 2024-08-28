@@ -1,4 +1,7 @@
 /**
+ * @jest-environment node
+ */
+/**
  * External dependencies
  */
 const fs = require( 'fs' ),
