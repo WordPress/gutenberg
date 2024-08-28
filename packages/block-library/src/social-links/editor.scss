@@ -1,10 +1,9 @@
 // Editor specific styles for Social Links.
-.wp-block-social-links {
-	div.block-editor-url-input {
-		display: inline-block;
-		margin-left: $grid-unit-10;
-	}
+.wp-block-social-links div.block-editor-url-input {
+	display: inline-block;
+	margin-left: $grid-unit-10;
 }
+
 
 // Prevent toolbar from jumping when selecting / hovering a link.
 .wp-social-link:hover {
@@ -104,5 +103,17 @@
 
 	.block-editor-button-block-appender.components-button.components-button {
 		padding: $grid-unit-10;
+	}
+}
+
+.wp-block-social-links {
+	&.has-small-icon-size .block-editor-button-block-appender.components-button.components-button {
+		padding: $grid-unit-10 / 2;
+	}
+	&.has-large-icon-size .block-editor-button-block-appender.components-button.components-button {
+		padding: $grid-unit-20;
+	}
+	&.has-huge-icon-size .block-editor-button-block-appender.components-button.components-button {
+		padding: $grid-unit-30;
 	}
 }
