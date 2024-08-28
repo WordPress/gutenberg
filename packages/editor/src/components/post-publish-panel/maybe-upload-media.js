@@ -25,7 +25,29 @@ function flattenBlocks( blocks ) {
 	return result;
 }
 
-function Image( block ) {
+function hasExternalMedia( block ) {
+	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+		return block.attributes.url && ! block.attributes.id;
+	}
+
+	if ( block.name === 'core/media-text' ) {
+		return block.attributes.mediaUrl && ! block.attributes.mediaId;
+	}
+}
+
+function getMediaInfo( block ) {
+	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+		const { url, alt, id } = block.attributes;
+		return { url, alt, id };
+	}
+
+	if ( block.name === 'core/media-text' ) {
+		const { mediaUrl: url, mediaAlt: alt, mediaId: id } = block.attributes;
+		return { url, alt, id };
+	}
+}
+
+function Image( { clientId, alt, url } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	return (
 		<motion.img
@@ -33,17 +55,17 @@ function Image( block ) {
 			role="button"
 			aria-label={ __( 'Select image block.' ) }
 			onClick={ () => {
-				selectBlock( block.clientId );
+				selectBlock( clientId );
 			} }
 			onKeyDown={ ( event ) => {
 				if ( event.key === 'Enter' || event.key === ' ' ) {
-					selectBlock( block.clientId );
+					selectBlock( clientId );
 					event.preventDefault();
 				}
 			} }
-			key={ block.clientId }
-			alt={ block.attributes.alt }
-			src={ block.attributes.url }
+			key={ clientId }
+			alt={ alt }
+			src={ url }
 			animate={ { opacity: 1 } }
 			exit={ { opacity: 0, scale: 0 } }
 			style={ {
@@ -69,15 +91,12 @@ export default function PostFormatPanel() {
 		} ),
 		[]
 	);
-	const externalImages = flattenBlocks( editorBlocks ).filter(
-		( block ) =>
-			block.name === 'core/image' &&
-			block.attributes.url &&
-			! block.attributes.id
+	const blocksWithExternalMedia = flattenBlocks( editorBlocks ).filter(
+		( block ) => hasExternalMedia( block )
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	if ( ! mediaUpload || ! externalImages.length ) {
+	if ( ! mediaUpload || ! blocksWithExternalMedia.length ) {
 		return null;
 	}
 
@@ -88,17 +107,30 @@ export default function PostFormatPanel() {
 		</span>,
 	];
 
+	function updateBlockWithUploadedMedia( block, media ) {
+		if ( block.name === 'core/image' || block.name === 'core/cover' ) {
+			return updateBlockAttributes( block.clientId, {
+				id: media.id,
+				url: media.url,
+			} );
+		}
+
+		if ( block.name === 'core/media-text' ) {
+			return updateBlockAttributes( block.clientId, {
+				mediaId: media.id,
+				mediaUrl: media.url,
+			} );
+		}
+	}
+
 	function uploadImages() {
 		setIsUploading( true );
 		setHadUploadError( false );
 		Promise.all(
-			externalImages.map( ( image ) =>
-				window
-					.fetch(
-						image.attributes.url.includes( '?' )
-							? image.attributes.url
-							: image.attributes.url + '?'
-					)
+			blocksWithExternalMedia.map( ( block ) => {
+				const { url } = getMediaInfo( block );
+				return window
+					.fetch( url.includes( '?' ) ? url : url + '?' )
 					.then( ( response ) => response.blob() )
 					.then( ( blob ) =>
 						new Promise( ( resolve, reject ) => {
@@ -109,13 +141,14 @@ export default function PostFormatPanel() {
 										return;
 									}
 
-									updateBlockAttributes( image.clientId, {
-										id: media.id,
-										url: media.url,
-									} );
+									updateBlockWithUploadedMedia(
+										block,
+										media
+									);
 									resolve();
 								},
 								onError() {
+									setHadUploadError( true );
 									reject();
 								},
 							} );
@@ -123,8 +156,8 @@ export default function PostFormatPanel() {
 					)
 					.catch( () => {
 						setHadUploadError( true );
-					} )
-			)
+					} );
+			} )
 		).finally( () => {
 			setIsUploading( false );
 		} );
@@ -147,8 +180,16 @@ export default function PostFormatPanel() {
 				<AnimatePresence
 					onExitComplete={ () => setIsAnimating( false ) }
 				>
-					{ externalImages.map( ( image ) => {
-						return <Image key={ image.clientId } { ...image } />;
+					{ blocksWithExternalMedia.map( ( block ) => {
+						const { url, alt } = getMediaInfo( block );
+						return (
+							<Image
+								key={ block.clientId }
+								clientId={ block.clientId }
+								url={ url }
+								alt={ alt }
+							/>
+						);
 					} ) }
 				</AnimatePresence>
 				{ isUploading || isAnimating ? (
