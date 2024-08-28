@@ -59,35 +59,39 @@ export function getBlockClientId( node ) {
 }
 
 /**
- * Calculates the union of two rectangles, and optionally constrains this union within a containerRect's
- * left and right values.
- * The function returns a new DOMRect object representing this union.
+ * Calculates the union of two rectangles.
  *
- * @param {DOMRect}          rect1         First rectangle.
- * @param {DOMRect}          rect2         Second rectangle.
- * @param {DOMRectReadOnly?} containerRect An optional container rectangle. The union will be clipped to this rectangle.
+ * @param {DOMRect} rect1 First rectangle.
+ * @param {DOMRect} rect2 Second rectangle.
  * @return {DOMRect} Union of the two rectangles.
  */
-export function rectUnion( rect1, rect2, containerRect ) {
-	let left = Math.min( rect1.left, rect2.left );
-	let right = Math.max( rect1.right, rect2.right );
+export function rectUnion( rect1, rect2 ) {
+	const left = Math.min( rect1.left, rect2.left );
+	const right = Math.max( rect1.right, rect2.right );
 	const bottom = Math.max( rect1.bottom, rect2.bottom );
 	const top = Math.min( rect1.top, rect2.top );
 
-	/*
-	 * To calculate visible bounds using rectUnion, take into account the outer
-	 * horizontal limits of the container in which an element is supposed to be "visible".
-	 * For example, if an element is positioned -10px to the left of the window x value (0),
-	 * this function discounts the negative overhang because it's not visible and
-	 * therefore not to be counted in the visibility calculations.
-	 * Top and bottom values are not accounted for to accommodate vertical scroll.
-	 */
-	if ( containerRect ) {
-		left = Math.max( left, containerRect.left );
-		right = Math.min( right, containerRect.right );
-	}
-
 	return new window.DOMRect( left, top, right - left, bottom - top );
+}
+
+/**
+ * Calculates the intersection of two rectangles. If there is no intersection,
+ * it returns a DOMRect with zero width and height.
+ *
+ * @param {DOMRect} rect1 First rectangle.
+ * @param {DOMRect} rect2 Second rectangle.
+ * @return {DOMRect} Intersection of the two rectangles.
+ */
+export function rectIntersect( rect1, rect2 ) {
+	const left = Math.max( rect1.left, rect2.left );
+	const top = Math.max( rect1.top, rect2.top );
+	const right = Math.min( rect1.right, rect2.right );
+	const bottom = Math.min( rect1.bottom, rect2.bottom );
+
+	const width = Math.max( 0, right - left );
+	const height = Math.max( 0, bottom - top );
+
+	return new window.DOMRect( left, top, width, height );
 }
 
 /**
@@ -142,12 +146,6 @@ export function getVisibleElementBounds( element ) {
 	}
 
 	let bounds = element.getBoundingClientRect();
-	const viewportRect = new window.DOMRectReadOnly(
-		0,
-		0,
-		viewport.innerWidth,
-		viewport.innerHeight
-	);
 
 	const stack = [ element ];
 	let currentElement;
@@ -156,11 +154,24 @@ export function getVisibleElementBounds( element ) {
 		for ( const child of currentElement.children ) {
 			if ( isElementVisible( child ) ) {
 				const childBounds = child.getBoundingClientRect();
-				bounds = rectUnion( bounds, childBounds, viewportRect );
+				bounds = rectUnion( bounds, childBounds );
 				stack.push( child );
 			}
 		}
 	}
+
+	/*
+	 * Take into account the outer horizontal limits of the container in which
+	 * an element is supposed to be "visible". For example, if an element is
+	 * positioned -10px to the left of the window x value (0), this function
+	 * discounts the negative overhang because it's not visible and therefore
+	 * not to be counted in the visibility calculations. Top and bottom values
+	 * are not accounted for to accommodate vertical scroll.
+	 */
+	bounds = rectIntersect(
+		bounds,
+		new window.DOMRect( 0, -Infinity, viewport.innerWidth, Infinity )
+	);
 
 	return bounds;
 }
