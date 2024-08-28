@@ -53,6 +53,7 @@ interface LanguageChooserProps {
 	hasMissingTranslations?: boolean;
 	showOptionSiteDefault?: boolean;
 	inputName?: string;
+	onPreferredLanguagesChange?: ( languages: Language[] ) => void;
 }
 
 function LanguageChooser( props: LanguageChooserProps ) {
@@ -63,9 +64,17 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		inputName,
 	} = props;
 
-	const [ languages, setLanguages ] = useState< Language[] >(
+	const [ languages, _setLanguages ] = useState< Language[] >(
 		props.preferredLanguages
 	);
+
+	function setLanguages( update: ( prev: Language[] ) => Language[] ) {
+		_setLanguages( ( prev ) => {
+			const newValues = update( prev );
+			props.onPreferredLanguagesChange?.( newValues );
+			return newValues;
+		} );
+	}
 
 	const [ selectedLanguage, setSelectedLanguage ] = useState< Language >(
 		props.preferredLanguages[ 0 ]
@@ -189,6 +198,11 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		);
 
 		setLanguages( ( prevLanguages ) =>
+			prevLanguages.filter(
+				( { locale } ) => locale !== selectedLanguage?.locale
+			)
+		);
+		_setLanguages( ( prevLanguages ) =>
 			prevLanguages.filter(
 				( { locale } ) => locale !== selectedLanguage?.locale
 			)
