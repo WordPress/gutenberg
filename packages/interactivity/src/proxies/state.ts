@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { signal, type Signal } from '@preact/signals';
+import { batch, signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -11,9 +11,11 @@ import {
 	getProxyFromObject,
 	getNamespaceFromProxy,
 	shouldProxy,
+	getObjectFromProxy,
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
+import { isPlainObject } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -32,6 +34,17 @@ const proxyToProps: WeakMap<
 	object,
 	Map< string | symbol, PropSignal >
 > = new WeakMap();
+
+/**
+ *
+ * @param proxy
+ * @param key
+ * @return TODO
+ */
+export const hasPropSignal = ( proxy, key ) =>
+	Boolean(
+		proxyToProps.has( proxy ) && proxyToProps.get( proxy )?.has( key )
+	);
 
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
@@ -248,3 +261,60 @@ export const peek = < T extends object, K extends keyof T >(
 		peeking = false;
 	}
 };
+
+const deepMergeRecursive = (
+	target: any,
+	source: any,
+	override: boolean = true
+) => {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		for ( const key in source ) {
+			const desc = Object.getOwnPropertyDescriptor( source, key );
+			if (
+				typeof desc?.get === 'function' ||
+				typeof desc?.set === 'function'
+			) {
+				if ( override || ! ( key in target ) ) {
+					Object.defineProperty( target, key, {
+						...desc,
+						configurable: true,
+						enumerable: true,
+					} );
+
+					const proxy = getProxyFromObject( target );
+					if ( desc?.get && proxy && hasPropSignal( proxy, key ) ) {
+						const propSignal = getPropSignal( proxy, key );
+						propSignal.setGetter( desc.get );
+					}
+				}
+			} else if ( isPlainObject( source[ key ] ) ) {
+				if ( ! ( key in target ) ) {
+					target[ key ] = {};
+				}
+
+				deepMergeRecursive( target[ key ], source[ key ], override );
+			} else if ( override || ! ( key in target ) ) {
+				Object.defineProperty( target, key, desc! );
+
+				const proxy = getProxyFromObject( target );
+				if ( desc?.value && proxy && hasPropSignal( proxy, key ) ) {
+					const propSignal = getPropSignal( proxy, key );
+					propSignal.setValue( desc.value );
+				}
+			}
+		}
+	}
+};
+
+export const deepMerge = (
+	target: any,
+	source: any,
+	override: boolean = true
+) =>
+	batch( () =>
+		deepMergeRecursive(
+			getObjectFromProxy( target ) || target,
+			source,
+			override
+		)
+	);

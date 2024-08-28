@@ -2,6 +2,7 @@
  * Proxies for each object.
  */
 const objToProxy = new WeakMap< object, object >();
+const proxyToObj = new WeakMap< object, object >();
 
 /**
  * Namespaces for each created proxy.
@@ -38,6 +39,7 @@ export const createProxy = < T extends object >(
 	if ( ! objToProxy.has( obj ) ) {
 		const proxy = new Proxy( obj, handlers );
 		objToProxy.set( obj, proxy );
+		proxyToObj.set( proxy, obj );
 		proxyToNs.set( proxy, namespace );
 	}
 	return objToProxy.get( obj ) as T;
@@ -80,3 +82,5 @@ export const shouldProxy = (
 		! proxyToNs.has( candidate ) && supported.has( candidate.constructor )
 	);
 };
+
+export const getObjectFromProxy = ( proxy ) => proxyToObj.get( proxy );
