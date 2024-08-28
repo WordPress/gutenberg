@@ -11,8 +11,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
-import { Icon, edit as editIcon } from '@wordpress/icons';
+import { forwardRef, useState } from '@wordpress/element';
+import { Icon, edit as editIcon, brush as brushIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,11 +31,28 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const mode = useSelect(
-		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
-		[]
-	);
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const [ isSimpleMode, setIsSimpleMode ] = useState( false );
+	const [ originalTemplateLocks, setOriginalTemplateLocks ] = useState( {} );
+	const { mode, blocksWithinMainBlockClientIds, getBlockAttributes } =
+		useSelect( ( select ) => {
+			const {
+				__unstableGetEditorMode,
+				getBlockOrder,
+				getBlockAttributes: _getBlockAttributes,
+			} = select( blockEditorStore );
+
+			const mainBlockClientId = getBlockOrder()[ 1 ];
+
+			return {
+				mode: __unstableGetEditorMode(),
+				blocksWithinMainBlockClientIds:
+					getBlockOrder( mainBlockClientId ),
+				getBlockAttributes: _getBlockAttributes,
+			};
+		}, [] );
+
+	const { __unstableSetEditorMode, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -58,10 +75,43 @@ function ToolSelector( props, ref ) {
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={
-								mode === 'navigation' ? 'navigation' : 'edit'
-							}
-							onSelect={ __unstableSetEditorMode }
+							value={ isSimpleMode ? 'simple' : mode }
+							onSelect={ ( newMode ) => {
+								if ( newMode === 'simple' ) {
+									const originalLocks = {};
+									blocksWithinMainBlockClientIds.forEach(
+										( clientId ) => {
+											const attributes =
+												getBlockAttributes( clientId );
+											originalLocks[ clientId ] =
+												attributes.templateLock;
+										}
+									);
+									setOriginalTemplateLocks( originalLocks );
+									updateBlockAttributes(
+										blocksWithinMainBlockClientIds,
+										{
+											templateLock: 'contentOnly',
+										}
+									);
+									__unstableSetEditorMode( 'edit' );
+									setIsSimpleMode( true );
+								} else {
+									// Restore the original templateLock attributes
+									blocksWithinMainBlockClientIds.forEach(
+										( clientId ) => {
+											updateBlockAttributes( clientId, {
+												templateLock:
+													originalTemplateLocks[
+														clientId
+													],
+											} );
+										}
+									);
+									__unstableSetEditorMode( newMode );
+									setIsSimpleMode( false );
+								}
+							} }
 							choices={ [
 								{
 									value: 'edit',
@@ -78,6 +128,15 @@ function ToolSelector( props, ref ) {
 										<>
 											{ selectIcon }
 											{ __( 'Select' ) }
+										</>
+									),
+								},
+								{
+									value: 'simple',
+									label: (
+										<>
+											<Icon icon={ brushIcon } />
+											{ __( 'Simple' ) }
 										</>
 									),
 								},
