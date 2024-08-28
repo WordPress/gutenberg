@@ -155,7 +155,6 @@ function EditableBlockBindingsPanelItems( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 							gutter={ isMobile ? 8 : 36 }
-							className="block-editor-bindings__popover"
 							trigger={
 								<Item>
 									<BlockBindingsAttribute
