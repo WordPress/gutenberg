@@ -43,7 +43,7 @@ function ButtonBlockAppender(
 					);
 				} else {
 					label = _x(
-						'Add block',
+						'Add new item',
 						'Generic label for block inserter button'
 					);
 				}
