@@ -8,14 +8,7 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	Icon,
-	positionCenter,
-	stretchWide,
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-} from '@wordpress/icons';
+import { justifyLeft, justifyCenter, justifyRight } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
@@ -72,53 +65,47 @@ export default {
 			<>
 				{ allowCustomContentAndWideSize && (
 					<>
-						<div className="block-editor-hooks__layout-controls">
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
-									__next40pxDefaultSize={ false }
-									className="block-editor-hooks__layout-controls-unit-input"
-									label={ __( 'Content' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ contentSize || wideSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											contentSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ positionCenter } />
-							</div>
-							<div className="block-editor-hooks__layout-controls-unit">
-								<UnitControl
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
-									className="block-editor-hooks__layout-controls-unit-input"
-									label={ __( 'Wide' ) }
-									labelPosition="top"
-									__unstableInputWidth="80px"
-									value={ wideSize || contentSize || '' }
-									onChange={ ( nextWidth ) => {
-										nextWidth =
-											0 > parseFloat( nextWidth )
-												? '0'
-												: nextWidth;
-										onChange( {
-											...layout,
-											wideSize: nextWidth,
-										} );
-									} }
-									units={ units }
-								/>
-								<Icon icon={ stretchWide } />
-							</div>
+						<div className="block-editor-hooks__layout-controls-unit">
+							<UnitControl
+								__next40pxDefaultSize
+								className="block-editor-hooks__layout-controls-unit-input"
+								label={ __( 'Content width' ) }
+								labelPosition="top"
+								__unstableInputWidth="112px"
+								value={ contentSize || wideSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange( {
+										...layout,
+										contentSize: nextWidth,
+									} );
+								} }
+								units={ units }
+							/>
+						</div>
+						<div className="block-editor-hooks__layout-controls-unit">
+							<UnitControl
+								__next40pxDefaultSize
+								className="block-editor-hooks__layout-controls-unit-input"
+								label={ __( 'Wide width' ) }
+								labelPosition="top"
+								__unstableInputWidth="112px"
+								value={ wideSize || contentSize || '' }
+								onChange={ ( nextWidth ) => {
+									nextWidth =
+										0 > parseFloat( nextWidth )
+											? '0'
+											: nextWidth;
+									onChange( {
+										...layout,
+										wideSize: nextWidth,
+									} );
+								} }
+								units={ units }
+							/>
 						</div>
 						<p className="block-editor-hooks__layout-controls-helptext">
 							{ __(
