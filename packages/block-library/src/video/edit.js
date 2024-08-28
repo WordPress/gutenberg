@@ -42,23 +42,6 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 
-// Much of this description is duplicated from MediaPlaceholder.
-const placeholder = ( content ) => {
-	return (
-		<Placeholder
-			className="block-editor-media-placeholder"
-			withIllustration
-			icon={ icon }
-			label={ __( 'Video' ) }
-			instructions={ __(
-				'Upload a video file, pick one from your media library, or add one with a URL.'
-			) }
-		>
-			{ content }
-		</Placeholder>
-	);
-};
-
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -148,6 +131,23 @@ function VideoEdit( {
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className="block-editor-media-placeholder"
+				withIllustration={ ! isSingleSelected }
+				icon={ icon }
+				label={ __( 'Video' ) }
+				instructions={ __(
+					'Upload a video file, pick one from your media library, or add one with a URL.'
+				) }
+			>
+				{ content }
+			</Placeholder>
+		);
+	};
 
 	const classes = clsx( className, {
 		'is-transient': !! temporaryURL,
