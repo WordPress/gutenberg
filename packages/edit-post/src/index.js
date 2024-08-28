@@ -73,6 +73,13 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 	} );
 
+	if ( window.__experimentalMediaProcessing ) {
+		dispatch( preferencesStore ).setDefaults( 'core/media', {
+			requireApproval: true,
+			optimizeOnUpload: true,
+		} );
+	}
+
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 	// Check if the block list view should be open by default.
