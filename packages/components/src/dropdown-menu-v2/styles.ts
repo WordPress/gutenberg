@@ -64,9 +64,6 @@ export const MenuPopoverOuterWrapper = styled.div<
 	Pick< DropdownMenuContext, 'variant' >
 >`
 	position: relative;
-	/* Same as popover component */
-	/* TODO: is there a way to read the sass variable? */
-	z-index: 1000000;
 
 	background-color: ${ COLORS.ui.background };
 	border-radius: ${ CONFIG.radiusMedium };
@@ -103,6 +100,9 @@ export const MenuPopoverOuterWrapper = styled.div<
 
 export const MenuPopoverInnerWrapper = styled.div`
 	position: relative;
+	/* Same as popover component */
+	/* TODO: is there a way to read the sass variable? */
+	z-index: 1000000;
 
 	display: grid;
 	grid-template-columns: ${ GRID_TEMPLATE_COLS };
