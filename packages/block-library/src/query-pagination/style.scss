@@ -4,9 +4,6 @@ $pagination-margin: 0.5em;
 	> .wp-block-query-pagination-next,
 	> .wp-block-query-pagination-previous,
 	> .wp-block-query-pagination-numbers {
-		// Override editor auto block margins.
-		margin-left: 0;
-
 		/*rtl:ignore*/
 		margin-right: $pagination-margin;
 
