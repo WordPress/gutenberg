@@ -10,7 +10,7 @@ import LanguageChooser from '../';
 import type { Language } from '../types';
 
 const meta: Meta< typeof LanguageChooser > = {
-	title: 'Components/Language Chooser',
+	title: 'Language Chooser/Language Chooser',
 	component: LanguageChooser,
 	parameters: {
 		argTypes: {
