@@ -66,6 +66,8 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 					) }
 					{ ! selectedWidgetArea && (
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							href={ addQueryArgs( 'customize.php', {
 								'autofocus[panel]': 'widgets',
 								return: window.location.pathname,

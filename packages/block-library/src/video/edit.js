@@ -232,6 +232,8 @@ function VideoEdit( {
 								}
 								render={ ( { open } ) => (
 									<Button
+										// TODO: Switch to `true` (40px size) if possible
+										__next40pxDefaultSize={ false }
 										variant="primary"
 										onClick={ open }
 										ref={ posterImageButton }
@@ -260,6 +262,8 @@ function VideoEdit( {
 							</p>
 							{ !! poster && (
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									onClick={ onRemovePoster }
 									variant="tertiary"
 								>
@@ -272,10 +276,10 @@ function VideoEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the video tag if the block is not selected
-					so the user clicking on it won't play the
-					video when the controls are enabled.
-				*/ }
+                Disable the video tag if the block is not selected
+                so the user clicking on it won't play the
+                video when the controls are enabled.
+            */ }
 				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }

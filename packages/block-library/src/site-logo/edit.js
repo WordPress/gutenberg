@@ -627,6 +627,8 @@ export default function LogoEdit( {
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button
+											// TODO: Switch to `true` (40px size) if possible
+											__next40pxDefaultSize={ false }
 											onClick={ open }
 											variant="secondary"
 										>
@@ -671,6 +673,8 @@ export default function LogoEdit( {
 					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								icon={ upload }
 								variant="primary"
 								label={ __( 'Choose logo' ) }

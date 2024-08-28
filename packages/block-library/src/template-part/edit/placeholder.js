@@ -74,13 +74,20 @@ export default function TemplatePartPlaceholder( {
 
 			{ ! isResolving &&
 				!! ( templateParts.length || blockPatterns.length ) && (
-					<Button variant="primary" onClick={ onOpenSelectionModal }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ onOpenSelectionModal }
+					>
 						{ __( 'Choose' ) }
 					</Button>
 				) }
 
 			{ ! isResolving && isBlockBasedTheme && canCreateTemplatePart && (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					variant="secondary"
 					onClick={ () => {
 						setShowTitleModal( true );
