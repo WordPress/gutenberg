@@ -8,7 +8,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
@@ -130,9 +130,11 @@ function InstalledFonts() {
 		} catch ( error ) {
 			setNotice( {
 				type: 'error',
-				message:
-					__( 'There was an error updating the font family. ' ) +
-					error.message,
+				message: sprintf(
+					/* translators: %s: error message */
+					__( 'There was an error updating the font family. %s' ),
+					error.message
+				),
 			} );
 		}
 	};
@@ -351,7 +353,7 @@ function InstalledFonts() {
 							/>
 
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
+								<NavigatorBackButton
 									icon={ chevronLeft }
 									size="small"
 									onClick={ () => {
@@ -417,6 +419,8 @@ function InstalledFonts() {
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								isDestructive
 								variant="tertiary"
 								onClick={ handleUninstallClick }
@@ -425,6 +429,8 @@ function InstalledFonts() {
 							</Button>
 						) }
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="primary"
 							onClick={ handleUpdate }
 							disabled={ ! fontFamiliesHasChanges }
@@ -464,7 +470,7 @@ function ConfirmDeleteDialog( {
 			setNotice( {
 				type: 'error',
 				message:
-					__( 'There was an error uninstalling the font family. ' ) +
+					__( 'There was an error uninstalling the font family.' ) +
 					error.message,
 			} );
 		}

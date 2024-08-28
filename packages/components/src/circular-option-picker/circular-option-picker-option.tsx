@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { useStoreState } from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -52,7 +53,7 @@ function UnforwardedOptionAsOption(
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { id, isSelected, compositeStore, ...additionalProps } = props;
-	const activeId = compositeStore.useState( 'activeId' );
+	const activeId = useStoreState( compositeStore, 'activeId' );
 
 	if ( isSelected && ! activeId ) {
 		compositeStore.setActiveId( id );

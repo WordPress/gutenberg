@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -109,11 +110,9 @@ export function ImageEdit( {
 	} = attributes;
 
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
-	// const parentWidth = sizes?.width;
-	// const parsedWidth = width && parseInt( width.replace( /px$/, '' ), 10 );
 
-	// const isSmallLayout =
-	// 	( parentWidth && parentWidth < 160 ) || parsedWidth < 160;
+	const [ contentResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -328,7 +327,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected, metadata?.bindings?.url ]
+		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
@@ -386,8 +385,8 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ parentLayout?.type }
+					containerWidth={ containerWidth }
 				/>
-
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
@@ -401,6 +400,11 @@ export function ImageEdit( {
 					disableMediaButtons={ temporaryURL || url }
 				/>
 			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				contentResizeListener
+			}
 		</>
 	);
 }
