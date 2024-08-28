@@ -14,11 +14,14 @@ function gutenberg_reregister_interactivity_script_modules() {
 	wp_deregister_script_module( '@wordpress/interactivity' );
 	wp_deregister_script_module( '@wordpress/interactivity-router' );
 
+	$experiments = get_option( 'gutenberg-experiments' );
+	$full_page_navigation_enabled = isset( $experiments['gutenberg-full-page-client-side-navigation'] );
+
 	wp_register_script_module(
 		'@wordpress/interactivity',
 		gutenberg_url( '/build-module/' . ( SCRIPT_DEBUG ? 'interactivity/debug.min.js' : 'interactivity/index.min.js' ) ),
 		array(),
-		$default_version
+		$full_page_navigation_enabled ? null : $default_version
 	);
 
 	wp_register_script_module(
@@ -31,7 +34,7 @@ function gutenberg_reregister_interactivity_script_modules() {
 			),
 			'@wordpress/interactivity',
 		),
-		$default_version
+		$full_page_navigation_enabled ? null : $default_version
 	);
 }
 add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
