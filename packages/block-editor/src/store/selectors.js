@@ -7,7 +7,6 @@ import {
 	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
-	parse,
 	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -27,6 +26,7 @@ import {
 	checkAllowList,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getParsedPattern,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2349,40 +2349,12 @@ export function __experimentalGetDirectInsertBlock(
 }
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
-	( select ) =>
-		createSelector(
-			( state, patternName ) => {
-				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
-					patternName
-				);
-				if ( ! pattern ) {
-					return null;
-				}
-				const blocks = parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} );
-				if ( blocks.length === 1 ) {
-					blocks[ 0 ].attributes = {
-						...blocks[ 0 ].attributes,
-						metadata: {
-							...( blocks[ 0 ].attributes.metadata || {} ),
-							categories: pattern.categories,
-							patternName: pattern.name,
-							name:
-								blocks[ 0 ].attributes.metadata?.name ||
-								pattern.title,
-						},
-					};
-				}
-				return {
-					...pattern,
-					blocks,
-				};
-			},
-			( state, patternName ) => [
-				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
-			]
-		)
+	( select ) => ( state, patternName ) => {
+		const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+			patternName
+		);
+		return pattern ? getParsedPattern( pattern ) : null;
+	}
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
@@ -2401,16 +2373,13 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
 		return createSelector( ( state, rootClientId = null ) => {
-			const {
-				getAllPatterns,
-				__experimentalGetParsedPattern: getParsedPattern,
-			} = unlock( select( STORE_NAME ) );
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
 
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( { name } ) => getParsedPattern( name ) );
+				.map( getParsedPattern );
 			const availableParsedPatterns = parsedPatterns.filter(
 				( { blocks } ) =>
 					checkAllowListRecursive( blocks, allowedBlockTypes )
