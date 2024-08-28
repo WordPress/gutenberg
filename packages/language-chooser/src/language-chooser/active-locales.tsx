@@ -60,8 +60,8 @@ export function ActiveLocales( {
 	const activeDescendant = isEmpty ? '' : selectedLanguage?.locale;
 
 	const className = isEmpty
-		? 'components-language-chooser__active-locales-list components-language-chooser__active-locales-list--empty'
-		: 'components-language-chooser__active-locales-list';
+		? 'language-chooser__active-locales-list language-chooser__active-locales-list--empty'
+		: 'language-chooser__active-locales-list';
 
 	let emptyMessage = sprintf(
 		/* translators: %s: English (United States) */
@@ -74,9 +74,9 @@ export function ActiveLocales( {
 	}
 
 	return (
-		<div className="components-language-chooser__active-locales wp-clearfix">
+		<div className="language-chooser__active-locales wp-clearfix">
 			{ isEmpty && (
-				<div className="components-language-chooser__active-locales-empty-message">
+				<div className="language-chooser__active-locales-empty-message">
 					{ __( 'Nothing set.' ) }
 					<br />
 					{ emptyMessage }
@@ -102,7 +102,7 @@ export function ActiveLocales( {
 							}
 							id={ locale }
 							lang={ lang }
-							className="components-language-chooser__active-locale"
+							className="language-chooser__active-locale"
 							onClick={ () => setSelectedLanguage( language ) }
 						>
 							{ nativeName }

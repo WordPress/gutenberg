@@ -21,7 +21,7 @@ function ActiveControls( {
 	isRemoveDisabled,
 }: ActiveControlsProps ) {
 	return (
-		<div className="components-language-chooser__active-locales-controls">
+		<div className="language-chooser__active-locales-controls">
 			<ul>
 				<li>
 					<Button

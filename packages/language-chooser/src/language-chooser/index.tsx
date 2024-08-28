@@ -290,14 +290,11 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		}
 	};
 
-	const instanceId = useInstanceId(
-		LanguageChooser,
-		'components-language-chooser'
-	);
+	const instanceId = useInstanceId( LanguageChooser, 'language-chooser' );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div className="components-language-chooser" onKeyDown={ onKeyDown }>
+		<div className="language-chooser" onKeyDown={ onKeyDown }>
 			<HiddenFormField
 				preferredLanguages={ languages }
 				inputName={ inputName || `${ instanceId }-languages` }
