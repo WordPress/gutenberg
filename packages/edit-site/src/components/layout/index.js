@@ -81,7 +81,6 @@ export default function Layout( { route } ) {
 	} );
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
-	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
@@ -113,7 +112,6 @@ export default function Layout( { route } ) {
 			<CommandMenu />
 			<KeyboardShortcutsRegister />
 			<KeyboardShortcutsGlobal />
-			{ fullResizer }
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
