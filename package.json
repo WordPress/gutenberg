@@ -337,7 +337,7 @@
 		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env run --env-cwd='wp-content/plugins/gutenberg' tests-cli composer run-script test:watch",
-		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
+		"test:unit": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test:unit:profile": "wp-scripts --cpu-prof test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",

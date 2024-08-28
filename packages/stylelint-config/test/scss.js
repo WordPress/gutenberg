@@ -4,14 +4,15 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
+import fs from 'node:fs';
+import stylelint from 'stylelint';
 
 /**
  * Internal dependencies
  */
-const config = require( '../scss-stylistic' ),
-	validScss = fs.readFileSync(
+import config from '../scss-stylistic';
+
+const validScss = fs.readFileSync(
 		'./packages/stylelint-config/test/scss-valid.scss',
 		'utf-8'
 	),
@@ -23,8 +24,8 @@ const config = require( '../scss-stylistic' ),
 describe( 'flags no warnings with valid scss', () => {
 	let result;
 
-	beforeEach( () => {
-		result = stylelint.lint( {
+	beforeEach( async () => {
+		result = ( await stylelint ).lint( {
 			code: validScss,
 			config,
 		} );
@@ -44,8 +45,8 @@ describe( 'flags no warnings with valid scss', () => {
 describe( 'flags warnings with invalid scss', () => {
 	let result;
 
-	beforeEach( () => {
-		result = stylelint.lint( {
+	beforeEach( async () => {
+		result = ( await stylelint ).lint( {
 			code: invalidScss,
 			config,
 		} );

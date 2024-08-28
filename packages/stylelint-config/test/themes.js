@@ -4,23 +4,24 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
+import fs from 'node:fs';
+import stylelint from 'stylelint';
 
 /**
  * Internal dependencies
  */
-const config = require( '../stylistic' ),
-	validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/themes-valid.css',
-		'utf-8'
-	);
+import config from '../stylistic';
+
+const validCss = fs.readFileSync(
+	'./packages/stylelint-config/test/themes-valid.css',
+	'utf-8'
+);
 
 describe( 'flags no warnings with valid css', () => {
 	let result;
 
-	beforeEach( () => {
-		result = stylelint.lint( {
+	beforeEach( async () => {
+		result = ( await stylelint ).lint( {
 			code: validCss,
 			config,
 		} );

@@ -4,14 +4,15 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
+import fs from 'node:fs';
+import stylelint from 'stylelint';
 
 /**
  * Internal dependencies
  */
-const config = require( '../stylistic' ),
-	validCss = fs.readFileSync(
+import config from '../stylistic';
+
+const validCss = fs.readFileSync(
 		'./packages/stylelint-config/test/commenting-valid.css',
 		'utf-8'
 	),
@@ -23,8 +24,8 @@ const config = require( '../stylistic' ),
 describe( 'flags no warnings with valid commenting css', () => {
 	let result;
 
-	beforeEach( () => {
-		result = stylelint.lint( {
+	beforeEach( async () => {
+		result = ( await stylelint ).lint( {
 			code: validCss,
 			config,
 		} );
@@ -44,8 +45,8 @@ describe( 'flags no warnings with valid commenting css', () => {
 describe( 'flags warnings with invalid commenting css', () => {
 	let result;
 
-	beforeEach( () => {
-		result = stylelint.lint( {
+	beforeEach( async () => {
+		result = ( await stylelint ).lint( {
 			code: invalidCss,
 			config,
 		} );
