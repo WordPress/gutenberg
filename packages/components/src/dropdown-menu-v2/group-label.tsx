@@ -8,6 +8,7 @@ import { forwardRef, useContext } from '@wordpress/element';
  */
 import type { WordPressComponentProps } from '../context';
 import { DropdownMenuContext } from './context';
+import { Text } from '../text';
 import type { DropdownMenuGroupProps } from './types';
 import * as Styled from './styles';
 
@@ -19,6 +20,10 @@ export const DropdownMenuGroupLabel = forwardRef<
 	return (
 		<Styled.DropdownMenuGroupLabel
 			ref={ ref }
+			render={
+				// @ts-expect-error The `children` prop is passed
+				<Text upperCase variant="muted" />
+			}
 			{ ...props }
 			store={ dropdownMenuContext?.store }
 		/>
