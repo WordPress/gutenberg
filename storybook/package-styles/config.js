@@ -61,7 +61,7 @@ const CONFIG = [
 		rtl: [ dataviewsRtl, componentsRtl ],
 	},
 	{
-		componentIdMatcher: /^components-language-chooser/,
+		componentIdMatcher: /^language-chooser/,
 		ltr: [ languageChooserLtr, componentsLtr ],
 		rtl: [ languageChooserRtl, componentsRtl ],
 	},
