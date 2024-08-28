@@ -14,7 +14,7 @@ function gutenberg_reregister_interactivity_script_modules() {
 	wp_deregister_script_module( '@wordpress/interactivity' );
 	wp_deregister_script_module( '@wordpress/interactivity-router' );
 
-	$experiments = get_option( 'gutenberg-experiments' );
+	$experiments                  = get_option( 'gutenberg-experiments' );
 	$full_page_navigation_enabled = isset( $experiments['gutenberg-full-page-client-side-navigation'] );
 
 	wp_register_script_module(
