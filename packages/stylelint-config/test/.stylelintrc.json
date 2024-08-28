@@ -1,4 +1,15 @@
 {
-	"extends": "@wordpress/stylelint-config/scss-stylistic",
-	"ignoreFiles": [ "*-invalid.scss" ]
+	"rules": {},
+	"overrides": [
+		{
+			"files": [ "*.scss", "**/*.scss" ],
+			"extends": "@wordpress/stylelint-config/scss-stylistic",
+			"ignoreFiles": [ "*-invalid.scss" ]
+		},
+		{
+			"files": [ "*.css", "**/*.css" ],
+			"extends": "@wordpress/stylelint-config/stylistic",
+			"ignoreFiles": [ "*-invalid.css" ]
+		}
+	]
 }

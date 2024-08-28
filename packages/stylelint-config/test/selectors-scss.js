@@ -10,7 +10,7 @@ const fs = require( 'fs' ),
 /**
  * Internal dependencies
  */
-const config = require( '../scss' ),
+const config = require( '../scss-stylistic' ),
 	validScss = fs.readFileSync(
 		'./packages/stylelint-config/test/selectors-valid.scss',
 		'utf-8'

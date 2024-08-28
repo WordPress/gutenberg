@@ -10,7 +10,7 @@ const fs = require( 'fs' ),
 /**
  * Internal dependencies
  */
-const config = require( '../' ),
+const config = require( '../stylistic' ),
 	validCss = fs.readFileSync(
 		'./packages/stylelint-config/test/media-queries-valid.css',
 		'utf-8'
