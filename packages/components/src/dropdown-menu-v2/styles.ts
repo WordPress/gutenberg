@@ -171,7 +171,10 @@ const baseItem = css`
 		cursor: not-allowed;
 	}
 
-	/* Active item (including hover) */
+	/* Active item (including hover)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
 	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
 			[aria-disabled='true']
 		) {
@@ -179,7 +182,10 @@ const baseItem = css`
 		color: ${ COLORS.white };
 	}
 
-	/* Keyboard focus (focus-visible) */
+	/* Keyboard focus (focus-visible)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
 	&[data-focus-visible],
 	&:focus-visible {
 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
