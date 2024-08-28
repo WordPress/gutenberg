@@ -28,4 +28,3 @@ export const CompositeTypeahead = forwardRef<
 		/>
 	);
 } );
-CompositeTypeahead.displayName = 'Composite.Typeahead';

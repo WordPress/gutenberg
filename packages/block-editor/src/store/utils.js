@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { parse } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import { selectBlockPatternsKey } from './private-keys';
@@ -6,6 +11,39 @@ import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 
 export const withRootClientIdOptionKey = Symbol( 'withRootClientId' );
+
+const parsedPatternCache = new WeakMap();
+
+function parsePattern( pattern ) {
+	const blocks = parse( pattern.content, {
+		__unstableSkipMigrationLogs: true,
+	} );
+	if ( blocks.length === 1 ) {
+		blocks[ 0 ].attributes = {
+			...blocks[ 0 ].attributes,
+			metadata: {
+				...( blocks[ 0 ].attributes.metadata || {} ),
+				categories: pattern.categories,
+				patternName: pattern.name,
+				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
+			},
+		};
+	}
+	return {
+		...pattern,
+		blocks,
+	};
+}
+
+export function getParsedPattern( pattern ) {
+	let parsedPattern = parsedPatternCache.get( pattern );
+	if ( parsedPattern ) {
+		return parsedPattern;
+	}
+	parsedPattern = parsePattern( pattern );
+	parsedPatternCache.set( pattern, parsedPattern );
+	return parsedPattern;
+}
 
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {

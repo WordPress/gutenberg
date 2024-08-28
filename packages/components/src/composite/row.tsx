@@ -28,4 +28,3 @@ export const CompositeRow = forwardRef<
 		/>
 	);
 } );
-CompositeRow.displayName = 'Composite.Row';

@@ -200,14 +200,30 @@ const UnconnectedDropdownMenu = (
 export const DropdownMenuV2 = Object.assign(
 	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
 	{
-		Context: DropdownMenuContext,
-		Item: DropdownMenuItem,
-		RadioItem: DropdownMenuRadioItem,
-		CheckboxItem: DropdownMenuCheckboxItem,
-		Group: DropdownMenuGroup,
-		Separator: DropdownMenuSeparator,
-		ItemLabel: DropdownMenuItemLabel,
-		ItemHelpText: DropdownMenuItemHelpText,
+		Context: Object.assign( DropdownMenuContext, {
+			displayName: 'DropdownMenuV2.Context',
+		} ),
+		Item: Object.assign( DropdownMenuItem, {
+			displayName: 'DropdownMenuV2.Item',
+		} ),
+		RadioItem: Object.assign( DropdownMenuRadioItem, {
+			displayName: 'DropdownMenuV2.RadioItem',
+		} ),
+		CheckboxItem: Object.assign( DropdownMenuCheckboxItem, {
+			displayName: 'DropdownMenuV2.CheckboxItem',
+		} ),
+		Group: Object.assign( DropdownMenuGroup, {
+			displayName: 'DropdownMenuV2.Group',
+		} ),
+		Separator: Object.assign( DropdownMenuSeparator, {
+			displayName: 'DropdownMenuV2.Separator',
+		} ),
+		ItemLabel: Object.assign( DropdownMenuItemLabel, {
+			displayName: 'DropdownMenuV2.ItemLabel',
+		} ),
+		ItemHelpText: Object.assign( DropdownMenuItemHelpText, {
+			displayName: 'DropdownMenuV2.ItemHelpText',
+		} ),
 	}
 );
 

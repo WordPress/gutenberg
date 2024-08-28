@@ -98,3 +98,13 @@ function gutenberg_register_wp_rest_templates_controller_plugin_field() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_wp_rest_templates_controller_plugin_field' );
+
+/**
+ * Overrides the default 'WP_REST_Server' class.
+ *
+ * @return string The name of the custom server class.
+ */
+function gutenberg_override_default_rest_server() {
+	return 'Gutenberg_REST_Server';
+}
+add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
