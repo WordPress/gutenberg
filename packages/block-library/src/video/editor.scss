@@ -1,18 +1,7 @@
-// Provide special styling for the placeholder.
-// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-video.wp-block-video {
 	// Hide border style on-select, when placeholder is visible.
 	&.is-selected .components-placeholder {
 		border: none;
-	}
-
-	// Remove the transition while we still have a legacy placeholder style.
-	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
-	// parent border that may get applied when you deselect.
-	.components-placeholder__label,
-	.components-placeholder__instructions,
-	.components-button {
-		transition: none;
 	}
 }
 
@@ -66,7 +55,6 @@
 
 .block-library-video-tracks-editor > .components-popover__content {
 	width: 360px;
-	padding: 0;
 }
 
 .block-library-video-tracks-editor__track-list,
@@ -75,10 +63,3 @@
 		padding: 0;
 	}
 }
-
-.block-library-video-tracks-editor__single-track-editor,
-.block-library-video-tracks-editor__track-list,
-.block-library-video-tracks-editor__add-tracks-container {
-	padding: $grid-unit-15;
-}
-
