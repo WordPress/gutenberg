@@ -14,9 +14,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalView as View,
 } from '@wordpress/components';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
 
 /**
@@ -480,16 +478,12 @@ export default function DimensionsPanel( {
 							__next40pxDefaultSize={ false }
 							label={ __( 'Content' ) }
 							labelPosition="top"
-							__unstableInputWidth="80px"
 							value={ contentSizeValue || '' }
 							onChange={ ( nextContentSize ) => {
 								setContentSizeValue( nextContentSize );
 							} }
 							units={ units }
 						/>
-						<View>
-							<Icon icon={ positionCenter } />
-						</View>
 					</HStack>
 				</ToolsPanelItem>
 			) }
@@ -510,16 +504,12 @@ export default function DimensionsPanel( {
 							__next40pxDefaultSize={ false }
 							label={ __( 'Wide' ) }
 							labelPosition="top"
-							__unstableInputWidth="80px"
 							value={ wideSizeValue || '' }
 							onChange={ ( nextWideSize ) => {
 								setWideSizeValue( nextWideSize );
 							} }
 							units={ units }
 						/>
-						<View>
-							<Icon icon={ stretchWide } />
-						</View>
 					</HStack>
 				</ToolsPanelItem>
 			) }
