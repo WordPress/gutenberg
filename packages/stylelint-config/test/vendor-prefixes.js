@@ -20,8 +20,8 @@ const validCss = fs.readFileSync(
 describe( 'flags no warnings with valid vendor prefixes css', () => {
 	let result;
 
-	beforeEach( async () => {
-		result = ( await stylelint ).lint( {
+	beforeEach( () => {
+		result = stylelint.lint( {
 			code: validCss,
 			config,
 		} );

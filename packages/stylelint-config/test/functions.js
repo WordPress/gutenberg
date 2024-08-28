@@ -24,8 +24,8 @@ const validCss = fs.readFileSync(
 describe( 'flags no warnings with valid functions css', () => {
 	let result;
 
-	beforeEach( async () => {
-		result = ( await stylelint ).lint( {
+	beforeEach( () => {
+		result = stylelint.lint( {
 			code: validCss,
 			config,
 		} );
@@ -45,8 +45,8 @@ describe( 'flags no warnings with valid functions css', () => {
 describe( 'flags warnings with invalid functions css', () => {
 	let result;
 
-	beforeEach( async () => {
-		result = ( await stylelint ).lint( {
+	beforeEach( () => {
+		result = stylelint.lint( {
 			code: invalidCss,
 			config,
 		} );

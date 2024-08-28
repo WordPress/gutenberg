@@ -24,8 +24,8 @@ const validScss = fs.readFileSync(
 describe( 'flags no warnings with valid scss', () => {
 	let result;
 
-	beforeEach( async () => {
-		result = ( await stylelint ).lint( {
+	beforeEach( () => {
+		result = stylelint.lint( {
 			code: validScss,
 			config,
 		} );
@@ -45,8 +45,8 @@ describe( 'flags no warnings with valid scss', () => {
 describe( 'flags warnings with invalid scss', () => {
 	let result;
 
-	beforeEach( async () => {
-		result = ( await stylelint ).lint( {
+	beforeEach( () => {
+		result = stylelint.lint( {
 			code: invalidScss,
 			config,
 		} );
