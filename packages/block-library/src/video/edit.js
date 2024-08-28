@@ -138,13 +138,17 @@ function VideoEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className="block-editor-media-placeholder"
+				className={ clsx( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSingleSelected,
+				} ) }
 				withIllustration={ ! isSingleSelected }
 				icon={ icon }
 				label={ __( 'Video' ) }
 				instructions={ __(
 					'Upload a video file, pick one from your media library, or add one with a URL.'
 				) }
+				style={ ! isSingleSelected ? { ...borderProps.style } : {} }
 			>
 				{ content }
 			</Placeholder>
@@ -158,27 +162,6 @@ function VideoEdit( {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
-
-	// Much of this description is duplicated from MediaPlaceholder.
-	const placeholder = ( content ) => {
-		return (
-			<Placeholder
-				className={ clsx( 'block-editor-media-placeholder', {
-					[ borderProps.className ]:
-						!! borderProps.className && ! isSingleSelected,
-				} ) }
-				withIllustration={ ! isSingleSelected }
-				icon={ icon }
-				label={ __( 'Video' ) }
-				instructions={ __(
-					'Upload a video file, pick one from your media library, or add one with a URL.'
-				) }
-				style={ borderProps.style }
-			>
-				{ content }
-			</Placeholder>
-		);
-	};
 
 	if ( ! src && ! temporaryURL ) {
 		return (
