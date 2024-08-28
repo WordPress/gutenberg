@@ -2349,18 +2349,12 @@ export function __experimentalGetDirectInsertBlock(
 }
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
-	( select ) =>
-		createSelector(
-			( state, patternName ) => {
-				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
-					patternName
-				);
-				return pattern ? getParsedPattern( pattern ) : null;
-			},
-			( state, patternName ) => [
-				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
-			]
-		)
+	( select ) => ( state, patternName ) => {
+		const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+			patternName
+		);
+		return pattern ? getParsedPattern( pattern ) : null;
+	}
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
