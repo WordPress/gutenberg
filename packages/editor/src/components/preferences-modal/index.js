@@ -4,7 +4,6 @@
 
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
@@ -37,31 +36,19 @@ const {
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isActive,
-		showBlockBreadcrumbsOption,
-		isTemplate,
-		canUpdateSettings,
-	} = useSelect(
+	const { isActive, showBlockBreadcrumbsOption } = useSelect(
 		( select ) => {
-			const { getEditorSettings, getEditedPostAttribute } =
-				select( editorStore );
+			const { getEditorSettings } = select( editorStore );
 			const { get } = select( preferencesStore );
 			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			const { canUser } = select( coreStore );
 			return {
 				showBlockBreadcrumbsOption:
 					! isDistractionFreeEnabled &&
 					isLargeViewport &&
 					isRichEditingEnabled,
 				isActive: isModalActive( 'editor/preferences' ),
-				isTemplate: getEditedPostAttribute( 'type' ) === 'wp_template',
-				canUpdateSettings: canUser( 'update', {
-					kind: 'root',
-					name: 'site',
-				} ),
 			};
 		},
 		[ isLargeViewport ]
@@ -266,21 +253,6 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								label={ __( 'Show most used blocks' ) }
 							/>
 						</PreferencesModalSection>
-						{ /* Don't show preference in templates until connecting attributes there is supported */ }
-						{ ! isTemplate && canUpdateSettings && (
-							<PreferencesModalSection title={ __( 'Advanced' ) }>
-								<PreferenceToggleControl
-									scope="core"
-									featureName="connectBlockAttributesUI"
-									label={ __(
-										'Enable connecting block attributes'
-									) }
-									help={ __(
-										'Allows connecting block attributes to custom fields or other dynamic data.'
-									) }
-								/>
-							</PreferencesModalSection>
-						) }
 						<PreferencesModalSection
 							title={ __( 'Manage block visibility' ) }
 							description={ __(
