@@ -1,3 +1,19 @@
+/**
+ * Colors
+ */
+
+// WordPress grays.
+$black: #000; // Use only when you truly need pure black. For UI, use $gray-900.
+$gray-900: #1e1e1e;
+$gray-800: #2f2f2f;
+$gray-700: #757575;	// Meets 4.6:1 text contrast against white.
+$gray-600: #949494;	// Meets 3:1 UI or large text contrast against white.
+$gray-400: #ccc;
+$gray-300: #ddd;		// Used for most borders.
+$gray-200: #e0e0e0;	// Used sparingly for light borders.
+$gray-100: #f0f0f0;	// Used for light gray backgrounds.
+$white: #fff;
+
 .language-chooser__active-locales {
 	margin: 1em 0;
 
@@ -26,9 +42,8 @@
 	margin: 0 1em 0 0;
 	padding: 0;
 	background: #fff;
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
-	border: 1px solid #ddd;
-	color: #32373c;
+	box-shadow: inset 0 1px 2px rgba($black, 0.07);
+	border: 1px solid $gray-300;
 	box-sizing: border-box;
 }
 
@@ -37,9 +52,9 @@
 }
 
 .language-chooser__active-locales-list--empty {
-	background: rgba(255, 255, 255, 0.5);
-	border-color: rgba(222, 222, 222, 0.75);
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+	background:  rgba($white, 0.5);
+	border-color: rgba($gray-300, 0.75);
+	box-shadow: inset 0 1px 2px rgba($black, 0.04);
 	display: flex;
 	align-items: center;
 }
@@ -82,11 +97,11 @@
 }
 
 .language-chooser__active-locales-list li:hover {
-	background: rgba(0, 0, 0, 0.07);
+	background: $gray-100;
 }
 
 .language-chooser__active-locales-list li[aria-selected="true"] {
-	background: rgba(0, 0, 0, 0.15);
+	background: $gray-300;
 }
 
 .language-chooser__active-locales-empty-message {
@@ -99,7 +114,7 @@
 	height: 130px;
 	margin-bottom: -130px;
 	box-sizing: border-box;
-	color: rgba(51, 51, 51, 0.5);
+	color: $gray-600;
 }
 
 .language-chooser__active-locales-empty-message.hidden {
