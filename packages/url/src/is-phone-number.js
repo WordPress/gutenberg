@@ -1,5 +1,5 @@
 const PHONE_REGEXP =
-	/^(\+?\d{1,3}[- ]?)?\(?(?:\d{2,3})\)?[- ]?\d{3,4}[- ]?\d{4}$/;
+	/^\+?(\d{1,3})?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/;
 
 /**
  * Determines whether the given string looks like a phone number.
