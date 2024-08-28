@@ -26,7 +26,11 @@ const ROOT_SELECTOR_TOKENS = [
  * instead, but this results in inconsistent specificity.
  *
  * This function instead inserts the prefix after the root tags but before
- * any other part of the selector.
+ * any other part of the selector. This results in consistent specificity:
+ * - If a `:where()` selector is used for the prefix, all selectors output
+ *   by `transformStyles` will have no specificity increase.
+ * - If a classname, id, or something else is used as the prefix, all selectors
+ *   will have the same specificity bump when transformed.
  *
  * @param {string} prefix   The prefix.
  * @param {string} selector The selector.
