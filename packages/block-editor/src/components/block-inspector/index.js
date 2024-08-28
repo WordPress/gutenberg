@@ -32,19 +32,37 @@ import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
 
+function BlockStylesPanel( { clientId } ) {
+	return (
+		<div>
+			<PanelBody title={ __( 'Styles' ) }>
+				<BlockStyles clientId={ clientId } />
+			</PanelBody>
+		</div>
+	);
+}
+
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
-	const contentClientIds = useSelect(
+	const { contentClientIds, hasBlockStyles } = useSelect(
 		( select ) => {
 			const {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			return getClientIdsOfDescendants( topLevelLockedBlock ).filter(
-				( clientId ) =>
-					getBlockName( clientId ) !== 'core/list-item' &&
-					getBlockEditingMode( clientId ) === 'contentOnly'
-			);
+			const { getBlockStyles } = select( blocksStore );
+			return {
+				contentClientIds: getClientIdsOfDescendants(
+					topLevelLockedBlock
+				).filter(
+					( clientId ) =>
+						getBlockName( clientId ) !== 'core/list-item' &&
+						getBlockEditingMode( clientId ) === 'contentOnly'
+				),
+				hasBlockStyles: !! getBlockStyles(
+					getBlockName( topLevelLockedBlock )
+				)?.length,
+			};
 		},
 		[ topLevelLockedBlock ]
 	);
@@ -57,6 +75,9 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			/>
 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
+			{ hasBlockStyles && (
+				<BlockStylesPanel clientId={ topLevelLockedBlock } />
+			) }
 			{ contentClientIds.length > 0 && (
 				<PanelBody title={ __( 'Content' ) }>
 					<BlockQuickNavigation clientIds={ contentClientIds } />
@@ -81,7 +102,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getContentLockingParent,
 			getTemplateLock,
 		} = unlock( select( blockEditorStore ) );
-
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
@@ -276,11 +296,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			{ ! showTabs && (
 				<>
 					{ hasBlockStyles && (
-						<div>
-							<PanelBody title={ __( 'Styles' ) }>
-								<BlockStyles clientId={ clientId } />
-							</PanelBody>
-						</div>
+						<BlockStylesPanel clientId={ clientId } />
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot group="list" />
