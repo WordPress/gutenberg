@@ -137,7 +137,7 @@ function block_core_categories_build_variations() {
 			),
 			'description' => sprintf(
 				/* translators: %s: taxonomy's label */
-				__( 'Display a list of terms from the taxonomy: %s' ),
+				__( 'Display a list of all terms for the taxonomy: %s' ),
 				$taxonomy->label
 			),
 			'attributes'  => array(
