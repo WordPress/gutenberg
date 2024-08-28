@@ -7,7 +7,6 @@ import {
 	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
-	parse,
 	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -27,6 +26,7 @@ import {
 	checkAllowList,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getParsedPattern,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2348,34 +2348,6 @@ export function __experimentalGetDirectInsertBlock(
 	return getDirectInsertBlock( state, rootClientId );
 }
 
-const parsedPatternCache = new WeakMap();
-
-function parsePattern( pattern ) {
-	const blocks = parse( pattern.content, {
-		__unstableSkipMigrationLogs: true,
-	} );
-	if ( blocks.length === 1 ) {
-		blocks[ 0 ].attributes = {
-			...blocks[ 0 ].attributes,
-			metadata: {
-				...( blocks[ 0 ].attributes.metadata || {} ),
-				categories: pattern.categories,
-				patternName: pattern.name,
-				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
-			},
-		};
-	}
-	return {
-		...pattern,
-		blocks,
-	};
-}
-
-function getParsedPattern( pattern ) {
-	const parsedPattern = parsedPatternCache.has( pattern );
-	return parsedPattern ? parsedPattern : parsePattern( pattern );
-}
-
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
 		createSelector(
@@ -2383,10 +2355,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
 					patternName
 				);
-				if ( ! pattern ) {
-					return null;
-				}
-				return getParsedPattern( pattern );
+				return pattern ? getParsedPattern( pattern ) : null;
 			},
 			( state, patternName ) => [
 				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
