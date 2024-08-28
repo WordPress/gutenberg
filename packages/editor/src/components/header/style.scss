@@ -228,7 +228,7 @@
 }
 
 .editor-header__post-preview-button {
-	@include break-small {
+	@include break-mobile {
 		display: none;
 	}
 }
