@@ -98,3 +98,11 @@
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
 }
+
+.wp-block-social-links .block-list-appender {
+	position: static; // display inline.
+
+	.block-editor-button-block-appender.components-button.components-button {
+		padding: $grid-unit-10;
+	}
+}

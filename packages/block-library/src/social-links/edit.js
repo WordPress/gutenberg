@@ -14,6 +14,7 @@ import {
 	InspectorControls,
 	ContrastChecker,
 	withColors,
+	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
@@ -75,7 +76,13 @@ export function SocialLinksEdit( props ) {
 		} else {
 			setAttributes( { ...backgroundBackupRef.current } );
 		}
-	}, [ logosOnly ] );
+	}, [
+		customIconBackgroundColor,
+		iconBackgroundColor,
+		iconBackgroundColorValue,
+		logosOnly,
+		setAttributes,
+	] );
 
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
@@ -84,12 +91,6 @@ export function SocialLinksEdit( props ) {
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</li>
-	);
-
-	const SelectedSocialPlaceholder = (
-		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
 		</li>
 	);
 
@@ -104,10 +105,11 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
+		placeholder: ! isSelected && SocialPlaceholder,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
+		renderAppender: isSelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const POPOVER_PROPS = {
