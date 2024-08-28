@@ -14,7 +14,6 @@ import {
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	MenuItem,
 	PanelBody,
 	RangeControl,
 	ResizableBox,

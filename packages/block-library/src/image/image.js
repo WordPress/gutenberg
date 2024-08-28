@@ -3,7 +3,6 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	MenuItem,
 	ExternalLink,
 	ResizableBox,
 	Spinner,

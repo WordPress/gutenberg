@@ -10,7 +10,6 @@ import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	MenuItem,
 	ToggleControl,
 	PanelBody,
 	Placeholder,
