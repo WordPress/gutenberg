@@ -692,16 +692,14 @@ function BackgroundToolsPanel( {
 	};
 
 	return (
-		<VStack
-			as={ ToolsPanel }
-			spacing={ 2 }
+		<ToolsPanel
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</VStack>
+		</ToolsPanel>
 	);
 }
 
