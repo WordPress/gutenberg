@@ -60,7 +60,7 @@ const fadeIn = keyframes( {
 	},
 } );
 
-export const DropdownMenu = styled( Ariakit.Menu )<
+export const MenuPopoverOuterWrapper = styled.div<
 	Pick< DropdownMenuContext, 'variant' >
 >`
 	position: relative;
@@ -76,35 +76,32 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 			: DEFAULT_BOX_SHADOW };
 	` }
 
-	/* Only visible in Windows High Contrast mode */
-	outline: 2px solid transparent !important;
-
 	overflow: hidden;
 
 	/* Animation */
 	@media not ( prefers-reduced-motion ) {
-		&[data-open] {
+		&:has( [data-open] ) {
 			animation-duration: ${ ANIMATION_PARAMS.DURATION };
 			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 			will-change: transform, opacity;
+		}
 
-			&[data-side='bottom'] {
-				transform-origin: top;
-				animation-name: ${ fadeIn }, ${ scaleYOuter };
-			}
-			&[data-side='top'] {
-				transform-origin: bottom;
-				animation-name: ${ fadeIn }, ${ scaleYOuter };
-			}
-			&[data-side='left'],
-			&[data-side='right'] {
-				animation-name: ${ fadeIn };
-			}
+		&:has( [data-open][data-side='bottom'] ) {
+			transform-origin: top;
+			animation-name: ${ fadeIn }, ${ scaleYOuter };
+		}
+		&:has( [data-open][data-side='top'] ) {
+			transform-origin: bottom;
+			animation-name: ${ fadeIn }, ${ scaleYOuter };
+		}
+		&:has( [data-open][data-side='left'] ),
+		&:has( [data-open][data-side='right'] ) {
+			animation-name: ${ fadeIn };
 		}
 	}
 `;
 
-export const ContentWrapper = styled.div`
+export const MenuPopoverInnerWrapper = styled.div`
 	position: relative;
 
 	display: grid;
@@ -121,18 +118,21 @@ export const ContentWrapper = styled.div`
 	overscroll-behavior: contain;
 	overflow: auto;
 
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
+
 	/* Animation */
 	@media not ( prefers-reduced-motion ) {
-		[data-open] & {
+		&[data-open] {
 			animation-duration: inherit;
 			animation-timing-function: inherit;
 			will-change: transform, opacity;
 			transform-origin: inherit;
 		}
-		[data-open][data-side='bottom'] & {
+		&[data-open][data-side='bottom'] {
 			animation-name: ${ fadeIn }, ${ scaleYContent };
 		}
-		[data-open][data-side='top'] & {
+		&[data-open][data-side='top'] {
 			animation-name: ${ fadeIn }, ${ scaleYContent };
 		}
 	}
@@ -216,7 +216,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ MenuPopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -314,9 +314,9 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ DropdownMenu }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ MenuPopoverInnerWrapper }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ DropdownMenu }) & {
+	[aria-disabled='true'] *:not(${ MenuPopoverInnerWrapper }) & {
 		color: inherit;
 	}
 `;
@@ -379,8 +379,10 @@ export const DropdownMenuItemHelpText = styled( Truncate )`
 	color: ${ LIGHTER_TEXT_COLOR };
 	word-break: break-all;
 
-	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
-	[aria-disabled='true'] *:not( ${ DropdownMenu } ) & {
+	[data-active-item]:not( [data-focus-visible] )
+		*:not( ${ MenuPopoverInnerWrapper } )
+		&,
+	[aria-disabled='true'] *:not( ${ MenuPopoverInnerWrapper } ) & {
 		color: inherit;
 	}
 `;

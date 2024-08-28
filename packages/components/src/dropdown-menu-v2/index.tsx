@@ -173,7 +173,7 @@ const UnconnectedDropdownMenu = (
 			/>
 
 			{ /* Menu popover */ }
-			<Styled.DropdownMenu
+			<Ariakit.Menu
 				{ ...otherProps }
 				modal={ modal }
 				store={ dropdownMenuStore }
@@ -185,15 +185,23 @@ const UnconnectedDropdownMenu = (
 				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
-				variant={ variant }
 				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
+				render={ ( renderProps ) => (
+					// Two wrappers are needed for the entry animation, where the menu
+					// container scales with a different factor than its contents.
+					// The {...renderProps} are passed to the inner wrapper, so that the
+					// menu element is the direct parent of the menu item elements.
+					<Styled.MenuPopoverOuterWrapper variant={ variant }>
+						<Styled.MenuPopoverInnerWrapper { ...renderProps } />
+					</Styled.MenuPopoverOuterWrapper>
+				) }
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
-					<Styled.ContentWrapper>{ children }</Styled.ContentWrapper>
+					{ children }
 				</DropdownMenuContext.Provider>
-			</Styled.DropdownMenu>
+			</Ariakit.Menu>
 		</>
 	);
 };
