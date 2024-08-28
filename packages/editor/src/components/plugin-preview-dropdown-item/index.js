@@ -34,6 +34,9 @@ import { ActionItem } from '@wordpress/interface';
  *     { __( 'Preview in new tab' ) }
  *   </PreviewDropdownMenuItem>
  * );
+ * registerPlugin( 'external-preview-menu-item', {
+ *     render: ExternalPreviewMenuItem,
+ * } );
  * ```
  *
  * @return {Component} The rendered menu item component.
