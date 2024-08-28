@@ -47,6 +47,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'allowedMimeTypes',
 	'bodyPlaceholder',
 	'canLockBlocks',
+	'canUpdateBlockBindings',
 	'capabilities',
 	'clearBlockSelection',
 	'codeEditingEnabled',

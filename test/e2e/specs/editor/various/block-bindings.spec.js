@@ -1394,11 +1394,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI preference.
-				await editor.setPreferences( 'core', {
-					connectBlockAttributesUI: true,
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 				} );
@@ -1412,11 +1407,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI preference.
-				await editor.setPreferences( 'core', {
-					connectBlockAttributesUI: true,
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
@@ -1529,11 +1519,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI preference.
-				await editor.setPreferences( 'core', {
-					connectBlockAttributesUI: true,
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/heading',
 				} );
@@ -1724,11 +1709,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI preference.
-				await editor.setPreferences( 'core', {
-					connectBlockAttributesUI: true,
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/buttons',
 					innerBlocks: [
@@ -2059,11 +2039,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI preference.
-				await editor.setPreferences( 'core', {
-					connectBlockAttributesUI: true,
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/image',
 				} );

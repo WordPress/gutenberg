@@ -16,7 +16,6 @@ import {
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -29,6 +28,7 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
+import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
@@ -202,11 +202,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
-	const { isConnectingEnabled } = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-
+	const { canUpdateBlockBindings } = useSelect( ( select ) => {
 		return {
-			isConnectingEnabled: get( 'core', 'connectBlockAttributesUI' ),
+			canUpdateBlockBindings:
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
 		};
 	}, [] );
 
@@ -247,7 +246,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 
 	// Lock the UI when the preference to create bindings is not enabled or there are no fields to connect to.
 	const readOnly =
-		! isConnectingEnabled || ! Object.keys( fieldsList ).length;
+		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
