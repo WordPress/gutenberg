@@ -22,7 +22,13 @@ export const DropdownMenuGroupLabel = forwardRef<
 			ref={ ref }
 			render={
 				// @ts-expect-error The `children` prop is passed
-				<Text upperCase variant="muted" />
+				<Text
+					upperCase
+					variant="muted"
+					size="11px"
+					weight={ 500 }
+					lineHeight="16px"
+				/>
 			}
 			{ ...props }
 			store={ dropdownMenuContext?.store }

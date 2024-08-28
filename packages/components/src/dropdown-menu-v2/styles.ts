@@ -306,10 +306,11 @@ export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
 
 export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
 	/* Occupy the width of all grid columns (ie. full width) */
-	grid-column: 2 / -1;
+	grid-column: 1 / -1;
 
-	padding-block: ${ ITEM_PADDING_BLOCK };
-	padding-inline-end: ${ ITEM_PADDING_INLINE };
+	padding-block-start: ${ space( 3 ) };
+	padding-block-end: ${ space( 2 ) };
+	padding-inline: ${ ITEM_PADDING_INLINE };
 `;
 
 export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
