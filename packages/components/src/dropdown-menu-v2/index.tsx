@@ -191,7 +191,7 @@ const UnconnectedDropdownMenu = (
 				unmountOnHide
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
-					{ children }
+					<Styled.ContentWrapper>{ children }</Styled.ContentWrapper>
 				</DropdownMenuContext.Provider>
 			</Styled.DropdownMenu>
 		</>

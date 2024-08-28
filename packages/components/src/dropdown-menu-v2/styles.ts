@@ -15,9 +15,10 @@ import { Truncate } from '../truncate';
 import type { DropdownMenuContext } from './types';
 
 const ANIMATION_PARAMS = {
-	SLIDE_AMOUNT: '2px',
+	SCALE_AMOUNT_OUTER: 0.8,
+	SCALE_AMOUNT_CONTENT: 0.9,
 	DURATION: '400ms',
-	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
 };
 
 const CONTENT_WRAPPER_PADDING = space( 1 );
@@ -38,36 +39,25 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-const slideUpAndFade = keyframes( {
-	'0%': {
-		opacity: 0,
-		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+const scaleYOuter = keyframes( {
+	from: {
+		transform: `scaleY(${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER })`,
 	},
-	'100%': { opacity: 1, transform: 'translateY(0)' },
 } );
 
-const slideRightAndFade = keyframes( {
-	'0%': {
-		opacity: 0,
-		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+const scaleYContent = keyframes( {
+	// Cause the content to scale at a different rate than the outer container:
+	// - counter the outer scale factor by doing "1 / scaleAmountOuter"
+	// - then apply the content scale factor
+	from: {
+		transform: `scaleY(calc(1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } * ${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }))`,
 	},
-	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
-const slideDownAndFade = keyframes( {
-	'0%': {
+const fadeIn = keyframes( {
+	from: {
 		opacity: 0,
-		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
 	},
-	'100%': { opacity: 1, transform: 'translateY(0)' },
-} );
-
-const slideLeftAndFade = keyframes( {
-	'0%': {
-		opacity: 0,
-		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
-	},
-	'100%': { opacity: 1, transform: 'translateX(0)' },
 } );
 
 export const DropdownMenu = styled( Ariakit.Menu )<
@@ -78,16 +68,6 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
-	display: grid;
-	grid-template-columns: ${ GRID_TEMPLATE_COLS };
-	grid-template-rows: auto;
-
-	box-sizing: border-box;
-	min-width: 160px;
-	max-width: 320px;
-	max-height: var( --popover-available-height );
-	padding: ${ CONTENT_WRAPPER_PADDING };
-
 	background-color: ${ COLORS.ui.background };
 	border-radius: ${ CONFIG.radiusMedium };
 	${ ( props ) => css`
@@ -96,29 +76,64 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 			: DEFAULT_BOX_SHADOW };
 	` }
 
-	overscroll-behavior: contain;
-	overflow: auto;
-
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent !important;
 
+	overflow: hidden;
+
 	/* Animation */
-	&[data-open] {
-		@media not ( prefers-reduced-motion ) {
+	@media not ( prefers-reduced-motion ) {
+		&[data-open] {
 			animation-duration: ${ ANIMATION_PARAMS.DURATION };
 			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
 			will-change: transform, opacity;
-			/* Default animation.*/
-			animation-name: ${ slideDownAndFade };
-			&[data-side='left'] {
-				animation-name: ${ slideLeftAndFade };
+
+			&[data-side='bottom'] {
+				transform-origin: top;
+				animation-name: ${ fadeIn }, ${ scaleYOuter };
 			}
-			&[data-side='up'] {
-				animation-name: ${ slideUpAndFade };
+			&[data-side='top'] {
+				transform-origin: bottom;
+				animation-name: ${ fadeIn }, ${ scaleYOuter };
 			}
+			&[data-side='left'],
 			&[data-side='right'] {
-				animation-name: ${ slideRightAndFade };
+				animation-name: ${ fadeIn };
 			}
+		}
+	}
+`;
+
+export const ContentWrapper = styled.div`
+	position: relative;
+
+	display: grid;
+	grid-template-columns: ${ GRID_TEMPLATE_COLS };
+	grid-template-rows: auto;
+
+	box-sizing: border-box;
+	min-width: 160px;
+	max-width: 320px;
+	max-height: var( --popover-available-height );
+
+	padding: ${ CONTENT_WRAPPER_PADDING };
+
+	overscroll-behavior: contain;
+	overflow: auto;
+
+	/* Animation */
+	@media not ( prefers-reduced-motion ) {
+		[data-open] & {
+			animation-duration: inherit;
+			animation-timing-function: inherit;
+			will-change: transform, opacity;
+			transform-origin: inherit;
+		}
+		[data-open][data-side='bottom'] & {
+			animation-name: ${ fadeIn }, ${ scaleYContent };
+		}
+		[data-open][data-side='top'] & {
+			animation-name: ${ fadeIn }, ${ scaleYContent };
 		}
 	}
 `;
