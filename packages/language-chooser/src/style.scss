@@ -1,5 +1,11 @@
 .language-chooser__active-locales {
 	margin: 1em 0;
+
+	&::after {
+		content: "";
+		display: table;
+		clear: both;
+	}
 }
 
 .active-locales-controls .button {
@@ -102,6 +108,12 @@
 
 .language-chooser__inactive-locales {
 	clear: both;
+
+	&::after {
+		content: "";
+		display: table;
+		clear: both;
+	}
 }
 
 .language-chooser__inactive-locales select {

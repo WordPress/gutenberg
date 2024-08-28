@@ -74,7 +74,7 @@ export function ActiveLocales( {
 	}
 
 	return (
-		<div className="language-chooser__active-locales wp-clearfix">
+		<div className="language-chooser__active-locales">
 			{ isEmpty && (
 				<div className="language-chooser__active-locales-empty-message">
 					{ __( 'Nothing set.' ) }
