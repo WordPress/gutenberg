@@ -2348,6 +2348,34 @@ export function __experimentalGetDirectInsertBlock(
 	return getDirectInsertBlock( state, rootClientId );
 }
 
+const parsedPatternCache = new WeakMap();
+
+function parsePattern( pattern ) {
+	const blocks = parse( pattern.content, {
+		__unstableSkipMigrationLogs: true,
+	} );
+	if ( blocks.length === 1 ) {
+		blocks[ 0 ].attributes = {
+			...blocks[ 0 ].attributes,
+			metadata: {
+				...( blocks[ 0 ].attributes.metadata || {} ),
+				categories: pattern.categories,
+				patternName: pattern.name,
+				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
+			},
+		};
+	}
+	return {
+		...pattern,
+		blocks,
+	};
+}
+
+function getParsedPattern( pattern ) {
+	const parsedPattern = parsedPatternCache.has( pattern );
+	return parsedPattern ? parsedPattern : parsePattern( pattern );
+}
+
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
 		createSelector(
@@ -2358,26 +2386,7 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 				if ( ! pattern ) {
 					return null;
 				}
-				const blocks = parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} );
-				if ( blocks.length === 1 ) {
-					blocks[ 0 ].attributes = {
-						...blocks[ 0 ].attributes,
-						metadata: {
-							...( blocks[ 0 ].attributes.metadata || {} ),
-							categories: pattern.categories,
-							patternName: pattern.name,
-							name:
-								blocks[ 0 ].attributes.metadata?.name ||
-								pattern.title,
-						},
-					};
-				}
-				return {
-					...pattern,
-					blocks,
-				};
+				return getParsedPattern( pattern );
 			},
 			( state, patternName ) => [
 				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
@@ -2401,16 +2410,13 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
 		return createSelector( ( state, rootClientId = null ) => {
-			const {
-				getAllPatterns,
-				__experimentalGetParsedPattern: getParsedPattern,
-			} = unlock( select( STORE_NAME ) );
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
 
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( { name } ) => getParsedPattern( name ) );
+				.map( getParsedPattern );
 			const availableParsedPatterns = parsedPatterns.filter(
 				( { blocks } ) =>
 					checkAllowListRecursive( blocks, allowedBlockTypes )
