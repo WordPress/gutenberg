@@ -11,7 +11,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
-	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -250,7 +249,7 @@ export default function DimensionsPanel( {
 	const minimumMargin = -Infinity;
 	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
-	// Content Size
+	// Content Width
 	const showContentSizeControl =
 		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
@@ -266,7 +265,7 @@ export default function DimensionsPanel( {
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
 	const resetContentSizeValue = () => setContentSizeValue( undefined );
 
-	// Wide Size
+	// Wide Width
 	const showWideSizeControl =
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
@@ -462,8 +461,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showContentSizeControl && (
 				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Content size' ) }
+					label={ __( 'Content width' ) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={
@@ -472,24 +470,22 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HStack alignment="flex-end" justify="flex-start">
-						<UnitControl
-							__next40pxDefaultSize
-							label={ __( 'Content' ) }
-							labelPosition="top"
-							value={ contentSizeValue || '' }
-							onChange={ ( nextContentSize ) => {
-								setContentSizeValue( nextContentSize );
-							} }
-							units={ units }
-						/>
-					</HStack>
+					<UnitControl
+						__next40pxDefaultSize
+						label={ __( 'Content width' ) }
+						labelPosition="top"
+						__unstableInputWidth="112px"
+						value={ contentSizeValue || '' }
+						onChange={ ( nextContentSize ) => {
+							setContentSizeValue( nextContentSize );
+						} }
+						units={ units }
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showWideSizeControl && (
 				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Wide size' ) }
+					label={ __( 'Wide width' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={
@@ -497,18 +493,17 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HStack alignment="flex-end" justify="flex-start">
-						<UnitControl
-							__next40pxDefaultSize
-							label={ __( 'Wide' ) }
-							labelPosition="top"
-							value={ wideSizeValue || '' }
-							onChange={ ( nextWideSize ) => {
-								setWideSizeValue( nextWideSize );
-							} }
-							units={ units }
-						/>
-					</HStack>
+					<UnitControl
+						__next40pxDefaultSize
+						label={ __( 'Wide width' ) }
+						labelPosition="top"
+						__unstableInputWidth="112px"
+						value={ wideSizeValue || '' }
+						onChange={ ( nextWideSize ) => {
+							setWideSizeValue( nextWideSize );
+						} }
+						units={ units }
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
