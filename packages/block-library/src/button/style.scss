@@ -38,6 +38,14 @@ $blocks-block__margin: 0.5em;
 	text-decoration: inherit;
 }
 
+.wp-block-button[style*="font-weight"] .wp-block-button__link {
+	font-weight: inherit;
+}
+
+.wp-block-button[style*="font-style"] .wp-block-button__link {
+	font-style: inherit;
+}
+
 // Increased specificity needed to override margins.
 .wp-block-buttons > .wp-block-button {
 	&.has-custom-width {
