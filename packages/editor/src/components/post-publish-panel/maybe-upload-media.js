@@ -61,6 +61,7 @@ function Image( block ) {
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const [ isAnimating, setIsAnimating ] = useState( false );
+	const [ hadUploadError, setHadUploadError ] = useState( false );
 	const { editorBlocks, mediaUpload } = useSelect(
 		( select ) => ( {
 			editorBlocks: select( blockEditorStore ).getBlocks(),
@@ -89,6 +90,7 @@ export default function PostFormatPanel() {
 
 	function uploadImages() {
 		setIsUploading( true );
+		setHadUploadError( false );
 		Promise.all(
 			externalImages.map( ( image ) =>
 				window
@@ -119,6 +121,9 @@ export default function PostFormatPanel() {
 							} );
 						} ).then( () => setIsAnimating( true ) )
 					)
+					.catch( () => {
+						setHadUploadError( true );
+					} )
 			)
 		).finally( () => {
 			setIsUploading( false );
@@ -159,6 +164,7 @@ export default function PostFormatPanel() {
 					</Button>
 				) }
 			</div>
+			{ hadUploadError && <p>{ __( 'Upload failed, try again.' ) }</p> }
 		</PanelBody>
 	);
 }
