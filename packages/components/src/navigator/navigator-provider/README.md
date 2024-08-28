@@ -33,7 +33,7 @@ const MyNavigation = () => (
 );
 ```
 
-**Important note**
+### Hierarchical `path`s
 
 `Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
 
@@ -46,6 +46,10 @@ For example:
 -   `/parent/child/grand-child` is a child of `/parent/child`.
 -   `/parent/:param` is a child of `/parent` as well.
 -   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
+
+### Height and animations
+
+Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is given enough height to match the tallest `NavigatorScreen`. Not doing so could result in glitchy animations, especially when transitioning from a taller to a shorter `NavigatorScreen`.
 
 ## Props
 
