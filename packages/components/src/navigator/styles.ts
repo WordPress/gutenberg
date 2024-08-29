@@ -51,8 +51,8 @@ export const slideToRight = keyframes( {
 } );
 
 type NavigatorScreenAnimationProps = {
-	skipInitialAnimation: boolean;
-	direction: 'forwards' | 'backwards';
+	skipAnimation: boolean;
+	animationDirection: 'forwards' | 'backwards';
 	isAnimatingOut: boolean;
 };
 
@@ -96,9 +96,9 @@ const ANIMATION = {
 		`,
 	},
 };
-const navigatorScreenAnimation = ( {
-	direction,
-	skipInitialAnimation,
+export const navigatorScreenAnimation = ( {
+	animationDirection,
+	skipAnimation,
 	isAnimatingOut,
 }: NavigatorScreenAnimationProps ) => {
 	return css`
@@ -109,9 +109,11 @@ const navigatorScreenAnimation = ( {
 			inset: 0;
 		` }
 
-		animation: ${ skipInitialAnimation
+		animation: ${ skipAnimation
 			? 'none'
-			: ANIMATION[ direction ][ isAnimatingOut ? 'out' : 'in' ] };
+			: ANIMATION[ animationDirection ][
+					isAnimatingOut ? 'out' : 'in'
+			  ] };
 
 		@media ( prefers-reduced-motion ) {
 			animation: none;
@@ -119,11 +121,9 @@ const navigatorScreenAnimation = ( {
 	`;
 };
 
-export const navigatorScreen = ( props: NavigatorScreenAnimationProps ) => css`
+export const navigatorScreen = css`
 	/* Ensures horizontal overflow is visually accessible */
 	overflow-x: auto;
 	/* In case the root has a height, it should not be exceeded */
 	max-height: 100%;
-
-	${ navigatorScreenAnimation( props ) }
 `;

@@ -13,15 +13,8 @@ import {
 	useMemo,
 	useRef,
 	useId,
-	useState,
-	useLayoutEffect,
 } from '@wordpress/element';
-import {
-	useMergeRefs,
-	usePrevious,
-	useReducedMotion,
-} from '@wordpress/compose';
-import { isRTL as isRTLFn } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 import { escapeAttribute } from '@wordpress/escape-html';
 import warning from '@wordpress/warning';
 
@@ -35,9 +28,7 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
 import type { NavigatorScreenProps } from '../types';
-
-const isExitAnimation = ( e: AnimationEvent ) =>
-	e.animationName === styles.slideToLeft.name || styles.slideToRight.name;
+import { useScreenAnimatePresence } from './use-screen-animate-presence';
 
 function UnconnectedNavigatorScreen(
 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
@@ -49,9 +40,12 @@ function UnconnectedNavigatorScreen(
 		);
 	}
 
+	// Generate a unique ID for the screen.
 	const screenId = useId();
-	const animationTimeoutRef = useRef< number >();
-	const prefersReducedMotion = useReducedMotion();
+
+	// Refs
+	const wrapperRef = useRef< HTMLDivElement >( null );
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	// Read props and components context.
 	const { children, className, path, ...otherProps } = useContextSystem(
@@ -64,23 +58,11 @@ function UnconnectedNavigatorScreen(
 		useContext( NavigatorContext );
 	const { isInitial, isBack, focusTargetSelector, skipFocus } = location;
 
-	// Determine if the screen is currently selected.
+	// Locally computed state
 	const isMatch = match === screenId;
-	const wasMatch = usePrevious( isMatch );
-
 	const skipAnimationAndFocusRestoration = !! isInitial && ! isBack;
 
-	const wrapperRef = useRef< HTMLDivElement >( null );
-
-	// Possible values:
-	// - idle: first value assigned to the screen when added to the React tree
-	// - armed: will start an exit animation when deselected
-	// - animating: the exit animation is happening
-	// - animated: the exit animation has ended
-	const [ exitAnimationStatus, setExitAnimationStatus ] = useState<
-		'idle' | 'armed' | 'animating' | 'animated'
-	>( 'idle' );
-
+	// Register / unregister screen with the navigator context.
 	useEffect( () => {
 		const screen = {
 			id: screenId,
@@ -90,72 +72,20 @@ function UnconnectedNavigatorScreen(
 		return () => removeScreen( screen );
 	}, [ screenId, path, addScreen, removeScreen ] );
 
-	// Update animation status.
-	useLayoutEffect( () => {
-		if ( ! wasMatch && isMatch ) {
-			// When the screen becomes selected, set it to 'armed',
-			// meaning that it will start an exit animation when deselected.
-			setExitAnimationStatus( 'armed' );
-		} else if ( wasMatch && ! isMatch ) {
-			// When the screen becomes deselected, set it to:
-			// - 'animating' (if animations are enabled)
-			// - 'animated' (causing the animation to end and the screen to stop
-			//    rendering its contents in the DOM, without the need to wait for
-			//    the `animationend` event)
-			setExitAnimationStatus(
-				skipAnimationAndFocusRestoration || prefersReducedMotion
-					? 'animated'
-					: 'animating'
-			);
-		}
-	}, [
-		isMatch,
-		wasMatch,
-		skipAnimationAndFocusRestoration,
-		prefersReducedMotion,
-	] );
+	// Animation.
+	const { animationStyles, onScreenAnimationEnd, shouldRenderScreen } =
+		useScreenAnimatePresence( {
+			isMatch,
+			isBack,
+			skipAnimation: skipAnimationAndFocusRestoration,
+		} );
 
 	// Styles
-	const isRTL = isRTLFn();
 	const cx = useCx();
-	const animationDirection =
-		( isRTL && isBack ) || ( ! isRTL && ! isBack )
-			? 'forwards'
-			: 'backwards';
-	const isAnimatingOut =
-		exitAnimationStatus === 'animating' ||
-		exitAnimationStatus === 'animated';
 	const classes = useMemo(
-		() =>
-			cx(
-				styles.navigatorScreen( {
-					skipInitialAnimation: skipAnimationAndFocusRestoration,
-					direction: animationDirection,
-					isAnimatingOut,
-				} ),
-				className
-			),
-		[
-			className,
-			cx,
-			skipAnimationAndFocusRestoration,
-			animationDirection,
-			isAnimatingOut,
-		]
+		() => cx( styles.navigatorScreen, animationStyles, className ),
+		[ className, cx, animationStyles ]
 	);
-	// Fallback timeout to ensure the screen is removed from the DOM in case the
-	// `animationend` event is not triggered.
-	useEffect( () => {
-		if ( exitAnimationStatus === 'animating' ) {
-			animationTimeoutRef.current = window.setTimeout( () => {
-				setExitAnimationStatus( 'animated' );
-				animationTimeoutRef.current = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION_OUT );
-		} else if ( animationTimeoutRef.current ) {
-			window.clearTimeout( animationTimeoutRef.current );
-			animationTimeoutRef.current = undefined;
-		}
-	}, [ exitAnimationStatus ] );
 
 	// Focus restoration
 	const locationRef = useRef( location );
@@ -213,33 +143,16 @@ function UnconnectedNavigatorScreen(
 		skipFocus,
 	] );
 
-	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
-
-	// Remove the screen contents from the DOM only when it not selected
-	// and its exit animation has ended.
-	if (
-		! isMatch &&
-		( exitAnimationStatus === 'idle' || exitAnimationStatus === 'animated' )
-	) {
-		return null;
-	}
-
-	return (
+	return shouldRenderScreen ? (
 		<View
 			ref={ mergedWrapperRef }
 			className={ classes }
-			onAnimationEnd={ ( e: AnimationEvent ) => {
-				if ( ! isMatch && isExitAnimation( e ) ) {
-					// When the exit animation ends on an unselected screen, set the
-					// status to 'animated' to remove the screen contents from the DOM.
-					setExitAnimationStatus( 'animated' );
-				}
-			} }
+			onAnimationEnd={ onScreenAnimationEnd }
 			{ ...otherProps }
 		>
 			{ children }
 		</View>
-	);
+	) : null;
 }
 
 /**
