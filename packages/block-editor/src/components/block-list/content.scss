@@ -250,11 +250,13 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 
-	&.is-selected {
+	&.is-selected,
+	&.is-hovered {
 		cursor: default;
 
-		&.rich-text {
-			cursor: unset;
+		&.rich-text,
+		.rich-text {
+			cursor: auto;
 		}
 	}
 
@@ -419,7 +421,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	width: 100%;
 	border: none;
 	outline: none;
-	border-radius: 2px;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;

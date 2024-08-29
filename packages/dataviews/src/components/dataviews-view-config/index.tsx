@@ -42,11 +42,7 @@ import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
@@ -62,7 +58,7 @@ function ViewTypeMenu( {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			trigger={
 				<Button
 					size="compact"
@@ -77,7 +73,7 @@ function ViewTypeMenu( {
 					return null;
 				}
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuV2.RadioItem
 						key={ layout }
 						value={ layout }
 						name="view-actions-available-view"
@@ -97,13 +93,13 @@ function ViewTypeMenu( {
 							warning( 'Invalid dataview' );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ config.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.RadioItem>
 				);
 			} ) }
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 }
 
@@ -143,6 +139,14 @@ function SortFieldControl() {
 
 function SortDirectionControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
+	if ( sortableFields.length === 0 ) {
+		return null;
+	}
+
 	let value = view.sort?.direction;
 	if ( ! value && view.sort?.field ) {
 		value = 'desc';

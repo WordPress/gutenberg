@@ -51,6 +51,8 @@ function ButtonBlockAppender(
 
 				let inserterButton = (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
