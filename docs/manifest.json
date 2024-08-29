@@ -1926,6 +1926,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/rule-parser",
+		"slug": "packages-rule-parser",
+		"markdown_source": "../packages/rule-parser/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/scripts",
 		"slug": "packages-scripts",
 		"markdown_source": "../packages/scripts/README.md",
