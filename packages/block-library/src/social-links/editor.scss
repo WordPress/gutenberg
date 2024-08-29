@@ -108,7 +108,7 @@
 
 .wp-block-social-links {
 	&.has-small-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-10 / 2;
+		padding: math.div($grid-unit-10, 2);
 	}
 	&.has-large-icon-size .block-editor-button-block-appender.components-button.components-button {
 		padding: $grid-unit-20;
