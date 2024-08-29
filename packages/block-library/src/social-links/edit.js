@@ -49,22 +49,6 @@ export function SocialLinksEdit( props ) {
 		setIconColor,
 	} = props;
 
-	const hasAnySelected = useSelect(
-		( select ) => {
-			const { getSelectedBlockClientId, getBlockOrder } =
-				select( blockEditorStore );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const innerBlockClientIds = getBlockOrder( clientId );
-
-			// Check if the selected block is the main block or any of its inner blocks
-			return (
-				selectedBlockClientId === clientId ||
-				innerBlockClientIds.includes( selectedBlockClientId )
-			);
-		},
-		[ clientId ]
-	);
-
 	const {
 		iconBackgroundColorValue,
 		customIconBackgroundColor,
@@ -73,6 +57,14 @@ export function SocialLinksEdit( props ) {
 		showLabels,
 		size,
 	} = attributes;
+
+	const hasSelectedChild = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
 
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
