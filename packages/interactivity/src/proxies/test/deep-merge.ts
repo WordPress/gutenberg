@@ -318,7 +318,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'should update signals when they exist', () => {
 			const target = { a: 1, b: { x: 10 } };
-			const source = { a: 2, b: { y: 20 }, c: 3 };
+			const source = { a: 2, b: { x: 20 }, c: 3 };
 			const result = proxifyState< any >( 'test', {} );
 
 			const spyA = jest.fn( () => result.a );
@@ -336,7 +336,7 @@ describe( 'Interactivity API', () => {
 			deepMerge( result, source );
 
 			expect( spyA ).toHaveBeenCalledTimes( 3 );
-			expect( spyBx ).toHaveBeenCalledTimes( 1 );
+			expect( spyBx ).toHaveBeenCalledTimes( 2 );
 		} );
 
 		it( 'should batch all signal updates together', () => {
