@@ -20,6 +20,7 @@ import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getParsedPattern,
 } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
@@ -291,16 +292,15 @@ export const getInserterMediaCategories = createSelector(
 export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
-			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( STORE_NAME )
-			);
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-			return patterns.some( ( { name, inserter = true } ) => {
+			return patterns.some( ( pattern ) => {
+				const { inserter = true } = pattern;
 				if ( ! inserter ) {
 					return false;
 				}
-				const { blocks } = __experimentalGetParsedPattern( name );
+				const { blocks } = getParsedPattern( pattern );
 				return (
 					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
 					blocks.every( ( { name: blockName } ) =>

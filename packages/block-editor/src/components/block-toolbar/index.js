@@ -65,6 +65,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		canRemove,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -75,6 +76,7 @@ export function PrivateBlockToolbar( {
 			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
+			canRemoveBlock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -115,6 +117,7 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
+			canRemove: canRemoveBlock( selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -195,7 +198,9 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				<Shuffle clientId={ blockClientId } />
+				{ ! isMultiToolbar && canRemove && (
+					<Shuffle clientId={ blockClientId } />
+				) }
 				{ shouldShowVisualToolbar && isMultiToolbar && (
 					<BlockGroupToolbar />
 				) }
