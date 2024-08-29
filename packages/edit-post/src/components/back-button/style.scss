@@ -54,7 +54,7 @@
 	.edit-post-fullscreen-mode-close_site-icon {
 		width: $button-size;
 		height: $button-size;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		object-fit: cover;
 		// Compensate for the top-bar border.
 		margin-top: -($border-width);
