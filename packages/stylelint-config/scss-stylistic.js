@@ -2,7 +2,7 @@
 
 /** @type {import('stylelint').Config} */
 module.exports = {
-	extends: [ './scss', './stylistic' ].map( require.resolve ),
+	extends: [ './stylistic', './scss' ].map( require.resolve ),
 	rules: {
 		'@stylistic/block-opening-brace-space-before': 'always',
 		'@stylistic/block-closing-brace-newline-after': [

@@ -1,34 +1,14 @@
 /**
- * @jest-environment node
- */
-/**
- * External dependencies
- */
-import fs from 'node:fs';
-import stylelint from 'stylelint';
-
-/**
  * Internal dependencies
  */
-import config from '../scss-stylistic';
-
-const validScss = fs.readFileSync(
-		'./packages/stylelint-config/test/scss-valid.scss',
-		'utf-8'
-	),
-	invalidScss = fs.readFileSync(
-		'./packages/stylelint-config/test/scss-invalid.scss',
-		'utf-8'
-	);
+const utils = require( './utils.cjs' );
+const getStylelintResult = utils.getStylelintResult;
 
 describe( 'flags no warnings with valid scss', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validScss,
-			config,
-		} );
+		result = getStylelintResult( './scss-valid.scss' );
 	} );
 
 	it( 'did not error', () => {
@@ -46,10 +26,7 @@ describe( 'flags warnings with invalid scss', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: invalidScss,
-			config,
-		} );
+		result = getStylelintResult( './scss-invalid.scss' );
 	} );
 
 	it( 'did error', () => {

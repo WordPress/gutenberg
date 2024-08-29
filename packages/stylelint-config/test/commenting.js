@@ -1,34 +1,14 @@
 /**
- * @jest-environment node
- */
-/**
- * External dependencies
- */
-import fs from 'node:fs';
-import stylelint from 'stylelint';
-
-/**
  * Internal dependencies
  */
-import config from '../stylistic';
-
-const validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/commenting-valid.css',
-		'utf-8'
-	),
-	invalidCss = fs.readFileSync(
-		'./packages/stylelint-config/test/commenting-invalid.css',
-		'utf-8'
-	);
+const utils = require( './utils.cjs' );
+const getStylelintResult = utils.getStylelintResult;
 
 describe( 'flags no warnings with valid commenting css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validCss,
-			config,
-		} );
+		result = getStylelintResult( './commenting-valid.css' );
 	} );
 
 	it( 'did not error', () => {
@@ -46,10 +26,7 @@ describe( 'flags warnings with invalid commenting css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: invalidCss,
-			config,
-		} );
+		result = getStylelintResult( './commenting-invalid.css' );
 	} );
 
 	it( 'did error', () => {
