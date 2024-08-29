@@ -33,6 +33,10 @@ const modifyBlockCommentAttributes = ( settings, name ) => {
 					type: 'number',
 					default: 0,
 				},
+				showCommentBoard: {
+					type: 'boolean',
+					default: false,
+				},
 			};
 		}
 	}
