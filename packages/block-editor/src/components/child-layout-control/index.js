@@ -220,10 +220,10 @@ function GridControls( {
 	};
 
 	// Calculate max column span based on current position and grid width
-	const maxColumnSpan = columnCount - ( columnStart ?? 1 ) + 1;
+	const maxColumnSpan = ( columnCount ?? 3 ) - ( columnStart ?? 1 ) + 1;
 
 	// Calculate max row span based on current position and grid height
-	const maxRowSpan = rowCount - ( rowStart ?? 1 ) + 1;
+	const maxRowSpan = ( rowCount ?? 1 ) - ( rowStart ?? 1 ) + 1;
 
 	return (
 		<>
