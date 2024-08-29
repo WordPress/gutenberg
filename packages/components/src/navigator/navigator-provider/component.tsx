@@ -6,7 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import { useMemo, useReducer } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { useMemo, useReducer, useState, useRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import warning from '@wordpress/warning';
 
@@ -236,6 +237,10 @@ function UnconnectedNavigatorProvider(
 		} )
 	);
 
+	const wrapperRef = useRef< HTMLElement | null >( null );
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+	const [ wrapperHeight, setWrapperHeight ] = useState< number >();
+
 	// The methods are constant forever, create stable references to them.
 	const methods = useMemo(
 		() => ( {
@@ -268,6 +273,18 @@ function UnconnectedNavigatorProvider(
 			location: currentLocation,
 			params: matchedPath?.params ?? {},
 			match: matchedPath?.id,
+			setWrapperHeight: ( height: number | undefined ) => {
+				setWrapperHeight(
+					height === undefined
+						? // An undefined `height` is used to remove the inline style.
+						  undefined
+						: // Ensure the height is at least the outer height.
+						  Math.max(
+								height,
+								wrapperRef.current?.offsetHeight ?? 0
+						  )
+				);
+			},
 			...methods,
 		} ),
 		[ currentLocation, matchedPath, methods ]
@@ -280,7 +297,15 @@ function UnconnectedNavigatorProvider(
 	);
 
 	return (
-		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+		<View
+			ref={ mergedWrapperRef }
+			className={ classes }
+			style={ {
+				minHeight: wrapperHeight,
+				...otherProps.style,
+			} }
+			{ ...otherProps }
+		>
 			<NavigatorContext.Provider value={ navigatorContextValue }>
 				{ children }
 			</NavigatorContext.Provider>

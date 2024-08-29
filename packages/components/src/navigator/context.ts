@@ -15,6 +15,7 @@ const initialContextValue: NavigatorContextType = {
 	goToParent: () => {},
 	addScreen: () => {},
 	removeScreen: () => {},
+	setWrapperHeight: () => {},
 	params: {},
 };
 export const NavigatorContext = createContext( initialContextValue );
