@@ -419,6 +419,8 @@ function InstalledFonts() {
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								isDestructive
 								variant="tertiary"
 								onClick={ handleUninstallClick }
@@ -427,6 +429,8 @@ function InstalledFonts() {
 							</Button>
 						) }
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="primary"
 							onClick={ handleUpdate }
 							disabled={ ! fontFamiliesHasChanges }

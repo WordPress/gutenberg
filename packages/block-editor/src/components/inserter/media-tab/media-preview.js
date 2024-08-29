@@ -102,12 +102,22 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="tertiary"
+						onClick={ onClose }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button variant="primary" onClick={ onSubmit }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ onSubmit }
+					>
 						{ __( 'Insert' ) }
 					</Button>
 				</FlexItem>

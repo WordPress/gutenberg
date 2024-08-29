@@ -31,6 +31,7 @@ export type ComboboxControlProps = Pick<
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**

@@ -66,13 +66,13 @@ const toggleHomeIconVariants = {
 
 const siteIconVariants = {
 	edit: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 	hover: {
 		clipPath: 'inset( 22% round 2px )',
 	},
 	tap: {
-		clipPath: 'inset(0% round 0)',
+		clipPath: 'inset(0% round 0px)',
 	},
 };
 
@@ -258,6 +258,8 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										whileTap="tap"
 									>
 										<Button
+											// TODO: Switch to `true` (40px size) if possible
+											__next40pxDefaultSize={ false }
 											label={ __( 'Open Navigation' ) }
 											showTooltip
 											tooltipPosition="middle right"

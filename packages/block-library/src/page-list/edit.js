@@ -225,7 +225,11 @@ export default function PageListEdit( {
 						page.title?.rendered?.trim() !== ''
 							? page.title?.rendered
 							: __( '(no title)' ),
-					title: page.title?.rendered,
+					title:
+						// translators: displayed when a page has an empty title.
+						page.title?.rendered?.trim() !== ''
+							? page.title?.rendered
+							: __( '(no title)' ),
 					link: page.url,
 					hasChildren,
 				};
@@ -338,6 +342,8 @@ export default function PageListEdit( {
 					<PanelBody title={ __( 'Edit this menu' ) }>
 						<p>{ convertDescription }</p>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="primary"
 							accessibleWhenDisabled
 							disabled={ ! hasResolvedPages }
