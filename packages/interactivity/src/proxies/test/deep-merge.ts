@@ -88,7 +88,7 @@ describe( 'Interactivity API', () => {
 			expect( sourceExecuted ).toBe( false );
 		} );
 
-		https: it( 'should handle setters', () => {
+		it( 'should handle setters', () => {
 			let targetValue = 1;
 			const target = {
 				get a() {
