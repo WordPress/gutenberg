@@ -9,7 +9,8 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxifyState, deepMerge, hasPropSignal } from '../';
+import { proxifyState, peek, deepMerge, hasPropSignal } from '../';
+import { getProxyFromObject } from '../registry';
 
 describe( 'Interactivity API', () => {
 	describe( 'deepMerge', () => {
