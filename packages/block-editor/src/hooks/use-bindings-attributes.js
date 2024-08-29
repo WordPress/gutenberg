@@ -134,7 +134,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = sources[ sourceName ];
-				if ( ! canBindAttribute( name, attributeName ) ) {
+				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
 					continue;
 				}
 
