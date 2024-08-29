@@ -44,6 +44,7 @@
     -   `TimePicker` (on the inputs)
     -   `TreeSelect`
     -   `UnitControl`
+-   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
 
 ### Bug Fixes
 
