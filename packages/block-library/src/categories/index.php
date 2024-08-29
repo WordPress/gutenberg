@@ -9,12 +9,15 @@
  * Renders the `core/categories` block on server.
  *
  * @since 5.0.0
+ * @since 6.7.0 Enable client-side rendering if enhancedPagination context is true.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the categories list/dropdown markup.
  */
-function render_block_core_categories( $attributes ) {
+function render_block_core_categories( $attributes, $content, $block ) {
 	static $block_id = 0;
 	++$block_id;
 
@@ -55,11 +58,13 @@ function render_block_core_categories( $attributes ) {
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
 
-		$p = new WP_HTML_Tag_Processor( $items_markup );
-		while ( $p->next_tag( 'a' ) ) {
-			$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+		if ( ! empty ( $block->context['enhancedPagination'] ) ) {
+			$p = new WP_HTML_Tag_Processor( $items_markup );
+			while ( $p->next_tag( 'a' ) ) {
+				$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+			}
+			$items_markup = $p->get_updated_html();
 		}
-		$items_markup = $p->get_updated_html();
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "wp-block-categories-{$type}" ) );
