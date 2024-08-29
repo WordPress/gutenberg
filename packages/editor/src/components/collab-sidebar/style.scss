@@ -1,155 +1,174 @@
 .editor-collab-sidebar {
-	&__activities {
-		padding: 16px;
-		background-color: #f9f9f9;
-	}
+    &__activities {
+        padding: 16px;
+        background-color: #f9f9f9;
+    }
 
-	&__thread {
-		position: relative;
-		padding: 16px;
-		border-radius: 8px;
-		border: 1px solid $gray-300;
-		background-color: $gray-100;
-		margin-bottom: 16px;
+    &__thread {
+        position: relative;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid $gray-300;
+        background-color: $gray-100;
+        margin-bottom: 16px;
 
-		&__focus {
-			border: 1.5px solid #3858e9;
-			background-color: $white;
-		}
-	}
+        .components-base-control__field {
+            margin-bottom: 0
+        }
 
+        input[type=text] {
+            @include input-control;
+            border-radius: 6px; 
+            padding: 8px 15px;
+        }
+    }
 
-	&__editarea {
-		flex: 1;
-
-		.components-textarea-control__input {
-			border: 1px solid $gray-300;
-			border-radius: 8px;
-			padding: 10px 15px;
-			background-color: $gray-100;
-		}
-	}
-
-	&__commentbtn {
-		margin-bottom: 10px;
-	}
+    &__activethread {
+        border: 1.5px solid #3858E9;
+        background-color: $white;
+        box-shadow: 0px 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+    }
 
 
-	&__userName {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-		text-transform: capitalize;
-	}
+    &__editarea,
+    &__replyComment {
+        flex: 1;
 
-	&__usertime {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-	}
+        &__textarea{
+            width: 100%;
+        }
 
-	&__usercomment {
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 20px;
-		text-align: left;
-		color: $gray-900;
+        .components-textarea-control__input {
+            border: 1px solid $gray-300;
+            border-radius: 8px;
+            padding: 10px 15px;
+            background-color: $gray-100;
+        }
+    }
 
-		p {
-			margin-bottom: 0;
-		}
-	}
+    &__childThread {
+        margin-top: 15px;
+    }
 
-	&__userIcon {
-		border-radius: 50%;
-		flex-shrink: 0;
-	}
+    &__userName {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 16px;
+        text-align: left;
+        color: $gray-700;
+        text-transform: capitalize;
+    }
 
-	&__userstatus {
-		button {
-			font-size: 12px;
-			font-weight: 400;
-			line-height: 16px;
-			padding: 0;
-			height: auto;
-			box-shadow: none;
-			outline: none;
-		}
-	}
+    &__usertime {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 16px;
+        text-align: left;
+        color: $gray-700;
+    }
 
-	&__useroverlay {
-		background-color: rgba(0, 0, 0, 0.7);
-		width: 100%;
-		height: 100%;
-		text-align: center;
-		position: absolute;
-		top: 0;
-		left: 0;
-		z-index: 1;
-		padding: 15px;
-		border-radius: 8px;
-		color: $white;
+    &__usercomment {
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 20px;
+        text-align: left;
+        color: $gray-900;
 
-		p {
-			margin-bottom: 15px;
-		}
+        p {
+            margin-bottom: 0;
+        }
+    }
 
-		button {
-			height: 24px;
-			padding: 6px;
-			color: $white;
-		}
-	}
+    &__userIcon {
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
 
-	&__resolvedIcon {
-		fill: #008000;
-		border-radius: 50%;
-		width: 18px;
-		height: 18px;
-		border: 1px solid #008000;
-		margin-right: 2px;
-		margin-top: 5px;
-	}
+    &__userstatus {
+        button {
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+            padding: 0;
+            height: auto;
+            box-shadow: none;
+            outline: none;
+        }
+    }
 
-	&__commentUpdate {
-		margin-left: auto;
+    &__useroverlay {
+        background-color: rgba(0, 0, 0, 0.7);
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        padding: 15px;
+        border-radius: 8px;
+        color: $white;
 
-		.components-button {
-			&.is-compact {
-				&.has-icon:not(.has-text) {
-					min-width: 24px;
-					padding: 0;
-					width: 24px;
-					height: 24px;
-					flex-shrink: 0;
-				}
-			}
-		}
+        p {
+            margin-bottom: 15px;
+        }
 
-		.components-dropdown {
-			&.is-compact {
-				flex-shrink: 0;
+        button {
+            height: 24px;
+            padding: 6px;
+            color: $white;
+        }
+    }
 
-				.components-button {
-					min-width: 24px;
-					padding: 0;
-					width: 24px;
-					height: 24px;
-				}
-			}
-		}
-	}
+    &__resolvedIcon {
+        fill: #008000;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #008000;
+        margin-right: 2px;
+        margin-top: 5px;
+    }
 
-	&__resolvedText {
-		font-style: italic;
-		font-weight: 500 !important;
-		color: #808080 !important;
-		margin-top: 5px !important;
-	}
+    &__commentUpdate {
+        margin-left: auto;
+
+        .components-button {
+            &.is-compact {
+                &.has-icon:not(.has-text) {
+                    min-width: 24px;
+                    padding: 0;
+                    width: 24px;
+                    height: 24px;
+                    flex-shrink: 0;
+                }
+            }
+        }
+
+        .components-dropdown {
+            &.is-compact {
+                flex-shrink: 0;
+
+                .components-button {
+                    min-width: 24px;
+                    padding: 0;
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+        }
+    }
+
+    &__resolvedText {
+        font-style: italic;
+        font-weight: 500 !important;
+        color: #808080 !important;
+        margin-top: 5px !important;
+    }
+}
+
+.is-collab-block-selected {
+    background-color: color-mix( in srgb, currentColor 5%, #182F97 20% );
 }
 
 .block-editor-format-toolbar__comment-board {
