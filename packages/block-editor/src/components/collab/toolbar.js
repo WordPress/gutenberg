@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
+const openCollabBoard = () => {};
 
 export default function BlockCommentToolbar( {} ) {
 	return (
@@ -11,6 +12,7 @@ export default function BlockCommentToolbar( {} ) {
 			<ToolbarGroup className="block-editor-block-comment-toolbar">
 				<ToolbarButton
 					accessibleWhenDisabled
+					onClick={ openCollabBoard }
 					icon={ collabComment }
 					label={ __( 'Comment' ) }
 				/>
