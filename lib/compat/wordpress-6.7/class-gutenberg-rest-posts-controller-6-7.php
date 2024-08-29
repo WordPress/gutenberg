@@ -149,7 +149,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 
 		$args = $this->prepare_tax_query( $args, $request );
 
-		if ( isset( $request['format'] ) && ! empty( $request['format'] ) ) {
+		if ( ! empty( $request['format'] ) ) {
 			// If format is not an array, convert it to an array so that the
 			// required prefix can be added to all items.
 			$formats = is_array( $request['format'] ) ? $request['format'] : array( $request['format'] );
