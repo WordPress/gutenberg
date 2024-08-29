@@ -1,0 +1,1 @@
+export { registry } from './registry';

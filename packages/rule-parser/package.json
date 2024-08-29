@@ -16,7 +16,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"sideEffects": false,
+	"sideEffects": "src/evaluators/registry.ts",
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
