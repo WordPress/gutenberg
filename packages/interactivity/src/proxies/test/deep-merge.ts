@@ -326,7 +326,7 @@ describe( 'Interactivity API', () => {
 
 		it( 'should update signals when they exist', () => {
 			const target = { a: 1, b: { x: 10 } };
-			const source = { a: 2, b: { x: 20 }, c: 3 };
+			const source = { a: 2, b: { x: 20, y: 30 }, c: 3 };
 			const result = proxifyState< any >( 'test', {} );
 
 			const spyA = jest.fn( () => result.a );
@@ -345,6 +345,14 @@ describe( 'Interactivity API', () => {
 
 			expect( spyA ).toHaveBeenCalledTimes( 3 );
 			expect( spyBx ).toHaveBeenCalledTimes( 2 );
+
+			expect( hasPropSignal( result, 'a' ) ).toBe( true );
+			expect( hasPropSignal( result, 'b' ) ).toBe( true );
+			expect( hasPropSignal( result, 'c' ) ).toBe( false );
+
+			const proxyB = getProxyFromObject( peek( result, 'b' ) )!;
+			expect( hasPropSignal( proxyB, 'x' ) ).toBe( true );
+			expect( hasPropSignal( proxyB, 'y' ) ).toBe( false );
 		} );
 
 		it( 'should batch all signal updates together', () => {
