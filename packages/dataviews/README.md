@@ -167,7 +167,7 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `fields`: the `id` of the fields that are visible in the UI.
+-   `fields`: the `id` of the fields that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
     -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item. This field is not hiddable.
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
@@ -288,7 +288,7 @@ For example, this is how you'd enable only the table view type:
 const defaultLayouts = {
 	table: {
 		layout: {
-			primaryKey: 'my-key',
+			primaryField: 'my-key',
 		},
 	},
 };
