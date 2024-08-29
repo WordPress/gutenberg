@@ -15,14 +15,20 @@ import {
 } from '@wordpress/components';
 import { dateI18n, format } from '@wordpress/date';
 import {
- 	Icon
+	Icon,
+	edit as editIcon,
+	trash as deleteIcon,
+	commentAuthorAvatar as userIcon,
 } from '@wordpress/icons';
 
 /**
  * Renders the new comment form.
+ *
+ * @param {Object}   root0                   The component props.
+ * @param {Object}   root0.threads           Comments.
+ * @param {Function} root0.setReloadComments Function to reload comments.
  */
-export function AddComment({ threads, setReloadComments }) {
-	 
+export function AddComment( { threads, setReloadComments } ) {
 	const generateNewComment = () => ( {
 		commentId: Date.now(),
 		createdBy: currentUser,
@@ -35,24 +41,26 @@ export function AddComment({ threads, setReloadComments }) {
 
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
-	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
+	const [ showConfirmation, setShowConfirmation ] = useState( false );
+
 	const curruntUserData = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( 'core' ).getCurrentUser();
 	}, [] );
 
-	let userAvatar = 'https://secure.gravatar.com/avatar/92929292929292929292929292929292?s=48&d=mm&r=g';
-	if( curruntUserData?.avatar_urls ) {
+	let userAvatar =
+		'https://secure.gravatar.com/avatar/92929292929292929292929292929292?s=48&d=mm&r=g';
+	if ( curruntUserData?.avatar_urls ) {
 		userAvatar = curruntUserData?.avatar_urls[ 48 ];
 	}
-	
+
 	//const userAvatar = curruntUserData?.avatar_urls[ 48 ] ? curruntUserData?.avatar_urls[ 48 ] : null;
-	
+
 	const currentUser = curruntUserData?.name || null;
 
 	const allThreads = [];
-	const threadId = 0;
+	let threadId = 0;
 	const currentThread = allThreads[ threadId ] ?? {};
 	const isCurrentThreadResolved = currentThread.threadIsResolved || false;
 	const commentsCount = isCurrentThreadResolved
@@ -64,16 +72,18 @@ export function AddComment({ threads, setReloadComments }) {
 		return select( 'core/editor' ).getCurrentPostId();
 	}, [] );
 
-	const clientId = useSelect((select) => {
+	const clientId = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-        const { getSelectedBlockClientId } = select('core/block-editor');
-        return getSelectedBlockClientId();
-    }, []);
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		return getSelectedBlockClientId();
+	}, [] );
 
-	const blockClassName = useSelect((select) => {
+	const blockClassName = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( select('core/block-editor').getSelectedBlockClientId() )?.attributes?.className;
-	}, []);
+		return select( 'core/block-editor' ).getBlock(
+			select( 'core/block-editor' ).getSelectedBlockClientId()
+		)?.attributes?.className;
+	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
@@ -86,27 +96,10 @@ export function AddComment({ threads, setReloadComments }) {
 		} );
 	};
 
-	// Helper function to get updated comments structure
-	const getUpdatedComments = ( newComment, threadKey ) => ( {
-		...threads,
-		[ threadKey ]: {
-			isResolved: false,
-			createdAt:
-				threads?.threadKey?.createdAt || new Date().toISOString(),
-			createdBy: currentUser,
-			comments: {
-				0: newComment,
-			},
-		},
-	} );
-
-
 	// Function to save the comment.
 	const saveComment = () => {
-				
 		const newComment = generateNewComment();
-		const threadId = newComment?.commentId;
-		// const updatedComments = getUpdatedComments( newComment, threadId );
+		threadId = newComment?.commentId;
 
 		apiFetch( {
 			path: '/wp/v2/comments',
@@ -119,13 +112,12 @@ export function AddComment({ threads, setReloadComments }) {
 				comment_author: currentUser,
 				comment_approved: 0,
 			},
-		} ).then( (response) => {
-			const threadId = response?.id;
-			setAttributes( clientId, threadId );
-			setInputComment('');
+		} ).then( ( response ) => {
+			setAttributes( clientId, response?.id );
+			setInputComment( '' );
 			setReloadComments( true );
+			//onClose();
 		} );
-	
 	};
 
 	// Function to edit the comment.
@@ -148,7 +140,7 @@ export function AddComment({ threads, setReloadComments }) {
 		setInputComment( '' );
 		setIsEditing( null );
 	};
- 
+
 	// Function to delete a comment.
 	const deleteComment = ( commentId ) => {
 		// Filter out the comment to be deleted.
@@ -175,256 +167,253 @@ export function AddComment({ threads, setReloadComments }) {
 	// Function to hide the confirmation overlay.
 	const hideConfirmationOverlay = () => setShowConfirmation( false );
 
-
 	// On cancel, remove the border if no comments are present.
 	const handleCancel = () => {
 		//onClose();
 	};
-	
 
 	return (
 		<>
-            { null !== clientId && undefined === blockClassName && (
-                <VStack spacing="3">
-                    { 0 < commentsCount && ! isCurrentThreadResolved && (
-                        <>
-                            { currentThread.comments.map(
-                                (
-                                    {
-                                        createdBy,
-                                        comment,
-                                        timestamp,
-                                        commentId,
-                                    },
-                                    index
-                                ) => (
-                                    <>
-                                        { isEditing === commentId && (
-                                            <VStack 
-                                                spacing="3"
-                                                className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
-                                            >
-                                                <HStack
-                                                    alignment="left"
-                                                    spacing="4"
-                                                >
-                                                    <Icon
-                                                    icon={ userIcon }
-                                                    className="editor-collab-sidebar__userIcon"
-                                                        size={ 32 }
-                                                        width={32}
-                                                        height={32}
-                                                    />
-                                                    <span className="editor-collab-sidebar__userName">
-                                                        { currentUser }
-                                                    </span>
-                                                </HStack>
-                                                <TextControl
-                                                    value={ inputComment }
-                                                    onChange={ ( val ) =>
-                                                        setInputComment( val )
-                                                    }
-                                                    placeholder={ __(
-                                                        'Add comment'
-                                                    ) }
-                                                    className="block-editor-format-toolbar__comment-input"
-                                                />
-                                                <HStack
-                                                    alignment="right"
-                                                    spacing="2"
-                                                >
-                                                    <Button
-                                                        className="block-editor-format-toolbar__cancel-button is-compact"
-                                                        variant="secondary"
-                                                        text={ __( 'Cancel' ) }
-                                                        onClick={ () => {
-                                                            setIsEditing(
-                                                                false
-                                                            );
-                                                            setInputComment(
-                                                                ''
-                                                            );
-                                                        } }
-                                                    />
-                                                    <Button
-                                                        className="block-editor-format-toolbar__comment-button is-compact"
-                                                        variant="primary"
-                                                        text={
-                                                            0 === commentsCount
-                                                                ? __(
-                                                                        'Comment'
-                                                                )
-                                                                : __( 'Reply' )
-                                                        }
-                                                        disabled={
-                                                            0 ===
-                                                            inputComment.length
-                                                        }
-                                                        __experimentalIsFocusable
-                                                        onClick={ () =>
-                                                            editComment(
-                                                                commentId
-                                                            )
-                                                        }
-                                                    />
-                                                </HStack>
-                                            </VStack>
-                                        ) }
-                                        { isEditing !== commentId && (
-                                            <VStack
-                                                spacing="3"
-                                                key={ timestamp }
-                                                className="editor-collab-sidebar__thread"
-                                            >
-                                                <HStack
-                                                    alignment="top"
-                                                    spacing="2"
-                                                    justify="space-between"
-                                                >
-                                                    <HStack
-                                                        alignment="left"
-                                                        spacing="3"
-                                                        justify="start"
-                                                    >
-                                                        <Icon
-                                                            icon={ userIcon }
-                                                            className="editor-collab-sidebar__userIcon"
-                                                            size={ 32 }
-                                                            width={32}
-                                                            height={32}
-                                                        />
-                                                        <VStack spacing="1">
-                                                            <span className="editor-collab-sidebar__userName">
-                                                                { createdBy }
-                                                            </span>
-                                                            <time
-                                                                className="comment-board__dateTime"
-                                                                dateTime={ format(
-                                                                    'c',
-                                                                    timestamp
-                                                                ) }
-                                                            >
-                                                                { dateI18n(
-                                                                    dateTimeFormat,
-                                                                    timestamp
-                                                                ) }
-                                                            </time>
-                                                        </VStack>
-                                                    </HStack>
-                                                    <HStack
-                                                        alignment="right"
-                                                        spacing="1"
-                                                        justify="end"
-                                                        className="comment-board__actions"
-                                                    >
-                                                        { index === 0 && (
-                                                            <div
-                                                                className="block-editor-format-toolbar__comment-board__resolved"
-                                                                title={ __(
-                                                                    'Mark as resolved'
-                                                                ) }
-                                                            >
-                                                                <CheckboxControl
-                                                                    checked={
-                                                                        isResolved
-                                                                    }
-                                                                    onChange={ () =>
-                                                                        showConfirmationOverlay()
-                                                                    }
-                                                                    label={ __(
-                                                                        'Resolve'
-                                                                    ) }
-                                                                />
-                                                            </div>
-                                                        ) }
-                                                        <Button
-                                                            icon={ editIcon }
-                                                            className="block-editor-format-toolbar__comment-board__edit"
-                                                            label={ __(
-                                                                'Edit comment'
-                                                            ) }
-                                                            onClick={ () => {
-                                                                setIsEditing(
-                                                                    commentId
-                                                                );
-                                                                setInputComment(
-                                                                    comment
-                                                                );
-                                                            } }
-                                                        />
-                                                        <Button
-                                                            icon={ deleteIcon }
-                                                            label={ __(
-                                                                'Delete comment'
-                                                            ) }
-                                                            onClick={ () =>
-                                                                deleteComment(
-                                                                    commentId
-                                                                )
-                                                            }
-                                                        />
-                                                    </HStack>
-                                                </HStack>
-                                                <p className="comment-board__commentText">
-                                                    { comment }
-                                                </p>
-                                            </VStack>
-                                        ) }
-                                    </>
-                                )
-                            ) }
-                        </>
-                    ) }
-                    { ! isEditing && (
-                        <VStack 
-                            spacing="3"
-                            className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
-                        >
-                            { 0 === commentsCount && (
-                                <HStack alignment="left" spacing="3">
-                                    <img
-                                        src={ userAvatar }
-                                        alt={ __( 'User Icon' ) }
-                                        className="editor-collab-sidebar__userIcon"
-                                        width={32}
-                                        height={32}
-                                    />
-                                    <span className="editor-collab-sidebar__userName">
-                                        { currentUser }
-                                    </span>
-                                </HStack>
-                            ) }
-                            <TextControl
-                                value={ inputComment }
-                                onChange={ ( val ) => setInputComment( val ) }
-                                placeholder={ __( 'Add comment' ) }
-                                className="block-editor-format-toolbar__comment-input"
-                            />
-                            <HStack alignment="right" spacing="3">
-                                <Button
-                                    className="block-editor-format-toolbar__cancel-button is-compact"
-                                    variant="tertiary"
-                                    text={ __( 'Cancel' ) }
-                                    onClick={ () => handleCancel() }
-                                />
-                                <Button
-                                    className="block-editor-format-toolbar__comment-button is-compact"
-                                    variant="primary"
-                                    text={
-                                        0 === commentsCount
-                                            ? __( 'Comment' )
-                                            : __( 'Reply' )
-                                    }
-                                    disabled={ 0 === inputComment.length }
-                                    __experimentalIsFocusable
-                                    onClick={ () => saveComment() }
-                                />
-                            </HStack>
-                        </VStack>
-                    ) }
-                </VStack>
-                )
-            }
-        </>
+			{ null !== clientId && undefined === blockClassName && (
+				<VStack spacing="3">
+					{ 0 < commentsCount && ! isCurrentThreadResolved && (
+						<>
+							{ currentThread.comments.map(
+								(
+									{
+										createdBy,
+										comment,
+										timestamp,
+										commentId,
+									},
+									index
+								) => (
+									<>
+										{ isEditing === commentId && (
+											<VStack
+												spacing="3"
+												className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
+											>
+												<HStack
+													alignment="left"
+													spacing="4"
+												>
+													<Icon
+														icon={ userIcon }
+														className="editor-collab-sidebar__userIcon"
+														size={ 32 }
+														width={ 32 }
+														height={ 32 }
+													/>
+													<span className="editor-collab-sidebar__userName">
+														{ currentUser }
+													</span>
+												</HStack>
+												<TextControl
+													value={ inputComment }
+													onChange={ ( val ) =>
+														setInputComment( val )
+													}
+													placeholder={ __(
+														'Add comment'
+													) }
+													className="block-editor-format-toolbar__comment-input"
+												/>
+												<HStack
+													alignment="right"
+													spacing="2"
+												>
+													<Button
+														className="block-editor-format-toolbar__cancel-button is-compact"
+														variant="secondary"
+														text={ __( 'Cancel' ) }
+														onClick={ () => {
+															setIsEditing(
+																false
+															);
+															setInputComment(
+																''
+															);
+														} }
+													/>
+													<Button
+														className="block-editor-format-toolbar__comment-button is-compact"
+														variant="primary"
+														text={
+															0 === commentsCount
+																? __(
+																		'Comment'
+																  )
+																: __( 'Reply' )
+														}
+														disabled={
+															0 ===
+															inputComment.length
+														}
+														__experimentalIsFocusable
+														onClick={ () =>
+															editComment(
+																commentId
+															)
+														}
+													/>
+												</HStack>
+											</VStack>
+										) }
+										{ isEditing !== commentId && (
+											<VStack
+												spacing="3"
+												key={ timestamp }
+												className="editor-collab-sidebar__thread"
+											>
+												<HStack
+													alignment="top"
+													spacing="2"
+													justify="space-between"
+												>
+													<HStack
+														alignment="left"
+														spacing="3"
+														justify="start"
+													>
+														<Icon
+															icon={ userIcon }
+															className="editor-collab-sidebar__userIcon"
+															size={ 32 }
+															width={ 32 }
+															height={ 32 }
+														/>
+														<VStack spacing="1">
+															<span className="editor-collab-sidebar__userName">
+																{ createdBy }
+															</span>
+															<time
+																className="comment-board__dateTime"
+																dateTime={ format(
+																	'c',
+																	timestamp
+																) }
+															>
+																{ dateI18n(
+																	dateTimeFormat,
+																	timestamp
+																) }
+															</time>
+														</VStack>
+													</HStack>
+													<HStack
+														alignment="right"
+														spacing="1"
+														justify="end"
+														className="comment-board__actions"
+													>
+														{ index === 0 && (
+															<div
+																className="block-editor-format-toolbar__comment-board__resolved"
+																title={ __(
+																	'Mark as resolved'
+																) }
+															>
+																<CheckboxControl
+																	checked={
+																		isResolved
+																	}
+																	onChange={ () =>
+																		showConfirmationOverlay()
+																	}
+																	label={ __(
+																		'Resolve'
+																	) }
+																/>
+															</div>
+														) }
+														<Button
+															icon={ editIcon }
+															className="block-editor-format-toolbar__comment-board__edit"
+															label={ __(
+																'Edit comment'
+															) }
+															onClick={ () => {
+																setIsEditing(
+																	commentId
+																);
+																setInputComment(
+																	comment
+																);
+															} }
+														/>
+														<Button
+															icon={ deleteIcon }
+															label={ __(
+																'Delete comment'
+															) }
+															onClick={ () =>
+																deleteComment(
+																	commentId
+																)
+															}
+														/>
+													</HStack>
+												</HStack>
+												<p className="comment-board__commentText">
+													{ comment }
+												</p>
+											</VStack>
+										) }
+									</>
+								)
+							) }
+						</>
+					) }
+					{ ! isEditing && (
+						<VStack
+							spacing="3"
+							className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
+						>
+							{ 0 === commentsCount && (
+								<HStack alignment="left" spacing="3">
+									<img
+										src={ userAvatar }
+										alt={ __( 'User Icon' ) }
+										className="editor-collab-sidebar__userIcon"
+										width={ 32 }
+										height={ 32 }
+									/>
+									<span className="editor-collab-sidebar__userName">
+										{ currentUser }
+									</span>
+								</HStack>
+							) }
+							<TextControl
+								value={ inputComment }
+								onChange={ ( val ) => setInputComment( val ) }
+								placeholder={ __( 'Add comment' ) }
+								className="block-editor-format-toolbar__comment-input"
+							/>
+							<HStack alignment="right" spacing="3">
+								<Button
+									className="block-editor-format-toolbar__cancel-button is-compact"
+									variant="tertiary"
+									text={ __( 'Cancel' ) }
+									onClick={ () => handleCancel() }
+								/>
+								<Button
+									className="block-editor-format-toolbar__comment-button is-compact"
+									variant="primary"
+									text={
+										0 === commentsCount
+											? __( 'Comment' )
+											: __( 'Reply' )
+									}
+									disabled={ 0 === inputComment.length }
+									__experimentalIsFocusable
+									onClick={ () => saveComment() }
+								/>
+							</HStack>
+						</VStack>
+					) }
+				</VStack>
+			) }
+		</>
 	);
 }

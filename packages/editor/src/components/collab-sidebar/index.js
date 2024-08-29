@@ -5,10 +5,8 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useState, useEffect, RawHTML } from '@wordpress/element';
-import {
-	comment as commentIcon,
-} from '@wordpress/icons';
+import { useState, useEffect } from '@wordpress/element';
+import { comment as commentIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +29,7 @@ export default function CollabSidebar() {
 	}, [] );
 
 	const [ threads, setThreads ] = useState( [] );
-    const [ reloadComments, setReloadComments ] = useState( false );
+	const [ reloadComments, setReloadComments ] = useState( false );
 
 	useEffect( () => {
 		if ( postId ) {
@@ -42,14 +40,35 @@ export default function CollabSidebar() {
 					'&type=block_comment' +
 					'&status=any&per_page=100',
 				method: 'GET',
-			} ).then( ( response ) => {
-				const filteredComments = response.filter(
+			} ).then( ( data ) => {
+				// Create a compare to store the references to all objects by id
+				const compare = {};
+				const result = [];
+
+				// Initialize each object with an empty `reply` array
+				data.forEach( ( item ) => {
+					compare[ item.id ] = { ...item, reply: [] };
+				} );
+
+				// Iterate over the data to build the tree structure
+				data.forEach( ( item ) => {
+					if ( item.parent === 0 ) {
+						// If parent is 0, it's a root item, push it to the result array
+						result.push( compare[ item.id ] );
+					} else if (
+						compare[ item.parent ] &&
+						'trash' !== item.status
+					) {
+						// Otherwise, find its parent and push it to the parent's `reply` array
+						compare[ item.parent ].reply.push( compare[ item.id ] );
+					}
+				} );
+				const filteredComments = result.filter(
 					( comment ) => comment.status !== 'trash'
 				);
 				setThreads(
 					Array.isArray( filteredComments ) ? filteredComments : []
 				);
-                setReloadComments( false );
 			} );
 		}
 	}, [ postId, reloadComments ] );
@@ -74,8 +93,11 @@ export default function CollabSidebar() {
 			icon={ commentIcon }
 		>
 			<div className="editor-collab-sidebar__activities">
-                <AddComment threads={ resultThreads } setReloadComments={ setReloadComments } />
-				<Comments threads={ resultThreads }  />
+				<AddComment
+					threads={ resultThreads }
+					setReloadComments={ setReloadComments }
+				/>
+				<Comments threads={ resultThreads } />
 			</div>
 		</PluginSidebar>
 	);

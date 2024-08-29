@@ -290,12 +290,12 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 								{ isBlockCommentExperimentEnabled &&
-								! blockClassName && (
-									<BlockCommentMenuItem
-										clientId={ clientIds }
-										onClose={ onClose }
-									/>
-								) }
+									! blockClassName && (
+										<BlockCommentMenuItem
+											clientId={ clientIds }
+											onClose={ onClose }
+										/>
+									) }
 							</MenuGroup>
 							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>
