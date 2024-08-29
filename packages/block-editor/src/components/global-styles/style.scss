@@ -152,9 +152,7 @@
 }
 
 .block-editor-global-styles-background-panel__color-tools-panel-item {
-
-	button.components-button {
-
+	button {
 		padding: 0;
 	}
 }
@@ -170,7 +168,6 @@
 	cursor: pointer;
 	background: transparent;
 	border: none;
-
 
 	&.is-open {
 		background-color: $gray-100;
