@@ -6,7 +6,6 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Flex,
@@ -220,9 +219,15 @@ function GridControls( {
 		} );
 	};
 
+	// Calculate max column span based on current position and grid width
+	const maxColumnSpan = columnCount - ( columnStart ?? 1 ) + 1;
+
+	// Calculate max row span based on current position and grid height
+	const maxRowSpan = rowCount - ( rowStart ?? 1 ) + 1;
+
 	return (
 		<>
-			<HStack
+			<Flex
 				as={ ToolsPanelItem }
 				hasValue={ hasSpanValue }
 				label={ __( 'Grid span' ) }
@@ -230,43 +235,59 @@ function GridControls( {
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
 			>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Column span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newColumnSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							rowSpan,
-							columnSpan: newColumnSpan,
-						} );
-					} }
-					value={ columnSpan ?? 1 }
-					min={ 1 }
-				/>
-				<InputControl
-					size="__unstable-large"
-					label={ __( 'Row span' ) }
-					type="number"
-					onChange={ ( value ) => {
-						// Don't allow unsetting.
-						const newRowSpan =
-							value === '' ? 1 : parseInt( value, 10 );
-						onChange( {
-							columnStart,
-							rowStart,
-							columnSpan,
-							rowSpan: newRowSpan,
-						} );
-					} }
-					value={ rowSpan ?? 1 }
-					min={ 1 }
-				/>
-			</HStack>
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Column span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							// Don't allow unsetting.
+							const newColumnSpan =
+								value === ''
+									? 1
+									: Math.min(
+											parseInt( value, 10 ),
+											maxColumnSpan
+									  );
+							onChange( {
+								columnStart,
+								rowStart,
+								rowSpan,
+								columnSpan: newColumnSpan,
+							} );
+						} }
+						value={ columnSpan ?? 1 }
+						min={ 1 }
+						max={ maxColumnSpan }
+					/>
+				</FlexItem>
+				<FlexItem style={ { width: '50%' } }>
+					<InputControl
+						size="__unstable-large"
+						label={ __( 'Row span' ) }
+						type="number"
+						onChange={ ( value ) => {
+							// Don't allow unsetting.
+							const newRowSpan =
+								value === ''
+									? 1
+									: Math.min(
+											parseInt( value, 10 ),
+											maxRowSpan
+									  );
+							onChange( {
+								columnStart,
+								rowStart,
+								columnSpan,
+								rowSpan: newRowSpan,
+							} );
+						} }
+						value={ rowSpan ?? 1 }
+						min={ 1 }
+						max={ maxRowSpan }
+					/>
+				</FlexItem>
+			</Flex>
 			{ window.__experimentalEnableGridInteractivity && columnCount && (
 				// Use Flex with an explicit width on the FlexItem instead of HStack to
 				// work around an issue in webkit where inputs with a max attribute are
