@@ -49,7 +49,7 @@ For example:
 
 ### Height and animations
 
-Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is given enough height to match the tallest `NavigatorScreen`. Not doing so could result in glitchy animations, especially when transitioning from a taller to a shorter `NavigatorScreen`.
+Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
 
 ## Props
 
