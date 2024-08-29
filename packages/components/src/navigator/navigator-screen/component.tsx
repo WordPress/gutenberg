@@ -48,10 +48,13 @@ function UnconnectedNavigatorScreen(
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	// Read props and components context.
-	const { children, className, path, ...otherProps } = useContextSystem(
-		props,
-		'NavigatorScreen'
-	);
+	const {
+		children,
+		className,
+		path,
+		onAnimationEnd: onAnimationEndProp,
+		...otherProps
+	} = useContextSystem( props, 'NavigatorScreen' );
 
 	// Read navigator context, destructure location props.
 	const { location, match, addScreen, removeScreen } =
@@ -73,10 +76,11 @@ function UnconnectedNavigatorScreen(
 	}, [ screenId, path, addScreen, removeScreen ] );
 
 	// Animation.
-	const { animationStyles, onScreenAnimationEnd, shouldRenderScreen } =
+	const { animationStyles, shouldRenderScreen, onAnimationEnd } =
 		useScreenAnimatePresence( {
 			isMatch,
 			isBack,
+			onAnimationEnd: onAnimationEndProp,
 			skipAnimation: skipAnimationAndFocusRestoration,
 		} );
 
@@ -147,7 +151,7 @@ function UnconnectedNavigatorScreen(
 		<View
 			ref={ mergedWrapperRef }
 			className={ classes }
-			onAnimationEnd={ onScreenAnimationEnd }
+			onAnimationEnd={ onAnimationEnd }
 			{ ...otherProps }
 		>
 			{ children }

@@ -17,17 +17,19 @@ import { isRTL as isRTLFn } from '@wordpress/i18n';
  */
 import * as styles from '../styles';
 
-const isExitAnimation = ( e: AnimationEvent ) =>
-	e.animationName === styles.slideToLeft.name || styles.slideToRight.name;
+const isExitAnimation = ( animationName: string ) =>
+	animationName === styles.slideToLeft.name || styles.slideToRight.name;
 
 export function useScreenAnimatePresence( {
 	isMatch,
 	skipAnimation,
 	isBack,
+	onAnimationEnd,
 }: {
 	isMatch: boolean;
 	skipAnimation: boolean;
 	isBack?: boolean;
+	onAnimationEnd?: React.AnimationEventHandler< Element >;
 } ) {
 	// Possible values:
 	// - idle: first value assigned to the screen when added to the React tree
@@ -77,14 +79,16 @@ export function useScreenAnimatePresence( {
 	}, [ exitAnimationStatus ] );
 
 	const onScreenAnimationEnd = useCallback(
-		( e: AnimationEvent ) => {
-			if ( ! isMatch && isExitAnimation( e ) ) {
+		( e: React.AnimationEvent< HTMLElement > ) => {
+			onAnimationEnd?.( e );
+
+			if ( ! isMatch && isExitAnimation( e.animationName ) ) {
 				// When the exit animation ends on an unselected screen, set the
 				// status to 'animated' to remove the screen contents from the DOM.
 				setExitAnimationStatus( 'animated' );
 			}
 		},
-		[ isMatch ]
+		[ onAnimationEnd, isMatch ]
 	);
 
 	// Styles
@@ -113,6 +117,6 @@ export function useScreenAnimatePresence( {
 			isMatch ||
 			exitAnimationStatus === 'armed' ||
 			exitAnimationStatus === 'animating',
-		onScreenAnimationEnd,
+		onAnimationEnd: onScreenAnimationEnd,
 	} as const;
 }
