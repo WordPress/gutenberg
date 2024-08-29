@@ -85,11 +85,22 @@ type ConvertPromisesToGenerators< T > = {
 		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
 		: T[ K ];
 };
+
+/**
+ * Creates a generator that yields a promise and returns its resolved value.
+ *
+ * This utility function is used to convert promises into generators, which
+ * can be useful when working with asynchronous actions.
+ *
+ * @param promise The promise to be converted into a generator.
+ *
+ * @return A generator that yields the promise and returns its resolved value.
+ */
 export function typed< T >(
-	cb: Promise< T >
+	promise: Promise< T >
 ): Generator< Promise< T >, T, T > {
 	return ( function* () {
-		return yield cb;
+		return yield promise;
 	} )();
 }
 
