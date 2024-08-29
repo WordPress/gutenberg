@@ -173,7 +173,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			if ( ! empty( $formats ) ) {
 				// Add the post-format- prefix.
 				$terms = array_map(
-					function ( $format ) {
+					static function ( $format ) {
 						return 'post-format-' . $format;
 					},
 					$formats
