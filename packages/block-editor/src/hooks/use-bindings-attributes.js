@@ -134,10 +134,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = sources[ sourceName ];
-				if (
-					! source?.getValues ||
-					! canBindAttribute( name, attributeName )
-				) {
+				if ( ! canBindAttribute( name, attributeName ) ) {
 					continue;
 				}
 
@@ -161,12 +158,20 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					// Get values in batch if the source supports it.
-					const values = source.getValues( {
-						registry,
-						context,
-						clientId,
-						bindings,
-					} );
+					let values = {};
+					if ( ! source.getValues ) {
+						// Set `undefined` if `getValues` doesn't exist.
+						Object.keys( bindings ).forEach( ( attr ) => {
+							values[ attr ] = undefined;
+						} );
+					} else {
+						values = source.getValues( {
+							registry,
+							context,
+							clientId,
+							bindings,
+						} );
+					}
 					for ( const [ attributeName, value ] of Object.entries(
 						values
 					) ) {
@@ -175,14 +180,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							if ( attributeName === 'url' ) {
 								attributes[ attributeName ] = null;
 							} else {
+								// Use the key of the source as a placeholder for the attribute.
+								// If it doesn't have a key, use the source label.
 								attributes[ attributeName ] =
-									source.getPlaceholder?.( {
-										registry,
-										context,
-										clientId,
-										attributeName,
-										args: bindings[ attributeName ].args,
-									} );
+									bindings[ attributeName ].args?.key ||
+									source.label;
 							}
 						} else {
 							attributes[ attributeName ] = value;

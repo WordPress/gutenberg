@@ -10,9 +10,6 @@ import { store as editorStore } from '../store';
 
 export default {
 	name: 'core/post-meta',
-	getPlaceholder( { args } ) {
-		return args.key;
-	},
 	getValues( { registry, context, bindings } ) {
 		const meta = registry
 			.select( coreDataStore )
