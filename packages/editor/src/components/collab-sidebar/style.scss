@@ -12,15 +12,31 @@
 		background-color: $gray-100;
 		margin-bottom: 16px;
 
-		&__focus {
-			border: 1.5px solid #3858e9;
-			background-color: $white;
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
+
+		input[type="text"] {
+			@include input-control;
+			border-radius: 6px;
+			padding: 8px 15px;
 		}
 	}
 
+	&__activethread {
+		border: 1.5px solid #3858e9;
+		background-color: $white;
+		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+	}
 
-	&__editarea {
+
+	&__editarea,
+	&__replyComment {
 		flex: 1;
+
+		&__textarea {
+			width: 100%;
+		}
 
 		.components-textarea-control__input {
 			border: 1px solid $gray-300;
@@ -30,10 +46,9 @@
 		}
 	}
 
-	&__commentbtn {
-		margin-bottom: 10px;
+	&__childThread {
+		margin-top: 15px;
 	}
-
 
 	&__userName {
 		font-size: 12px;
@@ -150,6 +165,10 @@
 		color: #808080 !important;
 		margin-top: 5px !important;
 	}
+}
+
+.is-collab-block-selected {
+	background-color: color-mix(in srgb, currentColor 5%, #182f97 20%);
 }
 
 .block-editor-format-toolbar__comment-board {

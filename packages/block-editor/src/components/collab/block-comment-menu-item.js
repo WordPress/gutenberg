@@ -7,13 +7,12 @@ import { collabComment } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 
 export default function BlockCommentMenuItem( { clientId, onClose } ) {
-
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	const openCollabBoard = () => {
 		onClose();
-		openGeneralSidebar("edit-post/collab-sidebar");
-	}
+		openGeneralSidebar( 'edit-post/collab-sidebar' );
+	};
 
 	return (
 		<MenuItem
@@ -22,6 +21,6 @@ export default function BlockCommentMenuItem( { clientId, onClose } ) {
 			aria-haspopup="dialog"
 		>
 			{ __( 'Add Comment' ) }
-		</MenuItem>	 
+		</MenuItem>
 	);
 }
