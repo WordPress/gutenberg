@@ -286,6 +286,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### receiveUserPermissions
+
+Undocumented declaration.
+
 ### redo
 
 Action triggered to redo the last undoed edit to an entity record, if any.

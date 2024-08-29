@@ -888,6 +888,13 @@ export function receiveUserPermission( key, isAllowed ) {
 	};
 }
 
+export function receiveUserPermissions( permissions ) {
+	return {
+		type: 'RECEIVE_USER_PERMISSIONS',
+		permissions,
+	};
+}
+
 /**
  * Returns an action object used in signalling that the autosaves for a
  * post have been received.
