@@ -160,9 +160,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					// Get values in batch if the source supports it.
 					let values = {};
 					if ( ! source.getValues ) {
-						// Set `undefined` if `getValues` doesn't exist.
 						Object.keys( bindings ).forEach( ( attr ) => {
-							values[ attr ] = undefined;
+							// Default to the `key` or the source label when `getValues` doesn't exist
+							values[ attr ] =
+								bindings[ attr ].args?.key || source.label;
 						} );
 					} else {
 						values = source.getValues( {
@@ -175,16 +176,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					for ( const [ attributeName, value ] of Object.entries(
 						values
 					) ) {
-						// Use placeholder when value is undefined.
-						if ( value === undefined ) {
-							if ( attributeName === 'url' ) {
+						if ( attributeName === 'url' ) {
+							// Return null if value is not a valid URL.
+							try {
+								new URL( value );
+								attributes[ attributeName ] = value;
+							} catch ( error ) {
 								attributes[ attributeName ] = null;
-							} else {
-								// Use the key of the source as a placeholder for the attribute.
-								// If it doesn't have a key, use the source label.
-								attributes[ attributeName ] =
-									bindings[ attributeName ].args?.key ||
-									source.label;
 							}
 						} else {
 							attributes[ attributeName ] = value;
