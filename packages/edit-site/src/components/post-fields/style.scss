@@ -10,6 +10,16 @@
 	}
 }
 
+.edit-site-post-featured-image-container {
+	.edit-site-post-featured-image-placeholder {
+		margin: 0;
+	}
+
+	span {
+		margin-right: auto;
+	}
+}
+
 .edit-site-post-featured-image-placeholder {
 	width: 24px;
 	height: 24px;
@@ -21,6 +31,12 @@
 		linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }
 
+.edit-site-post-featured-image {
+	width: 24px;
+	height: 24px;
+	border: $radius-small;
+}
+
 .edit-site-dataviews-controls__featured-image {
 	.edit-side-dataviews-controls__featured-image-container {
 		border: $border-width solid $gray-300;
@@ -29,12 +45,6 @@
 		&:hover {
 			background-color: $gray-100;
 		}
-	}
-
-	img {
-		width: 24px;
-		height: 24px;
-		border: $radius-small;
 	}
 
 	span {

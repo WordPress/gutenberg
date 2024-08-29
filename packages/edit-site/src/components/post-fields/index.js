@@ -31,8 +31,6 @@ import {
 	__experimentalGrid as Grid,
 	Icon,
 	Button,
-	Flex,
-	FlexItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -146,6 +144,75 @@ function PostAuthorField( { item } ) {
 	);
 }
 
+function FeaturedImage( { item, viewType, getFeaturedMediaUrl } ) {
+	const mediaId = item.featured_media;
+
+	const media = getFeaturedMediaUrl( mediaId );
+
+	const url = media?.source_url;
+	const title = media?.title?.rendered;
+
+	const { onClick } = useLink( {
+		postId: item.id,
+		postType: item.type,
+		canvas: 'edit',
+	} );
+
+	if ( viewType === LAYOUT_GRID && item.status !== 'trash' ) {
+		if ( ! url ) {
+			return null;
+		}
+		return (
+			<HStack classname="edit-site-post-featured-image-container">
+				<button
+					className="edit-site-post-list__featured-image-button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || __( '(no title)' ) }
+				>
+					<Media
+						className="edit-site-post-list__featured-image"
+						id={ item.featured_media }
+						size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
+					/>
+				</button>
+			</HStack>
+		);
+	}
+
+	if ( viewType === LAYOUT_LIST ) {
+		if ( ! url ) {
+			return null;
+		}
+
+		return (
+			<div className="edit-site-post-featured-image-container">
+				<img
+					className="edit-site-post-featured-image"
+					src={ url }
+					alt=""
+				/>
+			</div>
+		);
+	}
+
+	if ( ! url ) {
+		return (
+			<HStack className="edit-site-post-featured-image-container">
+				<span className="edit-site-post-featured-image-placeholder" />
+				<span>{ __( 'Choose an image…' ) }</span>
+			</HStack>
+		);
+	}
+
+	return (
+		<HStack className="edit-site-post-featured-image-container">
+			<img className="edit-site-post-featured-image" src={ url } alt="" />
+			<span>{ title }</span>
+		</HStack>
+	);
+}
+
 function usePostFields( viewType ) {
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
@@ -166,6 +233,131 @@ function usePostFields( viewType ) {
 
 	const fields = useMemo(
 		() => [
+			{
+				id: 'featured_media',
+				label: __( 'Featured Image' ),
+				type: 'image',
+				render: ( { item } ) => (
+					<FeaturedImage
+						item={ item }
+						viewType={ viewType }
+						getFeaturedMediaUrl={ getFeaturedMediaUrl }
+					/>
+				),
+				Edit: ( { field, onChange, data } ) => {
+					const { id } = field;
+
+					const value = field.getValue( { item: data } ) ?? '';
+
+					const onChangeControl = useCallback(
+						( newValue ) =>
+							onChange( {
+								[ id ]: newValue,
+							} ),
+						[ id, onChange ]
+					);
+
+					const media = getFeaturedMediaUrl( value );
+
+					const url = media?.source_url;
+					const title = media?.title?.rendered;
+					const filename =
+						media?.media_details?.file?.match( '([^/]+$)' )[ 0 ];
+
+					return (
+						<fieldset className="edit-site-dataviews-controls__featured-image">
+							<div className="edit-side-dataviews-controls__featured-image-container">
+								<MediaUpload
+									onSelect={ ( selectedMedia ) =>
+										onChangeControl( selectedMedia.id )
+									}
+									allowedTypes={ [ 'image' ] }
+									render={ ( { open } ) => {
+										return (
+											<div
+												role="button"
+												tabIndex={ 0 }
+												onClick={ () => {
+													open();
+												} }
+												onKeyDown={ open }
+											>
+												<Grid
+													rowGap={ 0 }
+													columnGap={ 8 }
+													templateColumns="24px 1fr 0.5fr"
+													rows={ url ? 2 : 0 }
+												>
+													{ url && (
+														<>
+															<img
+																className="edit-site-post-featured-image"
+																alt=""
+																src={ url }
+															/>
+															<Text
+																as="span"
+																truncate
+																numberOfLines={
+																	0
+																}
+															>
+																{ title }
+															</Text>
+														</>
+													) }
+													{ ! url && (
+														<>
+															<span className="edit-site-post-featured-image-placeholder" />
+															<span>
+																{ __(
+																	'Choose an image…'
+																) }
+															</span>
+														</>
+													) }
+													{ url && (
+														<>
+															<Button
+																size="small"
+																className="edit-site-dataviews-controls__featured-image-remove-button"
+																icon={
+																	lineSolid
+																}
+																onClick={ (
+																	event
+																) => {
+																	event.stopPropagation();
+																	onChangeControl(
+																		0
+																	);
+																} }
+															/>
+															<Text
+																className="edit-site-dataviews-controls__featured-image-filename"
+																as="span"
+																ellipsizeMode="middle"
+																limit={ 35 }
+																truncate
+																numberOfLines={
+																	0
+																}
+															>
+																{ filename }
+															</Text>
+														</>
+													) }
+												</Grid>
+											</div>
+										);
+									} }
+								/>
+							</div>
+						</fieldset>
+					);
+				},
+				enableSorting: false,
+			},
 			{
 				label: __( 'Title' ),
 				id: 'title',
@@ -366,87 +558,9 @@ function usePostFields( viewType ) {
 				id: 'featured_media',
 				label: __( 'Featured Image' ),
 				type: 'image',
-				render: ( { item } ) => {
-					const mediaId = item.featured_media;
-
-					const media = getFeaturedMediaUrl( mediaId );
-
-					const url = media?.source_url;
-					const title = media?.title?.rendered;
-
-					// This is a false positive
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const { onClick } = useLink( {
-						postId: item.id,
-						postType: item.type,
-						canvas: 'edit',
-					} );
-
-					if ( viewType === LAYOUT_GRID && item.status !== 'trash' ) {
-						if ( ! url ) {
-							return null;
-						}
-						return (
-							<button
-								className="edit-site-post-list__featured-image-button"
-								type="button"
-								onClick={ onClick }
-								aria-label={
-									item.title?.rendered || __( '(no title)' )
-								}
-							>
-								<Media
-									className="edit-site-post-list__featured-image"
-									id={ item.featured_media }
-									size={ [
-										'large',
-										'full',
-										'medium',
-										'thumbnail',
-									] }
-								/>
-							</button>
-						);
-					}
-
-					if ( viewType === LAYOUT_LIST ) {
-						if ( ! url ) {
-							return null;
-						}
-
-						return (
-							<img
-								className="edit-site-post-featured-image"
-								src={ url }
-								alt=""
-							/>
-						);
-					}
-
-					if ( ! url ) {
-						return (
-							<Flex>
-								<FlexItem>
-									<span className="edit-site-post-featured-image-placeholder" />
-								</FlexItem>
-								<FlexItem>
-									<span>{ __( 'Choose an image…' ) }</span>
-								</FlexItem>
-							</Flex>
-						);
-					}
-
-					return (
-						<HStack>
-							<img
-								className="edit-site-post-featured-image"
-								src={ url }
-								alt=""
-							/>
-							<span>{ title }</span>
-						</HStack>
-					);
-				},
+				render: ( { item } ) => (
+					<FeaturedImage item={ item } viewType={ viewType } />
+				),
 				Edit: ( { field, onChange, data } ) => {
 					const { id } = field;
 
