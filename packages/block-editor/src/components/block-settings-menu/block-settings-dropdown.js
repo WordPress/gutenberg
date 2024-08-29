@@ -228,14 +228,6 @@ export function BlockSettingsDropdown( {
 				>
 					{ ( { onClose } ) => (
 						<>
-							{ isBlockCommentExperimentEnabled &&
-								! blockClassName && (
-									<MenuGroup>
-										<BlockCommentMenuItem
-											clientId={ clientIds }
-										/>
-									</MenuGroup>
-								) }
 							<MenuGroup>
 								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
@@ -296,6 +288,13 @@ export function BlockSettingsDropdown( {
 											{ __( 'Add after' ) }
 										</MenuItem>
 									</>
+								) }
+								{ isBlockCommentExperimentEnabled &&
+								! blockClassName && (
+									<BlockCommentMenuItem
+										clientId={ clientIds }
+										onClose={ onClose }
+									/>
 								) }
 							</MenuGroup>
 							{ canCopyStyles && ! isContentOnly && (
