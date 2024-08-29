@@ -501,7 +501,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
 
 ```html
 <div data-wp-init="callbacks.logTimeInit">
-  <p>Hi!</>
+  <p>Hi!</p>
 </div>
 ```
 

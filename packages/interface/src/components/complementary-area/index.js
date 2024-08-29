@@ -119,42 +119,42 @@ function useAdjustComplementaryListener(
 	isActive,
 	isSmall
 ) {
-	const previousIsSmall = useRef( false );
-	const shouldOpenWhenNotSmall = useRef( false );
+	const previousIsSmallRef = useRef( false );
+	const shouldOpenWhenNotSmallRef = useRef( false );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	useEffect( () => {
 		// If the complementary area is active and the editor is switching from
 		// a big to a small window size.
-		if ( isActive && isSmall && ! previousIsSmall.current ) {
+		if ( isActive && isSmall && ! previousIsSmallRef.current ) {
 			disableComplementaryArea( scope );
 			// Flag the complementary area to be reopened when the window size
 			// goes from small to big.
-			shouldOpenWhenNotSmall.current = true;
+			shouldOpenWhenNotSmallRef.current = true;
 		} else if (
 			// If there is a flag indicating the complementary area should be
 			// enabled when we go from small to big window size and we are going
 			// from a small to big window size.
-			shouldOpenWhenNotSmall.current &&
+			shouldOpenWhenNotSmallRef.current &&
 			! isSmall &&
-			previousIsSmall.current
+			previousIsSmallRef.current
 		) {
 			// Remove the flag indicating the complementary area should be
 			// enabled.
-			shouldOpenWhenNotSmall.current = false;
+			shouldOpenWhenNotSmallRef.current = false;
 			enableComplementaryArea( scope, identifier );
 		} else if (
 			// If the flag is indicating the current complementary should be
 			// reopened but another complementary area becomes active, remove
 			// the flag.
-			shouldOpenWhenNotSmall.current &&
+			shouldOpenWhenNotSmallRef.current &&
 			activeArea &&
 			activeArea !== identifier
 		) {
-			shouldOpenWhenNotSmall.current = false;
+			shouldOpenWhenNotSmallRef.current = false;
 		}
-		if ( isSmall !== previousIsSmall.current ) {
-			previousIsSmall.current = isSmall;
+		if ( isSmall !== previousIsSmallRef.current ) {
+			previousIsSmallRef.current = isSmall;
 		}
 	}, [
 		isActive,

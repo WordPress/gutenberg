@@ -257,6 +257,8 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									icon={ dragHandle }
 									className="block-selection-button_drag-handle"
 									label={ dragHandleLabel }
@@ -272,6 +274,8 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				{ editorMode === 'navigation' && (
 					<FlexItem>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							ref={ ref }
 							onClick={
 								editorMode === 'navigation'
