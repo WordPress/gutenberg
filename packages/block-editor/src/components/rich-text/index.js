@@ -191,7 +191,9 @@ export function RichTextWrapper(
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
-				bindingsPlaceholder: _bindingsPlaceholder,
+				bindingsPlaceholder:
+					( ! adjustedValue || adjustedValue.length === 0 ) &&
+					_bindingsPlaceholder,
 			};
 		},
 		[ blockBindings, identifier, blockName, blockContext ]
