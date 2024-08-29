@@ -214,7 +214,6 @@
 		height: $grid-unit-40;
 		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
-		border-radius: $radius-block-ui;
 		position: relative;
 		white-space: nowrap;
 
@@ -406,7 +405,7 @@
 		right: 0;
 		transform: translateY(-50%);
 		background: rgba($black, 0.1);
-		border-radius: $radius-block-ui;
+		border-radius: $radius-x-small;
 		padding: 2px 6px;
 		max-width: 100%;
 		box-sizing: border-box;
@@ -429,7 +428,7 @@
 		background-size: cover;
 		width: 18px;
 		height: 18px;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-x-small;
 
 		&:not(:only-child) {
 			box-shadow: 0 0 0 $radius-block-ui $white;
