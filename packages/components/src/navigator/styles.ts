@@ -6,10 +6,10 @@ import { css, keyframes } from '@emotion/react';
 export const navigatorProviderWrapper = css`
 	position: relative;
 	/* Prevents horizontal overflow while animating screen transitions */
-	overflow-x: hidden;
 	/* Mark this subsection of the DOM as isolated, providing performance benefits
 	 * by limiting calculations of layout, style and paint to a DOM subtree rather
 	 * than the entire page.
+	overflow-x: clip;
 	 */
 	contain: content;
 `;
