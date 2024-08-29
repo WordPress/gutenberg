@@ -1,5 +1,5 @@
 /**
  * Internal dependencies
  */
-export { proxifyState, peek, deepMerge, hasPropSignal } from './state';
+export { proxifyState, peek, deepMerge } from './state';
 export { proxifyStore } from './store';
