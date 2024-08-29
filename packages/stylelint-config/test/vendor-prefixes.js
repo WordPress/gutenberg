@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const utils = require( './utils.cjs' );
+const utils = require( './utils' );
 const getStylelintResult = utils.getStylelintResult;
 
 describe( 'flags no warnings with valid vendor prefixes css', () => {

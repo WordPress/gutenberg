@@ -9,12 +9,12 @@ const execute = util.promisify( childProcess.exec );
 
 const generateStylelintCommand = ( filename ) =>
 	'npx stylelint ' +
-	path.resolve( __dirname, filename ) +
+	path.resolve( __dirname, '../', filename ) +
 	' -c' +
-	path.resolve( __dirname, './.stylelintrc.tests.json' ) +
+	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +
 	' --formatter json' +
 	' --ignore-path ' +
-	path.resolve( __dirname, './.stylelintignore' );
+	path.resolve( __dirname, '../', './.stylelintignore' );
 
 module.exports = {
 	getStylelintResult: ( filename ) =>
