@@ -59,6 +59,7 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
+		isContentOnlyEditingMode,
 		isDefaultEditingMode,
 		blockType,
 		toolbarKey,
@@ -85,8 +86,8 @@ export function PrivateBlockToolbar( {
 		const firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( firstParentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const _isDefaultEditingMode =
-			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
@@ -101,6 +102,7 @@ export function PrivateBlockToolbar( {
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
+			isContentOnlyEditingMode: editingMode === 'contentOnly',
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
@@ -171,7 +173,9 @@ export function PrivateBlockToolbar( {
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					( isDefaultEditingMode || isSynced ) && (
+					( isDefaultEditingMode ||
+						isContentOnlyEditingMode ||
+						isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
