@@ -41,10 +41,8 @@ const proxyToProps: WeakMap<
  * @param key
  * @return TODO
  */
-export const hasPropSignal = ( proxy, key ) =>
-	Boolean(
-		proxyToProps.has( proxy ) && proxyToProps.get( proxy )?.has( key )
-	);
+export const hasPropSignal = ( proxy: object, key: string ) =>
+	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
 
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
