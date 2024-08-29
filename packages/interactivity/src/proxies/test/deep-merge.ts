@@ -307,13 +307,20 @@ describe( 'Interactivity API', () => {
 		it( 'should never create signals', () => {
 			const target = { a: 1, b: { x: 10 } };
 			const source = { a: 2, b: { y: 20 }, c: 3 };
-			const result = proxifyState( 'test', {} );
+			const result = proxifyState(
+				'test',
+				{} as typeof target & typeof source
+			);
 			deepMerge( result, target );
 			deepMerge( result, source, false );
 
 			expect( hasPropSignal( result, 'a' ) ).toBe( false );
 			expect( hasPropSignal( result, 'b' ) ).toBe( false );
 			expect( hasPropSignal( result, 'c' ) ).toBe( false );
+
+			const proxyB = getProxyFromObject( peek( result, 'b' ) )!;
+			expect( hasPropSignal( proxyB, 'x' ) ).toBe( false );
+			expect( hasPropSignal( proxyB, 'y' ) ).toBe( false );
 		} );
 
 		it( 'should update signals when they exist', () => {
