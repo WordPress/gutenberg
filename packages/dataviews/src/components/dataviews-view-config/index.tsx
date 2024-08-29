@@ -461,7 +461,7 @@ function FieldControl() {
 		return null;
 	}
 	return (
-		<VStack spacing={ 4 } className="dataviews-field-control">
+		<VStack spacing={ 6 } className="dataviews-field-control">
 			{ !! visibleFields?.length && (
 				<ItemGroup isBordered isSeparated>
 					<FieldList
@@ -476,19 +476,21 @@ function FieldControl() {
 			) }
 			{ !! hiddenFields?.length && (
 				<>
-					<BaseControl.VisualLabel>
-						{ __( 'Hidden' ) }
-					</BaseControl.VisualLabel>
-					<ItemGroup isBordered isSeparated>
-						<FieldList
-							fields={ fields }
-							fieldIds={ hiddenFields }
-							mandatoryFields={ mandatoryFields }
-							viewFields={ viewFields }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					</ItemGroup>
+					<VStack spacing={ 4 }>
+						<BaseControl.VisualLabel style={ { margin: 0 } }>
+							{ __( 'Hidden' ) }
+						</BaseControl.VisualLabel>
+						<ItemGroup isBordered isSeparated>
+							<FieldList
+								fields={ fields }
+								fieldIds={ hiddenFields }
+								mandatoryFields={ mandatoryFields }
+								viewFields={ viewFields }
+								view={ view }
+								onChangeView={ onChangeView }
+							/>
+						</ItemGroup>
+					</VStack>
 				</>
 			) }
 		</VStack>
