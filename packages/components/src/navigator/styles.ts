@@ -26,7 +26,7 @@ const fadeOut = keyframes( {
 	},
 } );
 
-const slideFromRight = keyframes( {
+export const slideFromRight = keyframes( {
 	from: {
 		transform: 'translateX(100px)',
 	},
@@ -38,7 +38,7 @@ export const slideToLeft = keyframes( {
 	},
 } );
 
-const slideFromLeft = keyframes( {
+export const slideFromLeft = keyframes( {
 	from: {
 		transform: 'translateX(-100px)',
 	},

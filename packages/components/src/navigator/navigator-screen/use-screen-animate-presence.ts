@@ -17,6 +17,8 @@ import { isRTL as isRTLFn } from '@wordpress/i18n';
  */
 import * as styles from '../styles';
 
+const isEnterAnimation = ( animationName: string ) =>
+	animationName === styles.slideFromLeft.name || styles.slideFromRight.name;
 const isExitAnimation = ( animationName: string ) =>
 	animationName === styles.slideToLeft.name || styles.slideToRight.name;
 
@@ -25,58 +27,74 @@ export function useScreenAnimatePresence( {
 	skipAnimation,
 	isBack,
 	onAnimationEnd,
+	screenEl,
+	setWrapperHeight,
 }: {
 	isMatch: boolean;
 	skipAnimation: boolean;
 	isBack?: boolean;
 	onAnimationEnd?: React.AnimationEventHandler< Element >;
+	screenEl?: HTMLElement | null;
+	setWrapperHeight?: ( height: number | undefined ) => void;
 } ) {
-	// Possible values:
-	// - idle: first value assigned to the screen when added to the React tree
-	// - armed: will start an exit animation when deselected
-	// - animating: the exit animation is happening
-	// - animated: the exit animation has ended
-	const [ exitAnimationStatus, setExitAnimationStatus ] = useState<
-		'idle' | 'armed' | 'animating' | 'animated'
-	>( 'idle' );
-
 	const isRTL = isRTLFn();
 	const animationTimeoutRef = useRef< number >();
 	const prefersReducedMotion = useReducedMotion();
 
+	// Possible values:
+	// - 'INITIAL': the initial state
+	// - 'IN_START': start enter animation
+	// - 'IN_END': enter animation has ended
+	// - 'OUT_START': start exit animation
+	// - 'OUT_END': the exit animation has ended
+	const [ animationStatus, setAnimationStatus ] = useState<
+		'INITIAL' | 'IN_START' | 'IN_END' | 'OUT_START' | 'OUT_END'
+	>( 'INITIAL' );
+
 	const wasMatch = usePrevious( isMatch );
 
-	// Update animation status.
+	const screenHeightRef = useRef< number | undefined >();
+
+	// Start enter and exit animations when the screen is selected or deselected.
+	// The animation status is set to `*_END` immediately if the animation should
+	// be skipped.
 	useLayoutEffect( () => {
 		if ( ! wasMatch && isMatch ) {
-			// When the screen becomes selected, set it to 'armed',
-			// meaning that it will start an exit animation when deselected.
-			setExitAnimationStatus( 'armed' );
+			screenHeightRef.current = undefined;
+			setAnimationStatus(
+				skipAnimation || prefersReducedMotion ? 'IN_END' : 'IN_START'
+			);
 		} else if ( wasMatch && ! isMatch ) {
-			// When the screen becomes deselected, set it to:
-			// - 'animating' (if animations are enabled)
-			// - 'animated' (causing the animation to end and the screen to stop
-			//    rendering its contents in the DOM, without the need to wait for
-			//    the `animationend` event)
-			setExitAnimationStatus(
-				skipAnimation || prefersReducedMotion ? 'animated' : 'animating'
+			screenHeightRef.current = screenEl?.offsetHeight;
+			setAnimationStatus(
+				skipAnimation || prefersReducedMotion ? 'OUT_END' : 'OUT_START'
 			);
 		}
-	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion ] );
+	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion, screenEl ] );
+
+	// When starting an animation, set the wrapper height to the screen height,
+	// to prevent layout shifts during the animation.
+	useEffect( () => {
+		if ( animationStatus === 'OUT_START' ) {
+			setWrapperHeight?.( screenHeightRef.current ?? 0 );
+		} else if ( animationStatus === 'OUT_END' ) {
+			setWrapperHeight?.( undefined );
+		}
+	}, [ screenEl, animationStatus, setWrapperHeight ] );
 
 	// Fallback timeout to ensure the screen is removed from the DOM in case the
 	// `animationend` event is not triggered.
 	useEffect( () => {
-		if ( exitAnimationStatus === 'animating' ) {
+		if ( animationStatus === 'OUT_START' ) {
 			animationTimeoutRef.current = window.setTimeout( () => {
-				setExitAnimationStatus( 'animated' );
+				setAnimationStatus( 'OUT_END' );
 				animationTimeoutRef.current = undefined;
 			}, styles.TOTAL_ANIMATION_DURATION_OUT );
 		} else if ( animationTimeoutRef.current ) {
 			window.clearTimeout( animationTimeoutRef.current );
 			animationTimeoutRef.current = undefined;
 		}
-	}, [ exitAnimationStatus ] );
+	}, [ animationStatus ] );
 
 	const onScreenAnimationEnd = useCallback(
 		( e: React.AnimationEvent< HTMLElement > ) => {
@@ -84,8 +102,12 @@ export function useScreenAnimatePresence( {
 
 			if ( ! isMatch && isExitAnimation( e.animationName ) ) {
 				// When the exit animation ends on an unselected screen, set the
-				// status to 'animated' to remove the screen contents from the DOM.
-				setExitAnimationStatus( 'animated' );
+				// status to 'OUT_END' to remove the screen contents from the DOM.
+				setAnimationStatus( 'OUT_END' );
+			} else if ( isMatch && isEnterAnimation( e.animationName ) ) {
+				// When the enter animation ends on a selected screen, set the
+				// status to 'IN_END' to ensure the screen is rendered in the DOM.
+				setAnimationStatus( 'IN_END' );
 			}
 		},
 		[ onAnimationEnd, isMatch ]
@@ -97,8 +119,7 @@ export function useScreenAnimatePresence( {
 			? 'forwards'
 			: 'backwards';
 	const isAnimatingOut =
-		exitAnimationStatus === 'animating' ||
-		exitAnimationStatus === 'animated';
+		animationStatus === 'OUT_START' || animationStatus === 'OUT_END';
 	const animationStyles = useMemo(
 		() =>
 			styles.navigatorScreenAnimation( {
@@ -111,12 +132,12 @@ export function useScreenAnimatePresence( {
 
 	return {
 		animationStyles,
-		// Remove the screen contents from the DOM only when it not selected
-		// and its exit animation has ended.
+		// Render the screen's contents in the DOM not only when the screen is
+		// selected, but also while it is animating out.
 		shouldRenderScreen:
 			isMatch ||
-			exitAnimationStatus === 'armed' ||
-			exitAnimationStatus === 'animating',
+			animationStatus === 'IN_END' ||
+			animationStatus === 'OUT_START',
 		onAnimationEnd: onScreenAnimationEnd,
 	} as const;
 }
