@@ -163,20 +163,18 @@ function FeaturedImage( { item, viewType, getFeaturedMediaUrl } ) {
 			return null;
 		}
 		return (
-			<HStack classname="edit-site-post-featured-image-container">
-				<button
-					className="edit-site-post-list__featured-image-button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || __( '(no title)' ) }
-				>
-					<Media
-						className="edit-site-post-list__featured-image"
-						id={ item.featured_media }
-						size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
-					/>
-				</button>
-			</HStack>
+			<button
+				className="edit-site-post-list__featured-image-button"
+				type="button"
+				onClick={ onClick }
+				aria-label={ item.title?.rendered || __( '(no title)' ) }
+			>
+				<Media
+					className="edit-site-post-list__featured-image"
+					id={ item.featured_media }
+					size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
+				/>
+			</button>
 		);
 	}
 
