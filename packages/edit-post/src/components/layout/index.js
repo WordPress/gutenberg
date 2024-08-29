@@ -24,7 +24,12 @@ import {
 } from '@wordpress/block-editor';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -152,10 +157,37 @@ function useEditorStyles() {
 }
 
 function MetaBoxesWide() {
+	const [ isOpen, openHeight ] = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return [
+			get( 'core/edit-post', 'metaboxesWideIsOpen' ),
+			get( 'core/edit-post', 'metaboxesWideOpenHeight' ),
+		];
+	}, [] );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const resizableBoxRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
+
+	// In case a user size is set stops the default max-height from applying.
+	useLayoutEffect( () => {
+		if ( ! isShort && openHeight !== undefined ) {
+			resizableBoxRef.current.resizable.classList.add( 'has-user-size' );
+		}
+	}, [ isShort, openHeight ] );
+
 	if ( isShort ) {
 		return (
-			<details className="edit-post-layout__metaboxes">
+			<details
+				className="edit-post-layout__metaboxes"
+				open={ isOpen }
+				onToggle={ ( { target } ) => {
+					setPreference(
+						'core/edit-post',
+						'metaboxesWideIsOpen',
+						target.open
+					);
+				} }
+			>
 				<summary>{ __( 'Meta Boxes' ) }</summary>
 				<MetaBoxes location="normal" />
 				<MetaBoxes location="advanced" />
@@ -165,6 +197,8 @@ function MetaBoxesWide() {
 	return (
 		<ResizableBox
 			className="edit-post-layout__metaboxes-resizable-area"
+			defaultSize={ { height: openHeight } }
+			ref={ resizableBoxRef }
 			enable={ {
 				top: true,
 				right: false,
@@ -190,6 +224,13 @@ function MetaBoxesWide() {
 				elementRef.style.height = `${ elementRef.offsetHeight }px`;
 				// Stops initial max-height from being applied.
 				elementRef.classList.add( 'has-user-size' );
+			} }
+			onResizeStop={ () => {
+				setPreference(
+					'core/edit-post',
+					'metaboxesWideOpenHeight',
+					resizableBoxRef.current.state.height
+				);
 			} }
 		>
 			<div className="edit-post-layout__metaboxes">
