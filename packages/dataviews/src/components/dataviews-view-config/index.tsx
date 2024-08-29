@@ -232,15 +232,6 @@ function ItemsPerPageControl() {
 	);
 }
 
-function isFieldHidable(
-	field: NormalizedField< any >,
-	mandatoryFields: string | any[]
-) {
-	return (
-		field.enableHiding !== false && ! mandatoryFields.includes( field.id )
-	);
-}
-
 function FieldItem( {
 	fields,
 	fieldId,
@@ -277,9 +268,6 @@ function FieldItem( {
 	}
 
 	const index = view.fields?.indexOf( fieldId ) as number;
-	if ( view.type !== LAYOUT_TABLE && ! fieldIsHidable ) {
-		return null;
-	}
 	const isVisible = viewFields.includes( fieldId );
 	return (
 		<Item key={ fieldId }>
@@ -417,27 +405,44 @@ function FieldList( {
 
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
-	const mandatoryFields = getMandatoryFields( view );
+	const mandatoryFields = useMemo(
+		() => getMandatoryFields( view ),
+		[ view ]
+	);
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const visibleFields = view.fields;
 	const hiddenFields = useMemo( () => {
-		const nonFieldListFields = fields
-			.filter( ( field ) => ! viewFields.includes( field.id ) )
+		const nonViewFieldsList = fields
+			.filter(
+				( field ) =>
+					! viewFields.includes( field.id ) &&
+					! mandatoryFields?.includes( field.id )
+			)
 			.map( ( field ) => field.id );
 
 		if ( view.type !== LAYOUT_TABLE ) {
-			return nonFieldListFields;
+			return nonViewFieldsList;
 		}
-		return nonFieldListFields.filter( ( fieldId ) => {
-			return ! view.layout?.combinedFields?.some( ( combinedField ) =>
-				combinedField.children.includes( fieldId )
-			);
-		} );
-	}, [ view, fields, viewFields ] );
-	if (
-		view.type !== LAYOUT_TABLE &&
-		! fields?.some( ( field ) => isFieldHidable( field, mandatoryFields ) )
-	) {
+		const nonViewFieldsAndNonCombinedList = nonViewFieldsList.filter(
+			( fieldId ) => {
+				return ! view.layout?.combinedFields?.some( ( combinedField ) =>
+					combinedField.children.includes( fieldId )
+				);
+			}
+		);
+		const nonViewFieldsCombinedFieldsList =
+			view.layout?.combinedFields
+				?.filter(
+					( combinedField ) =>
+						! viewFields.includes( combinedField.id )
+				)
+				.map( ( combinedField ) => combinedField.id ) || [];
+		return [
+			...nonViewFieldsAndNonCombinedList,
+			...nonViewFieldsCombinedFieldsList,
+		];
+	}, [ view, mandatoryFields, fields, viewFields ] );
+	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
 		return null;
 	}
 	return (
@@ -455,7 +460,7 @@ function FieldControl() {
 				</ItemGroup>
 			) }
 			{ !! hiddenFields?.length && (
-				<BaseControl __nextHasNoMarginBottom>
+				<>
 					<BaseControl.VisualLabel>
 						{ __( 'Hidden' ) }
 					</BaseControl.VisualLabel>
@@ -469,7 +474,7 @@ function FieldControl() {
 							onChangeView={ onChangeView }
 						/>
 					</ItemGroup>
-				</BaseControl>
+				</>
 			) }
 		</VStack>
 	);
