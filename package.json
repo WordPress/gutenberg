@@ -83,6 +83,7 @@
 		"@wordpress/reusable-blocks": "file:packages/reusable-blocks",
 		"@wordpress/rich-text": "file:packages/rich-text",
 		"@wordpress/router": "file:packages/router",
+		"@wordpress/rule-parser": "file:packages/rule-parser",
 		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/style-engine": "file:packages/style-engine",

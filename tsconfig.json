@@ -48,6 +48,7 @@
 		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/rich-text" },
+		{ "path": "packages/rule-parser" },
 		{ "path": "packages/style-engine" },
 		{ "path": "packages/sync" },
 		{ "path": "packages/token-list" },
