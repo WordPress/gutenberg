@@ -8,6 +8,8 @@ import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 
+import { addFilter } from '@wordpress/hooks';
+
 /**
  * Internal dependencies
  */
@@ -19,17 +21,41 @@ import { AddComment } from './add-comment';
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 
+const modifyBlockCommentAttributes = ( settings, name ) => {
+	if ( name && name?.includes( 'core/' ) ) {
+		if (
+			undefined === settings.attributes.blockCommentId ||
+			null === settings.attributes.blockCommentId
+		) {
+			settings.attributes = {
+				...settings.attributes,
+				blockCommentId: {
+					type: 'number',
+					default: 0,
+				},
+			};
+		}
+	}
+	return settings;
+};
+
+// Apply the filter to all core blocks
+addFilter(
+	'blocks.registerBlockType',
+	'block-comment/modify-core-block-attributes',
+	modifyBlockCommentAttributes
+);
+
 /**
  * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
+	const [ threads, setThreads ] = useState( [] );
+	const [ reloadComments, setReloadComments ] = useState( false );
 	const postId = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( 'core/editor' ).getCurrentPostId();
 	}, [] );
-
-	const [ threads, setThreads ] = useState( [] );
-	const [ reloadComments, setReloadComments ] = useState( false );
 
 	useEffect( () => {
 		if ( postId ) {

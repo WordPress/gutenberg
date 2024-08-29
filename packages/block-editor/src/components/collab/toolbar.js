@@ -8,7 +8,7 @@ import { collabComment } from '@wordpress/icons';
 export default function BlockCommentToolbar( {} ) {
 	return (
 		<>
-			<ToolbarGroup className="block-editor-block-lock-toolbar">
+			<ToolbarGroup className="block-editor-block-comment-toolbar">
 				<ToolbarButton
 					accessibleWhenDisabled
 					icon={ collabComment }

@@ -6,7 +6,8 @@ import { MenuItem } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 
-export default function BlockCommentMenuItem( { clientId, onClose } ) {
+export default function BlockCommentMenuItem( { onClose } ) {
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	const openCollabBoard = () => {

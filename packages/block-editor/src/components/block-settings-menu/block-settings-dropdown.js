@@ -68,7 +68,7 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
-		blockClassName,
+		blockCommentID,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -89,10 +89,10 @@ export function BlockSettingsDropdown( {
 			const parentBlockName =
 				_firstParentClientId && getBlockName( _firstParentClientId );
 
-			const className =
+			const commentID =
 				// eslint-disable-next-line @wordpress/data-no-store-string-literals
 				select( 'core/block-editor' ).getBlock( firstBlockClientId )
-					?.attributes?.className;
+					?.attributes?.blockCommentId;
 
 			return {
 				firstParentClientId: _firstParentClientId,
@@ -110,7 +110,7 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
-				blockClassName: className,
+					blockCommentID: commentID,
 			};
 		},
 		[ firstBlockClientId ]
@@ -290,12 +290,12 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 								{ isBlockCommentExperimentEnabled &&
-									! blockClassName && (
-										<BlockCommentMenuItem
-											clientId={ clientIds }
-											onClose={ onClose }
-										/>
-									) }
+								! blockCommentID && (
+									<BlockCommentMenuItem
+										clientId={ clientIds }
+										onClose={ onClose }
+									/>
+								) }
 							</MenuGroup>
 							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>

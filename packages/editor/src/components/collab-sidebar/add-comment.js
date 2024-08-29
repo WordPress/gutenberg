@@ -25,10 +25,9 @@ import {
  * Renders the new comment form.
  *
  * @param {Object}   root0                   The component props.
- * @param {Object}   root0.threads           Comments.
  * @param {Function} root0.setReloadComments Function to reload comments.
  */
-export function AddComment( { threads, setReloadComments } ) {
+export function AddComment( { setReloadComments } ) {
 	const generateNewComment = () => ( {
 		commentId: Date.now(),
 		createdBy: currentUser,
@@ -42,7 +41,6 @@ export function AddComment( { threads, setReloadComments } ) {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isEditing, setIsEditing ] = useState( null );
-	const [ showConfirmation, setShowConfirmation ] = useState( false );
 
 	const curruntUserData = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
@@ -78,11 +76,13 @@ export function AddComment( { threads, setReloadComments } ) {
 		return getSelectedBlockClientId();
 	}, [] );
 
-	const blockClassName = useSelect( ( select ) => {
+	const blockCommentId = useSelect( ( select ) => {
+		const clientID =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/block-editor' ).getSelectedBlockClientId();
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock(
-			select( 'core/block-editor' ).getSelectedBlockClientId()
-		)?.attributes?.className;
+		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
+			?.blockCommentId;
 	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
@@ -160,14 +160,11 @@ export function AddComment( { threads, setReloadComments } ) {
 		}
 	};
 
-	// Function to show the confirmation overlay.
-	const showConfirmationOverlay = () => setShowConfirmation( true );
-
 	const handleCancel = () => {};
 
 	return (
 		<>
-			{ null !== clientId && undefined === blockClassName && (
+			{ null !== clientId && 0 === blockCommentId && (
 				<VStack spacing="3">
 					{ 0 < commentsCount && ! isCurrentThreadResolved && (
 						<>
@@ -308,12 +305,6 @@ export function AddComment( { threads, setReloadComments } ) {
 																) }
 															>
 																<CheckboxControl
-																	checked={
-																		isResolved
-																	}
-																	onChange={ () =>
-																		showConfirmationOverlay()
-																	}
 																	label={ __(
 																		'Resolve'
 																	) }

@@ -193,11 +193,6 @@ add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_prelo
  */
 if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 	function update_comment_meta_from_rest_request( $response, $comment, $request ) {
-		if ( isset( $request['meta'] ) && is_array( $request['meta'] ) ) {
-			foreach ( $request['meta'] as $key => $value ) { //phpcs:ignore
-				update_comment_meta( $comment->comment_ID, 'block_comment', $value );
-			}
-		}
 
 		if ( isset( $request['comment_type'] ) && ! empty( $request['comment_type'] ) ) {
 			$comment_data = array(

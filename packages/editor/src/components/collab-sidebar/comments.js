@@ -112,20 +112,6 @@ export function Comments( { threads } ) {
 		}
 	};
 
-	// Helper function to get updated comments structure
-	const getUpdatedComments = ( newComment, threadKey ) => ( {
-		...threads,
-		[ threadKey ]: {
-			isResolved: false,
-			createdAt:
-				threads?.threadKey?.createdAt || new Date().toISOString(),
-			createdBy: currentUser,
-			comments: {
-				0: newComment,
-			},
-		},
-	} );
-
 	const generateReplyComment = ( comment ) => ( {
 		commentId: Date.now(),
 		createdBy: currentUser,
@@ -136,8 +122,6 @@ export function Comments( { threads } ) {
 	const confirmReplyComment = ( threadID ) => {
 		if ( threadID ) {
 			const newComment = generateReplyComment( commentReply );
-			const commentId = newComment?.commentId;
-
 			apiFetch( {
 				path: '/wp/v2/comments/',
 				method: 'POST',
