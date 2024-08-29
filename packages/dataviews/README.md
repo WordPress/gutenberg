@@ -175,11 +175,16 @@ Properties:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
 -   `fields`: the `id` of the fields that are visible in the UI.
--   `layout`: config that is specific to a particular layout type.
-    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item. This field is not hiddable.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
-    -   `badgeFields`: used by the `grid` layout. It renders these fields without a label and styled as badges.
-    -   `columnFields`: used by the `grid` layout. It renders the label and the field data vertically stacked instead of horizontally (the default).
+-   `layout`: config that is specific to a particular layout type:
+
+| Property | Table | Grid | List |
+| --- | --- | --- | --- |
+| `layout.primaryField`: the field's `id` to be highlighted in each layout. It's not hidable. | &check; | &check; | &check; |
+| `layout.mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable. | | &check; | &check; |
+| `layout.columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default). | | &check; | |
+| `layout.badgeFields`: a list of field's `id` to render without label and styled as badges. | | &check; | |
+| `layout.combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | &check; | | |
+| `layout.styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column. | &check; | | |
 
 ### `onChangeView`: `function`
 
@@ -316,6 +321,35 @@ Callback that signals the user selected one of more items, and takes them as par
 ### Fields
 
 > The `enumeration` type was removed as it was deemed redundant with the field.elements metadata. New types will be introduced soon.
+
+## Combining fields
+
+The `table` layout has the ability to create "virtual" fields that are made out by combining existing ones.
+
+Each "virtual field", has to provide an `id` and `label` (optionally a `header` instead), which have the same meaning as any other field.
+
+Additionally, they need to provide:
+
+- `children`: a list of field's `id` to combine
+- `direction`: how should they be stacked, `vertically` or `horizontally`
+
+For example, this is how you'd define a `site` field which is a combination of a `title` and `description` fields, which are not displayed:
+
+```js
+{
+	fields: [ 'site', 'status' ],
+	layout: {
+		combinedFields: [
+			{
+				id: 'site',
+				label: 'Site',
+				children: [ 'title', 'description' ],
+				direction: 'vertical',
+			}
+		]
+	}
+}
+```
 
 ### Operators
 
