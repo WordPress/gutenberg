@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -26,7 +27,7 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 
-	const selectedId = context?.store.useState( 'selectedId' );
+	const selectedId = useStoreState( context?.store, 'selectedId' );
 	const selectedElement = context?.store.item( selectedId )?.element;
 	const indicatorPosition = useTrackElementOffsetRect( selectedElement );
 
@@ -38,13 +39,15 @@ export const TabList = forwardRef<
 		}
 	} );
 
-	if ( ! context ) {
+	const activeId = useStoreState( context?.store, 'activeId' );
+	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
+
+	if ( ! context || ! context.store ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
-	const { store } = context;
 
-	const { activeId, selectOnMove } = store.useState();
+	const { store } = context;
 	const { setActiveId } = store;
 
 	const onBlur = () => {

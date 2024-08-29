@@ -30,6 +30,8 @@ const Example = () => {
 };
 ```
 
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a></div>
+
 ## Properties
 
 ### `data`: `Object[]`
@@ -72,62 +74,66 @@ const STATUSES = [
 const fields = [
 	{
 		id: 'title',
-		header: 'Title',
+		label: 'Title',
 		enableHiding: false,
 	},
 	{
 		id: 'date',
-		header: 'Date',
+		label: 'Date',
 		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		}
+			return <time>{ getFormattedDate( item.date ) }</time>;
+		},
 	},
 	{
 		id: 'author',
-		header: __( 'Author' ),
+		label: __( 'Author' ),
 		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
+			return <a href="...">{ item.author }</a>;
 		},
 		elements: [
 			{ value: 1, label: 'Admin' },
-			{ value: 2, label: 'User' }
+			{ value: 2, label: 'User' },
 		],
 		filterBy: {
-			operators: [ 'is', 'isNot' ]
+			operators: [ 'is', 'isNot' ],
 		},
-		enableSorting: false
+		enableSorting: false,
 	},
 	{
-		header: __( 'Status' ),
+		label: __( 'Status' ),
 		id: 'status',
 		getValue: ( { item } ) =>
-			STATUSES.find( ( { value } ) => value === item.status )
-				?.label ?? item.status,
+			STATUSES.find( ( { value } ) => value === item.status )?.label ??
+			item.status,
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
 		},
 		enableSorting: false,
 	},
-]
+];
 ```
 
 Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
--   `header`: the field's name to be shown in the UI.
+-   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
--   `elements`: the set of valid values for the field's value.
+-   <code id="fields-elements">elements</code>: The list of options to pick from when using the field as a filter or when editing (DataForm component). It expects an array of objects with the following properties:
+
+    -   `value`: The id of the value to filter to (for internal use)
+    -   `label`: The text that will be displayed in the UI for the item.
+    -    `description`: A longer description that describes the element, to also be displayed. Optional.
+
+    To enable the filter by a field we just need to set a proper value to the `elements` property of the field we'd like to filter by.
+
 -   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
--   `filterBy`: configuration for the filters.
-    -   `operators`: the list of operators supported by the field.
+-   `enableGlobalSearch`: whether the field is searchable. False by default.
+-   `filterBy`: configuration for the filters enabled by the `elements` property.
+    -   `operators`: the list of [operators](#operators) supported by the field.
     -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 ### `view`: `object`
@@ -255,6 +261,8 @@ Each action is an object with the following properties:
 -   `callback`: function, required unless `RenderModal` is provided. Callback function that takes the record as input and performs the required action.
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
+-   `supportsBulk`: Whether the action can be used as a bulk action. False by default.
+-   `disabled`: Whether the action is disabled. False by default.
 
 ### `paginationInfo`: `Object`
 
@@ -288,8 +296,8 @@ const defaultLayouts = {
 	table: {
 		layout: {
 			primaryKey: 'my-key',
-		}
-	}
+		},
+	},
 };
 ```
 

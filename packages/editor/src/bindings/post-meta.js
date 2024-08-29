@@ -53,13 +53,14 @@ export default {
 		}
 
 		// Check that the custom field is not protected and available in the REST API.
-		const isFieldExposed = !! select( coreDataStore ).getEntityRecord(
+		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
+		const fieldValue = select( coreDataStore ).getEntityRecord(
 			'postType',
 			postType,
 			context?.postId
 		)?.meta?.[ args.key ];
 
-		if ( ! isFieldExposed ) {
+		if ( fieldValue === undefined ) {
 			return false;
 		}
 
@@ -88,10 +89,10 @@ export default {
 			return null;
 		}
 
-		// Remove footnotes from the list of fields
+		// Remove footnotes or private keys from the list of fields.
 		return Object.fromEntries(
 			Object.entries( metaFields ).filter(
-				( [ key ] ) => key !== 'footnotes'
+				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
 			)
 		);
 	},

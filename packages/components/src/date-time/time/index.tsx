@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BaseControl from '../../base-control';
+import { VisuallyHidden } from '../../visually-hidden';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimeInputValue, TimePickerProps } from '../types';
@@ -61,6 +62,7 @@ export function TimePicker( {
 	currentTime,
 	onChange,
 	dateOrder: dateOrderProp,
+	hideLabelFromVision = false,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -219,12 +221,18 @@ export function TimePicker( {
 			className="components-datetime__time" // Unused, for backwards compatibility.
 		>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Time' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Time' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Time' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
@@ -241,12 +249,18 @@ export function TimePicker( {
 				</HStack>
 			</Fieldset>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Date' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Date' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Date' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>

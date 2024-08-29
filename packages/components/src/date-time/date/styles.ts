@@ -83,7 +83,7 @@ export const DayButton = styled( Button, {
 		` }
 
 	&&& {
-		border-radius: 100%;
+		border-radius: ${ CONFIG.radiusRound };
 		height: ${ space( 7 ) };
 		width: ${ space( 7 ) };
 
@@ -107,7 +107,6 @@ export const DayButton = styled( Button, {
 		`
 		::before {
 			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
-			border-radius: 2px;
 			bottom: 2px;
 			content: " ";
 			height: 4px;

@@ -8,18 +8,11 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	CheckboxControl,
 	Spinner,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import {
-	useEffect,
-	useId,
-	useRef,
-	useState,
-	useMemo,
-} from '@wordpress/element';
+import { useEffect, useId, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,6 +23,7 @@ import { sortValues } from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
+	BulkSelectionCheckbox,
 } from '../../components/dataviews-bulk-actions';
 import type {
 	Action,
@@ -40,14 +34,6 @@ import type {
 } from '../../types';
 import type { SetSelection } from '../../private-types';
 import ColumnHeaderMenu from './column-header-menu';
-
-interface BulkSelectionCheckboxProps< Item > {
-	selection: string[];
-	onChangeSelection: SetSelection;
-	data: Item[];
-	actions: Action< Item >[];
-	getItemId: ( item: Item ) => string;
-}
 
 interface TableColumnFieldProps< Item > {
 	primaryField?: NormalizedField< Item >;
@@ -82,50 +68,6 @@ interface TableRowProps< Item > {
 	selection: string[];
 	getItemId: ( item: Item ) => string;
 	onChangeSelection: SetSelection;
-}
-
-function BulkSelectionCheckbox< Item >( {
-	selection,
-	onChangeSelection,
-	data,
-	actions,
-	getItemId,
-}: BulkSelectionCheckboxProps< Item > ) {
-	const selectableItems = useMemo( () => {
-		return data.filter( ( item ) => {
-			return actions.some(
-				( action ) =>
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ data, actions ] );
-	const selectedItems = data.filter(
-		( item ) =>
-			selection.includes( getItemId( item ) ) &&
-			selectableItems.includes( item )
-	);
-	const areAllSelected = selectedItems.length === selectableItems.length;
-	return (
-		<CheckboxControl
-			className="dataviews-view-table-selection-checkbox"
-			__nextHasNoMarginBottom
-			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selectedItems.length }
-			onChange={ () => {
-				if ( areAllSelected ) {
-					onChangeSelection( [] );
-				} else {
-					onChangeSelection(
-						selectableItems.map( ( item ) => getItemId( item ) )
-					);
-				}
-			} }
-			aria-label={
-				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
-			}
-		/>
-	);
 }
 
 function TableColumn< Item >( {
@@ -212,7 +154,7 @@ function TableRow< Item >( {
 	// Will be set to true if `onTouchStart` fires. This happens before
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
-	const isTouchDevice = useRef( false );
+	const isTouchDeviceRef = useRef( false );
 	const columns = view.fields || fields.map( ( f ) => f.id );
 
 	return (
@@ -225,14 +167,14 @@ function TableRow< Item >( {
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 			onTouchStart={ () => {
-				isTouchDevice.current = true;
+				isTouchDeviceRef.current = true;
 			} }
 			onClick={ () => {
 				if ( ! hasPossibleBulkAction ) {
 					return;
 				}
 				if (
-					! isTouchDevice.current &&
+					! isTouchDeviceRef.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
 					onChangeSelection(

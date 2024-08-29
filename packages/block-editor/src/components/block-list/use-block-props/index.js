@@ -49,13 +49,13 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
  *
  * export default function Edit() {
  *
- *   const blockProps = useBlockProps(
+ *   const blockProps = useBlockProps( {
  *     className: 'my-custom-class',
  *     style: {
  *       color: '#222222',
  *       backgroundColor: '#eeeeee'
  *     }
- *   )
+ *   } )
  *
  *   return (
  *	    <div { ...blockProps }>

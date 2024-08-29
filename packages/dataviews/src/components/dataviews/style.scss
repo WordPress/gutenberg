@@ -18,12 +18,6 @@
 	left: 0;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
-
-	.components-search-control {
-		.components-base-control__field {
-			max-width: 240px;
-		}
-	}
 }
 
 .dataviews-view-list__primary-field,
@@ -82,12 +76,6 @@
 	.dataviews__view-actions,
 	.dataviews-filters__container {
 		padding: $grid-unit-15 $grid-unit-30;
-
-		.components-search-control {
-			.components-base-control__field {
-				max-width: 112px;
-			}
-		}
 	}
 
 	.dataviews-view-grid,

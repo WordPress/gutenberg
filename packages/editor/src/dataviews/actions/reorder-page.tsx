@@ -17,7 +17,7 @@ import type { Action, RenderModalProps } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { CoreDataError, PostWithPageAttributesSupport } from '../types';
+import type { CoreDataError, BasePost } from '../types';
 import { orderField } from '../fields';
 
 const fields = [ orderField ];
@@ -29,7 +29,7 @@ function ReorderModal( {
 	items,
 	closeModal,
 	onActionPerformed,
-}: RenderModalProps< PostWithPageAttributesSupport > ) {
+}: RenderModalProps< BasePost > ) {
 	const [ item, setItem ] = useState( items[ 0 ] );
 	const orderInput = item.menu_order;
 	const { editEntityRecord, saveEditedEntityRecord } =
@@ -81,7 +81,12 @@ function ReorderModal( {
 					data={ item }
 					fields={ fields }
 					form={ formOrderAction }
-					onChange={ setItem }
+					onChange={ ( changes ) =>
+						setItem( {
+							...item,
+							...changes,
+						} )
+					}
 				/>
 				<HStack justify="right">
 					<Button
@@ -108,7 +113,7 @@ function ReorderModal( {
 	);
 }
 
-const reorderPage: Action< PostWithPageAttributesSupport > = {
+const reorderPage: Action< BasePost > = {
 	id: 'order-pages',
 	label: __( 'Order' ),
 	isEligible( { status } ) {

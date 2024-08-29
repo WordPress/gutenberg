@@ -10,7 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
-import { getCSSRules } from '@wordpress/style-engine';
+import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
@@ -24,7 +24,6 @@ import {
 	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
-	compileStyleValue,
 	getResolvedValue,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
@@ -357,7 +356,7 @@ export function getStylesDeclarations(
 						? name
 						: kebabCase( name );
 					declarations.push(
-						`${ cssProperty }: ${ compileStyleValue(
+						`${ cssProperty }: ${ getCSSValueFromRawStyle(
 							getValueFromObjectPath( styleValue, [ prop ] )
 						) }`
 					);
@@ -369,7 +368,7 @@ export function getStylesDeclarations(
 					? key
 					: kebabCase( key );
 				declarations.push(
-					`${ cssProperty }: ${ compileStyleValue(
+					`${ cssProperty }: ${ getCSSValueFromRawStyle(
 						getValueFromObjectPath( blockStyles, pathToValue )
 					) }`
 				);
@@ -538,10 +537,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `.${ className }${
+										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}

@@ -34,12 +34,37 @@ const fields = [
 		type: 'integer' as const,
 	},
 	{
+		id: 'date',
+		label: 'Date',
+		type: 'datetime' as const,
+	},
+	{
+		id: 'birthdate',
+		label: 'Date as options',
+		type: 'datetime' as const,
+		elements: [
+			{ value: '1970-02-23T12:00:00', label: "Jane's birth date" },
+			{ value: '1950-02-23T12:00:00', label: "John's birth date" },
+		],
+	},
+	{
 		id: 'author',
 		label: 'Author',
 		type: 'integer' as const,
 		elements: [
 			{ value: 1, label: 'Jane' },
 			{ value: 2, label: 'John' },
+		],
+	},
+	{
+		id: 'reviewer',
+		label: 'Reviewer',
+		type: 'text' as const,
+		Edit: 'radio' as const,
+		elements: [
+			{ value: 'fulano', label: 'Fulano' },
+			{ value: 'mengano', label: 'Mengano' },
+			{ value: 'zutano', label: 'Zutano' },
 		],
 	},
 	{
@@ -59,10 +84,21 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 		order: 2,
 		author: 1,
 		status: 'draft',
+		reviewer: 'fulano',
+		date: '2021-01-01T12:00:00',
+		birthdate: '1950-02-23T12:00:00',
 	} );
 
 	const form = {
-		fields: [ 'title', 'order', 'author', 'status' ],
+		fields: [
+			'title',
+			'order',
+			'author',
+			'reviewer',
+			'status',
+			'date',
+			'birthdate',
+		],
 	};
 
 	return (
@@ -73,7 +109,12 @@ export const Default = ( { type }: { type: 'panel' | 'regular' } ) => {
 				...form,
 				type,
 			} }
-			onChange={ setPost }
+			onChange={ ( edits ) =>
+				setPost( ( prev ) => ( {
+					...prev,
+					...edits,
+				} ) )
+			}
 		/>
 	);
 };
