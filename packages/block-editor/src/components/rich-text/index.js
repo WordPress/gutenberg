@@ -20,7 +20,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -163,49 +163,41 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	const disableBoundBlocks = useSelect(
+	const { disableBoundBlock, bindingsPlaceholder } = useSelect(
 		( select ) => {
-			// Disable Rich Text editing if block bindings specify that.
-			let _disableBoundBlocks = false;
-			if ( blockBindings && canBindBlock( blockName ) ) {
-				const blockTypeAttributes =
-					getBlockType( blockName ).attributes;
-				const { getBlockBindingsSource } = unlock(
-					select( blocksStore )
-				);
-				for ( const [ attribute, binding ] of Object.entries(
-					blockBindings
-				) ) {
-					if (
-						blockTypeAttributes?.[ attribute ]?.source !==
-						'rich-text'
-					) {
-						break;
-					}
-
-					// If the source is not defined, or if its value of `canUserEditValue` is `false`, disable it.
-					const blockBindingsSource = getBlockBindingsSource(
-						binding.source
-					);
-					if (
-						! blockBindingsSource?.canUserEditValue?.( {
-							select,
-							context: blockContext,
-							args: binding.args,
-						} )
-					) {
-						_disableBoundBlocks = true;
-						break;
-					}
-				}
+			if (
+				! blockBindings?.[ identifier ] ||
+				! canBindBlock( blockName )
+			) {
+				return {};
 			}
 
-			return _disableBoundBlocks;
+			const relevantBinding = blockBindings[ identifier ];
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const blockBindingsSource = getBlockBindingsSource(
+				relevantBinding.source
+			);
+
+			const _disableBoundBlock =
+				! blockBindingsSource?.canUserEditValue?.( {
+					select,
+					context: blockContext,
+					args: relevantBinding.args,
+				} );
+
+			const _bindingsPlaceholder =
+				( relevantBinding?.args?.key || blockBindingsSource?.label ) +
+				' value is empty';
+
+			return {
+				disableBoundBlock: _disableBoundBlock,
+				bindingsPlaceholder: _bindingsPlaceholder,
+			};
 		},
-		[ blockBindings, blockName ]
+		[ blockBindings, identifier, blockName, blockContext ]
 	);
 
-	const shouldDisableEditing = readOnly || disableBoundBlocks;
+	const shouldDisableEditing = readOnly || disableBoundBlock;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -335,7 +327,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
-		placeholder,
+		placeholder: bindingsPlaceholder || placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
@@ -404,9 +396,11 @@ export function RichTextWrapper(
 				// Overridable props.
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
-				aria-label={ placeholder }
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
+				aria-label={
+					bindingsPlaceholder || props[ 'aria-label' ] || placeholder
+				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
 					// Rich text ref must be first because its focus listener
