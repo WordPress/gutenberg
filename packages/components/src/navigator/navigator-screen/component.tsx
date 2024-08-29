@@ -16,7 +16,11 @@ import {
 	useState,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { useMergeRefs, usePrevious } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	usePrevious,
+	useReducedMotion,
+} from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
 import warning from '@wordpress/warning';
@@ -31,9 +35,6 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
 import type { NavigatorScreenProps } from '../types';
-
-const isReducedMotion = ( w: Window | null | undefined ) =>
-	!! w && w.matchMedia( `(prefers-reduced-motion)` ).matches === true;
 
 const isExitAnimation = ( e: AnimationEvent ) =>
 	e.animationName === styles.slideToLeft.name || styles.slideToRight.name;
@@ -50,6 +51,7 @@ function UnconnectedNavigatorScreen(
 
 	const screenId = useId();
 	const animationTimeoutRef = useRef< number >();
+	const prefersReducedMotion = useReducedMotion();
 
 	// Read props and components context.
 	const { children, className, path, ...otherProps } = useContextSystem(
@@ -101,15 +103,17 @@ function UnconnectedNavigatorScreen(
 			//    rendering its contents in the DOM, without the need to wait for
 			//    the `animationend` event)
 			setExitAnimationStatus(
-				skipAnimationAndFocusRestoration ||
-					isReducedMotion(
-						wrapperRef.current?.ownerDocument?.defaultView
-					)
+				skipAnimationAndFocusRestoration || prefersReducedMotion
 					? 'animated'
 					: 'animating'
 			);
 		}
-	}, [ isMatch, wasMatch, skipAnimationAndFocusRestoration ] );
+	}, [
+		isMatch,
+		wasMatch,
+		skipAnimationAndFocusRestoration,
+		prefersReducedMotion,
+	] );
 
 	// Styles
 	const isRTL = isRTLFn();
