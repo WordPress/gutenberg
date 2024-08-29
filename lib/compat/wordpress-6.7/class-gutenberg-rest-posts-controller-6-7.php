@@ -758,6 +758,212 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Retrieves the query params for the posts collection.
+	 *
+	 * @since 4.7.0
+	 * @since 5.4.0 The `tax_relation` query parameter was added.
+	 * @since 5.7.0 The `modified_after` and `modified_before` query parameters were added.
+	 * @since 6.7.0 The `format` query parameter was added.
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		$query_params = parent::get_collection_params();
+
+		$query_params['context']['default'] = 'view';
+
+		$query_params['after'] = array(
+			'description' => __( 'Limit response to posts published after a given ISO8601 compliant date.' ),
+			'type'        => 'string',
+			'format'      => 'date-time',
+		);
+
+		$query_params['modified_after'] = array(
+			'description' => __( 'Limit response to posts modified after a given ISO8601 compliant date.' ),
+			'type'        => 'string',
+			'format'      => 'date-time',
+		);
+
+		if ( post_type_supports( $this->post_type, 'author' ) ) {
+			$query_params['author']         = array(
+				'description' => __( 'Limit result set to posts assigned to specific authors.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'integer',
+				),
+				'default'     => array(),
+			);
+			$query_params['author_exclude'] = array(
+				'description' => __( 'Ensure result set excludes posts assigned to specific authors.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'integer',
+				),
+				'default'     => array(),
+			);
+		}
+
+		$query_params['before'] = array(
+			'description' => __( 'Limit response to posts published before a given ISO8601 compliant date.' ),
+			'type'        => 'string',
+			'format'      => 'date-time',
+		);
+
+		$query_params['modified_before'] = array(
+			'description' => __( 'Limit response to posts modified before a given ISO8601 compliant date.' ),
+			'type'        => 'string',
+			'format'      => 'date-time',
+		);
+
+		$query_params['exclude'] = array(
+			'description' => __( 'Ensure result set excludes specific IDs.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'integer',
+			),
+			'default'     => array(),
+		);
+
+		$query_params['include'] = array(
+			'description' => __( 'Limit result set to specific IDs.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'integer',
+			),
+			'default'     => array(),
+		);
+
+		if ( 'page' === $this->post_type || post_type_supports( $this->post_type, 'page-attributes' ) ) {
+			$query_params['menu_order'] = array(
+				'description' => __( 'Limit result set to posts with a specific menu_order value.' ),
+				'type'        => 'integer',
+			);
+		}
+
+		$query_params['offset'] = array(
+			'description' => __( 'Offset the result set by a specific number of items.' ),
+			'type'        => 'integer',
+		);
+
+		$query_params['order'] = array(
+			'description' => __( 'Order sort attribute ascending or descending.' ),
+			'type'        => 'string',
+			'default'     => 'desc',
+			'enum'        => array( 'asc', 'desc' ),
+		);
+
+		$query_params['orderby'] = array(
+			'description' => __( 'Sort collection by post attribute.' ),
+			'type'        => 'string',
+			'default'     => 'date',
+			'enum'        => array(
+				'author',
+				'date',
+				'id',
+				'include',
+				'modified',
+				'parent',
+				'relevance',
+				'slug',
+				'include_slugs',
+				'title',
+			),
+		);
+
+		if ( 'page' === $this->post_type || post_type_supports( $this->post_type, 'page-attributes' ) ) {
+			$query_params['orderby']['enum'][] = 'menu_order';
+		}
+
+		$post_type = get_post_type_object( $this->post_type );
+
+		if ( $post_type->hierarchical || 'attachment' === $this->post_type ) {
+			$query_params['parent']         = array(
+				'description' => __( 'Limit result set to items with particular parent IDs.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'integer',
+				),
+				'default'     => array(),
+			);
+			$query_params['parent_exclude'] = array(
+				'description' => __( 'Limit result set to all items except those of a particular parent ID.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'type' => 'integer',
+				),
+				'default'     => array(),
+			);
+		}
+
+		$query_params['search_columns'] = array(
+			'default'     => array(),
+			'description' => __( 'Array of column names to be searched.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'enum' => array( 'post_title', 'post_content', 'post_excerpt' ),
+				'type' => 'string',
+			),
+		);
+
+		$query_params['slug'] = array(
+			'description' => __( 'Limit result set to posts with one or more specific slugs.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'string',
+			),
+		);
+
+		$query_params['status'] = array(
+			'default'           => 'publish',
+			'description'       => __( 'Limit result set to posts assigned one or more statuses.' ),
+			'type'              => 'array',
+			'items'             => array(
+				'enum' => array_merge( array_keys( get_post_stati() ), array( 'any' ) ),
+				'type' => 'string',
+			),
+			'sanitize_callback' => array( $this, 'sanitize_post_statuses' ),
+		);
+
+		$query_params = $this->prepare_taxonomy_limit_schema( $query_params );
+
+		if ( 'post' === $this->post_type ) {
+			$query_params['sticky'] = array(
+				'description' => __( 'Limit result set to items that are sticky.' ),
+				'type'        => 'boolean',
+			);
+		}
+		
+		if ( post_type_supports( $this->post_type, 'post-formats' ) ) {
+			$query_params['format'] = array(
+				'default'     => 'standard',
+				'description' => __( 'Limit result set to items assigned one or more formats.' ),
+				'type'        => 'array',
+				'items'       => array(
+					'enum' => array_values( get_post_format_slugs() ),
+					'type' => 'string',
+				),
+			);
+		}
+
+		/**
+		 * Filters collection parameters for the posts controller.
+		 *
+		 * The dynamic part of the filter `$this->post_type` refers to the post
+		 * type slug for the controller.
+		 *
+		 * This filter registers the collection parameter, but does not map the
+		 * collection parameter to an internal WP_Query parameter. Use the
+		 * `rest_{$this->post_type}_query` filter to set WP_Query parameters.
+		 *
+		 * @since 4.7.0
+		 *
+		 * @param array        $query_params JSON Schema-formatted collection parameters.
+		 * @param WP_Post_Type $post_type    Post type object.
+		 */
+		return apply_filters( "rest_{$this->post_type}_collection_params", $query_params, $post_type );
+	}
+
+	/**
 	 * Prepares the 'tax_query' for a collection of posts.
 	 *
 	 * @since 5.7.0
