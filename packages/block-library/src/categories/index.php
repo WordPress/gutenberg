@@ -54,6 +54,12 @@ function render_block_core_categories( $attributes ) {
 		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
+
+		$p = new WP_HTML_Tag_Processor( $items_markup );
+		while ( $p->next_tag( 'a' ) ) {
+			$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+		}
+		$items_markup = $p->get_updated_html();
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "wp-block-categories-{$type}" ) );
