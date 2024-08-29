@@ -271,7 +271,10 @@ function FieldItem( {
 	const isVisible = viewFields.includes( fieldId );
 	return (
 		<Item key={ fieldId }>
-			<HStack expanded className="dataviews-field-control__field">
+			<HStack
+				expanded
+				className={ `dataviews-field-control__field dataviews-field-control__field-${ fieldId }` }
+			>
 				<span>{ fieldLabel }</span>
 				<HStack
 					justify="flex-end"
@@ -282,7 +285,7 @@ function FieldItem( {
 						<>
 							<Button
 								disabled={ ! isVisible || index < 1 }
-								accessibleWhenDisabled={ false }
+								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
 									if ( ! view.fields || index < 1 ) {
@@ -314,7 +317,7 @@ function FieldItem( {
 									! view.fields ||
 									index >= view.fields.length - 1
 								}
-								accessibleWhenDisabled={ false }
+								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
 									if (
@@ -346,10 +349,11 @@ function FieldItem( {
 						</>
 					) }
 					<Button
+						className="dataviews-field-control__field-visibility-button"
 						disabled={ ! fieldIsHidable }
-						accessibleWhenDisabled={ false }
+						accessibleWhenDisabled
 						size="compact"
-						onClick={ () =>
+						onClick={ () => {
 							onChangeView( {
 								...view,
 								fields: isVisible
@@ -357,8 +361,19 @@ function FieldItem( {
 											( id ) => id !== fieldId
 									  )
 									: [ ...viewFields, fieldId ],
-							} )
-						}
+							} );
+							// Focus the visibility button to avoid focus loss.
+							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+							setTimeout( () => {
+								const element = document.querySelector(
+									`.dataviews-field-control__field-${ fieldId } .dataviews-field-control__field-visibility-button`
+								);
+								if ( element instanceof HTMLElement ) {
+									element.focus();
+								}
+							}, 50 );
+						} }
 						icon={ isVisible ? seen : unseen }
 						label={
 							isVisible
@@ -446,7 +461,7 @@ function FieldControl() {
 		return null;
 	}
 	return (
-		<VStack spacing={ 4 }>
+		<VStack spacing={ 4 } className="dataviews-field-control">
 			{ !! visibleFields?.length && (
 				<ItemGroup isBordered isSeparated>
 					<FieldList
