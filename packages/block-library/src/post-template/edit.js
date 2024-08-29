@@ -19,6 +19,7 @@ import {
 } from '@wordpress/block-editor';
 import { Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 import { list, grid } from '@wordpress/icons';
 
 const TEMPLATE = [
@@ -85,6 +86,7 @@ export default function PostTemplateEdit( {
 			author,
 			search,
 			exclude,
+			excludeCurrent,
 			sticky,
 			inherit,
 			taxQuery,
@@ -109,6 +111,7 @@ export default function PostTemplateEdit( {
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+			const { getCurrentPostId } = select( editorStore );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -159,6 +162,13 @@ export default function PostTemplateEdit( {
 			}
 			if ( exclude?.length ) {
 				query.exclude = exclude;
+			}
+			if ( excludeCurrent ) {
+				if ( query.exclude ) {
+					query.exclude = [ ...query.exclude, getCurrentPostId() ];
+				} else {
+					query.exclude = [ getCurrentPostId() ];
+				}
 			}
 			if ( parents?.length ) {
 				query.parent = parents;

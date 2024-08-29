@@ -34,6 +34,7 @@ export const settings = {
 				search: '',
 				sticky: 'exclude',
 				inherit: false,
+				excludeCurrent: false,
 			},
 		},
 		innerBlocks: [
