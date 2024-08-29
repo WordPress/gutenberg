@@ -29,7 +29,7 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 		$page_options_key  = array_search( $page_options_path, $paths, true );
 		if ( false === $page_options_key ) {
 			$paths[] = $page_options_path;
-		};
+		}
 	}
 
 	if ( 'core/edit-post' === $context->name ) {
