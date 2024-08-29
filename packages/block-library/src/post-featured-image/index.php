@@ -89,6 +89,17 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 			foreach ( $processor->get_attribute_names_with_prefix( '' ) as $name ) {
 				$tag_html->set_attribute( $name, $processor->get_attribute( $name ) );
 			}
+
+			foreach ( $attr as $name => $value ) {
+				if ( $name !== 'style' ) {
+					$tag_html->set_attribute( $name, $value );
+				} else {
+					$existing_styles = $tag_html->get_attribute( 'style' );
+					$new_styles      = empty( $existing_styles ) ? $value : $existing_styles . ';' . $value;
+					$tag_html->set_attribute( 'style', $new_styles );
+				}
+			}
+
 			$featured_image = $tag_html->get_updated_html();
 		}
 	}
