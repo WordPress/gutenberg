@@ -102,18 +102,18 @@
 	position: static; // display inline.
 
 	.block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-10;
+		padding: $grid-unit-10 - 2px;
 	}
 }
 
 .wp-block-social-links {
 	&.has-small-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: math.div($grid-unit-10, 2);
+		padding: 0;
 	}
 	&.has-large-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-20;
+		padding: $grid-unit-20 - 2px;
 	}
 	&.has-huge-icon-size .block-editor-button-block-appender.components-button.components-button {
-		padding: $grid-unit-30;
+		padding: $grid-unit-30 - 1px;
 	}
 }
