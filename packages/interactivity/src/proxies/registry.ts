@@ -52,8 +52,9 @@ export const createProxy = < T extends object >(
  * @param obj Object from which to know the proxy.
  * @return Associated proxy or `undefined`.
  */
-export const getProxyFromObject = < T extends object >( obj: T ): T =>
-	objToProxy.get( obj ) as T;
+export const getProxyFromObject = < T extends object >(
+	obj: T
+): T | undefined => objToProxy.get( obj ) as T;
 
 /**
  * Gets the namespace associated with the given proxy.

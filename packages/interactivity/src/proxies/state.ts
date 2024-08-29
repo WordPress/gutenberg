@@ -163,7 +163,7 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const receiver = getProxyFromObject( target );
+			const receiver = getProxyFromObject( target )!;
 			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
@@ -200,7 +200,7 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getPropSignal( getProxyFromObject( target ), key );
+			const prop = getPropSignal( getProxyFromObject( target )!, key );
 			prop.setValue( undefined );
 
 			if ( objToIterable.has( target ) ) {
