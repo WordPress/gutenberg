@@ -33,14 +33,6 @@
 			"margin": true,
 			"padding": true
 		},
-		"__experimentalStyle": {
-			"spacing": {
-				"margin": {
-					"right": "0.5em",
-					"bottom": "0.5em"
-				}
-			}
-		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
