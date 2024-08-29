@@ -5,6 +5,7 @@
 	&[style*="font-weight"] :where(a) {
 		font-weight: inherit;
 	}
+	&[class*="-font-family"] :where(a),
 	&[style*="font-family"] :where(a) {
 		font-family: inherit;
 	}
