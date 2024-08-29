@@ -11,12 +11,15 @@
  *
  * @since 6.6.0
  *
+ * @deprecated 6.7.0
+ *
  * @param array  $block     Block object.
  * @param string $variation Slug for the block style variation.
  *
  * @return string The unique variation name.
  */
 function gutenberg_create_block_style_variation_instance_name( $block, $variation ) {
+	_deprecated_function( __FUNCTION__, '6.7.0' );
 	return $variation . '--' . md5( serialize( $block ) );
 }
 
@@ -119,7 +122,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	// theme_json data.
 	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
 
-	$variation_instance = gutenberg_create_block_style_variation_instance_name( $parsed_block, $variation );
+	$variation_instance = wp_unique_id( $variation . '--' );
 	$class_name         = "is-style-$variation_instance";
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
@@ -224,11 +227,9 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 
 	/*
 	 * Matches a class prefixed by `is-style`, followed by the
-	 * variation slug, then `--`, and finally a hash.
-	 *
-	 * See `gutenberg_create_block_style_variation_instance_name` for class generation.
+	 * variation slug, then `--`, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
+	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;

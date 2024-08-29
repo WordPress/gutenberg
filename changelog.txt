@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 19.1.0-rc.1 =
+= 19.1.0 =
 
 ## Changelog
 
@@ -13,9 +13,7 @@
 - Ariakit: Update to v0.4.10. ([64637](https://github.com/WordPress/gutenberg/pull/64637))
 - DimensionControl: Add flag to remove bottom margin. ([64346](https://github.com/WordPress/gutenberg/pull/64346))
 - DropdownMenu V2: Use themed color variables. ([64647](https://github.com/WordPress/gutenberg/pull/64647))
-- FocalPointPicker: Default to new 40px size. ([64456](https://github.com/WordPress/gutenberg/pull/64456))
 - Placeholders: Update radius temporarily. ([64672](https://github.com/WordPress/gutenberg/pull/64672))
-- QueryControls: Default to new 40px size. ([64457](https://github.com/WordPress/gutenberg/pull/64457))
 - Reduce gap between steps in SpacingSizesControl, add animation, remove first/last marks. ([63803](https://github.com/WordPress/gutenberg/pull/63803))
 - Textarea Control: Update styles. ([64586](https://github.com/WordPress/gutenberg/pull/64586))
 - Tools Panel: Sets column-gap to 16px for grid. ([64497](https://github.com/WordPress/gutenberg/pull/64497))
@@ -23,20 +21,24 @@
 - Update components radius. ([64368](https://github.com/WordPress/gutenberg/pull/64368))
 - Use `useStoreState()` instead of `store.useState()`. ([64648](https://github.com/WordPress/gutenberg/pull/64648))
 - Composite: Use internal context to consume composite store. ([64493](https://github.com/WordPress/gutenberg/pull/64493))
+- Default to new 40px size in the following:
+  - FocalPointPicker: ([64456](https://github.com/WordPress/gutenberg/pull/64456))
+  - QueryControls: ([64457](https://github.com/WordPress/gutenberg/pull/64457))
 
 #### Data Views
 - Do not display element descriptions in filters. ([64674](https://github.com/WordPress/gutenberg/pull/64674))
-- Add `comment_status` field to quick edit. ([64370](https://github.com/WordPress/gutenberg/pull/64370))
-- Add `status` to quick edit. ([64398](https://github.com/WordPress/gutenberg/pull/64398))
 - Apply minimal variant to pagination dropdown. ([63815](https://github.com/WordPress/gutenberg/pull/63815))
 - Update the style of the datetime fields to match the other types. ([64438](https://github.com/WordPress/gutenberg/pull/64438))
 - Use the fields array to define the order of the fields. ([64335](https://github.com/WordPress/gutenberg/pull/64335))
 - Make the move left/right controls in table header always available. ([64646](https://github.com/WordPress/gutenberg/pull/64646))
 - Support defining field headers/names as React elements. ([64642](https://github.com/WordPress/gutenberg/pull/64642))
-- Quick edit: Add Date as field and `datetime` as field type. ([64267](https://github.com/WordPress/gutenberg/pull/64267))
 - Add marks to preview size control. ([64546](https://github.com/WordPress/gutenberg/pull/64546))
 - Move item size control to the new view configuration UI. ([64380](https://github.com/WordPress/gutenberg/pull/64380))
 - Update search appearance in narrow containers. ([64681](https://github.com/WordPress/gutenberg/pull/64681))
+- Quick edit additions:
+  - `comment_status` field. ([64370](https://github.com/WordPress/gutenberg/pull/64370))
+  - `status` field. ([64398](https://github.com/WordPress/gutenberg/pull/64398))
+  - 'Date' as field and `datetime` as field type. ([64267](https://github.com/WordPress/gutenberg/pull/64267))
 - Extensibility - allow unregistering of the following:
   - Duplicate post action ([64441](https://github.com/WordPress/gutenberg/pull/64441))
   - Duplicate pattern action ([64373](https://github.com/WordPress/gutenberg/pull/64373))
@@ -45,16 +47,12 @@
   - Reorder-page action ([64199](https://github.com/WordPress/gutenberg/pull/64199))
   - View post action ([64467](https://github.com/WordPress/gutenberg/pull/64467))
   - View post revisions action ([64464](https://github.com/WordPress/gutenberg/pull/64464))
+- Add missing styles and remove opinionated ones for generic usage. ([64711](https://github.com/WordPress/gutenberg/pull/64711))
 
 #### Block Library
 - Embed Block: Replace native input element with InputControl component. ([64668](https://github.com/WordPress/gutenberg/pull/64668))
-- File: Add border block support. ([64509](https://github.com/WordPress/gutenberg/pull/64509))
 - Grid: Prevent highlight of cells when dragging a block if block type can't be dropped into grid. ([64290](https://github.com/WordPress/gutenberg/pull/64290))
 - Image block: Add reset button. ([64669](https://github.com/WordPress/gutenberg/pull/64669))
-- List Item: Add border support. ([63541](https://github.com/WordPress/gutenberg/pull/63541))
-- List: Add border support. ([63540](https://github.com/WordPress/gutenberg/pull/63540))
-- Preformatted: Add border block support. ([64302](https://github.com/WordPress/gutenberg/pull/64302))
-- Tag Cloud: Add border block support. ([63579](https://github.com/WordPress/gutenberg/pull/63579))
 - Overlay caption w. text-shadow. ([63471](https://github.com/WordPress/gutenberg/pull/63471))
 
 #### Design Tools
@@ -68,6 +66,11 @@
   - Post Author Name ([64530](https://github.com/WordPress/gutenberg/pull/64530))
   - Post Author ([64599](https://github.com/WordPress/gutenberg/pull/64599))
   - Query Title ([64581](https://github.com/WordPress/gutenberg/pull/64581))
+  - File: ([64509](https://github.com/WordPress/gutenberg/pull/64509))
+  - List Item: ([63541](https://github.com/WordPress/gutenberg/pull/63541))
+  - List: ([63540](https://github.com/WordPress/gutenberg/pull/63540))
+  - Preformatted: ([64302](https://github.com/WordPress/gutenberg/pull/64302))
+  - Tag Cloud: ([63579](https://github.com/WordPress/gutenberg/pull/63579))
 
 #### Zoom Out
 - Add private `isZoomOutMode` selector. ([64503](https://github.com/WordPress/gutenberg/pull/64503))
@@ -112,6 +115,7 @@
 - Load the filter toggle as open if there are primary filters. ([64651](https://github.com/WordPress/gutenberg/pull/64651))
 - Sort descending button may be wrongly pressed. ([64547](https://github.com/WordPress/gutenberg/pull/64547))
 - Filter icon is displayed even when no filter capabilities are given to any field. ([64640](https://github.com/WordPress/gutenberg/pull/64640))
+- Hide sort direction control if there are no sortable fields. ([64817](https://github.com/WordPress/gutenberg/pull/64817))
 
 #### Zoom Out
 - Disallow dropping outside section root in Zoom Out mode. ([64500](https://github.com/WordPress/gutenberg/pull/64500))
@@ -142,6 +146,7 @@
 #### Block bindings
 - Fix long keys overflow in bindings panel. ([64465](https://github.com/WordPress/gutenberg/pull/64465))
 - Hide keys starting with underscore. ([64618](https://github.com/WordPress/gutenberg/pull/64618))
+- Refactor utils file. ([64740](https://github.com/WordPress/gutenberg/pull/64740))
 
 #### CSS & Styling
 - Remove inconsistent dark theme focus style on block selection. ([64549](https://github.com/WordPress/gutenberg/pull/64549))
@@ -149,6 +154,7 @@
 
 #### Interactivity API
 - Fix context inheritance from namespaces different than the current one. ([64677](https://github.com/WordPress/gutenberg/pull/64677))
+- Fix computeds without scope in Firefox. ([64825](https://github.com/WordPress/gutenberg/pull/64825))
 
 #### Document Settings
 - Post Featured Image: Disable the media modal while uploading an image. ([64566](https://github.com/WordPress/gutenberg/pull/64566))
