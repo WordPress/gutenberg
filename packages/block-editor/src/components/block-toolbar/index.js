@@ -99,10 +99,10 @@ export function PrivateBlockToolbar( {
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
 
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const commentID = select( 'core/block-editor' ).getBlock(
-			selectedBlockClientId
-		)?.attributes?.blockCommentId;
+		const commentID =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/block-editor' ).getBlock( selectedBlockClientId )
+				?.attributes?.blockCommentId || null;
 
 		return {
 			blockClientId: selectedBlockClientId,

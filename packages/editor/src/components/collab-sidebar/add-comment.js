@@ -4,42 +4,61 @@
 // eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import {
-	TextControl,
-	Button,
-	CheckboxControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Modal,
+	Button,
+	TextControl,
+	CheckboxControl,
 } from '@wordpress/components';
-import { dateI18n, format, getSettings } from '@wordpress/date';
+import { dateI18n, format } from '@wordpress/date';
 import {
-	commentAuthorAvatar as userIcon,
 	Icon,
-	trash as deleteIcon,
 	edit as editIcon,
+	trash as deleteIcon,
+	commentAuthorAvatar as userIcon,
 } from '@wordpress/icons';
 
-import { useSelect, useDispatch } from '@wordpress/data';
-//import { store as coreStore } from '@wordpress/core-data';
-//import { useEntityProp } from '@wordpress/core-data';
+/**
+ * Renders the new comment form.
+ *
+ * @param {Object}   root0                   The component props.
+ * @param {Function} root0.setReloadComments Function to reload comments.
+ */
+export function AddComment( { setReloadComments } ) {
+	const generateNewComment = () => ( {
+		commentId: Date.now(),
+		createdBy: currentUser,
+		comment: inputComment,
+		createdAt: new Date().toISOString(),
+	} );
 
-export default function BlockCommentModal( { clientId, onClose, threadId } ) {
+	// Get the date time format from WordPress settings.
+	const dateTimeFormat = 'h:i A';
+
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
-	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
-	const [ showConfirmation, setShowConfirmation ] = useState( false );
+
 	const curruntUserData = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( 'core' ).getCurrentUser();
 	}, [] );
 
-	const userAvatar = curruntUserData.avatar_urls[ 48 ] || null;
+	let userAvatar =
+		'https://secure.gravatar.com/avatar/92929292929292929292929292929292?s=48&d=mm&r=g';
+	if ( curruntUserData?.avatar_urls ) {
+		userAvatar = curruntUserData?.avatar_urls[ 48 ];
+	}
+
+	//const userAvatar = curruntUserData?.avatar_urls[ 48 ] ? curruntUserData?.avatar_urls[ 48 ] : null;
+
 	const currentUser = curruntUserData?.name || null;
 
 	const allThreads = [];
+	let threadId = 0;
 	const currentThread = allThreads[ threadId ] ?? {};
 	const isCurrentThreadResolved = currentThread.threadIsResolved || false;
 	const commentsCount = isCurrentThreadResolved
@@ -51,16 +70,24 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 		return select( 'core/editor' ).getCurrentPostId();
 	}, [] );
 
+	const clientId = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		return getSelectedBlockClientId();
+	}, [] );
+
+	const blockCommentId = useSelect( ( select ) => {
+		const clientID =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/block-editor' ).getSelectedBlockClientId();
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
+			?.blockCommentId;
+	}, [] );
+
 	// Get the dispatch functions to save the comment and update the block attributes.
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	// Helper function to generate a new comment.
-	const generateNewComment = () => ( {
-		commentId: Date.now(),
-		createdBy: currentUser,
-		comment: inputComment,
-		createdAt: new Date().toISOString(),
-	} );
 
 	// // Function to add a border class to the content reference.
 	const setAttributes = () => {
@@ -69,26 +96,10 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 		} );
 	};
 
-	// Helper function to get updated comments structure
-	const getUpdatedComments = ( newComment, threadKey ) => ( {
-		...allThreads,
-		[ threadKey ]: {
-			isResolved,
-			createdAt:
-				allThreads?.threadKey?.createdAt || new Date().toISOString(),
-			createdBy: currentUser,
-			comments: [
-				...( allThreads[ threadKey ]?.comments || [] ),
-				newComment,
-			],
-		},
-	} );
-
 	// Function to save the comment.
 	const saveComment = () => {
 		const newComment = generateNewComment();
 		threadId = newComment?.commentId;
-		const updatedComments = getUpdatedComments( newComment, threadId );
 
 		apiFetch( {
 			path: '/wp/v2/comments',
@@ -101,12 +112,11 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 				comment_author: currentUser,
 				comment_approved: 0,
 			},
-		} ).then( (response) => {
-			threadId = response?.id;
-			setAttributes( clientId, threadId );
-			onClose();
+		} ).then( ( response ) => {
+			setAttributes( clientId, response?.id );
+			setInputComment( '' );
+			setReloadComments( true );
 		} );
-	
 	};
 
 	// Function to edit the comment.
@@ -130,22 +140,6 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 		setIsEditing( null );
 	};
 
-	// Function to mark thread as resolved
-	const markThreadAsResolved = () => {
-		setIsResolved( true );
-
-		const updatedComments = { ...allThreads };
-
-		updatedComments[ threadId ] = {
-			...updatedComments[ threadId ],
-			isResolved: true,
-			resolvedBy: currentUser,
-			resolvedAt: new Date().toISOString(),
-		};
-
-		onClose();
-	};
-
 	// Function to delete a comment.
 	const deleteComment = ( commentId ) => {
 		// Filter out the comment to be deleted.
@@ -166,28 +160,11 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 		}
 	};
 
-	// Function to show the confirmation overlay.
-	const showConfirmationOverlay = () => setShowConfirmation( true );
+	const handleCancel = () => {};
 
-	// Function to hide the confirmation overlay.
-	const hideConfirmationOverlay = () => setShowConfirmation( false );
-
-	// Function to confirm and mark thread as resolved.
-	const confirmAndMarkThreadAsResolved = () => {
-		markThreadAsResolved();
-		hideConfirmationOverlay();
-	};
-
-	// On cancel, remove the border if no comments are present.
-	const handleCancel = () => {
-		onClose();
-	};
-
-	// Get the date time format from WordPress settings.
-	const dateTimeFormat = getSettings().formats.datetime;
 	return (
 		<>
-			<Modal overlayClassName="block-editor-format-toolbar__comment-board">
+			{ null !== clientId && 0 === blockCommentId && (
 				<VStack spacing="3">
 					{ 0 < commentsCount && ! isCurrentThreadResolved && (
 						<>
@@ -203,17 +180,22 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 								) => (
 									<>
 										{ isEditing === commentId && (
-											<VStack spacing="4">
+											<VStack
+												spacing="3"
+												className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
+											>
 												<HStack
 													alignment="left"
 													spacing="4"
 												>
 													<Icon
 														icon={ userIcon }
-														className="comment-board__userIcon"
-														size={ 45 }
+														className="editor-collab-sidebar__userIcon"
+														size={ 32 }
+														width={ 32 }
+														height={ 32 }
 													/>
-													<span className="comment-board__userName">
+													<span className="editor-collab-sidebar__userName">
 														{ currentUser }
 													</span>
 												</HStack>
@@ -232,7 +214,7 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 													spacing="2"
 												>
 													<Button
-														className="block-editor-format-toolbar__cancel-button"
+														className="block-editor-format-toolbar__cancel-button is-compact"
 														variant="secondary"
 														text={ __( 'Cancel' ) }
 														onClick={ () => {
@@ -245,7 +227,7 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 														} }
 													/>
 													<Button
-														className="block-editor-format-toolbar__comment-button"
+														className="block-editor-format-toolbar__comment-button is-compact"
 														variant="primary"
 														text={
 															0 === commentsCount
@@ -270,13 +252,13 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 										) }
 										{ isEditing !== commentId && (
 											<VStack
-												spacing="2"
+												spacing="3"
 												key={ timestamp }
-												className="comment-board__comment"
+												className="editor-collab-sidebar__thread"
 											>
 												<HStack
 													alignment="top"
-													spacing="1"
+													spacing="2"
 													justify="space-between"
 												>
 													<HStack
@@ -286,11 +268,13 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 													>
 														<Icon
 															icon={ userIcon }
-															className="comment-board__userIcon"
-															size={ 45 }
+															className="editor-collab-sidebar__userIcon"
+															size={ 32 }
+															width={ 32 }
+															height={ 32 }
 														/>
 														<VStack spacing="1">
-															<span className="comment-board__userName">
+															<span className="editor-collab-sidebar__userName">
 																{ createdBy }
 															</span>
 															<time
@@ -321,12 +305,6 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 																) }
 															>
 																<CheckboxControl
-																	checked={
-																		isResolved
-																	}
-																	onChange={ () =>
-																		showConfirmationOverlay()
-																	}
 																	label={ __(
 																		'Resolve'
 																	) }
@@ -372,15 +350,20 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 						</>
 					) }
 					{ ! isEditing && (
-						<VStack spacing="4">
+						<VStack
+							spacing="3"
+							className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
+						>
 							{ 0 === commentsCount && (
 								<HStack alignment="left" spacing="3">
 									<img
 										src={ userAvatar }
 										alt={ __( 'User Icon' ) }
-										className="comment-board__userIcon"
+										className="editor-collab-sidebar__userIcon"
+										width={ 32 }
+										height={ 32 }
 									/>
-									<span className="comment-board__userName">
+									<span className="editor-collab-sidebar__userName">
 										{ currentUser }
 									</span>
 								</HStack>
@@ -393,13 +376,13 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 							/>
 							<HStack alignment="right" spacing="3">
 								<Button
-									className="block-editor-format-toolbar__cancel-button"
+									className="block-editor-format-toolbar__cancel-button is-compact"
 									variant="tertiary"
 									text={ __( 'Cancel' ) }
 									onClick={ () => handleCancel() }
 								/>
 								<Button
-									className="block-editor-format-toolbar__comment-button"
+									className="block-editor-format-toolbar__comment-button is-compact"
 									variant="primary"
 									text={
 										0 === commentsCount
@@ -414,28 +397,6 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 						</VStack>
 					) }
 				</VStack>
-			</Modal>
-			{ showConfirmation && (
-				<Modal
-					title={ __( 'Confirm' ) }
-					onRequestClose={ () => hideConfirmationOverlay() }
-					className="confirmation-overlay"
-				>
-					<p>
-						{ __(
-							'Are you sure you want to mark this thread as resolved?'
-						) }
-					</p>
-					<Button
-						variant="primary"
-						onClick={ () => confirmAndMarkThreadAsResolved() }
-					>
-						{ __( 'Yes' ) }
-					</Button>
-					<Button onClick={ () => hideConfirmationOverlay() }>
-						{ __( 'No' ) }
-					</Button>
-				</Modal>
 			) }
 		</>
 	);
