@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated `stylelint` dependency to `^16.8.2`
+-   Switched default config from `@wordpress/stylelint-config/scss` to use `@wordpress/stylelint-config/scss-stylistic` to keep stylistic rules.
+
 ## 28.6.0 (2024-08-21)
 
 ## 28.5.0 (2024-08-07)

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated `stylelint` peer dependency requirement to `^16.8.2`
+-   Updated `stylelint-config-recommended` to `^14.0.1` and disabled new rules.
+-   Updated `stylelint-config-recommended-scss` to `^14.1.0` and disabled new rules.
+-   Added `@stylistic/stylelint-plugin` dependency at `^3.0.1`
+-   Migrated stylelint's deprecated rules from v15 to use `@stylistic/stylelint-plugin`. For more information, see the [stylelint migration guide](https://stylelint.io/migration-guide/to-15). To migrate your rule overrides, you just need to add `@stylistic/` in front of the rule names.
+-   Created new `stylistic` and `scss-stylistic` configs. If you want to continue using the exact same rule set as before, you should use these, however if you currently use something like `stylelint-config-prettier` to disable formatting rules, you will want to use the non-stylistic configs (using the same names as before.)
+-   `scss/at-import-partial-extension` has been renamed, you must convert this rule to `scss/load-partial-extension` instead (name only change).
+
+### Bug Fixes
+
+-   Fixes `declaration-block-no-duplicate-properties` in the `scss` config to use the same value as the base config.
+
 ## 22.6.0 (2024-08-21)
 
 ## 22.5.0 (2024-08-07)
