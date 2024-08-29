@@ -256,22 +256,35 @@ function FieldItem( {
 	view: View;
 	onChangeView: ( view: View ) => void;
 } ) {
-	const field = fields.find(
+	let fieldLabel;
+	let fieldIsHidable;
+	const fieldObject = fields.find(
 		( f ) => f.id === fieldId
 	) as NormalizedField< any >;
-	if ( ! field ) {
+	if ( fieldObject ) {
+		fieldLabel = fieldObject.label;
+		fieldIsHidable =
+			fieldObject.enableHiding !== false &&
+			! mandatoryFields.includes( fieldId );
+	} else if ( view.type === LAYOUT_TABLE ) {
+		const combinedFieldObject = view.layout?.combinedFields?.find(
+			( f ) => f.id === fieldId
+		);
+		if ( combinedFieldObject ) {
+			fieldLabel = combinedFieldObject.label;
+			fieldIsHidable = ! mandatoryFields.includes( fieldId );
+		}
+	}
+
+	const index = view.fields?.indexOf( fieldId ) as number;
+	if ( view.type !== LAYOUT_TABLE && ! fieldIsHidable ) {
 		return null;
 	}
-	const index = view.fields?.indexOf( field.id ) as number;
-	const isHidable = isFieldHidable( field, mandatoryFields );
-	if ( view.type !== LAYOUT_TABLE && ! isHidable ) {
-		return null;
-	}
-	const isVisible = viewFields.includes( field.id );
+	const isVisible = viewFields.includes( fieldId );
 	return (
-		<Item key={ field.id }>
+		<Item key={ fieldId }>
 			<HStack expanded className="dataviews-field-control__field">
-				<span>{ field.label }</span>
+				<span>{ fieldLabel }</span>
 				<HStack
 					justify="flex-end"
 					expanded={ false }
@@ -294,7 +307,7 @@ function FieldItem( {
 												0,
 												index - 1
 											) ?? [] ),
-											field.id,
+											fieldId,
 											view.fields[ index - 1 ],
 											...view.fields.slice( index + 1 ),
 										],
@@ -304,7 +317,7 @@ function FieldItem( {
 								label={ sprintf(
 									/* translators: %s: field label */
 									__( 'Move %s up' ),
-									field.label
+									fieldLabel
 								) }
 							/>
 							<Button
@@ -330,7 +343,7 @@ function FieldItem( {
 												index
 											) ?? [] ),
 											view.fields[ index + 1 ],
-											field.id,
+											fieldId,
 											...view.fields.slice( index + 2 ),
 										],
 									} );
@@ -339,13 +352,13 @@ function FieldItem( {
 								label={ sprintf(
 									/* translators: %s: field label */
 									__( 'Move %s down' ),
-									field.label
+									fieldLabel
 								) }
 							/>{ ' ' }
 						</>
 					) }
 					<Button
-						disabled={ ! isHidable }
+						disabled={ ! fieldIsHidable }
 						accessibleWhenDisabled={ false }
 						size="compact"
 						onClick={ () =>
@@ -353,9 +366,9 @@ function FieldItem( {
 								...view,
 								fields: isVisible
 									? viewFields.filter(
-											( id ) => id !== field.id
+											( id ) => id !== fieldId
 									  )
-									: [ ...viewFields, field.id ],
+									: [ ...viewFields, fieldId ],
 							} )
 						}
 						icon={ isVisible ? seen : unseen }
@@ -364,12 +377,12 @@ function FieldItem( {
 								? sprintf(
 										/* translators: %s: field label */
 										__( 'Hide %s' ),
-										field.label
+										fieldLabel
 								  )
 								: sprintf(
 										/* translators: %s: field label */
 										__( 'Show %s' ),
-										field.label
+										fieldLabel
 								  )
 						}
 					/>
@@ -408,10 +421,19 @@ function FieldControl() {
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const visibleFields = view.fields;
 	const hiddenFields = useMemo( () => {
-		return fields
+		const nonFieldListFields = fields
 			.filter( ( field ) => ! viewFields.includes( field.id ) )
 			.map( ( field ) => field.id );
-	}, [ fields, viewFields ] );
+
+		if ( view.type !== LAYOUT_TABLE ) {
+			return nonFieldListFields;
+		}
+		return nonFieldListFields.filter( ( fieldId ) => {
+			return ! view.layout?.combinedFields?.some( ( combinedField ) =>
+				combinedField.children.includes( fieldId )
+			);
+		} );
+	}, [ view, fields, viewFields ] );
 	if (
 		view.type !== LAYOUT_TABLE &&
 		! fields?.some( ( field ) => isFieldHidable( field, mandatoryFields ) )
