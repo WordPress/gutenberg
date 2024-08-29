@@ -31,9 +31,6 @@ export const defaultLayouts = {
 		layout: {
 			primaryField: 'title',
 			styles: {
-				featured_media: {
-					width: '1%',
-				},
 				title: {
 					maxWidth: 300,
 				},
