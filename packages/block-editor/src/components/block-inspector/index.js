@@ -9,6 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -34,37 +35,36 @@ import { unlock } from '../../lock-unlock';
 
 function BlockStylesPanel( { clientId } ) {
 	return (
-		<div>
-			<PanelBody title={ __( 'Styles' ) }>
-				<BlockStyles clientId={ clientId } />
-			</PanelBody>
-		</div>
+		<PanelBody title={ __( 'Styles' ) }>
+			<BlockStyles clientId={ clientId } />
+		</PanelBody>
 	);
 }
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
+	const { getBlockName, getBlockEditingMode } = useSelect( blockEditorStore );
 	const { contentClientIds, hasBlockStyles } = useSelect(
 		( select ) => {
-			const {
-				getClientIdsOfDescendants,
-				getBlockName,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
+			const { getClientIdsOfDescendants } = select( blockEditorStore );
 			const { getBlockStyles } = select( blocksStore );
 			return {
-				contentClientIds: getClientIdsOfDescendants(
-					topLevelLockedBlock
-				).filter(
-					( clientId ) =>
-						getBlockName( clientId ) !== 'core/list-item' &&
-						getBlockEditingMode( clientId ) === 'contentOnly'
-				),
+				contentClientIds:
+					getClientIdsOfDescendants( topLevelLockedBlock ),
 				hasBlockStyles: !! getBlockStyles(
 					getBlockName( topLevelLockedBlock )
 				)?.length,
 			};
 		},
-		[ topLevelLockedBlock ]
+		[ topLevelLockedBlock, getBlockName ]
+	);
+	const eligibleContentClientIds = useMemo(
+		() =>
+			contentClientIds.filter(
+				( clientId ) =>
+					getBlockName( clientId ) !== 'core/list-item' &&
+					getBlockEditingMode( clientId ) === 'contentOnly'
+			),
+		[ contentClientIds, getBlockName, getBlockEditingMode ]
 	);
 	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
 	return (
@@ -78,9 +78,11 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			{ hasBlockStyles && (
 				<BlockStylesPanel clientId={ topLevelLockedBlock } />
 			) }
-			{ contentClientIds.length > 0 && (
+			{ eligibleContentClientIds.length > 0 && (
 				<PanelBody title={ __( 'Content' ) }>
-					<BlockQuickNavigation clientIds={ contentClientIds } />
+					<BlockQuickNavigation
+						clientIds={ eligibleContentClientIds }
+					/>
 				</PanelBody>
 			) }
 		</div>
