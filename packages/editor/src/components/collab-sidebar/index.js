@@ -4,7 +4,7 @@
 // eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, withDispatch, withSelect } from '@wordpress/data';
 import { useState, useEffect, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
@@ -26,19 +26,47 @@ import {
 	moreVertical
 } from '@wordpress/icons';
 
+import { registerBlockType } from '@wordpress/blocks';
+import { addFilter } from '@wordpress/hooks';
+
 /**
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
-//import BlockCommentModal from '../../../../block-editor/src/components/collab/collab-board';
+import { collabSidebarName } from './constants';
+
+import { store as blockEditorStore } from '../../store';
 
 const isBlockCommentExperimentEnabled = window?.__experimentalEnableBlockComment;
+
+const modifyBlockCommentAttributes = (settings, name) => {
+    if ( name && name?.includes( 'core/' ) ) {
+		if( undefined === settings.attributes.blockCommentId || null === settings.attributes.blockCommentId ) {
+			settings.attributes = {
+				...settings.attributes,
+				blockCommentId: {
+					type: 'number',
+					default: 0,
+				},
+			};
+		}
+        
+    }
+    return settings;
+};
+
+// Apply the filter to all core blocks
+addFilter(
+    'blocks.registerBlockType',
+    'block-comment/modify-core-block-attributes',
+    modifyBlockCommentAttributes
+);
 
 /**
  * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
-	
+
 	const postId = useSelect((select) => {
 		return select('core/editor').getCurrentPostId();
 	}, []);
@@ -55,19 +83,6 @@ export default function CollabSidebar() {
 	const [ hasCommentReply, setHasCommentReply ] = useState( false );
 	const [ commentReply, setCommentReply ] = useState( '' );
 	const [ replyMessage, setReplyMessage ] = useState( false );
-
-	// useEffect(() => {
-	// 	if (postId) {
-	// 		apiFetch({
-	// 			path: '/wp/v2/comments?post=' + postId + '&type=block_comment' + '&status=any&per_page=100',
-	// 			method: 'GET',
-	// 		})
-	// 		.then((response) => {
-	// 			const filteredComments = response.filter( comment => comment.status !== 'trash' );
-	// 			setThreads(Array.isArray(filteredComments) ? filteredComments : []);
-	// 		});
-	// 	}
-	// }, [postId]);
 
 	useEffect(() => {
 		if (postId) {
@@ -263,7 +278,6 @@ export default function CollabSidebar() {
 	//const userAvatar = curruntUserData?.avatar_urls[ 48 ] ? curruntUserData?.avatar_urls[ 48 ] : null;
 	
 	const currentUser = curruntUserData?.name || null;
-
 	const allThreads = [];
 	const threadId = 0;
 	const currentThread = allThreads[ threadId ] ?? {};
@@ -283,20 +297,24 @@ export default function CollabSidebar() {
         return getSelectedBlockClientId();
     }, []);
 
-	const blockClassName = useSelect((select) => {
+	const blockCommentId = useSelect((select) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( select('core/block-editor').getSelectedBlockClientId() )?.attributes?.className;
+		return select( 'core/block-editor' ).getBlock( select('core/block-editor').getSelectedBlockClientId() )?.attributes?.blockCommentId;
 	}, []);
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+
 	// // Function to add a border class to the content reference.
-	const setAttributes = () => {
+	const setAttributes = ( clientId, threadId ) => {
 		updateBlockAttributes( clientId, {
-			className: `block-editor-collab__${ threadId }`,
+			blockCommentId: threadId,
 		} );
+		
 	};
 
 	// Function to save the comment.
@@ -387,19 +405,19 @@ export default function CollabSidebar() {
 
 	// On cancel, remove the border if no comments are present.
 	const handleCancel = () => {
-		//onClose();
+		closeGeneralSidebar("edit-post/collab-sidebar");
 	};
 	
 
 	return (
 		<PluginSidebar
-			name="collab-activities"
+			identifier={ collabSidebarName }
 			title={ __( 'Comments' ) }
 			icon={ commentIcon }
 		>
 			<div className="editor-collab-sidebar__activities">
 
-				{ null !== clientId && undefined === blockClassName && (
+				{ null !== clientId && 0 === blockCommentId && (
 					<VStack spacing="3">
 						{ 0 < commentsCount && ! isCurrentThreadResolved && (
 							<>

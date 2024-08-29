@@ -66,7 +66,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		blockClassName,
+		blockCommentID,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -100,9 +100,9 @@ export function PrivateBlockToolbar( {
 		);
 
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const className = select( 'core/block-editor' ).getBlock(
+		const commentID = select( 'core/block-editor' ).getBlock(
 			selectedBlockClientId
-		)?.attributes?.className;
+		)?.attributes?.blockCommentId;
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -123,7 +123,7 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
-			blockClassName: className,
+			blockCommentID: commentID,
 		};
 	}, [] );
 
@@ -202,10 +202,10 @@ export function PrivateBlockToolbar( {
 									</>
 								) }
 
-								{ blockClassName && (
+								{ blockCommentID && (
 									<BlockCommentToolbar
 										clientId={ blockClientId }
-										blockClassName={ blockClassName }
+										blockClassName={ blockCommentID }
 									/>
 								) }
 							</ToolbarGroup>

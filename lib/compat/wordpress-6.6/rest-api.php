@@ -33,7 +33,7 @@ add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 
 /**
  * Adds the post classes to the REST API response.
  *
- * @param  array  $post  The response object data.
+ * @param  array $post  The response object data.
  *
  * @return array
  */
@@ -158,6 +158,39 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_themes_template_directory_ur
 }
 add_action( 'rest_api_init', 'gutenberg_register_wp_rest_themes_template_directory_uri_field' );
 
+/**
+ * Preload theme and global styles paths to avoid flash of variation styles in post editor.
+ *
+ * @param array                   $paths REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Current block editor context.
+ * @return array Filtered preload paths.
+ */
+function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
+	if ( 'core/edit-post' === $context->name ) {
+		$paths[] = '/wp/v2/global-styles/themes/' . get_stylesheet();
+		$paths[] = '/wp/v2/themes?context=edit&status=active';
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() . '?context=edit';
+	}
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_6', 10, 2 );
+
+/**
+ * Updates comment metadata from a REST API request.
+ *
+ * This function is hooked to the `rest_prepare_comment` filter and is responsible for updating the comment metadata based on the data provided in the REST API request.
+ *
+ * It performs the following tasks:
+ * - Updates the `block_comment` metadata for the comment based on the `meta` field in the request.
+ * - Updates the `comment_type` and `comment_approved` fields for the comment based on the corresponding fields in the request.
+ * - Retrieves the author's avatar URLs and adds them to the response data.
+ * - Retrieves the `block_comment` metadata for the comment and adds it to the response data.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Comment       $comment  The comment object.
+ * @param WP_REST_Request  $request  The request object.
+ * @return WP_REST_Response The updated response object.
+ */
 if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 	function update_comment_meta_from_rest_request( $response, $comment, $request ) {
 
