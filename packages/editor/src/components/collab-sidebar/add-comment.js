@@ -116,7 +116,6 @@ export function AddComment( { threads, setReloadComments } ) {
 			setAttributes( clientId, response?.id );
 			setInputComment( '' );
 			setReloadComments( true );
-			//onClose();
 		} );
 	};
 
@@ -164,13 +163,7 @@ export function AddComment( { threads, setReloadComments } ) {
 	// Function to show the confirmation overlay.
 	const showConfirmationOverlay = () => setShowConfirmation( true );
 
-	// Function to hide the confirmation overlay.
-	const hideConfirmationOverlay = () => setShowConfirmation( false );
-
-	// On cancel, remove the border if no comments are present.
-	const handleCancel = () => {
-		//onClose();
-	};
+	const handleCancel = () => {};
 
 	return (
 		<>
