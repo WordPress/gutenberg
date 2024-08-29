@@ -2,37 +2,26 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useReducer } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
+import { useDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import BlockCommentModal from './collab-board';
+export default function BlockCommentMenuItem( { clientId, onClose } ) {
 
-export default function BlockCommentMenuItem( { clientId } ) {
-	const [ isModalOpen, toggleModal ] = useReducer(
-		( isActive ) => ! isActive,
-		false
-	);
+	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+
+	const openCollabBoard = () => {
+		onClose();
+		openGeneralSidebar("edit-post/collab-sidebar");
+	}
 
 	return (
-		<>
-			<MenuItem
-				icon={ collabComment }
-				onClick={ toggleModal }
-				aria-expanded={ isModalOpen }
-				aria-haspopup="dialog"
-			>
-				{ __( 'Comment' ) }
-			</MenuItem>
-			{ isModalOpen && (
-				<BlockCommentModal
-					clientId={ clientId }
-					onClose={ toggleModal }
-				/>
-			) }
-		</>
+		<MenuItem
+			icon={ collabComment }
+			onClick={ openCollabBoard }
+			aria-haspopup="dialog"
+		>
+			{ __( 'Add Comment' ) }
+		</MenuItem>	 
 	);
 }

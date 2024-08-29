@@ -28,6 +28,7 @@ import {
  * Internal dependencies
  */
 import PluginSidebar from '../plugin-sidebar';
+import { collabSidebarName } from './constants';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
@@ -164,7 +165,7 @@ export default function CollabSidebar() {
 
 	return (
 		<PluginSidebar
-			name="collab-activities"
+			identifier={ collabSidebarName }
 			title={ __( 'Comments' ) }
 			icon={ commentIcon }
 		>
