@@ -84,4 +84,13 @@ export const shouldProxy = (
 	);
 };
 
-export const getObjectFromProxy = ( proxy ) => proxyToObj.get( proxy );
+/**
+ * Returns the target object for the passed proxy. If the passed object is not a registered proxy, the
+ * function returns `undefined`.
+ *
+ * @param proxy Proxy from which to know the target.
+ * @return The target object or `undefined`.
+ */
+export const getObjectFromProxy = < T extends object >(
+	proxy: T
+): T | undefined => proxyToObj.get( proxy ) as T;

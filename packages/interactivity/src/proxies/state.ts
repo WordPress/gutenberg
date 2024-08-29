@@ -36,10 +36,12 @@ const proxyToProps: WeakMap<
 > = new WeakMap();
 
 /**
+ *  Checks wether a {@link PropSignal | `PropSignal`} instance exists for the
+ *  given property in the passed proxy.
  *
- * @param proxy
- * @param key
- * @return TODO
+ * @param proxy Proxy of a state object or array.
+ * @param key   The property key.
+ * @return `true` when it exists; false otherwise.
  */
 export const hasPropSignal = ( proxy: object, key: string ) =>
 	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
@@ -260,6 +262,14 @@ export const peek = < T extends object, K extends keyof T >(
 	}
 };
 
+/**
+ * Internal recursive implementation for {@link deepMerge | `deepMerge`}.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
 const deepMergeRecursive = (
 	target: any,
 	source: any,
@@ -304,6 +314,20 @@ const deepMergeRecursive = (
 	}
 };
 
+/**
+ * Recursively update prop values inside the passed `target` and nested plain
+ * objects, using the values present in `source`. References to plain objects
+ * are kept, only updating props containing primitives or arrays. Arrays are
+ * replaced instead of merged or concatenated.
+ *
+ * If the `override` parameter is set to `false`, then all values in `target`
+ * are preserved, and only new properties from `source` are added.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
 export const deepMerge = (
 	target: any,
 	source: any,
