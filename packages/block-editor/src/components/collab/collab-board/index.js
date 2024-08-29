@@ -98,15 +98,15 @@ export default function BlockCommentModal( { clientId, onClose, threadId } ) {
 				content: newComment.comment,
 				comment_date: newComment.createdAt,
 				comment_type: 'block_comment',
-				meta: updatedComments,
 				comment_author: currentUser,
 				comment_approved: 0,
 			},
-		} ).then( ( response ) => {
+		} ).then( (response) => {
 			threadId = response?.id;
 			setAttributes( clientId, threadId );
 			onClose();
 		} );
+	
 	};
 
 	// Function to edit the comment.
