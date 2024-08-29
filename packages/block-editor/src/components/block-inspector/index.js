@@ -9,7 +9,6 @@ import {
 } from '@wordpress/blocks';
 import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,29 +41,29 @@ function BlockStylesPanel( { clientId } ) {
 }
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
-	const { getBlockName, getBlockEditingMode } = useSelect( blockEditorStore );
-	const { contentClientIds, hasBlockStyles } = useSelect(
+	const contentClientIds = useSelect(
 		( select ) => {
-			const { getClientIdsOfDescendants } = select( blockEditorStore );
-			const { getBlockStyles } = select( blocksStore );
-			return {
-				contentClientIds:
-					getClientIdsOfDescendants( topLevelLockedBlock ),
-				hasBlockStyles: !! getBlockStyles(
-					getBlockName( topLevelLockedBlock )
-				)?.length,
-			};
-		},
-		[ topLevelLockedBlock, getBlockName ]
-	);
-	const eligibleContentClientIds = useMemo(
-		() =>
-			contentClientIds.filter(
+			const {
+				getClientIdsOfDescendants,
+				getBlockName,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
+			return getClientIdsOfDescendants( topLevelLockedBlock ).filter(
 				( clientId ) =>
 					getBlockName( clientId ) !== 'core/list-item' &&
 					getBlockEditingMode( clientId ) === 'contentOnly'
-			),
-		[ contentClientIds, getBlockName, getBlockEditingMode ]
+			);
+		},
+		[ topLevelLockedBlock ]
+	);
+	const hasBlockStyles = useSelect(
+		( select ) => {
+			const { getBlockName } = select( blockEditorStore );
+			const { getBlockStyles } = select( blocksStore );
+			return !! getBlockStyles( getBlockName( topLevelLockedBlock ) )
+				?.length;
+		},
+		[ topLevelLockedBlock ]
 	);
 	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
 	return (
@@ -78,11 +77,9 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 			{ hasBlockStyles && (
 				<BlockStylesPanel clientId={ topLevelLockedBlock } />
 			) }
-			{ eligibleContentClientIds.length > 0 && (
+			{ contentClientIds.length > 0 && (
 				<PanelBody title={ __( 'Content' ) }>
-					<BlockQuickNavigation
-						clientIds={ eligibleContentClientIds }
-					/>
+					<BlockQuickNavigation clientIds={ contentClientIds } />
 				</PanelBody>
 			) }
 		</div>
