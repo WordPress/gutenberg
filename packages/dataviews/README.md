@@ -177,14 +177,14 @@ Properties:
 -   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type:
 
-| Property | Table | Grid | List |
+| Properties of `layout` | Table | Grid | List |
 | --- | --- | --- | --- |
-| `layout.primaryField`: the field's `id` to be highlighted in each layout. It's not hidable. | &check; | &check; | &check; |
-| `layout.mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable. | | &check; | &check; |
-| `layout.columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default). | | &check; | |
-| `layout.badgeFields`: a list of field's `id` to render without label and styled as badges. | | &check; | |
-| `layout.combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | &check; | | |
-| `layout.styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column. | &check; | | |
+| `primaryField`: the field's `id` to be highlighted in each layout. It's not hidable. | &check; | &check; | &check; |
+| `mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable. | | &check; | &check; |
+| `columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default). | | &check; | |
+| `badgeFields`: a list of field's `id` to render without label and styled as badges. | | &check; | |
+| `combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | &check; | | |
+| `styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column. | &check; | | |
 
 ### `onChangeView`: `function`
 
