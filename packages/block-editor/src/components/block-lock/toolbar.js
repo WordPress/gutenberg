@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { useReducer, useRef, useEffect } from '@wordpress/element';
 import { lock, unlock } from '@wordpress/icons';
 
@@ -45,16 +45,14 @@ export default function BlockLockToolbar( { clientId } ) {
 
 	return (
 		<>
-			<ToolbarGroup className="block-editor-block-lock-toolbar">
-				<ToolbarButton
-					disabled={ ! canLock }
-					icon={ isLocked ? lock : unlock }
-					label={ label }
-					onClick={ toggleModal }
-					aria-expanded={ isModalOpen }
-					aria-haspopup="dialog"
-				/>
-			</ToolbarGroup>
+			<ToolbarButton
+				disabled={ ! canLock }
+				icon={ isLocked ? lock : unlock }
+				label={ label }
+				onClick={ toggleModal }
+				aria-expanded={ isModalOpen }
+				aria-haspopup="dialog"
+			/>
 			{ isModalOpen && (
 				<BlockLockModal clientId={ clientId } onClose={ toggleModal } />
 			) }

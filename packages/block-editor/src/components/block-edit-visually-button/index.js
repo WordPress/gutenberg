@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -26,14 +26,12 @@ export default function BlockEditVisuallyButton( { clientIds } ) {
 	}
 
 	return (
-		<ToolbarGroup>
-			<ToolbarButton
-				onClick={ () => {
-					toggleBlockMode( clientId );
-				} }
-			>
-				{ __( 'Edit visually' ) }
-			</ToolbarButton>
-		</ToolbarGroup>
+		<ToolbarButton
+			onClick={ () => {
+				toggleBlockMode( clientId );
+			} }
+		>
+			{ __( 'Edit visually' ) }
+		</ToolbarButton>
 	);
 }

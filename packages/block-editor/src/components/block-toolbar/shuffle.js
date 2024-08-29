@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { shuffle } from '@wordpress/icons';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -14,15 +14,7 @@ import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
 
-function Container( props ) {
-	return (
-		<ToolbarGroup>
-			<ToolbarButton { ...props } />
-		</ToolbarGroup>
-	);
-}
-
-export default function Shuffle( { clientId, as = Container } ) {
+export default function Shuffle( { clientId } ) {
 	const { categories, patterns, patternName } = useSelect(
 		( select ) => {
 			const {
@@ -89,9 +81,8 @@ export default function Shuffle( { clientId, as = Container } ) {
 		return sameCategoryPatternsWithSingleWrapper[ nextPatternIndex ];
 	}
 
-	const ComponentToUse = as;
 	return (
-		<ComponentToUse
+		<ToolbarButton
 			label={ __( 'Shuffle' ) }
 			icon={ shuffle }
 			className="block-editor-block-toolbar-shuffle"
