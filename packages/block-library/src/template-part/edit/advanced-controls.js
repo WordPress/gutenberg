@@ -82,7 +82,6 @@ export function TemplatePartAdvancedControls( {
 						} }
 						onFocus={ ( event ) => event.target.select() }
 					/>
-
 					<SelectControl
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom

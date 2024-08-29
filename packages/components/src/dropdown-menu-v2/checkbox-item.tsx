@@ -57,4 +57,3 @@ export const DropdownMenuCheckboxItem = forwardRef<
 		</Styled.DropdownMenuCheckboxItem>
 	);
 } );
-DropdownMenuCheckboxItem.displayName = 'DropdownMenuV2.CheckboxItem';

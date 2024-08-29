@@ -28,7 +28,9 @@ describe( 'typography utils', () => {
 				preset: {
 					size: 0,
 				},
-				typographySettings: undefined,
+				typographySettings: {
+					fluid: true,
+				},
 				expected: 0,
 			},
 
@@ -37,7 +39,9 @@ describe( 'typography utils', () => {
 				preset: {
 					size: '0',
 				},
-				typographySettings: undefined,
+				typographySettings: {
+					fluid: true,
+				},
 				expected: '0',
 			},
 
@@ -46,7 +50,9 @@ describe( 'typography utils', () => {
 				preset: {
 					size: null,
 				},
-				typographySettings: null,
+				typographySettings: {
+					fluid: true,
+				},
 				expected: null,
 			},
 
@@ -153,7 +159,6 @@ describe( 'typography utils', () => {
 				message: 'should return already clamped value',
 				preset: {
 					size: 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
-					fluid: false,
 				},
 				settings: {
 					typography: {
@@ -168,7 +173,6 @@ describe( 'typography utils', () => {
 				message: 'should return value with unsupported unit',
 				preset: {
 					size: '1000%',
-					fluid: false,
 				},
 				settings: {
 					typography: {
@@ -676,6 +680,38 @@ describe( 'typography utils', () => {
 					},
 				},
 				expected: 'clamp(16px, 1rem + ((1vw - 6.4px) * 0.179), 17px)',
+			},
+
+			// Individual preset settings override global settings.
+			{
+				message:
+					'should convert individual preset size to fluid if fluid is disabled in global settings',
+				preset: {
+					size: '17px',
+					fluid: true,
+				},
+				settings: {
+					typography: {},
+				},
+				expected:
+					'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.234), 17px)',
+			},
+			{
+				message:
+					'should use individual preset settings if fluid is disabled in global settings',
+				preset: {
+					size: '17px',
+					fluid: {
+						min: '16px',
+						max: '26px',
+					},
+				},
+				settings: {
+					typography: {
+						fluid: false,
+					},
+				},
+				expected: 'clamp(16px, 1rem + ((1vw - 3.2px) * 0.781), 26px)',
 			},
 		].forEach( ( { message, preset, settings, expected } ) => {
 			it( `${ message }`, () => {

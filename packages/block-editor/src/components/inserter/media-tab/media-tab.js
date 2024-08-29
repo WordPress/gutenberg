@@ -71,6 +71,8 @@ function MediaTab( {
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							render={ ( { open } ) => (
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									onClick={ ( event ) => {
 										// Safari doesn't emit a focus event on button elements when
 										// clicked and we need to manually focus the button here.

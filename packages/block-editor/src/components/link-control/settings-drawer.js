@@ -25,6 +25,8 @@ function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
 	return (
 		<>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="block-editor-link-control__drawer-toggle"
 				aria-expanded={ settingsOpen }
 				onClick={ () => setSettingsOpen( ! settingsOpen ) }

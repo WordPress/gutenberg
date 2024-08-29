@@ -2,9 +2,28 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+-   Soft deprecate `size` prop on `AlignmentMatrixControl.Icon` ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
+
 ### Enhancements
 
+-   `ColorPicker`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `CustomSelectControl V2`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `AlignmentMatrixControl.Icon`: rewrite entirely using SVG markup ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
+-   `DateTime`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `FormToggle`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `FormTokenField`: Remove unused border-radius ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `InputControl`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `Navigation`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `RangeControl`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `ResizeableBox`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `TabPanel`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+-   `Tabs`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
 -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+-   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
+-   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
     -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
@@ -27,8 +46,13 @@
     -   `UnitControl`
 -   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
 
+### Bug Fixes
+
+-   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
+
 ### Internal
 
+-   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873)).
 -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
 -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
 

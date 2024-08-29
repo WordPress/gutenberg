@@ -52,6 +52,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 				/>
 				<div className="block-editor-global-styles__clear-shadow">
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
 					>
@@ -99,6 +101,8 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 			} ) }
 			render={
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					className={ clsx(
 						'block-editor-global-styles__shadow-indicator',
 						{
@@ -151,7 +155,11 @@ function renderShadowToggle() {
 		};
 
 		return (
-			<Button { ...toggleProps }>
+			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
+				{ ...toggleProps }
+			>
 				<HStack justify="flex-start">
 					<Icon
 						className="block-editor-global-styles__toggle-icon"

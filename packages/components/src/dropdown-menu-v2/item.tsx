@@ -44,4 +44,3 @@ export const DropdownMenuItem = forwardRef<
 		</Styled.DropdownMenuItem>
 	);
 } );
-DropdownMenuItem.displayName = 'DropdownMenuV2.Item';

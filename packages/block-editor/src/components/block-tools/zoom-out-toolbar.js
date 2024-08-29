@@ -21,7 +21,7 @@ import BlockMover from '../block-mover';
 import Shuffle from '../block-toolbar/shuffle';
 import NavigableToolbar from '../navigable-toolbar';
 
-export default function ZoomOutToolbar( { clientId, rootClientId } ) {
+export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -61,11 +61,11 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId ]
 	);
 
 	const {
@@ -133,6 +133,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 					label={ __( 'Edit' ) }
 					onClick={ () => {
 						__unstableSetEditorMode( 'edit' );
+						__unstableContentRef.current?.focus();
 					} }
 				/>
 			) }

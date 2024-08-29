@@ -62,22 +62,18 @@ function ToolbarEditButton( {
 	onSelectMedia,
 	toggleUseFeaturedImage,
 	useFeaturedImage,
-	featuredImageURL,
 } ) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
-				mediaUrl={
-					useFeaturedImage && featuredImageURL
-						? featuredImageURL
-						: mediaUrl
-				}
+				mediaURL={ mediaUrl }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
 	);
@@ -200,7 +196,6 @@ function MediaContainer( props, ref ) {
 					}
 					mediaId={ mediaId }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }

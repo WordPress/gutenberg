@@ -59,18 +59,9 @@ export const Default = Template.bind( {} );
 export const IconSubcomponent = () => {
 	return (
 		<HStack justify="flex-start">
+			<Icon icon={ <AlignmentMatrixControl.Icon value="top left" /> } />
 			<Icon
-				icon={
-					<AlignmentMatrixControl.Icon size={ 24 } value="top left" />
-				}
-			/>
-			<Icon
-				icon={
-					<AlignmentMatrixControl.Icon
-						size={ 24 }
-						value="center center"
-					/>
-				}
+				icon={ <AlignmentMatrixControl.Icon value="center center" /> }
 			/>
 		</HStack>
 	);
