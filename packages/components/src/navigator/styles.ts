@@ -104,10 +104,9 @@ export const navigatorScreenAnimation = ( {
 	return css`
 		position: ${ isAnimatingOut ? 'absolute' : 'relative' };
 		z-index: ${ isAnimatingOut ? 0 : 1 };
-		${ isAnimatingOut &&
-		css`
-			inset: 0;
-		` }
+		inset-block-start: ${ isAnimatingOut ? 0 : 'initial' };
+		inset-inline-start: ${ isAnimatingOut ? 0 : 'initial' };
+		inset-inline-end: ${ isAnimatingOut ? 0 : 'initial' };
 
 		animation: ${ skipAnimation
 			? 'none'
@@ -126,4 +125,5 @@ export const navigatorScreen = css`
 	overflow-x: auto;
 	/* In case the root has a height, it should not be exceeded */
 	max-height: 100%;
+	box-sizing: border-box;
 `;
