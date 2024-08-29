@@ -10,6 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import isURLLike from '../components/link-control/is-url-like';
 import { unlock } from '../lock-unlock';
 import BlockContext from '../components/block-context';
 
@@ -176,14 +177,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					for ( const [ attributeName, value ] of Object.entries(
 						values
 					) ) {
-						if ( attributeName === 'url' ) {
+						if (
+							attributeName === 'url' &&
+							( ! value || ! isURLLike( value ) )
+						) {
 							// Return null if value is not a valid URL.
-							try {
-								new URL( value );
-								attributes[ attributeName ] = value;
-							} catch ( error ) {
-								attributes[ attributeName ] = null;
-							}
+							attributes[ attributeName ] = null;
 						} else {
 							attributes[ attributeName ] = value;
 						}
