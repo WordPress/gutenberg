@@ -5,6 +5,7 @@ import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	ToolbarButton,
+	ToolbarGroup,
 	ToolbarItem,
 	__experimentalText as Text,
 	MenuGroup,
@@ -264,18 +265,20 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 
 	if ( hideDropdown ) {
 		return (
-			<ToolbarButton
-				disabled
-				className="block-editor-block-switcher__no-switcher-icon"
-				title={ blockSwitcherLabel }
-				icon={
-					<BlockIndicator
-						icon={ icon }
-						showTitle={ isReusable || isTemplate }
-						blockTitle={ blockTitle }
-					/>
-				}
-			/>
+			<ToolbarGroup>
+				<ToolbarButton
+					disabled
+					className="block-editor-block-switcher__no-switcher-icon"
+					title={ blockSwitcherLabel }
+					icon={
+						<BlockIndicator
+							icon={ icon }
+							showTitle={ isReusable || isTemplate }
+							blockTitle={ blockTitle }
+						/>
+					}
+				/>
+			</ToolbarGroup>
 		);
 	}
 
@@ -291,40 +294,42 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 				clientIds.length
 		  );
 	return (
-		<ToolbarItem>
-			{ ( toggleProps ) => (
-				<DropdownMenu
-					className="block-editor-block-switcher"
-					label={ blockSwitcherLabel }
-					popoverProps={ {
-						placement: 'bottom-start',
-						className: 'block-editor-block-switcher__popover',
-					} }
-					icon={
-						<BlockIndicator
-							icon={ icon }
-							showTitle={ isReusable || isTemplate }
-							blockTitle={ blockTitle }
-						/>
-					}
-					toggleProps={ {
-						description: blockSwitcherDescription,
-						...toggleProps,
-					} }
-					menuProps={ { orientation: 'both' } }
-				>
-					{ ( { onClose } ) => (
-						<BlockSwitcherDropdownMenuContents
-							onClose={ onClose }
-							clientIds={ clientIds }
-							hasBlockStyles={ hasBlockStyles }
-							canRemove={ canRemove }
-							isUsingBindings={ isUsingBindings }
-						/>
-					) }
-				</DropdownMenu>
-			) }
-		</ToolbarItem>
+		<ToolbarGroup>
+			<ToolbarItem>
+				{ ( toggleProps ) => (
+					<DropdownMenu
+						className="block-editor-block-switcher"
+						label={ blockSwitcherLabel }
+						popoverProps={ {
+							placement: 'bottom-start',
+							className: 'block-editor-block-switcher__popover',
+						} }
+						icon={
+							<BlockIndicator
+								icon={ icon }
+								showTitle={ isReusable || isTemplate }
+								blockTitle={ blockTitle }
+							/>
+						}
+						toggleProps={ {
+							description: blockSwitcherDescription,
+							...toggleProps,
+						} }
+						menuProps={ { orientation: 'both' } }
+					>
+						{ ( { onClose } ) => (
+							<BlockSwitcherDropdownMenuContents
+								onClose={ onClose }
+								clientIds={ clientIds }
+								hasBlockStyles={ hasBlockStyles }
+								canRemove={ canRemove }
+								isUsingBindings={ isUsingBindings }
+							/>
+						) }
+					</DropdownMenu>
+				) }
+			</ToolbarItem>
+		</ToolbarGroup>
 	);
 };
 
