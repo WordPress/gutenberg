@@ -6,10 +6,6 @@
 	&:not(details) {
 		padding-top: 23px;
 		max-height: 100%;
-
-		&:not(.has-user-size) {
-			max-height: 50% !important;
-		}
 	}
 
 	// The component renders as a details element in short viewports.
@@ -31,24 +27,54 @@
 			z-index: 1;
 		}
 	}
+}
 
-	& .components-resizable-box__handle-top {
-		top: 0;
-		box-shadow: 0 $border-width $gray-300;
+.edit-post-meta-boxes-main__resize-handle {
+	display: flex;
+	// The position is absolute by default inline style of ResizableBox.
+	inset: 0 0 auto 0;
+	height: 23px;
+	box-shadow: 0 $border-width $gray-300;
+
+	&:hover > button::before,
+	&:hover > button::after {
+		background-color: var(--wp-admin-theme-color);
 	}
-	& .components-resizable-box__side-handle::before {
-		border-radius: 0;
-		top: 0;
-		height: $border-width;
+	&:hover > button::before {
+		transform: translateX(-$grid-unit-20);
 	}
-	& .components-resizable-box__handle::after {
-		background-color: $gray-300;
-		box-shadow: none;
-		border-radius: 4px;
-		height: $grid-unit-05;
-		top: calc(50% - #{$grid-unit-05} / 2);
-		width: 100px;
-		right: calc(50% - 50px);
+	&:hover > button::after {
+		transform: translateX($grid-unit-20);
+	}
+
+	& > button {
+		appearance: none;
+		cursor: inherit;
+		margin: auto;
+		padding: 0;
+		border: none;
+		background: none;
+		outline: none;
+		display: grid;
+		grid-template: auto / auto;
+
+		&:is(:focus, :active)::before,
+		&:is(:focus, :active)::after {
+			background-color: var(--wp-admin-theme-color);
+		}
+
+		&::before,
+		&::after {
+			content: "";
+			grid-area: 1 / 1;
+			display: block;
+			// Other resize handles are 68px when not hovered and this grid unit is close.
+			width: $grid-unit-80;
+			height: $grid-unit-05;
+			background-color: $gray-300;
+			border-radius: $grid-unit-05;
+			transition: transform 0.3s ease-out;
+		}
 	}
 }
 

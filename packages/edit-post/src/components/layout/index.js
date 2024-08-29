@@ -26,9 +26,10 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
-	useLayoutEffect,
 	useMemo,
+	useId,
 	useRef,
+	useState,
 } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -41,8 +42,17 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { ResizableBox, SlotFillProvider } from '@wordpress/components';
-import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
+import {
+	ResizableBox,
+	SlotFillProvider,
+	Tooltip,
+	VisuallyHidden,
+} from '@wordpress/components';
+import {
+	useMediaQuery,
+	useRefEffect,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -176,13 +186,41 @@ function MetaBoxesMain( { isLegacy } ) {
 	const resizableBoxRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
-	const isAutoHeight = openHeight === undefined;
-	// In case a user size is set stops the default max-height from applying.
-	useLayoutEffect( () => {
-		if ( ! isLegacy && hasAnyVisible && ! isShort && ! isAutoHeight ) {
-			resizableBoxRef.current.resizable.classList.add( 'has-user-size' );
+	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
+	// Keeps the resizable area’s size constraints updated taking into account
+	// editor notices. The constraints are also used to derive the value for the
+	// aria-valuenow attribute on the seperator.
+	const effectSizeContraints = useRefEffect( ( node ) => {
+		const container = node.closest(
+			'.interface-interface-skeleton__content'
+		);
+		const noticeLists = container.querySelectorAll(
+			':scope > .components-notice-list'
+		);
+		const resizeHandle = container.querySelector(
+			'.edit-post-meta-boxes-main__resize-handle'
+		);
+		const actualize = () => {
+			const fullHeight = container.offsetHeight;
+			let nextMax = fullHeight;
+			for ( const element of noticeLists ) {
+				nextMax -= element.offsetHeight;
+			}
+			const nextMin = resizeHandle.offsetHeight;
+			setHeightConstraints( { min: nextMin, max: nextMax } );
+		};
+		const observer = new window.ResizeObserver( actualize );
+		observer.observe( container );
+		for ( const element of noticeLists ) {
+			observer.observe( element );
 		}
-	}, [ isAutoHeight, isShort, hasAnyVisible, isLegacy ] );
+		return () => observer.disconnect();
+	}, [] );
+
+	const separatorRef = useRef();
+	const separatorHelpId = useId();
+
+	const [ isUntouched, setIsUntouched ] = useState( true );
 
 	if ( ! hasAnyVisible ) {
 		return;
@@ -206,6 +244,20 @@ function MetaBoxesMain( { isLegacy } ) {
 		return contents;
 	}
 
+	const isAutoHeight = openHeight === undefined;
+	let usedMax = '50%'; // Approximation before max has a value.
+	if ( max !== undefined ) {
+		// Halves the available max height until a user height is set.
+		usedMax = isAutoHeight && isUntouched ? max / 2 : max;
+	}
+
+	const getAriaValueNow = ( current, total ) =>
+		Math.round( ( ( current - min ) / ( total - min ) ) * 100 );
+	const usedAriaValueNow =
+		max === undefined || isAutoHeight
+			? 50
+			: getAriaValueNow( openHeight, max );
+
 	if ( isShort ) {
 		return (
 			<details
@@ -224,6 +276,29 @@ function MetaBoxesMain( { isLegacy } ) {
 			</details>
 		);
 	}
+
+	// TODO: Support more/all keyboard interactions from the window splitter pattern:
+	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
+	const onSeparatorKeyDown = ( event ) => {
+		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
+		if ( delta ) {
+			const { resizable } = resizableBoxRef.current;
+			const fromHeight = isAutoHeight
+				? resizable.offsetHeight
+				: openHeight;
+			const nextHeight = Math.min(
+				max,
+				Math.max( min, delta + fromHeight )
+			);
+			resizableBoxRef.current.updateSize( { height: nextHeight } );
+			setPreference(
+				'core/edit-post',
+				'metaBoxesMainOpenHeight',
+				nextHeight
+			);
+		}
+	};
+
 	return (
 		<ResizableBox
 			className={ className }
@@ -239,8 +314,8 @@ function MetaBoxesMain( { isLegacy } ) {
 				bottomRight: false,
 				bottomLeft: false,
 			} }
-			// This is overriden by an !important rule that applies until user resizes.
-			maxHeight="100%"
+			minHeight={ min }
+			maxHeight={ usedMax }
 			bounds="parent"
 			boundsByDirection
 			// Avoids hiccups while dragging over objects like iframes and ensures that
@@ -250,19 +325,59 @@ function MetaBoxesMain( { isLegacy } ) {
 				target.setPointerCapture( pointerId );
 			} }
 			onResizeStart={ ( event, direction, elementRef ) => {
-				// Avoids height jumping in case it’s limited by max-height.
-				elementRef.style.height = `${ elementRef.offsetHeight }px`;
-				// Stops initial max-height from being applied.
-				elementRef.classList.add( 'has-user-size' );
+				if ( isAutoHeight ) {
+					const heightNow = elementRef.offsetHeight;
+					// Sets the starting height to avoid visual jumps in height and
+					// aria-valuenow being `NaN` for the first (few) resize events.
+					resizableBoxRef.current.updateSize( { height: heightNow } );
+					// Causes `maxHeight` to update to full `max` value instead of half.
+					setIsUntouched( false );
+				}
+			} }
+			onResize={ ( event, direction, elementRef, delta ) => {
+				const fromHeight = resizableBoxRef.current.state.height;
+				const nextHeight = fromHeight + delta.height;
+				const separator = separatorRef.current;
+				separator.ariaValueNow = getAriaValueNow( nextHeight, max );
 			} }
 			onResizeStop={ () => {
+				const nextHeight = resizableBoxRef.current.state.height;
 				setPreference(
 					'core/edit-post',
 					'metaBoxesMainOpenHeight',
-					resizableBoxRef.current.state.height
+					nextHeight
 				);
 			} }
+			handleClasses={ {
+				top: 'edit-post-meta-boxes-main__resize-handle',
+			} }
+			handleComponent={ {
+				top: (
+					<>
+						<Tooltip text={ __( 'Drag to resize' ) }>
+							{ /* Disable reason: aria-valuenow is supported by separator role. */ }
+							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
+							<button
+								ref={ separatorRef }
+								aria-label={ __( 'Drag to resize' ) }
+								aria-describedby={ separatorHelpId }
+								onKeyDown={ onSeparatorKeyDown }
+								// Disable reason: buttons are allowed to be separator role.
+								// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+								role="separator"
+								aria-valuenow={ usedAriaValueNow }
+							/>
+						</Tooltip>
+						<VisuallyHidden id={ separatorHelpId }>
+							{ __(
+								'Use up and down arrow keys to resize the metabox panel.'
+							) }
+						</VisuallyHidden>
+					</>
+				),
+			} }
 		>
+			<meta ref={ effectSizeContraints } />
 			{ contents }
 		</ResizableBox>
 	);
