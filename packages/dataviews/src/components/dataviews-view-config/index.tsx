@@ -21,6 +21,7 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
+	BaseControl,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
@@ -38,7 +39,7 @@ import {
 	sortLabels,
 } from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
-import type { NormalizedField, SupportedLayouts } from '../../types';
+import type { NormalizedField, SupportedLayouts, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
@@ -240,23 +241,177 @@ function isFieldHidable(
 	);
 }
 
+function FieldItem( {
+	fields,
+	fieldId,
+	mandatoryFields,
+	viewFields,
+	view,
+	onChangeView,
+}: {
+	fields: NormalizedField< any >[];
+	fieldId: string;
+	mandatoryFields: string | any[];
+	viewFields: string[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+} ) {
+	const field = fields.find(
+		( f ) => f.id === fieldId
+	) as NormalizedField< any >;
+	if ( ! field ) {
+		return null;
+	}
+	const index = view.fields?.indexOf( field.id ) as number;
+	const isHidable = isFieldHidable( field, mandatoryFields );
+	if ( view.type !== LAYOUT_TABLE && ! isHidable ) {
+		return null;
+	}
+	const isVisible = viewFields.includes( field.id );
+	return (
+		<Item key={ field.id }>
+			<HStack expanded className="dataviews-field-control__field">
+				<span>{ field.label }</span>
+				<HStack
+					justify="flex-end"
+					expanded={ false }
+					className="dataviews-field-control__actions"
+				>
+					{ view.type === LAYOUT_TABLE && isVisible && (
+						<>
+							<Button
+								disabled={ ! isVisible || index < 1 }
+								accessibleWhenDisabled={ false }
+								size="compact"
+								onClick={ () => {
+									if ( ! view.fields || index < 1 ) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index - 1
+											) ?? [] ),
+											field.id,
+											view.fields[ index - 1 ],
+											...view.fields.slice( index + 1 ),
+										],
+									} );
+								} }
+								icon={ chevronUp }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s up' ),
+									field.label
+								) }
+							/>
+							<Button
+								disabled={
+									! isVisible ||
+									! view.fields ||
+									index >= view.fields.length - 1
+								}
+								accessibleWhenDisabled={ false }
+								size="compact"
+								onClick={ () => {
+									if (
+										! view.fields ||
+										index >= view.fields.length - 1
+									) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index
+											) ?? [] ),
+											view.fields[ index + 1 ],
+											field.id,
+											...view.fields.slice( index + 2 ),
+										],
+									} );
+								} }
+								icon={ chevronDown }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s down' ),
+									field.label
+								) }
+							/>{ ' ' }
+						</>
+					) }
+					<Button
+						disabled={ ! isHidable }
+						accessibleWhenDisabled={ false }
+						size="compact"
+						onClick={ () =>
+							onChangeView( {
+								...view,
+								fields: isVisible
+									? viewFields.filter(
+											( id ) => id !== field.id
+									  )
+									: [ ...viewFields, field.id ],
+							} )
+						}
+						icon={ isVisible ? seen : unseen }
+						label={
+							isVisible
+								? sprintf(
+										/* translators: %s: field label */
+										__( 'Hide %s' ),
+										field.label
+								  )
+								: sprintf(
+										/* translators: %s: field label */
+										__( 'Show %s' ),
+										field.label
+								  )
+						}
+					/>
+				</HStack>
+			</HStack>
+		</Item>
+	);
+}
+
+function FieldList( {
+	fields,
+	fieldIds,
+	mandatoryFields,
+	viewFields,
+	view,
+	onChangeView,
+}: Omit< Parameters< typeof FieldItem >[ 0 ], 'fieldId' > & {
+	fieldIds: string[];
+} ) {
+	return fieldIds.map( ( fieldId ) => (
+		<FieldItem
+			key={ fieldId }
+			fields={ fields }
+			fieldId={ fieldId }
+			mandatoryFields={ mandatoryFields }
+			viewFields={ viewFields }
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	) );
+}
+
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const mandatoryFields = getMandatoryFields( view );
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	const fieldsOrdered = useMemo( () => {
-		if ( ! view.fields ) {
-			return fields.map( ( field ) => field.id );
-		}
-		const result = [ ...view.fields ];
-		fields.forEach( ( field ) => {
-			if ( result.includes( field.id ) ) {
-				return;
-			}
-			result.push( field.id );
-		} );
-		return result;
-	}, [ fields, view.fields ] );
+	const visibleFields = view.fields;
+	const hiddenFields = useMemo( () => {
+		return fields
+			.filter( ( field ) => ! viewFields.includes( field.id ) )
+			.map( ( field ) => field.id );
+	}, [ fields, viewFields ] );
 	if (
 		view.type !== LAYOUT_TABLE &&
 		! fields?.some( ( field ) => isFieldHidable( field, mandatoryFields ) )
@@ -264,146 +419,37 @@ function FieldControl() {
 		return null;
 	}
 	return (
-		<ItemGroup isBordered isSeparated>
-			{ fieldsOrdered?.map( ( fieldId ) => {
-				const field = fields.find(
-					( f ) => f.id === fieldId
-				) as NormalizedField< any >;
-				const index = view.fields?.indexOf( field.id ) as number;
-				const isHidable = isFieldHidable( field, mandatoryFields );
-				if ( view.type !== LAYOUT_TABLE && ! isHidable ) {
-					return null;
-				}
-				const isVisible = viewFields.includes( field.id );
-				return (
-					<Item key={ field.id }>
-						<HStack
-							expanded
-							className="dataviews-field-control__field"
-						>
-							<span>{ field.label }</span>
-							<HStack
-								justify="flex-end"
-								expanded={ false }
-								className="dataviews-field-control__actions"
-							>
-								{ view.type === LAYOUT_TABLE && (
-									<>
-							<Button
-											disabled={
-												! isVisible || index < 1
-									}
-									accessibleWhenDisabled={ false }
-									size="compact"
-											onClick={ () => {
-												if (
-													! view.fields ||
-													index < 1
-												) {
-													return;
-												}
-										onChangeView( {
-											...view,
-													fields: [
-														...( view.fields.slice(
-															0,
-															index - 1
-														) ?? [] ),
-														field.id,
-														view.fields[
-															index - 1
-														],
-														...view.fields.slice(
-															index + 1
-														),
-													],
-												} );
-											} }
-											icon={ chevronUp }
-									label={ sprintf(
-										/* translators: %s: field label */
-												__( 'Move %s up' ),
-										field.label
-									) }
-								/>
-								<Button
-											disabled={
-												! isVisible ||
-												! view.fields ||
-												index >= view.fields.length - 1
-									}
-									accessibleWhenDisabled={ false }
-									size="compact"
-											onClick={ () => {
-												if (
-													! view.fields ||
-													index >=
-														view.fields.length - 1
-												) {
-													return;
-												}
-										onChangeView( {
-											...view,
-													fields: [
-														...( view.fields.slice(
-															0,
-															index
-														) ?? [] ),
-														view.fields[
-															index + 1
-														],
-														field.id,
-														...view.fields.slice(
-															index + 2
-														),
-													],
-												} );
-											} }
-											icon={ chevronDown }
-									label={ sprintf(
-										/* translators: %s: field label */
-												__( 'Move %s down' ),
-										field.label
-									) }
-										/>{ ' ' }
-									</>
-								) }
-								<Button
-									disabled={ ! isHidable }
-									accessibleWhenDisabled={ false }
-								size="compact"
-								onClick={ () =>
-									onChangeView( {
-										...view,
-										fields: isVisible
-											? viewFields.filter(
-														( id ) =>
-															id !== field.id
-											  )
-											: [ ...viewFields, field.id ],
-									} )
-								}
-								icon={ isVisible ? seen : unseen }
-								label={
-									isVisible
-											? sprintf(
-													/* translators: %s: field label */
-													__( 'Hide %s' ),
-													field.label
-											  )
-											: sprintf(
-													/* translators: %s: field label */
-													__( 'Show %s' ),
-													field.label
-											  )
-								}
-							/>
-						</HStack>
-						</HStack>
-					</Item>
-				);
-			} ) }
-		</ItemGroup>
+		<VStack spacing={ 4 }>
+			{ !! visibleFields?.length && (
+				<ItemGroup isBordered isSeparated>
+					<FieldList
+						fields={ fields }
+						fieldIds={ visibleFields }
+						mandatoryFields={ mandatoryFields }
+						viewFields={ viewFields }
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
+				</ItemGroup>
+			) }
+			{ !! hiddenFields?.length && (
+				<BaseControl __nextHasNoMarginBottom>
+					<BaseControl.VisualLabel>
+						{ __( 'Hidden' ) }
+					</BaseControl.VisualLabel>
+					<ItemGroup isBordered isSeparated>
+						<FieldList
+							fields={ fields }
+							fieldIds={ hiddenFields }
+							mandatoryFields={ mandatoryFields }
+							viewFields={ viewFields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</ItemGroup>
+				</BaseControl>
+			) }
+		</VStack>
 	);
 }
 
