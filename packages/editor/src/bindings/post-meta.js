@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -81,19 +82,33 @@ export default {
 
 		return true;
 	},
-	getFieldsList( { registry, context } ) {
+	getFieldsList: function GetFieldsList( { registry, context } ) {
 		let metaFields = {};
 		const {
 			type,
 			is_custom: isCustom,
 			slug,
 		} = registry.select( editorStore ).getCurrentPost();
-		const { getPostTypes, getEntityRecord, getEditedEntityRecord } =
+		const { getPostTypes, getEditedEntityRecord } =
 			registry.select( coreDataStore );
+
+		let postType = context?.postType;
+
+		// useSelect prevents needing a blockBindingsPanel render to fetch the data.
+		const fields = useSelect(
+			( select ) => {
+				const entityRecord = select( coreDataStore ).getEntityRecord(
+					'root',
+					'postType',
+					postType
+				);
+				return entityRecord?.meta;
+			},
+			[ postType ]
+		);
 
 		// If it is a template, use the default values.
 		if ( ! context?.postType && type === 'wp_template' ) {
-			let postType;
 			let isGlobalTemplate = false;
 			// Get the 'kind' from the start of the slug.
 			const [ kind ] = slug.split( '-' );
@@ -110,18 +125,12 @@ export default {
 					) || [];
 
 				// Infer the post type from the slug.
+				// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
 				const match = slug.match(
 					`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
 				);
 				postType = match ? match[ 1 ] : 'post';
 			}
-
-			// TODO: Fields returns undefined on the first click.
-			const fields = getEntityRecord(
-				'root',
-				'postType',
-				postType
-			)?.meta;
 
 			// Populate the `metaFields` object with the default values.
 			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
@@ -144,6 +153,7 @@ export default {
 		}
 
 		// Remove footnotes or private keys from the list of fields.
+		// TODO: Remove this once we retrieve the fields from 'types' endpoint in post or page editor.
 		return Object.fromEntries(
 			Object.entries( metaFields ).filter(
 				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
