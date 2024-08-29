@@ -120,8 +120,12 @@ const { state, actions, callbacks } = store(
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
-				const { lightbox, images } = getContext( 'core/gallery' ) || {};
-				state.images = lightbox ? images || [] : [ imageId ];
+				const { state: galleryState } = store( 'core/gallery' );
+				const { lightbox, galleryId } =
+					getContext( 'core/gallery' ) || {};
+				state.images = lightbox
+					? galleryState.images[ galleryId ] || []
+					: [ imageId ];
 
 				// Sets the current image index to the one that was clicked.
 				callbacks.setCurrentImageIndex( imageId );
@@ -258,15 +262,6 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
-			populateGalleryArray() {
-				const { lightbox, images } = getContext( 'core/gallery' ) || {};
-				if ( ! lightbox ) {
-					return;
-				}
-
-				const ctx = getContext();
-				images.push( ctx.imageId );
-			},
 			setCurrentImageIndex( imageId ) {
 				const currentIndex = state.images.findIndex(
 					( id ) => id === imageId
@@ -447,18 +442,8 @@ const { state, actions, callbacks } = store(
 				const { ref } = getElement();
 				if ( ! state.overlayEnabled ) {
 					ref.textContent = '';
-				} else if ( state.images.length === 1 ) {
-					ref.textContent = state.currentImage.alt
-						? `Enlarged image: ${ state.currentImage.alt }`
-						: 'Enlarged image';
 				} else {
-					ref.textContent = state.currentImage.alt
-						? `Enlarged image ${ state.currentImageIndex + 1 } of ${
-								state.images.length
-						  }: ${ state.currentImage.alt }`
-						: `Enlarged image ${ state.currentImageIndex + 1 } of ${
-								state.images.length
-						  }`;
+					ref.textContent = state.currentImage.screenReaderText;
 				}
 			},
 			setButtonStyles() {

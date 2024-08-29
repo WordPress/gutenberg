@@ -161,13 +161,14 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$alt              = $p->get_attribute( 'alt' );
-	$img_uploaded_src = $p->get_attribute( 'src' );
-	$img_class_names  = $p->get_attribute( 'class' );
-	$img_styles       = $p->get_attribute( 'style' );
-	$img_width        = 'none';
-	$img_height       = 'none';
-	$aria_label       = __( 'Enlarge image' );
+	$alt                = $p->get_attribute( 'alt' );
+	$img_uploaded_src   = $p->get_attribute( 'src' );
+	$img_class_names    = $p->get_attribute( 'class' );
+	$img_styles         = $p->get_attribute( 'style' );
+	$img_width          = 'none';
+	$img_height         = 'none';
+	$aria_label         = __( 'Enlarge image' );
+	$screen_reader_text = __( 'Enlarged image' );
 
 	if ( isset( $block['attrs']['id'] ) ) {
 		$img_uploaded_src = wp_get_attachment_url( $block['attrs']['id'] );
@@ -198,10 +199,30 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 					'targetHeight'     => $img_height,
 					'scaleAttr'        => $block['attrs']['scale'] ?? false,
 					'alt'              => $alt,
+					'screenReaderText' => empty( $alt ) ? $screen_reader_text : "$screen_reader_text: $alt",
 				),
 			),
 		)
 	);
+
+	$state = wp_interactivity_state( 'core/gallery' );
+	if ( true === $state["lightbox"] ) {
+		$gallery_id = $state['galleryId'];
+		$images = $state['images'][$gallery_id];
+		if (!isset($images)) {
+			$images = array();
+		}
+		$images[] = $unique_image_id;
+
+		wp_interactivity_state(
+			'core/gallery',
+			array(
+				'images' => array(
+					$gallery_id => $images,
+				),
+			)
+		);
+	}
 
 	$p->add_class( 'wp-lightbox-container' );
 	$p->set_attribute( 'data-wp-interactive', 'core/image' );
@@ -214,7 +235,6 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
 	);
-	$p->set_attribute( 'data-wp-init', 'callbacks.populateGalleryArray' );
 
 	// Image.
 	$p->next_tag( 'img' );

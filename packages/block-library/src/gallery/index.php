@@ -34,6 +34,26 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
+function block_core_gallery_interactivity_state($block_content, $block) {
+	if ( 'core/gallery' !== $block['blockName'] ) {
+		return $block_content;
+	}
+
+	$unique_gallery_id = uniqid();
+	wp_interactivity_state(
+		'core/gallery',
+		array(
+			'lightbox' => true,
+			'images' => array(),
+			'galleryId' => $unique_gallery_id,
+		)
+	);
+
+	return $block_content;
+}
+
+add_filter( 'render_block_data', 'block_core_gallery_interactivity_state', 15, 2 );
+
 /**
  * Renders the `core/gallery` block on the server.
  *
@@ -120,9 +140,23 @@ function block_core_gallery_render( $attributes, $content ) {
 			'context' => 'block-supports',
 		)
 	);
+	
+	$state = wp_interactivity_state('core/gallery');
+	$gallery_id = $state['galleryId'];
 
 	$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
-	$processed_content->set_attribute( 'data-wp-context', '{"lightbox": true, "images": []}' );
+	$processed_content->set_attribute(
+		'data-wp-context',
+		wp_json_encode(
+			array(
+				'galleryId' => $gallery_id,
+				'lightbox'  => true,
+			),
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+		)
+	);
+
+	add_filter( 'render_block_core/gallery', 'block_core_gallery_render_lightbox' );
 
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly
@@ -168,6 +202,45 @@ function block_core_gallery_render( $attributes, $content ) {
 	);
 
 	return $content;
+}
+
+function block_core_gallery_render_lightbox( $block_content ) {
+	$state = wp_interactivity_state('core/gallery');
+	$gallery_id = $state['galleryId'];
+
+	$images = $state['images'][$gallery_id] ?? array();
+	$translations = array();
+
+	if (!empty($images)) {
+		if (1 == count($images)) {
+			$image_id = $images[0];
+			$translations[$image_id] = __( 'Enlarged image', 'gutenberg' );
+		} else {
+			for ($i=0; $i < count($images); $i++) {
+				$image_id = $images[$i];
+				/* translators: %1$s: current image index, %2$s: total number of images */
+				$translations[$image_id] = sprintf( __( 'Enlarged image %1$s of %2$s', 'gutenberg' ), $i + 1, count($images) );
+			}
+		}
+
+		$image_state = wp_interactivity_state('core/image');
+
+		foreach ($translations as $image_id => $translation) {
+			$alt = $image_state['metadata'][$image_id]['alt'];
+			wp_interactivity_state(
+				'core/image',
+				array(
+					'metadata' => array(
+						$image_id => array(
+							'screenReaderText' => empty($alt) ? $translation : "$translation: $alt",
+						),
+					),
+				)
+			);
+		}
+	}
+
+	return $block_content;
 }
 
 /**
