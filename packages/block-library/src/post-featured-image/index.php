@@ -91,7 +91,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 			}
 
 			foreach ( $attr as $name => $value ) {
-				if ( $name !== 'style' ) {
+				if ( 'style' !== $name ) {
 					$tag_html->set_attribute( $name, $value );
 				} else {
 					$existing_styles = $tag_html->get_attribute( 'style' );
