@@ -110,7 +110,7 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
-					blockCommentID: commentID,
+				blockCommentID: commentID,
 			};
 		},
 		[ firstBlockClientId ]
@@ -290,12 +290,12 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 								{ isBlockCommentExperimentEnabled &&
-								! blockCommentID && (
-									<BlockCommentMenuItem
-										clientId={ clientIds }
-										onClose={ onClose }
-									/>
-								) }
+									! blockCommentID && (
+										<BlockCommentMenuItem
+											clientId={ clientIds }
+											onClose={ onClose }
+										/>
+									) }
 							</MenuGroup>
 							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>
