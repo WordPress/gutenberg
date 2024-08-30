@@ -24,7 +24,7 @@ export const TabListWrapper = styled.div`
 
 	@media not ( prefers-reduced-motion: reduce ) {
 		&.is-animation-enabled::after {
-			transition-property: left, top, width, height;
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -33,6 +33,7 @@ export const TabListWrapper = styled.div`
 		content: '';
 		position: absolute;
 		pointer-events: none;
+		transform-origin: 0 0;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
@@ -40,18 +41,21 @@ export const TabListWrapper = styled.div`
 	}
 	&:not( [aria-orientation='vertical'] )::after {
 		bottom: 0;
-		left: var( --indicator-left );
-		width: var( --indicator-width );
 		height: 0;
+		width: 1px;
+		transform: translateX( calc( var( --indicator-left ) * 1px ) )
+			scaleX( var( --indicator-width ) );
 		border-bottom: var( --wp-admin-border-width-focus ) solid
 			${ COLORS.theme.accent };
 	}
 	&[aria-orientation='vertical']::after {
 		z-index: -1;
+		top: 0;
 		left: 0;
 		width: 100%;
-		top: var( --indicator-top );
-		height: var( --indicator-height );
+		height: 1px;
+		transform: translateY( calc( var( --indicator-top ) * 1px ) )
+			scaleY( var( --indicator-height ) );
 		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;

@@ -78,10 +78,10 @@ export const TabList = forwardRef<
 			onBlur={ onBlur }
 			{ ...otherProps }
 			style={ {
-				'--indicator-left': `${ indicatorPosition.left }px`,
-				'--indicator-top': `${ indicatorPosition.top }px`,
-				'--indicator-width': `${ indicatorPosition.width }px`,
-				'--indicator-height': `${ indicatorPosition.height }px`,
+				'--indicator-left': indicatorPosition.left,
+				'--indicator-top': indicatorPosition.top,
+				'--indicator-width': indicatorPosition.width,
+				'--indicator-height': indicatorPosition.height,
 				...otherProps.style,
 			} }
 			className={ clsx(
