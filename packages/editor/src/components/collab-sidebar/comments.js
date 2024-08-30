@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 // eslint-disable-next-line no-restricted-imports
@@ -142,6 +147,15 @@ export function Comments( { threads } ) {
 		}
 	};
 
+	const blockCommentId = useSelect( ( select ) => {
+		const clientID =
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			select( 'core/block-editor' ).getSelectedBlockClientId();
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
+			?.blockCommentId ?? false;
+	}, [] );
+
 	return (
 		<>
 			{
@@ -167,7 +181,9 @@ export function Comments( { threads } ) {
 				threads.reverse().map( ( thread ) => (
 					<VStack
 						key={ thread.id }
-						className="editor-collab-sidebar__thread"
+						className={ clsx( 'editor-collab-sidebar__thread', {
+							'is-focused': blockCommentId && blockCommentId === thread.id,
+						} ) }
 						id={ thread.id }
 						spacing="2"
 					>
