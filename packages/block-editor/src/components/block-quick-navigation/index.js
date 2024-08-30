@@ -45,16 +45,15 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected, blockHasInnerBlocks } = useSelect(
+	const { isSelected } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock, getBlockCount } =
+			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
-				blockHasInnerBlocks: getBlockCount( clientId ) > 0,
 			};
 		},
 		[ clientId ]
@@ -80,15 +79,12 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				<FlexBlock style={ { textAlign: 'left' } }>
 					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
-				{ blockHasInnerBlocks && (
-					<FlexItem>
-						<Icon
-							icon={
-								isRTL() ? chevronLeftSmall : chevronRightSmall
-							}
-						/>
-					</FlexItem>
-				) }
+
+				<FlexItem>
+					<Icon
+						icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
+					/>
+				</FlexItem>
 			</Flex>
 		</Button>
 	);
