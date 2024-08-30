@@ -27,23 +27,27 @@ function SuffixItem( {
 	onChange,
 	onClose,
 }: SuffixItemProps ) {
-	if ( ! onClose && ! value ) {
+	if ( ! onClose ) {
 		return <Icon icon={ search } />;
 	}
 
-	const onReset = () => {
-		onChange( '' );
-		searchRef.current?.focus();
-	};
+	if ( value ) {
+		const onReset = () => {
+			onChange( '' );
+			searchRef.current?.focus();
+		};
 
-	return (
-		<Button
-			size="small"
-			icon={ closeSmall }
-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-			onClick={ onClose ?? onReset }
-		/>
-	);
+		return (
+			<Button
+				size="small"
+				icon={ closeSmall }
+				label={ __( 'Reset search' ) }
+				onClick={ onClose ?? onReset }
+			/>
+		);
+	}
+
+	return <Icon icon={ search } />;
 }
 
 function UnforwardedSearchControl(
