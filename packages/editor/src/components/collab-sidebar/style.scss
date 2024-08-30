@@ -43,7 +43,7 @@
 			width: 100%;
 		}
 
-		.components-textarea-control__input {
+		textarea {
 			border: 1px solid $gray-300;
 			border-radius: 8px;
 			padding: 10px 15px;
@@ -89,18 +89,6 @@
 		flex-shrink: 0;
 	}
 
-	&__userstatus {
-		button {
-			font-size: 12px;
-			font-weight: 400;
-			line-height: 16px;
-			padding: 0;
-			height: auto;
-			box-shadow: none;
-			outline: none;
-		}
-	}
-
 	&__useroverlay {
 		background-color: rgba(0, 0, 0, 0.7);
 		width: 100%;
@@ -125,33 +113,26 @@
 		}
 	}
 
-	&__resolvedIcon {
-		fill: #008000;
-		border-radius: 50%;
-		width: 18px;
-		height: 18px;
-		border: 1px solid #008000;
-		margin-right: 2px;
-		margin-top: 5px;
-	}
-
 	&__commentUpdate {
 		margin-left: auto;
 
-		.components-button {
-			&.has-icon:not(.has-text) {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-				flex-shrink: 0;
+		button {
+			&.is-compact {
+				&.has-icon:not(.has-text) {
+					min-width: 24px;
+					padding: 0;
+					width: 24px;
+					height: 24px;
+					flex-shrink: 0;
+				}
 			}
 		}
+	}
+	&__commentDropdown {
+		flex-shrink: 0;
 
-		.components-dropdown {
-			flex-shrink: 0;
-
-			.components-button {
+		button {
+			&.has-icon {
 				min-width: 24px;
 				padding: 0;
 				width: 24px;
@@ -160,103 +141,8 @@
 		}
 	}
 
-	&__resolvedText {
-		font-style: italic;
-		font-weight: 500 !important;
-		color: #808080 !important;
-		margin-top: 5px !important;
-	}
 }
 
 .is-collab-block-selected {
 	background-color: color-mix(in srgb, currentColor 5%, #182f97 20%);
-}
-
-.block-editor-format-toolbar__comment-board {
-	z-index: 1000001;
-
-	.components-modal__frame {
-		max-width: 380px;
-		min-width: auto;
-		width: 90vw;
-	}
-
-	.components-modal__content {
-		margin-top: 0;
-		padding: 32px 32px;
-
-		.components-modal__header {
-			display: none;
-		}
-	}
-
-	.comment-board__userIcon {
-		width: 35px;
-		height: 35px;
-		max-width: 100%;
-		border-radius: 50%;
-	}
-
-	.comment-board__comment {
-		border-bottom: 1px solid $gray-300;
-	}
-
-	&__resolved {
-		align-self: end;
-	}
-
-	.comment-board__actions {
-		width: auto;
-	}
-
-	.comment-board__userName {
-		font-size: 16px;
-		text-transform: capitalize;
-	}
-
-	.comment-board__commentText {
-		font-size: 14px;
-		margin-top: 5px;
-	}
-
-	.comment-board__dateTime {
-		font-size: 12px;
-	}
-
-	.block-editor-format-toolbar__comment-input {
-		.components-text-control__input {
-			border: 1px solid #ccc;
-			height: 40px;
-
-			&::placeholder {
-				font-style: italic;
-			}
-
-			&:focus {
-				border-color: #2271b1;
-			}
-		}
-	}
-
-	.block-editor-format-toolbar__comment-board__resolved {
-		min-width: auto;
-
-		* {
-			min-width: auto;
-		}
-
-		span.components-checkbox-control__input-container {
-			display: none;
-
-			& + label {
-				text-decoration: underline;
-				cursor: pointer;
-				color: rgb(0, 124, 186);
-			}
-		}
-	}
-
-	.block-editor-format-toolbar__comment-board__edit {
-		margin-right: -8px;
-	}
 }

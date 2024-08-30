@@ -780,6 +780,7 @@ function CommentHeader( { thread, onResolve, onEdit, onDelete, onReply } ) {
 						<DropdownMenu
 							icon={ moreVertical }
 							label="Select an action"
+							className="editor-collab-sidebar__commentDropdown"
 							controls={ moreActions }
 						/>
 					</HStack>

@@ -191,8 +191,8 @@ add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_prelo
  * @param WP_REST_Request  $request  The request object.
  * @return WP_REST_Response The updated response object.
  */
-if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
-	function update_comment_meta_from_rest_request( $response, $comment, $request ) {
+if ( ! function_exists( 'update_comment_meta_from_rest_request_6_6' ) ) {
+	function update_comment_meta_from_rest_request_6_6( $response, $comment, $request ) {
 
 		if ( isset( $request['comment_type'] ) && ! empty( $request['comment_type'] ) ) {
 			$comment_data = array(
@@ -204,9 +204,8 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 			wp_update_comment( $comment_data );
 		}
 
-		$author = get_user_by( 'login', $response->data['author_name'] );
-		if ( $author ) {
-			$avatar_url                           = get_avatar_url( $author->ID );
+		if ( $response->data['author'] ) {
+			$avatar_url                           = get_avatar_url( $response->data['author'] );
 			$response->data['author_avatar_urls'] = array(
 				'default' => $avatar_url,
 				'48'      => add_query_arg( 's', 48, $avatar_url ),
@@ -214,15 +213,7 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request' ) ) {
 			);
 		}
 
-		$comment_id = $comment->comment_ID;
-		$meta_key   = 'block_comment';
-		$meta_value = get_comment_meta( $comment_id, $meta_key, true );
-
-		if ( ! empty( $meta_value ) ) {
-			$response->data['meta'] = $meta_value;
-		}
-
 		return $response;
 	}
 }
-add_filter( 'rest_prepare_comment', 'update_comment_meta_from_rest_request', 10, 3 );
+add_filter( 'rest_prepare_comment', 'update_comment_meta_from_rest_request_6_6', 10, 3 );
