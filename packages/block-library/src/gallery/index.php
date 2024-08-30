@@ -34,7 +34,17 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
-function block_core_gallery_interactivity_state($block_content, $block) {
+/**
+ * Handles interactivity state initialization for Gallery Block.
+ *
+ * @since 6.7.0
+ *
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ *
+ * @return string Filtered block content.
+ */
+function block_core_gallery_interactivity_state( $block_content, $block ) {
 	if ( 'core/gallery' !== $block['blockName'] ) {
 		return $block_content;
 	}
@@ -43,7 +53,7 @@ function block_core_gallery_interactivity_state($block_content, $block) {
 	wp_interactivity_state(
 		'core/gallery',
 		array(
-			'images' => array(),
+			'images'    => array(),
 			'galleryId' => $unique_gallery_id,
 		)
 	);
@@ -139,8 +149,8 @@ function block_core_gallery_render( $attributes, $content ) {
 			'context' => 'block-supports',
 		)
 	);
-	
-	$state = wp_interactivity_state('core/gallery');
+
+	$state      = wp_interactivity_state( 'core/gallery' );
 	$gallery_id = $state['galleryId'];
 
 	$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
@@ -203,35 +213,47 @@ function block_core_gallery_render( $attributes, $content ) {
 	return $content;
 }
 
+/**
+ * Handles state updates needed for the lightbox behavior in a Gallery Block.
+ *
+ * Now that the Gallery Block contains inner Image Blocks,
+ * we add translations for the screen reader text before rendering the gallery
+ * so that the Image Block can pick it up in its render_callback.
+ *
+ * @since 6.7.0
+ *
+ * @param string $block_content Rendered block content.
+ *
+ * @return string Filtered block content.
+ */
 function block_core_gallery_render_lightbox( $block_content ) {
-	$state = wp_interactivity_state('core/gallery');
-	$gallery_id = $state['galleryId'];
-
-	$images = $state['images'][$gallery_id] ?? array();
+	$state        = wp_interactivity_state( 'core/gallery' );
+	$gallery_id   = $state['galleryId'];
+	$images       = $state['images'][ $gallery_id ] ?? array();
 	$translations = array();
 
-	if (!empty($images)) {
-		if (1 == count($images)) {
-			$image_id = $images[0];
-			$translations[$image_id] = __( 'Enlarged image', 'gutenberg' );
+	if ( ! empty( $images ) ) {
+		if ( 1 === count( $images ) ) {
+			$image_id                  = $images[0];
+			$translations[ $image_id ] = __( 'Enlarged image', 'gutenberg' );
 		} else {
-			for ($i=0; $i < count($images); $i++) {
-				$image_id = $images[$i];
+			for ( $i = 0; $i < count( $images ); $i++ ) {
+				$image_id = $images[ $i ];
 				/* translators: %1$s: current image index, %2$s: total number of images */
-				$translations[$image_id] = sprintf( __( 'Enlarged image %1$s of %2$s', 'gutenberg' ), $i + 1, count($images) );
+				$translations[ $image_id ] = sprintf( __( 'Enlarged image %1$s of %2$s', 'gutenberg' ), $i + 1, count( $images ) );
 			}
 		}
 
-		$image_state = wp_interactivity_state('core/image');
+		$image_state = wp_interactivity_state( 'core/image' );
 
-		foreach ($translations as $image_id => $translation) {
-			$alt = $image_state['metadata'][$image_id]['alt'];
+		foreach ( $translations as $image_id => $translation ) {
+			$alt = $image_state['metadata'][ $image_id ]['alt'];
 			wp_interactivity_state(
 				'core/image',
 				array(
 					'metadata' => array(
 						$image_id => array(
-							'screenReaderText' => empty($alt) ? $translation : "$translation: $alt",
+							'screenReaderText' => empty( $alt ) ? $translation : "$translation: $alt",
 						),
 					),
 				)

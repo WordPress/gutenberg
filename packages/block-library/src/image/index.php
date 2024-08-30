@@ -205,11 +205,11 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 		)
 	);
 
-	$state = wp_interactivity_state( 'core/gallery' );
+	$state      = wp_interactivity_state( 'core/gallery' );
 	$gallery_id = $state['galleryId'];
 	if ( isset( $gallery_id ) ) {
-		$images = $state['images'][$gallery_id];
-		if (!isset($images)) {
+		$images = $state['images'][ $gallery_id ];
+		if ( ! isset( $images ) ) {
 			$images = array();
 		}
 		$images[] = $unique_image_id;
