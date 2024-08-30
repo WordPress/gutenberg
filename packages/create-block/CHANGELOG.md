@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Unpin the `@wordpress/scripts` version and set the minimum supported WordPress version to 6.6.
+
 ## 4.49.0 (2024-08-21)
 
 ## 4.48.0 (2024-08-07)
