@@ -19,7 +19,7 @@ import { ActionItem } from '@wordpress/interface';
  * @example
  * ```jsx
  * import { __ } from '@wordpress/i18n';
- * import { PreviewDropdownMenuItem } from './preview-dropdown-menu-item';
+ * import { PluginPreviewMenuItem } from '@wordpress/editor';
  * import { external } from '@wordpress/icons';
  *
  * function onPreviewClick() {
