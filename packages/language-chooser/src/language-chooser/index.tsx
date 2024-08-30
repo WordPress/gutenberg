@@ -32,7 +32,8 @@ function MissingTranslationsNotice() {
 
 interface LanguageChooserProps {
 	allLanguages: Language[];
-	selectedLanguages: Language[];
+	defaultSelectedLanguages?: Language[];
+	selectedLanguages?: Language[];
 	hasMissingTranslations?: boolean;
 	showOptionSiteDefault?: boolean;
 	onChange?: ( languages: Language[] ) => void;
@@ -45,20 +46,27 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		showOptionSiteDefault = false,
 	} = props;
 
-	const [ languages, _setLanguages ] = useState< Language[] >(
-		props.selectedLanguages
-	);
+	const selectedLanguages =
+		props.selectedLanguages || props.defaultSelectedLanguages || [];
+
+	const [ languages, _setLanguages ] =
+		useState< Language[] >( selectedLanguages );
 
 	function setLanguages( update: ( prev: Language[] ) => Language[] ) {
-		_setLanguages( ( prev ) => {
-			const newValues = update( prev );
+		if ( props.selectedLanguages !== undefined ) {
+			const newValues = update( props.selectedLanguages );
 			props.onChange?.( newValues );
-			return newValues;
-		} );
+		} else {
+			_setLanguages( ( prev ) => {
+				const newValues = update( prev );
+				props.onChange?.( newValues );
+				return newValues;
+			} );
+		}
 	}
 
 	const [ activeLanguage, setActiveLanguage ] = useState< Language >(
-		props.selectedLanguages[ 0 ]
+		selectedLanguages[ 0 ]
 	);
 
 	const inactiveLocales = allLanguages.filter(

@@ -139,7 +139,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [] }
-				selectedLanguages={ [] }
+				defaultSelectedLanguages={ [] }
 				hasMissingTranslations
 			/>
 		);
@@ -154,7 +154,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES ] }
-				selectedLanguages={ [ de_DE, fr_FR ] }
+				defaultSelectedLanguages={ [ de_DE, fr_FR ] }
 			/>
 		);
 
@@ -188,7 +188,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, fr_FR, es_ES ] }
-				selectedLanguages={ [ de_DE, fr_FR ] }
+				defaultSelectedLanguages={ [ de_DE, fr_FR ] }
 			/>
 		);
 
@@ -228,7 +228,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, fr_FR, it_IT ] }
+				defaultSelectedLanguages={ [ de_DE, fr_FR, it_IT ] }
 			/>
 		);
 
@@ -385,7 +385,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE ] }
+				defaultSelectedLanguages={ [ de_DE ] }
 				showOptionSiteDefault
 			/>
 		);
@@ -408,7 +408,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, fr_FR, it_IT ] }
+				defaultSelectedLanguages={ [ de_DE, fr_FR, it_IT ] }
 			/>
 		);
 
@@ -429,7 +429,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR ] }
-				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
+				defaultSelectedLanguages={ [ de_DE, en_GB, fr_FR ] }
 			/>
 		);
 
@@ -444,7 +444,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [] }
+				defaultSelectedLanguages={ [] }
 			/>
 		);
 
@@ -466,7 +466,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [] }
+				defaultSelectedLanguages={ [] }
 				showOptionSiteDefault
 			/>
 		);
@@ -489,7 +489,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE ] }
+				defaultSelectedLanguages={ [ de_DE ] }
 			/>
 		);
 		expect( screen.queryByText( /Falling back/ ) ).not.toBeInTheDocument();
@@ -508,7 +508,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, en_GB ] }
+				defaultSelectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 
@@ -529,7 +529,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, en_GB ] }
+				defaultSelectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 
@@ -552,7 +552,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
+				defaultSelectedLanguages={ [ de_DE, en_GB, fr_FR ] }
 			/>
 		);
 
@@ -569,7 +569,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				selectedLanguages={ [ de_DE, en_GB ] }
+				defaultSelectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 
