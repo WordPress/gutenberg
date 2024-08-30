@@ -156,12 +156,12 @@ function useEditorStyles() {
 	] );
 }
 
-function MetaBoxesWide() {
+function MetaBoxesMain() {
 	const [ isOpen, openHeight ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return [
-			get( 'core/edit-post', 'metaboxesWideIsOpen' ),
-			get( 'core/edit-post', 'metaboxesWideOpenHeight' ),
+			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -175,28 +175,36 @@ function MetaBoxesWide() {
 		}
 	}, [ isShort, openHeight ] );
 
+	const className = 'edit-post-meta-boxes-main';
+	const contents = (
+		// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
+		<div className="edit-post-meta-boxes-main__liner edit-post-layout__metaboxes">
+			<MetaBoxes location="normal" />
+			<MetaBoxes location="advanced" />
+		</div>
+	);
+
 	if ( isShort ) {
 		return (
 			<details
-				className="edit-post-layout__metaboxes"
+				className={ className }
 				open={ isOpen }
 				onToggle={ ( { target } ) => {
 					setPreference(
 						'core/edit-post',
-						'metaboxesWideIsOpen',
+						'metaBoxesMainIsOpen',
 						target.open
 					);
 				} }
 			>
 				<summary>{ __( 'Meta Boxes' ) }</summary>
-				<MetaBoxes location="normal" />
-				<MetaBoxes location="advanced" />
+				{ contents }
 			</details>
 		);
 	}
 	return (
 		<ResizableBox
-			className="edit-post-layout__metaboxes-resizable-area"
+			className={ className }
 			defaultSize={ { height: openHeight } }
 			ref={ resizableBoxRef }
 			enable={ {
@@ -228,15 +236,12 @@ function MetaBoxesWide() {
 			onResizeStop={ () => {
 				setPreference(
 					'core/edit-post',
-					'metaboxesWideOpenHeight',
+					'metaBoxesMainOpenHeight',
 					resizableBoxRef.current.state.height
 				);
 			} }
 		>
-			<div className="edit-post-layout__metaboxes">
-				<MetaBoxes location="normal" />
-				<MetaBoxes location="advanced" />
-			</div>
+			{ contents }
 		</ResizableBox>
 	);
 }
@@ -444,7 +449,7 @@ function Layout( {
 					}
 					extraContent={
 						! isDistractionFree &&
-						showMetaBoxes && <MetaBoxesWide />
+						showMetaBoxes && <MetaBoxesMain />
 					}
 				>
 					<PostLockedModal />

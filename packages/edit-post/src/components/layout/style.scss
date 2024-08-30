@@ -1,20 +1,40 @@
-$shadow: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
-
-// If all metaboxes are hidden hides the container.
-:is(
-.edit-post-layout__metaboxes-resizable-area,
-details.edit-post-layout__metaboxes
-):not(:has(.postbox:not(.is-hidden))) {
+// If all meta boxes are hidden hides the container.
+.edit-post-meta-boxes-main:not(:has(.postbox:not(.is-hidden))) {
 	display: none;
 }
 
-.edit-post-layout__metaboxes-resizable-area {
-	padding-top: 23px;
-	filter: $shadow;
+.edit-post-meta-boxes-main {
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	background-color: $white;
+	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
 
-	&:not(.has-user-size) {
-		max-height: 50% !important;
+	&:not(details) {
+		padding-top: 23px;
+		max-height: 100%;
+
+		&:not(.has-user-size) {
+			max-height: 50% !important;
+		}
+	}
+
+	// The component renders as a details element in short viewports.
+	&:is(details) {
+		& > summary {
+			cursor: pointer;
+			color: $gray-900;
+			background-color: $white;
+			height: $button-size-compact;
+			line-height: $button-size-compact;
+			font-size: 13px;
+			padding-left: $grid-unit-30;
+			box-shadow: 0 $border-width $gray-300;
+		}
+
+		&[open] > summary {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
 	}
 
 	& .components-resizable-box__handle-top {
@@ -37,35 +57,9 @@ details.edit-post-layout__metaboxes
 	}
 }
 
-.edit-post-layout__metaboxes {
-	clear: both;
+.edit-post-meta-boxes-main__liner {
 	overflow: auto;
-	background-color: $white;
-
-	&:not(details) {
-		max-height: 100%;
-	}
-
-	// The component renders as a details element in short viewports.
-	&:is(details) {
-		filter: $shadow;
-
-		& > summary {
-			cursor: pointer;
-			color: $gray-900;
-			background-color: $white;
-			height: $button-size-compact;
-			line-height: $button-size-compact;
-			font-size: 13px;
-			padding-left: $grid-unit-30;
-		}
-
-		&[open] > summary {
-			position: sticky;
-			top: 0;
-			z-index: 1;
-		}
-	}
+	max-height: 100%;
 }
 
 .has-metaboxes .editor-visual-editor {
