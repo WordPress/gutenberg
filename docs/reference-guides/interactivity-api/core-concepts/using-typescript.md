@@ -525,6 +525,8 @@ However, there are a couple of things to consider when using asynchronous action
 
     To fix this, you can combine the use of `yield*` with the `typed()` helper, which converts the promise type into an iterator that can be correctly inferred by TypeScript when used in conjunction with `yield*`.
 
+    _**Note**: The `typed` function will be included in WordPress 6.7._
+
     ```ts
     import { typed } from '@wordpress/interactivity';
 

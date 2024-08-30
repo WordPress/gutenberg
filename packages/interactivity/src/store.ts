@@ -92,6 +92,8 @@ type ConvertPromisesToGenerators< T > = {
  * This utility function is used to convert promises into generators, which
  * can be useful when working with asynchronous actions.
  *
+ * @since 6.7.0
+ *
  * @param promise The promise to be converted into a generator.
  *
  * @return A generator that yields the promise and returns its resolved value.
