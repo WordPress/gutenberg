@@ -36,15 +36,12 @@ const SiteHub = memo(
 		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
 
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
 			return {
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
-				homeUrl: getUnstableBase()?.home,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )
@@ -128,13 +125,10 @@ export const SiteHubMobile = memo(
 		const { navigate } = useContext( SidebarNavigationContext );
 
 		const { homeUrl, siteTitle } = useSelect( ( select ) => {
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
 			return {
-				homeUrl: getUnstableBase()?.home,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )

@@ -44,6 +44,7 @@
     -   `TimePicker` (on the inputs)
     -   `TreeSelect`
     -   `UnitControl`
+-   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
 
 ### Bug Fixes
 
@@ -51,6 +52,7 @@
 
 ### Internal
 
+-   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873)).
 -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
 -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
 

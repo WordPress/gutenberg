@@ -2,6 +2,7 @@
  * Proxies for each object.
  */
 const objToProxy = new WeakMap< object, object >();
+const proxyToObj = new WeakMap< object, object >();
 
 /**
  * Namespaces for each created proxy.
@@ -38,6 +39,7 @@ export const createProxy = < T extends object >(
 	if ( ! objToProxy.has( obj ) ) {
 		const proxy = new Proxy( obj, handlers );
 		objToProxy.set( obj, proxy );
+		proxyToObj.set( proxy, obj );
 		proxyToNs.set( proxy, namespace );
 	}
 	return objToProxy.get( obj ) as T;
@@ -50,8 +52,9 @@ export const createProxy = < T extends object >(
  * @param obj Object from which to know the proxy.
  * @return Associated proxy or `undefined`.
  */
-export const getProxyFromObject = < T extends object >( obj: T ): T =>
-	objToProxy.get( obj ) as T;
+export const getProxyFromObject = < T extends object >(
+	obj: T
+): T | undefined => objToProxy.get( obj ) as T;
 
 /**
  * Gets the namespace associated with the given proxy.
@@ -80,3 +83,14 @@ export const shouldProxy = (
 		! proxyToNs.has( candidate ) && supported.has( candidate.constructor )
 	);
 };
+
+/**
+ * Returns the target object for the passed proxy. If the passed object is not a registered proxy, the
+ * function returns `undefined`.
+ *
+ * @param proxy Proxy from which to know the target.
+ * @return The target object or `undefined`.
+ */
+export const getObjectFromProxy = < T extends object >(
+	proxy: T
+): T | undefined => proxyToObj.get( proxy ) as T;

@@ -273,6 +273,10 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
 			}
 
 			// If we request fields but the result doesn't contain the fields,

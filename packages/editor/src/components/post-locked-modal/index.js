@@ -178,6 +178,8 @@ export default function PostLockedModal() {
 			shouldCloseOnClickOutside={ false }
 			shouldCloseOnEsc={ false }
 			isDismissible={ false }
+			// Do not remove this class, as this class is used by third party plugins.
+			className="editor-post-locked-modal"
 			size="medium"
 		>
 			<HStack alignment="top" spacing={ 6 }>

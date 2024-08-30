@@ -54,7 +54,7 @@ function FontSize() {
 
 	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
 	const isFluid =
-		fontSize.fluid !== undefined ? !! fontSize.fluid : globalFluid;
+		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 
 	// Whether custom fluid values are used.
 	const isCustomFluid = typeof fontSize.fluid === 'object';

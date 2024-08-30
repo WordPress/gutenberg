@@ -181,7 +181,7 @@ describe( 'getEntityRecords', () => {
 			{},
 			false,
 			undefined,
-			undefined
+			{ totalItems: 2, totalPages: 1 }
 		);
 	} );
 
