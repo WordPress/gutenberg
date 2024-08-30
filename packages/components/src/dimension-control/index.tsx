@@ -29,6 +29,8 @@ const CONTEXT_VALUE = {
 /**
  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
  *
+ * @deprecated
+ *
  * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
  *
  * ```jsx
