@@ -3,7 +3,6 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	MenuItem,
 	ExternalLink,
 	ResizableBox,
 	Spinner,
@@ -603,11 +602,8 @@ export default function Image( {
 						onSelect={ onSelectImage }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => onSelectImage( undefined ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
+						onReset={ () => onSelectImage( undefined ) }
+					/>
 				</BlockControls>
 			) }
 			{ isSingleSelected && externalBlob && (

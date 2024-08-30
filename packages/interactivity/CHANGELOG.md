@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
+
 ### Bug Fixes
 
 -   Fix computeds without scope in Firefox ([#64825](https://github.com/WordPress/gutenberg/pull/64825)).
