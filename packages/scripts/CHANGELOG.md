@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
+
 ### Bug Fixes
 
 -   Added chunk filename in webpack config to avoid reading stale files ([#58176](https://github.com/WordPress/gutenberg/pull/58176)).
