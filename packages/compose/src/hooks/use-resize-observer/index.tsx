@@ -94,8 +94,10 @@ function ResizeElement( { onResize }: ResizeElementProps ) {
 	useLayoutEffect( () => {
 		const resizeElement = resizeElementRef.current as HTMLDivElement;
 		const resizeObserver = new ResizeObserver( ( entries ) => {
-			const newSize = extractSize( entries[ 0 ] );
-			resizeCallbackRef.current( newSize );
+			for ( const entry of entries ) {
+				const newSize = extractSize( entry );
+				resizeCallbackRef.current( newSize );
+			}
 		} );
 
 		resizeObserver.observe( resizeElement );
