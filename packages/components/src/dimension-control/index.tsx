@@ -31,8 +31,6 @@ const CONTEXT_VALUE = {
  *
  * @deprecated
  *
- * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
- *
  * ```jsx
  * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';

@@ -13,6 +13,11 @@ import sizes from '../sizes';
  */
 import { desktop, tablet, mobile } from '@wordpress/icons';
 
+/**
+ * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+ *
+ * This component is deprecated.
+ */
 const meta: Meta< typeof DimensionControl > = {
 	component: DimensionControl,
 	title: 'Components (Deprecated)/DimensionControl',
@@ -43,7 +48,6 @@ const Template: StoryFn< typeof DimensionControl > = ( args ) => (
 );
 
 export const Default = Template.bind( {} );
-
 Default.args = {
 	__nextHasNoMarginBottom: true,
 	label: 'Please select a size',
