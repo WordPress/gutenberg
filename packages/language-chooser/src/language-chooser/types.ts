@@ -6,11 +6,3 @@ export interface Language {
 	lang: string;
 	installed: boolean;
 }
-
-export interface LanguageChooserConfig {
-	currentLocale: Locale;
-	preferredLanguages: Language[];
-	allLanguages: Language[];
-	hasMissingTranslations: boolean;
-	showOptionSiteDefault: boolean;
-}

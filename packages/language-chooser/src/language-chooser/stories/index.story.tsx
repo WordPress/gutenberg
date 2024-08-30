@@ -74,7 +74,7 @@ const it_IT: Language = {
 
 export const Default: StoryObj< typeof LanguageChooser > = {
 	args: {
-		preferredLanguages: [ de_DE, fr_FR ],
+		selectedLanguages: [ de_DE, fr_FR ],
 		allLanguages: [ de_DE, de_CH, it_IT, en_GB, fr_FR, en_US ],
 	},
 };

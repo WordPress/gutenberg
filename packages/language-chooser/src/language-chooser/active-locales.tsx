@@ -12,9 +12,9 @@ import ActiveControls from './active-controls';
 
 interface ActiveLocalesProps {
 	languages: Language[];
-	selectedLanguage?: Language;
+	activeLanguage?: Language;
 	showOptionSiteDefault?: boolean;
-	setSelectedLanguage: ( language: Language ) => void;
+	setActiveLanguage: ( language: Language ) => void;
 	onMoveUp: () => void;
 	onMoveDown: () => void;
 	onRemove: () => void;
@@ -28,8 +28,8 @@ interface ActiveLocalesProps {
 export function ActiveLocales( {
 	languages,
 	showOptionSiteDefault = false,
-	selectedLanguage,
-	setSelectedLanguage,
+	activeLanguage,
+	setActiveLanguage,
 	onMoveUp,
 	onMoveDown,
 	onRemove,
@@ -54,9 +54,9 @@ export function ActiveLocales( {
 			behavior: 'smooth',
 			block: 'nearest',
 		} );
-	}, [ selectedLanguage, languages ] );
+	}, [ activeLanguage, languages ] );
 
-	const activeDescendant = isEmpty ? '' : selectedLanguage?.locale;
+	const activeDescendant = isEmpty ? '' : activeLanguage?.locale;
 
 	const className = isEmpty
 		? 'language-chooser__active-locales-list language-chooser__active-locales-list--empty'
@@ -96,13 +96,11 @@ export function ActiveLocales( {
 						<li
 							key={ locale }
 							role="option"
-							aria-selected={
-								locale === selectedLanguage?.locale
-							}
+							aria-selected={ locale === activeLanguage?.locale }
 							id={ locale }
 							lang={ lang }
 							className="language-chooser__active-locale"
-							onClick={ () => setSelectedLanguage( language ) }
+							onClick={ () => setActiveLanguage( language ) }
 						>
 							{ nativeName }
 						</li>

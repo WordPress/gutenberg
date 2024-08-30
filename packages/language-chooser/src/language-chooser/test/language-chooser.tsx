@@ -123,7 +123,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [] }
-				preferredLanguages={ [] }
+				selectedLanguages={ [] }
 				hasMissingTranslations
 			/>
 		);
@@ -138,7 +138,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES ] }
-				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
 				inputName="preferred_languages"
 			/>
 		);
@@ -155,7 +155,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES ] }
-				preferredLanguages={ [ de_DE, fr_FR ] }
+				selectedLanguages={ [ de_DE, fr_FR ] }
 			/>
 		);
 
@@ -189,7 +189,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, fr_FR, es_ES ] }
-				preferredLanguages={ [ de_DE, fr_FR ] }
+				selectedLanguages={ [ de_DE, fr_FR ] }
 			/>
 		);
 
@@ -229,7 +229,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, fr_FR, it_IT ] }
+				selectedLanguages={ [ de_DE, fr_FR, it_IT ] }
 			/>
 		);
 
@@ -374,7 +374,7 @@ describe( 'LanguageChooser', () => {
 		const { container } = render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, es_ES, fr_FR ] }
-				preferredLanguages={ [ es_ES ] }
+				selectedLanguages={ [ es_ES ] }
 			/>,
 			{
 				wrapper: ( { children } ) => (
@@ -398,7 +398,7 @@ describe( 'LanguageChooser', () => {
 		const { container } = render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, es_ES, fr_FR ] }
-				preferredLanguages={ [ es_ES ] }
+				selectedLanguages={ [ es_ES ] }
 			/>,
 			{
 				wrapper: ( { children } ) => (
@@ -426,7 +426,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE ] }
+				selectedLanguages={ [ de_DE ] }
 				showOptionSiteDefault
 			/>
 		);
@@ -449,7 +449,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, fr_FR, it_IT ] }
+				selectedLanguages={ [ de_DE, fr_FR, it_IT ] }
 			/>
 		);
 
@@ -470,7 +470,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR ] }
-				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
 			/>
 		);
 
@@ -485,7 +485,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [] }
+				selectedLanguages={ [] }
 			/>
 		);
 
@@ -507,7 +507,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [] }
+				selectedLanguages={ [] }
 				showOptionSiteDefault
 			/>
 		);
@@ -530,7 +530,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE ] }
+				selectedLanguages={ [ de_DE ] }
 			/>
 		);
 		expect( screen.queryByText( /Falling back/ ) ).not.toBeInTheDocument();
@@ -549,7 +549,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, en_GB ] }
+				selectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 
@@ -570,7 +570,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, en_GB ] }
+				selectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 
@@ -593,7 +593,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, en_GB, fr_FR ] }
+				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
 			/>
 		);
 
@@ -610,7 +610,7 @@ describe( 'LanguageChooser', () => {
 		render(
 			<LanguageChooser
 				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES, it_IT ] }
-				preferredLanguages={ [ de_DE, en_GB ] }
+				selectedLanguages={ [ de_DE, en_GB ] }
 			/>
 		);
 

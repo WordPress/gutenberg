@@ -31,15 +31,15 @@ function MissingTranslationsNotice() {
 }
 
 interface HiddenFormFieldProps {
-	preferredLanguages: Language[];
+	selectedLanguages: Language[];
 	inputName: string;
 }
 
 function HiddenFormField( {
-	preferredLanguages,
+	selectedLanguages,
 	inputName,
 }: HiddenFormFieldProps ) {
-	const value = preferredLanguages
+	const value = selectedLanguages
 		.filter( ( language ) => Boolean( language ) )
 		.map( ( { locale } ) => locale )
 		.join( ',' );
@@ -49,11 +49,11 @@ function HiddenFormField( {
 
 interface LanguageChooserProps {
 	allLanguages: Language[];
-	preferredLanguages: Language[];
+	selectedLanguages: Language[];
 	hasMissingTranslations?: boolean;
 	showOptionSiteDefault?: boolean;
 	inputName?: string;
-	onPreferredLanguagesChange?: ( languages: Language[] ) => void;
+	onChange?: ( languages: Language[] ) => void;
 }
 
 function LanguageChooser( props: LanguageChooserProps ) {
@@ -65,19 +65,19 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	} = props;
 
 	const [ languages, _setLanguages ] = useState< Language[] >(
-		props.preferredLanguages
+		props.selectedLanguages
 	);
 
 	function setLanguages( update: ( prev: Language[] ) => Language[] ) {
 		_setLanguages( ( prev ) => {
 			const newValues = update( prev );
-			props.onPreferredLanguagesChange?.( newValues );
+			props.onChange?.( newValues );
 			return newValues;
 		} );
 	}
 
-	const [ selectedLanguage, setSelectedLanguage ] = useState< Language >(
-		props.preferredLanguages[ 0 ]
+	const [ activeLanguage, setActiveLanguage ] = useState< Language >(
+		props.selectedLanguages[ 0 ]
 	);
 
 	const inactiveLocales = allLanguages.filter(
@@ -85,15 +85,15 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			! languages.find( ( { locale } ) => locale === language.locale )
 	);
 
-	const [ selectedInactiveLanguage, setSelectedInactiveLanguage ] = useState(
+	const [ inactiveLanguage, setInactiveLanguage ] = useState(
 		inactiveLocales[ 0 ]
 	);
 
 	useEffect( () => {
-		if ( ! selectedInactiveLanguage ) {
-			setSelectedInactiveLanguage( inactiveLocales[ 0 ] );
+		if ( ! inactiveLanguage ) {
+			setInactiveLanguage( inactiveLocales[ 0 ] );
 		}
-	}, [ selectedInactiveLanguage, inactiveLocales ] );
+	}, [ inactiveLanguage, inactiveLocales ] );
 
 	const installedLanguages = inactiveLocales.filter( ( { installed } ) =>
 		Boolean( installed )
@@ -103,12 +103,12 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		( { installed } ) => ! installed
 	);
 
-	const hasUninstalledPreferredLanguages = languages.some(
+	const hasUninstalledSelectedLanguages = languages.some(
 		( { installed } ) => ! installed
 	);
 
 	useEffect( () => {
-		if ( ! hasUninstalledPreferredLanguages ) {
+		if ( ! hasUninstalledSelectedLanguages ) {
 			return;
 		}
 
@@ -137,74 +137,70 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		return () => {
 			form.removeEventListener( 'submit', addSpinner );
 		};
-	}, [ hasUninstalledPreferredLanguages ] );
+	}, [ hasUninstalledSelectedLanguages ] );
 
 	const onAddLanguage = ( locale: Language ) => {
 		setLanguages( ( current ) => [ ...current, locale ] );
-		setSelectedLanguage( locale );
+		setActiveLanguage( locale );
 	};
 
 	const isEmpty = languages.length === 0;
 	const isMoveUpDisabled =
-		! selectedLanguage ||
-		languages[ 0 ]?.locale === selectedLanguage?.locale;
+		! activeLanguage || languages[ 0 ]?.locale === activeLanguage?.locale;
 	const isMoveDownDisabled =
-		! selectedLanguage ||
-		languages[ languages.length - 1 ]?.locale === selectedLanguage?.locale;
-	const isRemoveDisabled = ! selectedLanguage;
+		! activeLanguage ||
+		languages[ languages.length - 1 ]?.locale === activeLanguage?.locale;
+	const isRemoveDisabled = ! activeLanguage;
 
 	const onAdd = () => {
-		onAddLanguage( selectedInactiveLanguage );
+		onAddLanguage( inactiveLanguage );
 
 		const installedIndex = installedLanguages.findIndex(
-			( { locale } ) => locale === selectedInactiveLanguage.locale
+			( { locale } ) => locale === inactiveLanguage.locale
 		);
 
 		const availableIndex = availableLanguages.findIndex(
-			( { locale } ) => locale === selectedInactiveLanguage.locale
+			( { locale } ) => locale === inactiveLanguage.locale
 		);
 
 		let newSelected: Language | undefined;
 
 		newSelected = installedLanguages[ installedIndex + 1 ];
 
-		if (
-			! newSelected &&
-			installedLanguages[ 0 ] !== selectedInactiveLanguage
-		) {
+		if ( ! newSelected && installedLanguages[ 0 ] !== inactiveLanguage ) {
 			newSelected = installedLanguages[ 0 ];
 		}
 
 		if ( ! newSelected ) {
 			newSelected = availableLanguages[ availableIndex + 1 ];
 
-			if ( availableLanguages[ 0 ] !== selectedInactiveLanguage ) {
+			if ( availableLanguages[ 0 ] !== inactiveLanguage ) {
 				newSelected = availableLanguages[ 0 ];
 			}
 		}
 
-		setSelectedInactiveLanguage( newSelected );
+		setInactiveLanguage( newSelected );
 
 		speak( __( 'Locale added to list' ) );
 	};
 
 	const onRemove = () => {
 		const foundIndex = languages.findIndex(
-			( { locale } ) => locale === selectedLanguage?.locale
+			( { locale } ) => locale === activeLanguage?.locale
 		);
 
-		setSelectedLanguage(
+		setActiveLanguage(
 			languages[ foundIndex + 1 ] || languages[ foundIndex - 1 ]
 		);
 
 		setLanguages( ( prevLanguages ) =>
 			prevLanguages.filter(
-				( { locale } ) => locale !== selectedLanguage?.locale
+				( { locale } ) => locale !== activeLanguage?.locale
 			)
 		);
 		_setLanguages( ( prevLanguages ) =>
 			prevLanguages.filter(
-				( { locale } ) => locale !== selectedLanguage?.locale
+				( { locale } ) => locale !== activeLanguage?.locale
 			)
 		);
 
@@ -230,7 +226,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	const onMoveUp = () => {
 		setLanguages( ( prevLanguages ) => {
 			const srcIndex = prevLanguages.findIndex(
-				( { locale } ) => locale === selectedLanguage?.locale
+				( { locale } ) => locale === activeLanguage?.locale
 			);
 			return reorder(
 				Array.from( prevLanguages ),
@@ -245,7 +241,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	const onMoveDown = () => {
 		setLanguages( ( prevLanguages ) => {
 			const srcIndex = prevLanguages.findIndex(
-				( { locale } ) => locale === selectedLanguage?.locale
+				( { locale } ) => locale === activeLanguage?.locale
 			);
 			return reorder< Language[] >(
 				Array.from( prevLanguages ),
@@ -276,14 +272,14 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			// Select first item.
 			case 'Home':
 				if ( ! isEmpty ) {
-					setSelectedLanguage( languages.at( 0 ) as Language );
+					setActiveLanguage( languages.at( 0 ) as Language );
 					event.preventDefault();
 				}
 				break;
 			// Select last item.
 			case 'End':
 				if ( ! isEmpty ) {
-					setSelectedLanguage( languages.at( -1 ) as Language );
+					setActiveLanguage( languages.at( -1 ) as Language );
 					event.preventDefault();
 				}
 				break;
@@ -296,7 +292,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 				break;
 			// Add item.
 			case 'KeyA':
-				if ( event.altKey && selectedInactiveLanguage ) {
+				if ( event.altKey && inactiveLanguage ) {
 					onAdd();
 					event.preventDefault();
 				}
@@ -310,7 +306,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div className="language-chooser" onKeyDown={ onKeyDown }>
 			<HiddenFormField
-				preferredLanguages={ languages }
+				selectedLanguages={ languages }
 				inputName={ inputName || `${ instanceId }-languages` }
 			/>
 			<p id={ instanceId }>
@@ -321,8 +317,8 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			<ActiveLocales
 				languages={ languages }
 				showOptionSiteDefault={ showOptionSiteDefault }
-				selectedLanguage={ selectedLanguage }
-				setSelectedLanguage={ setSelectedLanguage }
+				activeLanguage={ activeLanguage }
+				setActiveLanguage={ setActiveLanguage }
 				onMoveUp={ onMoveUp }
 				onMoveDown={ onMoveDown }
 				onRemove={ onRemove }
@@ -335,8 +331,8 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			<InactiveLocales
 				languages={ inactiveLocales }
 				onAdd={ onAdd }
-				selectedInactiveLanguage={ selectedInactiveLanguage }
-				setSelectedInactiveLanguage={ setSelectedInactiveLanguage }
+				inactiveLanguage={ inactiveLanguage }
+				setInactiveLanguage={ setInactiveLanguage }
 				installedLanguages={ installedLanguages }
 				availableLanguages={ availableLanguages }
 			/>

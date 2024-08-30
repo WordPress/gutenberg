@@ -8,8 +8,8 @@ import InactiveLocalesSelect from './inactive-locales-select';
 interface InactiveLocalesProps {
 	languages: Language[];
 	onAdd: () => void;
-	selectedInactiveLanguage: Language;
-	setSelectedInactiveLanguage: ( locale: Language ) => void;
+	inactiveLanguage: Language;
+	setInactiveLanguage: ( locale: Language ) => void;
 	installedLanguages: Language[];
 	availableLanguages: Language[];
 }
@@ -17,13 +17,13 @@ interface InactiveLocalesProps {
 function InactiveLocales( {
 	languages,
 	onAdd,
-	selectedInactiveLanguage,
-	setSelectedInactiveLanguage,
+	inactiveLanguage,
+	setInactiveLanguage,
 	installedLanguages,
 	availableLanguages,
 }: InactiveLocalesProps ) {
 	const onChange = ( locale: string ) => {
-		setSelectedInactiveLanguage(
+		setInactiveLanguage(
 			languages.find(
 				( language ) => locale === language.locale
 			) as Language
@@ -36,14 +36,11 @@ function InactiveLocales( {
 				<InactiveLocalesSelect
 					installedLanguages={ installedLanguages }
 					availableLanguages={ availableLanguages }
-					value={ selectedInactiveLanguage?.locale }
+					value={ inactiveLanguage?.locale }
 					onChange={ onChange }
 				/>
 			</div>
-			<InactiveControls
-				onAdd={ onAdd }
-				disabled={ ! selectedInactiveLanguage }
-			/>
+			<InactiveControls onAdd={ onAdd } disabled={ ! inactiveLanguage } />
 		</div>
 	);
 }
