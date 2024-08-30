@@ -134,23 +134,6 @@ describe( 'LanguageChooser', () => {
 		).not.toHaveLength( 0 );
 	} );
 
-	it( 'populates hidden form field', () => {
-		render(
-			<LanguageChooser
-				allLanguages={ [ de_DE, en_GB, fr_FR, es_ES ] }
-				selectedLanguages={ [ de_DE, en_GB, fr_FR ] }
-				inputName="preferred_languages"
-			/>
-		);
-
-		// eslint-disable-next-line testing-library/no-node-access
-		const hiddenInput = document.querySelector(
-			'input[name="preferred_languages"][type="hidden"]'
-		);
-
-		expect( hiddenInput ).toHaveValue( 'de_DE,en_GB,fr_FR' );
-	} );
-
 	it( 'adds language to list', async () => {
 		render(
 			<LanguageChooser
