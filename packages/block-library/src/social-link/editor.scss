@@ -29,6 +29,12 @@
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 3px solid transparent;
 	}
+
+	// Override the shared `.wp-block-social-link` class used on both the li and button
+	// due to backwards compatibility from moving the blockProps from the li to the button.
+	&:hover {
+		transform: none;
+	}
 }
 
 :root :where(.wp-block-social-links.is-style-pill-shape .wp-social-link button) {
