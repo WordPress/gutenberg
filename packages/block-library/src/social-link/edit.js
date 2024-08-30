@@ -149,6 +149,8 @@ const SocialLinkEdit = ( {
 		},
 	} );
 
+	const isURLPopoverOpen = isSelected && showURLPopover;
+
 	return (
 		<>
 			<InspectorControls>
@@ -188,9 +190,7 @@ const SocialLinkEdit = ( {
 			>
 				<button
 					aria-haspopup="dialog"
-					aria-expanded={ (
-						isSelected && showURLPopover
-					).toString() }
+					aria-expanded={ isURLPopoverOpen.toString() }
 					{ ...blockProps }
 				>
 					<IconComponent />
@@ -202,7 +202,7 @@ const SocialLinkEdit = ( {
 						{ socialLinkText }
 					</span>
 				</button>
-				{ isSelected && showURLPopover && (
+				{ isURLPopoverOpen && (
 					<SocialLinkURLPopover
 						url={ url }
 						setAttributes={ setAttributes }
