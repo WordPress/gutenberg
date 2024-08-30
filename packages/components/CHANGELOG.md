@@ -7,6 +7,7 @@
 -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
 -   Soft deprecate `size` prop on `AlignmentMatrixControl.Icon` ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
 -   `__experimentalAlignmentMatrixControl` can now be imported as a stable `AlignmentMatrixControl` ([#60913](https://github.com/WordPress/gutenberg/pull/60913)).
+-   Deprecate `DimensionControl`, scheduled to be removed in WordPress 7.0 ([#64951](https://github.com/WordPress/gutenberg/pull/64951)).
 
 ### Enhancements
 
