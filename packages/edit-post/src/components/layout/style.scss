@@ -64,6 +64,10 @@
 
 .has-metaboxes .editor-visual-editor {
 	flex: 1;
+
+	&.is-iframed {
+		isolation: isolate;
+	}
 }
 
 // Adjust the position of the notices
