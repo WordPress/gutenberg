@@ -186,11 +186,13 @@ export function RichTextWrapper(
 					args: relevantBinding.args,
 				} );
 
-			const _bindingsPlaceholder = sprintf(
-				/* translators: %s: source label or key */
-				__( '%s value is empty' ),
-				relevantBinding?.args?.key || blockBindingsSource?.label
-			);
+			const _bindingsPlaceholder = _disableBoundBlock
+				? relevantBinding?.args?.key || blockBindingsSource?.label
+				: sprintf(
+						/* translators: %s: source label or key */
+						__( 'Add %s value' ),
+						relevantBinding?.args?.key || blockBindingsSource?.label
+				  );
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
