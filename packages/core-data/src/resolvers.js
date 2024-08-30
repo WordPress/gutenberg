@@ -273,6 +273,10 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
 			}
 
 			// If we request fields but the result doesn't contain the fields,
@@ -321,6 +325,7 @@ export const getEntityRecords =
 						} ) );
 
 					const canUserResolutionsArgs = [];
+					const receiveUserPermissionArgs = {};
 					for ( const targetHint of targetHints ) {
 						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 							canUserResolutionsArgs.push( [
@@ -328,17 +333,19 @@ export const getEntityRecords =
 								{ kind, name, id: targetHint.id },
 							] );
 
-							dispatch.receiveUserPermission(
+							receiveUserPermissionArgs[
 								getUserPermissionCacheKey( action, {
 									kind,
 									name,
 									id: targetHint.id,
-								} ),
-								targetHint.permissions[ action ]
-							);
+								} )
+							] = targetHint.permissions[ action ];
 						}
 					}
 
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
 					dispatch.finishResolutions(
 						'getEntityRecord',
 						resolutionsArgs
