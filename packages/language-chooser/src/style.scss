@@ -24,10 +24,6 @@ $white: #fff;
 	}
 }
 
-.active-locales-controls .button {
-	margin: 0;
-}
-
 .language-chooser__active-locales-list,
 .language-chooser__inactive-locales-list {
 	width: 25em;
@@ -39,12 +35,18 @@ $white: #fff;
 	height: 130px;
 	overflow-y: scroll;
 	list-style: none;
-	margin: 0 1em 0 0;
+	margin: 0 1em 1em 0;
 	padding: 0;
 	background: #fff;
 	box-shadow: inset 0 1px 2px rgba($black, 0.07);
 	border: 1px solid $gray-300;
 	box-sizing: border-box;
+}
+
+@media screen and (min-width: 510px) {
+	.language-chooser__active-locales-list {
+		margin-bottom: 0;
+	}
 }
 
 .language-chooser__inactive-locales-list {
@@ -70,30 +72,30 @@ $white: #fff;
 	font-size: 13px;
 }
 
-.language-chooser__active-locales-controls {
+.language-chooser .components-button-group {
 	clear: both;
 }
 
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @media screen and (min-width: 510px) {
-
-	.language-chooser__active-locales-controls {
+	.language-chooser .components-button-group {
 		clear: none;
 	}
 }
 
-
-.language-chooser__active-locales-controls ul {
-	list-style: none;
-	margin: 0;
-	padding: 0;
+.language-chooser .components-button-group .components-button + .components-button {
+	margin: 0 0 0 5px;
 }
 
-.language-chooser__active-locales-controls li {
-	margin: 0;
-}
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@media screen and (min-width: 510px) {
+	.language-chooser .components-button-group .components-button {
+		display: block;
+	}
 
-.language-chooser__active-locales-controls li + li {
-	margin-top: 5px;
+	.language-chooser .components-button-group .components-button + .components-button {
+		margin: 5px 0 0;
+	}
 }
 
 .language-chooser__active-locales-list li:hover {
