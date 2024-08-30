@@ -25,7 +25,6 @@ function InactiveLocalesSelect( {
 	const hasItems = installedLanguages.length || availableLanguages.length;
 
 	return (
-		// eslint-disable-next-line no-restricted-syntax -- Do not want __next40pxDefaultSize in wp-admin
 		<SelectControl
 			aria-label={ __( 'Inactive Locales' ) }
 			label={ __( 'Inactive Locales' ) }
