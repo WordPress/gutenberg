@@ -261,6 +261,7 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	const instanceId = useInstanceId( LanguageChooser, 'language-chooser' );
 
 	return (
+		// Legit use case as it's capturing events bubbling up from children who have shortcuts defined.
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div className="language-chooser" onKeyDown={ onKeyDown }>
 			<Text id={ instanceId }>
