@@ -20,26 +20,21 @@ import { AddComment } from './add-comment';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
-
 const modifyBlockCommentAttributes = ( settings, name ) => {
-	if ( name && name?.includes( 'core/' ) ) {
-		if (
-			undefined === settings.attributes.blockCommentId ||
-			null === settings.attributes.blockCommentId
-		) {
-			settings.attributes = {
-				...settings.attributes,
-				blockCommentId: {
-					type: 'number',
-					default: 0,
-				},
-				showCommentBoard: {
-					type: 'boolean',
-					default: false,
-				},
-			};
-		}
+	if ( name?.includes( 'core/' ) && ! settings.attributes.blockCommentId ) {
+		settings.attributes = {
+			...settings.attributes,
+			blockCommentId: {
+				type: 'number',
+				default: 0,
+			},
+			showCommentBoard: {
+				type: 'boolean',
+				default: false,
+			},
+		};
 	}
+
 	return settings;
 };
 
@@ -54,7 +49,12 @@ addFilter(
  * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
-	const [ threads, setThreads ] = useState( [] );
+	// Check if the experimental flag is enabled.
+	if ( ! isBlockCommentExperimentEnabled ) {
+		return null; // or maybe return some message indicating no threads are available.
+	}
+
+	const [ threads, setThreads ] = useState( () => [] );
 	const [ reloadComments, setReloadComments ] = useState( false );
 	const postId = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
@@ -103,18 +103,7 @@ export default function CollabSidebar() {
 		}
 	}, [ postId, reloadComments ] );
 
-	const { threads: selectedThreads } = useSelect( () => {
-		return {
-			threads,
-		};
-	}, [ threads ] );
-
-	// Check if the experimental flag is enabled.
-	if ( ! isBlockCommentExperimentEnabled ) {
-		return null; // or maybe return some message indicating no threads are available.
-	}
-
-	const resultThreads = selectedThreads.map( ( thread ) => thread ).reverse();
+	const resultThreads = threads.map( ( thread ) => thread ).reverse();
 
 	return (
 		<PluginSidebar
