@@ -50,6 +50,7 @@ export function getGrammar( pattern ) {
 	let grammarMap = grammarMapCache.get( pattern );
 	if ( ! grammarMap ) {
 		grammarMap = grammarParse( pattern.content );
+		// Block names are null only at the top level for whitespace.
 		grammarMap = grammarMap.filter( ( block ) => block.blockName !== null );
 		grammarMapCache.set( pattern, grammarMap );
 	}
