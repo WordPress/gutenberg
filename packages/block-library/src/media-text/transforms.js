@@ -3,7 +3,7 @@
  */
 import { createBlock } from '@wordpress/blocks';
 
-function transform(
+function unwrap(
 	{ mediaType, mediaPosition, mediaAlt, mediaId, mediaUrl, anchor },
 	innerBlocks
 ) {
@@ -121,19 +121,19 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/image' ],
 			isMatch: ( { mediaType } ) => mediaType === 'image',
-			transform,
+			transform: unwrap,
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
 			isMatch: ( { mediaType } ) => mediaType === 'video',
-			transform,
+			transform: unwrap,
 		},
 		{
 			type: 'block',
 			// To do: ideally this should be '*', and quote should also use '*'.
 			blocks: [ 'core/paragraph' ],
-			transform,
+			transform: unwrap,
 		},
 		{
 			type: 'block',
