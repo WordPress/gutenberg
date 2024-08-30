@@ -27,8 +27,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 
 	return (
 		<SelectControl
-			// TODO: Switch to `true` (40px size) if possible
-			__next40pxDefaultSize={ false }
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Select a legacy widget to display:' ) }
 			value={ selectedId ?? '' }

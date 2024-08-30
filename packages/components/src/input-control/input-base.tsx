@@ -14,13 +14,7 @@ import { useMemo } from '@wordpress/element';
  */
 import Backdrop from './backdrop';
 import Label from './label';
-import {
-	Container,
-	Root,
-	Prefix,
-	Suffix,
-	getSizeConfig,
-} from './styles/input-control-styles';
+import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
 import {
@@ -90,16 +84,12 @@ function InputBase(
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
-	const { paddingLeft, paddingRight } = getSizeConfig( {
-		inputSize: size,
-		__next40pxDefaultSize,
-	} );
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefixWrapper: { paddingLeft },
-			InputControlSuffixWrapper: { paddingRight },
+			InputControlPrefixWrapper: { __next40pxDefaultSize, size },
+			InputControlSuffixWrapper: { __next40pxDefaultSize, size },
 		};
-	}, [ paddingLeft, paddingRight ] );
+	}, [ __next40pxDefaultSize, size ] );
 
 	return (
 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.

@@ -160,6 +160,12 @@ test.describe( 'Block template registration', () => {
 		await expect(
 			page.getByText( 'Custom Template (overridden by the theme)' )
 		).toBeHidden();
+		// Verify the template description fall backs to the plugin registered description.
+		await expect(
+			page.getByText(
+				'A custom template registered by a plugin and overridden by a theme.'
+			)
+		).toBeVisible();
 		// Verify the theme template shows the theme name as the author.
 		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );

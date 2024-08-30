@@ -120,9 +120,9 @@ export default function DocumentBar( props ) {
 	const title = props.title || entityTitle;
 	const icon = props.icon || templateIcon;
 
-	const mounted = useRef( false );
+	const mountedRef = useRef( false );
 	useEffect( () => {
-		mounted.current = true;
+		mountedRef.current = true;
 	}, [] );
 
 	return (
@@ -143,7 +143,7 @@ export default function DocumentBar( props ) {
 						} }
 						size="compact"
 						initial={
-							mounted.current
+							mountedRef.current
 								? { opacity: 0, transform: 'translateX(15%)' }
 								: false // Don't show entry animation when DocumentBar mounts.
 						}
@@ -170,7 +170,7 @@ export default function DocumentBar( props ) {
 						// Force entry animation when the back button is added or removed.
 						key={ hasBackButton }
 						initial={
-							mounted.current
+							mountedRef.current
 								? {
 										opacity: 0,
 										transform: hasBackButton

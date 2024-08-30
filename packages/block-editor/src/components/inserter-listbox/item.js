@@ -42,7 +42,15 @@ function InserterListboxItem(
 				if ( typeof children === 'function' ) {
 					return children( propsWithTabIndex );
 				}
-				return <Button { ...propsWithTabIndex }>{ children }</Button>;
+				return (
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						{ ...propsWithTabIndex }
+					>
+						{ children }
+					</Button>
+				);
 			} }
 		/>
 	);

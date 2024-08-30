@@ -39,14 +39,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getDeviceType, getCurrentPostType } = select( editorStore );
-		const { getUnstableBase, getPostType } = select( coreStore );
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const _currentPostType = getCurrentPostType();
 		return {
 			deviceType: getDeviceType(),
 			editorMode: __unstableGetEditorMode(),
-			homeUrl: getUnstableBase()?.home,
+			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -58,18 +58,18 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	/**
 	 * Save the original editing mode in a ref to restore it when we exit zoom out.
 	 */
-	const originalEditingMode = useRef( editorMode );
+	const originalEditingModeRef = useRef( editorMode );
 	useEffect( () => {
 		if ( editorMode !== 'zoom-out' ) {
-			originalEditingMode.current = editorMode;
+			originalEditingModeRef.current = editorMode;
 		}
 
 		return () => {
 			if (
 				editorMode === 'zoom-out' &&
-				editorMode !== originalEditingMode.current
+				editorMode !== originalEditingModeRef.current
 			) {
-				__unstableSetEditorMode( originalEditingMode.current );
+				__unstableSetEditorMode( originalEditingModeRef.current );
 			}
 		};
 	}, [ editorMode, __unstableSetEditorMode ] );
@@ -136,7 +136,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 * @param {string} value The device type.
 	 */
 	const onSelect = ( value ) => {
-		let newEditorMode = originalEditingMode.current;
+		let newEditorMode = originalEditingModeRef.current;
 
 		if ( value === 'ZoomOut' ) {
 			newEditorMode = 'zoom-out';

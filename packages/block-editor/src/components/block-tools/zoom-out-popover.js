@@ -11,12 +11,8 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import ZoomOutToolbar from './zoom-out-toolbar';
 
 export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
-	const {
-		capturingClientId,
-		isInsertionPointVisible,
-		lastClientId,
-		rootClientId,
-	} = useSelectedBlockToolProps( clientId );
+	const { capturingClientId, isInsertionPointVisible, lastClientId } =
+		useSelectedBlockToolProps( clientId );
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
@@ -42,8 +38,8 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 			{ ...props }
 		>
 			<ZoomOutToolbar
+				__unstableContentRef={ __unstableContentRef }
 				clientId={ clientId }
-				rootClientId={ rootClientId }
 			/>
 		</BlockPopover>
 	);

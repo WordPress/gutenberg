@@ -11,11 +11,6 @@
 	.dataviews-view-table & {
 		width: 96px;
 		flex-grow: 0;
-		border-radius: 2px;
-
-		.page-patterns-preview-field__button {
-			border-radius: 2px;
-		}
 	}
 
 	.page-patterns-preview-field__button {
@@ -110,10 +105,6 @@
 }
 
 .edit-site-page-patterns-dataviews {
-	.dataviews-pagination {
-		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
-	}
-
 	.dataviews-view-grid__badge-fields {
 		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);

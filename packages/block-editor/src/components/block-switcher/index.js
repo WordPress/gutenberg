@@ -181,6 +181,21 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
+const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
+	<>
+		<BlockIcon
+			className="block-editor-block-switcher__toggle"
+			icon={ icon }
+			showColors
+		/>
+		{ showTitle && blockTitle && (
+			<span className="block-editor-block-switcher__toggle-text">
+				{ blockTitle }
+			</span>
+		) }
+	</>
+);
+
 export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
 		canRemove,
@@ -247,6 +262,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		: __( 'Multiple blocks selected' );
 
 	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
+
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
@@ -255,14 +271,11 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					className="block-editor-block-switcher__no-switcher-icon"
 					title={ blockSwitcherLabel }
 					icon={
-						<>
-							<BlockIcon icon={ icon } showColors />
-							{ ( isReusable || isTemplate ) && (
-								<span className="block-editor-block-switcher__toggle-text">
-									{ blockTitle }
-								</span>
-							) }
-						</>
+						<BlockIndicator
+							icon={ icon }
+							showTitle={ isReusable || isTemplate }
+							blockTitle={ blockTitle }
+						/>
 					}
 				/>
 			</ToolbarGroup>
@@ -292,18 +305,11 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
-							<>
-								<BlockIcon
-									icon={ icon }
-									className="block-editor-block-switcher__toggle"
-									showColors
-								/>
-								{ ( isReusable || isTemplate ) && (
-									<span className="block-editor-block-switcher__toggle-text">
-										{ blockTitle }
-									</span>
-								) }
-							</>
+							<BlockIndicator
+								icon={ icon }
+								showTitle={ isReusable || isTemplate }
+								blockTitle={ blockTitle }
+							/>
 						}
 						toggleProps={ {
 							description: blockSwitcherDescription,

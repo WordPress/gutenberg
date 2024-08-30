@@ -6,6 +6,8 @@
 
 -   Added TypeScript variant of the template ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
 
+## 2.6.0 (2024-08-21)
+
 ## 2.5.0 (2024-08-07)
 
 ## 2.4.0 (2024-07-24)

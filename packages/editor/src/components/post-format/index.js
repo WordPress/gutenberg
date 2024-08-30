@@ -100,6 +100,8 @@ export default function PostFormat() {
 				{ suggestion && suggestion.id !== postFormat && (
 					<p className="editor-post-format__suggestion">
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="link"
 							onClick={ () =>
 								onUpdatePostFormat( suggestion.id )

@@ -23,6 +23,7 @@ import useSelectionObserver from './use-selection-observer';
 import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
+import useEventRedirect from './use-event-redirect';
 import { store as blockEditorStore } from '../../store';
 
 export function useWritingFlow() {
@@ -65,6 +66,7 @@ export function useWritingFlow() {
 				},
 				[ hasMultiSelection ]
 			),
+			useEventRedirect(),
 		] ),
 		after,
 	];
