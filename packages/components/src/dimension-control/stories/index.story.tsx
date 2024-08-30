@@ -15,7 +15,8 @@ import { desktop, tablet, mobile } from '@wordpress/icons';
 
 const meta: Meta< typeof DimensionControl > = {
 	component: DimensionControl,
-	title: 'Components (Experimental)/DimensionControl',
+	title: 'Components (Deprecated)/DimensionControl',
+	id: 'components-dimensioncontrol',
 	argTypes: {
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },
