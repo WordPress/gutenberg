@@ -1,26 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
+import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 // All WP post formats, sorted alphabetically by translated name.
+// Value is the post format slug. Label is the name.
 const POST_FORMATS = [
-	{ slug: 'aside', name: __( 'Aside' ) },
-	{ slug: 'audio', name: __( 'Audio' ) },
-	{ slug: 'chat', name: __( 'Chat' ) },
-	{ slug: 'gallery', name: __( 'Gallery' ) },
-	{ slug: 'image', name: __( 'Image' ) },
-	{ slug: 'link', name: __( 'Link' ) },
-	{ slug: 'quote', name: __( 'Quote' ) },
-	{ slug: 'standard', name: __( 'Standard' ) },
-	{ slug: 'status', name: __( 'Status' ) },
-	{ slug: 'video', name: __( 'Video' ) },
+	{ value: 'aside', label: __( 'Aside' ) },
+	{ value: 'audio', label: __( 'Audio' ) },
+	{ value: 'chat', label: __( 'Chat' ) },
+	{ value: 'gallery', label: __( 'Gallery' ) },
+	{ value: 'image', label: __( 'Image' ) },
+	{ value: 'link', label: __( 'Link' ) },
+	{ value: 'quote', label: __( 'Quote' ) },
+	{ value: 'standard', label: __( 'Standard' ) },
+	{ value: 'status', label: __( 'Status' ) },
+	{ value: 'video', label: __( 'Video' ) },
 ].sort( ( a, b ) => {
-	const normalizedA = a.name.toUpperCase();
-	const normalizedB = b.name.toUpperCase();
+	const normalizedA = a.label.toUpperCase();
+	const normalizedB = b.label.toUpperCase();
 
 	if ( normalizedA < normalizedB ) {
 		return -1;
@@ -32,7 +33,7 @@ const POST_FORMATS = [
 } );
 
 export default function FormatControls( { onChange, query } ) {
-	const { format } = query;
+	const format = query.format.map( ( item ) => item.toLowerCase() );
 
 	const { supportedFormats } = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
@@ -42,27 +43,34 @@ export default function FormatControls( { onChange, query } ) {
 	}, [] );
 
 	const formats = POST_FORMATS.filter( ( item ) =>
-		supportedFormats.includes( item.slug )
+		supportedFormats.includes( item.value )
 	);
 
-	const formatOptions = [
-		...( formats || [] ).map( ( item ) => ( {
-			value: item.slug,
-			label: item.name,
-		} ) ),
-	];
+	const suggestions = formats
+		.filter( ( item ) => ! format.includes( item.value ) )
+		.map( ( item ) => item.label );
 
 	return (
-		<SelectControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			multiple
+		<FormTokenField
 			label={ __( 'Formats' ) }
 			value={ format }
-			options={ formatOptions }
+			suggestions={ suggestions }
 			onChange={ ( value ) => {
-				onChange( { format: value } );
+				const normalizedValue = value.map( ( item ) =>
+					item.toLowerCase()
+				);
+				// Only allow the post formats that are in the 'formats' constant.
+				const values = normalizedValue.filter( ( item ) =>
+					formats.some(
+						( supportedFormat ) => supportedFormat.value === item
+					)
+				);
+				onChange( { format: values } );
 			} }
+			__experimentalShowHowTo={ false }
+			__experimentalExpandOnFocus
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 }
