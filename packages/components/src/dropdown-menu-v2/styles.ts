@@ -85,12 +85,16 @@ export const MenuPopoverOuterWrapper = styled.div<
 
 		&:has( [data-open][data-side='bottom'] ) {
 			transform-origin: top;
-			animation-name: ${ fadeIn }, ${ scaleYOuter };
 		}
 		&:has( [data-open][data-side='top'] ) {
 			transform-origin: bottom;
+		}
+
+		&:has( [data-open][data-side='bottom'] ),
+		&:has( [data-open][data-side='top'] ) {
 			animation-name: ${ fadeIn }, ${ scaleYOuter };
 		}
+
 		&:has( [data-open][data-side='left'] ),
 		&:has( [data-open][data-side='right'] ) {
 			animation-name: ${ fadeIn };
@@ -129,9 +133,7 @@ export const MenuPopoverInnerWrapper = styled.div`
 			will-change: transform, opacity;
 			transform-origin: inherit;
 		}
-		&[data-open][data-side='bottom'] {
-			animation-name: ${ fadeIn }, ${ scaleYContent };
-		}
+		&[data-open][data-side='bottom'],
 		&[data-open][data-side='top'] {
 			animation-name: ${ fadeIn }, ${ scaleYContent };
 		}
