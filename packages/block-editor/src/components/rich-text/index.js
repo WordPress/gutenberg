@@ -22,6 +22,7 @@ import {
 import { Popover } from '@wordpress/components';
 import { store as blocksStore } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -185,9 +186,11 @@ export function RichTextWrapper(
 					args: relevantBinding.args,
 				} );
 
-			const _bindingsPlaceholder =
-			// Translators: %s is the bindings source or bindings key placeholder.
-			 sprintf( '%s value is empty', ( relevantBinding?.args?.key || blockBindingsSource?.label )  );
+			const _bindingsPlaceholder = sprintf(
+				/* translators: %s: source label or key */
+				__( '%s value is empty' ),
+				relevantBinding?.args?.key || blockBindingsSource?.label
+			);
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
