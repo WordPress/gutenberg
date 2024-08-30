@@ -97,6 +97,10 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		languages[ languages.length - 1 ]?.locale === activeLanguage?.locale;
 	const isRemoveDisabled = ! activeLanguage;
 
+	const activeLanguageIndex = languages.findIndex(
+		( { locale } ) => locale === activeLanguage?.locale
+	);
+
 	const onAdd = () => {
 		onAddLanguage( inactiveLanguage );
 
@@ -130,12 +134,9 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	};
 
 	const onRemove = () => {
-		const foundIndex = languages.findIndex(
-			( { locale } ) => locale === activeLanguage?.locale
-		);
-
 		setActiveLanguage(
-			languages[ foundIndex + 1 ] || languages[ foundIndex - 1 ]
+			languages[ activeLanguageIndex + 1 ] ||
+				languages[ activeLanguageIndex - 1 ]
 		);
 
 		setLanguages( ( prevLanguages ) =>
@@ -203,14 +204,26 @@ function LanguageChooser( props: LanguageChooserProps ) {
 			// Move item up.
 			case 'ArrowUp':
 				if ( ! isMoveUpDisabled ) {
-					onMoveUp();
+					if ( event.altKey ) {
+						onMoveUp();
+					} else {
+						setActiveLanguage(
+							languages[ activeLanguageIndex - 1 ]
+						);
+					}
 					event.preventDefault();
 				}
 				break;
 			// Move item down.
 			case 'ArrowDown':
 				if ( ! isMoveDownDisabled ) {
-					onMoveDown();
+					if ( event.altKey ) {
+						onMoveDown();
+					} else {
+						setActiveLanguage(
+							languages[ activeLanguageIndex + 1 ]
+						);
+					}
 					event.preventDefault();
 				}
 				break;

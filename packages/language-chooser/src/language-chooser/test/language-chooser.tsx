@@ -71,10 +71,25 @@ window.HTMLElement.prototype.scrollIntoView = scrollIntoView;
  * @see https://github.com/WordPress/gutenberg/issues/45777
  */
 
+function selectPrevious() {
+	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
+		key: 'ArrowUp',
+		code: 'ArrowUp',
+	} );
+}
+
+function selectNext() {
+	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
+		key: 'ArrowDown',
+		code: 'ArrowDown',
+	} );
+}
+
 function moveUp() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'ArrowUp',
 		code: 'ArrowUp',
+		altKey: true,
 	} );
 }
 
@@ -82,6 +97,7 @@ function moveDown() {
 	fireEvent.keyDown( screen.getByRole( 'listbox' ), {
 		key: 'ArrowDown',
 		code: 'ArrowDown',
+		altKey: true,
 	} );
 }
 
@@ -280,6 +296,18 @@ describe( 'LanguageChooser', () => {
 
 		moveUp();
 		moveUp();
+
+		selectNext();
+
+		expect(
+			screen.getByRole( 'option', { name: /Français/ } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+
+		selectPrevious();
+
+		expect(
+			screen.getByRole( 'option', { name: /Deutsch/ } )
+		).toHaveAttribute( 'aria-selected', 'true' );
 
 		expect(
 			screen.getByRole( 'button', { name: /Move down/ } )
