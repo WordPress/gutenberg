@@ -22,8 +22,13 @@ export default function BlockToolbarPopover( {
 	isTyping,
 	__unstableContentRef,
 } ) {
-	const { capturingClientId, isInsertionPointVisible, lastClientId } =
-		useSelectedBlockToolProps( clientId );
+	const {
+		capturingClientId,
+		isInsertionPointVisible,
+		lastClientId,
+		isContentOnlyRichTextBlock,
+		hasTextSelection,
+	} = useSelectedBlockToolProps( clientId );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
 	// to it when re-mounting.
@@ -56,8 +61,12 @@ export default function BlockToolbarPopover( {
 		clientId: clientIdToPositionOver,
 	} );
 
+	const showBlockToolbar =
+		( ! isTyping && ! isContentOnlyRichTextBlock ) ||
+		( isContentOnlyRichTextBlock && hasTextSelection );
+
 	return (
-		! isTyping && (
+		showBlockToolbar && (
 			<BlockPopover
 				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
