@@ -300,15 +300,15 @@ export function toTree( {
 			append( getParent( pointer ), ZWNBSP );
 
 			if ( placeholder && text.length === 0 ) {
-				append( getParent( pointer ), {
-					type: 'span',
-					attributes: {
-						'data-rich-text-placeholder': placeholder,
-						// Necessary to prevent the placeholder from catching
-						// selection and being editable.
-						style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
-					},
-				} );
+				// append( getParent( pointer ), {
+				// 	type: 'span',
+				// 	attributes: {
+				// 		'data-rich-text-placeholder': placeholder,
+				// 		// Necessary to prevent the placeholder from catching
+				// 		// selection and being editable.
+				// 		style: 'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
+				// 	},
+				// } );
 			}
 		}
 
