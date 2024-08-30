@@ -50,6 +50,7 @@ export function getGrammar( pattern ) {
 	let grammarMap = grammarMapCache.get( pattern );
 	if ( ! grammarMap ) {
 		grammarMap = grammarParse( pattern.content );
+		grammarMap = grammarMap.filter( ( block ) => block.blockName !== null );
 		grammarMapCache.set( pattern, grammarMap );
 	}
 	return grammarMap;
