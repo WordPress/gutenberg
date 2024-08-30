@@ -21,35 +21,6 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 
 const EMPTY_ACTIVE_FORMATS = [];
 
-const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
-
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.hasAttribute( PLACEHOLDER_ATTR_NAME )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
-}
-
 export default ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
@@ -141,13 +112,6 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( defaultView );
-			}
-
 			return;
 		}
 
@@ -186,11 +150,6 @@ export default ( props ) => ( element ) => {
 			'selectionchange',
 			handleSelectionChange
 		);
-		// Remove the placeholder. Since the rich text value doesn't update
-		// during composition, the placeholder doesn't get removed. There's no
-		// need to re-add it, when the value is updated on compositionend it
-		// will be re-added when the value is empty.
-		element.querySelector( `[${ PLACEHOLDER_ATTR_NAME }]` )?.remove();
 	}
 
 	function onCompositionEnd() {

@@ -1,12 +1,6 @@
 .rich-text {
-	[data-rich-text-placeholder] {
-		pointer-events: none;
-	}
-
-	[data-rich-text-placeholder]::after {
+	&:empty::after {
 		content: attr(data-rich-text-placeholder);
-		// Use opacity to work in various editor styles.
-		// We don't specify the color here, because blocks or editor styles might provide their own.
 		opacity: 0.62;
 	}
 
@@ -28,7 +22,7 @@
 
 // Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
 // To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before {
+figcaption.block-editor-rich-text__editable:empty::after {
 	opacity: 0.8;
 }
 

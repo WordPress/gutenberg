@@ -23,7 +23,7 @@
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	&[data-rich-text-placeholder]::after {
+	&:empty::after {
 		opacity: 0.8;
 	}
 }

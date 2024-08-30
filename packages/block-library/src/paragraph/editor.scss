@@ -4,17 +4,13 @@
 }
 
 // Hide multiple sequential paragraphs, but don't hide placeholders if a custom placeholder is set.
-.block-editor-block-list__block[data-empty="true"] {
-	[data-rich-text-placeholder] {
-		opacity: 1;
-	}
+.block-editor-block-list__block:empty::after {
+	// opacity: 1;
 }
 
-.block-editor-block-list__block[data-empty="true"] + .block-editor-block-list__block[data-empty="true"] {
-	&:not([data-custom-placeholder="true"]) {
-		[data-rich-text-placeholder] {
-			opacity: 0;
-		}
+.block-editor-block-list__block:empty + .block-editor-block-list__block:empty {
+	&:not([data-custom-placeholder="true"])::after {
+		opacity: 0;
 	}
 }
 
