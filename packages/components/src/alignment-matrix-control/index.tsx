@@ -21,27 +21,7 @@ import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
 import type { AlignmentMatrixControlProps } from './types';
 
-/**
- *
- * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
- *
- * ```jsx
- * import { AlignmentMatrixControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const Example = () => {
- * 	const [ alignment, setAlignment ] = useState( 'center center' );
- *
- * 	return (
- * 		<AlignmentMatrixControl
- * 			value={ alignment }
- * 			onChange={ setAlignment }
- * 		/>
- * 	);
- * };
- * ```
- */
-export function AlignmentMatrixControl( {
+function UnforwardedAlignmentMatrixControl( {
 	className,
 	id,
 	label = __( 'Alignment Matrix Control' ),
@@ -52,7 +32,7 @@ export function AlignmentMatrixControl( {
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
 	const baseId = useInstanceId(
-		AlignmentMatrixControl,
+		UnforwardedAlignmentMatrixControl,
 		'alignment-matrix-control',
 		id
 	);
@@ -100,6 +80,41 @@ export function AlignmentMatrixControl( {
 	);
 }
 
-AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+/**
+ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ *
+ * ```jsx
+ * import { AlignmentMatrixControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ alignment, setAlignment ] = useState( 'center center' );
+ *
+ * 	return (
+ * 		<AlignmentMatrixControl
+ * 			value={ alignment }
+ * 			onChange={ setAlignment }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export const AlignmentMatrixControl = Object.assign(
+	UnforwardedAlignmentMatrixControl,
+	{
+		/**
+		 * Render an alignment matrix as an icon.
+		 *
+		 * ```jsx
+		 * import { AlignmentMatrixControl } from '@wordpress/components';
+		 *
+		 * <Icon icon={<AlignmentMatrixControl.Icon value="top left" />} />
+		 * ```
+		 */
+		Icon: Object.assign( AlignmentMatrixControlIcon, {
+			displayName: 'AlignmentMatrixControl.Icon',
+		} ),
+	}
+);
 
 export default AlignmentMatrixControl;

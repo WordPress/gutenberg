@@ -13,11 +13,9 @@ export {
 
 // Components.
 export {
-	/**
-	 * @deprecated Import `AlignmentMatrixControl` instead.
-	 */
+	/** @deprecated Import `AlignmentMatrixControl` instead. */
 	default as __experimentalAlignmentMatrixControl,
-	AlignmentMatrixControl,
+	default as AlignmentMatrixControl,
 } from './alignment-matrix-control';
 export {
 	default as Animate,
