@@ -31,6 +31,8 @@ export default function InspectorPopoverHeader( {
 				<Spacer />
 				{ actions.map( ( { label, icon, onClick } ) => (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						key={ label }
 						className="block-editor-inspector-popover-header__action"
 						label={ label }
@@ -43,6 +45,8 @@ export default function InspectorPopoverHeader( {
 				) ) }
 				{ onClose && (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						className="block-editor-inspector-popover-header__action"
 						label={ __( 'Close' ) }
 						icon={ closeSmall }

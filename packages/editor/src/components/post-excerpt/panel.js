@@ -198,6 +198,8 @@ function PrivateExcerpt() {
 				ref={ setPopoverAnchor }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						className="editor-post-excerpt__dropdown__trigger"
 						onClick={ onToggle }
 						variant="link"

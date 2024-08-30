@@ -51,8 +51,7 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }

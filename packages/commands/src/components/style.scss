@@ -30,7 +30,7 @@
 	.components-button {
 		height: $grid-unit-70;
 		width: $grid-unit-70;
-		border: 1px solid $gray-600;
+		border: $border-width solid $gray-600;
 		border-right: 0;
 		justify-content: center;
 		border-radius: $radius-block-ui 0 0 $radius-block-ui;
