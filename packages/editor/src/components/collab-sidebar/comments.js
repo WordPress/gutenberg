@@ -223,7 +223,7 @@ export function Comments( { threads } ) {
 											<DropdownMenu
 												icon={ moreVertical }
 												label="Select an action"
-												className="is-compact"
+												className="is-compact editor-collab-sidebar__commentDropdown"
 												controls={ [
 													{
 														title: __( 'Edit' ),
@@ -267,7 +267,7 @@ export function Comments( { threads } ) {
 											<DropdownMenu
 												icon={ moreVertical }
 												label="Select an action"
-												className="is-compact"
+												className="is-compact editor-collab-sidebar__commentDropdown"
 												controls={ [
 													{
 														title: __( 'Edit' ),
@@ -613,7 +613,7 @@ export function Comments( { threads } ) {
 																moreVertical
 															}
 															label="Select an action"
-															className="is-compact"
+															className="is-compact editor-collab-sidebar__commentDropdown"
 															controls={ [
 																{
 																	title: __(
@@ -672,7 +672,7 @@ export function Comments( { threads } ) {
 																	moreVertical
 																}
 																label="Select an action"
-																className="is-compact"
+																className="is-compact editor-collab-sidebar__commentDropdown"
 																controls={ [
 																	{
 																		title: __(
