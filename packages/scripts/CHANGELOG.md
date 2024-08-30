@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+
+-   Added chunk filename in webpack config to avoid reading stale files ([#58176](https://github.com/WordPress/gutenberg/pull/58176)).
+
 ### Breaking Changes
 
 -   Drop support for Node.js versions < 18.
