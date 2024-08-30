@@ -17,6 +17,24 @@ If you haven't done so already, you need to install the package `@wordpress/inte
 
 It is also a good practice to keep that package updated.
 
+## Scaffolding a new typed interactive block
+
+If you want to explore an example of an interactive block using TypeScript in your local environment, you can use the `@wordpress/create-block-interactive-template`.
+
+Start by ensuring you have Node.js and `npm` installed on your computer. Review the [Node.js development environment](https://developer.wordpress.org/block-editor/getting-started/devenv/nodejs-development-environment/) guide if not.
+
+Next, use the [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package and the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) template to scaffold the block.
+
+Choose the folder where you want to create the plugin, execute the following command in the terminal from within that folder, and choose the `typescript` variant when asked.
+
+```
+npx @wordpress/create-block@latest --template @wordpress/create-block-interactive-template
+```
+
+**Important**: Do not provide a slug in the terminal. Otherwise, `create-block` will not ask you which variant you want to choose and it will select the default non-TypeScript variant by default.
+
+Finally, you can keep following the instructions in the [Getting Started Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/) as the rest of the instructions remain the same.
+
 ## Typing the store
 
 Depending on the structure of your store and your preference, there are three options you can choose from to generate your store's types:
