@@ -5,6 +5,7 @@ import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -146,9 +147,15 @@ export class PostPublishButton extends Component {
 		}
 
 		const onClickButton = () => {
+			// Allow for overriding saving for custom validations.
+			if ( ! applyFilters( 'editor.PostPublishButton.shouldSubmit', true, this.props, publishStatus ) ) {
+				return;
+			}
+
 			if ( isButtonDisabled ) {
 				return;
 			}
+
 			onSubmit();
 			savePostStatus( publishStatus );
 		};
