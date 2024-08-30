@@ -206,7 +206,6 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
-			resetValueOnSelect={ false }
 			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter
@@ -266,6 +265,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 				{ matches.map( ( element ) => {
 					return (
 						<Ariakit.ComboboxItem
+							resetValueOnSelect={ false }
 							key={ element.value }
 							value={ element.value }
 							className="dataviews-filters__search-widget-listitem"

@@ -234,6 +234,8 @@ export default function ShadowsEditPanel() {
 						>
 							<FlexItem>
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									variant="tertiary"
 									onClick={ () =>
 										setIsRenameModalVisible( false )
@@ -243,7 +245,12 @@ export default function ShadowsEditPanel() {
 								</Button>
 							</FlexItem>
 							<FlexItem>
-								<Button variant="primary" type="submit">
+								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Save' ) }
 								</Button>
 							</FlexItem>
@@ -373,7 +380,12 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 				return (
 					<HStack align="center" justify="flex-start" spacing={ 0 }>
 						<FlexItem style={ { flexGrow: 1 } }>
-							<Button icon={ shadowIcon } { ...toggleProps }>
+							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
+								icon={ shadowIcon }
+								{ ...toggleProps }
+							>
 								{ shadowObj.inset
 									? __( 'Inner shadow' )
 									: __( 'Drop shadow' ) }
@@ -382,6 +394,8 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						{ canRemove && (
 							<FlexItem>
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									icon={ reset }
 									{ ...removeButtonProps }
 								/>

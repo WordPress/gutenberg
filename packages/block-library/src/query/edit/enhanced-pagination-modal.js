@@ -75,7 +75,12 @@ export default function EnhancedPaginationModal( {
 			>
 				<VStack alignment="right" spacing={ 5 }>
 					<span id={ modalDescriptionId }>{ notice }</span>
-					<Button variant="primary" onClick={ closeModal }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ closeModal }
+					>
 						{ __( 'OK' ) }
 					</Button>
 				</VStack>

@@ -5,6 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Action } from '@wordpress/dataviews';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 	id: 'permanently-delete',
 	label: __( 'Permanently delete' ),
 	supportsBulk: true,
+	icon: trash,
 	isEligible( item ) {
 		if ( isTemplateOrTemplatePart( item ) || item.type === 'wp_block' ) {
 			return false;

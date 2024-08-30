@@ -9,6 +9,7 @@ import { downloadZip } from 'client-zip';
  */
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
+import { download } from '@wordpress/icons';
 import type { Action } from '@wordpress/dataviews';
 
 /**
@@ -36,6 +37,7 @@ function getJsonFromItem( item: Pattern ) {
 const exportPattern: Action< Pattern > = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
+	icon: download,
 	supportsBulk: true,
 	isEligible: ( item ) => item.type === 'wp_block',
 	callback: async ( items ) => {
