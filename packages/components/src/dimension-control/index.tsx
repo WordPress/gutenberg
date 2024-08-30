@@ -17,6 +17,7 @@ import sizesTable, { findSizeBySlug } from './sizes';
 import type { DimensionControlProps, Size } from './types';
 import type { SelectControlSingleSelectionProps } from '../select-control/types';
 import { ContextSystemProvider } from '../context';
+import deprecated from '@wordpress/deprecated';
 
 const CONTEXT_VALUE = {
 	BaseControl: {
@@ -61,6 +62,11 @@ export function DimensionControl( props: DimensionControlProps ) {
 		onChange,
 		className = '',
 	} = props;
+
+	deprecated( 'wp.components.DimensionControl', {
+		since: '6.7',
+		version: '7.0',
+	} );
 
 	const onChangeSpacingSize: SelectControlSingleSelectionProps[ 'onChange' ] =
 		( val ) => {
