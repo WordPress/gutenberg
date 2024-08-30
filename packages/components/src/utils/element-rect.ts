@@ -59,7 +59,7 @@ export function useResizeObserver(
 		element: HTMLElement
 	) => void,
 	/**
-	 * Options to pass to the `ResizeObserver.observe` callback.
+	 * Options to pass to `ResizeObserver.observe` when called internally.
 	 *
 	 * Updating this option will not cause the observer to be re-created, and it
 	 * will only take effect if a new element is observed.
