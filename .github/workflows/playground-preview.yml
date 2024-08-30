@@ -1,6 +1,3 @@
-# For now (!) the name here is important and should not be changed!
-#
-# The plugin-proxy.php does a check against exact this workflow name.
 name: Playground Preview
 
 # Inspired by, but not based on https://github.com/WordPress/gutenberg/blob/b89fb7b6eaf619bde0269e2a7fbf6245822f6cbf/.github/workflows/build-plugin-zip.yml#L153
@@ -36,67 +33,9 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    zip:
-        name: Build Gutenberg plugin & upload as zipped artifact
-        runs-on: ubuntu-latest
-        steps:
-            # To checkout the merged commit with actions/checkout on pull_request_target event,
-            # you need to get the pull request by GitHub API
-            # and set the merge commit hash to actions/checkout input ref.
-            #
-            # @source https://dev.to/suzukishunsuke/secure-github-actions-by-pullrequesttarget-641#checkout-merge-commits
-            - uses: suzuki-shunsuke/get-pr-action@v0.1.0
-              id: pr
-
-            - name: Checkout
-              uses: actions/checkout@v4
-              with:
-                  ref: ${{ steps.pr.outputs.merge_commit_sha }}
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v2
-              with:
-                  php-version: latest
-                  coverage: none
-                  tools: wp-cli
-
-            - name: Install latest version of dist-archive-command
-              run: wp package install wp-cli/dist-archive-command:dev-main
-
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version-file: '.nvmrc'
-                  # Enable built-in functionality for caching and restoring dependencies, which is disabled by default.
-                  # The actions/setup-node uses actions/cache under the hood.
-                  # https://github.com/actions/setup-node#caching-global-packages-data
-                  cache: 'npm'
-
-            - name: Npm install
-              # A "full" install is executed, since `npm ci` does not always exit
-              # with an error status code if the lock file is inaccurate. This also
-              # helps to catch dependencies not being installed with exact version.
-              #
-              # See: https://github.com/WordPress/gutenberg/issues/16157
-              # See: https://github.com/WordPress/gutenberg/pull/39865
-              run: npm install
-
-            - name: Build plugin
-              # - [Incorrect version number used when creating zip archive · Issue #92 · wp-cli/dist-archive-command](https://github.com/wp-cli/dist-archive-command/issues/92)
-              run: |
-                  npm run build
-                  wp dist-archive . ./${{ github.event.repository.name }}.zip
-
-            - name: Upload artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: ${{ github.event.repository.name }}-pr
-                  path: ./${{ github.event.repository.name }}.zip
-
     comment:
         name: Comment with playground link
-        needs: zip # Ensure this runs after zip job.
+        # needs: zip # Ensure this runs after zip job.
         runs-on: ubuntu-latest
 
         steps:
