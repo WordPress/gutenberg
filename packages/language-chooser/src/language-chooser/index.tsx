@@ -84,42 +84,6 @@ function LanguageChooser( props: LanguageChooserProps ) {
 		( { installed } ) => ! installed
 	);
 
-	const hasUninstalledSelectedLanguages = languages.some(
-		( { installed } ) => ! installed
-	);
-
-	useEffect( () => {
-		if ( ! hasUninstalledSelectedLanguages ) {
-			return;
-		}
-
-		const addSpinner = () => {
-			const spinner = document.createElement( 'span' );
-			spinner.className =
-				'spinner language-install-spinner is-active language-chooser-spinner';
-
-			const submit = document.querySelector( '#submit' );
-
-			if ( ! submit ) {
-				return;
-			}
-
-			submit.after( spinner );
-		};
-
-		const form = document.querySelector( 'form' );
-
-		if ( ! form ) {
-			return;
-		}
-
-		form.addEventListener( 'submit', addSpinner );
-
-		return () => {
-			form.removeEventListener( 'submit', addSpinner );
-		};
-	}, [ hasUninstalledSelectedLanguages ] );
-
 	const onAddLanguage = ( locale: Language ) => {
 		setLanguages( ( current ) => [ ...current, locale ] );
 		setActiveLanguage( locale );
