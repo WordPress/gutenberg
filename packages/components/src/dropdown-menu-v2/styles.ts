@@ -130,7 +130,6 @@ export const MenuPopoverInnerWrapper = styled.div`
 		&[data-open] {
 			animation-duration: inherit;
 			animation-timing-function: inherit;
-			will-change: transform, opacity;
 			transform-origin: inherit;
 		}
 		&[data-open][data-side='bottom'],
