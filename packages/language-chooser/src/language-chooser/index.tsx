@@ -9,7 +9,7 @@ import type { KeyboardEvent } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { Notice } from '@wordpress/components';
+import { Notice, __experimentalText as Text } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -250,11 +250,11 @@ function LanguageChooser( props: LanguageChooserProps ) {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div className="language-chooser" onKeyDown={ onKeyDown }>
-			<p id={ instanceId }>
+			<Text id={ instanceId }>
 				{ __(
 					'Choose languages for displaying WordPress in, in order of preference.'
 				) }
-			</p>
+			</Text>
 			<ActiveLocales
 				languages={ languages }
 				showOptionSiteDefault={ showOptionSiteDefault }

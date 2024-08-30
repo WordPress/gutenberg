@@ -3,6 +3,7 @@
  */
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { __experimentalText as Text } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -76,9 +77,8 @@ export function ActiveLocales( {
 		<div className="language-chooser__active-locales">
 			{ isEmpty && (
 				<div className="language-chooser__active-locales-empty-message">
-					{ __( 'Nothing set.' ) }
-					<br />
-					{ emptyMessage }
+					<Text>{ __( 'Nothing set.' ) }</Text>
+					<Text>{ emptyMessage }</Text>
 				</div>
 			) }
 			<ul
