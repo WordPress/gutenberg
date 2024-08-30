@@ -21,8 +21,8 @@ import {
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { chevronLeft } from '@wordpress/icons';
+import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
+import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -354,7 +354,9 @@ function InstalledFonts() {
 
 							<Flex justify="flex-start">
 								<NavigatorBackButton
-									icon={ chevronLeft }
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										handleSetLibraryFontSelected( null );
