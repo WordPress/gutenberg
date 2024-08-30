@@ -24,6 +24,7 @@
 -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
 -   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
 -   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+-   `AlignmentMatrixControl`: Promote to stable ([#60913](https://github.com/WordPress/gutenberg/pull/60913)).
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
     -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
