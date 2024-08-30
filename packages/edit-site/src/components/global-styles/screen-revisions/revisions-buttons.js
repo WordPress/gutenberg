@@ -162,8 +162,10 @@ function RevisionsButtons( {
 						aria-current={ isSelected }
 					>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							className="edit-site-global-styles-screen-revisions__revision-button"
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 							disabled={ isSelected }
 							onClick={ () => {
 								onChange( revision );

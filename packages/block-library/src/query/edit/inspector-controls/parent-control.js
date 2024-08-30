@@ -132,12 +132,14 @@ function ParentControl( { parents, postType, onChange } ) {
 	};
 	return (
 		<FormTokenField
+			__next40pxDefaultSize
 			label={ __( 'Parents' ) }
 			value={ value }
 			onInputChange={ debouncedSearch }
 			suggestions={ suggestions }
 			onChange={ onParentChange }
 			__experimentalShowHowTo={ false }
+			__nextHasNoMarginBottom
 		/>
 	);
 }

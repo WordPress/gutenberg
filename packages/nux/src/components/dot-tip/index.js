@@ -56,11 +56,18 @@ export function DotTip( {
 		>
 			<p>{ children }</p>
 			<p>
-				<Button variant="link" onClick={ onDismiss }>
+				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
+					variant="link"
+					onClick={ onDismiss }
+				>
 					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 				</Button>
 			</p>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="nux-dot-tip__disable"
 				icon={ close }
 				label={ __( 'Disable tips' ) }

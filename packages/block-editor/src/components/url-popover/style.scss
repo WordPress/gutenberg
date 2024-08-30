@@ -10,6 +10,7 @@
 .block-editor-url-popover__row {
 	display: flex;
 	gap: $grid-unit-05;
+	align-items: center;
 }
 
 // Any children of the popover-row that are not the settings-toggle

@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
+- Add [`@wordpress/i18n-hyphenated-range`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).
+
+## 20.3.0 (2024-08-21)
+
+## 20.2.0 (2024-08-07)
+
+## 20.1.0 (2024-07-24)
+
+## 20.0.0 (2024-07-10)
+
+### Breaking Changes
+- Add [`@typescript-eslint/no-unused-vars` rule](https://typescript-eslint.io/rules/no-unused-vars) to the recommended TypeScript ruleset ([#62925](https://github.com/WordPress/gutenberg/pull/62925)).
+- Add [`@typescript-eslint/method-signature-style` rule](https://typescript-eslint.io/rules/method-signature-style) to the recommended TypeScript ruleset ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
+## 19.2.0 (2024-06-26)
+
 ## 19.1.0 (2024-06-15)
 
 ## 19.0.0 (2024-05-31)

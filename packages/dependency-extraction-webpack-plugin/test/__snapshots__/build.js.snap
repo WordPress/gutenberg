@@ -236,12 +236,12 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`overrides\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '77b6df15bf179d0ae624', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'a1906cfc819b623c86f8', 'type' => 'module');
 "
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => 'e14dfa7260edaee86a85', 'type' => 'module');
+"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '04771412967314fde455', 'type' => 'module');
 "
 `;
 

@@ -22,7 +22,7 @@ import { useCallback, useState, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
@@ -175,6 +175,7 @@ function DimensionsToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -185,7 +186,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -475,6 +476,8 @@ export default function DimensionsPanel( {
 				>
 					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
+							__next40pxDefaultSize={ false }
 							label={ __( 'Content' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -503,6 +506,8 @@ export default function DimensionsPanel( {
 				>
 					<HStack alignment="flex-end" justify="flex-start">
 						<UnitControl
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							label={ __( 'Wide' ) }
 							labelPosition="top"
 							__unstableInputWidth="80px"
@@ -610,6 +615,9 @@ export default function DimensionsPanel( {
 					}
 					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
+						'single-column':
+							// If UnitControl is used, should be single-column.
+							! showSpacingPresetsControl && ! isAxialGap,
 					} ) }
 					panelId={ panelId }
 				>
@@ -627,8 +635,8 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
+								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
-								__unstableInputWidth="80px"
 								min={ 0 }
 								onChange={ setGapValue }
 								units={ units }

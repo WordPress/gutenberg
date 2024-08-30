@@ -19,6 +19,8 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 	return (
 		<>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="wp-block-navigation-delete-menu-button"
 				variant="secondary"
 				isDestructive
@@ -41,6 +43,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ __(
 						'Are you sure you want to delete this Navigation Menu?'

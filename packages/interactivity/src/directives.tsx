@@ -6,7 +6,10 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import { deepSignal, peek, type DeepSignal } from 'deepsignal';
+/**
+ * Internal dependencies
+ */
+import { proxifyState, peek } from './proxies';
 
 /**
  * Internal dependencies
@@ -16,10 +19,11 @@ import {
 	useInit,
 	kebabToCamelCase,
 	warn,
-	yieldToMain,
+	splitTask,
+	isPlainObject,
 } from './utils';
-import type { DirectiveEntry } from './hooks';
-import { directive, getScope, getEvaluate } from './hooks';
+import { directive, getEvaluate, type DirectiveEntry } from './hooks';
+import { getScope } from './scopes';
 
 // Assigned objects should be ignored during proxification.
 const contextAssignedObjects = new WeakMap();
@@ -28,9 +32,6 @@ const contextAssignedObjects = new WeakMap();
 const contextObjectToProxy = new WeakMap();
 const contextProxyToObject = new WeakMap();
 const contextObjectToFallback = new WeakMap();
-
-const isPlainObject = ( item: unknown ): boolean =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
@@ -53,7 +54,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 	contextObjectToFallback.set( current, inherited );
 	if ( ! contextObjectToProxy.has( current ) ) {
 		const proxy = new Proxy( current, {
-			get: ( target: DeepSignal< any >, k ) => {
+			get: ( target: object, k: string ) => {
 				const fallback = contextObjectToFallback.get( current );
 				// Always subscribe to prop changes in the current context.
 				const currentProp = target[ k ];
@@ -67,9 +68,9 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 				if (
 					k in target &&
 					! contextAssignedObjects.get( target )?.has( k ) &&
-					isPlainObject( peek( target, k ) )
+					isPlainObject( currentProp )
 				) {
-					return proxifyContext( currentProp, fallback[ k ] );
+					return proxifyContext( currentProp );
 				}
 
 				// Return the stored proxy for `currentProp` when it exists.
@@ -131,22 +132,19 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 };
 
 /**
- * Recursively update values within a deepSignal object.
+ * Recursively update values within a context object.
  *
- * @param target A deepSignal instance.
+ * @param target A context instance.
  * @param source Object with properties to update in `target`.
  */
-const updateSignals = (
-	target: DeepSignal< any >,
-	source: DeepSignal< any >
-) => {
+const updateContext = ( target: any, source: any ) => {
 	for ( const k in source ) {
 		if (
 			isPlainObject( peek( target, k ) ) &&
-			isPlainObject( peek( source, k ) )
+			isPlainObject( source[ k ] )
 		) {
-			updateSignals( target[ `$${ k }` ].peek(), source[ k ] );
-		} else {
+			updateContext( peek( target, k ) as object, source[ k ] );
+		} else if ( ! ( k in target ) ) {
 			target[ k ] = source[ k ];
 		}
 	}
@@ -246,7 +244,7 @@ const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
-						await yieldToMain();
+						await splitTask();
 						evaluate( entry, event );
 					};
 					const globalVar = type === 'window' ? window : document;
@@ -263,21 +261,23 @@ export default () => {
 	// data-wp-context
 	directive(
 		'context',
-		// @ts-ignore-next-line
 		( {
 			directives: { context },
 			props: { children },
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const inheritedValue = useContext( inheritedContext );
-			const currentValue = useRef( deepSignal( {} ) );
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
+			const inheritedValue = useContext( inheritedContext );
+
+			const ns = defaultEntry!.namespace;
+			const currentValue = useRef( proxifyState( ns, {} ) );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
+				const result = { ...inheritedValue };
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
@@ -286,11 +286,17 @@ export default () => {
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}
-					updateSignals( currentValue.current, {
-						[ namespace ]: deepClone( value ),
-					} );
+					updateContext(
+						currentValue.current,
+						deepClone( value ) as object
+					);
+					currentValue.current = proxifyContext(
+						currentValue.current,
+						inheritedValue[ namespace ]
+					);
+					result[ namespace ] = currentValue.current;
 				}
-				return proxifyContext( currentValue.current, inheritedValue );
+				return result;
 			}, [ defaultEntry, inheritedValue ] );
 
 			return createElement( Provider, { value: contextStack }, children );
@@ -301,7 +307,33 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useWatch( () => evaluate( entry ) );
+			useWatch( () => {
+				let start;
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						// eslint-disable-next-line no-unused-vars
+						start = performance.now();
+					}
+				}
+				const result = evaluate( entry );
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						performance.measure(
+							`interactivity api watch ${ entry.namespace }`,
+							{
+								start,
+								end: performance.now(),
+								detail: {
+									devtools: {
+										track: `IA: watch ${ entry.namespace }`,
+									},
+								},
+							}
+						);
+					}
+				}
+				return result;
+			} );
 		} );
 	} );
 
@@ -309,7 +341,33 @@ export default () => {
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
 			// TODO: Replace with useEffect to prevent unneeded scopes.
-			useInit( () => evaluate( entry ) );
+			useInit( () => {
+				let start;
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						start = performance.now();
+					}
+				}
+				const result = evaluate( entry );
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						performance.measure(
+							`interactivity api init ${ entry.namespace }`,
+							{
+								// eslint-disable-next-line no-undef
+								start,
+								end: performance.now(),
+								detail: {
+									devtools: {
+										track: `IA: init ${ entry.namespace }`,
+									},
+								},
+							}
+						);
+					}
+				}
+				return result;
+			} );
 		} );
 	} );
 
@@ -333,7 +391,30 @@ export default () => {
 					if ( existingHandler ) {
 						existingHandler( event );
 					}
+					let start;
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							start = performance.now();
+						}
+					}
 					evaluate( entry, event );
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							performance.measure(
+								`interactivity api on ${ entry.namespace }`,
+								{
+									// eslint-disable-next-line no-undef
+									start,
+									end: performance.now(),
+									detail: {
+										devtools: {
+											track: `IA: on ${ entry.namespace }`,
+										},
+									},
+								}
+							);
+						}
+					}
 				} );
 			};
 		} );
@@ -361,7 +442,7 @@ export default () => {
 						existingHandler( event );
 					}
 					entries.forEach( async ( entry ) => {
-						await yieldToMain();
+						await splitTask();
 						evaluate( entry, event );
 					} );
 				};
@@ -608,11 +689,14 @@ export default () => {
 			return list.map( ( item ) => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const itemContext = deepSignal( { [ namespace ]: {} } );
-				const mergedContext = proxifyContext(
-					itemContext,
-					inheritedValue
+				const itemContext = proxifyContext(
+					proxifyState( namespace, {} ),
+					inheritedValue[ namespace ]
 				);
+				const mergedContext = {
+					...inheritedValue,
+					[ namespace ]: itemContext,
+				};
 
 				// Set the item after proxifying the context.
 				mergedContext[ namespace ][ itemProp ] = item;

@@ -37,6 +37,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { SlotFillProvider } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -73,7 +74,6 @@ function useEditorStyles() {
 		hasThemeStyleSupport,
 		editorSettings,
 		isZoomedOutView,
-		hasMetaBoxes,
 		renderingMode,
 		postType,
 	} = useSelect( ( select ) => {
@@ -85,7 +85,6 @@ function useEditorStyles() {
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
 			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
-			hasMetaBoxes: select( editPostStore ).hasMetaBoxes(),
 			renderingMode: getRenderingMode(),
 			postType: _postType,
 		};
@@ -131,14 +130,13 @@ function useEditorStyles() {
 		// bottom, there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
-			! hasMetaBoxes &&
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {
 			return [
 				...baseStyles,
 				{
-					css: 'body{padding-bottom: 40vh}',
+					css: ':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}',
 				},
 			];
 		}
@@ -196,7 +194,10 @@ function Layout( {
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canViewTemplate = canUser( 'read', 'templates' );
+			const canViewTemplate = canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 
 			return {
 				mode: select( editorStore ).getEditorMode(),
@@ -322,6 +323,12 @@ function Layout( {
 			id: initialPostId,
 		};
 	}, [ initialPostType, initialPostId ] );
+
+	const backButton =
+		useViewportMatch( 'medium' ) && isFullscreenActive ? (
+			<BackButton initialPost={ initialPost } />
+		) : null;
+
 	return (
 		<SlotFillProvider>
 			<ErrorBoundary>
@@ -368,7 +375,7 @@ function Layout( {
 					<InitPatternModal />
 					<PluginArea onError={ onPluginAreaError } />
 					<PostEditorMoreMenu />
-					<BackButton initialPost={ initialPost } />
+					{ backButton }
 					<EditorSnackbars />
 				</Editor>
 			</ErrorBoundary>

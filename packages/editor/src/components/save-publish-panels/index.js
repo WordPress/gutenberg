@@ -14,7 +14,6 @@ import PostPublishPanel from '../post-publish-panel';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 import PluginPostPublishPanel from '../plugin-post-publish-panel';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
@@ -30,20 +29,26 @@ export default function SavePublishPanels( {
 		useDispatch( editorStore );
 	const {
 		publishSidebarOpened,
-		hasNonPostEntityChanges,
-		hasPostMetaChanges,
-	} = useSelect(
-		( select ) => ( {
-			publishSidebarOpened:
-				select( editorStore ).isPublishSidebarOpened(),
-			hasNonPostEntityChanges:
-				select( editorStore ).hasNonPostEntityChanges(),
-			hasPostMetaChanges: unlock(
-				select( editorStore )
-			).hasPostMetaChanges(),
-		} ),
-		[]
-	);
+		isPublishable,
+		isDirty,
+		hasOtherEntitiesChanges,
+	} = useSelect( ( select ) => {
+		const {
+			isPublishSidebarOpened,
+			isEditedPostPublishable,
+			isCurrentPostPublished,
+			isEditedPostDirty,
+			hasNonPostEntityChanges,
+		} = select( editorStore );
+		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
+		return {
+			publishSidebarOpened: isPublishSidebarOpened(),
+			isPublishable:
+				! isCurrentPostPublished() && isEditedPostPublishable(),
+			isDirty: _hasOtherEntitiesChanges || isEditedPostDirty(),
+			hasOtherEntitiesChanges: _hasOtherEntitiesChanges,
+		};
+	}, [] );
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
@@ -62,29 +67,35 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( hasNonPostEntityChanges || hasPostMetaChanges ) {
-		unmountableContent = (
-			<div className="editor-layout__toggle-entities-saved-states-panel">
-				<Button
-					variant="secondary"
-					className="editor-layout__toggle-entities-saved-states-panel-button"
-					onClick={ openEntitiesSavedStates }
-					aria-expanded={ false }
-				>
-					{ __( 'Open save panel' ) }
-				</Button>
-			</div>
-		);
-	} else {
+	} else if ( isPublishable && ! hasOtherEntitiesChanges ) {
 		unmountableContent = (
 			<div className="editor-layout__toggle-publish-panel">
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					variant="secondary"
 					className="editor-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }
 				>
 					{ __( 'Open publish panel' ) }
+				</Button>
+			</div>
+		);
+	} else {
+		unmountableContent = (
+			<div className="editor-layout__toggle-entities-saved-states-panel">
+				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
+					variant="secondary"
+					className="editor-layout__toggle-entities-saved-states-panel-button"
+					onClick={ openEntitiesSavedStates }
+					aria-expanded={ false }
+					disabled={ ! isDirty }
+					accessibleWhenDisabled
+				>
+					{ __( 'Open save panel' ) }
 				</Button>
 			</div>
 		);

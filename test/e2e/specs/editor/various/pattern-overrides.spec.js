@@ -18,6 +18,7 @@ test.describe( 'Pattern Overrides', () => {
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -75,7 +76,7 @@ test.describe( 'Pattern Overrides', () => {
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
 				.getByRole( 'dialog', { name: 'Rename' } )
-				.getByRole( 'textbox', { name: 'Block name' } )
+				.getByRole( 'textbox', { name: 'Name' } )
 				.fill( editableParagraphName );
 			await page
 				.getByRole( 'dialog', { name: 'Rename' } )
@@ -149,7 +150,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			// Ensure the first pattern is selected.
-			await patternBlocks.first().selectText();
+			await editor.selectBlocks( patternBlocks.first() );
 			await expect( paragraphs.first() ).not.toHaveAttribute(
 				'inert',
 				'true'
@@ -167,7 +168,7 @@ test.describe( 'Pattern Overrides', () => {
 			await page.keyboard.type( 'I would word it this way' );
 
 			// Ensure the second pattern is selected.
-			await patternBlocks.last().selectText();
+			await editor.selectBlocks( patternBlocks.last() );
 			await patternBlocks
 				.last()
 				.getByRole( 'document', {
@@ -795,6 +796,139 @@ test.describe( 'Pattern Overrides', () => {
 		expect( patternInnerBlocks[ 0 ].attributes.link ).toBe( undefined );
 	} );
 
+	test( 'image block classname and data-id attributes contain the correct media ids when used in a gallery', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Upload two images, one for the original pattern, one for the override.
+		const { id: originalImageId, source_url: originalImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+				)
+			);
+		const { id: overrideImageId, source_url: overrideImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
+				)
+			);
+		const overrideName = 'test';
+
+		// Might be overkill, but check that the ids are actually different.
+		expect( overrideImageId ).not.toBe( originalImageId );
+
+		// Create a pattern with a gallery that has a single image with pattern overrides enabled.
+		// It has media that is not yet uploaded.
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ originalImageId },"sizeSlug":"large","linkDestination":"none","metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"${ overrideName }"}} -->
+<figure class="wp-block-image size-large"><img src="${ originalImageSrc }" alt="" class="wp-image-${ originalImageId }"/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->`,
+			status: 'publish',
+		} );
+
+		// Insert the pattern into a new post, overriding the image via the pattern block attributes.
+		await admin.createNewPost();
+		const imageAlt = 'Overridden Image';
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: {
+				ref: id,
+				content: {
+					[ overrideName ]: {
+						id: overrideImageId,
+						url: overrideImageSrc,
+						alt: imageAlt,
+					},
+				},
+			},
+		} );
+
+		// Check the image attributes on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageBlock = page.getByAltText( imageAlt );
+		await expect( imageBlock ).toHaveAttribute(
+			'data-id',
+			`${ overrideImageId }`
+		);
+		await expect( imageBlock ).toHaveAttribute(
+			'class',
+			`wp-image-${ overrideImageId }`
+		);
+	} );
+
+	test( 'image block classname contains the correct media id and has no data-id attribute when used as a standalone image', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Upload two images, one for the original pattern, one for the override.
+		const { id: originalImageId, source_url: originalImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+				)
+			);
+		const { id: overrideImageId, source_url: overrideImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
+				)
+			);
+		const overrideName = 'test';
+
+		// Might be overkill, but check that the ids are actually different.
+		expect( overrideImageId ).not.toBe( originalImageId );
+
+		// Create a pattern with a gallery that has a single image with pattern overrides enabled.
+		// It has media that is not yet uploaded.
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:image {"id":${ originalImageId },"sizeSlug":"large","linkDestination":"none","metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"${ overrideName }"}} -->
+<figure class="wp-block-image size-large"><img src="${ originalImageSrc }" alt="" class="wp-image-${ originalImageId }"/></figure>
+<!-- /wp:image -->`,
+			status: 'publish',
+		} );
+
+		// Insert the pattern into a new post, overriding the image via the pattern block attributes.
+		await admin.createNewPost();
+		const imageAlt = 'Overridden Image';
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: {
+				ref: id,
+				content: {
+					[ overrideName ]: {
+						id: overrideImageId,
+						url: overrideImageSrc,
+						alt: imageAlt,
+					},
+				},
+			},
+		} );
+
+		// Check the image attributes on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageBlock = page.getByAltText( imageAlt );
+		await expect( imageBlock ).not.toHaveAttribute( 'data-id' );
+		await expect( imageBlock ).toHaveAttribute(
+			'class',
+			`wp-image-${ overrideImageId }`
+		);
+	} );
+
 	test( 'blocks with the same name should be synced', async ( {
 		page,
 		admin,
@@ -997,7 +1131,7 @@ test.describe( 'Pattern Overrides', () => {
 			/\/wp-content\/uploads\//
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockToolbarButton( 'Alt' );
+		await editor.clickBlockToolbarButton( 'Alternative text' );
 		await page
 			.getByRole( 'textbox', { name: 'alternative text' } )
 			.fill( 'Test Image' );

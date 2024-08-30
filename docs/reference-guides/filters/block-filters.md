@@ -4,15 +4,15 @@ WordPress exposes several APIs that allow you to modify the behavior of existing
 
 ## Registration
 
-The following filters are available to extend block settings during their registration.
+Blocks in WordPress are typically registered on both the server and client side using `block.json`` metadata. You can use the following filters to modify or extend block settings during their registration on the server with PHP and on the client with JavaScript. To learn more, refer to the [block registration](https://developer.wordpress.org/block-editor/getting-started/fundamentals/registration-of-a-block/) guide.
 
 ### `block_type_metadata`
 
 Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows modifications to be applied before the metadata gets processed.
 
-The filter takes one parameter:
+The callback function for this filter receives one parameter:
 
-- `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+- `$metadata` (`array`): Metadata loaded from `block.json` for registering a block type.
 
 The following example sets the `apiVersion` of all blocks to `2`.
 
@@ -28,33 +28,33 @@ Here's a more robust example that disables background color and gradient support
 
 ```php
 function example_disable_heading_background_color_and_gradients( $metadata ) {
-    
-    // Only apply the filter to Heading blocks.
-    if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
-        return $metadata;
-    }
+	
+	// Only apply the filter to Heading blocks.
+	if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
+		return $metadata;
+	}
 
-    // Check if 'supports' key exists.
-    if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
-        
-        // Remove Background color and Gradients support.
-        $metadata['supports']['color']['background'] = false;
-        $metadata['supports']['color']['gradients']  = false;
-    }
+	// Check if 'supports' key exists.
+	if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
+		
+		// Remove Background color and Gradients support.
+		$metadata['supports']['color']['background'] = false;
+		$metadata['supports']['color']['gradients']  = false;
+	}
 
-    return $metadata;
+	return $metadata;
 }
 add_filter( 'block_type_metadata', 'example_disable_heading_background_color_and_gradients' );
 ```
 
 ### `block_type_metadata_settings`
 
-Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn’t handled by default.
+Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn't handled by default.
 
-The filter takes two parameters:
+The callback function for this filter receives two parameters:
 
--   `$settings` (`array`) – Array of determined settings for registering a block type.
--   `$metadata` (`array`) – Metadata loaded from the `block.json` file.
+-   `$settings` (`array`): Array of determined settings for registering a block type.
+-   `$metadata` (`array`): Metadata loaded from the `block.json` file.
 
 The following example increases the `apiVersion` for all blocks by `1`.
 
@@ -64,6 +64,45 @@ function example_filter_metadata_registration( $settings, $metadata ) {
 	return $settings;
 };
 add_filter( 'block_type_metadata_settings', 'example_filter_metadata_registration', 10, 2 );
+```
+
+### `register_block_type_args`
+
+Filters a block's arguments array (`$args`) right before the block type is officially registered on the server.
+
+The callback function for this filter receives two parameters:
+
+- `$args` (`array`): Array of arguments for registering a block type.
+- `$block_type` (`string`): Block type name including namespace.
+
+`register_block_type_args` is the most low-level PHP filter available, and it will work for every block registered on the server. All settings defined on the server are propagated to the client with higher priority than those set in the client.
+
+The following code will disable the color controls for Paragraph, Heading, List, and List Item blocks.
+
+```php
+function example_disable_color_for_specific_blocks( $args, $block_type ) {
+
+	// List of block types to modify.
+	$block_types_to_modify = [
+		'core/paragraph',
+		'core/heading',
+		'core/list',
+		'core/list-item'
+	];
+
+	// Check if the current block type is in the list.
+	if ( in_array( $block_type, $block_types_to_modify, true ) ) {
+		// Disable color controls.
+		$args['supports']['color'] = array(
+			'text'       => false,
+			'background' => false,
+			'link'       => false,
+		);
+	}
+
+	return $args;
+}
+add_filter( 'register_block_type_args', 'example_disable_color_for_specific_blocks', 10, 2 );
 ```
 
 ### `blocks.registerBlockType`
@@ -94,31 +133,100 @@ wp.hooks.addFilter(
 );
 ```
 
-## Block Editor
+## Front end
 
-The following filters are available to change the behavior of blocks while editing in the block editor.
+The following PHP filters are available to change the output of a block on the front end.
+
+### `render_block`
+
+Filters the front-end content of any block. This filter has no impact on the behavior of blocks in the Editor. 
+
+The callback function for this filter receives three parameters:
+
+- `$block_content` (`string`): The block content.
+- `$block` (`array`): The full block, including name and attributes.
+- `$instance` (`WP_Block`): The block instance.
+
+In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Here the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used to easily add the class instead of relying on regex.
+
+```php
+function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
+	
+	// Check if the block is a Paragraph block.
+	if ( 'core/paragraph' === $block['blockName'] ) {
+	   
+		// Add the custom class to the block content using the HTML API.
+		$processor = new WP_HTML_Tag_Processor( $block_content );
+		
+		if ( $processor->next_tag( 'p' ) ) {
+			$processor->add_class( 'example-class' );
+		}
+
+		return $processor->get_updated_html();
+	}
+
+	return $block_content;
+}
+add_filter( 'render_block', 'example_add_custom_class_to_paragraph_block', 10, 2 );
+```
+
+### `render_block_{namespace/block}`
+
+Filters the front-end content of the defined block. This is just a simpler form of `render_block` when you only need to modify a specific block type.
+
+The callback function for this filter receives three parameters:
+
+- `$block_content` (`string`): The block content.
+- `$block` (`array`): The full block, including name and attributes.
+- `$instance` (`WP_Block`): The block instance.
+
+In the following example, the class `example-class` is added to all Paragraph blocks on the front end. Notice that compared to the `render_block` example above, you no longer need to check the block type before modifying the content. Again, the [HTML API](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/) is used instead of regex.
+
+```php
+function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
+	   
+	// Add the custom class to the block content using the HTML API.
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	
+	if ( $processor->next_tag( 'p' ) ) {
+		$processor->add_class( 'example-class' );
+	}
+
+	return $processor->get_updated_html();
+}
+add_filter( 'render_block_core/paragraph', 'example_add_custom_class_to_paragraph_block', 10, 2 );
+```
+
+## Editor
+
+The following JavaScript filters are available to change the behavior of blocks while editing in the Editor.
 
 ### `blocks.getSaveElement`
 
-A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
+A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props, replace its children, or return an entirely new element.
 
-The filter's callback receives an element, a block-type definition object, and the block attributes as arguments. It should return an element.
+The callback function for this filter receives three parameters:
 
-The following example wraps a Cover block in an outer container div.
+- `element` (`Object`): The element to be modified and returned.
+- `blockType` (`Object`): A block-type definition object. 
+- `attributes` (`Object`): The block's attributes. 
+
+The following example wraps a Cover block in an outer container `div`.
 
 ```js
 function wrapCoverBlockInContainer( element, blockType, attributes ) {
-	// skip if element is undefined
+	
+	// Skip if element is undefined.
 	if ( ! element ) {
 		return;
 	}
 
-	// only apply to cover blocks
+	// Only apply to Cover blocks.
 	if ( blockType.name !== 'core/cover' ) {
 		return element;
 	}
 
-	// return the element wrapped in a div
+	// Return the element wrapped in a div.
 	return <div className="cover-block-wrapper">{ element }</div>;
 }
 
@@ -131,9 +239,13 @@ wp.hooks.addFilter(
 
 ### `blocks.getSaveContent.extraProps`
 
-A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
+A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example, you could add a className, an id, or any valid prop for this element.
 
-The filter receives the current `save` element's props, a block type, and the block attributes as arguments. It should return a props object.
+The callback function for this filter receives three parameters:
+
+- `props` (`Object`): The current `save` element's props to be modified and returned.
+- `blockType` (`Object`): A block-type definition object. 
+- `attributes` (`Object`): The block's attributes. 
 
 The following example adds a red background by default to all blocks.
 
@@ -152,7 +264,7 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_ A [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content output by the `save()` function.
+_Note:_ A [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The Editor verifies that the content stored in the post matches the content output by the `save()` function.
 
 To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
 
@@ -160,15 +272,13 @@ To avoid this validation error, use `render_block` server-side to modify existin
 
 Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
 
-_Example:_
-
 ```js
-// Our filter function
+// Our filter function.
 function setBlockCustomClassName( className, blockName ) {
 	return blockName === 'core/code' ? 'my-plugin-code' : className;
 }
 
-// Adding the filter
+// Adding the filter.
 wp.hooks.addFilter(
 	'blocks.getBlockDefaultClassName',
 	'my-plugin/set-block-custom-class-name',
@@ -188,8 +298,7 @@ Called immediately after the default parsing of a block's attributes and before 
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
 
-_Example:_
-
+The following example adds a new Inspector panel for all blocks.
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -216,12 +325,13 @@ wp.hooks.addFilter(
 );
 ```
 
-
 Note that as this hook is run for _all blocks_, consuming it has the potential for performance regressions, particularly around block selection metrics.
 
 To mitigate this, consider whether any work you perform can be altered to run only under certain conditions.
 
 For example, suppose you are adding components that only need to render when the block is _selected_. In that case, you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
+
+The following example adds a new Inspector panel for all blocks, but only when a block is selected.
 
 ```js
 const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
@@ -244,7 +354,7 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 
 Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
 
-The following example adds a unique class name.
+The following example adds a unique class name to all blocks.
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -424,7 +534,7 @@ You can also display an icon with your block category by setting an `icon` attri
 
 You can also set a custom icon in SVG format. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
-To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
+To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the Editor calling `wp.blocks.updateCategory` e.g:
 
 ```js
 ( function () {

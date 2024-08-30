@@ -1549,4 +1549,64 @@ test.describe( 'List (@firefox)', () => {
 			await expect.poll( editor.getBlocks ).toMatchObject( end );
 		} );
 	} );
+
+	test( 'should leave nested list intact when deleting the parent item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '1' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: '' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+							],
+						},
+					],
+				},
+				{ name: 'core/list-item', attributes: { content: '3' } },
+			],
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'a' },
+									},
+								],
+							},
+						],
+					},
+					{ name: 'core/list-item', attributes: { content: '3' } },
+				],
+			},
+		] );
+	} );
 } );

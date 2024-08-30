@@ -14,8 +14,10 @@ import {
 	InspectorControls,
 	ContrastChecker,
 	withColors,
+	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -26,6 +28,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
@@ -55,14 +58,22 @@ export function SocialLinksEdit( props ) {
 		size,
 	} = attributes;
 
+	const hasSelectedChild = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
+
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
-	const backgroundBackup = useRef( {} );
+	const backgroundBackupRef = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
-			backgroundBackup.current = {
+			backgroundBackupRef.current = {
 				iconBackgroundColor,
 				iconBackgroundColorValue,
 				customIconBackgroundColor,
@@ -73,8 +84,9 @@ export function SocialLinksEdit( props ) {
 				iconBackgroundColorValue: undefined,
 			} );
 		} else {
-			setAttributes( { ...backgroundBackup.current } );
+			setAttributes( { ...backgroundBackupRef.current } );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ logosOnly ] );
 
 	const SocialPlaceholder = (
@@ -84,12 +96,6 @@ export function SocialLinksEdit( props ) {
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</li>
-	);
-
-	const SelectedSocialPlaceholder = (
-		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
 		</li>
 	);
 
@@ -104,10 +110,11 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
+		placeholder: ! isSelected && SocialPlaceholder,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
+		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const POPOVER_PROPS = {

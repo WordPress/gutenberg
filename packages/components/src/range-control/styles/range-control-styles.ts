@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, rtl } from '../../utils';
+import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 
 import type {
@@ -102,7 +102,7 @@ export const Rail = styled.span`
 	position: absolute;
 	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
 	top: 0;
-	border-radius: ${ railHeight }px;
+	border-radius: ${ CONFIG.radiusFull };
 
 	${ railBackgroundColor };
 `;
@@ -119,7 +119,7 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
 
 export const Track = styled.span`
 	background-color: currentColor;
-	border-radius: ${ railHeight }px;
+	border-radius: ${ CONFIG.radiusFull };
 	height: ${ railHeight }px;
 	pointer-events: none;
 	display: block;
@@ -154,7 +154,7 @@ export const Mark = styled.span`
 	height: ${ thumbSize }px;
 	left: 0;
 	position: absolute;
-	top: -4px;
+	top: 9px;
 	width: 1px;
 
 	${ markFill };
@@ -168,12 +168,16 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 
 export const MarkLabel = styled.span`
 	color: ${ COLORS.gray[ 300 ] };
-	left: 0;
 	font-size: 11px;
 	position: absolute;
-	top: 12px;
-	transform: translateX( -50% );
+	top: 22px;
 	white-space: nowrap;
+
+	${ rtl( { left: 0 } ) };
+	${ rtl(
+		{ transform: 'translateX( -50% )' },
+		{ transform: 'translateX( 50% )' }
+	) };
 
 	${ markLabelFill };
 `;
@@ -199,7 +203,7 @@ export const ThumbWrapper = styled.span`
 	top: 0;
 	user-select: none;
 	width: ${ thumbSize }px;
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 
 	${ thumbColor };
 	${ rtl( { marginLeft: -10 } ) };
@@ -217,7 +221,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 					position: absolute;
 					background-color: ${ COLORS.theme.accent };
 					opacity: 0.4;
-					border-radius: 50%;
+					border-radius: ${ CONFIG.radiusRound };
 					height: ${ thumbSize + 8 }px;
 					width: ${ thumbSize + 8 }px;
 					top: -4px;
@@ -229,7 +233,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 
 export const Thumb = styled.span< ThumbProps >`
 	align-items: center;
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 	height: 100%;
 	outline: 0;
 	position: absolute;
@@ -277,7 +281,7 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
 
 export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	color: white;
 	display: inline-block;
 	font-size: 12px;

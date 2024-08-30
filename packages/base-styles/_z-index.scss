@@ -65,8 +65,10 @@ $z-layers: (
 	// Needs to be below media library that has a z-index of 160000.
 	"{core/video track editor popover}": 160000 - 10,
 
-	// Needs to be below media library that has a z-index of 160000.
+	// Needs to be below media library (.media-model) that has a z-index of 160000.
 	".block-editor-format-toolbar__image-popover": 160000 - 10,
+	// Below the media library backdrop (.media-modal-backdrop), which has a z-index of 159900.
+	".block-editor-global-styles-background-panel__popover": 159900 - 10,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
@@ -191,7 +193,6 @@ $z-layers: (
 	// Site editor layout
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
@@ -205,8 +206,11 @@ $z-layers: (
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
-	// Ensure quick actions toolbar appear above pagination
-	".dataviews-bulk-actions": 2,
+	// Ensure selection checkbox stays above the preview field.
+	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
+
+	// Ensure footer stays above the preview field.
+	".dataviews-footer": 2,
 );
 
 @function z-index( $key ) {

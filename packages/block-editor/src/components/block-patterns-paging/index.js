@@ -18,14 +18,11 @@ export default function Pagination( {
 	return (
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<Text variant="muted">
-				{
+				{ sprintf(
 					// translators: %s: Total number of patterns.
-					sprintf(
-						// translators: %s: Total number of patterns.
-						_n( '%s item', '%s items', totalItems ),
-						totalItems
-					)
-				}
+					_n( '%s item', '%s items', totalItems ),
+					totalItems
+				) }
 			</Text>
 
 			{ numPages > 1 && (
@@ -41,20 +38,24 @@ export default function Pagination( {
 						className="block-editor-patterns__grid-pagination-previous"
 					>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="tertiary"
 							onClick={ () => changePage( 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'First page' ) }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							<span>«</span>
 						</Button>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="tertiary"
 							onClick={ () => changePage( currentPage - 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'Previous page' ) }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							<span>‹</span>
 						</Button>
@@ -73,11 +74,13 @@ export default function Pagination( {
 						className="block-editor-patterns__grid-pagination-next"
 					>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							variant="tertiary"
 							onClick={ () => changePage( currentPage + 1 ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Next page' ) }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							<span>›</span>
 						</Button>
@@ -87,7 +90,7 @@ export default function Pagination( {
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Last page' ) }
 							size="default"
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							<span>»</span>
 						</Button>

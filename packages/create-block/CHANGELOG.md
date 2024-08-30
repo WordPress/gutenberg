@@ -2,11 +2,29 @@
 
 ## Unreleased
 
+## 4.49.0 (2024-08-21)
+
+## 4.48.0 (2024-08-07)
+
+## 4.47.0 (2024-07-24)
+
+## 4.46.0 (2024-07-10)
+
+## 4.45.0 (2024-06-26)
+
 ## 4.44.0 (2024-06-15)
+
+### Bug fix
+
+-   Pin the `@wordpress/scripts` version to a version supported by WordPress 6.5 ([#62234](https://github.com/WordPress/gutenberg/pull/62234)).
 
 ## 4.43.0 (2024-05-31)
 
 ## 4.42.0 (2024-05-16)
+
+### Breaking Change
+
+-   Increase the minimum required Node.js version to v20.10.0 matching the support defined for Gutenberg and WordPress core ([#61430](https://github.com/WordPress/gutenberg/pull/61430)).
 
 ## 4.41.0 (2024-05-02)
 

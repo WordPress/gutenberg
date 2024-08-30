@@ -188,7 +188,7 @@ export function RichTextWrapper(
 						binding.source
 					);
 					if (
-						! blockBindingsSource?.canUserEditValue( {
+						! blockBindingsSource?.canUserEditValue?.( {
 							select,
 							context: blockContext,
 							args: binding.args,
@@ -357,7 +357,19 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		anchorRef.current?.focus();
+		let element = anchorRef.current;
+
+		if ( ! element ) {
+			return;
+		}
+
+		// Writing flow might be editable, so we should make sure focus goes to
+		// the root editable element.
+		while ( element.parentElement?.isContentEditable ) {
+			element = element.parentElement;
+		}
+
+		element.focus();
 	}
 
 	const registry = useRegistry();

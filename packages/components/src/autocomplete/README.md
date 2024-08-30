@@ -8,7 +8,7 @@ The following props are used to control the behavior of the component.
 
 ### record
 
-The rich text value object the autocomleter is being applied to.
+The rich text value object the autocompleter is being applied to.
 
 -   Required: Yes
 -   Type: `RichTextValue`
@@ -50,7 +50,7 @@ A function that returns nodes to be rendered within the Autocomplete.
 
 ### isSelected
 
-Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
+Whether or not the Autocomplete component is selected, and if its `Popover` should be displayed.
 
 - Required: Yes
 - Type: `Boolean`

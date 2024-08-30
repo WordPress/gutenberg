@@ -31,12 +31,12 @@ export default function useRefEffect< TElement = Node >(
 	callback: ( node: TElement ) => ( () => void ) | void,
 	dependencies: DependencyList
 ): RefCallback< TElement | null > {
-	const cleanup = useRef< ( () => void ) | void >();
+	const cleanupRef = useRef< ( () => void ) | void >();
 	return useCallback( ( node: TElement | null ) => {
 		if ( node ) {
-			cleanup.current = callback( node );
-		} else if ( cleanup.current ) {
-			cleanup.current();
+			cleanupRef.current = callback( node );
+		} else if ( cleanupRef.current ) {
+			cleanupRef.current();
 		}
 	}, dependencies );
 }

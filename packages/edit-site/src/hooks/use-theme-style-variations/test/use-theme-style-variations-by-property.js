@@ -2,11 +2,11 @@
  * Internal dependencies
  */
 import {
-	filterObjectByProperty,
-	removePropertyFromObject,
+	filterObjectByProperties,
+	removePropertiesFromObject,
 } from '../use-theme-style-variations-by-property';
 
-describe( 'filterObjectByProperty', () => {
+describe( 'filterObjectByProperties', () => {
 	const noop = () => {};
 	test.each( [
 		{
@@ -14,21 +14,21 @@ describe( 'filterObjectByProperty', () => {
 				foo: 'bar',
 				array: [ 1, 3, 4 ],
 			},
-			property: 'array',
+			properties: [ 'array' ],
 			expected: { array: [ 1, 3, 4 ] },
 		},
 		{
 			object: {
 				foo: 'bar',
 			},
-			property: 'does-not-exist',
+			properties: [ 'does-not-exist' ],
 			expected: {},
 		},
 		{
 			object: {
 				foo: 'bar',
 			},
-			property: false,
+			properties: false,
 			expected: {},
 		},
 		{
@@ -39,7 +39,7 @@ describe( 'filterObjectByProperty', () => {
 					},
 				},
 			},
-			property: 'null',
+			properties: [ 'null' ],
 			expected: {
 				dig: {
 					deeper: {
@@ -52,19 +52,19 @@ describe( 'filterObjectByProperty', () => {
 			object: {
 				function: noop,
 			},
-			property: 'function',
+			properties: [ 'function' ],
 			expected: {
 				function: noop,
 			},
 		},
 		{
 			object: [],
-			property: 'something',
+			properties: [ 'something' ],
 			expected: {},
 		},
 		{
 			object: {},
-			property: undefined,
+			properties: undefined,
 			expected: {},
 		},
 		{
@@ -74,7 +74,7 @@ describe( 'filterObjectByProperty', () => {
 					array: [ 1, 3, 4 ],
 				},
 			},
-			property: 'nested-object-foo',
+			properties: [ 'nested-object-foo' ],
 			expected: {
 				'nested-object': {
 					'nested-object-foo': 'bar',
@@ -82,15 +82,15 @@ describe( 'filterObjectByProperty', () => {
 			},
 		},
 	] )(
-		'should filter object by $property',
-		( { expected, object, property } ) => {
-			const result = filterObjectByProperty( object, property );
+		'should filter object by $properties',
+		( { expected, object, properties } ) => {
+			const result = filterObjectByProperties( object, properties );
 			expect( result ).toEqual( expected );
 		}
 	);
 } );
 
-describe( 'removePropertyFromObject', () => {
+describe( 'removePropertiesFromObject', () => {
 	const mockBaseVariation = {
 		settings: {
 			typography: {
@@ -188,34 +188,38 @@ describe( 'removePropertyFromObject', () => {
 		},
 	};
 
-	it( 'should return with no property', () => {
+	it( 'should return with no properties', () => {
 		const object = { test: 'me' };
-		expect( removePropertyFromObject( object, undefined ) ).toEqual(
+		expect( removePropertiesFromObject( object, undefined ) ).toEqual(
 			object
 		);
 	} );
 
-	it( 'should return with non-string property', () => {
+	it( 'should return with non-string properties', () => {
 		const object = { test: 'you' };
-		expect( removePropertyFromObject( object, true ) ).toEqual( object );
+		expect( removePropertiesFromObject( object, true ) ).toEqual( object );
 	} );
 
 	it( 'should return with empty object', () => {
 		const object = {};
-		expect( removePropertyFromObject( object, 'color' ) ).toEqual( object );
+		expect( removePropertiesFromObject( object, [ 'color' ] ) ).toEqual(
+			object
+		);
 	} );
 
 	it( 'should return with null', () => {
-		expect( removePropertyFromObject( null, 'color' ) ).toEqual( null );
+		expect( removePropertiesFromObject( null, [ 'color' ] ) ).toEqual(
+			null
+		);
 	} );
 
-	it( 'should remove the specified property from the object', () => {
+	it( 'should remove the specified properties from the object', () => {
 		expect(
-			removePropertyFromObject(
+			removePropertiesFromObject(
 				{
 					...mockBaseVariation,
 				},
-				'typography'
+				[ 'typography' ]
 			)
 		).toEqual( {
 			settings: {

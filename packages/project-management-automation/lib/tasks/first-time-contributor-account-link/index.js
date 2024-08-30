@@ -6,7 +6,7 @@ const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
 
 /** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
+/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 /** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
