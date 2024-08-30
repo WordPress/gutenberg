@@ -22,7 +22,7 @@ export const TabListWrapper = styled.div`
 		text-align: start;
 	}
 
-	@media not ( prefers-reduced-motion: reduce ) {
+	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::after {
 			transition-property: transform;
 			transition-duration: 0.2s;
