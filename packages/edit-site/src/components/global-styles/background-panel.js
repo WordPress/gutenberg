@@ -16,7 +16,6 @@ const BACKGROUND_DEFAULT_VALUES = {
 const {
 	useGlobalStyle,
 	useGlobalSetting,
-	useGlobalStyleLinks,
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -42,15 +41,7 @@ export default function BackgroundPanel() {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );
-	const _links = useGlobalStyleLinks();
 	const [ settings ] = useGlobalSetting( '' );
-
-	const defaultControls = {
-		backgroundImage: true,
-		backgroundSize:
-			hasBackgroundImageValue( style ) ||
-			hasBackgroundImageValue( inheritedStyle ),
-	};
 
 	return (
 		<StylesBackgroundPanel
@@ -59,8 +50,6 @@ export default function BackgroundPanel() {
 			onChange={ setStyle }
 			settings={ settings }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			defaultControls={ defaultControls }
-			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);
 }

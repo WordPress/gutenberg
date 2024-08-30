@@ -39,10 +39,12 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				) }
 			</p>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="edit-post-preferences-modal__custom-fields-confirmation-button"
 				variant="secondary"
 				isBusy={ isReloading }
-				__experimentalIsFocusable
+				accessibleWhenDisabled
 				disabled={ isReloading }
 				onClick={ () => {
 					setIsReloading( true );

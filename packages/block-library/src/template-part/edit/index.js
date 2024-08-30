@@ -128,7 +128,7 @@ export default function TemplatePartEdit( {
 		area,
 		onNavigateToEntityRecord,
 		title,
-		canEditTemplate,
+		canUserEdit,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
@@ -151,8 +151,13 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			const _canEditTemplate =
-				select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			const _canUserEdit = hasResolvedEntity
+				? select( coreStore ).canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_template_part',
+						id: templatePartId,
+				  } )
+				: false;
 
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
@@ -165,7 +170,7 @@ export default function TemplatePartEdit( {
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
-				canEditTemplate: _canEditTemplate,
+				canUserEdit: !! _canUserEdit,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -235,7 +240,7 @@ export default function TemplatePartEdit( {
 			<RecursionProvider uniqueId={ templatePartId }>
 				{ isEntityAvailable &&
 					onNavigateToEntityRecord &&
-					canEditTemplate && (
+					canUserEdit && (
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () =>
@@ -249,16 +254,18 @@ export default function TemplatePartEdit( {
 							</ToolbarButton>
 						</BlockControls>
 					) }
-				<InspectorControls group="advanced">
-					<TemplatePartAdvancedControls
-						tagName={ tagName }
-						setAttributes={ setAttributes }
-						isEntityAvailable={ isEntityAvailable }
-						templatePartId={ templatePartId }
-						defaultWrapper={ areaObject.tagName }
-						hasInnerBlocks={ hasInnerBlocks }
-					/>
-				</InspectorControls>
+				{ canUserEdit && (
+					<InspectorControls group="advanced">
+						<TemplatePartAdvancedControls
+							tagName={ tagName }
+							setAttributes={ setAttributes }
+							isEntityAvailable={ isEntityAvailable }
+							templatePartId={ templatePartId }
+							defaultWrapper={ areaObject.tagName }
+							hasInnerBlocks={ hasInnerBlocks }
+						/>
+					</InspectorControls>
+				) }
 				{ isPlaceholder && (
 					<TagName { ...blockProps }>
 						<TemplatePartPlaceholder

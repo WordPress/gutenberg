@@ -28,7 +28,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];
@@ -72,6 +72,7 @@ function FiltersToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -82,7 +83,7 @@ function FiltersToolsPanel( {
 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -188,7 +189,11 @@ export default function FiltersPanel( {
 
 							return (
 								<ItemGroup isBordered isSeparated>
-									<Button { ...toggleProps }>
+									<Button
+										// TODO: Switch to `true` (40px size) if possible
+										__next40pxDefaultSize={ false }
+										{ ...toggleProps }
+									>
 										<LabeledColorIndicator
 											indicator={ duotone }
 											label={ __( 'Duotone' ) }

@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -52,7 +53,9 @@ export default function PostExcerpt( {
 		[]
 	);
 	const { editPost } = useDispatch( editorStore );
-	const [ localExcerpt, setLocalExcerpt ] = useState( excerpt );
+	const [ localExcerpt, setLocalExcerpt ] = useState(
+		decodeEntities( excerpt )
+	);
 	const updatePost = ( value ) => {
 		editPost( { [ usedAttribute ]: value } );
 	};

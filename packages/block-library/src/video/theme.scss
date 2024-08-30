@@ -1,4 +1,4 @@
-.wp-block-video figcaption {
+.wp-block-video :where(figcaption) {
 	@include caption-style-theme();
 }
 

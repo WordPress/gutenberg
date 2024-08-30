@@ -36,21 +36,36 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { isBlockBasedTheme, addNewPatternLabel, addNewTemplatePartLabel } =
-		useSelect( ( select ) => {
-			const { getCurrentTheme, getPostType } = select( coreStore );
-			return {
-				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-				addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
-					?.add_new_item,
-				addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
-					?.labels?.add_new_item,
-			};
-		}, [] );
+	const {
+		isBlockBasedTheme,
+		addNewPatternLabel,
+		addNewTemplatePartLabel,
+		canCreatePattern,
+		canCreateTemplatePart,
+	} = useSelect( ( select ) => {
+		const { getCurrentTheme, getPostType, canUser } = select( coreStore );
+		return {
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+			addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+				?.labels?.add_new_item,
+			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+			canCreatePattern: canUser( 'create', {
+				kind: 'postType',
+				name: PATTERN_TYPES.user,
+			} ),
+			canCreateTemplatePart: canUser( 'create', {
+				kind: 'postType',
+				name: TEMPLATE_PART_POST_TYPE,
+			} ),
+		};
+	}, [] );
 
 	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
@@ -78,15 +93,16 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
+	const controls = [];
+	if ( canCreatePattern ) {
+		controls.push( {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
 			title: addNewPatternLabel,
-		},
-	];
+		} );
+	}
 
-	if ( isBlockBasedTheme ) {
+	if ( isBlockBasedTheme && canCreateTemplatePart ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -94,15 +110,20 @@ export default function AddNewPattern() {
 		} );
 	}
 
-	controls.push( {
-		icon: upload,
-		onClick: () => {
-			patternUploadInputRef.current.click();
-		},
-		title: __( 'Import pattern from JSON' ),
-	} );
+	if ( canCreatePattern ) {
+		controls.push( {
+			icon: upload,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
+		} );
+	}
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
+	if ( controls.length === 0 ) {
+		return null;
+	}
 	return (
 		<>
 			{ addNewPatternLabel && (
@@ -152,9 +173,14 @@ export default function AddNewPattern() {
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
 						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
-							const currentCategory = categoryMap
-								.values()
-								.find( ( term ) => term.name === categoryId );
+							/*
+							 * categoryMap.values() returns an iterator.
+							 * Iterator.prototype.find() is not yet widely supported.
+							 * Convert to array to use the Array.prototype.find method.
+							 */
+							const currentCategory = Array.from(
+								categoryMap.values()
+							).find( ( term ) => term.name === categoryId );
 							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||

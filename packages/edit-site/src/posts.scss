@@ -7,6 +7,7 @@
 @import "./components/site-hub/style.scss";
 @import "./components/site-icon/style.scss";
 @import "./components/editor-canvas-container/style.scss";
+@import "./components/post-list/style.scss";
 @import "./components/resizable-frame/style.scss";
 
 @include wordpress-admin-schemes();
@@ -42,5 +43,13 @@ body {
 	.no-js & {
 		min-height: 0;
 		position: static;
+	}
+
+	.components-editor-notices__snackbar {
+		position: fixed;
+		right: 0;
+		bottom: 16px;
+		padding-left: 16px;
+		padding-right: 16px;
 	}
 }

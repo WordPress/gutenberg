@@ -498,6 +498,30 @@
 		"parent": "reference-guides"
 	},
 	{
+		"title": "Core Concepts",
+		"slug": "core-concepts",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/README.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "The Reactive and Declarative mindset",
+		"slug": "the-reactive-and-declarative-mindset",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Understanding global state, local context and derived state",
+		"slug": "undestanding-global-state-local-context-and-derived-state",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"parent": "core-concepts"
+	},
+	{
+		"title": "Server-side rendering: Processing directives on the server",
+		"slug": "server-side-rendering",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md",
+		"parent": "core-concepts"
+	},
+	{
 		"title": "Quick start guide",
 		"slug": "iapi-quick-start-guide",
 		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
@@ -765,6 +789,12 @@
 		"title": "ComboboxControl",
 		"slug": "combobox-control",
 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Composite",
+		"slug": "composite",
+		"markdown_source": "../packages/components/src/composite/README.md",
 		"parent": "components"
 	},
 	{

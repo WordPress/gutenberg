@@ -20,6 +20,11 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import {
+	store as richTextStore,
+	unregisterFormatType,
+} from '@wordpress/rich-text';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -58,14 +63,18 @@ export async function selectBlock( name ) {
 
 export function Editor( { testBlocks, settings = {} } ) {
 	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
+	const { getFormatTypes } = useSelect( richTextStore );
 
 	useEffect( () => {
 		return () => {
 			getBlockTypes().forEach( ( { name } ) =>
 				unregisterBlockType( name )
 			);
+			getFormatTypes().forEach( ( { name } ) =>
+				unregisterFormatType( name )
+			);
 		};
-	}, [] );
+	}, [ getFormatTypes ] );
 
 	return (
 		<BlockEditorProvider

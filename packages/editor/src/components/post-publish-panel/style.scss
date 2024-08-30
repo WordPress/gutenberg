@@ -39,6 +39,7 @@
 	border: none;
 	border-radius: $radius-block-ui;
 	margin-right: $grid-unit-15;
+	flex-shrink: 0;
 
 	// Same size as in the Site menu.
 	height: 36px;
@@ -54,6 +55,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	word-break: break-word;
 }
 
 .editor-post-publish-panel__header-publish-button,
@@ -196,7 +198,7 @@
 	position: fixed;
 	z-index: z-index(".editor-post-publish-panel");
 	background: $white;
-	top: 0;
+	top: $admin-bar-height-big;
 	bottom: 0;
 	right: 0;
 	left: 0;

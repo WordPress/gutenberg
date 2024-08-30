@@ -22,12 +22,15 @@ const Example = () => {
 			fields={ fields }
 			view={ view }
 			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
 			actions={ actions }
 			paginationInfo={ paginationInfo }
 		/>
 	);
 };
 ```
+
+<div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's and <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a></div>
 
 ## Properties
 
@@ -71,62 +74,66 @@ const STATUSES = [
 const fields = [
 	{
 		id: 'title',
-		header: 'Title',
+		label: 'Title',
 		enableHiding: false,
 	},
 	{
 		id: 'date',
-		header: 'Date',
+		label: 'Date',
 		render: ( { item } ) => {
-			return (
-				<time>{ getFormattedDate( item.date ) }</time>
-			);
-		}
+			return <time>{ getFormattedDate( item.date ) }</time>;
+		},
 	},
 	{
 		id: 'author',
-		header: __( 'Author' ),
+		label: __( 'Author' ),
 		render: ( { item } ) => {
-			return (
-				<a href="...">{ item.author }</a>
-			);
+			return <a href="...">{ item.author }</a>;
 		},
 		elements: [
 			{ value: 1, label: 'Admin' },
-			{ value: 2, label: 'User' }
+			{ value: 2, label: 'User' },
 		],
 		filterBy: {
-			operators: [ 'is', 'isNot' ]
+			operators: [ 'is', 'isNot' ],
 		},
-		enableSorting: false
+		enableSorting: false,
 	},
 	{
-		header: __( 'Status' ),
+		label: __( 'Status' ),
 		id: 'status',
 		getValue: ( { item } ) =>
-			STATUSES.find( ( { value } ) => value === item.status )
-				?.label ?? item.status,
+			STATUSES.find( ( { value } ) => value === item.status )?.label ??
+			item.status,
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
 		},
 		enableSorting: false,
 	},
-]
+];
 ```
 
 Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
--   `header`: the field's name to be shown in the UI.
+-   `label`: the field's name to be shown in the UI.
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
--   `elements`: the set of valid values for the field's value.
+-   <code id="fields-elements">elements</code>: The list of options to pick from when using the field as a filter or when editing (DataForm component). It expects an array of objects with the following properties:
+
+    -   `value`: The id of the value to filter to (for internal use)
+    -   `label`: The text that will be displayed in the UI for the item.
+    -    `description`: A longer description that describes the element, to also be displayed. Optional.
+
+    To enable the filter by a field we just need to set a proper value to the `elements` property of the field we'd like to filter by.
+
 -   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
--   `filterBy`: configuration for the filters.
-    -   `operators`: the list of operators supported by the field.
+-   `enableGlobalSearch`: whether the field is searchable. False by default.
+-   `filterBy`: configuration for the filters enabled by the `elements` property.
+    -   `operators`: the list of [operators](#operators) supported by the field.
     -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 ### `view`: `object`
@@ -149,7 +156,7 @@ const view = {
 		field: 'date',
 		direction: 'desc',
 	},
-	hiddenFields: [ 'date', 'featured-image' ],
+	fields: [ 'author', 'status' ],
 	layout: {},
 };
 ```
@@ -167,10 +174,17 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `hiddenFields`: the `id` of the fields that are hidden in the UI.
--   `layout`: config that is specific to a particular layout type.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
-    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
+-   `fields`: the `id` of the fields that are visible in the UI.
+-   `layout`: config that is specific to a particular layout type:
+
+| Properties of `layout` | Table | Grid | List |
+| --- | --- | --- | --- |
+| `primaryField`: the field's `id` to be highlighted in each layout. It's not hidable. | &check; | &check; | &check; |
+| `mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable. | | &check; | &check; |
+| `columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default). | | &check; | |
+| `badgeFields`: a list of field's `id` to render without label and styled as badges. | | &check; | |
+| `combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | &check; | | |
+| `styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column. | &check; | | |
 
 ### `onChangeView`: `function`
 
@@ -199,7 +213,7 @@ function MyCustomPageTable() {
 				value: [ 'publish', 'draft' ],
 			},
 		],
-		hiddenFields: [ 'date', 'featured-image' ],
+		fields: [ 'author', 'status' ],
 		layout: {},
 	} );
 
@@ -252,6 +266,8 @@ Each action is an object with the following properties:
 -   `callback`: function, required unless `RenderModal` is provided. Callback function that takes the record as input and performs the required action.
 -   `RenderModal`: ReactElement, optional. If an action requires that some UI be rendered in a modal, it can provide a component which takes as props the record as `item` and a `closeModal` function. When this prop is provided, the `callback` property is ignored.
 -   `hideModalHeader`: boolean, optional. This property is used in combination with `RenderModal` and controls the visibility of the modal's header. If the action renders a modal and doesn't hide the header, the action's label is going to be used in the modal's header.
+-   `supportsBulk`: Whether the action can be used as a bulk action. False by default.
+-   `disabled`: Whether the action is disabled. False by default.
 
 ### `paginationInfo`: `Object`
 
@@ -274,11 +290,23 @@ Function that receives an item and returns an unique identifier for it. By defau
 
 Whether the data is loading. `false` by default.
 
-### `supportedLayouts`: `String[]`
+### `defaultLayouts`: `Record< string, view >`
 
-Array of layouts supported. By default, all are: `table`, `grid`, `list`.
+This property provides layout information about the view types that are active. If empty, enables all layout types (see "Layout Types") with empty layout data.
 
-### `onSelectionChange`: `function`
+For example, this is how you'd enable only the table view type:
+
+```js
+const defaultLayouts = {
+	table: {
+		layout: {
+			primaryKey: 'my-key',
+		},
+	},
+};
+```
+
+### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 
@@ -293,6 +321,35 @@ Callback that signals the user selected one of more items, and takes them as par
 ### Fields
 
 > The `enumeration` type was removed as it was deemed redundant with the field.elements metadata. New types will be introduced soon.
+
+## Combining fields
+
+The `table` layout has the ability to create "virtual" fields that are made out by combining existing ones.
+
+Each "virtual field", has to provide an `id` and `label` (optionally a `header` instead), which have the same meaning as any other field.
+
+Additionally, they need to provide:
+
+- `children`: a list of field's `id` to combine
+- `direction`: how should they be stacked, `vertically` or `horizontally`
+
+For example, this is how you'd define a `site` field which is a combination of a `title` and `description` fields, which are not displayed:
+
+```js
+{
+	fields: [ 'site', 'status' ],
+	layout: {
+		combinedFields: [
+			{
+				id: 'site',
+				label: 'Site',
+				children: [ 'title', 'description' ],
+				direction: 'vertical',
+			}
+		]
+	}
+}
+```
 
 ### Operators
 

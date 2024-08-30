@@ -1,20 +1,14 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import {
-	forwardRef,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,97 +18,8 @@ import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
-
-function useTrackElementOffset(
-	targetElement?: HTMLElement | null,
-	onUpdate?: () => void
-) {
-	const [ indicatorPosition, setIndicatorPosition ] = useState( {
-		left: 0,
-		top: 0,
-		width: 0,
-		height: 0,
-	} );
-
-	// TODO: replace with useEventCallback or similar when officially available.
-	const updateCallbackRef = useRef( onUpdate );
-	useLayoutEffect( () => {
-		updateCallbackRef.current = onUpdate;
-	} );
-
-	const observedElementRef = useRef< HTMLElement >();
-	const resizeObserverRef = useRef< ResizeObserver >();
-	useEffect( () => {
-		if ( targetElement === observedElementRef.current ) {
-			return;
-		}
-
-		observedElementRef.current = targetElement ?? undefined;
-
-		function updateIndicator( element: HTMLElement ) {
-			setIndicatorPosition( {
-				// Workaround to prevent unwanted scrollbars, see:
-				// https://github.com/WordPress/gutenberg/pull/61979
-				left: Math.max( element.offsetLeft - 1, 0 ),
-				top: Math.max( element.offsetTop - 1, 0 ),
-				width: parseFloat( getComputedStyle( element ).width ),
-				height: parseFloat( getComputedStyle( element ).height ),
-			} );
-			updateCallbackRef.current?.();
-		}
-
-		// Set up a ResizeObserver.
-		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( () => {
-				if ( observedElementRef.current ) {
-					updateIndicator( observedElementRef.current );
-				}
-			} );
-		}
-		const { current: resizeObserver } = resizeObserverRef;
-
-		// Observe new element.
-		if ( targetElement ) {
-			updateIndicator( targetElement );
-			resizeObserver.observe( targetElement );
-		}
-
-		return () => {
-			// Unobserve previous element.
-			if ( observedElementRef.current ) {
-				resizeObserver.unobserve( observedElementRef.current );
-			}
-		};
-	}, [ targetElement ] );
-
-	return indicatorPosition;
-}
-
-type ValueUpdateContext< T > = {
-	previousValue: T;
-};
-
-function useOnValueUpdate< T >(
-	value: T,
-	onUpdate: ( context: ValueUpdateContext< T > ) => void
-) {
-	const previousValueRef = useRef( value );
-
-	// TODO: replace with useEventCallback or similar when officially available.
-	const updateCallbackRef = useRef( onUpdate );
-	useLayoutEffect( () => {
-		updateCallbackRef.current = onUpdate;
-	} );
-
-	useEffect( () => {
-		if ( previousValueRef.current !== value ) {
-			updateCallbackRef.current( {
-				previousValue: previousValueRef.current,
-			} );
-			previousValueRef.current = value;
-		}
-	}, [ value ] );
-}
+import { useTrackElementOffsetRect } from '../utils/element-rect';
+import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
 
 export const TabList = forwardRef<
 	HTMLDivElement,
@@ -122,8 +27,9 @@ export const TabList = forwardRef<
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 
-	const selectedId = context?.store.useState( 'selectedId' );
-	const indicatorPosition = useTrackElementOffset(
+	const tabStoreState = useStoreState( context?.store );
+	const selectedId = tabStoreState?.selectedId;
+	const indicatorPosition = useTrackElementOffsetRect(
 		context?.store.item( selectedId )?.element
 	);
 
@@ -133,13 +39,13 @@ export const TabList = forwardRef<
 		( { previousValue } ) => previousValue && setAnimationEnabled( true )
 	);
 
-	if ( ! context ) {
+	if ( ! context || ! tabStoreState ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
-	const { store } = context;
 
-	const { activeId, selectOnMove } = store.useState();
+	const { store } = context;
+	const { activeId, selectOnMove } = tabStoreState;
 	const { setActiveId } = store;
 
 	const onBlur = () => {

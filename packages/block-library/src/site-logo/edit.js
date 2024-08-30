@@ -14,7 +14,6 @@ import {
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	MenuItem,
 	PanelBody,
 	RangeControl,
 	ResizableBox,
@@ -348,15 +347,19 @@ const SiteLogo = ( {
 
 // This is a light wrapper around MediaReplaceFlow because the block has two
 // different MediaReplaceFlows, one for the inspector and one for the toolbar.
-function SiteLogoReplaceFlow( { onRemoveLogo, ...mediaReplaceProps } ) {
+function SiteLogoReplaceFlow( {
+	mediaURL,
+	onRemoveLogo,
+	...mediaReplaceProps
+} ) {
 	return (
 		<MediaReplaceFlow
 			{ ...mediaReplaceProps }
+			mediaURL={ mediaURL }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			accept={ ACCEPT_MEDIA_STRING }
-		>
-			<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
-		</MediaReplaceFlow>
+			onReset={ onRemoveLogo }
+		/>
 	);
 }
 
@@ -392,7 +395,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -403,7 +405,10 @@ export default function LogoEdit( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const _canUserEdit = canUser( 'update', 'settings' );
+		const _canUserEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const siteSettings = _canUserEdit
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;
@@ -512,16 +517,18 @@ export default function LogoEdit( {
 				onInitialSelectLogo( image );
 			},
 			onError: onUploadError,
+			onRemoveLogo,
 		} );
 	};
 
 	const mediaReplaceFlowProps = {
 		mediaURL: logoUrl,
+		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
 		onSelect: onSelectLogo,
 		onError: onUploadError,
 		onRemoveLogo,
 	};
-	const controls = canUserEdit && logoUrl && ! temporaryURL && (
+	const controls = canUserEdit && (
 		<BlockControls group="other">
 			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
@@ -587,8 +594,6 @@ export default function LogoEdit( {
 
 	const blockProps = useBlockProps( { className: classes } );
 
-	const label = __( 'Add a site logo' );
-
 	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
 		<InspectorControls>
 			<PanelBody title={ __( 'Media' ) }>
@@ -622,13 +627,15 @@ export default function LogoEdit( {
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button
+											// TODO: Switch to `true` (40px size) if possible
+											__next40pxDefaultSize={ false }
 											onClick={ open }
 											variant="secondary"
 										>
 											{ isLoading ? (
 												<Spinner />
 											) : (
-												__( 'Add media' )
+												__( 'Choose logo' )
 											) }
 										</Button>
 										<DropZone onFilesDrop={ onFilesDrop } />
@@ -666,11 +673,13 @@ export default function LogoEdit( {
 					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								icon={ upload }
 								variant="primary"
-								label={ label }
+								label={ __( 'Choose logo' ) }
 								showTooltip
-								tooltipPosition="top center"
+								tooltipPosition="middle right"
 								onClick={ () => {
 									open();
 								} }

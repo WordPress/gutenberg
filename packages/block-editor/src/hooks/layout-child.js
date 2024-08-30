@@ -11,7 +11,11 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
+import {
+	GridVisualizer,
+	GridItemResizer,
+	GridItemMovers,
+} from '../components/grid';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -30,6 +34,23 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const { columnCount, minimumColumnWidth } = parentLayout;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
+
+	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+	// write code that stores a string attribute instead of a number.
+	if ( process.env.NODE_ENV === 'development' ) {
+		if ( columnStart && typeof columnStart !== 'number' ) {
+			throw new Error( 'columnStart must be a number' );
+		}
+		if ( rowStart && typeof rowStart !== 'number' ) {
+			throw new Error( 'rowStart must be a number' );
+		}
+		if ( columnSpan && typeof columnSpan !== 'number' ) {
+			throw new Error( 'columnSpan must be a number' );
+		}
+		if ( rowSpan && typeof rowSpan !== 'number' ) {
+			throw new Error( 'rowSpan must be a number' );
+		}
+	}
 
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
@@ -55,6 +76,19 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				grid-column: span ${ columnSpan };
 			}`;
 		}
+		if ( rowStart && rowSpan ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart } / span ${ rowSpan };
+			}`;
+		} else if ( rowStart ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart };
+			}`;
+		} else if ( rowSpan ) {
+			css += `${ selector } {
+				grid-row: span ${ rowSpan };
+			}`;
+		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no
 		 * columnCount is set, the grid is responsive so a
@@ -64,16 +98,6 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			( columnSpan || columnStart ) &&
 			( minimumColumnWidth || ! columnCount )
 		) {
-			// Check if columnSpan and columnStart are numbers so Math.max doesn't break.
-			const columnSpanNumber = columnSpan ? parseInt( columnSpan ) : null;
-			const columnStartNumber = columnStart
-				? parseInt( columnStart )
-				: null;
-			const highestNumber = Math.max(
-				columnSpanNumber,
-				columnStartNumber
-			);
-
 			let parentColumnValue = parseFloat( minimumColumnWidth );
 			/**
 			 * 12rem is the default minimumColumnWidth value.
@@ -95,30 +119,36 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				parentColumnUnit = 'rem';
 			}
 
+			let numColsToBreakAt = 2;
+
+			if ( columnSpan && columnStart ) {
+				numColsToBreakAt = columnSpan + columnStart - 1;
+			} else if ( columnSpan ) {
+				numColsToBreakAt = columnSpan;
+			} else {
+				numColsToBreakAt = columnStart;
+			}
+
 			const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
 			const containerQueryValue =
-				highestNumber * parentColumnValue +
-				( highestNumber - 1 ) * defaultGapValue;
+				numColsToBreakAt * parentColumnValue +
+				( numColsToBreakAt - 1 ) * defaultGapValue;
+			// For blocks that only span one column, we want to remove any rowStart values as
+			// the container reduces in size, so that blocks are still arranged in markup order.
+			const minimumContainerQueryValue =
+				parentColumnValue * 2 + defaultGapValue - 1;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
+			const gridColumnValue =
+				columnSpan && columnSpan > 1 ? '1/-1' : 'auto';
 
-			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
+			css += `@container (max-width: ${ Math.max(
+				containerQueryValue,
+				minimumContainerQueryValue
+			) }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
+					grid-row: auto;
 				}
-			}`;
-		}
-		if ( rowStart && rowSpan ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart } / span ${ rowSpan };
-			}`;
-		} else if ( rowStart ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart };
-			}`;
-		} else if ( rowSpan ) {
-			css += `${ selector } {
-				grid-row: span ${ rowSpan };
 			}`;
 		}
 	}
@@ -135,10 +165,12 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 }
 
 function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
+	const parentLayout = useLayout() || {};
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-	} = useLayout() || {};
+		isManualPlacement,
+	} = parentLayout;
 
 	const rootClientId = useSelect(
 		( select ) => {
@@ -154,31 +186,44 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		return null;
 	}
 
+	function updateLayout( layout ) {
+		setAttributes( {
+			style: {
+				...style,
+				layout: {
+					...style?.layout,
+					...layout,
+				},
+			},
+		} );
+	}
+
 	return (
 		<>
 			<GridVisualizer
 				clientId={ rootClientId }
 				contentRef={ setResizerBounds }
+				parentLayout={ parentLayout }
 			/>
 			{ allowSizingOnChildren && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
 					bounds={ resizerBounds }
-					onChange={ ( { columnSpan, rowSpan } ) => {
-						setAttributes( {
-							style: {
-								...style,
-								layout: {
-									...style?.layout,
-									columnSpan,
-									rowSpan,
-								},
-							},
-						} );
-					} }
+					onChange={ updateLayout }
+					parentLayout={ parentLayout }
 				/>
 			) }
+			{ isManualPlacement &&
+				window.__experimentalEnableGridInteractivity && (
+					<GridItemMovers
+						layout={ style?.layout }
+						parentLayout={ parentLayout }
+						onChange={ updateLayout }
+						gridClientId={ rootClientId }
+						blockClientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }

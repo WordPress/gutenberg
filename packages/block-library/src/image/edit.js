@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -55,17 +56,6 @@ export const pickRelevantMediaFiles = ( image, size ) => {
 		image.url;
 	return imageProps;
 };
-
-/**
- * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
- * while the image is being uploaded and will not have an id yet allocated.
- *
- * @param {number=} id  The id of the image.
- * @param {string=} url The url of the image.
- *
- * @return {boolean} Is the URL a Blob URL
- */
-const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 /**
  * Is the url for the image hosted externally. An externally hosted image has no
@@ -118,9 +108,10 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState( () => {
-		return isTemporaryImage( id, url ) ? url : undefined;
-	} );
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const [ contentResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -157,8 +148,8 @@ export function ImageEdit( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
+			blob: undefined,
 		} );
-		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -169,7 +160,9 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
 
 			return;
 		}
@@ -178,8 +171,6 @@ export function ImageEdit( {
 			setTemporaryURL( media.url );
 			return;
 		}
-
-		setTemporaryURL();
 
 		const { imageDefaultSize } = getSettings();
 
@@ -254,24 +245,28 @@ export function ImageEdit( {
 		mediaAttributes.href = href;
 
 		setAttributes( {
+			blob: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
 		} );
+		setTemporaryURL();
 	}
 
 	function onSelectURL( newURL ) {
 		if ( newURL !== url ) {
 			setAttributes( {
+				blob: undefined,
 				url: newURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
+			setTemporaryURL();
 		}
 	}
 
 	useUploadMediaFromBlobURL( {
-		url,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
@@ -292,7 +287,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': temporaryURL,
+		'is-transient': !! temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -317,7 +312,7 @@ export function ImageEdit( {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					! blockBindingsSource?.canUserEditValue( {
+					! blockBindingsSource?.canUserEditValue?.( {
 						select,
 						context,
 						args: metadata?.bindings?.url?.args,
@@ -331,7 +326,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected, metadata?.bindings?.url ]
+		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
@@ -373,35 +368,43 @@ export function ImageEdit( {
 	};
 
 	return (
-		<figure { ...blockProps }>
-			<Image
-				temporaryURL={ temporaryURL }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSingleSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				onReplace={ onReplace }
-				onSelectImage={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onUploadError={ onUploadError }
-				context={ context }
-				clientId={ clientId }
-				blockEditingMode={ blockEditingMode }
-				parentLayoutType={ parentLayout?.type }
-			/>
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
-		</figure>
+		<>
+			<figure { ...blockProps }>
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ parentLayout?.type }
+					containerWidth={ containerWidth }
+				/>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				contentResizeListener
+			}
+		</>
 	);
 }
 

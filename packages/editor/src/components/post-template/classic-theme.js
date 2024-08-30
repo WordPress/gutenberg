@@ -33,8 +33,10 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			return availableTemplates[ templateSlug ];
 		}
 		const template =
-			select( coreStore ).canUser( 'create', 'templates' ) &&
-			select( editorStore ).getCurrentTemplateId();
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) && select( editorStore ).getCurrentTemplateId();
 		return (
 			template?.title ||
 			template?.slug ||
@@ -78,7 +80,10 @@ function PostTemplateDropdownContent( { onClose } ) {
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
 			const editorSettings = select( editorStore ).getEditorSettings();
-			const canCreateTemplates = canUser( 'create', 'templates' );
+			const canCreateTemplates = canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 			const _currentTemplateId =
 				select( editorStore ).getCurrentTemplateId();
 			return {
@@ -172,6 +177,8 @@ function PostTemplateDropdownContent( { onClose } ) {
 			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="link"
 						onClick={ () => {
 							onNavigateToEntityRecord( {

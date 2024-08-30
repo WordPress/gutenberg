@@ -25,7 +25,6 @@ export default function QueryPlaceholder( {
 	clientId,
 	name,
 	openPatternSelectionModal,
-	setAttributes,
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
@@ -64,7 +63,6 @@ export default function QueryPlaceholder( {
 			<QueryVariationPicker
 				clientId={ clientId }
 				attributes={ attributes }
-				setAttributes={ setAttributes }
 				icon={ icon }
 				label={ label }
 			/>
@@ -81,6 +79,8 @@ export default function QueryPlaceholder( {
 			>
 				{ !! hasPatterns && (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="primary"
 						onClick={ openPatternSelectionModal }
 					>
@@ -89,6 +89,8 @@ export default function QueryPlaceholder( {
 				) }
 
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					variant="secondary"
 					onClick={ () => {
 						setIsStartingBlank( true );
@@ -101,13 +103,7 @@ export default function QueryPlaceholder( {
 	);
 }
 
-function QueryVariationPicker( {
-	clientId,
-	attributes,
-	setAttributes,
-	icon,
-	label,
-} ) {
+function QueryVariationPicker( { clientId, attributes, icon, label } ) {
 	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
@@ -118,18 +114,6 @@ function QueryVariationPicker( {
 				label={ label }
 				variations={ scopeVariations }
 				onSelect={ ( variation ) => {
-					if ( variation.attributes ) {
-						setAttributes( {
-							...variation.attributes,
-							query: {
-								...variation.attributes.query,
-								postType:
-									attributes.query.postType ||
-									variation.attributes.query.postType,
-							},
-							namespace: attributes.namespace,
-						} );
-					}
 					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,

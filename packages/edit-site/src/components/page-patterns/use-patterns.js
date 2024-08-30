@@ -5,7 +5,7 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { decodeEntities } from '@wordpress/html-entities';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,7 +16,6 @@ import {
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -25,38 +24,16 @@ import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
 
-const createTemplatePartId = ( theme, slug ) =>
-	theme && slug ? theme + '//' + slug : null;
-
-const templatePartToPattern = ( templatePart ) => ( {
-	blocks: parse( templatePart.content.raw, {
-		__unstableSkipMigrationLogs: true,
-	} ),
-	categories: [ templatePart.area ],
-	description: templatePart.description || '',
-	isCustom: templatePart.source === TEMPLATE_ORIGINS.custom,
-	keywords: templatePart.keywords || [],
-	id: createTemplatePartId( templatePart.theme, templatePart.slug ),
-	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
-	title: decodeEntities( templatePart.title.rendered ),
-	type: templatePart.type,
-	_links: templatePart._links,
-	templatePart,
-} );
-
-const selectTemplatePartsAsPatterns = createSelector(
+const selectTemplateParts = createSelector(
 	( select, categoryId, search = '' ) => {
 		const { getEntityRecords, isResolving: isResolvingSelector } =
 			select( coreStore );
 		const { __experimentalGetDefaultTemplatePartAreas } =
 			select( editorStore );
 		const query = { per_page: -1 };
-		const rawTemplateParts =
+		const templateParts =
 			getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
 			EMPTY_PATTERN_LIST;
-		const templateParts = rawTemplateParts.map( ( templatePart ) =>
-			templatePartToPattern( templatePart )
-		);
 
 		// In the case where a custom template part area has been removed we need
 		// the current list of areas to cross check against so orphaned template
@@ -66,12 +43,12 @@ const selectTemplatePartsAsPatterns = createSelector(
 
 		const templatePartHasCategory = ( item, category ) => {
 			if ( category !== TEMPLATE_PART_AREA_DEFAULT_CATEGORY ) {
-				return item.templatePart.area === category;
+				return item.area === category;
 			}
 
 			return (
-				item.templatePart.area === category ||
-				! templatePartAreas.includes( item.templatePart.area )
+				item.area === category ||
+				! templatePartAreas.includes( item.area )
 			);
 		};
 
@@ -152,8 +129,11 @@ const selectPatterns = createSelector(
 			patterns: themePatterns,
 			isResolving: isResolvingThemePatterns,
 		} = selectThemePatterns( select );
-		const { patterns: userPatterns, isResolving: isResolvingUserPatterns } =
-			selectUserPatterns( select );
+		const {
+			patterns: userPatterns,
+			isResolving: isResolvingUserPatterns,
+			categories: userPatternCategories,
+		} = selectUserPatterns( select );
 
 		let patterns = [
 			...( themePatterns || [] ),
@@ -165,7 +145,8 @@ const selectPatterns = createSelector(
 			// Non-user patterns are all unsynced for the time being.
 			patterns = patterns.filter( ( pattern ) => {
 				return pattern.type === PATTERN_TYPES.user
-					? pattern.syncStatus === syncStatus
+					? ( pattern.wp_pattern_sync_status ||
+							PATTERN_SYNC_TYPES.full ) === syncStatus
 					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
 			} );
 		}
@@ -173,12 +154,35 @@ const selectPatterns = createSelector(
 		if ( categoryId ) {
 			patterns = searchItems( patterns, search, {
 				categoryId,
-				hasCategory: ( item, currentCategory ) =>
-					item.categories?.includes( currentCategory ),
+				hasCategory: ( item, currentCategory ) => {
+					if ( item.type === PATTERN_TYPES.user ) {
+						return item.wp_pattern_category.some(
+							( catId ) =>
+								userPatternCategories.find(
+									( cat ) => cat.id === catId
+								)?.slug === currentCategory
+						);
+					}
+					return item.categories?.includes( currentCategory );
+				},
 			} );
 		} else {
 			patterns = searchItems( patterns, search, {
-				hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
+				hasCategory: ( item ) => {
+					if ( item.type === PATTERN_TYPES.user ) {
+						return (
+							userPatternCategories?.length &&
+							( ! item.wp_pattern_category?.length ||
+								! item.wp_pattern_category.some( ( catId ) =>
+									userPatternCategories.find(
+										( cat ) => cat.id === catId
+									)
+								) )
+						);
+					}
+
+					return ! item.hasOwnProperty( 'categories' );
+				},
 			} );
 		}
 		return {
@@ -191,41 +195,6 @@ const selectPatterns = createSelector(
 		selectUserPatterns( select ),
 	]
 );
-
-/**
- * Converts a post of type `wp_block` to a 'pattern item' that more closely
- * matches the structure of theme provided patterns.
- *
- * @param {Object} patternPost The `wp_block` record being normalized.
- * @param {Map}    categories  A Map of user created categories.
- *
- * @return {Object} The normalized item.
- */
-const convertPatternPostToItem = ( patternPost, categories ) => ( {
-	blocks: parse( patternPost.content.raw, {
-		__unstableSkipMigrationLogs: true,
-	} ),
-	...( patternPost.wp_pattern_category.length > 0 && {
-		categories: patternPost.wp_pattern_category.map(
-			( patternCategoryId ) =>
-				categories && categories.get( patternCategoryId )
-					? categories.get( patternCategoryId ).slug
-					: patternCategoryId
-		),
-	} ),
-	termLabels: patternPost.wp_pattern_category.map( ( patternCategoryId ) =>
-		categories?.get( patternCategoryId )
-			? categories.get( patternCategoryId ).label
-			: patternCategoryId
-	),
-	id: patternPost.id,
-	name: patternPost.slug,
-	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
-	title: patternPost.title.raw,
-	type: patternPost.type,
-	description: patternPost.excerpt.raw,
-	patternPost,
-} );
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
@@ -246,12 +215,7 @@ const selectUserPatterns = createSelector(
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-		let patterns = patternPosts
-			? patternPosts.map( ( record ) =>
-					convertPatternPostToItem( record, categories )
-			  )
-			: EMPTY_PATTERN_LIST;
-
+		let patterns = patternPosts ?? EMPTY_PATTERN_LIST;
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,
@@ -260,7 +224,9 @@ const selectUserPatterns = createSelector(
 
 		if ( syncStatus ) {
 			patterns = patterns.filter(
-				( pattern ) => pattern.syncStatus === syncStatus
+				( pattern ) =>
+					pattern.wp_pattern_sync_status ||
+					PATTERN_SYNC_TYPES.full === syncStatus
 			);
 		}
 
@@ -290,6 +256,38 @@ const selectUserPatterns = createSelector(
 	]
 );
 
+export function useAugmentPatternsWithPermissions( patterns ) {
+	const idsAndTypes = useMemo(
+		() =>
+			patterns
+				?.filter( ( record ) => record.type !== PATTERN_TYPES.theme )
+				.map( ( record ) => [ record.type, record.id ] ) ?? [],
+		[ patterns ]
+	);
+
+	const permissions = useSelect(
+		( select ) => {
+			const { getEntityRecordPermissions } = unlock(
+				select( coreStore )
+			);
+			return idsAndTypes.reduce( ( acc, [ type, id ] ) => {
+				acc[ id ] = getEntityRecordPermissions( 'postType', type, id );
+				return acc;
+			}, {} );
+		},
+		[ idsAndTypes ]
+	);
+
+	return useMemo(
+		() =>
+			patterns?.map( ( record ) => ( {
+				...record,
+				permissions: permissions?.[ record.id ] ?? {},
+			} ) ) ?? [],
+		[ patterns, permissions ]
+	);
+}
+
 export const usePatterns = (
 	postType,
 	categoryId,
@@ -298,11 +296,7 @@ export const usePatterns = (
 	return useSelect(
 		( select ) => {
 			if ( postType === TEMPLATE_PART_POST_TYPE ) {
-				return selectTemplatePartsAsPatterns(
-					select,
-					categoryId,
-					search
-				);
+				return selectTemplateParts( select, categoryId, search );
 			} else if ( postType === PATTERN_TYPES.user && !! categoryId ) {
 				const appliedCategory =
 					categoryId === 'uncategorized' ? '' : categoryId;

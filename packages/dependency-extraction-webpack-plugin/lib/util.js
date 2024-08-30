@@ -117,7 +117,7 @@ function defaultRequestToExternalModule( request ) {
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
 		case '@babel/runtime/regenerator':
-			return 'wp-polyfill';
+			return 'regenerator-runtime';
 
 		case 'lodash-es':
 			return 'lodash';
