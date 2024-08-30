@@ -1,8 +1,3 @@
-// If all meta boxes are hidden hides the container.
-.edit-post-meta-boxes-main:not(:has(.postbox:not(.is-hidden))) {
-	display: none;
-}
-
 .edit-post-meta-boxes-main {
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	background-color: $white;

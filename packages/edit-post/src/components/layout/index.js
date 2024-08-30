@@ -157,23 +157,31 @@ function useEditorStyles() {
 }
 
 function MetaBoxesMain() {
-	const [ isOpen, openHeight ] = useSelect( ( select ) => {
+	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
+		const { isMetaBoxLocationVisible } = select( editPostStore );
 		return [
 			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+			isMetaBoxLocationVisible( 'normal' ) ||
+				isMetaBoxLocationVisible( 'advanced' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const resizableBoxRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
+	const isAutoHeight = openHeight === undefined;
 	// In case a user size is set stops the default max-height from applying.
 	useLayoutEffect( () => {
-		if ( ! isShort && openHeight !== undefined ) {
+		if ( hasAnyVisible && ! isShort && ! isAutoHeight ) {
 			resizableBoxRef.current.resizable.classList.add( 'has-user-size' );
 		}
-	}, [ isShort, openHeight ] );
+	}, [ isAutoHeight, isShort, hasAnyVisible ] );
+
+	if ( ! hasAnyVisible ) {
+		return;
+	}
 
 	const className = 'edit-post-meta-boxes-main';
 	const contents = (
