@@ -9,7 +9,10 @@ import {
 	Flex,
 	FlexBlock,
 	FlexItem,
+	Icon,
 } from '@wordpress/components';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -42,15 +45,16 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected } = useSelect(
+	const { isSelected, blockHasInnerBlocks } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
+			const { isBlockSelected, hasSelectedInnerBlock, getBlockCount } =
 				select( blockEditorStore );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				blockHasInnerBlocks: getBlockCount( clientId ) > 0,
 			};
 		},
 		[ clientId ]
@@ -76,6 +80,15 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				<FlexBlock style={ { textAlign: 'left' } }>
 					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
+				{ blockHasInnerBlocks && (
+					<FlexItem>
+						<Icon
+							icon={
+								isRTL() ? chevronLeftSmall : chevronRightSmall
+							}
+						/>
+					</FlexItem>
+				) }
 			</Flex>
 		</Button>
 	);
