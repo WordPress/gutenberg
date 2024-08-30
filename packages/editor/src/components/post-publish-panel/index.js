@@ -53,6 +53,7 @@ export class PostPublishPanel extends Component {
 			forceIsDirty,
 			isBeingScheduled,
 			isPublished,
+			isPrivateToPublished,
 			isPublishSidebarEnabled,
 			isScheduled,
 			isSaving,
@@ -70,7 +71,9 @@ export class PostPublishPanel extends Component {
 			...propsForPanel
 		} = additionalProps;
 		const isPublishedOrScheduled =
-			isPublished || ( isScheduled && isBeingScheduled );
+			isPublished ||
+			( isScheduled && isBeingScheduled ) ||
+			isPrivateToPublished;
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 		const isPostPublish = isPublishedOrScheduled && ! isSaving;
 		return (
