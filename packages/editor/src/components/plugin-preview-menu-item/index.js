@@ -46,7 +46,7 @@ export default compose(
 		return {
 			as: ownProps.as ?? MenuItem,
 			icon: ownProps.icon || context.icon,
-			name: 'core/plugin-preview-dropdown-menu',
+			name: 'core/plugin-preview-menu',
 		};
 	} )
 )( ActionItem );

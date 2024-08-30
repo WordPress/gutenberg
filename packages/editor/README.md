@@ -862,7 +862,7 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
-### PluginPreviewDropdownItem
+### PluginPreviewMenuItem
 
 Renders a menu item in the Preview dropdown, which can be used as a button or link depending on the props provided. The text within the component appears as the menu item label.
 
@@ -870,7 +870,7 @@ _Usage_
 
 ```jsx
 import { __ } from '@wordpress/i18n';
-import { PreviewDropdownMenuItem } from './preview-dropdown-menu-item';
+import { PluginPreviewMenuItem } from '@wordpress/editor';
 import { external } from '@wordpress/icons';
 
 function onPreviewClick() {
@@ -882,6 +882,9 @@ const ExternalPreviewMenuItem = () => (
 		{ __( 'Preview in new tab' ) }
 	</PreviewDropdownMenuItem>
 );
+registerPlugin( 'external-preview-menu-item', {
+	render: ExternalPreviewMenuItem,
+} );
 ```
 
 _Parameters_

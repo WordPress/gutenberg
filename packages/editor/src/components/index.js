@@ -32,7 +32,7 @@ export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
-export { default as PluginPreviewDropdownItem } from './plugin-preview-dropdown-item';
+export { default as PluginPreviewMenuItem } from './plugin-preview-menu-item';
 export { default as PluginSidebar } from './plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './plugin-sidebar-more-menu-item';
 export { default as PostTemplatePanel } from './post-template/panel';
