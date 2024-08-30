@@ -206,8 +206,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	);
 
 	$state = wp_interactivity_state( 'core/gallery' );
-	if ( true === $state["lightbox"] ) {
-		$gallery_id = $state['galleryId'];
+	$gallery_id = $state['galleryId'];
+	if ( isset( $gallery_id ) ) {
 		$images = $state['images'][$gallery_id];
 		if (!isset($images)) {
 			$images = array();

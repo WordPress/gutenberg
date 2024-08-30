@@ -43,7 +43,6 @@ function block_core_gallery_interactivity_state($block_content, $block) {
 	wp_interactivity_state(
 		'core/gallery',
 		array(
-			'lightbox' => true,
 			'images' => array(),
 			'galleryId' => $unique_gallery_id,
 		)
@@ -239,6 +238,14 @@ function block_core_gallery_render_lightbox( $block_content ) {
 			);
 		}
 	}
+
+	// reset galleryId
+	wp_interactivity_state(
+		'core/gallery',
+		array(
+			'galleryId' => null,
+		)
+	);
 
 	return $block_content;
 }
