@@ -480,6 +480,31 @@ _Returns_
 
 -   `V | undefined`: The value corresponding to the map key requested.
 
+### useObserveElementSize
+
+Tracks a given element's size and calls `onUpdate` for all of its discrete values using a `ResizeObserver`. The element can change dynamically and **it must not be stored in a ref**. Instead, it should be stored in a React state or equivalent.
+
+_Usage_
+
+```tsx
+const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
+useObserveElementSize(
+	targetElement,
+	( resizeObserverEntries, element ) => {
+		console.log( 'Resize observer entries:', resizeObserverEntries );
+		console.log( 'Element that was resized:', element );
+	},
+	{ box: 'border-box' }
+);
+<div ref={ setTargetElement } />;
+```
+
+_Parameters_
+
+-   _targetElement_ `HTMLElement | undefined | null`: The target element to observe. It can be changed dynamically.
+-   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: HTMLElement ) => void`: Callback that will be called when the element is resized. It is passed the list of [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry) objects passed to the `ResizeObserver.observe` callback internally, and the element being tracked at the time of this update.
+-   _resizeObserverOptions_ `ResizeObserverOptions`: Options to pass to `ResizeObserver.observe` when called internally. Updating this option will not cause the observer to be re-created, and it will only take effect if a new element is observed.
+
 ### usePrevious
 
 Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.

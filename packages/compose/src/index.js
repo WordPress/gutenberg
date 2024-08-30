@@ -34,6 +34,7 @@ export { default as useInstanceId } from './hooks/use-instance-id';
 export { default as useIsomorphicLayoutEffect } from './hooks/use-isomorphic-layout-effect';
 export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
+export { default as useObserveElementSize } from './hooks/use-observe-element-size';
 export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useStateWithHistory } from './hooks/use-state-with-history';
