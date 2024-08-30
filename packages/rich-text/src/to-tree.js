@@ -299,7 +299,7 @@ export function toTree( {
 		if ( shouldInsertPadding && i === text.length ) {
 			append( getParent( pointer ), ZWNBSP );
 
-			// We CANNOT use CSS to add a placehoder with pseude elements on the
+			// We CANNOT use CSS to add a placeholder with pseudo elements on the
 			// main block wrappers because that could clash with theme CSS.
 			if ( placeholder && text.length === 0 ) {
 				append( getParent( pointer ), {
