@@ -59,7 +59,7 @@ function extractSelectionEndNode( selection ) {
 	// may trigger multi selection even though the selection does not visually
 	// end in the next block.
 	if ( focusOffset === 0 && isSelectionForward( selection ) ) {
-		return focusNode.previousSibling;
+		return focusNode.previousSibling ?? focusNode.parentElement;
 	}
 
 	return focusNode.childNodes[ focusOffset ];
