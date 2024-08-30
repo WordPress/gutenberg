@@ -107,9 +107,10 @@ function BlockSwitcherDropdownMenuContents( {
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
-	const hasBlockOrBlockVariationTransforms =
+	/*	const hasBlockOrBlockVariationTransforms =
 		hasPossibleBlockTransformations ||
-		hasPossibleBlockVariationTransformations;
+		hasPossibleBlockVariationTransformations;*/
+	const hasBlockOrBlockVariationTransforms = false;
 	const hasContents =
 		hasBlockStyles ||
 		hasBlockOrBlockVariationTransforms ||
@@ -198,6 +199,7 @@ const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
 
 export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
+		selectedHasTemplateLock,
 		canRemove,
 		hasBlockStyles,
 		icon,
@@ -206,8 +208,12 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		isTemplate,
 	} = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks } =
-				select( blockEditorStore );
+			const {
+				getTemplateLock,
+				getBlocksByClientId,
+				getBlockAttributes,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
@@ -219,6 +225,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 			const blockType = getBlockType( firstBlockName );
 
 			let _icon;
+			let _hasTemplateLock;
 			if ( _isSingleBlockSelected ) {
 				const match = getActiveBlockVariation(
 					firstBlockName,
@@ -226,6 +233,8 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 				);
 				// Take into account active block variations.
 				_icon = match?.icon || blockType.icon;
+				_hasTemplateLock =
+					getTemplateLock( clientIds[ 0 ] ) === 'contentOnly';
 			} else {
 				const isSelectionOfSameType =
 					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
@@ -244,6 +253,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
 				isTemplate:
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
+				selectedHasTemplateLock: _hasTemplateLock,
 			};
 		},
 		[ clientIds ]
@@ -252,7 +262,8 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
 	} );
-	if ( invalidBlocks ) {
+
+	if ( invalidBlocks || selectedHasTemplateLock ) {
 		return null;
 	}
 
