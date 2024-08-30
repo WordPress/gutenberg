@@ -23,6 +23,11 @@
 			margin: 0;
 		}
 	}
+
+	&:has(.wp-block-form-input__label-content + input[type="checkbox"]) {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This style is required for old markup. */
+		flex-direction: row-reverse;
+	}
 }
 
 .wp-block-form-input__label-content {
