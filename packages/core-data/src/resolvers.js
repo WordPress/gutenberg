@@ -321,7 +321,7 @@ export const getEntityRecords =
 						} ) );
 
 					const canUserResolutionsArgs = [];
-					const receiveUserPermissionArgs = [];
+					const receiveUserPermissionArgs = {};
 					for ( const targetHint of targetHints ) {
 						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 							canUserResolutionsArgs.push( [
@@ -329,14 +329,13 @@ export const getEntityRecords =
 								{ kind, name, id: targetHint.id },
 							] );
 
-							receiveUserPermissionArgs.push( [
+							receiveUserPermissionArgs[
 								getUserPermissionCacheKey( action, {
 									kind,
 									name,
 									id: targetHint.id,
-								} ),
-								targetHint.permissions[ action ],
-							] );
+								} )
+							] = targetHint.permissions[ action ];
 						}
 					}
 
