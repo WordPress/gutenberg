@@ -186,7 +186,13 @@ const SocialLinkEdit = ( {
 					backgroundColor: iconBackgroundColorValue,
 				} }
 			>
-				<button aria-haspopup="dialog" { ...blockProps }>
+				<button
+					aria-haspopup="dialog"
+					aria-expanded={ (
+						isSelected && showURLPopover
+					).toString() }
+					{ ...blockProps }
+				>
 					<IconComponent />
 					<span
 						className={ clsx( 'wp-block-social-link-label', {
