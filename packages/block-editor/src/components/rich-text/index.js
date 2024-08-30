@@ -186,8 +186,8 @@ export function RichTextWrapper(
 				} );
 
 			const _bindingsPlaceholder =
-				( relevantBinding?.args?.key || blockBindingsSource?.label ) +
-				' value is empty';
+			// Translators: %s is the bindings source or bindings key placeholder.
+			 sprintf( '%s value is empty', ( relevantBinding?.args?.key || blockBindingsSource?.label )  );
 
 			return {
 				disableBoundBlock: _disableBoundBlock,
