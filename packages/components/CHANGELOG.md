@@ -24,6 +24,15 @@
 -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
 -   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
 -   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+-   Tighten gap between the main control and the prefix/suffix slot for the following components ([#64908](https://github.com/WordPress/gutenberg/pull/64908)).
+    -   `InputControl`
+    -   `NumberControl`
+    -   `SelectControl`
+    -   `TreeSelect`
+    -   `UnitControl`
+    -   Contains internal visual changes from this PR:
+        -   `AnglePickerControl`
+        -   `ColorPicker`
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
     -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
