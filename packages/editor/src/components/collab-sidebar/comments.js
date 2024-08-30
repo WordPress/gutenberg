@@ -218,7 +218,7 @@ export function Comments( { threads } ) {
 										spacing="0"
 									>
 										<Tooltip text={ __( 'Resolve' ) }>
-											<Button className="is-compact has-icon">
+											<Button className="has-icon">
 												<Icon
 													icon={ published }
 													onClick={ () => {
@@ -239,7 +239,6 @@ export function Comments( { threads } ) {
 											<DropdownMenu
 												icon={ moreVertical }
 												label="Select an action"
-												className="is-compact"
 												controls={ [
 													{
 														title: __( 'Edit' ),
@@ -283,7 +282,6 @@ export function Comments( { threads } ) {
 											<DropdownMenu
 												icon={ moreVertical }
 												label="Select an action"
-												className="is-compact"
 												controls={ [
 													{
 														title: __( 'Edit' ),
@@ -317,7 +315,7 @@ export function Comments( { threads } ) {
 								) }
 								{ thread.status === 'approved' && (
 									<Tooltip text={ __( 'Resolved' ) }>
-										<Button className="is-compact has-icon">
+										<Button className="has-icon">
 											<Icon icon={ check } />
 										</Button>
 									</Tooltip>
@@ -361,9 +359,6 @@ export function Comments( { threads } ) {
 												spacing="3"
 												justify="flex-start"
 												className="editor-collab-sidebar__commentbtn"
-												onRequestClose={ () =>
-													setCommentEdit( false )
-												}
 											>
 												<HStack
 													alignment="left"
@@ -372,7 +367,6 @@ export function Comments( { threads } ) {
 												>
 													<Button
 														variant="primary"
-														className="is-compact"
 														onClick={ () => {
 															confirmEditComment(
 																thread.id
@@ -385,7 +379,6 @@ export function Comments( { threads } ) {
 														{ __( 'Update' ) }
 													</Button>
 													<Button
-														className="is-compact"
 														onClick={ () => {
 															setCommentEdit(
 																false
@@ -428,9 +421,6 @@ export function Comments( { threads } ) {
 											alignment="left"
 											spacing="3"
 											justify="flex-start"
-											onRequestClose={ () =>
-												setHasCommentReply( false )
-											}
 										>
 											<HStack
 												alignment="left"
@@ -448,7 +438,6 @@ export function Comments( { threads } ) {
 															false
 														);
 													} }
-													className="is-compact"
 												>
 													{ __( 'Reply' ) }
 												</Button>
@@ -461,7 +450,6 @@ export function Comments( { threads } ) {
 															false
 														);
 													} }
-													className="is-compact"
 												>
 													{ __( 'Cancel' ) }
 												</Button>
@@ -498,82 +486,20 @@ export function Comments( { threads } ) {
 
 						{ showConfirmation &&
 							thread.id === showConfirmationTabId && (
-								<VStack
-									title={ __( 'Confirm' ) }
-									onRequestClose={ () =>
-										setShowConfirmation( false )
-									}
-									className="editor-collab-sidebar__useroverlay confirmation-overlay"
-									spacing="0"
-									justify="space-between"
-								>
-									<p>
-										{ __(
-											'Are you sure you want to mark this thread as resolved?'
-										) }
-									</p>
-									<HStack>
-										<Button
-											variant="primary"
-											onClick={ () =>
-												confirmAndMarkThreadAsResolved(
-													thread.id
-												)
-											}
-										>
-											{ __( 'Yes' ) }
-										</Button>
-										<Button
-											onClick={ () =>
-												setShowConfirmation( false )
-											}
-										>
-											{ __( 'No' ) }
-										</Button>
-									</HStack>
-								</VStack>
+								<ConfirmNotice 
+									confirmMessage={ __( 'Are you sure you want to mark this thread as resolved?' ) }
+									confirmAction={ () => confirmAndMarkThreadAsResolved( thread.id ) } 
+									discardAction={ () => setShowConfirmation( false ) }
+								/>
 							) }
 
 						{ deleteCommentShowConfirmation &&
 							thread.id === showConfirmationTabId && (
-								<VStack
-									title={ __( 'Confirm' ) }
-									onRequestClose={ () =>
-										setDeleteCommentShowConfirmation(
-											false
-										)
-									}
-									className="editor-collab-sidebar__useroverlay confirmation-overlay"
-									spacing="0"
-									justify="space-between"
-								>
-									<p>
-										{ __(
-											'Are you sure you want to delete this thread?'
-										) }
-									</p>
-									<HStack>
-										<Button
-											variant="primary"
-											onClick={ () =>
-												confirmDeleteComment(
-													thread.id
-												)
-											}
-										>
-											{ __( 'Yes' ) }
-										</Button>
-										<Button
-											onClick={ () =>
-												setDeleteCommentShowConfirmation(
-													false
-												)
-											}
-										>
-											{ __( 'No' ) }
-										</Button>
-									</HStack>
-								</VStack>
+								<ConfirmNotice 
+									confirmMessage={ __( 'Are you sure you want to delete this thread?' ) }
+									confirmAction={ () => confirmDeleteComment( thread.id ) } 
+									discardAction={ () => setDeleteCommentShowConfirmation( false ) }
+								/>
 							) }
 
 						{ 0 < thread?.reply?.length &&
@@ -629,7 +555,6 @@ export function Comments( { threads } ) {
 																moreVertical
 															}
 															label="Select an action"
-															className="is-compact"
 															controls={ [
 																{
 																	title: __(
@@ -688,7 +613,6 @@ export function Comments( { threads } ) {
 																	moreVertical
 																}
 																label="Select an action"
-																className="is-compact"
 																controls={ [
 																	{
 																		title: __(
@@ -769,11 +693,6 @@ export function Comments( { threads } ) {
 															spacing="3"
 															justify="flex-start"
 															className="editor-collab-sidebar__commentbtn"
-															onRequestClose={ () =>
-																setCommentEdit(
-																	false
-																)
-															}
 														>
 															<HStack
 																alignment="left"
@@ -782,7 +701,6 @@ export function Comments( { threads } ) {
 															>
 																<Button
 																	variant="primary"
-																	className="is-compact"
 																	onClick={ () => {
 																		confirmEditComment(
 																			reply.id
@@ -797,7 +715,6 @@ export function Comments( { threads } ) {
 																	) }
 																</Button>
 																<Button
-																	className="is-compact"
 																	onClick={ () => {
 																		setCommentEdit(
 																			false
@@ -849,11 +766,6 @@ export function Comments( { threads } ) {
 														alignment="left"
 														spacing="3"
 														justify="flex-start"
-														onRequestClose={ () =>
-															setHasCommentReply(
-																false
-															)
-														}
 													>
 														<HStack
 															alignment="left"
@@ -871,7 +783,6 @@ export function Comments( { threads } ) {
 																		false
 																	);
 																} }
-																className="is-compact"
 															>
 																{ __(
 																	'Reply'
@@ -886,7 +797,6 @@ export function Comments( { threads } ) {
 																		false
 																	);
 																} }
-																className="is-compact"
 															>
 																{ __(
 																	'Cancel'
@@ -933,89 +843,50 @@ export function Comments( { threads } ) {
 
 									{ showConfirmation &&
 										reply.id === showConfirmationTabId && (
-											<VStack
-												title={ __( 'Confirm' ) }
-												onRequestClose={ () =>
-													setShowConfirmation( false )
-												}
-												className="editor-collab-sidebar__useroverlay confirmation-overlay"
-												spacing="0"
-												justify="space-between"
-											>
-												<p>
-													{ __(
-														'Are you sure you want to mark this thread as resolved?'
-													) }
-												</p>
-												<HStack>
-													<Button
-														variant="primary"
-														onClick={ () =>
-															confirmAndMarkThreadAsResolved(
-																reply.id
-															)
-														}
-													>
-														{ __( 'Yes' ) }
-													</Button>
-													<Button
-														onClick={ () =>
-															setShowConfirmation(
-																false
-															)
-														}
-													>
-														{ __( 'No' ) }
-													</Button>
-												</HStack>
-											</VStack>
+											<ConfirmNotice 
+												confirmMessage={ __( 'Are you sure you want to mark this thread as resolved?' ) }
+												confirmAction={ () => confirmAndMarkThreadAsResolved( reply.id ) } 
+												discardAction={ () => setShowConfirmation(
+													false
+												) }
+											/>
 										) }
 
 									{ deleteCommentShowConfirmation &&
-										reply.id === showConfirmationTabId && (
-											<VStack
-												title={ __( 'Confirm' ) }
-												onRequestClose={ () =>
-													setDeleteCommentShowConfirmation(
-														false
-													)
-												}
-												className="editor-collab-sidebar__useroverlay confirmation-overlay"
-												spacing="0"
-												justify="space-between"
-											>
-												<p>
-													{ __(
-														'Are you sure you want to delete this thread?'
-													) }
-												</p>
-												<HStack>
-													<Button
-														variant="primary"
-														onClick={ () =>
-															confirmDeleteComment(
-																reply.id
-															)
-														}
-													>
-														{ __( 'Yes' ) }
-													</Button>
-													<Button
-														onClick={ () =>
-															setDeleteCommentShowConfirmation(
-																false
-															)
-														}
-													>
-														{ __( 'No' ) }
-													</Button>
-												</HStack>
-											</VStack>
+										reply.id === showConfirmationTabId && ( 
+											<ConfirmNotice 
+												confirmMessage={ __( 'Are you sure you want to delete this thread?' ) }
+												confirmAction={ () => confirmDeleteComment( reply.id ) } 
+												discardAction={ () => setDeleteCommentShowConfirmation( false ) }
+											/>
 										) }
 								</VStack>
 							) ) }
 					</VStack>
 				) ) }
 		</>
+	);
+}
+
+function ConfirmNotice({ cofirmMessage, confirmAction, discardAction}) {
+	return (
+		<VStack
+			title={ __( 'Confirm' ) }
+			className="editor-collab-sidebar__useroverlay confirmation-overlay"
+			spacing="0"
+			justify="space-between"
+		>
+			<p>
+				{ cofirmMessage ?? __( 'Are you sure?' ) }
+			</p>
+			<HStack>
+				<Button variant="primary" onClick={ confirmAction } >
+					{ __( 'Yes' ) }
+				</Button>
+				<Button 	onClick={ discardAction } >
+					{ __( 'No' ) }
+				</Button>
+			</HStack>
+		</VStack>
 	);
 }

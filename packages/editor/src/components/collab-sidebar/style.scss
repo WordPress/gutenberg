@@ -139,27 +139,23 @@
 		margin-left: auto;
 
 		.components-button {
-			&.is-compact {
-				&.has-icon:not(.has-text) {
-					min-width: 24px;
-					padding: 0;
-					width: 24px;
-					height: 24px;
-					flex-shrink: 0;
-				}
+			&.has-icon:not(.has-text) {
+				min-width: 24px;
+				padding: 0;
+				width: 24px;
+				height: 24px;
+				flex-shrink: 0;
 			}
 		}
 
 		.components-dropdown {
-			&.is-compact {
-				flex-shrink: 0;
+			flex-shrink: 0;
 
-				.components-button {
-					min-width: 24px;
-					padding: 0;
-					width: 24px;
-					height: 24px;
-				}
+			.components-button {
+				min-width: 24px;
+				padding: 0;
+				width: 24px;
+				height: 24px;
 			}
 		}
 	}
