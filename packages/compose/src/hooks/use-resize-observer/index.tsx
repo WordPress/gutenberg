@@ -6,12 +6,12 @@ import type { ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import useEvent from '../use-event';
+import useObserveElementSize from '../use-observe-element-size';
 
 type ObservedSize = {
 	width: number | null;
@@ -84,32 +84,21 @@ type ResizeElementProps = {
 };
 
 function ResizeElement( { onResize }: ResizeElementProps ) {
-	const resizeElementRef = useRef< HTMLDivElement >( null );
-	const resizeCallbackRef = useRef( onResize );
+	const resizeCallbackEvent = useEvent( onResize );
 
-	useLayoutEffect( () => {
-		resizeCallbackRef.current = onResize;
-	}, [ onResize ] );
+	const [ resizeElement, setResizeElement ] =
+		useState< HTMLDivElement | null >();
 
-	useLayoutEffect( () => {
-		const resizeElement = resizeElementRef.current as HTMLDivElement;
-		const resizeObserver = new ResizeObserver( ( entries ) => {
-			for ( const entry of entries ) {
-				const newSize = extractSize( entry );
-				resizeCallbackRef.current( newSize );
-			}
-		} );
-
-		resizeObserver.observe( resizeElement );
-
-		return () => {
-			resizeObserver.unobserve( resizeElement );
-		};
-	}, [] );
+	useObserveElementSize( resizeElement, ( entries ) => {
+		for ( const entry of entries ) {
+			const newSize = extractSize( entry );
+			resizeCallbackEvent( newSize );
+		}
+	} );
 
 	return (
 		<div
-			ref={ resizeElementRef }
+			ref={ setResizeElement }
 			style={ RESIZE_ELEMENT_STYLES }
 			aria-hidden="true"
 		/>
