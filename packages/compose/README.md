@@ -305,6 +305,23 @@ _Returns_
 
 -   `import('react').RefCallback<HTMLElement>`: Element Ref.
 
+### useEvent
+
+Creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks. Throws when used in the render phase.
+
+_Usage_
+
+```tsx
+function Component( props ) {
+	const onClick = useEvent( props.onClick );
+	React.useEffect( () => {}, [ onClick ] );
+}
+```
+
+_Parameters_
+
+-   _callback_ `T`: The callback function to wrap.
+
 ### useFocusableIframe
 
 Dispatches a bubbling focus event when the iframe receives focus. Use `onFocus` as usual on the iframe or a parent element.
