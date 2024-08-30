@@ -174,8 +174,9 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `fields`: the `id` of the fields that are visible in the UI.
--   `layout`: config that is specific to a particular layout type:
+
+-   `fields`: the `id` of the fields that are visible in the UI and the specific order in which they are displayed.
+-   `layout`: config that is specific to a particular layout type.
 
 | Properties of `layout` | Table | Grid | List |
 | --- | --- | --- | --- |
@@ -300,7 +301,7 @@ For example, this is how you'd enable only the table view type:
 const defaultLayouts = {
 	table: {
 		layout: {
-			primaryKey: 'my-key',
+			primaryField: 'my-key',
 		},
 	},
 };
