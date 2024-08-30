@@ -15,7 +15,7 @@ import { Truncate } from '../truncate';
 import type { DropdownMenuContext } from './types';
 
 const ANIMATION_PARAMS = {
-	SCALE_AMOUNT_OUTER: 0.8,
+	SCALE_AMOUNT_OUTER: 0.82,
 	SCALE_AMOUNT_CONTENT: 0.9,
 	DURATION: '400ms',
 	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
