@@ -694,8 +694,6 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 		onClick: onReply,
 	});
 
-	console.log('moreActions',moreActions);
-
 	return(
 		<HStack
 			alignment="left"
