@@ -172,6 +172,7 @@ Properties:
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
+
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
 
@@ -308,6 +309,8 @@ const defaultLayouts = {
 	},
 };
 ```
+
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. Each of these properties should contain a `layout` property, which holds the configuration for each specific layout type. Check [here](#properties-of-layout) the full list of properties available for each layout's configuration
 
 ### `onChangeSelection`: `function`
 
