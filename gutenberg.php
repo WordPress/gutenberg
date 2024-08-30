@@ -75,15 +75,17 @@ function gutenberg_pre_init() {
 	require_once __DIR__ . '/lib/load.php';
 }
 
-/**
- * This is included for demonstration purposes only.
- * We should make this change in the core `build_query_vars_from_query_block` function.
- */
-function filter_query_block_exclude_current( $query, $block ) {
-	if ( isset( $block->context['query']['excludeCurrent'] ) && $block->context['query']['excludeCurrent'] ) {
-		$query['post__not_in'] = array( get_the_ID() );
-	}
+if ( ! function_exists('filter_query_block_exclude_current') ) {
+	/**
+	 * This is included for demonstration purposes only.
+	 * We should make this change in the core `build_query_vars_from_query_block` function.
+	 */
+	function filter_query_block_exclude_current( $query, $block ) {
+		if ( isset( $block->context['query']['excludeCurrent'] ) && $block->context['query']['excludeCurrent'] ) {
+			$query['post__not_in'] = array( get_the_ID() );
+		}
 
-	return $query;
+		return $query;
+	}
+	add_filter( 'query_loop_block_query_vars', 'filter_query_block_exclude_current', 10, 2 );
 }
-add_filter( 'query_loop_block_query_vars', 'filter_query_block_exclude_current', 10, 2 );
