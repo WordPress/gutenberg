@@ -18,7 +18,11 @@ import {
 	TextareaControl,
 	Tooltip,
 } from '@wordpress/components';
-import { dateI18n, format, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	format,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -28,7 +32,8 @@ export function Comments( { threads } ) {
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
 	const [ showConfirmationTabId, setShowConfirmationTabId ] = useState( 0 );
 	const [ commentConfirmation, setCommentConfirmation ] = useState( false );
-	const [ deleteCommentShowConfirmation, setDeleteCommentShowConfirmation ] = useState( false );
+	const [ deleteCommentShowConfirmation, setDeleteCommentShowConfirmation ] =
+		useState( false );
 	const [ commentDeleteMessage, setCommentDeleteMessage ] = useState( false );
 	const [ commentEdit, setCommentEdit ] = useState( false );
 	const [ newEditedComment, setNewEditedComment ] = useState( '' );
@@ -150,8 +155,10 @@ export function Comments( { threads } ) {
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
 			select( 'core/block-editor' ).getSelectedBlockClientId();
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
-			?.blockCommentId ?? false;
+		return (
+			select( 'core/block-editor' ).getBlock( clientID )?.attributes
+				?.blockCommentId ?? false
+		);
 	}, [] );
 
 	return (
@@ -180,12 +187,13 @@ export function Comments( { threads } ) {
 					<VStack
 						key={ thread.id }
 						className={ clsx( 'editor-collab-sidebar__thread', {
-							'is-focused': blockCommentId && blockCommentId === thread.id,
+							'is-focused':
+								blockCommentId && blockCommentId === thread.id,
 						} ) }
 						id={ thread.id }
 						spacing="2"
 					>
-						<CommentHeader 
+						<CommentHeader
 							thread={ thread }
 							onResolve={ () => {
 								setCommentConfirmation( false );
@@ -376,19 +384,35 @@ export function Comments( { threads } ) {
 
 						{ showConfirmation &&
 							thread.id === showConfirmationTabId && (
-								<ConfirmNotice 
-									confirmMessage={ __( 'Are you sure you want to mark this thread as resolved?' ) }
-									confirmAction={ () => confirmAndMarkThreadAsResolved( thread.id ) } 
-									discardAction={ () => setShowConfirmation( false ) }
+								<ConfirmNotice
+									confirmMessage={ __(
+										'Are you sure you want to mark this thread as resolved?'
+									) }
+									confirmAction={ () =>
+										confirmAndMarkThreadAsResolved(
+											thread.id
+										)
+									}
+									discardAction={ () =>
+										setShowConfirmation( false )
+									}
 								/>
 							) }
 
 						{ deleteCommentShowConfirmation &&
 							thread.id === showConfirmationTabId && (
-								<ConfirmNotice 
-									confirmMessage={ __( 'Are you sure you want to delete this thread?' ) }
-									confirmAction={ () => confirmDeleteComment( thread.id ) } 
-									discardAction={ () => setDeleteCommentShowConfirmation( false ) }
+								<ConfirmNotice
+									confirmMessage={ __(
+										'Are you sure you want to delete this thread?'
+									) }
+									confirmAction={ () =>
+										confirmDeleteComment( thread.id )
+									}
+									discardAction={ () =>
+										setDeleteCommentShowConfirmation(
+											false
+										)
+									}
 								/>
 							) }
 
@@ -400,21 +424,29 @@ export function Comments( { threads } ) {
 									id={ reply.id }
 									spacing="2"
 								>
-									<CommentHeader 
+									<CommentHeader
 										thread={ reply }
 										onResolve={ () => {
 											setCommentConfirmation( false );
 											setShowConfirmation( true );
-											setShowConfirmationTabId( reply.id );
+											setShowConfirmationTabId(
+												reply.id
+											);
 										} }
 										onEdit={ () => {
-											setShowConfirmationTabId( reply.id );
+											setShowConfirmationTabId(
+												reply.id
+											);
 											onEditComment( reply.id );
 										} }
 										onDelete={ () => {
 											setCommentEdit( false );
-											setShowConfirmationTabId( reply.id );
-											setDeleteCommentShowConfirmation( true );
+											setShowConfirmationTabId(
+												reply.id
+											);
+											setDeleteCommentShowConfirmation(
+												true
+											);
 										} }
 									/>
 									<HStack
@@ -614,21 +646,37 @@ export function Comments( { threads } ) {
 
 									{ showConfirmation &&
 										reply.id === showConfirmationTabId && (
-											<ConfirmNotice 
-												confirmMessage={ __( 'Are you sure you want to mark this thread as resolved?' ) }
-												confirmAction={ () => confirmAndMarkThreadAsResolved( reply.id ) } 
-												discardAction={ () => setShowConfirmation(
-													false
+											<ConfirmNotice
+												confirmMessage={ __(
+													'Are you sure you want to mark this thread as resolved?'
 												) }
+												confirmAction={ () =>
+													confirmAndMarkThreadAsResolved(
+														reply.id
+													)
+												}
+												discardAction={ () =>
+													setShowConfirmation( false )
+												}
 											/>
 										) }
 
 									{ deleteCommentShowConfirmation &&
-										reply.id === showConfirmationTabId && ( 
-											<ConfirmNotice 
-												confirmMessage={ __( 'Are you sure you want to delete this thread?' ) }
-												confirmAction={ () => confirmDeleteComment( reply.id ) } 
-												discardAction={ () => setDeleteCommentShowConfirmation( false ) }
+										reply.id === showConfirmationTabId && (
+											<ConfirmNotice
+												confirmMessage={ __(
+													'Are you sure you want to delete this thread?'
+												) }
+												confirmAction={ () =>
+													confirmDeleteComment(
+														reply.id
+													)
+												}
+												discardAction={ () =>
+													setDeleteCommentShowConfirmation(
+														false
+													)
+												}
 											/>
 										) }
 								</VStack>
@@ -639,7 +687,7 @@ export function Comments( { threads } ) {
 	);
 }
 
-function ConfirmNotice({ cofirmMessage, confirmAction, discardAction}) {
+function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
 			title={ __( 'Confirm' ) }
@@ -647,20 +695,16 @@ function ConfirmNotice({ cofirmMessage, confirmAction, discardAction}) {
 			spacing="0"
 			justify="space-between"
 		>
-			<p>
-				{ cofirmMessage ?? __( 'Are you sure?' ) }
-			</p>
+			<p>{ cofirmMessage ?? __( 'Are you sure?' ) }</p>
 			<HStack>
-				<Button 
+				<Button
 					__next40pxDefaultSize
-					variant="primary" onClick={ confirmAction } 
+					variant="primary"
+					onClick={ confirmAction }
 				>
 					{ __( 'Yes' ) }
 				</Button>
-				<Button 
-					__next40pxDefaultSize
-					onClick={ discardAction } 
-				>
+				<Button __next40pxDefaultSize onClick={ discardAction }>
 					{ __( 'No' ) }
 				</Button>
 			</HStack>
@@ -668,7 +712,7 @@ function ConfirmNotice({ cofirmMessage, confirmAction, discardAction}) {
 	);
 }
 
-function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
+function CommentHeader( { thread, onResolve, onEdit, onDelete, onReply } ) {
 	const dateSettings = getDateSettings();
 	const [ dateTimeFormat = dateSettings.formats.time ] = useEntityProp(
 		'root',
@@ -678,28 +722,27 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 
 	const moreActions = [];
 
-	onEdit && moreActions.push( {
-		title: __( 'Edit' ),
-		onClick: onEdit,
-	} );
- 
-	onDelete && moreActions.push({
-		title: __( 'Delete' ),
-		onClick: onDelete,
-	});
-		
-	0 === thread.parent &&
-	onReply && moreActions.push( {
-		title: __( 'Reply' ),
-		onClick: onReply,
-	});
+	onEdit &&
+		moreActions.push( {
+			title: __( 'Edit' ),
+			onClick: onEdit,
+		} );
 
-	return(
-		<HStack
-			alignment="left"
-			spacing="3"
-			justify="flex-start"
-		>
+	onDelete &&
+		moreActions.push( {
+			title: __( 'Delete' ),
+			onClick: onDelete,
+		} );
+
+	0 === thread.parent &&
+		onReply &&
+		moreActions.push( {
+			title: __( 'Reply' ),
+			onClick: onReply,
+		} );
+
+	return (
+		<HStack alignment="left" spacing="3" justify="flex-start">
 			<img
 				src={ thread?.author_avatar_urls?.[ 48 ] }
 				className="editor-collab-sidebar__userIcon"
@@ -720,15 +763,11 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 			</VStack>
 			<span className="editor-collab-sidebar__commentUpdate">
 				{ thread.status !== 'approved' && (
-					<HStack
-						alignment="right"
-						justify="flex-end"
-						spacing="0"
-					>
+					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ onResolve && (
 							<Tooltip text={ __( 'Resolve' ) }>
-								<Button 
-									__next40pxDefaultSize 
+								<Button
+									__next40pxDefaultSize
 									className="has-icon"
 								>
 									<Icon
@@ -737,8 +776,7 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 									/>
 								</Button>
 							</Tooltip>
-							)
-						}
+						) }
 						<DropdownMenu
 							icon={ moreVertical }
 							label="Select an action"
@@ -748,15 +786,12 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 				) }
 				{ thread.status === 'approved' && (
 					<Tooltip text={ __( 'Resolved' ) }>
-						<Button 
-							__next40pxDefaultSize
-						 	className="has-icon"
-						>
+						<Button __next40pxDefaultSize className="has-icon">
 							<Icon icon={ check } />
 						</Button>
 					</Tooltip>
 				) }
 			</span>
 		</HStack>
-	)
+	);
 }

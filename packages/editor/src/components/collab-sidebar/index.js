@@ -21,22 +21,19 @@ import { AddComment } from './add-comment';
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 const modifyBlockCommentAttributes = ( settings, name ) => {
- 		if (
-			name?.includes( 'core/' ) &&
-			! settings.attributes.blockCommentId
-		) {
-			settings.attributes = {
-				...settings.attributes,
-				blockCommentId: {
-					type: 'number',
-					default: 0,
-				},
-				showCommentBoard: {
-					type: 'boolean',
-					default: false,
-				},
-			};
-		}
+	if ( name?.includes( 'core/' ) && ! settings.attributes.blockCommentId ) {
+		settings.attributes = {
+			...settings.attributes,
+			blockCommentId: {
+				type: 'number',
+				default: 0,
+			},
+			showCommentBoard: {
+				type: 'boolean',
+				default: false,
+			},
+		};
+	}
 
 	return settings;
 };

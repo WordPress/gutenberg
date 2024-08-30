@@ -7,7 +7,6 @@ import { collabComment } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 export default function BlockCommentToolbar( {} ) {
-
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
