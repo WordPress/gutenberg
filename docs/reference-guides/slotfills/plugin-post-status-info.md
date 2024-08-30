@@ -6,7 +6,7 @@ This slots allows for the insertion of items in the Summary panel of the documen
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginPostStatusInfo } from '@wordpress/edit-post';
+import { PluginPostStatusInfo } from '@wordpress/editor';
 
 const PluginPostStatusInfoTest = () => (
 	<PluginPostStatusInfo>

@@ -1,7 +1,3 @@
-.editor-post-publish-panel {
-	background: $white;
-}
-
 .editor-post-publish-panel__content {
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});
@@ -43,6 +39,7 @@
 	border: none;
 	border-radius: $radius-block-ui;
 	margin-right: $grid-unit-15;
+	flex-shrink: 0;
 
 	// Same size as in the Site menu.
 	height: 36px;
@@ -58,6 +55,7 @@
 	display: block;
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	word-break: break-word;
 }
 
 .editor-post-publish-panel__header-publish-button,
@@ -71,6 +69,7 @@
 
 .editor-post-publish-panel__header-publish-button {
 	padding-right: $grid-unit-05;
+	justify-content: center;
 }
 
 .editor-post-publish-panel__header-cancel-button {
@@ -119,6 +118,12 @@
 	.editor-post-visibility__dialog-legend {
 		display: none;
 	}
+
+	.components-panel__body-title .components-button {
+		align-items: flex-start;
+		text-wrap: balance; // Fallback for Safari.
+		text-wrap: pretty;
+	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {
@@ -152,7 +157,9 @@
 	}
 
 	input[readonly] {
-		padding: $grid-unit-20;
+		// Do not increase top and bottom padding otherwise Firefox won't show the text overflow ellipsis.
+		// See https://github.com/WordPress/gutenberg/pull/57310
+		padding: $grid-unit-15;
 		background: $gray-100;
 		border-color: $gray-400;
 		overflow: hidden;
@@ -184,5 +191,42 @@
 		.components-button {
 			height: 40px;
 		}
+	}
+}
+
+.editor-post-publish-panel {
+	position: fixed;
+	z-index: z-index(".editor-post-publish-panel");
+	background: $white;
+	top: $admin-bar-height-big;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow: auto;
+
+	@include break-medium() {
+		z-index: z-index(".editor-post-publish-panel {greater than small}");
+		top: $admin-bar-height;
+		left: auto;
+		width: $sidebar-width + $border-width;
+		border-left: $border-width solid $gray-300;
+		transform: translateX(+100%);
+		animation: editor-post-publish-panel__slide-in-animation 0.1s forwards;
+		@include reduce-motion("animation");
+
+		body.is-fullscreen-mode & {
+			top: 0;
+		}
+
+		// Keep it open on focus to avoid conflict with navigate-regions animation.
+		[role="region"]:focus & {
+			transform: translateX(0%);
+		}
+	}
+}
+
+@keyframes editor-post-publish-panel__slide-in-animation {
+	100% {
+		transform: translateX(0%);
 	}
 }

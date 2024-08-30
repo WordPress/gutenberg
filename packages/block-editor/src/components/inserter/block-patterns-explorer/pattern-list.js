@@ -18,7 +18,7 @@ import { searchItems } from '../search-items';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import {
-	PATTERN_TYPES,
+	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
 	myPatternsCategory,
 } from '../block-patterns-tab/utils';
@@ -31,7 +31,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	return (
 		<Heading
 			level={ 2 }
-			lineHeight={ '48px' }
+			lineHeight="48px"
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(
@@ -47,15 +47,22 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	);
 }
 
-function PatternList( { searchValue, selectedCategory, patternCategories } ) {
+function PatternList( {
+	searchValue,
+	selectedCategory,
+	patternCategories,
+	rootClientId,
+} ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
+		rootClientId,
 		shouldFocusBlock: true,
 	} );
 	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
-		destinationRootClientId
+		destinationRootClientId,
+		selectedCategory
 	);
 
 	const registeredPatternCategories = useMemo(
@@ -73,7 +80,7 @@ function PatternList( { searchValue, selectedCategory, patternCategories } ) {
 			}
 			if (
 				selectedCategory === myPatternsCategory.name &&
-				pattern.type === PATTERN_TYPES.user
+				pattern.type === INSERTER_PATTERN_TYPES.user
 			) {
 				return true;
 			}

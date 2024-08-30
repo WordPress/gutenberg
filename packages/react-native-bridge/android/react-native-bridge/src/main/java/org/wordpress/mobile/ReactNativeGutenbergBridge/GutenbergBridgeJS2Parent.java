@@ -4,9 +4,9 @@ import androidx.core.util.Consumer;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 import org.wordpress.mobile.WPAndroidGlue.RequestExecutor;
 
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface GutenbergBridgeJS2Parent extends RequestExecutor {
-
     void responseHtml(String title, String html, boolean changed, ReadableMap contentInfo);
 
     void editorDidMount(ReadableArray unsupportedBlockNames);
@@ -32,6 +31,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadProgress(int mediaId, float progress);
         void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId, WritableNativeMap metadata);
         void onMediaFileUploadFailed(int mediaId);
+        void onMediaFileUploadPaused(int mediaId);
     }
 
     interface MediaSaveEventEmitter {
@@ -62,6 +62,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     interface ConnectionStatusCallback {
         void onRequestConnectionStatus(boolean isConnected);
+    }
+
+    interface LogExceptionCallback {
+        void onLogException(boolean success);
     }
 
     // Ref: https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
@@ -122,8 +126,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback);
 
-    void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback);
-
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
@@ -158,16 +160,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void onShowXpostSuggestions(Consumer<String> onResult);
 
-    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
-
-    void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
-
-    void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId);
-
     void setFocalPointPickerTooltipShown(boolean tooltipShown);
 
     void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback);
@@ -189,4 +181,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void toggleRedoButton(boolean isDisabled);
 
     void requestConnectionStatus(ConnectionStatusCallback connectionStatusCallback);
+
+    void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback);
 }

@@ -4,7 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"citation": "...with a caption",
-			"align": "right"
+			"textAlign": "right"
 		},
 		"innerBlocks": [
 			{

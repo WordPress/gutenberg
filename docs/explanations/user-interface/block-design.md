@@ -74,7 +74,7 @@ When referring to a block in documentation or UI, use title case for the block t
 -   Latest Posts block
 -   Media & Text block
 
-Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
+Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://fonts.google.com/icons). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
 ![A screenshot of the block library with concise block names](https://developer.wordpress.org/files/2022/01/blocks-do.png)
 **Do:**

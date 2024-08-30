@@ -35,6 +35,8 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
@@ -116,7 +118,9 @@ function VariationsToggleGroupControl( {
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
 						key={ variation.name }
-						icon={ variation.icon }
+						icon={
+							<BlockIcon icon={ variation.icon } showColors />
+						}
 						value={ variation.name }
 						label={
 							selectedValue === variation.name
@@ -178,7 +182,9 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	};
 
 	// Skip rendering if there are no variations
-	if ( ! variations?.length ) return null;
+	if ( ! variations?.length ) {
+		return null;
+	}
 
 	const baseClass = 'block-editor-block-variation-transforms';
 

@@ -4,9 +4,6 @@
 /**
  * External dependencies
  */
-const lightCodeTheme = require( 'prism-react-renderer/themes/github' );
-const darkCodeTheme = require( 'prism-react-renderer/themes/dracula' );
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
 	title: 'Gutenberg Block Editor',
@@ -37,7 +34,7 @@ const config = {
 				docs: {
 					sidebarPath: require.resolve( './sidebars.js' ),
 					editUrl:
-						'https://github.com/WordPress/gutenberg/tree/main/platform-docs/',
+						'https://github.com/WordPress/gutenberg/tree/trunk/platform-docs/',
 				},
 				theme: {
 					customCss: require.resolve( './src/css/custom.css' ),
@@ -72,10 +69,6 @@ const config = {
 						position: 'right',
 					},
 				],
-			},
-			prism: {
-				theme: lightCodeTheme,
-				darkTheme: darkCodeTheme,
 			},
 		} ),
 };

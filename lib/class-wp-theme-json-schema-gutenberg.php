@@ -2,12 +2,8 @@
 /**
  * WP_Theme_JSON_Schema_Gutenberg class
  *
- * This class/file will NOT be backported to Core. It exists to provide a
- * migration path for theme.json files that used the deprecated "behaviors".
- * This file will be removed from Gutenberg in version 17.0.0.
- *
- * @package gutenberg
- * @since 16.7.0
+ * @package Gutenberg
+ * @since 5.9.0
  */
 
 if ( class_exists( 'WP_Theme_JSON_Schema_Gutenberg' ) ) {
@@ -42,24 +38,28 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Function that migrates a given theme.json structure to the last version.
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Migrate up to v3.
 	 *
-	 * @param array $theme_json The structure to migrate.
+	 * @param array  $theme_json The structure to migrate.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 *
 	 * @return array The structure in the last version.
 	 */
-	public static function migrate( $theme_json ) {
+	public static function migrate( $theme_json, $origin = 'theme' ) {
 		if ( ! isset( $theme_json['version'] ) ) {
 			$theme_json = array(
 				'version' => WP_Theme_JSON::LATEST_SCHEMA,
 			);
 		}
 
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = self::migrate_v1_to_v2( $theme_json );
-		}
-
-		if ( 2 === $theme_json['version'] ) {
-			$theme_json = self::migrate_deprecated_lightbox_behaviors( $theme_json );
+		// Migrate each version in order starting with the current version.
+		switch ( $theme_json['version'] ) {
+			case 1:
+				$theme_json = self::migrate_v1_to_v2( $theme_json );
+				// Deliberate fall through. Once migrated to v2, also migrate to v3.
+			case 2:
+				$theme_json = self::migrate_v2_to_v3( $theme_json, $origin );
 		}
 
 		return $theme_json;
@@ -95,41 +95,72 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		return $new;
 	}
 
-
 	/**
-	 * Migrate away from the previous syntax that used a top-level "behaviors" key
-	 * in the `theme.json` to a new "lightbox" setting.
+	 * Migrates from v2 to v3.
 	 *
-	 * This function SHOULD NOT be ported to Core!!!
+	 * - Sets settings.typography.defaultFontSizes to false if settings.typography.fontSizes are defined.
+	 * - Sets settings.spacing.defaultSpacingSizes to false if settings.spacing.spacingSizes are defined.
+	 * - Prevents settings.spacing.spacingSizes from merging with settings.spacing.spacingScale by
+	 *   unsetting spacingScale when spacingSizes are defined.
 	 *
-	 * It is a temporary migration that will be removed in Gutenberg 17.0.0
+	 * @since 6.6.0
 	 *
-	 * @since 16.7.0
-	 *
-	 * @param array $old Data with (potentially) behaviors.
-	 * @return array Data with behaviors removed.
+	 * @param array $old     Data to migrate.
+	 * @param string $origin What source of data this object represents.
+	 *                       One of 'blocks', 'default', 'theme', or 'custom'.
+	 * @return array Data with defaultFontSizes set to false.
 	 */
-	private static function migrate_deprecated_lightbox_behaviors( $old ) {
+	private static function migrate_v2_to_v3( $old, $origin ) {
 		// Copy everything.
 		$new = $old;
 
-		// Migrate the old behaviors syntax to the new "lightbox" syntax.
-		if ( isset( $old['behaviors']['blocks']['core/image']['lightbox']['enabled'] ) ) {
-			_wp_array_set(
-				$new,
-				array( 'settings', 'blocks', 'core/image', 'lightbox', 'enabled' ),
-				$old['behaviors']['blocks']['core/image']['lightbox']['enabled']
-			);
+		// Set the new version.
+		$new['version'] = 3;
+
+		/*
+		 * Remaining changes do not need to be applied to the custom origin,
+		 * as they should take on the value of the theme origin.
+		 */
+		if ( 'custom' === $origin ) {
+			return $new;
 		}
 
-		// Migrate the behaviors setting to the new syntax. This setting controls
-		// whether the Lightbox UI shows up in the block editor.
-		if ( isset( $old['settings']['blocks']['core/image']['behaviors']['lightbox'] ) ) {
-			_wp_array_set(
-				$new,
-				array( 'settings', 'blocks', 'core/image', 'lightbox', 'allowEditing' ),
-				$old['settings']['blocks']['core/image']['behaviors']['lightbox']
-			);
+		/*
+		 * Even though defaultFontSizes is a new setting, we need to migrate
+		 * it as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided font sizes as they could match the default ones and
+		 * affect the generated CSS. And in v2 we provided default font sizes
+		 * when the theme did not provide any.
+		 */
+		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
+			$new['settings']['typography']['defaultFontSizes'] = false;
+		}
+
+		/*
+		 * Similarly to defaultFontSizes, we need to migrate defaultSpacingSizes
+		 * as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided spacing sizes via spacingSizes or spacingScale.
+		 */
+		if (
+			isset( $old['settings']['spacing']['spacingSizes'] ) ||
+			isset( $old['settings']['spacing']['spacingScale'] )
+		) {
+			$new['settings']['spacing']['defaultSpacingSizes'] = false;
+		}
+
+		/*
+		 * In v3 spacingSizes is merged with the generated spacingScale sizes
+		 * instead of completely replacing them. The v3 behavior is what was
+		 * documented for the v2 schema, but the code never actually did work
+		 * that way. Instead of surprising users with a behavior change two
+		 * years after the fact at the same time as a v3 update is introduced,
+		 * we'll continue using the "bugged" behavior for v2 themes. And treat
+		 * the "bug fix" as a breaking change for v3.
+		 */
+		if ( isset( $old['settings']['spacing']['spacingSizes'] ) ) {
+			unset( $new['settings']['spacing']['spacingScale'] );
 		}
 
 		return $new;

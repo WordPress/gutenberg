@@ -11,8 +11,8 @@ To help with detecting infinite loops on the client, the `RecursionProvider` com
  * WordPress dependencies
  */
 import {
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';

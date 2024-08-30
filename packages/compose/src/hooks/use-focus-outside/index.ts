@@ -71,20 +71,20 @@ type UseFocusOutsideReturn = {
 export default function useFocusOutside(
 	onFocusOutside: ( ( event: React.FocusEvent ) => void ) | undefined
 ): UseFocusOutsideReturn {
-	const currentOnFocusOutside = useRef( onFocusOutside );
+	const currentOnFocusOutsideRef = useRef( onFocusOutside );
 	useEffect( () => {
-		currentOnFocusOutside.current = onFocusOutside;
+		currentOnFocusOutsideRef.current = onFocusOutside;
 	}, [ onFocusOutside ] );
 
-	const preventBlurCheck = useRef( false );
+	const preventBlurCheckRef = useRef( false );
 
-	const blurCheckTimeoutId = useRef< number | undefined >();
+	const blurCheckTimeoutIdRef = useRef< number | undefined >();
 
 	/**
 	 * Cancel a blur check timeout.
 	 */
 	const cancelBlurCheck = useCallback( () => {
-		clearTimeout( blurCheckTimeoutId.current );
+		clearTimeout( blurCheckTimeoutIdRef.current );
 	}, [] );
 
 	// Cancel blur checks on unmount.
@@ -116,9 +116,9 @@ export default function useFocusOutside(
 		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
 
 		if ( isInteractionEnd ) {
-			preventBlurCheck.current = false;
+			preventBlurCheckRef.current = false;
 		} else if ( isFocusNormalizedButton( target ) ) {
-			preventBlurCheck.current = true;
+			preventBlurCheckRef.current = true;
 		}
 	}, [] );
 
@@ -135,7 +135,7 @@ export default function useFocusOutside(
 		event.persist();
 
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
-		if ( preventBlurCheck.current ) {
+		if ( preventBlurCheckRef.current ) {
 			return;
 		}
 
@@ -156,7 +156,7 @@ export default function useFocusOutside(
 			return;
 		}
 
-		blurCheckTimeoutId.current = setTimeout( () => {
+		blurCheckTimeoutIdRef.current = setTimeout( () => {
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel
 			// this blur event thereby leaving focus in place.
@@ -166,8 +166,8 @@ export default function useFocusOutside(
 				return;
 			}
 
-			if ( 'function' === typeof currentOnFocusOutside.current ) {
-				currentOnFocusOutside.current( event );
+			if ( 'function' === typeof currentOnFocusOutsideRef.current ) {
+				currentOnFocusOutsideRef.current( event );
 			}
 		}, 0 );
 	}, [] );

@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -45,7 +49,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
-		<div className={ classnames( 'block-editor-block-card', className ) }>
+		<div className={ clsx( 'block-editor-block-card', className ) }>
 			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
 				<Button
 					onClick={ () => selectBlock( parentNavBlockClientId ) }
@@ -60,14 +64,14 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 				/>
 			) }
 			<BlockIcon icon={ icon } showColors />
-			<div className="block-editor-block-card__content">
+			<VStack spacing={ 1 }>
 				<h2 className="block-editor-block-card__title">{ title }</h2>
 				{ description && (
-					<span className="block-editor-block-card__description">
+					<Text className="block-editor-block-card__description">
 						{ description }
-					</span>
+					</Text>
 				) }
-			</div>
+			</VStack>
 		</div>
 	);
 }

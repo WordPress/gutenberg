@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,13 +48,9 @@ function MetaBoxesArea( { location } ) {
 		return select( editPostStore ).isSavingMetaBoxes();
 	}, [] );
 
-	const classes = classnames(
-		'edit-post-meta-boxes-area',
-		`is-${ location }`,
-		{
-			'is-loading': isSaving,
-		}
-	);
+	const classes = clsx( 'edit-post-meta-boxes-area', `is-${ location }`, {
+		'is-loading': isSaving,
+	} );
 
 	return (
 		<div className={ classes }>

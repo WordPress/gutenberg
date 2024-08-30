@@ -1,11 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, privateApis } from '@wordpress/interactivity';
+
+const { h } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 const { state } = store( 'directive-context', {
 	state: {
 		text: 'Text 1',
+		component: () => h( 'div', {}, state.text ),
+		number: 1,
+		boolean: true,
 	},
 	actions: {
 		toggleStateText() {

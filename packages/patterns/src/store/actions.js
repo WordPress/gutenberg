@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { parse } from '@wordpress/blocks';
+import { getBlockType, cloneBlock } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -90,25 +90,60 @@ export const createPatternFromFile =
 export const convertSyncedPatternToStatic =
 	( clientId ) =>
 	( { registry } ) => {
-		const oldBlock = registry
+		const patternBlock = registry
 			.select( blockEditorStore )
 			.getBlock( clientId );
-		const pattern = registry
-			.select( 'core' )
-			.getEditedEntityRecord(
-				'postType',
-				'wp_block',
-				oldBlock.attributes.ref
-			);
+		const existingOverrides = patternBlock.attributes?.content;
 
-		const newBlocks = parse(
-			typeof pattern.content === 'function'
-				? pattern.content( pattern )
-				: pattern.content
-		);
+		function cloneBlocksAndRemoveBindings( blocks ) {
+			return blocks.map( ( block ) => {
+				let metadata = block.attributes.metadata;
+				if ( metadata ) {
+					metadata = { ...metadata };
+					delete metadata.id;
+					delete metadata.bindings;
+					// Use overridden values of the pattern block if they exist.
+					if ( existingOverrides?.[ metadata.name ] ) {
+						// Iterate over each overriden attribute.
+						for ( const [ attributeName, value ] of Object.entries(
+							existingOverrides[ metadata.name ]
+						) ) {
+							// Skip if the attribute does not exist in the block type.
+							if (
+								! getBlockType( block.name )?.attributes[
+									attributeName
+								]
+							) {
+								continue;
+							}
+							// Update the block attribute with the override value.
+							block.attributes[ attributeName ] = value;
+						}
+					}
+				}
+				return cloneBlock(
+					block,
+					{
+						metadata:
+							metadata && Object.keys( metadata ).length > 0
+								? metadata
+								: undefined,
+					},
+					cloneBlocksAndRemoveBindings( block.innerBlocks )
+				);
+			} );
+		}
+
+		const patternInnerBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( patternBlock.clientId );
+
 		registry
 			.dispatch( blockEditorStore )
-			.replaceBlocks( oldBlock.clientId, newBlocks );
+			.replaceBlocks(
+				patternBlock.clientId,
+				cloneBlocksAndRemoveBindings( patternInnerBlocks )
+			);
 	};
 
 /**

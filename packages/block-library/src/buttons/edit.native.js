@@ -21,10 +21,7 @@ import { alignmentHelpers } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
 
 const layoutProp = { type: 'default', alignments: [] };
 
@@ -72,13 +69,6 @@ export default function ButtonsEdit( {
 		[ clientId ]
 	);
 
-	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
-	}, [] );
-
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } =
 		useDispatch( blockEditorStore );
@@ -116,7 +106,7 @@ export default function ButtonsEdit( {
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
-				isFloating={ true }
+				isFloating
 				onAddBlock={ onAddNextButton }
 			/>
 		</View>
@@ -147,17 +137,7 @@ export default function ButtonsEdit( {
 			) }
 			{ resizeObserver }
 			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ [
-					[
-						buttonBlockName,
-						{
-							className:
-								preferredStyle &&
-								`is-style-${ preferredStyle }`,
-						},
-					],
-				] }
+				template={ [ [ 'core/button' ] ] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}

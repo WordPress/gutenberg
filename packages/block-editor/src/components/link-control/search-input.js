@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
@@ -119,26 +115,21 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
-		const inputClasses = classnames( className, {
-			// 'has-no-label': ! hideLabelFromVision,
-		} );
-
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
-					__nextHasNoMarginBottom
 					label={ __( 'Link' ) }
 					hideLabelFromVision={ hideLabelFromVision }
-					className={ inputClasses }
+					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					placeholder={ placeholder ?? __( 'Search or type URL' ) }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
 					__experimentalFetchLinkSuggestions={ searchHandler }
-					__experimentalHandleURLSuggestions={ true }
+					__experimentalHandleURLSuggestions
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}

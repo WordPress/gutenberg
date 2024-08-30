@@ -99,8 +99,12 @@ export function createHighlighterText( {
 	unhighlightClassName = '',
 	unhighlightStyle,
 }: Options ) {
-	if ( ! children ) return null;
-	if ( typeof children !== 'string' ) return children;
+	if ( ! children ) {
+		return null;
+	}
+	if ( typeof children !== 'string' ) {
+		return children;
+	}
 
 	const textToHighlight = children;
 

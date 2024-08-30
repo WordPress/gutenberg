@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,9 @@ import { MenuUI } from '../styles/navigation-styles';
 
 import type { NavigationMenuProps } from '../types';
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export function NavigationMenu( props: NavigationMenuProps ) {
 	const {
 		backButtonLabel,
@@ -63,7 +66,7 @@ export function NavigationMenu( props: NavigationMenuProps ) {
 		: setUncontrolledSearch;
 
 	const menuTitleId = `components-navigation__menu-title-${ menu }`;
-	const classes = classnames( 'components-navigation__menu', className );
+	const classes = clsx( 'components-navigation__menu', className );
 
 	return (
 		<NavigationMenuContext.Provider value={ context }>

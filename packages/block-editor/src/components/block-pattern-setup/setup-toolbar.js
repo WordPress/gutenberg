@@ -17,7 +17,12 @@ import { VIEWMODES } from './constants';
 
 const Actions = ( { onBlockPatternSelect } ) => (
 	<div className="block-editor-block-pattern-setup__actions">
-		<Button variant="primary" onClick={ onBlockPatternSelect }>
+		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
+			variant="primary"
+			onClick={ onBlockPatternSelect }
+		>
 			{ __( 'Choose' ) }
 		</Button>
 	</div>
@@ -31,18 +36,22 @@ const CarouselNavigation = ( {
 } ) => (
 	<div className="block-editor-block-pattern-setup__navigation">
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			icon={ chevronLeft }
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
 			disabled={ activeSlide === 0 }
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 		/>
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			icon={ chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
 			disabled={ activeSlide === totalSlides - 1 }
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 		/>
 	</div>
 );
@@ -60,12 +69,16 @@ const SetupToolbar = ( {
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				icon={ stretchFullWidth }
 				label={ __( 'Carousel view' ) }
 				onClick={ () => setViewMode( VIEWMODES.carousel ) }
 				isPressed={ isCarouselView }
 			/>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				icon={ grid }
 				label={ __( 'Grid view' ) }
 				onClick={ () => setViewMode( VIEWMODES.grid ) }

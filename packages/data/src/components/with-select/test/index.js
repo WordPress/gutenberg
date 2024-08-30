@@ -143,7 +143,7 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		// @todo, Should we allow this behaviour? Side-effects
+		// @todo Should we allow this behaviour? Side-effects
 		// on mount are discouraged in React (breaks Suspense and React Async Mode)
 		// leaving in place for now under the assumption there's current usage
 		// of withSelect in GB that expects support.

@@ -22,6 +22,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 const TILE_SPACING = 8;
 
@@ -64,7 +65,6 @@ export const Gallery = ( props ) => {
 		{},
 		{
 			contentResizeMode: 'stretch',
-			allowedBlocks: [ 'core/image' ],
 			orientation: 'horizontal',
 			renderAppender: false,
 			numColumns: displayedColumns,
@@ -101,7 +101,7 @@ export const Gallery = ( props ) => {
 			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
-				accessible={ true }
+				accessible
 				accessibilityLabelCreator={ ( caption ) =>
 					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
@@ -121,4 +121,4 @@ export const Gallery = ( props ) => {
 	);
 };
 
-export default Gallery;
+export default withViewportMatch( { isNarrow: '< small' } )( Gallery );

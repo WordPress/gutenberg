@@ -26,6 +26,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
+import setNestedValue from '../../utils/set-nested-value';
 
 const { cleanEmptyObject, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
@@ -235,50 +236,6 @@ function useChangesToPush( name, attributes, userConfig ) {
 	}, [ supports, attributes, blockUserConfig ] );
 }
 
-/**
- * Sets the value at path of object.
- * If a portion of path doesn’t exist, it’s created.
- * Arrays are created for missing index properties while objects are created
- * for all other missing properties.
- *
- * This function intentionally mutates the input object.
- *
- * Inspired by _.set().
- *
- * @see https://lodash.com/docs/4.17.15#set
- *
- * @todo Needs to be deduplicated with its copy in `@wordpress/core-data`.
- *
- * @param {Object} object Object to modify
- * @param {Array}  path   Path of the property to set.
- * @param {*}      value  Value to set.
- */
-function setNestedValue( object, path, value ) {
-	if ( ! object || typeof object !== 'object' ) {
-		return object;
-	}
-
-	path.reduce( ( acc, key, idx ) => {
-		if ( acc[ key ] === undefined ) {
-			if ( Number.isInteger( path[ idx + 1 ] ) ) {
-				acc[ key ] = [];
-			} else {
-				acc[ key ] = {};
-			}
-		}
-		if ( idx === path.length - 1 ) {
-			acc[ key ] = value;
-		}
-		return acc[ key ];
-	}, object );
-
-	return object;
-}
-
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
-}
-
 function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
@@ -301,8 +258,8 @@ function PushChangesToGlobalStylesControl( {
 		if ( changes.length > 0 ) {
 			const { style: blockStyles } = attributes;
 
-			const newBlockStyles = cloneDeep( blockStyles );
-			const newUserConfig = cloneDeep( userConfig );
+			const newBlockStyles = structuredClone( blockStyles );
+			const newUserConfig = structuredClone( userConfig );
 
 			for ( const { path, value } of changes ) {
 				setNestedValue( newBlockStyles, path, undefined );
@@ -329,7 +286,7 @@ function PushChangesToGlobalStylesControl( {
 			// notification.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
-			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			setUserConfig( newUserConfig, { undoIgnore: true } );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -344,7 +301,7 @@ function PushChangesToGlobalStylesControl( {
 							onClick() {
 								__unstableMarkNextChangeAsNotPersistent();
 								setAttributes( attributes );
-								setUserConfig( () => userConfig, {
+								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
 							},
@@ -366,6 +323,7 @@ function PushChangesToGlobalStylesControl( {
 
 	return (
 		<BaseControl
+			__nextHasNoMarginBottom
 			className="edit-site-push-changes-to-global-styles-control"
 			help={ sprintf(
 				// translators: %s: Title of the block e.g. 'Heading'.
@@ -379,7 +337,9 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
-				variant="primary"
+				__next40pxDefaultSize
+				variant="secondary"
+				accessibleWhenDisabled
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
@@ -389,30 +349,36 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const isBlockBasedTheme = useSelect(
-			( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-			[]
-		);
-		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
-			hasBlockSupport( props.name, feature )
-		);
+function PushChangesToGlobalStyles( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+		hasBlockSupport( props.name, feature )
+	);
+	const isDisplayed =
+		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' &&
-					supportsStyles &&
-					isBlockBasedTheme && (
-						<InspectorAdvancedControls>
-							<PushChangesToGlobalStylesControl { ...props } />
-						</InspectorAdvancedControls>
-					) }
-			</>
-		);
+	if ( ! isDisplayed ) {
+		return null;
 	}
+
+	return (
+		<InspectorAdvancedControls>
+			<PushChangesToGlobalStylesControl { ...props } />
+		</InspectorAdvancedControls>
+	);
+}
+
+const withPushChangesToGlobalStyles = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit key="edit" { ...props } />
+			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
+		</>
+	)
 );
 
 addFilter(

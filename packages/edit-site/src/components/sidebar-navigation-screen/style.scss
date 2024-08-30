@@ -33,9 +33,8 @@
 }
 
 .edit-site-sidebar-navigation-screen__meta {
-	margin: 0 0 $grid-unit-20 0;
+	margin: 0 0 $grid-unit-20 $grid-unit-20;
 	color: $gray-400;
-	margin-left: $grid-unit-20;
 	.components-text {
 		color: $gray-400;
 	}
@@ -43,6 +42,8 @@
 
 .edit-site-sidebar-navigation-screen__page-link {
 	color: $gray-600;
+	display: inline-block;
+	word-break: break-word;
 
 	&:hover,
 	&:focus {
@@ -52,14 +53,13 @@
 	.components-external-link__icon {
 		margin-left: $grid-unit-05;
 	}
-	display: inline-block;
 }
 
 .edit-site-sidebar-navigation-screen__title-icon {
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $header-height;
+	padding-top: $grid-unit-60;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
@@ -67,8 +67,8 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
-	padding: $grid-unit-15 * 0.5 0 0 0;
 	overflow-wrap: break-word;
+	padding: $grid-unit-05 * 0.5 0 0 0;
 }
 
 .edit-site-sidebar-navigation-screen__actions {
@@ -76,7 +76,7 @@
 	flex-shrink: 0;
 }
 
-.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
+.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variation-container {
 	@include break-medium() {
 		// Safari does not currently support `scrollbar-gutter: stable`, so at
 		// particular viewport sizes it's possible for previews to render prior to a
@@ -89,18 +89,32 @@
 		// See: https://github.com/WordPress/gutenberg/issues/55112
 		max-width: 292px;
 	}
+}
 
+.edit-site-global-styles-variation-title {
+	color: $gray-300;
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+}
+
+.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variations_item {
+
+	// Use a white outline to provide contrast with the dark background.
 	.edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width $gray-900;
+		outline-color: rgba($white, 0.05);
 	}
-	.edit-site-global-styles-variations_item.is-active .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width $gray-100;
+
+	&:not(.is-active):hover .edit-site-global-styles-variations_item-preview {
+		outline-color: rgba($white, 0.15);
 	}
-	.edit-site-global-styles-variations_item:hover .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+
+	&.is-active .edit-site-global-styles-variations_item-preview {
+		outline-color: $white;
 	}
-	.edit-site-global-styles-variations_item:focus .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+	&:focus-visible .edit-site-global-styles-variations_item-preview {
+		outline-color: var(--wp-admin-theme-color);
 	}
 }
 
@@ -112,25 +126,6 @@
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
-}
-
-.edit-site-sidebar__notice {
-	background: $gray-800;
-	color: $gray-300;
-	margin: $grid-unit-30 0;
-	&.is-dismissible {
-		padding-right: $grid-unit-10;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
-		color: $gray-400;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		color: $white;
-	}
 }
 
 /* In general style overrides are discouraged.

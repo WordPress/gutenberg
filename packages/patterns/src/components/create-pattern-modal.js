@@ -10,7 +10,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,21 +18,44 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
-
-/**
- * Internal dependencies
- */
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_SYNC_TYPES,
+	PATTERN_TYPES,
+} from '../constants';
 import { store as patternsStore } from '../store';
-import CategorySelector, { CATEGORY_SLUG } from './category-selector';
+import CategorySelector from './category-selector';
+import { useAddPatternCategory } from '../private-hooks';
 import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
-	confirmLabel = __( 'Create' ),
-	defaultCategories = [],
 	className = 'patterns-menu-items__convert-modal',
+	modalTitle,
+	...restProps
+} ) {
+	const defaultModalTitle = useSelect(
+		( select ) =>
+			select( coreStore ).getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+		[]
+	);
+	return (
+		<Modal
+			title={ modalTitle || defaultModalTitle }
+			onRequestClose={ restProps.onClose }
+			overlayClassName={ className }
+			focusOnMount="firstContentElement"
+			size="small"
+		>
+			<CreatePatternModalContents { ...restProps } />
+		</Modal>
+	);
+}
+
+export function CreatePatternModalContents( {
+	confirmLabel = __( 'Add' ),
+	defaultCategories = [],
 	content,
-	modalTitle = __( 'Create pattern' ),
 	onClose,
 	onError,
 	onSuccess,
@@ -45,44 +68,9 @@ export default function CreatePatternModal( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const { createPattern } = unlock( useDispatch( patternsStore ) );
-	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const { corePatternCategories, userPatternCategories } = useSelect(
-		( select ) => {
-			const { getUserPatternCategories, getBlockPatternCategories } =
-				select( coreStore );
-
-			return {
-				corePatternCategories: getBlockPatternCategories(),
-				userPatternCategories: getUserPatternCategories(),
-			};
-		}
-	);
-
-	const categoryMap = useMemo( () => {
-		// Merge the user and core pattern categories and remove any duplicates.
-		const uniqueCategories = new Map();
-		[ ...userPatternCategories, ...corePatternCategories ].forEach(
-			( category ) => {
-				if (
-					! uniqueCategories.has( category.label ) &&
-					// There are two core categories with `Post` label so explicitly remove the one with
-					// the `query` slug to avoid any confusion.
-					category.name !== 'query'
-				) {
-					// We need to store the name separately as this is used as the slug in the
-					// taxonomy and may vary from the label.
-					uniqueCategories.set( category.label, {
-						label: category.label,
-						value: category.label,
-						name: category.name,
-					} );
-				}
-			}
-		);
-		return uniqueCategories;
-	}, [ userPatternCategories, corePatternCategories ] );
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 
 	async function onCreate( patternTitle, sync ) {
 		if ( ! title || isSaving ) {
@@ -120,106 +108,66 @@ export default function CreatePatternModal( {
 		}
 	}
 
-	/**
-	 * @param {string} term
-	 * @return {Promise<number>} The pattern category id.
-	 */
-	async function findOrCreateTerm( term ) {
-		try {
-			// We need to match any existing term to the correct slug to prevent duplicates, eg.
-			// the core `Headers` category uses the singular `header` as the slug.
-			const existingTerm = categoryMap.get( term );
-			const termData = existingTerm
-				? { name: existingTerm.label, slug: existingTerm.name }
-				: { name: term };
-			const newTerm = await saveEntityRecord(
-				'taxonomy',
-				CATEGORY_SLUG,
-				termData,
-				{ throwOnError: true }
-			);
-			invalidateResolution( 'getUserPatternCategories' );
-			return newTerm.id;
-		} catch ( error ) {
-			if ( error.code !== 'term_exists' ) {
-				throw error;
-			}
-
-			return error.data.term_id;
-		}
-	}
-
 	return (
-		<Modal
-			title={ modalTitle }
-			onRequestClose={ () => {
-				onClose();
-				setTitle( '' );
+		<form
+			onSubmit={ ( event ) => {
+				event.preventDefault();
+				onCreate( title, syncType );
 			} }
-			overlayClassName={ className }
 		>
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					onCreate( title, syncType );
-				} }
-			>
-				<VStack spacing="5">
-					<TextControl
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						placeholder={ __( 'My pattern' ) }
-						className="patterns-create-modal__name-input"
-						__nextHasNoMarginBottom
+			<VStack spacing="5">
+				<TextControl
+					label={ __( 'Name' ) }
+					value={ title }
+					onChange={ setTitle }
+					placeholder={ __( 'My pattern' ) }
+					className="patterns-create-modal__name-input"
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+				<CategorySelector
+					categoryTerms={ categoryTerms }
+					onChange={ setCategoryTerms }
+					categoryMap={ categoryMap }
+				/>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ _x( 'Synced', 'pattern (singular)' ) }
+					help={ __(
+						'Sync this pattern across multiple locations.'
+					) }
+					checked={ syncType === PATTERN_SYNC_TYPES.full }
+					onChange={ () => {
+						setSyncType(
+							syncType === PATTERN_SYNC_TYPES.full
+								? PATTERN_SYNC_TYPES.unsynced
+								: PATTERN_SYNC_TYPES.full
+						);
+					} }
+				/>
+				<HStack justify="right">
+					<Button
 						__next40pxDefaultSize
-					/>
-					<CategorySelector
-						categoryTerms={ categoryTerms }
-						onChange={ setCategoryTerms }
-						categoryMap={ categoryMap }
-					/>
-					<ToggleControl
-						label={ _x(
-							'Synced',
-							'Option that makes an individual pattern synchronized'
-						) }
-						help={ __(
-							'Sync this pattern across multiple locations.'
-						) }
-						checked={ syncType === PATTERN_SYNC_TYPES.full }
-						onChange={ () => {
-							setSyncType(
-								syncType === PATTERN_SYNC_TYPES.full
-									? PATTERN_SYNC_TYPES.unsynced
-									: PATTERN_SYNC_TYPES.full
-							);
+						variant="tertiary"
+						onClick={ () => {
+							onClose();
+							setTitle( '' );
 						} }
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								onClose();
-								setTitle( '' );
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
+					>
+						{ __( 'Cancel' ) }
+					</Button>
 
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-							aria-disabled={ ! title || isSaving }
-							isBusy={ isSaving }
-						>
-							{ confirmLabel }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		</Modal>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						aria-disabled={ ! title || isSaving }
+						isBusy={ isSaving }
+					>
+						{ confirmLabel }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
 	);
 }

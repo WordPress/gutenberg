@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { colord } from 'colord';
 
 /**
@@ -66,7 +66,7 @@ function ControlPointButton( {
 				aria-describedby={ descriptionId }
 				aria-haspopup="true"
 				aria-expanded={ isOpen }
-				className={ classnames(
+				className={ clsx(
 					'components-custom-gradient-picker__control-point-button',
 					{
 						'is-active': isOpen,
@@ -102,7 +102,7 @@ function GradientColorPickerDropdown( {
 		[]
 	);
 
-	const mergedClassName = classnames(
+	const mergedClassName = clsx(
 		'components-custom-gradient-picker__control-point-dropdown',
 		className
 	);
@@ -128,11 +128,11 @@ function ControlPoints( {
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
 }: ControlPointsProps ) {
-	const controlPointMoveState = useRef< ControlPointMoveState >();
+	const controlPointMoveStateRef = useRef< ControlPointMoveState >();
 
 	const onMouseMove = ( event: MouseEvent ) => {
 		if (
-			controlPointMoveState.current === undefined ||
+			controlPointMoveStateRef.current === undefined ||
 			gradientPickerDomRef.current === null
 		) {
 			return;
@@ -144,14 +144,14 @@ function ControlPoints( {
 		);
 
 		const { initialPosition, index, significantMoveHappened } =
-			controlPointMoveState.current;
+			controlPointMoveStateRef.current;
 
 		if (
 			! significantMoveHappened &&
 			Math.abs( initialPosition - relativePosition ) >=
 				MINIMUM_SIGNIFICANT_MOVE
 		) {
-			controlPointMoveState.current.significantMoveHappened = true;
+			controlPointMoveStateRef.current.significantMoveHappened = true;
 		}
 
 		onChange(
@@ -163,13 +163,13 @@ function ControlPoints( {
 		if (
 			window &&
 			window.removeEventListener &&
-			controlPointMoveState.current &&
-			controlPointMoveState.current.listenersActivated
+			controlPointMoveStateRef.current &&
+			controlPointMoveStateRef.current.listenersActivated
 		) {
 			window.removeEventListener( 'mousemove', onMouseMove );
 			window.removeEventListener( 'mouseup', cleanEventListeners );
 			onStopControlPointChange();
-			controlPointMoveState.current.listenersActivated = false;
+			controlPointMoveStateRef.current.listenersActivated = false;
 		}
 	};
 
@@ -202,8 +202,8 @@ function ControlPoints( {
 									key={ index }
 									onClick={ () => {
 										if (
-											controlPointMoveState.current &&
-											controlPointMoveState.current
+											controlPointMoveStateRef.current &&
+											controlPointMoveStateRef.current
 												.significantMoveHappened
 										) {
 											return;
@@ -220,7 +220,7 @@ function ControlPoints( {
 											window &&
 											window.addEventListener
 										) {
-											controlPointMoveState.current = {
+											controlPointMoveStateRef.current = {
 												initialPosition,
 												index,
 												significantMoveHappened: false,

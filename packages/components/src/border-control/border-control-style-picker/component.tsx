@@ -7,16 +7,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
-import { StyledLabel } from '../../base-control/styles/base-control-styles';
-import { View } from '../../view';
-import { Flex } from '../../flex';
-import { VisuallyHidden } from '../../visually-hidden';
-import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import { useBorderControlStylePicker } from './hook';
-
-import type { LabelProps, StylePickerProps } from '../types';
+import type { StylePickerProps } from '../types';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOptionIcon,
+} from '../../toggle-group-control';
 
 const BORDER_STYLES = [
 	{ label: __( 'Solid' ), icon: lineSolid, value: 'solid' },
@@ -24,67 +20,36 @@ const BORDER_STYLES = [
 	{ label: __( 'Dotted' ), icon: lineDotted, value: 'dotted' },
 ];
 
-const Label = ( props: LabelProps ) => {
-	const { label, hideLabelFromVision } = props;
-
-	if ( ! label ) {
-		return null;
-	}
-
-	return hideLabelFromVision ? (
-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
-	) : (
-		<StyledLabel>{ label }</StyledLabel>
-	);
-};
-
-const BorderControlStylePicker = (
-	props: WordPressComponentProps< StylePickerProps, 'div' >,
+function UnconnectedBorderControlStylePicker(
+	{ onChange, ...restProps }: StylePickerProps,
 	forwardedRef: React.ForwardedRef< any >
-) => {
-	const {
-		buttonClassName,
-		hideLabelFromVision,
-		label,
-		onChange,
-		value,
-		...otherProps
-	} = useBorderControlStylePicker( props );
-
+) {
 	return (
-		<View { ...otherProps } ref={ forwardedRef }>
-			<Label
-				label={ label }
-				hideLabelFromVision={ hideLabelFromVision }
-			/>
-			<Flex justify="flex-start" gap={ 1 }>
-				{ BORDER_STYLES.map( ( borderStyle ) => (
-					<Button
-						key={ borderStyle.value }
-						className={ buttonClassName }
-						icon={ borderStyle.icon }
-						size="small"
-						isPressed={ borderStyle.value === value }
-						onClick={ () =>
-							onChange(
-								borderStyle.value === value
-									? undefined
-									: borderStyle.value
-							)
-						}
-						aria-label={ borderStyle.label }
-						label={ borderStyle.label }
-						showTooltip={ true }
-					/>
-				) ) }
-			</Flex>
-		</View>
+		<ToggleGroupControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
+			ref={ forwardedRef }
+			isDeselectable
+			onChange={ ( value ) => {
+				onChange?.( value as string | undefined );
+			} }
+			{ ...restProps }
+		>
+			{ BORDER_STYLES.map( ( borderStyle ) => (
+				<ToggleGroupControlOptionIcon
+					key={ borderStyle.value }
+					value={ borderStyle.value }
+					icon={ borderStyle.icon }
+					label={ borderStyle.label }
+				/>
+			) ) }
+		</ToggleGroupControl>
 	);
-};
+}
 
-const ConnectedBorderControlStylePicker = contextConnect(
-	BorderControlStylePicker,
+const BorderControlStylePicker = contextConnect(
+	UnconnectedBorderControlStylePicker,
 	'BorderControlStylePicker'
 );
 
-export default ConnectedBorderControlStylePicker;
+export default BorderControlStylePicker;

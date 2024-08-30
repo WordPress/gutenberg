@@ -43,10 +43,18 @@ export default function getRectangleFromRange( range ) {
 		} = filteredRects[ 0 ];
 
 		for ( const { top, bottom, left, right } of filteredRects ) {
-			if ( top < furthestTop ) furthestTop = top;
-			if ( bottom > furthestBottom ) furthestBottom = bottom;
-			if ( left < furthestLeft ) furthestLeft = left;
-			if ( right > furthestRight ) furthestRight = right;
+			if ( top < furthestTop ) {
+				furthestTop = top;
+			}
+			if ( bottom > furthestBottom ) {
+				furthestBottom = bottom;
+			}
+			if ( left < furthestLeft ) {
+				furthestLeft = left;
+			}
+			if ( right > furthestRight ) {
+				furthestRight = right;
+			}
 		}
 
 		return new window.DOMRect(

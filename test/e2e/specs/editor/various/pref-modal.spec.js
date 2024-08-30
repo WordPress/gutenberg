@@ -9,7 +9,7 @@ test.describe( 'Preferences modal', () => {
 	} );
 
 	test.describe( 'Preferences modal adaps to viewport', () => {
-		test( 'Enable pre-publish flow is visible on desktop ', async ( {
+		test( 'Enable pre-publish checks is visible on desktop ', async ( {
 			page,
 		} ) => {
 			await page.click(
@@ -18,14 +18,14 @@ test.describe( 'Preferences modal', () => {
 			await page.click( 'role=menuitem[name="Preferences"i]' );
 
 			const prePublishToggle = page.locator(
-				'role=checkbox[name="Enable pre-publish flow"i]'
+				'role=checkbox[name="Enable pre-publish checks"i]'
 			);
 
 			await expect( prePublishToggle ).toBeVisible();
 		} );
 	} );
 	test.describe( 'Preferences modal adaps to viewport', () => {
-		test( 'Enable pre-publish flow is not visible on mobile ', async ( {
+		test( 'Enable pre-publish checks is not visible on mobile ', async ( {
 			page,
 		} ) => {
 			await page.setViewportSize( { width: 500, height: 800 } );
@@ -44,7 +44,7 @@ test.describe( 'Preferences modal', () => {
 			);
 
 			const prePublishToggle = page.locator(
-				'role=checkbox[name="Enable pre-publish flow"i]'
+				'role=checkbox[name="Enable pre-publish checks"i]'
 			);
 
 			await expect( generalButton ).toBeVisible();

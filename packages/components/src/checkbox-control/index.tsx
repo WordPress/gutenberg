@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -16,6 +16,7 @@ import { Icon, check, reset } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { HStack } from '../h-stack';
 import type { CheckboxControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -30,6 +31,7 @@ import type { WordPressComponentProps } from '../context';
  *   const [ isChecked, setChecked ] = useState( true );
  *   return (
  *     <CheckboxControl
+ *       __nextHasNoMarginBottom
  *       label="Is author"
  *       help="Is the user a author or not?"
  *       checked={ isChecked }
@@ -93,46 +95,55 @@ export function CheckboxControl(
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="CheckboxControl"
 			label={ heading }
 			id={ id }
-			help={ help }
-			className={ classnames( 'components-checkbox-control', className ) }
+			help={
+				help && (
+					<span className="components-checkbox-control__help">
+						{ help }
+					</span>
+				)
+			}
+			className={ clsx( 'components-checkbox-control', className ) }
 		>
-			<span className="components-checkbox-control__input-container">
-				<input
-					ref={ ref }
-					id={ id }
-					className="components-checkbox-control__input"
-					type="checkbox"
-					value="1"
-					onChange={ onChangeValue }
-					checked={ checked }
-					aria-describedby={ !! help ? id + '__help' : undefined }
-					{ ...additionalProps }
-				/>
-				{ showIndeterminateIcon ? (
-					<Icon
-						icon={ reset }
-						className="components-checkbox-control__indeterminate"
-						role="presentation"
+			<HStack spacing={ 0 } justify="start" alignment="top">
+				<span className="components-checkbox-control__input-container">
+					<input
+						ref={ ref }
+						id={ id }
+						className="components-checkbox-control__input"
+						type="checkbox"
+						value="1"
+						onChange={ onChangeValue }
+						checked={ checked }
+						aria-describedby={ !! help ? id + '__help' : undefined }
+						{ ...additionalProps }
 					/>
-				) : null }
-				{ showCheckedIcon ? (
-					<Icon
-						icon={ check }
-						className="components-checkbox-control__checked"
-						role="presentation"
-					/>
-				) : null }
-			</span>
-			{ label && (
-				<label
-					className="components-checkbox-control__label"
-					htmlFor={ id }
-				>
-					{ label }
-				</label>
-			) }
+					{ showIndeterminateIcon ? (
+						<Icon
+							icon={ reset }
+							className="components-checkbox-control__indeterminate"
+							role="presentation"
+						/>
+					) : null }
+					{ showCheckedIcon ? (
+						<Icon
+							icon={ check }
+							className="components-checkbox-control__checked"
+							role="presentation"
+						/>
+					) : null }
+				</span>
+				{ label && (
+					<label
+						className="components-checkbox-control__label"
+						htmlFor={ id }
+					>
+						{ label }
+					</label>
+				) }
+			</HStack>
 		</BaseControl>
 	);
 }

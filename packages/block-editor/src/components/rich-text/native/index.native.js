@@ -52,10 +52,6 @@ import { getFormatColors } from './get-format-colors';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
-const unescapeSpaces = ( text ) => {
-	return text.replace( /&nbsp;|&#160;/gi, ' ' );
-};
-
 // The flattened color palettes array is memoized to ensure that the same array instance is
 // returned for the colors palettes. This value might be used as a prop, so having the same
 // instance will prevent unnecessary re-renders of the RichText component.
@@ -268,7 +264,7 @@ export class RichText extends Component {
 	onCreateUndoLevel() {
 		const { __unstableOnCreateUndoLevel: onCreateUndoLevel } = this.props;
 		// If the content is the same, no level needs to be created.
-		if ( this.lastHistoryValue.toString() === this.value.toString() ) {
+		if ( this.lastHistoryValue?.toString() === this.value?.toString() ) {
 			return;
 		}
 
@@ -318,10 +314,27 @@ export class RichText extends Component {
 		}
 
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
+
+		const { __unstableInputRule } = this.props;
+		const currentValuePosition = {
+			end: this.isIOS ? this.selectionEnd : this.selectionEnd + 1,
+			start: this.isIOS ? this.selectionStart : this.selectionStart + 1,
+		};
+
+		if (
+			__unstableInputRule &&
+			__unstableInputRule( {
+				...currentValuePosition,
+				...this.formatToValue( contentWithoutRootTag ),
+			} )
+		) {
+			return;
+		}
+
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
-		if ( contentWithoutRootTag === this.value.toString() ) {
+		if ( contentWithoutRootTag === this.value?.toString() ) {
 			return;
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
@@ -333,11 +346,11 @@ export class RichText extends Component {
 
 	onTextUpdate( event ) {
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
 
 		this.debounceCreateUndoLevel();
-		const refresh = this.value.toString() !== contentWithoutRootTag;
+		const refresh = this.value?.toString() !== contentWithoutRootTag;
 		this.value = contentWithoutRootTag;
 
 		// We don't want to refresh if our goal is just to create a record.
@@ -406,7 +419,8 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { start, end, text } = value;
+		const { start, end, text, activeFormats } = value;
+		const hasActiveFormats = activeFormats && !! activeFormats.length;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
@@ -419,15 +433,17 @@ export class RichText extends Component {
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
 		if (
-			! onDelete ||
 			! isCollapsed( value ) ||
+			hasActiveFormats ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
 		) {
 			return;
 		}
 
-		onDelete( { isReverse, value } );
+		if ( onDelete ) {
+			onDelete( { isReverse, value } );
+		}
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
@@ -568,7 +584,7 @@ export class RichText extends Component {
 		// Check if value is up to date with latest state of native AztecView.
 		if (
 			event.nativeEvent.text &&
-			event.nativeEvent.text !== this.props.value.toString()
+			event.nativeEvent.text !== this.props.value?.toString()
 		) {
 			this.onTextUpdate( event );
 		}
@@ -593,7 +609,7 @@ export class RichText extends Component {
 		// this approach is not perfectly reliable.
 		const isManual =
 			this.lastAztecEventType !== 'input' &&
-			this.props.value.toString() === this.value.toString();
+			this.props.value?.toString() === this.value?.toString();
 		if ( hasChanged && isManual ) {
 			const value = this.createRecord();
 			const activeFormats = getActiveFormats( value );
@@ -660,10 +676,10 @@ export class RichText extends Component {
 
 		// Check and dicsard stray event, where the text and selection is equal to the ones already cached.
 		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			unescapeSpaces( event.nativeEvent.text )
+			event.nativeEvent.text
 		);
 		if (
-			contentWithoutRootTag === this.value.toString() &&
+			contentWithoutRootTag === this.value?.toString() &&
 			realStart === this.selectionStart &&
 			realEnd === this.selectionEnd
 		) {
@@ -760,7 +776,7 @@ export class RichText extends Component {
 			typeof nextProps.value !== 'undefined' &&
 			typeof this.props.value !== 'undefined' &&
 			( ! this.comesFromAztec || ! this.firedAfterTextChanged ) &&
-			nextProps.value.toString() !== this.props.value.toString()
+			nextProps.value?.toString() !== this.props.value?.toString()
 		) {
 			// Gutenberg seems to try to mirror the caret state even on events that only change the content so,
 			//  let's force caret update if state has selection set.
@@ -828,7 +844,7 @@ export class RichText extends Component {
 		const { style, tagName } = this.props;
 		const { currentFontSize } = this.state;
 
-		if ( this.props.value.toString() !== this.value.toString() ) {
+		if ( this.props.value?.toString() !== this.value?.toString() ) {
 			this.value = this.props.value;
 		}
 		const { __unstableIsSelected: prevIsSelected } = prevProps;
@@ -877,6 +893,17 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { clearCurrentSelectionOnUnmount } = this.props;
+
+		// There are cases when the component is unmounted e.g. scrolling in a
+		// long post due to virtualization, so the block selection needs to be cleared
+		// so it doesn't auto-focus when it's added back.
+		if ( this._editor?.isFocused() ) {
+			clearCurrentSelectionOnUnmount?.();
+		}
+	}
+
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree.
 		let value = this.valueToFormat( record );
@@ -888,8 +915,8 @@ export class RichText extends Component {
 		// On android if content is empty we need to send no content or else the placeholder will not show.
 		if (
 			! this.isIOS &&
-			( value.toString() === '' ||
-				value.toString() === EMPTY_PARAGRAPH_TAGS )
+			( value?.toString() === '' ||
+				value?.toString() === EMPTY_PARAGRAPH_TAGS )
 		) {
 			return '';
 		}
@@ -1226,8 +1253,8 @@ export class RichText extends Component {
 					ref={ ( ref ) => {
 						this._editor = ref;
 
-						if ( this.props.setRef ) {
-							this.props.setRef( ref );
+						if ( this.props.nativeEditorRef ) {
+							this.props.nativeEditorRef( ref );
 						}
 					} }
 					style={ {

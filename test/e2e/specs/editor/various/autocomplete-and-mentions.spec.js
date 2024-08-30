@@ -421,6 +421,43 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		} );
 	} );
 
+	test( `should insert mention in a table block`, async ( {
+		page,
+		editor,
+	} ) => {
+		// Insert table block.
+		await editor.insertBlock( { name: 'core/table' } );
+
+		// Create the table.
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
+
+		// Select the first cell.
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
+
+		// Type autocomplete text.
+		await page.keyboard.type( '@j' );
+
+		// Verify that option is selected.
+		const selectedOption = page.getByRole( 'option', {
+			name: 'Jane Doe',
+			selected: true,
+		} );
+		await expect( selectedOption ).toBeVisible();
+
+		// Insert the option.
+		await selectedOption.click();
+
+		// Verify it's been inserted.
+		const snapshot = `<!-- wp:table -->
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td>@testuser</td><td></td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->`;
+		await expect.poll( editor.getEditedPostContent ).toBe( snapshot );
+	} );
+
 	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
 	// When present, the regression will cause this test to time out.
 	test( 'should insert elements from multiple completers in a single block', async ( {

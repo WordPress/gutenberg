@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, useEffect, useId, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { createHigherOrderComponent, pure } from '@wordpress/compose';
+import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -133,32 +133,91 @@ export function shouldSkipSerialization(
 	return skipSerialization;
 }
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+const pendingStyleOverrides = new WeakMap();
+
+/**
+ * Override a block editor settings style. Leave the ID blank to create a new
+ * style.
+ *
+ * @param {Object}  override     Override object.
+ * @param {?string} override.id  Id of the style override, leave blank to create
+ *                               a new style.
+ * @param {string}  override.css CSS to apply.
+ */
+export function useStyleOverride( { id, css } ) {
+	return usePrivateStyleOverride( { id, css } );
+}
+
+export function usePrivateStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	variation,
+	clientId,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const registry = useRegistry();
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
+
 		const _id = id || fallbackId;
-		setStyleOverride( _id, {
+		const override = {
 			id,
 			css,
 			assets,
 			__unstableType,
+			variation,
+			clientId,
+		};
+		// Batch updates to style overrides to avoid triggering cascading renders
+		// for each style override block included in a tree and optimize initial render.
+		if ( ! pendingStyleOverrides.get( registry ) ) {
+			pendingStyleOverrides.set( registry, [] );
+		}
+		pendingStyleOverrides.get( registry ).push( [ _id, override ] );
+		window.queueMicrotask( () => {
+			if ( pendingStyleOverrides.get( registry )?.length ) {
+				registry.batch( () => {
+					pendingStyleOverrides.get( registry ).forEach( ( args ) => {
+						setStyleOverride( ...args );
+					} );
+					pendingStyleOverrides.set( registry, [] );
+				} );
+			}
 		} );
+
 		return () => {
-			deleteStyleOverride( _id );
+			const isPending = pendingStyleOverrides
+				.get( registry )
+				?.find( ( [ currentId ] ) => currentId === _id );
+			if ( isPending ) {
+				pendingStyleOverrides.set(
+					registry,
+					pendingStyleOverrides
+						.get( registry )
+						.filter( ( [ currentId ] ) => currentId !== _id )
+				);
+			} else {
+				deleteStyleOverride( _id );
+			}
 		};
 	}, [
 		id,
 		css,
+		clientId,
 		assets,
 		__unstableType,
 		fallbackId,
 		setStyleOverride,
 		deleteStyleOverride,
+		registry,
 	] );
 }
 
@@ -176,12 +235,18 @@ export function useBlockSettings( name, parentLayout ) {
 	const [
 		backgroundImage,
 		backgroundSize,
-		fontFamilies,
-		fontSizes,
+		customFontFamilies,
+		defaultFontFamilies,
+		themeFontFamilies,
+		defaultFontSizesEnabled,
+		customFontSizes,
+		defaultFontSizes,
+		themeFontSizes,
 		customFontSize,
 		fontStyle,
 		fontWeight,
 		lineHeight,
+		textAlign,
 		textColumns,
 		textDecoration,
 		writingMode,
@@ -190,8 +255,13 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		borderColor,
@@ -218,15 +288,22 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] = useSettings(
 		'background.backgroundImage',
 		'background.backgroundSize',
-		'typography.fontFamilies',
-		'typography.fontSizes',
+		'typography.fontFamilies.custom',
+		'typography.fontFamilies.default',
+		'typography.fontFamilies.theme',
+		'typography.defaultFontSizes',
+		'typography.fontSizes.custom',
+		'typography.fontSizes.default',
+		'typography.fontSizes.theme',
 		'typography.customFontSize',
 		'typography.fontStyle',
 		'typography.fontWeight',
 		'typography.lineHeight',
+		'typography.textAlign',
 		'typography.textColumns',
 		'typography.textDecoration',
 		'typography.writingMode',
@@ -235,8 +312,13 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.padding',
 		'spacing.margin',
 		'spacing.blockGap',
-		'spacing.spacingSizes',
+		'spacing.defaultSpacingSizes',
+		'spacing.customSpacingSize',
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.default',
+		'spacing.spacingSizes.theme',
 		'spacing.units',
+		'dimensions.aspectRatio',
 		'dimensions.minHeight',
 		'layout',
 		'border.color',
@@ -262,7 +344,8 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.link',
 		'color.text',
 		'color.heading',
-		'color.button'
+		'color.button',
+		'shadow'
 	);
 
 	const rawSettings = useMemo( () => {
@@ -301,15 +384,21 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			typography: {
 				fontFamilies: {
-					custom: fontFamilies,
+					custom: customFontFamilies,
+					default: defaultFontFamilies,
+					theme: themeFontFamilies,
 				},
 				fontSizes: {
-					custom: fontSizes,
+					custom: customFontSizes,
+					default: defaultFontSizes,
+					theme: themeFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
+				textAlign,
 				textColumns,
 				textDecoration,
 				textTransform,
@@ -318,8 +407,12 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			spacing: {
 				spacingSizes: {
-					custom: spacingSizes,
+					custom: userSpacingSizes,
+					default: defaultSpacingSizes,
+					theme: themeSpacingSizes,
 				},
+				customSpacingSize,
+				defaultSpacingSizes: defaultSpacingSizesEnabled,
 				padding,
 				margin,
 				blockGap,
@@ -332,20 +425,28 @@ export function useBlockSettings( name, parentLayout ) {
 				width: borderWidth,
 			},
 			dimensions: {
+				aspectRatio,
 				minHeight,
 			},
 			layout,
 			parentLayout,
+			shadow,
 		};
 	}, [
 		backgroundImage,
 		backgroundSize,
-		fontFamilies,
-		fontSizes,
+		customFontFamilies,
+		defaultFontFamilies,
+		themeFontFamilies,
+		defaultFontSizesEnabled,
+		customFontSizes,
+		defaultFontSizes,
+		themeFontSizes,
 		customFontSize,
 		fontStyle,
 		fontWeight,
 		lineHeight,
+		textAlign,
 		textColumns,
 		textDecoration,
 		textTransform,
@@ -354,8 +455,13 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
+		aspectRatio,
 		minHeight,
 		layout,
 		parentLayout,
@@ -383,6 +489,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		shadow,
 	] );
 
 	return useSettingsForBlockElement( rawSettings, name );
@@ -390,10 +497,10 @@ export function useBlockSettings( name, parentLayout ) {
 
 export function createBlockEditFilter( features ) {
 	// We don't want block controls to re-render when typing inside a block.
-	// `pure` will prevent re-renders unless props change, so only pass the
+	// `memo` will prevent re-renders unless props change, so only pass the
 	// needed props and not the whole attributes object.
 	features = features.map( ( settings ) => {
-		return { ...settings, Edit: pure( settings.edit ) };
+		return { ...settings, Edit: memo( settings.edit ) };
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) => ( props ) => {
@@ -476,7 +583,7 @@ function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
 	return null;
 }
 
-const BlockPropsPure = pure( BlockProps );
+const BlockPropsPure = memo( BlockProps );
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
@@ -490,6 +597,7 @@ export function createBlockListBlockFilter( features ) {
 						hasSupport,
 						attributeKeys = [],
 						useBlockProps,
+						isMatch,
 					} = feature;
 
 					const neededProps = {};
@@ -503,7 +611,8 @@ export function createBlockListBlockFilter( features ) {
 						// Skip rendering if none of the needed attributes are
 						// set.
 						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name )
+						! hasSupport( props.name ) ||
+						( isMatch && ! isMatch( neededProps ) )
 					) {
 						return null;
 					}
@@ -519,6 +628,7 @@ export function createBlockListBlockFilter( features ) {
 							// function reference.
 							setAllWrapperProps={ setAllWrapperProps }
 							name={ props.name }
+							clientId={ props.clientId }
 							// This component is pure, so only pass needed
 							// props!!!
 							{ ...neededProps }
@@ -534,7 +644,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),

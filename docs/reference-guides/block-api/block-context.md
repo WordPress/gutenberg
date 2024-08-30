@@ -4,7 +4,7 @@ Block context is a feature which enables ancestor blocks to provide values which
 
 This is especially useful in full-site editing where, for example, the contents of a block may depend on the context of the post in which it is displayed. A blogroll template may show excerpts of many different posts. Using block context, there can still be one single "Post Excerpt" block which displays the contents of the post based on an inherited post ID.
 
-If you are familiar with [React Context](https://reactjs.org/docs/context.html), block context adopts many of the same ideas. In fact, the client-side block editor implementation of block context is a very simple application of React Context. Block context is also supported in server-side `render_callback` implementations, demonstrated in the examples below.
+If you are familiar with [React Context](https://react.dev/learn/passing-data-deeply-with-context), block context adopts many of the same ideas. In fact, the client-side block editor implementation of block context is a very simple application of React Context. Block context is also supported in server-side `render_callback` implementations, demonstrated in the examples below.
 
 ## Defining block context
 
@@ -12,7 +12,7 @@ Block context is defined in the registered settings of a block. A block can prov
 
 ### Providing block context
 
-A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an object which maps a context name to one of the block's own attribute. The value corresponding to that attribute value is made available to descendent blocks and can be referenced by the same context name. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
+A block can provide a context value by assigning a `providesContext` property in its registered settings. This is an object which maps a context name to one of the block's own attributes. The value corresponding to that attribute value is made available to descendent blocks and can be referenced by the same context name. Currently, block context only supports values derived from the block's own attributes. This could be enhanced in the future to support additional sources of context values.
 
 ```js
 	attributes: {
@@ -26,7 +26,7 @@ A block can provide a context value by assigning a `providesContext` property in
 	},
 ```
 
-For complete example, refer to the section below.
+For a complete example, refer to the section below.
 
 #### Include a namespace
 
@@ -76,14 +76,14 @@ register_block_type( 'my-plugin/record-title', array(
 
 ## Example
 
-1. Create `record` block.
+1. Create a `record` block.
 
 ```
 npm init @wordpress/block --namespace my-plugin record
 cd record
 ```
 
-2. Edit `src/index.js`. Insert `recordId` attribute and `providesContext` property in `registerBlockType` function and add registration of `record-title` block at the bottom.
+2. Edit `src/index.js`. Insert the `recordId` attribute and `providesContext` property in the `registerBlockType` function and add the registration of the `record-title` block at the bottom:
 
 ```js
 registerBlockType( 'my-plugin/record', {
@@ -126,7 +126,7 @@ registerBlockType( 'my-plugin/record-title', {
 } );
 ```
 
-3. Edit `src/edit.js` for the `record` block. Replace `Edit` function by following code.
+3. Edit `src/edit.js` for the `record` block. Replace the `Edit` function with the following code:
 
 ```js
 import { TextControl } from '@wordpress/components';
@@ -153,7 +153,7 @@ export default function Edit( props ) {
 }
 ```
 
-4. Edit `src/save.js` for the `record` block. Replace `save` function by following code.
+4. Edit `src/save.js` for the `record` block. Replace the `save` function with the following code:
 
 ```js
 export default function save( props ) {
@@ -161,6 +161,6 @@ export default function save( props ) {
 }
 ```
 
-5. Create new post and add the `record` block. If you type a number in the text box, you'll see the same number is shown in the `record-title` block below it.
+5. Create a new post and add the `record` block. If you type a number in the text box, you'll see the same number is shown in the `record-title` block below it.
 
 ![Block Context Example](https://user-images.githubusercontent.com/8876600/93000215-c8570380-f561-11ea-9bd0-0b2bd0ca1752.png)

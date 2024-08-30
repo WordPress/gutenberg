@@ -23,7 +23,6 @@ const noop = () => {};
 
 export default function FocalPointPickerControls( {
 	__nextHasNoMarginBottom,
-	__next40pxDefaultSize,
 	hasHelpText,
 	onChange = noop,
 	point = {
@@ -38,7 +37,9 @@ export default function FocalPointPickerControls( {
 		value: Parameters< UnitControlOnChangeCallback >[ 0 ],
 		axis: FocalPointAxis
 	) => {
-		if ( value === undefined ) return;
+		if ( value === undefined ) {
+			return;
+		}
 
 		const num = parseInt( value, 10 );
 
@@ -55,7 +56,6 @@ export default function FocalPointPickerControls( {
 			gap={ 4 }
 		>
 			<FocalPointUnitControl
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 				label={ __( 'Left' ) }
 				aria-label={ __( 'Focal point left position' ) }
 				value={ [ valueX, '%' ].join( '' ) }
@@ -69,7 +69,6 @@ export default function FocalPointPickerControls( {
 				dragDirection="e"
 			/>
 			<FocalPointUnitControl
-				__next40pxDefaultSize={ __next40pxDefaultSize }
 				label={ __( 'Top' ) }
 				aria-label={ __( 'Focal point top position' ) }
 				value={ [ valueY, '%' ].join( '' ) }
@@ -89,6 +88,7 @@ export default function FocalPointPickerControls( {
 function FocalPointUnitControl( props: UnitControlProps ) {
 	return (
 		<StyledUnitControl
+			__next40pxDefaultSize
 			className="focal-point-picker__controls-position-unit-control"
 			labelPosition="top"
 			max={ TEXTCONTROL_MAX }

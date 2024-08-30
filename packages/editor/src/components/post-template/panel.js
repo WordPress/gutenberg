@@ -13,6 +13,11 @@ import ClassicThemeControl from './classic-theme';
 import BlockThemeControl from './block-theme';
 import PostPanelRow from '../post-panel-row';
 
+/**
+ * Displays the template controls based on the current editor settings and user permissions.
+ *
+ * @return {JSX.Element|null} The rendered PostTemplatePanel component.
+ */
 export default function PostTemplatePanel() {
 	const { templateId, isBlockTheme } = useSelect( ( select ) => {
 		const { getCurrentTemplateId, getEditorSettings } =
@@ -43,11 +48,23 @@ export default function PostTemplatePanel() {
 		}
 
 		const canCreateTemplates =
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false;
 		return canCreateTemplates;
 	}, [] );
 
-	if ( ! isBlockTheme && isVisible ) {
+	const canViewTemplates = useSelect( ( select ) => {
+		return (
+			select( coreStore ).canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false
+		);
+	}, [] );
+
+	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
 		return (
 			<PostPanelRow label={ __( 'Template' ) }>
 				<ClassicThemeControl />

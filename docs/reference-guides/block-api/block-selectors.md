@@ -1,11 +1,5 @@
 # Selectors
 
-<div class="callout callout-alert">
-	This API was stabilized in Gutenberg 15.5 and is planned for core release
-	in WordPress 6.3. To use this prior to WordPress 6.3, you will need to
-	install and activate Gutenberg >= 15.5.
-</div>
-
 Block Selectors is the API that allows blocks to customize the CSS selector used
 when their styles are generated.
 

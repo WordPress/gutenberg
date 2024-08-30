@@ -10,7 +10,7 @@ In WordPress lingo, a _format_ is a [HTML tag with text-level semantics](https:/
 
 ## Before you start
 
-This guide assumes you are already familiar with WordPress plugins and loading JavaScript with them, see the [Plugin Handbook](https://developer.wordpress.org/plugins/) or [JavaScript Tutorial](/docs/how-to-guides/javascript/README.md) to brush up.
+This guide assumes you are already familiar with WordPress plugins and loading JavaScript with them, see the [Plugin Handbook](https://developer.wordpress.org/plugins/) or [JavaScript Tutorial](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) to brush up.
 
 You will need:
 

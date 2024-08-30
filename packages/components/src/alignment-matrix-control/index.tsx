@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,8 +13,9 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
-import { Root, Row } from './styles/alignment-matrix-control-styles';
+import { Composite } from '../composite';
+import { useCompositeStore } from '../composite/store';
+import { GridContainer, GridRow } from './styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
@@ -61,23 +62,20 @@ export function AlignmentMatrixControl( {
 		activeId: getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
 			const nextValue = getItemValue( baseId, nextActiveId );
-			if ( nextValue ) onChange?.( nextValue );
+			if ( nextValue ) {
+				onChange?.( nextValue );
+			}
 		},
 		rtl: isRTL(),
 	} );
 
-	const activeId = compositeStore.useState( 'activeId' );
-
-	const classes = classnames(
-		'component-alignment-matrix-control',
-		className
-	);
+	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite
 			store={ compositeStore }
 			render={
-				<Root
+				<GridContainer
 					{ ...props }
 					aria-label={ label }
 					className={ classes }
@@ -88,21 +86,15 @@ export function AlignmentMatrixControl( {
 			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<CompositeRow render={ <Row role="row" /> } key={ index }>
-					{ cells.map( ( cell ) => {
-						const cellId = getItemId( baseId, cell );
-						const isActive = cellId === activeId;
-
-						return (
-							<Cell
-								id={ cellId }
-								isActive={ isActive }
-								key={ cell }
-								value={ cell }
-							/>
-						);
-					} ) }
-				</CompositeRow>
+				<Composite.Row render={ <GridRow role="row" /> } key={ index }>
+					{ cells.map( ( cell ) => (
+						<Cell
+							id={ getItemId( baseId, cell ) }
+							key={ cell }
+							value={ cell }
+						/>
+					) ) }
+				</Composite.Row>
 			) ) }
 		</Composite>
 	);

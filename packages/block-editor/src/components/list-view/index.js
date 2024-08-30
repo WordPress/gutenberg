@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -28,16 +33,22 @@ import { __ } from '@wordpress/i18n';
  */
 import ListViewBranch from './branch';
 import { ListViewContext } from './context';
-import ListViewDropIndicator from './drop-indicator';
+import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
+import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
+import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { focusListItem } from './utils';
+import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
+	if ( action.type === 'clear' ) {
+		return {};
+	}
 	if ( Array.isArray( action.clientIds ) ) {
 		return {
 			...state,
@@ -53,7 +64,7 @@ const expanded = ( state, action ) => {
 	return state;
 };
 
-export const BLOCK_LIST_ITEM_HEIGHT = 36;
+export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
 /** @typedef {import('react').ComponentType} ComponentType */
 /** @typedef {import('react').Ref<HTMLElement>} Ref */
@@ -105,6 +116,7 @@ function ListViewComponent(
 	const instanceId = useInstanceId( ListViewComponent );
 	const { clientIdsTree, draggedClientIds, selectedClientIds } =
 		useListViewClientIds( { blocks, rootClientId } );
+	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
 	const { getBlock } = useSelect( blockEditorStore );
 	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
@@ -130,12 +142,6 @@ function ListViewComponent(
 
 	const [ expandedState, setExpandedState ] = useReducer( expanded, {} );
 
-	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
-		dropZoneElement,
-	} );
-	const elementRef = useRef();
-	const treeGridRef = useMergeRefs( [ elementRef, dropZoneRef, ref ] );
-
 	const [ insertedBlock, setInsertedBlock ] = useState( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
@@ -157,11 +163,31 @@ function ListViewComponent(
 		},
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
 	);
+
+	const { ref: dropZoneRef, target: blockDropTarget } = useListViewDropZone( {
+		dropZoneElement,
+		expandedState,
+		setExpandedState,
+	} );
+	const elementRef = useRef();
+
+	// Allow handling of copy, cut, and paste events.
+	const clipBoardRef = useClipboardHandler( {
+		selectBlock: selectEditorBlock,
+	} );
+
+	const treeGridRef = useMergeRefs( [
+		clipBoardRef,
+		elementRef,
+		dropZoneRef,
+		ref,
+	] );
+
 	useEffect( () => {
 		// If a blocks are already selected when the list view is initially
 		// mounted, shift focus to the first selected block.
 		if ( selectedClientIds?.length ) {
-			focusListItem( selectedClientIds[ 0 ], elementRef );
+			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
 		}
 		// Disable reason: Only focus on the selected item when the list view is mounted.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,7 +198,10 @@ function ListViewComponent(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			const clientIds = Array.isArray( clientId )
+				? clientId
+				: [ clientId ];
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
@@ -185,6 +214,9 @@ function ListViewComponent(
 		},
 		[ setExpandedState ]
 	);
+	const collapseAll = useCallback( () => {
+		setExpandedState( { type: 'clear' } );
+	}, [ setExpandedState ] );
 	const expandRow = useCallback(
 		( row ) => {
 			expand( row?.dataset?.block );
@@ -210,12 +242,62 @@ function ListViewComponent(
 		[ updateBlockSelection ]
 	);
 
+	useListViewCollapseItems( {
+		collapseAll,
+		expand,
+	} );
+
+	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
+
+	// Convert a blockDropTarget into indexes relative to the blocks in the list view.
+	// These values are used to determine which blocks should be displaced to make room
+	// for the drop indicator. See `ListViewBranch` and `getDragDisplacementValues`.
+	const { blockDropTargetIndex, blockDropPosition, firstDraggedBlockIndex } =
+		useMemo( () => {
+			let _blockDropTargetIndex, _firstDraggedBlockIndex;
+
+			if ( blockDropTarget?.clientId ) {
+				const foundBlockIndex =
+					blockIndexes[ blockDropTarget.clientId ];
+				// If dragging below or inside the block, treat the drop target as the next block.
+				_blockDropTargetIndex =
+					foundBlockIndex === undefined ||
+					blockDropTarget?.dropPosition === 'top'
+						? foundBlockIndex
+						: foundBlockIndex + 1;
+			} else if ( blockDropTarget === null ) {
+				// A `null` value is used to indicate that the user is dragging outside of the list view.
+				_blockDropTargetIndex = null;
+			}
+
+			if ( firstDraggedBlockClientId ) {
+				const foundBlockIndex =
+					blockIndexes[ firstDraggedBlockClientId ];
+				_firstDraggedBlockIndex =
+					foundBlockIndex === undefined ||
+					blockDropTarget?.dropPosition === 'top'
+						? foundBlockIndex
+						: foundBlockIndex + 1;
+			}
+
+			return {
+				blockDropTargetIndex: _blockDropTargetIndex,
+				blockDropPosition: blockDropTarget?.dropPosition,
+				firstDraggedBlockIndex: _firstDraggedBlockIndex,
+			};
+		}, [ blockDropTarget, blockIndexes, firstDraggedBlockClientId ] );
+
 	const contextValue = useMemo(
 		() => ( {
+			blockDropPosition,
+			blockDropTargetIndex,
+			blockIndexes,
 			draggedClientIds,
 			expandedState,
 			expand,
+			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
@@ -225,10 +307,15 @@ function ListViewComponent(
 			rootClientId,
 		} ),
 		[
+			blockDropPosition,
+			blockDropTargetIndex,
+			blockIndexes,
 			draggedClientIds,
 			expandedState,
 			expand,
+			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
@@ -266,8 +353,9 @@ function ListViewComponent(
 		description && `block-editor-list-view-description-${ instanceId }`;
 
 	return (
-		<AsyncModeProvider value={ true }>
-			<ListViewDropIndicator
+		<AsyncModeProvider value>
+			<ListViewDropIndicatorPreview
+				draggedBlockClientId={ firstDraggedBlockClientId }
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>
@@ -278,7 +366,11 @@ function ListViewComponent(
 			) }
 			<TreeGrid
 				id={ id }
-				className="block-editor-list-view-tree"
+				className={ clsx( 'block-editor-list-view-tree', {
+					'is-dragging':
+						draggedClientIds?.length > 0 &&
+						blockDropTargetIndex !== undefined,
+				} ) }
 				aria-label={ __( 'Block navigation structure' ) }
 				ref={ treeGridRef }
 				onCollapseRow={ collapseRow }
@@ -286,6 +378,15 @@ function ListViewComponent(
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
 				aria-describedby={ describedById }
+				style={ {
+					'--wp-admin--list-view-dragged-items-height':
+						draggedClientIds?.length
+							? `${
+									BLOCK_LIST_ITEM_HEIGHT *
+									( draggedClientIds.length - 1 )
+							  }px`
+							: null,
+				} }
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewBranch

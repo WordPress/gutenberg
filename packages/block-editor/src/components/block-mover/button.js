@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -65,6 +65,7 @@ const BlockMoverButton = forwardRef(
 			? clientIds
 			: [ clientIds ];
 		const blocksCount = normalizedClientIds.length;
+		const { disabled } = props;
 
 		const {
 			blockType,
@@ -98,7 +99,9 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
+					isDisabled:
+						disabled ||
+						( direction === 'up' ? isFirstBlock : isLastBlock ),
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
@@ -126,8 +129,10 @@ const BlockMoverButton = forwardRef(
 		return (
 			<>
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					ref={ ref }
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
@@ -140,7 +145,7 @@ const BlockMoverButton = forwardRef(
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(

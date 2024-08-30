@@ -24,6 +24,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
+import { BlockControls, JustifyContentControl } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
@@ -74,6 +75,8 @@ export default {
 						<div className="block-editor-hooks__layout-controls">
 							<div className="block-editor-hooks__layout-controls-unit">
 								<UnitControl
+									// TODO: Switch to `true` (40px size) if possible (https://github.com/WordPress/gutenberg/pull/64520#discussion_r1717314262)
+									__next40pxDefaultSize={ false }
 									className="block-editor-hooks__layout-controls-unit-input"
 									label={ __( 'Content' ) }
 									labelPosition="top"
@@ -95,6 +98,8 @@ export default {
 							</div>
 							<div className="block-editor-hooks__layout-controls-unit">
 								<UnitControl
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									className="block-editor-hooks__layout-controls-unit-input"
 									label={ __( 'Wide' ) }
 									labelPosition="top"
@@ -124,6 +129,7 @@ export default {
 				) }
 				{ allowJustification && (
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Justification' ) }
 						value={ justifyContent }
@@ -146,8 +152,24 @@ export default {
 			</>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
-		return null;
+	toolBarControls: function DefaultLayoutToolbarControls( {
+		layout = {},
+		onChange,
+		layoutBlockSupport,
+	} ) {
+		const { allowJustification = true } = layoutBlockSupport;
+
+		if ( ! allowJustification ) {
+			return null;
+		}
+		return (
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DefaultLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</BlockControls>
+		);
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -217,15 +239,23 @@ export default {
 			const paddingValues = getCSSRules( style );
 			paddingValues.forEach( ( rule ) => {
 				if ( rule.key === 'paddingRight' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingRightValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-right: calc(${ rule.value } * -1);
+						margin-right: calc(${ paddingRightValue } * -1);
 					}
 					`;
 				} else if ( rule.key === 'paddingLeft' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingLeftValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-left: calc(${ rule.value } * -1);
+						margin-left: calc(${ paddingLeftValue } * -1);
 					}
 					`;
 				}
@@ -278,3 +308,27 @@ export default {
 		return alignments;
 	},
 };
+
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
+function DefaultLayoutJustifyContentControl( { layout, onChange } ) {
+	const { justifyContent = 'center' } = layout;
+	const onJustificationChange = ( value ) => {
+		onChange( {
+			...layout,
+			justifyContent: value,
+		} );
+	};
+	const allowedControls = [ 'left', 'center', 'right' ];
+
+	return (
+		<JustifyContentControl
+			allowedControls={ allowedControls }
+			value={ justifyContent }
+			onChange={ onJustificationChange }
+			popoverProps={ POPOVER_PROPS }
+		/>
+	);
+}

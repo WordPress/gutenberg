@@ -1,14 +1,18 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	humanTimeDiff,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -24,7 +28,7 @@ import {
 	ToggleControl,
 	PanelBody,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
@@ -35,7 +39,7 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),
@@ -82,7 +86,9 @@ export default function PostDateEdit( {
 
 	let postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
-			{ dateI18n( format || siteFormat, date ) }
+			{ format === 'human-diff'
+				? humanTimeDiff( date )
+				: dateI18n( format || siteFormat, date ) }
 		</time>
 	) : (
 		dateLabel
@@ -108,40 +114,49 @@ export default function PostDateEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				{ date && ! isDescendentOfQueryLoop && (
-					<ToolbarGroup>
-						<Dropdown
-							popoverProps={ popoverProps }
-							renderContent={ ( { onClose } ) => (
-								<PublishDateTimePicker
-									currentDate={ date }
-									onChange={ setDate }
-									is12Hour={ is12HourFormat(
-										siteTimeFormat
-									) }
-									onClose={ onClose }
-								/>
-							) }
-							renderToggle={ ( { isOpen, onToggle } ) => {
-								const openOnArrowDown = ( event ) => {
-									if ( ! isOpen && event.keyCode === DOWN ) {
-										event.preventDefault();
-										onToggle();
-									}
-								};
-								return (
-									<ToolbarButton
-										aria-expanded={ isOpen }
-										icon={ edit }
-										title={ __( 'Change Date' ) }
-										onClick={ onToggle }
-										onKeyDown={ openOnArrowDown }
+				{ date &&
+					displayType === 'date' &&
+					! isDescendentOfQueryLoop && (
+						<ToolbarGroup>
+							<Dropdown
+								popoverProps={ popoverProps }
+								renderContent={ ( { onClose } ) => (
+									<PublishDateTimePicker
+										currentDate={ date }
+										onChange={ setDate }
+										is12Hour={ is12HourFormat(
+											siteTimeFormat
+										) }
+										onClose={ onClose }
+										dateOrder={
+											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+											_x( 'dmy', 'date order' )
+										}
 									/>
-								);
-							} }
-						/>
-					</ToolbarGroup>
-				) }
+								) }
+								renderToggle={ ( { isOpen, onToggle } ) => {
+									const openOnArrowDown = ( event ) => {
+										if (
+											! isOpen &&
+											event.keyCode === DOWN
+										) {
+											event.preventDefault();
+											onToggle();
+										}
+									};
+									return (
+										<ToolbarButton
+											aria-expanded={ isOpen }
+											icon={ edit }
+											title={ __( 'Change Date' ) }
+											onClick={ onToggle }
+											onKeyDown={ openOnArrowDown }
+										/>
+									);
+								} }
+							/>
+						</ToolbarGroup>
+					) }
 			</BlockControls>
 
 			<InspectorControls>

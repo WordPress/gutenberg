@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -180,10 +180,10 @@ function LinkControl( {
 	// Therefore a local state is used as a fallback.
 	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
 
-	const isMounting = useRef( true );
+	const isMountingRef = useRef( true );
 	const wrapperNode = useRef();
 	const textInputRef = useRef();
-	const isEndingEditWithFocus = useRef( false );
+	const isEndingEditWithFocusRef = useRef( false );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
@@ -219,8 +219,7 @@ function LinkControl( {
 		// We don't auto focus into the Link UI on mount
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
-		if ( isMounting.current ) {
-			isMounting.current = false;
+		if ( isMountingRef.current ) {
 			return;
 		}
 
@@ -235,8 +234,18 @@ function LinkControl( {
 
 		nextFocusTarget.focus();
 
-		isEndingEditWithFocus.current = false;
+		isEndingEditWithFocusRef.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
+
+	// The component mounting reference is maintained separately
+	// to correctly reset values in `StrictMode`.
+	useEffect( () => {
+		isMountingRef.current = false;
+
+		return () => {
+			isMountingRef.current = true;
+		};
+	}, [] );
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
@@ -245,7 +254,7 @@ function LinkControl( {
 	 * the next render, if focus was within the wrapper when editing finished.
 	 */
 	const stopEditing = () => {
-		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
+		isEndingEditWithFocusRef.current = !! wrapperNode.current?.contains(
 			wrapperNode.current.ownerDocument.activeElement
 		);
 
@@ -359,7 +368,7 @@ function LinkControl( {
 			{ isEditing && (
 				<>
 					<div
-						className={ classnames( {
+						className={ clsx( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
 							'has-actions': showActions,
@@ -399,6 +408,8 @@ function LinkControl( {
 						{ ! showActions && (
 							<div className="block-editor-link-control__search-enter">
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									onClick={ isDisabled ? noop : handleSubmit }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
@@ -427,25 +438,6 @@ function LinkControl( {
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
-					additionalControls={ () => {
-						// Expose the "Opens in new tab" settings in the preview
-						// as it is the most common setting to change.
-						if (
-							settings?.find(
-								( setting ) => setting.id === 'opensInNewTab'
-							)
-						) {
-							return (
-								<LinkSettings
-									value={ internalControlValue }
-									settings={ settings?.filter(
-										( { id } ) => id === 'opensInNewTab'
-									) }
-									onChange={ onChange }
-								/>
-							);
-						}
-					} }
 					onRemove={ () => {
 						onRemove();
 						setIsEditingLink( true );
@@ -477,10 +469,17 @@ function LinkControl( {
 					justify="right"
 					className="block-editor-link-control__search-actions"
 				>
-					<Button variant="tertiary" onClick={ handleCancel }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="tertiary"
+						onClick={ handleCancel }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
 						className="block-editor-link-control__search-submit"
@@ -491,7 +490,7 @@ function LinkControl( {
 				</HStack>
 			) }
 
-			{ renderControlBottom && renderControlBottom() }
+			{ ! isCreatingPage && renderControlBottom && renderControlBottom() }
 		</div>
 	);
 }

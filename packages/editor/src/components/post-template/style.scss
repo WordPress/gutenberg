@@ -20,14 +20,6 @@
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
 	}
-
-	.block-editor-block-patterns-list__item {
-		// Avoid to override the BlockPatternList component
-		// default hover and focus styles.
-		&:not(:focus):not(:hover) .block-editor-block-preview__container {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
-	}
 }
 
 .editor-post-template__dropdown {

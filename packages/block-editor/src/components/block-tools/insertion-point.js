@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,8 @@ export const InsertionPointOpenRef = createContext();
 function InbetweenInsertionPointPopover( {
 	__unstablePopoverSlot,
 	__unstableContentRef,
+	operation = 'insert',
+	nearestSide = 'right',
 } ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
@@ -36,6 +38,7 @@ function InbetweenInsertionPointPopover( {
 		isInserterShown,
 		isDistractionFree,
 		isNavigationMode,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -46,6 +49,7 @@ function InbetweenInsertionPointPopover( {
 			getNextBlockClientId,
 			getSettings,
 			isNavigationMode: _isNavigationMode,
+			__unstableGetEditorMode,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
@@ -77,13 +81,19 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
+	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
+		if (
+			event.target === ref.current &&
+			nextClientId &&
+			getBlockEditingMode( nextClientId ) !== 'disabled'
+		) {
 			selectBlock( nextClientId, -1 );
 		}
 	}
@@ -138,9 +148,22 @@ function InbetweenInsertionPointPopover( {
 		return null;
 	}
 
-	const className = classnames(
+	// Zoom out mode should only show the insertion point for the insert operation.
+	// Other operations such as "group" are when the editor tries to create a row
+	// block by grouping the block being dragged with the block it's being dropped
+	// onto.
+	if ( isZoomOutMode && operation !== 'insert' ) {
+		return null;
+	}
+
+	const orientationClassname =
+		orientation === 'horizontal' || operation === 'group'
+			? 'is-horizontal'
+			: 'is-vertical';
+
+	const className = clsx(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation
+		orientationClassname
 	);
 
 	return (
@@ -149,6 +172,8 @@ function InbetweenInsertionPointPopover( {
 			nextClientId={ nextClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
 			__unstableContentRef={ __unstableContentRef }
+			operation={ operation }
+			nearestSide={ nearestSide }
 		>
 			<motion.div
 				layout={ ! disableMotion }
@@ -161,7 +186,7 @@ function InbetweenInsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ classnames( className, {
+				className={ clsx( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
 				onHoverEnd={ maybeHideInserterPoint }
@@ -174,7 +199,7 @@ function InbetweenInsertionPointPopover( {
 				{ isInserterShown && (
 					<motion.div
 						variants={ inserterVariants }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
 					>
@@ -236,6 +261,10 @@ export default function InsertionPoint( props ) {
 			{ ...props }
 		/>
 	) : (
-		<InbetweenInsertionPointPopover { ...props } />
+		<InbetweenInsertionPointPopover
+			operation={ insertionPoint.operation }
+			nearestSide={ insertionPoint.nearestSide }
+			{ ...props }
+		/>
 	);
 }

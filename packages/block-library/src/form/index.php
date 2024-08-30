@@ -92,11 +92,11 @@ function block_core_form_send_email() {
 	// Start building the email content.
 	$content = sprintf(
 		/* translators: %s: The request URI. */
-		__( 'Form submission from %1$s', 'gutenberg' ) . '</br>',
+		__( 'Form submission from %1$s' ) . '</br>',
 		'<a href="' . esc_url( get_site_url( null, $params['_wp_http_referer'] ) ) . '">' . get_bloginfo( 'name' ) . '</a>'
 	);
 
-	$skip_fields = array( 'formAction', '_ajax_nonce', 'action' );
+	$skip_fields = array( 'formAction', '_ajax_nonce', 'action', '_wp_http_referer' );
 	foreach ( $params as $key => $value ) {
 		if ( in_array( $key, $skip_fields, true ) ) {
 			continue;
@@ -109,8 +109,8 @@ function block_core_form_send_email() {
 
 	// Send the email.
 	$result = wp_mail(
-		str_replace( 'mailto:', '', $params['wp-email-address'] ),
-		__( 'Form submission', 'gutenberg' ),
+		str_replace( 'mailto:', '', $params['formAction'] ),
+		__( 'Form submission' ),
 		$content
 	);
 

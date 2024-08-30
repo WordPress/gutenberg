@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,6 +48,7 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onReset,
 	onToggleFeaturedImage,
 	useFeaturedImage,
 	onFilesUpload = noop,
@@ -75,7 +76,7 @@ const MediaReplaceFlow = ( {
 		}
 		// We need to set a timeout for showing the notice
 		// so that VoiceOver and possibly other screen readers
-		// can announce the error afer the toolbar button
+		// can announce the error after the toolbar button
 		// regains focus once the upload dialog closes.
 		// Otherwise VO simply skips over the notice and announces
 		// the focused element and the open menu.
@@ -202,12 +203,24 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
-						{ children }
+						{ mediaURL && onReset && (
+							<MenuItem
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+							>
+								{ __( 'Reset' ) }
+							</MenuItem>
+						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form
-							className={ classnames(
+							className={ clsx(
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':

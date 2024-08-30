@@ -1,7 +1,7 @@
 .block-editor-block-switcher {
 	position: relative;
 
-	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
 	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {
@@ -35,10 +35,6 @@
 	}
 }
 
-.show-icon-labels .block-editor-block-toolbar .block-editor-block-switcher .components-button.has-icon::after {
-	font-size: 14px;
-}
-
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	display: flex;
 
@@ -50,12 +46,11 @@
 }
 
 // Even when the block switcher does not have any transformations, it still serves as a block indicator.
-.components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	opacity: 1;
+.components-button.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] {
+	color: $gray-900;
 
 	// Since it's not clickable, though, don't show a hover state.
-	&,
-	.block-editor-block-icon.has-colors {
+	&:hover {
 		color: $gray-900;
 	}
 }
@@ -88,26 +83,17 @@
 	min-width: 300px;
 }
 
-.block-editor-block-switcher__popover__preview__parent {
-	.block-editor-block-switcher__popover__preview__container {
-		position: absolute;
-		top: -$grid-unit-15;
-		left: calc(100% + #{$grid-unit-20});
-	}
+.block-editor-block-switcher__popover-preview-container {
+	left: 0;
+	position: absolute;
+	top: -$border-width;
+	width: 100%;
+	bottom: 0;
+	pointer-events: none;
 }
 
-.block-editor-block-switcher__preview__popover {
-	display: none;
+.block-editor-block-switcher__popover-preview {
 	overflow: hidden;
-
-	// Position correctly. Needs specificity.
-	&.components-popover {
-		margin-top: $grid-unit-15 - $border-width;
-	}
-
-	@include break-medium() {
-		display: block;
-	}
 
 	.components-popover__content {
 		width: 300px;
@@ -200,4 +186,15 @@
 			}
 		}
 	}
+}
+
+.block-editor-block-switcher__no-transforms {
+	color: $gray-700;
+	padding: 6px $grid-unit;
+	margin: 0;
+}
+
+.block-editor-block-switcher__binding-indicator {
+	display: block;
+	padding: $grid-unit;
 }

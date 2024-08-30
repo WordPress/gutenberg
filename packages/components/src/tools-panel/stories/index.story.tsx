@@ -71,7 +71,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<UnitControl
 							label="Width"
@@ -83,7 +83,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<UnitControl
 							label="Height"
@@ -95,7 +95,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						hasValue={ () => !! minHeight }
 						label="Minimum height"
 						onDeselect={ () => setMinHeight( undefined ) }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<UnitControl
 							label="Minimum height"
@@ -163,7 +163,7 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						hasValue={ () => !! width }
 						label="Width"
 						onDeselect={ () => setWidth( undefined ) }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<UnitControl
 							label="Width"
@@ -175,7 +175,7 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
 						hasValue={ () => !! height }
 						label="Height"
 						onDeselect={ () => setHeight( undefined ) }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<UnitControl
 							label="Height"
@@ -367,7 +367,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
 					label="Item for alternate panel"
 					onDeselect={ () => undefined }
 					resetAllFilter={ () => undefined }
-					panelId={ 'intended-for-another-panel-via-shared-slot' }
+					panelId="intended-for-another-panel-via-shared-slot"
 				>
 					<p>
 						This panel item will not be displayed in the demo as its
@@ -437,7 +437,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					onDeselect={ () => updateAttribute( 'height', undefined ) }
 					resetAllFilter={ () => ( { height: undefined } ) }
 					panelId={ panelId }
-					isShownByDefault={ true }
+					isShownByDefault
 				>
 					<UnitControl
 						label="Injected Height"
@@ -536,7 +536,7 @@ export const WithConditionallyRenderedControl: StoryFn<
 					} }
 					resetAllFilter={ () => ( { height: undefined } ) }
 					panelId={ panelId }
-					isShownByDefault={ true }
+					isShownByDefault
 				>
 					<UnitControl
 						label="Injected Height"
@@ -555,7 +555,7 @@ export const WithConditionallyRenderedControl: StoryFn<
 						}
 						resetAllFilter={ () => ( { scale: undefined } ) }
 						panelId={ panelId }
-						isShownByDefault={ true }
+						isShownByDefault
 					>
 						<ToggleGroupControl
 							__nextHasNoMarginBottom

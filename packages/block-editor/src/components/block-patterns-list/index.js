@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, forwardRef } from '@wordpress/element';
+import { cloneBlock } from '@wordpress/blocks';
+import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
 	VisuallyHidden,
 	Tooltip,
@@ -24,7 +25,7 @@ import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
-import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const {
 	CompositeV2: Composite,
@@ -45,17 +46,40 @@ function BlockPattern( {
 	pattern,
 	onClick,
 	onHover,
+	showTitle = true,
 	showTooltip,
+	category,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const { blocks, viewportWidth } = pattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 
+	// When we have a selected category and the pattern is draggable, we need to update the
+	// pattern's categories in metadata to only contain the selected category, and pass this to
+	// InserterDraggableBlocks component. We do that because we use this information for pattern
+	// shuffling and it makes more sense to show only the ones from the initially selected category during insertion.
+	const patternBlocks = useMemo( () => {
+		if ( ! category || ! isDraggable ) {
+			return blocks;
+		}
+		return ( blocks ?? [] ).map( ( block ) => {
+			const clonedBlock = cloneBlock( block );
+			if (
+				clonedBlock.attributes.metadata?.categories?.includes(
+					category
+				)
+			) {
+				clonedBlock.attributes.metadata.categories = [ category ];
+			}
+			return clonedBlock;
+		} );
+	}, [ blocks, isDraggable, category ] );
+
 	return (
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
-			blocks={ blocks }
+			blocks={ patternBlocks }
 			pattern={ pattern }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
@@ -78,7 +102,8 @@ function BlockPattern( {
 				>
 					<WithToolTip
 						showTooltip={
-							showTooltip && ! pattern.type !== PATTERN_TYPES.user
+							showTooltip &&
+							! pattern.type !== INSERTER_PATTERN_TYPES.user
 						}
 						title={ pattern.title }
 					>
@@ -92,12 +117,12 @@ function BlockPattern( {
 											? descriptionId
 											: undefined
 									}
-									className={ classnames(
+									className={ clsx(
 										'block-editor-block-patterns-list__item',
 										{
 											'block-editor-block-patterns-list__list-item-synced':
 												pattern.type ===
-													PATTERN_TYPES.user &&
+													INSERTER_PATTERN_TYPES.user &&
 												! pattern.syncStatus,
 										}
 									) }
@@ -121,23 +146,30 @@ function BlockPattern( {
 								viewportWidth={ viewportWidth }
 							/>
 
-							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.type === PATTERN_TYPES.user &&
-									! pattern.syncStatus && (
-										<div className="block-editor-patterns__pattern-icon-wrapper">
-											<Icon
-												className="block-editor-patterns__pattern-icon"
-												icon={ symbol }
-											/>
+							{ showTitle && (
+								<HStack
+									className="block-editor-patterns__pattern-details"
+									spacing={ 2 }
+								>
+									{ pattern.type ===
+										INSERTER_PATTERN_TYPES.user &&
+										! pattern.syncStatus && (
+											<div className="block-editor-patterns__pattern-icon-wrapper">
+												<Icon
+													className="block-editor-patterns__pattern-icon"
+													icon={ symbol }
+												/>
+											</div>
+										) }
+									{ ( ! showTooltip ||
+										pattern.type ===
+											INSERTER_PATTERN_TYPES.user ) && (
+										<div className="block-editor-block-patterns-list__item-title">
+											{ pattern.title }
 										</div>
 									) }
-								{ ( ! showTooltip ||
-									pattern.type === PATTERN_TYPES.user ) && (
-									<div className="block-editor-block-patterns-list__item-title">
-										{ pattern.title }
-									</div>
-								) }
-							</HStack>
+								</HStack>
+							) }
 
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
@@ -167,6 +199,8 @@ function BlockPatternsList(
 		onClickPattern,
 		orientation,
 		label = __( 'Block patterns' ),
+		category,
+		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
 	},
@@ -200,7 +234,9 @@ function BlockPatternsList(
 						onClick={ onClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
+						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
+						category={ category }
 					/>
 				) : (
 					<BlockPatternPlaceholder key={ pattern.name } />

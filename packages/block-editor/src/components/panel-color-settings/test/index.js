@@ -16,7 +16,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',
@@ -39,7 +39,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',
@@ -63,7 +63,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',

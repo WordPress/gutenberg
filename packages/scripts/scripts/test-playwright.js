@@ -12,7 +12,6 @@ process.on( 'unhandledRejection', ( err ) => {
 /**
  * External dependencies
  */
-const path = require( 'path' );
 const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 
@@ -28,20 +27,9 @@ const {
 } = require( '../utils' );
 
 if ( ! getAsBooleanFromENV( 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD' ) ) {
-	const result = spawn(
-		'node',
-		[
-			path.resolve(
-				require.resolve( 'playwright-core' ),
-				'..',
-				'cli.js'
-			),
-			'install',
-		],
-		{
-			stdio: 'inherit',
-		}
-	);
+	const result = spawn( 'npx', [ 'playwright', 'install' ], {
+		stdio: 'inherit',
+	} );
 
 	if ( result.status > 0 ) {
 		process.exit( result.status );

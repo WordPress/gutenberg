@@ -1,5 +1,4 @@
 $block-editor-link-control-number-of-actions: 1;
-$preview-image-height: 140px;
 
 @keyframes loadingpulse {
 	0% {
@@ -35,6 +34,21 @@ $preview-image-height: 140px;
 				content: attr(aria-label);
 			}
 		}
+
+		.block-editor-link-control__search-item-top {
+			gap: $grid-unit-05;
+			flex-wrap: wrap;
+
+			.components-button.has-icon {
+				width: auto;
+				padding: $grid-unit-05;
+			}
+		}
+
+		.is-preview .block-editor-link-control__search-item-header {
+			min-width: 100%;
+			margin-right: 0;
+		}
 	}
 }
 
@@ -51,13 +65,6 @@ $preview-image-height: 140px;
 	position: relative;
 }
 
-// If the input doesn't have a visible label then
-// we need to expand the input itself to occupy
-// the full available horizontal space.
-.block-editor-link-control__search-input.has-no-label .block-editor-url-input__input {
-	flex: 1;
-}
-
 .block-editor-link-control__field {
 	margin: $grid-unit-20; // allow margin collapse for vertical spacing.
 
@@ -70,13 +77,17 @@ $preview-image-height: 140px;
 	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
 		@include input-control;
 		display: block;
-		border: 1px solid $gray-600;
+		border: $border-width solid $gray-600;
 		border-radius: $radius-block-ui;
 		height: $button-size-next-default-40px; // components do not properly support unstable-large yet.
 		margin: 0;
 		padding: $grid-unit-10 $button-size-next-default-40px $grid-unit-10 $grid-unit-20;
 		position: relative;
 		width: 100%;
+
+		.has-actions & {
+			padding-right: $grid-unit-20;
+		}
 	}
 }
 
@@ -88,11 +99,6 @@ $preview-image-height: 140px;
 	position: absolute;
 	right: 19px; // specific to place the button properly.
 	top: 3px;
-
-	svg {
-		position: relative;
-		top: -2px; // the icon itself is not centered within the bounds; this centers it.
-	}
 }
 
 .block-editor-link-control__search-actions {
@@ -181,8 +187,9 @@ $preview-image-height: 140px;
 	.block-editor-link-control__search-item-header {
 		display: block;
 		flex-direction: row;
-		align-items: flex-start;
+		align-items: center;
 		margin-right: $grid-unit-10;
+		gap: $grid-unit-10;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -191,6 +198,9 @@ $preview-image-height: 140px;
 		overflow-wrap: break-word;
 
 		.block-editor-link-control__search-item-info {
+			color: $gray-700;
+			line-height: 1.1;
+			font-size: $helptext-font-size;
 			word-break: break-all;
 		}
 	}
@@ -209,17 +219,29 @@ $preview-image-height: 140px;
 		word-break: break-all;
 	}
 
+	.block-editor-link-control__search-item-details {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: $grid-unit-05;
+	}
+
+	.block-editor-link-control__search-item-header .block-editor-link-control__search-item-icon {
+		background-color: $gray-100;
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		border-radius: $radius-block-ui;
+	}
+
 	.block-editor-link-control__search-item-icon {
 		position: relative;
-		margin-right: $grid-unit-10;
-		max-height: 24px;
 		flex-shrink: 0;
-		width: 24px;
 		display: flex;
 		justify-content: center;
+		align-items: center;
 
 		img {
-			width: 16px; // favicons often have a source of 32px
+			width: $grid-unit-20; // favicons often have a source of 32px
 		}
 	}
 
@@ -230,10 +252,18 @@ $preview-image-height: 140px;
 	}
 
 	.block-editor-link-control__search-item-title {
-		display: block;
-		font-weight: 500;
-		position: relative;
-		line-height: $grid-unit-30;
+		border-radius: $radius-block-ui;
+		line-height: 1.1;
+
+
+		&:focus {
+			box-shadow: none;
+		}
+
+		&:focus-visible {
+			@include block-toolbar-button-style__focus();
+			text-decoration: none;
+		}
 
 		mark {
 			font-weight: 600;
@@ -245,60 +275,15 @@ $preview-image-height: 140px;
 			font-weight: normal;
 		}
 
-		svg {
-			display: none; // specifically requested to be removed visually as well.
-		}
-	}
-
-	.block-editor-link-control__search-item-description {
-		padding-top: 12px;
-		margin: 0;
-
-		&.is-placeholder {
-			margin-top: 12px;
-			padding-top: 0;
-			height: 28px;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-around;
-
-			&::before,
-			&::after {
-				display: block;
-				content: "";
-				height: 0.7em;
-				width: 100%;
-				background-color: $gray-100;
-				border-radius: 3px;
-			}
-		}
-
-		.components-text {
-			font-size: 0.9em;
-		}
-	}
-
-	.block-editor-link-control__search-item-image {
-		display: flex;
-		width: 100%;
-		background-color: $gray-100;
-		justify-content: center;
-		height: $preview-image-height; // limit height
-		max-height: $preview-image-height; // limit height
-		overflow: hidden;
-		border-radius: 2px;
-		margin-top: 12px;
-
-		&.is-placeholder {
-			background-color: $gray-100;
-			border-radius: 3px;
-		}
-
-		img {
-			display: block; // remove unwanted space below image
-			width: 100%;
-			height: 100%;
-			object-fit: contain;
+		.components-external-link__icon {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0); // specifically requested to be removed visually as well.
+			border: 0;
 		}
 	}
 }
@@ -310,24 +295,7 @@ $preview-image-height: 140px;
 	align-items: center;
 }
 
-.block-editor-link-control__search-item-bottom {
-	transition: opacity 1.5s;
-	width: 100%;
-}
-
 .block-editor-link-control__search-item.is-fetching {
-	.block-editor-link-control__search-item-description {
-		&::before,
-		&::after {
-			animation: loadingpulse 1s linear infinite;
-			animation-delay: 0.5s; // avoid animating for fast network responses
-		}
-	}
-
-	.block-editor-link-control__search-item-image {
-		animation: loadingpulse 1s linear infinite;
-		animation-delay: 0.5s; // avoid animating for fast network responses
-	}
 
 	.block-editor-link-control__search-item-icon {
 		svg,
@@ -390,13 +358,6 @@ $preview-image-height: 140px;
 	}
 }
 
-.block-editor-link-control__drawer {
-	display: flex; // allow for ordering.
-	order: 30;
-	flex-direction: column;
-	flex-basis: 100%; // occupy full width.
-}
-
 // Inner div required to avoid padding/margin
 // causing janky animation.
 .block-editor-link-control__drawer-inner {
@@ -404,11 +365,6 @@ $preview-image-height: 140px;
 	flex-direction: column;
 	flex-basis: 100%; // occupy full width.
 	position: relative;
-}
-
-.block-editor-link-control__unlink {
-	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-20;
 }
 
 .block-editor-link-control__setting {
@@ -478,9 +434,4 @@ $preview-image-height: 140px;
 .block-editor-link-control .block-editor-link-control__search-input-wrapper.has-actions .components-spinner {
 	top: calc(50% + #{$spinner-size} / 4); // Add top spacing because this input has a visual label.
 	right: $grid-unit-15;
-}
-
-.block-editor-link-control__search-item-action {
-	margin-left: auto; // push to far right hand side
-	flex-shrink: 0;
 }

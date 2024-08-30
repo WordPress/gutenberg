@@ -27,11 +27,8 @@ import {
 	useSpace,
 	useIndentListItem,
 	useOutdentListItem,
-	useSplit,
 	useMerge,
-	useCopy,
 } from './hooks';
-import { convertToListItems } from './utils';
 
 export function IndentUI( { clientId } ) {
 	const indentListItem = useIndentListItem( clientId );
@@ -56,15 +53,15 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
-				describedBy={ __( 'Outdent list item' ) }
+				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ () => outdentListItem() }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
-				describedBy={ __( 'Indent list item' ) }
-				isDisabled={ ! canIndent }
+				description={ __( 'Indent list item' ) }
+				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }
 			/>
 		</>
@@ -74,20 +71,17 @@ export function IndentUI( { clientId } ) {
 export default function ListItemEdit( {
 	attributes,
 	setAttributes,
-	onReplace,
 	clientId,
 	mergeBlocks,
 } ) {
 	const { placeholder, content } = attributes;
-	const blockProps = useBlockProps( { ref: useCopy( clientId ) } );
+	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 	} );
 	const useEnterRef = useEnter( { content, clientId } );
 	const useSpaceRef = useSpace( clientId );
-	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
 	return (
 		<>
@@ -102,18 +96,7 @@ export default function ListItemEdit( {
 					value={ content }
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
-					onSplit={ onSplit }
 					onMerge={ onMerge }
-					onReplace={
-						onReplace
-							? ( blocks, ...args ) => {
-									onReplace(
-										convertToListItems( blocks ),
-										...args
-									);
-							  }
-							: undefined
-					}
 				/>
 				{ innerBlocksProps.children }
 			</li>

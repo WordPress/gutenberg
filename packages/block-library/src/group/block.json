@@ -45,6 +45,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
@@ -87,6 +88,9 @@
 		},
 		"layout": {
 			"allowSizingOnChildren": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",

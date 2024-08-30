@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/social-link-patreon",
+		"attrs": {
+			"url": "https://example.com/"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

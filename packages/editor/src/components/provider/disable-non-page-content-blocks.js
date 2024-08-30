@@ -1,55 +1,83 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useBlockEditingMode,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useEffect, useMemo } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-function DisableBlock( { clientId } ) {
-	const isDescendentOfQueryLoop = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/query' ).length !==
-				0
-			);
-		},
-		[ clientId ]
-	);
-	const mode = isDescendentOfQueryLoop ? undefined : 'contentOnly';
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( mode ) {
-			setBlockEditingMode( clientId, mode );
-			return () => {
-				unsetBlockEditingMode( clientId );
-			};
-		}
-	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
-}
+const POST_CONTENT_BLOCK_TYPES = [
+	'core/post-title',
+	'core/post-featured-image',
+	'core/post-content',
+];
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	useBlockEditingMode( 'disabled' );
-	const clientIds = useSelect( ( select ) => {
-		const { __experimentalGetGlobalBlocksByName } =
-			select( blockEditorStore );
-		return __experimentalGetGlobalBlocksByName( PAGE_CONTENT_BLOCK_TYPES );
+	const contentOnlyBlockTypes = useMemo(
+		() => [
+			...applyFilters(
+				'editor.postContentBlockTypes',
+				POST_CONTENT_BLOCK_TYPES
+			),
+			'core/template-part',
+		],
+		[]
+	);
+
+	// Note that there are two separate subscriptions because the result for each
+	// returns a new array.
+	const contentOnlyIds = useSelect(
+		( select ) => {
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			return getPostBlocksByName( contentOnlyBlockTypes );
+		},
+		[ contentOnlyBlockTypes ]
+	);
+	const disabledIds = useSelect( ( select ) => {
+		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
+		return getBlocksByName( 'core/template-part' ).flatMap( ( clientId ) =>
+			getBlockOrder( clientId )
+		);
 	}, [] );
 
-	return clientIds.map( ( clientId ) => {
-		return <DisableBlock key={ clientId } clientId={ clientId } />;
-	} );
+	const registry = useRegistry();
+
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		registry.batch( () => {
+			setBlockEditingMode( '', 'disabled' );
+			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of disabledIds ) {
+				setBlockEditingMode( clientId, 'disabled' );
+			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				unsetBlockEditingMode( '' );
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of disabledIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
+		};
+	}, [ contentOnlyIds, disabledIds, registry ] );
+
+	return null;
 }

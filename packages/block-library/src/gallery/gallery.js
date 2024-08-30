@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ export default function Gallery( props ) {
 	return (
 		<figure
 			{ ...blockProps }
-			className={ classnames(
+			className={ clsx(
 				blockProps.className,
 				layoutClassNames,
 				'blocks-gallery-grid',

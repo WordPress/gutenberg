@@ -3,11 +3,12 @@
  */
 import {
 	act,
+	advanceAnimationByFrames,
 	fireEvent,
 	initializeEditor,
+	screen,
 	waitForStoreResolvers,
 	within,
-	advanceAnimationByFrames,
 } from 'test/helpers';
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
@@ -52,15 +53,15 @@ const DEFAULT_TOUCH_EVENTS = [
 export const initializeWithBlocksLayouts = async ( blocks ) => {
 	const initialHtml = blocks.map( ( block ) => block.html ).join( '\n' );
 
-	const screen = await initializeEditor( { initialHtml } );
-	const { getAllByLabelText } = screen;
+	await initializeEditor( { initialHtml } );
 
 	const waitPromises = [];
+	const blockListItems = screen.getAllByTestId( 'block-list-item-cell' );
+	// Check that rendered block list items match expected block count.
+	expect( blockListItems.length ).toBe( blocks.length );
+
 	blocks.forEach( ( block, index ) => {
-		const a11yLabel = new RegExp(
-			`${ block.name } Block\\. Row ${ index + 1 }`
-		);
-		const [ element ] = getAllByLabelText( a11yLabel );
+		const element = blockListItems[ index ];
 		// "onLayout" event will populate the blocks layouts data.
 		fireEvent( element, 'layout', {
 			nativeEvent: { layout: block.layout },

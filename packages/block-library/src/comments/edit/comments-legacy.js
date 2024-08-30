@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,8 @@ export default function CommentsLegacy( {
 
 	const actions = [
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			key="convert"
 			onClick={ () => void setAttributes( { legacy: false } ) }
 			variant="primary"
@@ -38,7 +40,7 @@ export default function CommentsLegacy( {
 	];
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

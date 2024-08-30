@@ -1,32 +1,38 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 
+export type CustomSelectStore = {
+	/**
+	 * The store object returned by Ariakit's `useSelectStore` hook.
+	 */
+	store: Ariakit.SelectStore;
+};
+
+type CustomSelectSize< Size = 'compact' | 'default' > = {
+	/**
+	 * The size of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: Size;
+};
+
+export type CustomSelectButtonSize = CustomSelectSize<
+	'compact' | 'default' | 'small'
+>;
+
 export type CustomSelectContext =
-	| {
-			/**
-			 * The store object returned by Ariakit's `useSelectStore` hook.
-			 */
-			store: Ariakit.SelectStore;
-	  }
+	| ( CustomSelectStore & CustomSelectButtonSize )
 	| undefined;
 
-export type CustomSelectProps = {
+export type CustomSelectButtonProps = {
 	/**
-	 * The child elements. This should be composed of CustomSelectItem components.
-	 */
-	children: React.ReactNode;
-	/**
-	 * An optional default value for the control. If left `undefined`, the first
-	 * non-disabled item will be used.
+	 * An optional default value for the control when used in uncontrolled mode.
+	 * If left `undefined`, the first non-disabled item will be used.
 	 */
 	defaultValue?: string | string[];
-	/**
-	 * Label for the control.
-	 */
-	label: string;
 	/**
 	 * A function that receives the new value of the input.
 	 */
@@ -38,16 +44,42 @@ export type CustomSelectProps = {
 		selectedValue: string | string[]
 	) => React.ReactNode;
 	/**
-	 * The size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'default' | 'small';
-	/**
-	 * Can be used to externally control the value of the control.
+	 * The value of the control when used in uncontrolled mode.
 	 */
 	value?: string | string[];
 };
+
+// Props only exposed on the internal implementation
+export type _CustomSelectInternalProps = {
+	/**
+	 * True if the consumer is emulating the legacy component behavior and look
+	 */
+	isLegacy?: boolean;
+};
+
+// Props that are exposed in exported components
+export type _CustomSelectProps = CustomSelectButtonProps & {
+	/**
+	 * Additional className added to the root wrapper element.
+	 */
+	className?: string;
+	/**
+	 * The child elements. This should be composed of `CustomSelectItem` components.
+	 */
+	children: React.ReactNode;
+	/**
+	 * Used to visually hide the label. It will always be visible to screen readers.
+	 *
+	 * @default false
+	 */
+	hideLabelFromVision?: boolean;
+	/**
+	 * Accessible label for the control.
+	 */
+	label: string;
+};
+
+export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 
 export type CustomSelectItemProps = {
 	/**
@@ -60,4 +92,11 @@ export type CustomSelectItemProps = {
 	 * used if left `undefined`.
 	 */
 	children?: React.ReactNode;
+	/**
+	 * If true, the item will be disabled.
+	 *
+	 * You will need to add your own styles (e.g. reduced opacity) to visually show that they are disabled.
+	 * @default false
+	 */
+	disabled?: boolean;
 };

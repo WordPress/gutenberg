@@ -1,14 +1,11 @@
 .editor-post-last-revision__title {
 	width: 100%;
-	font-weight: 600;
-
-	.dashicon {
-		margin-right: 5px;
-	}
+	font-weight: 500;
 }
 
-.components-button.editor-post-last-revision__title {
+.editor-post-last-revision__title.components-button.has-icon {
 	height: 100%;
+	justify-content: space-between;
 
 	&:hover,
 	&:active {
@@ -30,4 +27,8 @@
 	.editor-post-last-revision__title.components-button.components-button {
 		padding: $grid-unit-20;
 	}
+}
+
+.editor-private-post-last-revision__button {
+	display: inline-block;
 }

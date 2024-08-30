@@ -1,4 +1,5 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
 		{ "path": "bin" },
 		{ "path": "packages/a11y" },
@@ -12,6 +13,7 @@
 		{ "path": "packages/compose" },
 		{ "path": "packages/core-data" },
 		{ "path": "packages/data" },
+		{ "path": "packages/dataviews" },
 		{ "path": "packages/data-controls" },
 		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
@@ -19,6 +21,7 @@
 		{ "path": "packages/dom" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/e2e-test-utils-playwright" },
+		{ "path": "packages/editor" },
 		{ "path": "packages/element" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
@@ -28,6 +31,7 @@
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/interactivity" },
+		{ "path": "packages/interactivity-router" },
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/lazy-import" },

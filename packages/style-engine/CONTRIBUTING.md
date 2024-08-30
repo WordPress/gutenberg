@@ -4,7 +4,7 @@ This document contains information you might need to know when extending or debu
 
 ## Workflow and build tooling
 
-The Style Engine PHP and Javascript (JS) files exist inside the `style-engine` package. 
+The Style Engine PHP and JavaScript (JS) files exist inside the `style-engine` package.
 
 In order to use the Style Engine in the Block Editor, these files must be compiled (in the case of JS) and copied to the build folder.
 
@@ -29,9 +29,9 @@ To start the JS unit tests, run:
 
 `npm run test:unit packages/style-engine/src/test/`
 
-[PHP unit tests](https://github.com/WordPress/gutenberg/tree/HEAD/phpunit/style-engine) are located in the root `phpunit` directory. 
+[PHP unit tests](https://github.com/WordPress/gutenberg/tree/HEAD/phpunit/style-engine) are located in the root `phpunit` directory.
 
-In order to test the latest version of the Style Engine and avoid conflicts with existing Core equivalents, all PHP unit tests call the `gutenberg_` functions and `_Gutenberg` classes. 
+In order to test the latest version of the Style Engine and avoid conflicts with existing Core equivalents, all PHP unit tests call the `gutenberg_` functions and `_Gutenberg` classes.
 
 Therefore, Style Engine PHP source files should be parsed and copied to the build folder before running tests. During development, this will happen as part of the `npm run dev` script. You can also trigger a build by executing `npm run build`.
 

@@ -43,6 +43,8 @@ function SuggestionListItem( {
 		<CompositeItem
 			render={
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					role="option"
 					className={ baseCssClass }
 					onClick={ () =>
@@ -99,7 +101,9 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 		);
 	const [ suggestions, setSuggestions ] = useState( EMPTY_ARRAY );
 	useEffect( () => {
-		if ( ! searchHasResolved ) return;
+		if ( ! searchHasResolved ) {
+			return;
+		}
 		let newSuggestions = EMPTY_ARRAY;
 		if ( searchResults?.length ) {
 			newSuggestions = searchResults;

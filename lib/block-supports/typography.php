@@ -26,6 +26,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
@@ -37,6 +38,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_font_weight_support
 		|| $has_letter_spacing_support
 		|| $has_line_height_support
+		|| $has_text_align_support
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support
@@ -95,6 +97,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
@@ -106,6 +109,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_font_style      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
 	$should_skip_font_weight     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
 	$should_skip_line_height     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
+	$should_skip_text_align      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
 	$should_skip_text_columns    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
@@ -143,6 +147,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			$typography_block_styles['lineHeight'] = $block_attributes['style']['typography']['lineHeight'] ?? null;
 	}
 
+	if ( $has_text_align_support && ! $should_skip_text_align ) {
+			$typography_block_styles['textAlign'] = $block_attributes['style']['typography']['textAlign'] ?? null;
+	}
+
 	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumns'] ) ) {
 		$typography_block_styles['textColumns'] = $block_attributes['style']['typography']['textColumns'] ?? null;
 	}
@@ -167,13 +175,22 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
+	$classnames = array();
 	$styles     = gutenberg_style_engine_get_styles(
 		array( 'typography' => $typography_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
 	);
 
 	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
+		$classnames[] = $styles['classnames'];
+	}
+
+	if ( $has_text_align_support && ! $should_skip_text_align && isset( $block_attributes['style']['typography']['textAlign'] ) ) {
+		$classnames[] = 'has-text-align-' . $block_attributes['style']['typography']['textAlign'];
+	}
+
+	if ( ! empty( $classnames ) ) {
+		$attributes['class'] = implode( ' ', $classnames );
 	}
 
 	if ( ! empty( $styles['css'] ) ) {
@@ -401,16 +418,25 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 		return null;
 	}
 
-	// Build CSS rule.
-	// Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	// Calculates the linear factor denominator. If it's 0, we cannot calculate a fluid value.
+	$linear_factor_denominator = $maximum_viewport_width['value'] - $minimum_viewport_width['value'];
+	if ( empty( $linear_factor_denominator ) ) {
+		return null;
+	}
+
+	/*
+	 * Build CSS rule.
+	 * Borrowed from https://websemantics.uk/tools/responsive-font-calculator/.
+	 */
 	$view_port_width_offset = round( $minimum_viewport_width['value'] / 100, 3 ) . $font_size_unit;
-	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $maximum_viewport_width['value'] - $minimum_viewport_width['value'] ) );
+	$linear_factor          = 100 * ( ( $maximum_font_size['value'] - $minimum_font_size['value'] ) / ( $linear_factor_denominator ) );
 	$linear_factor_scaled   = round( $linear_factor * $scale_factor, 3 );
 	$linear_factor_scaled   = empty( $linear_factor_scaled ) ? 1 : $linear_factor_scaled;
 	$fluid_target_font_size = implode( '', $minimum_font_size_rem ) . " + ((1vw - $view_port_width_offset) * $linear_factor_scaled)";
 
 	return "clamp($minimum_font_size_raw, $fluid_target_font_size, $maximum_font_size_raw)";
 }
+
 
 /**
  * Returns a font-size value based on a given font-size preset.
@@ -422,47 +448,69 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
  * @since 6.2.0 Added 'settings.typography.fluid.minFontSize' support.
  * @since 6.3.0 Using layout.wideSize as max viewport width, and logarithmic scale factor to calculate minimum font scale.
  * @since 6.4.0 Added configurable min and max viewport width values to the typography.fluid theme.json schema.
+ * @since 6.6.0 Deprecated bool argument $should_use_fluid_typography.
+ * @since 6.7.0 Font size presets can enable fluid typography individually, even if it’s disabled globally.
  *
- * @param array $preset                     {
+ * @param array $preset       {
  *     Required. fontSizes preset value as seen in theme.json.
  *
  *     @type string           $name Name of the font size preset.
  *     @type string           $slug Kebab-case unique identifier for the font size preset.
  *     @type string|int|float $size CSS font-size value, including units where applicable.
  * }
- * @param bool  $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing. Default is `false`.
+ * @param bool|array $settings Optional Theme JSON settings array that overrides any global theme settings.
+ *                             Default is `array()`.
  *
  * @return string|null Font-size value or `null` if a size is not passed in $preset.
  */
-function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_typography = false ) {
+function gutenberg_get_typography_font_size_value( $preset, $settings = array() ) {
 	if ( ! isset( $preset['size'] ) ) {
 		return null;
 	}
 
 	/*
-	 * Catches empty values and 0/'0'.
-	 * Fluid calculations cannot be performed on 0.
+	 * Catch falsy values and 0/'0'. Fluid calculations cannot be performed on `0`.
+	 * Also return early when a preset font size explicitly disables fluid typography with `false`.
 	 */
-	if ( empty( $preset['size'] ) ) {
+	$fluid_font_size_settings = $preset['fluid'] ?? null;
+	if ( false === $fluid_font_size_settings || empty( $preset['size'] ) ) {
 		return $preset['size'];
 	}
 
-	// Checks if fluid font sizes are activated.
+	/*
+	 * Backwards compatibility since 6.5.
+	 * As a bool (deprecated since 6.5), $settings acts as an override to switch fluid typography "on" (`true`) or "off" (`false`).
+	 */
+	if ( is_bool( $settings ) ) {
+		_deprecated_argument( __FUNCTION__, '6.6.0', __( '`boolean` type for second argument `$settings` is deprecated. Use `array()` instead.', 'gutenberg' ) );
+		$settings = array(
+			'typography' => array(
+				'fluid' => $settings,
+			),
+		);
+	}
+
+	// Fallback to global settings as default.
 	$global_settings     = gutenberg_get_global_settings();
-	$typography_settings = isset( $global_settings['typography'] ) ? $global_settings['typography'] : array();
-	$layout_settings     = isset( $global_settings['layout'] ) ? $global_settings['layout'] : array();
+	$settings            = wp_parse_args(
+		$settings,
+		$global_settings
+	);
+	$typography_settings = $settings['typography'] ?? array();
 
-	$should_use_fluid_typography
-		= isset( $typography_settings['fluid'] ) &&
-		( true === $typography_settings['fluid'] || is_array( $typography_settings['fluid'] ) ) ?
-		true :
-		$should_use_fluid_typography;
-
-	if ( ! $should_use_fluid_typography ) {
+	/*
+	 * Return early when fluid typography is disabled in the settings, and there
+	 * are no local settings to enable it for the individual preset.
+	 *
+	 * If this condition isn't met, either the settings or individual preset settings
+	 * have enabled fluid typography.
+	 */
+	if ( empty( $typography_settings['fluid'] ) && empty( $fluid_font_size_settings ) ) {
 		return $preset['size'];
 	}
 
-	$fluid_settings = isset( $typography_settings['fluid'] ) && is_array( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+	$fluid_settings  = isset( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
+	$layout_settings = isset( $settings['layout'] ) ? $settings['layout'] : array();
 
 	// Defaults.
 	$default_maximum_viewport_width       = '1600px';
@@ -480,14 +528,6 @@ function gutenberg_get_typography_font_size_value( $preset, $should_use_fluid_ty
 	}
 	$has_min_font_size       = isset( $fluid_settings['minFontSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $fluid_settings['minFontSize'] ) );
 	$minimum_font_size_limit = $has_min_font_size ? $fluid_settings['minFontSize'] : $default_minimum_font_size_limit;
-
-	// Font sizes.
-	$fluid_font_size_settings = isset( $preset['fluid'] ) ? $preset['fluid'] : null;
-
-	// A font size has explicitly bypassed fluid calculations.
-	if ( false === $fluid_font_size_settings ) {
-		return $preset['size'];
-	}
 
 	// Try to grab explicit min and max fluid font sizes.
 	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;

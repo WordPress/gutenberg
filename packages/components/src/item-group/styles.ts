@@ -35,10 +35,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 
 		&:focus-visible {
 			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-				var(
-					--wp-components-color-accent,
-					var( --wp-admin-theme-color, ${ COLORS.theme.accent } )
-				);
+				${ COLORS.theme.accent };
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
 			outline-offset: 0;
@@ -73,7 +70,7 @@ export const separated = css`
 	}
 `;
 
-const borderRadius = CONFIG.controlBorderRadius;
+const borderRadius = CONFIG.radiusSmall;
 
 export const spacedAround = css`
 	border-radius: ${ borderRadius };
@@ -108,12 +105,12 @@ const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight 
 
 export const itemSizes = {
 	small: css`
-		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
+		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall }px;
 	`,
 	medium: css`
-		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
+		padding: ${ paddingY } ${ CONFIG.controlPaddingX }px;
 	`,
 	large: css`
-		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
+		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge }px;
 	`,
 };

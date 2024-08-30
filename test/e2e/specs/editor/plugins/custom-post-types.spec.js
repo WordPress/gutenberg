@@ -36,16 +36,7 @@ test.describe( 'Test Custom Post Types', () => {
 			} )
 			.click();
 
-		// Open the Document -> Page Attributes panel.
-		const pageAttributes = page.getByRole( 'button', {
-			name: 'Page Attributes',
-		} );
-		const isClosed =
-			( await pageAttributes.getAttribute( 'aria-expanded' ) ) ===
-			'false';
-		if ( isClosed ) {
-			await pageAttributes.click();
-		}
+		await page.locator( '.editor-post-parent__panel-toggle' ).click();
 
 		const parentPageLocator = page.getByRole( 'combobox', {
 			name: 'Parent',
@@ -62,8 +53,23 @@ test.describe( 'Test Custom Post Types', () => {
 		await editor.publishPost();
 		await page.reload();
 
+		await page.locator( '.editor-post-parent__panel-toggle' ).click();
+
 		// Confirm parent page selection matches after reloading.
 		await expect( parentPageLocator ).toHaveValue( parentPage );
+	} );
+
+	test( 'should not be able to rename a post that lacks title support', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { postType: 'hierar-no-title' } );
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Rename' } )
+		).toHaveCount( 0 );
 	} );
 
 	test( 'should create a cpt with a legacy block in its template without WSOD', async ( {
@@ -72,9 +78,7 @@ test.describe( 'Test Custom Post Types', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'leg_block_in_tpl' } );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Hello there' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,25 +32,25 @@ export default function ClipboardButton( {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	const timeoutId = useRef< NodeJS.Timeout >();
+	const timeoutIdRef = useRef< NodeJS.Timeout >();
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
-		if ( timeoutId.current ) {
-			clearTimeout( timeoutId.current );
+		if ( timeoutIdRef.current ) {
+			clearTimeout( timeoutIdRef.current );
 		}
 
 		if ( onFinishCopy ) {
-			timeoutId.current = setTimeout( () => onFinishCopy(), TIMEOUT );
+			timeoutIdRef.current = setTimeout( () => onFinishCopy(), TIMEOUT );
 		}
 	} );
 
 	useEffect( () => {
-		if ( timeoutId.current ) {
-			clearTimeout( timeoutId.current );
+		if ( timeoutIdRef.current ) {
+			clearTimeout( timeoutIdRef.current );
 		}
 	}, [] );
 
-	const classes = classnames( 'components-clipboard-button', className );
+	const classes = clsx( 'components-clipboard-button', className );
 
 	// Workaround for inconsistent behavior in Safari, where <textarea> is not
 	// the document.activeElement at the moment when the copy event fires.

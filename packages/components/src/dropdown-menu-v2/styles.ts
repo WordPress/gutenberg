@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -26,13 +25,15 @@ const ITEM_PADDING_BLOCK = space( 2 );
 const ITEM_PADDING_INLINE = space( 3 );
 
 // TODO:
-// - those values are different from saved variables?
-// - should bring this into the config, and make themeable
-// - border color and divider color are different?
-const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
-const DIVIDER_COLOR = COLORS.gray[ 200 ];
-const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+// - border color and divider color are different from COLORS.theme variables
+// - lighter text color is not defined in COLORS.theme, should it be?
+// - lighter background color is not defined in COLORS.theme, should it be?
+const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
+const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
+const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
+const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
+const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
@@ -88,7 +89,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	padding: ${ CONTENT_WRAPPER_PADDING };
 
 	background-color: ${ COLORS.ui.background };
-	border-radius: 4px;
+	border-radius: ${ CONFIG.radiusMedium };
 	${ ( props ) => css`
 		box-shadow: ${ props.variant === 'toolbar'
 			? TOOLBAR_VARIANT_BOX_SHADOW
@@ -102,23 +103,23 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	outline: 2px solid transparent !important;
 
 	/* Animation */
-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	will-change: transform, opacity;
-	/* Default animation.*/
-	animation-name: ${ slideDownAndFade };
-
-	&[data-side='right'] {
-		animation-name: ${ slideLeftAndFade };
-	}
-	&[data-side='bottom'] {
-		animation-name: ${ slideUpAndFade };
-	}
-	&[data-side='left'] {
-		animation-name: ${ slideRightAndFade };
-	}
-	@media ( prefers-reduced-motion ) {
-		animation-duration: 0s;
+	&[data-open] {
+		@media not ( prefers-reduced-motion ) {
+			animation-duration: ${ ANIMATION_PARAMS.DURATION };
+			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+			will-change: transform, opacity;
+			/* Default animation.*/
+			animation-name: ${ slideDownAndFade };
+			&[data-side='left'] {
+				animation-name: ${ slideLeftAndFade };
+			}
+			&[data-side='up'] {
+				animation-name: ${ slideUpAndFade };
+			}
+			&[data-side='right'] {
+				animation-name: ${ slideRightAndFade };
+			}
+		}
 	}
 `;
 
@@ -150,8 +151,8 @@ const baseItem = css`
 	font-weight: normal;
 	line-height: 20px;
 
-	color: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.radiusBlockUi };
+	color: ${ COLORS.theme.foreground };
+	border-radius: ${ CONFIG.radiusSmall };
 
 	padding-block: ${ ITEM_PADDING_BLOCK };
 	padding-inline: ${ ITEM_PADDING_INLINE };
@@ -170,17 +171,24 @@ const baseItem = css`
 		cursor: not-allowed;
 	}
 
-	/* Hover */
-	&[data-active-item]:not( [data-focus-visible] ):not(
+	/* Active item (including hover)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
+	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
 			[aria-disabled='true']
 		) {
 		background-color: ${ COLORS.theme.accent };
 		color: ${ COLORS.white };
 	}
 
-	/* Keyboard focus (focus-visible) */
-	&[data-focus-visible] {
-		box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+	/* Keyboard focus (focus-visible)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
+	&[data-focus-visible],
+	&:focus-visible {
+		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
 
 		/* Only visible in Windows High Contrast mode */
 		outline: 2px solid transparent;
@@ -194,8 +202,8 @@ const baseItem = css`
 
 	/* When the item is the trigger of an open submenu */
 	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
-		background-color: ${ COLORS.gray[ 100 ] };
-		color: ${ COLORS.gray[ 900 ] };
+		background-color: ${ LIGHT_BACKGROUND_COLOR };
+		color: ${ COLORS.theme.foreground };
 	}
 
 	svg {
@@ -239,7 +247,7 @@ export const ItemPrefixWrapper = styled.span`
 	align-items: center;
 	justify-content: center;
 
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
 	* When the parent menu item is active, except when it's a non-focused/hovered
@@ -285,7 +293,7 @@ export const ItemSuffixWrapper = styled.span`
 	justify-content: center;
 	gap: ${ space( 3 ) };
 
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
 
 	/*
 	 * When the parent menu item is active, except when it's a non-focused/hovered
@@ -344,7 +352,8 @@ export const DropdownMenuItemLabel = styled( Truncate )`
 export const DropdownMenuItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
-	color: ${ COLORS.gray[ '700' ] };
+	color: ${ LIGHTER_TEXT_COLOR };
+	word-break: break-all;
 
 	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
 	[aria-disabled='true'] *:not( ${ DropdownMenu } ) & {

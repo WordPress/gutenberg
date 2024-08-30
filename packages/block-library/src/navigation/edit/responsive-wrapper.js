@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ export default function ResponsiveWrapper( {
 		return children;
 	}
 
-	const responsiveContainerClasses = classnames(
+	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
 		{
 			'has-text-color':
@@ -59,7 +59,7 @@ export default function ResponsiveWrapper( {
 			overlayBackgroundColor.color,
 	};
 
-	const openButtonClasses = classnames(
+	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
 		{ 'always-shown': isHiddenByDefault }
 	);
@@ -79,6 +79,8 @@ export default function ResponsiveWrapper( {
 		<>
 			{ ! isOpen && (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					aria-haspopup="true"
 					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
@@ -100,6 +102,8 @@ export default function ResponsiveWrapper( {
 				>
 					<div { ...dialogProps }>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }

@@ -129,6 +129,7 @@ function isEqualUntil( a, b, index ) {
 
 export function toTree( {
 	value,
+	preserveWhiteSpace,
 	createEmpty,
 	append,
 	getLastChild,
@@ -222,7 +223,9 @@ export function toTree( {
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
 			const replacement = replacements[ i ];
-			if ( ! replacement ) continue;
+			if ( ! replacement ) {
+				continue;
+			}
 			const { type, attributes, innerHTML } = replacement;
 			const formatType = getFormatType( type );
 
@@ -267,7 +270,7 @@ export function toTree( {
 			}
 			// Ensure pointer is text node.
 			pointer = append( getParent( pointer ), '' );
-		} else if ( character === '\n' ) {
+		} else if ( ! preserveWhiteSpace && character === '\n' ) {
 			pointer = append( getParent( pointer ), {
 				type: 'br',
 				attributes: isEditableTree

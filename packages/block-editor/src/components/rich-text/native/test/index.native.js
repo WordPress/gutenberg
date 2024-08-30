@@ -5,15 +5,20 @@ import { Dimensions } from 'react-native';
 import {
 	fireEvent,
 	getEditorHtml,
-	render,
 	initializeEditor,
+	render,
+	screen,
 } from 'test/helpers';
 
 /**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import { store as richTextStore, RichTextData } from '@wordpress/rich-text';
+import {
+	store as richTextStore,
+	RichTextData,
+	__unstableCreateElement,
+} from '@wordpress/rich-text';
 import { coreBlocks } from '@wordpress/block-library';
 import {
 	getBlockTypes,
@@ -83,11 +88,11 @@ describe( '<RichText/>', () => {
 		} );
 	} );
 
-	describe( 'when changes arrive from Aztec', () => {
+	describe( 'when the value changes', () => {
 		it( 'should avoid updating attributes when values are equal', async () => {
 			const handleChange = jest.fn();
-			const defaultEmptyValue = new RichTextData();
-			const screen = render(
+			const defaultEmptyValue = RichTextData.empty();
+			render(
 				<RichText
 					onChange={ handleChange }
 					value={ defaultEmptyValue }
@@ -101,15 +106,52 @@ describe( '<RichText/>', () => {
 
 			expect( handleChange ).not.toHaveBeenCalled();
 		} );
+
+		it( 'should preserve non-breaking space HTML entity', () => {
+			const onChange = jest.fn();
+			const onSelectionChange = jest.fn();
+			// The initial value is created using an HTML element to preserve
+			// the HTML entity.
+			const initialValue = RichTextData.fromHTMLElement(
+				__unstableCreateElement( document, '&nbsp;' )
+			);
+			render(
+				<RichText
+					onChange={ onChange }
+					onSelectionChange={ onSelectionChange }
+					value={ initialValue }
+					__unstableIsSelected
+				/>
+			);
+
+			// Trigger selection event with same text value as initial.
+			fireEvent(
+				screen.getByLabelText( /Text input/ ),
+				'onSelectionChange',
+				0,
+				0,
+				initialValue.toString(),
+				{
+					nativeEvent: {
+						eventCount: 0,
+						target: undefined,
+						text: initialValue.toString(),
+					},
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+			expect( onSelectionChange ).toHaveBeenCalled();
+		} );
 	} );
 
-	describe( 'Font Size', () => {
+	describe( 'when applying the font size', () => {
 		it( 'should display rich text at the DEFAULT font size.', () => {
 			// Arrange.
 			const expectedFontSize = 16;
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } />
+				<RichText accessibilityLabel="editor" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -122,8 +164,8 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					fontSize={ 'min(2em, 3em)' }
+					accessibilityLabel="editor"
+					fontSize="min(2em, 3em)"
 				/>
 			);
 			// Assert.
@@ -137,7 +179,7 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: 'min(2em, 3em)' } }
 				/>
 			);
@@ -153,7 +195,7 @@ describe( '<RichText/>', () => {
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } tagName="div" />
+				<RichText accessibilityLabel="editor" tagName="div" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -167,7 +209,7 @@ describe( '<RichText/>', () => {
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } tagName="p" />
+				<RichText accessibilityLabel="editor" tagName="p" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -182,7 +224,7 @@ describe( '<RichText/>', () => {
 				mockGlobalSettings( { fontSize: unit } );
 				// Act.
 				const { getByLabelText } = render(
-					<RichText accessibilityLabel={ 'editor' } tagName="p" />
+					<RichText accessibilityLabel="editor" tagName="p" />
 				);
 				// Assert.
 				const actualFontSize =
@@ -199,9 +241,9 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: '1' } }
-					fontSize={ '2' }
+					fontSize="2"
 					tagName="p"
 				/>
 			);
@@ -218,7 +260,7 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: '1' } }
 					tagName="p"
 				/>
@@ -234,7 +276,7 @@ describe( '<RichText/>', () => {
 			Dimensions.set( { window: { ...window, width: 300 } } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vw' } />
+				<RichText accessibilityLabel="editor" fontSize="1vw" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -247,7 +289,7 @@ describe( '<RichText/>', () => {
 			Dimensions.set( { window: { ...window, height: 300 } } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vh' } />
+				<RichText accessibilityLabel="editor" fontSize="1vh" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -259,7 +301,7 @@ describe( '<RichText/>', () => {
 			const fontSize = '10';
 			const style = { fontSize: '12' };
 			// Act.
-			const screen = render( <RichText fontSize={ fontSize } /> );
+			render( <RichText fontSize={ fontSize } /> );
 			screen.update( <RichText fontSize={ fontSize } style={ style } /> );
 			// Assert.
 			expect( screen.toJSON() ).toMatchSnapshot();
@@ -281,7 +323,7 @@ describe( '<RichText/>', () => {
 			const fontSize = '10';
 			const style = { fontSize: '12.56px' };
 			// Act.
-			const screen = render( <RichText fontSize={ fontSize } /> );
+			render( <RichText fontSize={ fontSize } /> );
 			screen.update( <RichText fontSize={ fontSize } style={ style } /> );
 			// Assert.
 			expect( screen.toJSON() ).toMatchSnapshot();
@@ -293,7 +335,7 @@ describe( '<RichText/>', () => {
 			const style = { lineHeight: 0.2 };
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } style={ style } />
+				<RichText accessibilityLabel="editor" style={ style } />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.lineHeight;

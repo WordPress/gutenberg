@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+
+/**
+ * Internal dependencies
+ */
+import useRefEffect from '../use-ref-effect';
 
 /**
  * Hook used to focus the first tabbable element on mount.
@@ -44,21 +49,13 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 	};
 
 	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
-	const timerId = useRef();
+	const timerIdRef = useRef();
 
 	useEffect( () => {
 		focusOnMountRef.current = focusOnMount;
 	}, [ focusOnMount ] );
 
-	useEffect( () => {
-		return () => {
-			if ( timerId.current ) {
-				clearTimeout( timerId.current );
-			}
-		};
-	}, [] );
-
-	return useCallback( ( node ) => {
+	return useRefEffect( ( node ) => {
 		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
@@ -68,11 +65,11 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		}
 
 		if ( focusOnMountRef.current === 'firstElement' ) {
-			timerId.current = setTimeout( () => {
+			timerIdRef.current = setTimeout( () => {
 				const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 				if ( firstTabbable ) {
-					setFocus( /** @type {HTMLElement} */ ( firstTabbable ) );
+					setFocus( firstTabbable );
 				}
 			}, 0 );
 
@@ -80,5 +77,11 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		}
 
 		setFocus( node );
+
+		return () => {
+			if ( timerIdRef.current ) {
+				clearTimeout( timerIdRef.current );
+			}
+		};
 	}, [] );
 }

@@ -142,7 +142,7 @@ export const focus = ( element ) => {
 	// will take precedence and cancels pending blur events.
 	blur.cancel();
 	// Similar to blur events, we also need to cancel potential keyboard dismiss.
-	dismissKeyboardDebounce.cancel();
+	blurOnUnmountDebounce.cancel();
 
 	TextInputState.focusTextInput( element );
 	notifyInputChange();
@@ -164,13 +164,6 @@ export const blur = debounce( ( element ) => {
 /**
  * Unfocuses the specified element in case it's about to be unmounted.
  *
- * On iOS text inputs are automatically unfocused and keyboard dismissed when they
- * are removed. However, this is not the case on Android, where text inputs are
- * unfocused but the keyboard remains open.
- *
- * For dismissing the keyboard, we use debounce to avoid conflicts with the focus
- * event when both are triggered at the same time.
- *
  * Note that we can't trigger the blur event, as it's likely that the Aztec view is no
  * longer available when the event is executed and will produce an exception.
  *
@@ -181,13 +174,25 @@ export const blurOnUnmount = ( element ) => {
 		// If a blur event was triggered before unmount, we need to cancel them to avoid
 		// exceptions.
 		blur.cancel();
-		if ( Platform.OS === 'android' ) {
-			dismissKeyboardDebounce();
-		}
+		blurOnUnmountDebounce();
 	}
 };
 
-const dismissKeyboardDebounce = debounce( () => hideAndroidSoftKeyboard(), 0 );
+// For updating the input state and dismissing the keyboard, we use debounce to avoid
+// conflicts with the focus event when both are triggered at the same time.
+const blurOnUnmountDebounce = debounce( () => {
+	// At this point, the text input will be destroyed but it's still focused. Hence, we
+	// have to explicitly notify listeners and update internal input state.
+	notifyListeners( { isFocused: false } );
+	currentFocusedElement = null;
+
+	// On iOS text inputs are automatically unfocused and keyboard dismissed when they
+	// are removed. However, this is not the case on Android, where text inputs are
+	// unfocused but the keyboard remains open.
+	if ( Platform.OS === 'android' ) {
+		hideAndroidSoftKeyboard();
+	}
+}, 0 );
 
 /**
  * Unfocuses the current focused element.

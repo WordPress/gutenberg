@@ -2,6 +2,45 @@
 
 ## Unreleased
 
+## 1.6.0 (2024-08-21)
+
+## 1.5.0 (2024-08-07)
+
+## 1.4.0 (2024-07-24)
+
+## 1.3.0 (2024-07-10)
+
+## 1.2.0 (2024-06-26)
+
+## 1.1.0 (2024-06-15)
+
+## 1.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 0.40.0 (2024-05-16)
+
+## 0.39.0 (2024-05-02)
+
+## 0.38.0 (2024-04-19)
+
+## 0.37.0 (2024-04-03)
+
+## 0.36.0 (2024-03-21)
+
+## 0.35.0 (2024-03-06)
+
+## 0.34.0 (2024-02-21)
+
+## 0.33.0 (2024-02-09)
+
+## 0.32.0 (2024-01-24)
+
+## 0.31.0 (2024-01-10)
+
 ## 0.30.0 (2023-12-13)
 
 ## 0.29.0 (2023-11-29)

@@ -66,6 +66,15 @@ export type PopoverProps = {
 	 */
 	flip?: boolean;
 	/**
+	 * Determines whether tabbing is constrained to within the popover,
+	 * preventing keyboard focus from leaving the popover content without
+	 * explicit focus elswhere, or whether the popover remains part of the wider
+	 * tab order. If no value is passed, it will be derived from `focusOnMount`.
+	 *
+	 * @default `focusOnMount` !== false
+	 */
+	constrainTabbing?: boolean;
+	/**
 	 * By default, the _first tabbable element_ in the popover will receive focus
 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
 	 * Specifying a `false` value disables the focus handling entirely (this

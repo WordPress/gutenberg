@@ -81,11 +81,10 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `boolean | undefined`: Whether the given block is allowed to be moved.
+-   `boolean`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -95,7 +94,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be moved.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -109,7 +107,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -123,7 +120,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be removed.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -409,6 +405,19 @@ _Returns_
 
 -   `WPBlock[]`: Block objects.
 
+### getBlocksByName
+
+Returns all blocks that match a blockName. Results include nested blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
+
+_Returns_
+
+-   `Array`: Array of clientIds of blocks with name equal to blockName.
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.
@@ -473,7 +482,7 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
+-   _rootIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
@@ -502,7 +511,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPDirectInsertBlock`: The block type to be directly inserted.
+-   `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
 
 _Type Definition_
 
@@ -553,6 +562,18 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
+### getHoveredBlockClientId
+
+Returns the currently hovered block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Client Id of the hovered block.
+
 ### getInserterItems
 
 Determines the items that appear in the inserter. Includes both static items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
@@ -587,18 +608,6 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
-
-### getLastFocus
-
-Returns the element of the last element that had focus when focus left the editor canvas.
-
-_Parameters_
-
--   _state_ `Object`: Block editor state.
-
-_Returns_
-
--   `Object`: Element.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -1260,9 +1269,21 @@ _Parameters_
 
 Action that hides the insertion point.
 
+### hoverBlock
+
+Returns an action object used in signalling that the block with the specified client ID has been hovered.
+
+_Parameters_
+
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### insertAfterBlock
 
-Action that inserts an empty block after a given block.
+Action that inserts a default block after a given block.
 
 _Parameters_
 
@@ -1270,7 +1291,7 @@ _Parameters_
 
 ### insertBeforeBlock
 
-Action that inserts an empty block before a given block.
+Action that inserts a default block before a given block.
 
 _Parameters_
 
@@ -1438,7 +1459,7 @@ wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
 			per_page: 'page_size',
 			search: 'q',
 		};
-		const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+		const url = new URL( 'https://api.openverse.org/v1/images/' );
 		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
 			const queryKey = mapFromInserterMediaRequest[ key ] || key;
 			url.searchParams.set( queryKey, value );
@@ -1663,18 +1684,6 @@ _Parameters_
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
 
-### setLastFocus
-
-Action that sets the element that had focus when focus leaves the editor canvas.
-
-_Parameters_
-
--   _lastFocus_ `Object`: The last focused element.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### setNavigationMode
 
 Action that enables or disables the navigation mode.
@@ -1852,11 +1861,11 @@ _Returns_
 
 ### updateBlockListSettings
 
-Action that changes the nested settings of a given block.
+Action that changes the nested settings of the given block(s).
 
 _Parameters_
 
--   _clientId_ `string`: Client ID of the block whose nested setting are being received.
+-   _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
 -   _settings_ `Object`: Object with the new settings for the nested block.
 
 _Returns_

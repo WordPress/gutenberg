@@ -1,176 +1,87 @@
-.edit-site-patterns {
-	border-left: 1px solid $gray-800;
-	background: none;
-	margin: $header-height 0 0;
-	border-radius: 0;
-	padding: 0;
-	overflow-x: auto;
+.edit-site-patterns__delete-modal {
+	width: $modal-width-small;
+}
 
-	.components-base-control {
-		width: 100%;
-		@include break-medium {
-			width: auto;
-		}
+.page-patterns-preview-field {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border-radius: $radius-medium;
+
+	.dataviews-view-table & {
+		width: 96px;
+		flex-grow: 0;
 	}
 
-	.components-text {
-		color: $gray-600;
-	}
-
-	.components-heading {
-		color: $gray-200;
-	}
-
-	@include break-medium {
-		margin: 0;
-	}
-
-	.edit-site-patterns__search-block {
-		min-width: fit-content;
-		flex-grow: 1;
-	}
-
-	// The increased specificity here is to overcome component styles
-	// without relying on internal component class names.
-	.edit-site-patterns__search {
-		input[type="search"] {
-			height: $button-size-next-default-40px;
-			background: $gray-800;
-			color: $gray-200;
-
-			&:focus {
-				background: $gray-800;
-			}
-		}
-
-		svg {
-			fill: $gray-600;
-		}
-	}
-
-	.edit-site-patterns__sync-status-filter {
-		background: $gray-800;
+	.page-patterns-preview-field__button {
+		box-shadow: none;
 		border: none;
-		height: $button-size-next-default-40px;
-		min-width: max-content;
-		width: 100%;
-		max-width: 100%;
+		padding: 0;
+		background-color: unset;
+		box-sizing: border-box;
+		cursor: pointer;
+		overflow: hidden;
+		height: 100%;
+		border-radius: $grid-unit-05;
 
-		@include break-medium {
-			width: 300px;
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+
+		&[aria-disabled="true"] {
+			cursor: default;
 		}
 	}
-	.edit-site-patterns__sync-status-filter-option:not([aria-checked="true"]) {
-		color: $gray-600;
-	}
-	.edit-site-patterns__sync-status-filter-option:active {
-		background: $gray-700;
-		color: $gray-100;
-	}
 }
 
-.edit-site-patterns__header {
-	position: sticky;
-	top: 0;
-	background: $gray-900;
-	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
-	z-index: z-index(".edit-site-patterns__header");
-
-	.edit-site-patterns__button {
-		color: $gray-600;
-	}
+.edit-site-patterns__pattern-icon {
+	fill: var(--wp-block-synced-color);
+	flex-shrink: 0;
 }
 
-.edit-site-patterns__section {
-	padding: $grid-unit-30 $grid-unit-40;
-	flex: 1;
+.edit-site-patterns__pattern-lock-icon {
+	min-width: min-content;
 }
 
 .edit-site-patterns__section-header {
+	border-bottom: 1px solid #f0f0f0;
+	padding: $grid-unit-20 $grid-unit-60;
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	flex-shrink: 0;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
+	min-height: $grid-unit-50;
+
+	.edit-site-patterns__title {
+		min-height: $grid-unit-50;
+
+		.components-heading {
+			flex-grow: 1;
+			flex-basis: 0;
+			white-space: nowrap;
+		}
+	}
+
+	.edit-site-patterns__sub-title {
+		margin-bottom: $grid-unit-10;
+	}
+
 	.screen-reader-shortcut:focus {
 		top: 0;
 	}
 }
 
-.edit-site-patterns__grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: $grid-unit-40;
-	margin-top: 0;
-	margin-bottom: 0;
-	@include break-large {
-		grid-template-columns: 1fr 1fr;
-	}
-	@include break-huge {
-		grid-template-columns: 1fr 1fr 1fr;
-	}
-	@include break-xhuge {
-		grid-template-columns: 1fr 1fr 1fr 1fr;
-	}
-	.edit-site-patterns__pattern {
-		break-inside: avoid-column;
-		display: flex;
-		flex-direction: column;
-		.edit-site-patterns__preview {
-			box-shadow: none;
-			border: none;
-			padding: 0;
-			background-color: unset;
-			box-sizing: border-box;
-			border-radius: 4px;
-			cursor: pointer;
-			overflow: hidden;
-
-			&:focus {
-				box-shadow: inset 0 0 0 0 $white, 0 0 0 2px var(--wp-admin-theme-color);
-				// Windows High Contrast mode will show this outline, but not the box-shadow.
-				outline: 2px solid transparent;
-			}
-
-			&.is-inactive {
-				cursor: default;
-			}
-			&.is-inactive:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $gray-800;
-				opacity: 0.8;
-			}
-		}
-
-		.edit-site-patterns__footer,
-		.edit-site-patterns__button {
-			color: $gray-600;
-		}
-
-		.edit-site-patterns__dropdown {
-			flex-shrink: 0;
-		}
-
-		&.is-placeholder .edit-site-patterns__preview {
-			min-height: $grid-unit-80;
-			color: $gray-600;
-			border: 1px dashed $gray-800;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-
-			&:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			}
-		}
-	}
-
-	.edit-site-patterns__preview {
-		flex: 0 1 auto;
-		margin-bottom: $grid-unit-15;
-	}
-}
-
-.edit-site-patterns__load-more {
-	align-self: center;
-}
-
 .edit-site-patterns__pattern-title {
-	color: $gray-200;
+	display: block;
+	width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: inherit;
 
 	.is-link {
 		text-decoration: none;
@@ -193,33 +104,53 @@
 	}
 }
 
-.edit-site-patterns__no-results {
-	color: $gray-600;
+.edit-site-page-patterns-dataviews {
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+			color: var(--wp-block-synced-color);
+		}
+	}
 }
 
-.edit-site-patterns__delete-modal {
-	width: $modal-width-small;
+.dataviews-action-modal__duplicate-pattern {
+	// Fix the modal width to prevent added categories from stretching the modal.
+	[role="dialog"] > [role="document"] {
+		width: 350px;
+	}
+
+	.patterns-menu-items__convert-modal-categories {
+		position: relative;
+	}
+
+	.components-form-token-field__suggestions-list:not(:empty) {
+		position: absolute;
+		border: $border-width solid var(--wp-admin-theme-color);
+		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-block-ui;
+		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
+		box-sizing: border-box;
+		z-index: 1;
+		background-color: $white;
+		width: calc(100% + 2px); // Account for the border width of the token field.
+		left: -1px;
+		min-width: initial;
+		max-height: $grid-unit-60 * 2; // Adjust to not cover the save button, showing three items.
+	}
 }
 
-.edit-site-patterns__pagination {
-	padding: $grid-unit-30 $grid-unit-40;
-	border-top: 1px solid $gray-800;
-	background: $gray-900;
-	position: sticky;
-	bottom: 0;
-	color: $gray-100;
-	z-index: z-index(".edit-site-patterns__grid-pagination");
-	.components-button.is-tertiary {
-		background-color: $gray-800;
-		color: $gray-100;
-
-		&:disabled {
-			color: $gray-600;
-			background: none;
+.dataviews-action-modal__duplicate-template-part {
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
 		}
+	}
+}
 
-		&:hover:not(:disabled) {
-			background-color: $gray-700;
-		}
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
 	}
 }

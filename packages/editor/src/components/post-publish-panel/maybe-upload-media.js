@@ -14,11 +14,6 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { isBlobURL } from '@wordpress/blob';
 
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
-
 function flattenBlocks( blocks ) {
 	const result = [];
 
@@ -65,9 +60,11 @@ function Image( block ) {
 
 export default function PostFormatPanel() {
 	const [ isUploading, setIsUploading ] = useState( false );
+	const [ isAnimating, setIsAnimating ] = useState( false );
+	const [ hadUploadError, setHadUploadError ] = useState( false );
 	const { editorBlocks, mediaUpload } = useSelect(
 		( select ) => ( {
-			editorBlocks: select( editorStore ).getEditorBlocks(),
+			editorBlocks: select( blockEditorStore ).getBlocks(),
 			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[]
@@ -93,6 +90,7 @@ export default function PostFormatPanel() {
 
 	function uploadImages() {
 		setIsUploading( true );
+		setHadUploadError( false );
 		Promise.all(
 			externalImages.map( ( image ) =>
 				window
@@ -102,28 +100,30 @@ export default function PostFormatPanel() {
 							: image.attributes.url + '?'
 					)
 					.then( ( response ) => response.blob() )
-					.then(
-						( blob ) =>
-							new Promise( ( resolve, reject ) => {
-								mediaUpload( {
-									filesList: [ blob ],
-									onFileChange: ( [ media ] ) => {
-										if ( isBlobURL( media.url ) ) {
-											return;
-										}
+					.then( ( blob ) =>
+						new Promise( ( resolve, reject ) => {
+							mediaUpload( {
+								filesList: [ blob ],
+								onFileChange: ( [ media ] ) => {
+									if ( isBlobURL( media.url ) ) {
+										return;
+									}
 
-										updateBlockAttributes( image.clientId, {
-											id: media.id,
-											url: media.url,
-										} );
-										resolve();
-									},
-									onError() {
-										reject();
-									},
-								} );
-							} )
+									updateBlockAttributes( image.clientId, {
+										id: media.id,
+										url: media.url,
+									} );
+									resolve();
+								},
+								onError() {
+									reject();
+								},
+							} );
+						} ).then( () => setIsAnimating( true ) )
 					)
+					.catch( () => {
+						setHadUploadError( true );
+					} )
 			)
 		).finally( () => {
 			setIsUploading( false );
@@ -131,7 +131,7 @@ export default function PostFormatPanel() {
 	}
 
 	return (
-		<PanelBody initialOpen={ true } title={ panelBodyTitle }>
+		<PanelBody initialOpen title={ panelBodyTitle }>
 			<p>
 				{ __(
 					'Upload external images to the Media Library. Images from different domains may load slowly, display incorrectly, or be removed unexpectedly.'
@@ -144,19 +144,27 @@ export default function PostFormatPanel() {
 					gap: '8px',
 				} }
 			>
-				<AnimatePresence>
+				<AnimatePresence
+					onExitComplete={ () => setIsAnimating( false ) }
+				>
 					{ externalImages.map( ( image ) => {
 						return <Image key={ image.clientId } { ...image } />;
 					} ) }
 				</AnimatePresence>
-				{ isUploading ? (
+				{ isUploading || isAnimating ? (
 					<Spinner />
 				) : (
-					<Button variant="primary" onClick={ uploadImages }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ uploadImages }
+					>
 						{ __( 'Upload' ) }
 					</Button>
 				) }
 			</div>
+			{ hadUploadError && <p>{ __( 'Upload failed, try again.' ) }</p> }
 		</PanelBody>
 	);
 }

@@ -27,6 +27,7 @@ const VALID_SETTINGS = [
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -49,6 +50,7 @@ const VALID_SETTINGS = [
 	'color.palette',
 	'color.text',
 	'custom',
+	'dimensions.aspectRatio',
 	'dimensions.minHeight',
 	'layout.contentSize',
 	'layout.definitions',
@@ -58,6 +60,7 @@ const VALID_SETTINGS = [
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
+	'spacing.defaultSpacingSizes',
 	'spacing.spacingSizes',
 	'spacing.spacingScale',
 	'spacing.blockGap',
@@ -66,6 +69,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -73,6 +77,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textAlign',
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
@@ -80,14 +85,15 @@ const VALID_SETTINGS = [
 ];
 
 export const useGlobalStylesReset = () => {
-	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
+	const { user, setUserConfig } = useContext( GlobalStylesContext );
+	const config = {
+		settings: user.settings,
+		styles: user.styles,
+	};
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
@@ -238,6 +244,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 
@@ -288,6 +295,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',
@@ -342,12 +350,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -362,12 +372,26 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.background = {
+					...updatedSettings.background,
+					[ key ]: false,
+				};
+			}
+		} );
+
 		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
 			? updatedSettings.shadow
 			: false;
 
+		// Text alignment is only available for blocks.
+		if ( element ) {
+			updatedSettings.typography.textAlign = false;
+		}
+
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports ] );
+	}, [ parentSettings, supportedStyles, supports, element ] );
 }
 
 export function useColorsPerOrigin( settings ) {

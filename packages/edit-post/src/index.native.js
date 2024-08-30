@@ -23,14 +23,17 @@ import Editor from './editor';
 export function initializeEditor( id, postType, postId ) {
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		editorMode: 'visual',
-		fixedToolbar: false,
 		fullscreenMode: true,
+		inactivePanels: [],
+		openPanels: [ 'post-status' ],
+		welcomeGuide: true,
+	} );
+	dispatch( preferencesStore ).setDefaults( 'core', {
 		hiddenBlockTypes: [],
 		inactivePanels: [],
-		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
-		preferredStyleVariations: {},
-		welcomeGuide: true,
+		isPublishSidebarEnabled: true,
+		fixedToolbar: false,
 	} );
 
 	return <Editor postId={ postId } postType={ postType } />;

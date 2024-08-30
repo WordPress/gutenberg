@@ -306,12 +306,10 @@ describe( 'onFilesDrop', () => {
 		const canInsertBlockType = noop;
 		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
-		const targetBlockIndex = 0;
 		const getSettings = jest.fn( () => ( {} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
-			targetBlockIndex,
 			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
@@ -331,14 +329,12 @@ describe( 'onFilesDrop', () => {
 		const insertOrReplaceBlocks = jest.fn();
 		const canInsertBlockType = noop;
 		const targetRootClientId = '1';
-		const targetBlockIndex = 0;
 		const getSettings = jest.fn( () => ( {
 			mediaUpload: true,
 		} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
-			targetBlockIndex,
 			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
@@ -361,14 +357,12 @@ describe( 'onFilesDrop', () => {
 		const canInsertBlockType = noop;
 		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
-		const targetBlockIndex = 0;
 		const getSettings = jest.fn( () => ( {
 			mediaUpload: true,
 		} ) );
 
 		const onFileDropHandler = onFilesDrop(
 			targetRootClientId,
-			targetBlockIndex,
 			getSettings,
 			updateBlockAttributes,
 			canInsertBlockType,
@@ -389,15 +383,9 @@ describe( 'onFilesDrop', () => {
 describe( 'onHTMLDrop', () => {
 	it( 'does nothing if the HTML cannot be converted into blocks', () => {
 		pasteHandler.mockImplementation( () => [] );
-		const targetRootClientId = '1';
-		const targetBlockIndex = 0;
 		const insertOrReplaceBlocks = jest.fn();
 
-		const eventHandler = onHTMLDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			insertOrReplaceBlocks
-		);
+		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
 		eventHandler();
 
 		expect( insertOrReplaceBlocks ).not.toHaveBeenCalled();
@@ -406,15 +394,9 @@ describe( 'onHTMLDrop', () => {
 	it( 'inserts blocks if the HTML can be converted into blocks', () => {
 		const blocks = [ 'blocks' ];
 		pasteHandler.mockImplementation( () => blocks );
-		const targetRootClientId = '1';
-		const targetBlockIndex = 0;
 		const insertOrReplaceBlocks = jest.fn();
 
-		const eventHandler = onHTMLDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			insertOrReplaceBlocks
-		);
+		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
 		eventHandler();
 
 		expect( insertOrReplaceBlocks ).toHaveBeenCalledWith( blocks );

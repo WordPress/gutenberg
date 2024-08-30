@@ -7,9 +7,9 @@ import {
 	useSettings,
 	__experimentalSpacingSizesControl as SpacingSizesControl,
 	isValueSpacingPreset,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	BaseControl,
 	PanelBody,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
@@ -21,14 +21,15 @@ import { View } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { MIN_SPACER_SIZE } from './constants';
+
+const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
 function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	const inputId = useInstanceId( UnitControl, 'block-spacer-height-input' );
-	const [ spacingSizes, spacingUnits ] = useSettings(
-		'spacing.spacingSizes',
-		'spacing.units'
-	);
+	const spacingSizes = useSpacingSizes();
+	const [ spacingUnits ] = useSettings( 'spacing.units' );
 	// In most contexts the spacer size cannot meaningfully be set to a
 	// percentage, since this is relative to the parent container. This
 	// unit is disabled from the UI.
@@ -55,19 +56,17 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	return (
 		<>
 			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
-				<BaseControl label={ label } id={ inputId }>
-					<UnitControl
-						id={ inputId }
-						isResetValueOnUnitChange
-						min={ MIN_SPACER_SIZE }
-						onChange={ handleOnChange }
-						style={ { maxWidth: 80 } }
-						value={ computedValue }
-						units={ units }
-					/>
-				</BaseControl>
+				<UnitControl
+					id={ inputId }
+					isResetValueOnUnitChange
+					min={ MIN_SPACER_SIZE }
+					onChange={ handleOnChange }
+					value={ computedValue }
+					units={ units }
+					label={ label }
+					__next40pxDefaultSize
+				/>
 			) }
-
 			{ spacingSizes?.length > 0 && (
 				<View className="tools-panel-item-spacing">
 					<SpacingSizesControl

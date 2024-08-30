@@ -211,12 +211,12 @@ const LinkSettingsScreen = ( {
 							label={ __( 'Open in new tab' ) }
 							value={ opensInNewWindow }
 							onValueChange={ setOpensInNewWindows }
-							separatorType={ 'fullWidth' }
+							separatorType="fullWidth"
 						/>
 						<BottomSheet.Cell
 							label={ __( 'Remove link' ) }
 							labelStyle={ styles.clearLinkButton }
-							separatorType={ 'none' }
+							separatorType="none"
 							onPress={ removeLink }
 						/>
 					</>

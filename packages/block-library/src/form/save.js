@@ -3,7 +3,7 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-const Save = ( { attributes } ) => {
+export default function save( { attributes } ) {
 	const blockProps = useBlockProps.save();
 	const { submissionMethod } = attributes;
 
@@ -16,5 +16,4 @@ const Save = ( { attributes } ) => {
 			<InnerBlocks.Content />
 		</form>
 	);
-};
-export default Save;
+}

@@ -6,6 +6,7 @@ $shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
 $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover {
+	@include reset;
 	z-index: z-index(".components-popover");
 	will-change: transform;
 
@@ -21,8 +22,8 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__content {
 	background: $white;
-	box-shadow: $shadow-popover-border-default, $shadow-popover;
-	border-radius: $radius-block-ui;
+	box-shadow: $shadow-popover-border-default, $elevation-x-small;
+	border-radius: $radius-medium;
 	box-sizing: border-box;
 	width: min-content;
 
@@ -132,13 +133,4 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	.is-alternate & {
 		stroke: $gray-900;
 	}
-}
-
-.components-popover-pointer-events-trap {
-	// Same z-index as popover, but rendered before the popover element
-	// in DOM order = it will display just under the popover
-	z-index: z-index(".components-popover");
-	position: fixed;
-	inset: 0;
-	background-color: transparent;
 }

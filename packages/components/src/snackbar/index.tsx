@@ -2,13 +2,19 @@
  * External dependencies
  */
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	forwardRef,
+	renderToString,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 
@@ -88,36 +94,40 @@ function UnforwardedSnackbar(
 
 	useSpokenMessage( spokenMessage, politeness );
 
-	// Only set up the timeout dismiss if we're not explicitly dismissing.
+	// The `onDismiss/onRemove` can have unstable references,
+	// trigger side-effect cleanup, and reset timers.
+	const callbacksRef = useRef( { onDismiss, onRemove } );
+	useLayoutEffect( () => {
+		callbacksRef.current = { onDismiss, onRemove };
+	} );
+
 	useEffect( () => {
+		// Only set up the timeout dismiss if we're not explicitly dismissing.
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				onDismiss?.();
-				onRemove?.();
+				callbacksRef.current.onDismiss?.();
+				callbacksRef.current.onRemove?.();
 			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ onDismiss, onRemove, explicitDismiss ] );
+	}, [ explicitDismiss ] );
 
-	const classes = classnames( className, 'components-snackbar', {
+	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
 	} );
 	if ( actions && actions.length > 1 ) {
 		// We need to inform developers that snackbar only accepts 1 action.
 		warning(
-			'Snackbar can only have 1 action, use Notice if your message require many messages'
+			'Snackbar can only have one action. Use Notice if your message requires many actions.'
 		);
 		// return first element only while keeping it inside an array
 		actions = [ actions[ 0 ] ];
 	}
 
-	const snackbarContentClassnames = classnames(
-		'components-snackbar__content',
-		{
-			'components-snackbar__content-with-icon': !! icon,
-		}
-	);
+	const snackbarContentClassnames = clsx( 'components-snackbar__content', {
+		'components-snackbar__content-with-icon': !! icon,
+	} );
 
 	return (
 		<div
@@ -125,9 +135,12 @@ function UnforwardedSnackbar(
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
-			role={ ! explicitDismiss ? 'button' : '' }
+			role={ ! explicitDismiss ? 'button' : undefined }
 			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
-			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
+			aria-label={
+				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
+			}
+			data-testid="snackbar"
 		>
 			<div className={ snackbarContentClassnames }>
 				{ icon && (
@@ -152,7 +165,7 @@ function UnforwardedSnackbar(
 				{ explicitDismiss && (
 					<span
 						role="button"
-						aria-label="Dismiss this notice"
+						aria-label={ __( 'Dismiss this notice' ) }
 						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }

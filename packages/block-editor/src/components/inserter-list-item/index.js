@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ function InserterListItem( {
 	isDraggable,
 	...props
 } ) {
-	const isDragging = useRef( false );
+	const isDraggingRef = useRef( false );
 	const itemIconStyle = item.icon
 		? {
 				backgroundColor: item.icon.background,
@@ -62,7 +62,7 @@ function InserterListItem( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-types-list__list-item',
 						{
 							'is-synced': isSynced,
@@ -70,14 +70,14 @@ function InserterListItem( {
 					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
-						isDragging.current = true;
+						isDraggingRef.current = true;
 						if ( onDragStart ) {
 							onHover( null );
 							onDragStart( event );
 						}
 					} }
 					onDragEnd={ ( event ) => {
-						isDragging.current = false;
+						isDraggingRef.current = false;
 						if ( onDragEnd ) {
 							onDragEnd( event );
 						}
@@ -85,7 +85,7 @@ function InserterListItem( {
 				>
 					<InserterListboxItem
 						isFirst={ isFirst }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-types-list__item',
 							className
 						) }
@@ -110,7 +110,7 @@ function InserterListItem( {
 							}
 						} }
 						onMouseEnter={ () => {
-							if ( isDragging.current ) {
+							if ( isDraggingRef.current ) {
 								return;
 							}
 							onHover( item );

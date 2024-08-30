@@ -25,7 +25,7 @@ plugins {
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 apply from: '../extractPackageVersion.gradle'
 
-group='org.wordpress-mobile.gutenberg-mobile'
+group='org.wordpress.gutenberg-mobile'
 
 def buildAssetsFolder = 'build/assets'
 
@@ -39,7 +39,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
         buildConfigField "boolean", "SHOULD_ATTACH_JS_BUNDLE", willPublishReactNativeBridgeBinary.toString()
     }
 
@@ -48,8 +48,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -93,8 +93,8 @@ dependencies {
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
-    def reactNativeLibrariesPublisherVersion = "v3"
-    def reactNativeLibrariesGroupId = "org.wordpress-mobile.react-native-libraries.$reactNativeLibrariesPublisherVersion"
+    def reactNativeLibrariesPublisherVersion = "v6"
+    def reactNativeLibrariesGroupId = "org.wordpress.react-native-libraries.$reactNativeLibrariesPublisherVersion"
     implementation "$reactNativeLibrariesGroupId:react-native-get-random-values:${extractPackageVersion(packageJson, 'react-native-get-random-values', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-safe-area-context:${extractPackageVersion(packageJson, 'react-native-safe-area-context', 'dependencies')}"
     implementation "$reactNativeLibrariesGroupId:react-native-screens:${extractPackageVersion(packageJson, 'react-native-screens', 'dependencies')}"
@@ -110,7 +110,7 @@ dependencies {
     runtimeOnly "com.facebook.react:hermes-android:$rnVersion"
 
     if (willPublishReactNativeBridgeBinary) {
-        implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
+        implementation "org.wordpress.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
    } else {
         api project(':@wordpress_react-native-aztec')
    }
@@ -122,7 +122,7 @@ project.afterEvaluate {
             ReactNativeBridgePublication(MavenPublication) {
                 artifact bundleReleaseAar
 
-                groupId 'org.wordpress-mobile.gutenberg-mobile'
+                groupId 'org.wordpress.gutenberg-mobile'
                 artifactId 'react-native-gutenberg-bridge'
                 // version is set by 'publish-to-s3' plugin
 

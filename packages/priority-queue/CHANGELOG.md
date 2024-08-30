@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 3.6.0 (2024-08-21)
+
+## 3.5.0 (2024-08-07)
+
+## 3.4.0 (2024-07-24)
+
+## 3.3.0 (2024-07-10)
+
+## 3.2.0 (2024-06-26)
+
+## 3.1.0 (2024-06-15)
+
+## 3.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 2.58.0 (2024-05-16)
+
+## 2.57.0 (2024-05-02)
+
+## 2.56.0 (2024-04-19)
+
+## 2.55.0 (2024-04-03)
+
+## 2.54.0 (2024-03-21)
+
+## 2.53.0 (2024-03-06)
+
+## 2.52.0 (2024-02-21)
+
+## 2.51.0 (2024-02-09)
+
+## 2.50.0 (2024-01-24)
+
+## 2.49.0 (2024-01-10)
+
 ## 2.48.0 (2023-12-13)
 
 ## 2.47.0 (2023-11-29)
@@ -86,9 +124,9 @@
 
 ## 2.7.0 (2022-04-21)
 
-### New features
+### New Features
 
--  Add a new `cancel` method that removes scheduled callbacks without executing them.
+-   Add a new `cancel` method that removes scheduled callbacks without executing them.
 
 ## 2.6.0 (2022-04-08)
 
@@ -113,7 +151,7 @@
 
 ## 1.6.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 

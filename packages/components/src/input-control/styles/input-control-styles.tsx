@@ -13,8 +13,7 @@ import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
 import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
-import type { LabelPosition, Size } from '../types';
-import { space } from '../../utils/space';
+import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -23,23 +22,74 @@ type ContainerProps = {
 	labelPosition?: LabelPosition;
 };
 
-type RootProps = {
-	isFocused?: boolean;
-	labelPosition?: LabelPosition;
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
+
+export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+`;
+
+type BackdropProps = {
+	disabled?: boolean;
+	isBorderless?: boolean;
 };
 
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
-	if ( ! isFocused ) return '';
+const backdropBorderColor = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
+	if ( isBorderless ) {
+		return 'transparent';
+	}
 
-	return css( { zIndex: 1 } );
+	if ( disabled ) {
+		return COLORS.ui.borderDisabled;
+	}
+
+	return COLORS.ui.border;
 };
 
-export const Root = styled( Flex )< RootProps >`
+export const BackdropUI = styled.div< BackdropProps >`
+	&&& {
+		box-sizing: border-box;
+		border-color: ${ backdropBorderColor };
+		border-radius: inherit;
+		border-style: solid;
+		border-width: 1px;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		${ rtl( { paddingLeft: 2 } ) }
+	}
+`;
+
+export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	padding-top: 0;
-	${ rootFocusedStyles }
+
+	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
+	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
+		${ BackdropUI } {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -54,9 +104,13 @@ const containerWidthStyles = ( {
 	__unstableInputWidth,
 	labelPosition,
 }: ContainerProps ) => {
-	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+	if ( ! __unstableInputWidth ) {
+		return css( { width: '100%' } );
+	}
 
-	if ( labelPosition === 'side' ) return '';
+	if ( labelPosition === 'side' ) {
+		return '';
+	}
 
 	if ( labelPosition === 'edge' ) {
 		return css( {
@@ -90,24 +144,29 @@ type InputProps = {
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
-	if ( ! disabled ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
 	return css( {
 		color: COLORS.ui.textDisabled,
 	} );
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		compact: '13px',
 		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
 	const fontSizeMobile = '16px';
 
-	if ( ! fontSize ) return '';
+	if ( ! fontSize ) {
+		return '';
+	}
 
 	return css`
 		font-size: ${ fontSizeMobile };
@@ -128,33 +187,34 @@ export const getSizeConfig = ( {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
 		},
 		small: {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
+		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
+			paddingLeft: CONFIG.controlPaddingXSmall,
+			paddingRight: CONFIG.controlPaddingXSmall,
 		},
 		'__unstable-large': {
 			height: 40,
 			lineHeight: 1,
 			minHeight: 40,
-			paddingLeft: space( 4 ),
-			paddingRight: space( 4 ),
+			paddingLeft: CONFIG.controlPaddingX,
+			paddingRight: CONFIG.controlPaddingX,
 		},
 	};
 
 	if ( ! __next40pxDefaultSize ) {
-		sizes.default = {
-			height: 32,
-			lineHeight: 1,
-			minHeight: 32,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		};
+		sizes.default = sizes.compact;
 	}
 
 	return sizes[ size as Size ] || sizes.default;
@@ -211,7 +271,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -259,68 +319,34 @@ export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
 `;
 
-type BackdropProps = {
-	disabled?: boolean;
-	isFocused?: boolean;
-};
+const prefixSuffixWrapperStyles = ( {
+	variant = 'default',
+	size,
+	__next40pxDefaultSize,
+	isPrefix,
+}: PrefixSuffixWrapperProps & { isPrefix?: boolean } ) => {
+	const { paddingLeft: padding } = getSizeConfig( {
+		inputSize: size,
+		__next40pxDefaultSize,
+	} );
 
-const backdropFocusedStyles = ( {
-	disabled,
-	isFocused,
-}: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+	const paddingProperty = isPrefix
+		? 'paddingInlineStart'
+		: 'paddingInlineEnd';
 
-	let boxShadow;
-	let outline;
-	let outlineOffset;
-
-	if ( isFocused ) {
-		boxShadow = CONFIG.controlBoxShadowFocus;
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline = `2px solid transparent`;
-		outlineOffset = `-2px`;
+	if ( variant === 'default' ) {
+		return css( {
+			[ paddingProperty ]: padding,
+		} );
 	}
 
-	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
-	}
-
+	// If variant is 'icon' or 'control'
 	return css( {
-		boxShadow,
-		borderColor,
-		borderStyle: 'solid',
-		borderWidth: 1,
-		outline,
-		outlineOffset,
+		display: 'flex',
+		[ paddingProperty ]: padding - 4,
 	} );
 };
 
-export const BackdropUI = styled.div< BackdropProps >`
-	&&& {
-		box-sizing: border-box;
-		border-radius: inherit;
-		bottom: 0;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-		top: 0;
-
-		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
-	}
-`;
-
-export const Prefix = styled.span`
-	box-sizing: border-box;
-	display: block;
-`;
-
-export const Suffix = styled.span`
-	align-items: center;
-	align-self: stretch;
-	box-sizing: border-box;
-	display: flex;
+export const PrefixSuffixWrapper = styled.div`
+	${ prefixSuffixWrapperStyles }
 `;
