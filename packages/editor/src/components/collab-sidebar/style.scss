@@ -116,7 +116,6 @@
 	&__commentUpdate {
 		margin-left: auto;
 
-<<<<<<< HEAD
 		button {
 			&.is-compact {
 				&.has-icon:not(.has-text) {
@@ -126,30 +125,14 @@
 					height: 24px;
 					flex-shrink: 0;
 				}
-=======
-		.components-button {
-			&.has-icon:not(.has-text) {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-				flex-shrink: 0;
->>>>>>> b0ad9d5ae1070b9480a9c8353569d8596dc84764
 			}
 		}
 	}
 	&__commentDropdown {
 		flex-shrink: 0;
 
-<<<<<<< HEAD
 		button {
 			&.has-icon {
-=======
-		.components-dropdown {
-			flex-shrink: 0;
-
-			.components-button {
->>>>>>> b0ad9d5ae1070b9480a9c8353569d8596dc84764
 				min-width: 24px;
 				padding: 0;
 				width: 24px;
