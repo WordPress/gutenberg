@@ -13,7 +13,9 @@ import {
 	__experimentalBoxControl as BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
+import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
 
 /**
@@ -474,12 +476,16 @@ export default function DimensionsPanel( {
 						__next40pxDefaultSize
 						label={ __( 'Content width' ) }
 						labelPosition="top"
-						__unstableInputWidth="112px"
 						value={ contentSizeValue || '' }
 						onChange={ ( nextContentSize ) => {
 							setContentSizeValue( nextContentSize );
 						} }
 						units={ units }
+						prefix={
+							<InputControlPrefixWrapper variant="icon">
+								<Icon icon={ alignNone } />
+							</InputControlPrefixWrapper>
+						}
 					/>
 				</ToolsPanelItem>
 			) }
@@ -497,12 +503,16 @@ export default function DimensionsPanel( {
 						__next40pxDefaultSize
 						label={ __( 'Wide width' ) }
 						labelPosition="top"
-						__unstableInputWidth="112px"
 						value={ wideSizeValue || '' }
 						onChange={ ( nextWideSize ) => {
 							setWideSizeValue( nextWideSize );
 						} }
 						units={ units }
+						prefix={
+							<InputControlPrefixWrapper variant="icon">
+								<Icon icon={ stretchWide } />
+							</InputControlPrefixWrapper>
+						}
 					/>
 				</ToolsPanelItem>
 			) }

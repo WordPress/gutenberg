@@ -6,9 +6,17 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { justifyLeft, justifyCenter, justifyRight } from '@wordpress/icons';
+import {
+	Icon,
+	alignNone,
+	stretchWide,
+	justifyLeft,
+	justifyCenter,
+	justifyRight,
+} from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
 
 /**
@@ -71,7 +79,6 @@ export default {
 								className="block-editor-hooks__layout-controls-unit-input"
 								label={ __( 'Content width' ) }
 								labelPosition="top"
-								__unstableInputWidth="112px"
 								value={ contentSize || wideSize || '' }
 								onChange={ ( nextWidth ) => {
 									nextWidth =
@@ -84,6 +91,11 @@ export default {
 									} );
 								} }
 								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ alignNone } />
+									</InputControlPrefixWrapper>
+								}
 							/>
 						</div>
 						<div className="block-editor-hooks__layout-controls-unit">
@@ -92,7 +104,6 @@ export default {
 								className="block-editor-hooks__layout-controls-unit-input"
 								label={ __( 'Wide width' ) }
 								labelPosition="top"
-								__unstableInputWidth="112px"
 								value={ wideSize || contentSize || '' }
 								onChange={ ( nextWidth ) => {
 									nextWidth =
@@ -105,6 +116,11 @@ export default {
 									} );
 								} }
 								units={ units }
+								prefix={
+									<InputControlPrefixWrapper variant="icon">
+										<Icon icon={ stretchWide } />
+									</InputControlPrefixWrapper>
+								}
 							/>
 						</div>
 						<p className="block-editor-hooks__layout-controls-helptext">
