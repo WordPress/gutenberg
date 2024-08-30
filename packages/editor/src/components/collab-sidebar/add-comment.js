@@ -227,6 +227,7 @@ export function AddComment( { setReloadComments } ) {
 												spacing="2"
 											>
 												<Button
+													__next40pxDefaultSize
 													className="block-editor-format-toolbar__cancel-button"
 													variant="secondary"
 													text={ __(
@@ -244,6 +245,7 @@ export function AddComment( { setReloadComments } ) {
 													} }
 												/>
 												<Button
+													__next40pxDefaultSize
 													className="block-editor-format-toolbar__comment-button"
 													variant="primary"
 													text={
@@ -334,6 +336,7 @@ export function AddComment( { setReloadComments } ) {
 														</div>
 													) }
 													<Button
+														__next40pxDefaultSize
 														icon={
 															editIcon
 														}
@@ -351,6 +354,7 @@ export function AddComment( { setReloadComments } ) {
 														} }
 													/>
 													<Button
+														__next40pxDefaultSize
 														icon={
 															deleteIcon
 														}
@@ -401,12 +405,14 @@ export function AddComment( { setReloadComments } ) {
 								/>
 								<HStack alignment="right" spacing="3">
 									<Button
+										__next40pxDefaultSize
 										className="block-editor-format-toolbar__cancel-button"
 										variant="tertiary"
 										text={ __( 'Cancel' ) }
 										onClick={ () => handleCancel() }
 									/>
 									<Button
+										__next40pxDefaultSize
 										className="block-editor-format-toolbar__comment-button"
 										variant="primary"
 										text={

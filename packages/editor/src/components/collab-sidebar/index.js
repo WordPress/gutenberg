@@ -20,7 +20,6 @@ import { AddComment } from './add-comment';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
-	export { default as __experimentalBlockAlignmentMatrixControl }
 const modifyBlockCommentAttributes = ( settings, name ) => {
  		if (
 			name?.includes( 'core/' ) &&

@@ -220,6 +220,7 @@ export function Comments( { threads } ) {
 									thread.id === showConfirmationTabId && (
 										<>
 											<TextareaControl
+												__nextHasNoMarginBottom
 												className="editor-collab-sidebar__replyComment__textarea"
 												value={
 													'' !== newEditedComment
@@ -250,6 +251,7 @@ export function Comments( { threads } ) {
 													justify="flex-start"
 												>
 													<Button
+														__next40pxDefaultSize
 														variant="primary"
 														onClick={ () => {
 															confirmEditComment(
@@ -263,6 +265,7 @@ export function Comments( { threads } ) {
 														{ __( 'Update' ) }
 													</Button>
 													<Button
+														__next40pxDefaultSize
 														onClick={ () => {
 															setCommentEdit(
 																false
@@ -295,6 +298,7 @@ export function Comments( { threads } ) {
 										className="editor-collab-sidebar__replyComment"
 									>
 										<TextareaControl
+											__nextHasNoMarginBottom
 											className="editor-collab-sidebar__replyComment__textarea"
 											value={ commentReply ?? '' }
 											onChange={ ( value ) => {
@@ -313,6 +317,7 @@ export function Comments( { threads } ) {
 												className="editor-collab-sidebar__replybtn"
 											>
 												<Button
+													__next40pxDefaultSize
 													variant="primary"
 													onClick={ () => {
 														confirmReplyComment(
@@ -326,6 +331,7 @@ export function Comments( { threads } ) {
 													{ __( 'Reply' ) }
 												</Button>
 												<Button
+													__next40pxDefaultSize
 													onClick={ () => {
 														setHasCommentReply(
 															false
@@ -426,6 +432,7 @@ export function Comments( { threads } ) {
 													showConfirmationTabId && (
 													<>
 														<TextareaControl
+															__nextHasNoMarginBottom
 															className="editor-collab-sidebar__replyComment__textarea"
 															value={
 																'' !==
@@ -459,6 +466,7 @@ export function Comments( { threads } ) {
 																justify="flex-start"
 															>
 																<Button
+																	__next40pxDefaultSize
 																	variant="primary"
 																	onClick={ () => {
 																		confirmEditComment(
@@ -474,6 +482,7 @@ export function Comments( { threads } ) {
 																	) }
 																</Button>
 																<Button
+																	__next40pxDefaultSize
 																	onClick={ () => {
 																		setCommentEdit(
 																			false
@@ -509,6 +518,7 @@ export function Comments( { threads } ) {
 													className="editor-collab-sidebar__replyComment"
 												>
 													<TextareaControl
+														__nextHasNoMarginBottom
 														className="editor-collab-sidebar__replyComment__textarea"
 														value={
 															commentReply ?? ''
@@ -533,6 +543,7 @@ export function Comments( { threads } ) {
 															className="editor-collab-sidebar__replybtn"
 														>
 															<Button
+																__next40pxDefaultSize
 																variant="primary"
 																onClick={ () => {
 																	confirmReplyComment(
@@ -548,6 +559,7 @@ export function Comments( { threads } ) {
 																) }
 															</Button>
 															<Button
+																__next40pxDefaultSize
 																onClick={ () => {
 																	setHasCommentReply(
 																		false
@@ -639,10 +651,16 @@ function ConfirmNotice({ cofirmMessage, confirmAction, discardAction}) {
 				{ cofirmMessage ?? __( 'Are you sure?' ) }
 			</p>
 			<HStack>
-				<Button variant="primary" onClick={ confirmAction } >
+				<Button 
+					__next40pxDefaultSize
+					variant="primary" onClick={ confirmAction } 
+				>
 					{ __( 'Yes' ) }
 				</Button>
-				<Button 	onClick={ discardAction } >
+				<Button 
+					__next40pxDefaultSize
+					onClick={ discardAction } 
+				>
 					{ __( 'No' ) }
 				</Button>
 			</HStack>
@@ -662,19 +680,21 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 
 	onEdit && moreActions.push( {
 		title: __( 'Edit' ),
-		onClick: () => { onEdit },
+		onClick: onEdit,
 	} );
  
 	onDelete && moreActions.push({
 		title: __( 'Delete' ),
-		onClick: () => { onDelete },
+		onClick: onDelete,
 	});
 		
 	0 === thread.parent &&
 	onReply && moreActions.push( {
 		title: __( 'Reply' ),
-		onClick: () => { onReply },
+		onClick: onReply,
 	});
+
+	console.log('moreActions',moreActions);
 
 	return(
 		<HStack
@@ -709,7 +729,10 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 					>
 						{ onResolve && (
 							<Tooltip text={ __( 'Resolve' ) }>
-								<Button className="has-icon">
+								<Button 
+									__next40pxDefaultSize 
+									className="has-icon"
+								>
 									<Icon
 										icon={ published }
 										onClick={ onResolve }
@@ -727,7 +750,10 @@ function CommentHeader ( { thread, onResolve, onEdit, onDelete, onReply } ){
 				) }
 				{ thread.status === 'approved' && (
 					<Tooltip text={ __( 'Resolved' ) }>
-						<Button className="has-icon">
+						<Button 
+							__next40pxDefaultSize
+						 	className="has-icon"
+						>
 							<Icon icon={ check } />
 						</Button>
 					</Tooltip>
