@@ -64,12 +64,13 @@ export function ActiveLocales( {
 		: 'language-chooser__active-locales-list';
 
 	let emptyMessage = sprintf(
-		/* translators: %s: English (United States) */
+		/* translators: Used in language chooser, indicating fall back to the site's default language. %s: English (United States) */
 		__( 'Falling back to %s.' ),
 		'English (United States)'
 	);
 
 	if ( showOptionSiteDefault ) {
+		/* translators: Used in language chooser, indicating fall back to the site's default language. */
 		emptyMessage = __( 'Falling back to Site Default.' );
 	}
 
