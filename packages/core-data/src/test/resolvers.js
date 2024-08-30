@@ -219,7 +219,7 @@ describe( 'getEntityRecords', () => {
 		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
-			receiveUserPermission: jest.fn(),
+			receiveUserPermissions: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 			finishResolutions,
