@@ -10,9 +10,6 @@ import { store as editorStore } from '../store';
 
 export default {
 	name: 'core/post-meta',
-	getPlaceholder( { args } ) {
-		return args.key;
-	},
 	getValues( { registry, context, bindings } ) {
 		const meta = registry
 			.select( coreDataStore )
@@ -23,7 +20,9 @@ export default {
 			)?.meta;
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			newValues[ attributeName ] = meta?.[ source.args.key ];
+			// Use the key if the value is not set.
+			newValues[ attributeName ] =
+				meta?.[ source.args.key ] || source.args.key;
 		}
 		return newValues;
 	},
