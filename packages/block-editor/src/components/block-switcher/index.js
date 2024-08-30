@@ -107,10 +107,9 @@ function BlockSwitcherDropdownMenuContents( {
 	const hasPossibleBlockVariationTransformations =
 		!! blockVariationTransformations?.length;
 	const hasPatternTransformation = !! patterns?.length && canRemove;
-	/*	const hasBlockOrBlockVariationTransforms =
+	const hasBlockOrBlockVariationTransforms =
 		hasPossibleBlockTransformations ||
-		hasPossibleBlockVariationTransformations;*/
-	const hasBlockOrBlockVariationTransforms = false;
+		hasPossibleBlockVariationTransformations;
 	const hasContents =
 		hasBlockStyles ||
 		hasBlockOrBlockVariationTransforms ||
