@@ -32,7 +32,7 @@
 			right: 9px;
 			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
 			left: 9px;
-			border-radius: $radius-block-ui + $border-width + $border-width;
+			border-radius: $radius-small + $border-width + $border-width;
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
 		}
 
