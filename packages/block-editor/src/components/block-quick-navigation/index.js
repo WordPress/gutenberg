@@ -45,18 +45,24 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected } = useSelect(
+
+	const isSynced = blockInformation?.isSynced;
+
+	const { isSelected, showDrillDown } = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
+
+			const _showDrillDown = ! isSynced;
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				showDrillDown: _showDrillDown,
 			};
 		},
-		[ clientId ]
+		[ isSynced, clientId ]
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -80,11 +86,15 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
 
-				<FlexItem>
-					<Icon
-						icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
-					/>
-				</FlexItem>
+				{ showDrillDown && (
+					<FlexItem>
+						<Icon
+							icon={
+								isRTL() ? chevronLeftSmall : chevronRightSmall
+							}
+						/>
+					</FlexItem>
+				) }
 			</Flex>
 		</Button>
 	);
