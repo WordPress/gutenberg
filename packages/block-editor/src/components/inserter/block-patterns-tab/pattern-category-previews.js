@@ -42,11 +42,8 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const [ allPatterns, , onClickPattern ] = usePatternsState(
-		onInsert,
-		rootClientId,
-		category?.name
-	);
+	const [ allPatterns, , onClickPattern, hasResolvingRequests ] =
+		usePatternsState( onInsert, rootClientId, category?.name );
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
 
@@ -178,6 +175,7 @@ export function PatternCategoryPreviews( {
 					showTitlesAsTooltip={ showTitlesAsTooltip }
 					patternFilter={ patternSourceFilter }
 					pagingProps={ pagingProps }
+					hasResolvingRequests={ hasResolvingRequests }
 				/>
 			) }
 		</>

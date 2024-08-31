@@ -9,12 +9,13 @@ import clsx from 'clsx';
 import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
+	Spinner,
 	VisuallyHidden,
 	Tooltip,
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useDebounce, useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';
 
@@ -203,6 +204,7 @@ function BlockPatternsList(
 		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
+		hasResolvingRequests,
 	},
 	ref
 ) {
@@ -216,34 +218,52 @@ function BlockPatternsList(
 		setActiveId( undefined );
 	}, [ setActiveId, shownPatterns, blockPatterns ] );
 
+	const [ isLoading, setLoading ] = useState( true );
+	const setDebouncedIsLoading = useDebounce( setLoading, 250 );
+
+	useEffect( () => {
+		setDebouncedIsLoading( hasResolvingRequests );
+	}, [ hasResolvingRequests, setDebouncedIsLoading ] );
+
 	return (
-		<Composite
-			store={ compositeStore }
-			role="listbox"
-			className="block-editor-block-patterns-list"
-			aria-label={ label }
-			ref={ ref }
-		>
-			{ blockPatterns.map( ( pattern ) => {
-				const isShown = shownPatterns.includes( pattern );
-				return isShown ? (
-					<BlockPattern
-						key={ pattern.name }
-						id={ pattern.name }
-						pattern={ pattern }
-						onClick={ onClickPattern }
-						onHover={ onHover }
-						isDraggable={ isDraggable }
-						showTitle={ showTitle }
-						showTooltip={ showTitlesAsTooltip }
-						category={ category }
-					/>
-				) : (
-					<BlockPatternPlaceholder key={ pattern.name } />
-				);
-			} ) }
-			{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
-		</Composite>
+		<>
+			{ isLoading ? (
+				<Spinner style={ { margin: '0 auto' } } />
+			) : undefined }
+			<Composite
+				store={ compositeStore }
+				role="listbox"
+				className="block-editor-block-patterns-list"
+				aria-label={ label }
+				ref={ ref }
+				style={
+					isLoading
+						? { opacity: 0, transition: 'opacity 0.3s ease' }
+						: { transition: 'opacity 0.3s ease' }
+				}
+				inert={ isLoading ? 'true' : undefined }
+			>
+				{ blockPatterns.map( ( pattern ) => {
+					const isShown = shownPatterns.includes( pattern );
+					return isShown ? (
+						<BlockPattern
+							key={ pattern.name }
+							id={ pattern.name }
+							pattern={ pattern }
+							onClick={ onClickPattern }
+							onHover={ onHover }
+							isDraggable={ isDraggable }
+							showTitle={ showTitle }
+							showTooltip={ showTitlesAsTooltip }
+							category={ category }
+						/>
+					) : (
+						<BlockPatternPlaceholder key={ pattern.name } />
+					);
+				} ) }
+				{ pagingProps && <BlockPatternsPaging { ...pagingProps } /> }
+			</Composite>
+		</>
 	);
 }
 
