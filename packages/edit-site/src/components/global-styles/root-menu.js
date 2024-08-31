@@ -24,6 +24,7 @@ const {
 	useHasColorPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
+	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
 function RootMenu() {
@@ -34,7 +35,7 @@ function RootMenu() {
 	const hasShadowPanel = true; // useHasShadowPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
-	const hasBackgroundPanel = true; // useHasBackgroundPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 
 	return (
 		<>
