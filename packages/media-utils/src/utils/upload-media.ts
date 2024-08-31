@@ -72,7 +72,7 @@ export function uploadMedia( {
 	const filesSet: Array< Partial< Attachment > | null > = [];
 	const setAndUpdateFiles = ( index: number, value: Attachment | null ) => {
 		if ( filesSet[ index ]?.url ) {
-			revokeBlobURL( filesSet[ index ]?.url );
+			revokeBlobURL( filesSet[ index ].url );
 		}
 		filesSet[ index ] = value;
 		onFileChange?.(
