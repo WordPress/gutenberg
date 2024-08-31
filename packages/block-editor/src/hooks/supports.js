@@ -6,7 +6,7 @@ import { Platform } from '@wordpress/element';
 
 const ALIGN_SUPPORT_KEY = 'align';
 const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
-const BORDER_SUPPORT_KEY = '__experimentalBorder';
+const BORDER_SUPPORT_KEY = 'border';
 const COLOR_SUPPORT_KEY = 'color';
 const CUSTOM_CLASS_NAME_SUPPORT_KEY = 'customClassName';
 const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
