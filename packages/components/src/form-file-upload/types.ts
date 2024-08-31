@@ -11,6 +11,12 @@ import type Icon from '../icon';
 // TODO: Replace `children` and `icon` types with props from Button once Button is typed.
 export type FormFileUploadProps = {
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * A string passed to `input` element that tells the browser which file types can be
 	 * upload to the upload by the user use. e.g: `image/*,video/*`.
 	 *

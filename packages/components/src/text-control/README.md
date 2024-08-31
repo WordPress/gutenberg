@@ -127,6 +127,14 @@ A function that receives the value of the input.
 -   Type: `function`
 -   Required: Yes
 
+#### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ## Related components
 
 -   To offer users more constrained options for input, use SelectControl, RadioControl, CheckboxControl, or RangeControl.

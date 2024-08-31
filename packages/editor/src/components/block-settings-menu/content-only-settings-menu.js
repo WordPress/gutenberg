@@ -10,7 +10,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalText as Text, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -137,27 +137,23 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 	);
 	const blockDisplayInformation =
 		useBlockDisplayInformation( contentLockingParent );
-	// Disable reason: We're using a hook here so it has to be on top-level.
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { modifyContentLockBlock, selectBlock } = unlock(
-		useDispatch( blockEditorStore )
-	);
-
+	const blockEditorActions = useDispatch( blockEditorStore );
 	if ( ! blockDisplayInformation?.title ) {
 		return null;
 	}
+
+	const { modifyContentLockBlock } = unlock( blockEditorActions );
 
 	return (
 		<>
 			<BlockSettingsMenuFirstItem>
 				<MenuItem
 					onClick={ () => {
-						selectBlock( contentLockingParent );
 						modifyContentLockBlock( contentLockingParent );
 						onClose();
 					} }
 				>
-					{ __( 'Unlock' ) }
+					{ _x( 'Unlock', 'Unlock content locked blocks' ) }
 				</MenuItem>
 			</BlockSettingsMenuFirstItem>
 			<Text

@@ -29,6 +29,10 @@
 	}
 }
 
+.dataviews-settings-section:has(.dataviews-settings-section__content:empty) {
+	display: none;
+}
+
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 500px) {
 	.dataviews-settings-section.dataviews-settings-section {
@@ -40,5 +44,24 @@
 		.dataviews-settings-section__content {
 			grid-column: span 2;
 		}
+	}
+}
+.dataviews-field-control__field {
+	height: $grid-unit-40;
+}
+
+.dataviews-field-control__actions {
+	position: absolute;
+	top: -9999em;
+}
+.dataviews-field-control__actions.dataviews-field-control__actions {
+	gap: $grid-unit-05;
+}
+
+.dataviews-field-control__field:hover,
+.dataviews-field-control__field:focus-within {
+	.dataviews-field-control__actions {
+		position: unset;
+		top: unset;
 	}
 }

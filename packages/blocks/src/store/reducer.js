@@ -404,7 +404,6 @@ export function blockBindingsSources( state = {}, action ) {
 					),
 					getValues: action.getValues,
 					setValues: action.setValues,
-					getPlaceholder: action.getPlaceholder,
 					canUserEditValue: action.canUserEditValue,
 					getFieldsList: action.getFieldsList,
 				},

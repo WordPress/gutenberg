@@ -109,7 +109,7 @@ export default function QueryContent( {
 		} );
 	const htmlElementMessages = {
 		main: __(
-			'The <main> element should be used for the primary content of your document only. '
+			'The <main> element should be used for the primary content of your document only.'
 		),
 		section: __(
 			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."

@@ -13,7 +13,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -24,19 +24,12 @@ import {
 	canBindAttribute,
 	getBindableAttributes,
 } from '../hooks/use-bindings-attributes';
-import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
+import { useBlockBindingsUtils } from '../utils/block-bindings';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -51,49 +44,47 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelDropdown( {
-	fieldsList,
-	addConnection,
-	attribute,
-	binding,
-} ) {
+function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+	const registeredSources = getBlockBindingsSources();
+	const { updateBlockBindings } = useBlockBindingsUtils();
 	const currentKey = binding?.args?.key;
 	return (
 		<>
-			{ Object.entries( fieldsList ).map( ( [ label, fields ], i ) => (
-				<Fragment key={ label }>
-					<DropdownMenuGroup>
+			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
+				<Fragment key={ name }>
+					<DropdownMenuV2.Group>
 						{ Object.keys( fieldsList ).length > 1 && (
-							<Text
-								className="block-editor-bindings__source-label"
-								upperCase
-								variant="muted"
-								aria-hidden
-							>
-								{ label }
-							</Text>
+							<DropdownMenuV2.GroupLabel>
+								{ registeredSources[ name ].label }
+							</DropdownMenuV2.GroupLabel>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
-							<DropdownMenuRadioItem
+							<DropdownMenuV2.RadioItem
 								key={ key }
 								onChange={ () =>
-									addConnection( key, attribute )
+									updateBlockBindings( {
+										[ attribute ]: {
+											source: name,
+											args: { key },
+										},
+									} )
 								}
 								name={ attribute + '-binding' }
 								value={ key }
 								checked={ key === currentKey }
 							>
-								<DropdownMenuItemLabel>
+								<DropdownMenuV2.ItemLabel>
 									{ key }
-								</DropdownMenuItemLabel>
-								<DropdownMenuItemHelpText>
+								</DropdownMenuV2.ItemLabel>
+								<DropdownMenuV2.ItemHelpText>
 									{ value }
-								</DropdownMenuItemHelpText>
-							</DropdownMenuRadioItem>
+								</DropdownMenuV2.ItemHelpText>
+							</DropdownMenuV2.RadioItem>
 						) ) }
-					</DropdownMenuGroup>
+					</DropdownMenuV2.Group>
 					{ i !== Object.keys( fieldsList ).length - 1 && (
-						<DropdownMenuSeparator />
+						<DropdownMenuV2.Separator />
 					) }
 				</Fragment>
 			) ) }
@@ -141,9 +132,8 @@ function EditableBlockBindingsPanelItems( {
 	attributes,
 	bindings,
 	fieldsList,
-	addConnection,
-	removeConnection,
 } ) {
+	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
@@ -155,15 +145,16 @@ function EditableBlockBindingsPanelItems( {
 						hasValue={ () => !! binding }
 						label={ attribute }
 						onDeselect={ () => {
-							removeConnection( attribute );
+							updateBlockBindings( {
+								[ attribute ]: undefined,
+							} );
 						} }
 					>
-						<DropdownMenu
+						<DropdownMenuV2
 							placement={
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 							gutter={ isMobile ? 8 : 36 }
-							className="block-editor-bindings__popover"
 							trigger={
 								<Item>
 									<BlockBindingsAttribute
@@ -175,11 +166,10 @@ function EditableBlockBindingsPanelItems( {
 						>
 							<BlockBindingsPanelDropdown
 								fieldsList={ fieldsList }
-								addConnection={ addConnection }
 								attribute={ attribute }
 								binding={ binding }
 							/>
-						</DropdownMenu>
+						</DropdownMenuV2>
 					</ToolsPanelItem>
 				);
 			} ) }
@@ -187,91 +177,33 @@ function EditableBlockBindingsPanelItems( {
 	);
 }
 
-export const BlockBindingsPanel = ( { name, metadata } ) => {
+export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
 	const { bindings } = metadata || {};
-
-	const bindableAttributes = getBindableAttributes( name );
+	const { removeAllBlockBindings } = useBlockBindingsUtils();
+	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
-			! canBindAttribute( name, key ) ||
+			! canBindAttribute( blockName, key ) ||
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
 		}
 	} );
 
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const { _id } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
-
-		return {
-			_id: getSelectedBlockClientId(),
-		};
-	}, [] );
-
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
 
-	const removeAllConnections = () => {
-		const newMetadata = { ...metadata };
-		delete newMetadata.bindings;
-		updateBlockAttributes( _id, {
-			metadata:
-				Object.keys( newMetadata ).length === 0
-					? undefined
-					: newMetadata,
-		} );
-	};
-
-	const addConnection = ( value, attribute ) => {
-		// Assuming the block expects a flat structure for its metadata attribute
-		const newMetadata = {
-			...metadata,
-			// Adjust this according to the actual structure expected by your block
-			bindings: {
-				...metadata?.bindings,
-				[ attribute ]: {
-					source: 'core/post-meta',
-					args: { key: value },
-				},
-			},
-		};
-		// Update the block's attributes with the new metadata
-		updateBlockAttributes( _id, {
-			metadata: newMetadata,
-		} );
-	};
-
-	const removeConnection = ( key ) => {
-		const newMetadata = { ...metadata };
-		if ( ! newMetadata.bindings ) {
-			return;
-		}
-
-		delete newMetadata.bindings[ key ];
-		if ( Object.keys( newMetadata.bindings ).length === 0 ) {
-			delete newMetadata.bindings;
-		}
-		updateBlockAttributes( _id, {
-			metadata:
-				Object.keys( newMetadata ).length === 0
-					? undefined
-					: newMetadata,
-		} );
-	};
-
 	const fieldsList = {};
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
-	Object.values( registeredSources ).forEach(
-		( { getFieldsList, label, usesContext } ) => {
+	Object.entries( registeredSources ).forEach(
+		( [ sourceName, { getFieldsList, usesContext } ] ) => {
 			if ( getFieldsList ) {
 				// Populate context.
 				const context = {};
@@ -286,7 +218,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				} );
 				// Only add source if the list is not empty.
 				if ( sourceList ) {
-					fieldsList[ label ] = { ...sourceList };
+					fieldsList[ sourceName ] = { ...sourceList };
 				}
 			}
 		}
@@ -312,7 +244,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
-					removeAllConnections();
+					removeAllBlockBindings();
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-editor-bindings__panel"
@@ -327,8 +259,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							attributes={ bindableAttributes }
 							bindings={ filteredBindings }
 							fieldsList={ fieldsList }
-							addConnection={ addConnection }
-							removeConnection={ removeConnection }
 						/>
 					) }
 				</ItemGroup>

@@ -8,7 +8,6 @@
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
-	// backdrop-filter: blur($grid-unit);
 	// This animates the appearance of the white background.
 	@include edit-post__fade-in-animation();
 }
@@ -20,19 +19,19 @@
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;
 	background: $white;
-	box-shadow: $shadow-modal;
-	border-radius: $grid-unit-05 $grid-unit-05 0 0;
+	box-shadow: $elevation-large;
+	border-radius: $radius-large $radius-large 0 0;
 	overflow: hidden;
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.1s ease-out;
+	animation: components-modal__appear-animation 0.26s cubic-bezier(0.29, 0, 0, 1);
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 
 	// Show a centered modal on bigger screens.
 	@include break-small() {
-		border-radius: $grid-unit-05;
+		border-radius: $radius-large;
 		margin: auto;
 		width: auto;
 		min-width: $modal-min-width;
@@ -80,10 +79,12 @@
 
 @keyframes components-modal__appear-animation {
 	from {
-		transform: translateY($grid-unit-40);
+		opacity: 0;
+		transform: scale(0.9);
 	}
 	to {
-		transform: translateY(0);
+		opacity: 1;
+		transform: scale(1);
 	}
 }
 
