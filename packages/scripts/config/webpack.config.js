@@ -147,6 +147,7 @@ const baseConfig = {
 	target,
 	output: {
 		filename: '[name].js',
+		chunkFilename: '[name].js?v=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {

@@ -46,12 +46,11 @@
 }
 
 // Even when the block switcher does not have any transformations, it still serves as a block indicator.
-.components-button.block-editor-block-switcher__no-switcher-icon:disabled {
-	opacity: 1;
+.components-button.block-editor-block-switcher__no-switcher-icon[aria-disabled="true"] {
+	color: $gray-900;
 
 	// Since it's not clickable, though, don't show a hover state.
-	&,
-	.block-editor-block-icon.has-colors {
+	&:hover {
 		color: $gray-900;
 	}
 }

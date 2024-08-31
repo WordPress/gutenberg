@@ -1752,7 +1752,7 @@ export function canRemoveBlocks( state, clientIds ) {
  * @param {Object} state    Editor state.
  * @param {string} clientId The block client Id.
  *
- * @return {boolean | undefined} Whether the given block is allowed to be moved.
+ * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
