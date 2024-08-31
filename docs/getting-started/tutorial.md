@@ -25,7 +25,7 @@ To complete this tutorial, you will need:
 If you don't have one or more of these items, the [Block Development Environment](https://developer.wordpress.org/block-editor/getting-started/devenv/) documentation will help you get started. Come back here once you are all set up.
 
 <div class="callout callout-info">
-	This tutorial uses <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/"><code>wp-env</code></a> to create a local WordPress development environment. However, feel free to use alternate local development tools if you already have one that you prefer.
+	This tutorial uses <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/"><code>wp-env</code></a> to create a local WordPress development environment. However, feel free to use any development environment that meets the abovementioned prerequisites.
 </div>
 
 ## Scaffolding the block
