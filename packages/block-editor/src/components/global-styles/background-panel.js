@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalUseNavigator as useNavigator,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
@@ -778,7 +777,11 @@ function ColorPanelDropdown( {
 					};
 
 					return (
-						<Button { ...toggleProps }>
+						// no-restricted-syntax
+						<Button
+							{ ...toggleProps }
+							__next40pxDefaultSize={ false }
+						>
 							<LabeledColorIndicators
 								indicators={ indicators }
 								label={ label }
@@ -850,10 +853,8 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Tools' ),
+	showColorControl = false,
 } ) {
-	const navigator = useNavigator();
-	const { path } = navigator.location;
-
 	/*
 	 * Resolve any inherited "ref" pointers.
 	 * Should the block editor need resolved, inherited values
@@ -1048,51 +1049,49 @@ export default function BackgroundPanel( {
 						/>
 					) }
 				</ToolsPanelItem>
-				{ shouldShowBackgroundColorControls &&
-					path === '/background' && (
-						<ToolsPanelItem
-							hasValue={ hasBackground }
+				{ shouldShowBackgroundColorControls && showColorControl && (
+					<ToolsPanelItem
+						hasValue={ hasBackground }
+						label={ __( 'Color' ) }
+						onDeselect={ resetBackgroundColor }
+						isShownByDefault={ defaultControls.background }
+						panelId={ panelId }
+					>
+						<ColorPanelDropdown
+							key="background"
 							label={ __( 'Color' ) }
-							onDeselect={ resetBackgroundColor }
+							hasValue={ hasBackground }
+							resetValue={ resetBackgroundColor }
 							isShownByDefault={ defaultControls.background }
+							indicators={ [ gradient ?? backgroundColor ] }
+							tabs={ [
+								hasSolidColors && {
+									key: 'background',
+									label: __( 'Background' ),
+									inheritedValue: backgroundColor,
+									setValue: setBackgroundColor,
+									userValue: userBackgroundColor,
+								},
+								hasGradientColors && {
+									key: 'gradient',
+									label: __( 'Gradient' ),
+									inheritedValue: gradient,
+									setValue: setGradient,
+									userValue: userGradient,
+									isGradient: true,
+								},
+							].filter( Boolean ) }
+							colorGradientControlSettings={ {
+								colors,
+								disableCustomColors: ! areCustomSolidsEnabled,
+								gradients,
+								disableCustomGradients:
+									! areCustomGradientsEnabled,
+							} }
 							panelId={ panelId }
-						>
-							<ColorPanelDropdown
-								key="background"
-								label={ __( 'Color' ) }
-								hasValue={ hasBackground }
-								resetValue={ resetBackgroundColor }
-								isShownByDefault={ defaultControls.background }
-								indicators={ [ gradient ?? backgroundColor ] }
-								tabs={ [
-									hasSolidColors && {
-										key: 'background',
-										label: __( 'Background' ),
-										inheritedValue: backgroundColor,
-										setValue: setBackgroundColor,
-										userValue: userBackgroundColor,
-									},
-									hasGradientColors && {
-										key: 'gradient',
-										label: __( 'Gradient' ),
-										inheritedValue: gradient,
-										setValue: setGradient,
-										userValue: userGradient,
-										isGradient: true,
-									},
-								].filter( Boolean ) }
-								colorGradientControlSettings={ {
-									colors,
-									disableCustomColors:
-										! areCustomSolidsEnabled,
-									gradients,
-									disableCustomGradients:
-										! areCustomGradientsEnabled,
-								} }
-								panelId={ panelId }
-							/>
-						</ToolsPanelItem>
-					) }
+						/>
+					</ToolsPanelItem>
+				) }
 			</ItemGroup>
 		</Wrapper>
 	);
