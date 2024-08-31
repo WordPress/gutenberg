@@ -54,6 +54,7 @@ type NavigatorScreenAnimationProps = {
 	skipAnimation: boolean;
 	animationDirection: 'forwards' | 'backwards';
 	isAnimatingOut: boolean;
+	isAnimatingIn: boolean;
 };
 
 const FADE = {
@@ -73,6 +74,17 @@ export const TOTAL_ANIMATION_DURATION_OUT = Math.max(
 	FADE.DURATION + FADE.DELAY.OUT,
 	SLIDE.DURATION
 );
+
+export const ANIMATION_END_NAMES = {
+	forwards: {
+		in: slideFromRight.name,
+		out: slideToLeft.name,
+	},
+	backwards: {
+		in: slideFromLeft.name,
+		out: slideToRight.name,
+	},
+};
 
 const ANIMATION = {
 	forwards: {
@@ -100,6 +112,7 @@ export const navigatorScreenAnimation = ( {
 	animationDirection,
 	skipAnimation,
 	isAnimatingOut,
+	isAnimatingIn,
 }: NavigatorScreenAnimationProps ) => {
 	return css`
 		position: ${ isAnimatingOut ? 'absolute' : 'relative' };
@@ -108,7 +121,7 @@ export const navigatorScreenAnimation = ( {
 		inset-inline-start: ${ isAnimatingOut ? 0 : 'initial' };
 		inset-inline-end: ${ isAnimatingOut ? 0 : 'initial' };
 
-		animation: ${ skipAnimation
+		animation: ${ skipAnimation || ( ! isAnimatingOut && ! isAnimatingIn )
 			? 'none'
 			: ANIMATION[ animationDirection ][
 					isAnimatingOut ? 'out' : 'in'
