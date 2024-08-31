@@ -72,13 +72,11 @@ export function PrivateBlockToolbar( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( firstParentClientId );
@@ -103,7 +101,6 @@ export function PrivateBlockToolbar( {
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
 			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
 				parentBlockType &&
