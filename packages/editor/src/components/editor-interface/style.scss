@@ -9,4 +9,5 @@
 
 .editor-visual-editor {
 	flex: 1 0 auto;
+	z-index: 9; /* Added z-index to ensure popovers are displayed above other elements such as metaboxes */
 }
