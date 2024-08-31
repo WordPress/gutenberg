@@ -34,7 +34,6 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import Shuffle from './shuffle';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 
 /**
@@ -66,7 +65,6 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		canRemove,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -77,7 +75,6 @@ export function PrivateBlockToolbar( {
 			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
-			canRemoveBlock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -119,7 +116,6 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
-			canRemove: canRemoveBlock( selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -202,9 +198,6 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				{ ! isMultiToolbar && canRemove && (
-					<Shuffle clientId={ blockClientId } />
-				) }
 				{ shouldShowVisualToolbar && isMultiToolbar && (
 					<BlockGroupToolbar />
 				) }
