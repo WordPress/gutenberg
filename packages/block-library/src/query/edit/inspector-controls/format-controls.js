@@ -33,7 +33,7 @@ const POST_FORMATS = [
 } );
 
 export default function FormatControls( { onChange, query } ) {
-	const format = query.format.map( ( item ) => item.toLowerCase() );
+	const format = query?.format?.map( ( item ) => item.toLowerCase() ) || [];
 
 	const { supportedFormats } = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
