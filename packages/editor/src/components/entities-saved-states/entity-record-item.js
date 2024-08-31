@@ -4,7 +4,6 @@
 import { CheckboxControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -17,43 +16,33 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
-	const { entityRecordTitle, hasPostMetaChanges } = useSelect(
-		( select ) => {
-			if ( 'postType' !== kind || 'wp_template' !== name ) {
+	const { entityRecordTitle = decodeEntities( title ), hasPostMetaChanges } =
+		useSelect(
+			( select ) => {
+				const {
+					getPostTitle,
+					hasPostMetaChanges: _hasPostMetaChanges,
+				} = unlock( select( editorStore ) );
 				return {
-					entityRecordTitle: title,
-					hasPostMetaChanges: unlock(
-						select( editorStore )
-					).hasPostMetaChanges( name, key ),
+					entityRecordTitle:
+						kind === 'postType'
+							? getPostTitle( kind, name, key )
+							: undefined,
+					hasPostMetaChanges:
+						kind === 'postType'
+							? _hasPostMetaChanges( name, key )
+							: false,
 				};
-			}
-
-			const template = select( coreStore ).getEditedEntityRecord(
-				kind,
-				name,
-				key
-			);
-			return {
-				entityRecordTitle:
-					select( editorStore ).__experimentalGetTemplateInfo(
-						template
-					).title,
-				hasPostMetaChanges: unlock(
-					select( editorStore )
-				).hasPostMetaChanges( name, key ),
-			};
-		},
-		[ name, kind, title, key ]
-	);
+			},
+			[ kind, name, key ]
+		);
 
 	return (
 		<>
 			<PanelRow>
 				<CheckboxControl
 					__nextHasNoMarginBottom
-					label={
-						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
-					}
+					label={ entityRecordTitle || __( 'No title' ) }
 					checked={ checked }
 					onChange={ onChange }
 				/>
