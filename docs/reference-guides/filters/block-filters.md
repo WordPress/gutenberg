@@ -294,6 +294,32 @@ Used to filter an individual transform result from block transformation. All of 
 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
+It can be used to add a unique ID attribute for every block to maintain references to the block.
+
+```js
+// Importing "js-md5" package
+import { md5 } from "js-md5";
+
+function addUniqueID( attributes ) {
+	
+	// Generating a hash value unique for every block.
+	// Similar technique used by ACF to add ids to their blocks.
+	const hash = md5(JSON.stringify(Object.keys(attributes).sort().reduce((acc, currVal) => {
+		acc[currVal] = attributes[currVal]
+		return acc;
+	}, {})));
+	const id = `block_${hash}`;
+	const newAttrs = {blockId, ...attributes};
+	return newAttrs;
+}
+
+wp.hooks.addFilter(
+    'blocks.getBlockAttributes',
+    'my-plugin/add-unique-id',
+    addUniqueID
+);
+```
+
 ### `editor.BlockEdit`
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
