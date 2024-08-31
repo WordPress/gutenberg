@@ -144,11 +144,11 @@ export const actions = [
 		isPrimary: true,
 		icon: trash,
 		hideModalHeader: true,
-		RenderModal: ( { item, closeModal } ) => {
+		RenderModal: ( { items, closeModal } ) => {
 			return (
 				<VStack spacing="5">
 					<Text>
-						{ `Are you sure you want to delete "${ item?.title }"?` }
+						{ `Are you sure you want to delete "${ items[ 0 ].title }"?` }
 					</Text>
 					<HStack justify="right">
 						<Button

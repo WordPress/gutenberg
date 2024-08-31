@@ -171,16 +171,23 @@ const baseItem = css`
 		cursor: not-allowed;
 	}
 
-	/* Hover */
-	&[data-active-item]:not( [data-focus-visible] ):not(
+	/* Active item (including hover)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
+	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
 			[aria-disabled='true']
 		) {
 		background-color: ${ COLORS.theme.accent };
 		color: ${ COLORS.white };
 	}
 
-	/* Keyboard focus (focus-visible) */
-	&[data-focus-visible] {
+	/* Keyboard focus (focus-visible)
+	 * Note: we should be able to remove :focus-visible once
+	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
+	 */
+	&[data-focus-visible],
+	&:focus-visible {
 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
 
 		/* Only visible in Windows High Contrast mode */
@@ -302,6 +309,15 @@ export const ItemSuffixWrapper = styled.span`
 export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
 	/* Ignore this element when calculating the layout. Useful for subgrid */
 	display: contents;
+`;
+
+export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+	/* Occupy the width of all grid columns (ie. full width) */
+	grid-column: 1 / -1;
+
+	padding-block-start: ${ space( 3 ) };
+	padding-block-end: ${ space( 2 ) };
+	padding-inline: ${ ITEM_PADDING_INLINE };
 `;
 
 export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<

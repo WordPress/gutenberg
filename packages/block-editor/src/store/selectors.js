@@ -27,6 +27,7 @@ import {
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getParsedPattern,
+	getGrammar,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -1752,7 +1753,7 @@ export function canRemoveBlocks( state, clientIds ) {
  * @param {Object} state    Editor state.
  * @param {string} clientId The block client Id.
  *
- * @return {boolean | undefined} Whether the given block is allowed to be moved.
+ * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
@@ -2376,17 +2377,27 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( getParsedPattern );
+				.map( ( pattern ) => {
+					return {
+						...pattern,
+						get blocks() {
+							return getParsedPattern( pattern ).blocks;
+						},
+					};
+				} );
+
 			const availableParsedPatterns = parsedPatterns.filter(
-				( { blocks } ) =>
-					checkAllowListRecursive( blocks, allowedBlockTypes )
+				( pattern ) =>
+					checkAllowListRecursive(
+						getGrammar( pattern ),
+						allowedBlockTypes
+					)
 			);
 			const patternsAllowed = availableParsedPatterns.filter(
-				( { blocks } ) =>
-					blocks.every( ( { name } ) =>
+				( pattern ) =>
+					getGrammar( pattern ).every( ( { blockName: name } ) =>
 						canInsertBlockType( state, name, rootClientId )
 					)
 			);

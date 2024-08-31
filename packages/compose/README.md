@@ -500,7 +500,7 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen the resize event of any target element when it changes sizes. \_Note: `useResizeObserver` will report `null` until after first render.
+Hook which allows to listen to the resize event of any target element when it changes size. \_Note: `useResizeObserver` will report `null` sizes until after first render.
 
 _Usage_
 
