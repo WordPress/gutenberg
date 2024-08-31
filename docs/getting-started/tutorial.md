@@ -250,7 +250,7 @@ At this point, the block's icon and description are correct, and block supports 
 
 ### Updating edit.js
 
-The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message " Copyright Date Block – hello from the editor!". Let's change that.
+The [`edit.js`](https://developer.wordpress.org/block-editor/getting-started/fundamentals/file-structure-of-a-block/#edit-js) file controls how the block functions and appears in the Editor. Right now, the user sees the message "Copyright Date Block – hello from the editor!". Let's change that.
 
 Open the file and see that the `Edit()` function returns a paragraph tag with the default message.
 
@@ -647,10 +647,10 @@ While the Editor looks great, the starting year functionality has yet to be adde
 
 Start by adding a variable called `$display_date` and replicate what you did in the `Edit()` function above.
 
-This variable should display the value of the `startingYear` attribute and the `$current_year` variable separated by an em dash, or just the `$current_year` is the `showStartingYear` attribute is `false`.
+This variable should display the value of the `startingYear` attribute and the `$current_year` variable separated by an em dash, or just the `$current_year` if the `showStartingYear` attribute is `false`.
 
 <div class="callout callout-tip">
-	<p>Three variables are exposed in the <code>render.php</code>, which you can use to customize the block's output:</p>
+	<p>Three variables are exposed in <code>render.php</code>, which you can use to customize the block's output:</p>
 	<ul>
 		<li><code>$attributes</code> (array): The block attributes.</li>
 		<li><code>$content</code> (string): The block default content.</li>
