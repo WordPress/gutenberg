@@ -114,6 +114,33 @@ export function ImageEdit( {
 	const [ contentResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 
+	const [ placeholderResizeListener, { width: placeholderWidth } ] =
+		useResizeObserver();
+
+	// Parse width of the image block attribute.
+	const parseWidth = ( widthValue ) => {
+		const parsed = parseInt( widthValue, 10 );
+		return isNaN( parsed ) ? null : parsed;
+	};
+
+	const parsedWidth = parseWidth( width );
+	const parsedPlaceholderWidth = placeholderWidth || null;
+
+	// Get the effective width of the image placeholder use the minimum of placeholder width
+	// or image attribute width if both are defined. If only one is defined, use that one.
+
+	const getEffectiveWidth = () => {
+		if ( parsedPlaceholderWidth !== null && parsedWidth !== null ) {
+			return Math.min( parsedPlaceholderWidth, parsedWidth );
+		}
+		return parsedPlaceholderWidth !== null
+			? parsedPlaceholderWidth
+			: parsedWidth;
+	};
+
+	const effectiveWidth = getEffectiveWidth();
+	const isLargeContainer = effectiveWidth !== null && effectiveWidth > 160;
+
 	const altRef = useRef();
 	useEffect( () => {
 		altRef.current = alt;
@@ -331,40 +358,49 @@ export function ImageEdit( {
 	);
 	const placeholder = ( content ) => {
 		return (
-			<Placeholder
-				className={ clsx( 'block-editor-media-placeholder', {
-					[ borderProps.className ]:
-						!! borderProps.className && ! isSingleSelected,
-				} ) }
-				withIllustration
-				icon={ lockUrlControls ? pluginsIcon : icon }
-				label={ __( 'Image' ) }
-				instructions={
-					! lockUrlControls &&
-					__(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
-					)
-				}
-				style={ {
-					aspectRatio:
-						! ( width && height ) && aspectRatio
-							? aspectRatio
-							: undefined,
-					width: height && aspectRatio ? '100%' : width,
-					height: width && aspectRatio ? '100%' : height,
-					objectFit: scale,
-					...borderProps.style,
-					...shadowProps.style,
-				} }
-			>
-				{ lockUrlControls ? (
-					<span className="block-bindings-media-placeholder-message">
-						{ lockUrlControlsMessage }
-					</span>
-				) : (
-					content
-				) }
-			</Placeholder>
+			<>
+				{ placeholderResizeListener }
+				<Placeholder
+					className={ clsx( 'block-editor-media-placeholder', {
+						[ borderProps.className ]:
+							!! borderProps.className && ! isSingleSelected,
+					} ) }
+					icon={
+						isLargeContainer &&
+						( lockUrlControls ? pluginsIcon : icon )
+					}
+					withIllustration={
+						! isSingleSelected || ! isLargeContainer
+					}
+					label={ isLargeContainer && __( 'Image' ) }
+					instructions={
+						! lockUrlControls &&
+						isLargeContainer &&
+						__(
+							'Upload an image file, pick one from your media library, or add one with a URL.'
+						)
+					}
+					style={ {
+						aspectRatio:
+							! ( width && height ) && aspectRatio
+								? aspectRatio
+								: undefined,
+						width: height && aspectRatio ? '100%' : width,
+						height: width && aspectRatio ? '100%' : height,
+						objectFit: scale,
+						...borderProps.style,
+						...shadowProps.style,
+					} }
+				>
+					{ lockUrlControls ? (
+						<span className="block-bindings-media-placeholder-message">
+							{ lockUrlControlsMessage }
+						</span>
+					) : (
+						isLargeContainer && content
+					) }
+				</Placeholder>
+			</>
 		);
 	};
 
