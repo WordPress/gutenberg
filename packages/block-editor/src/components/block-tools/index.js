@@ -109,6 +109,7 @@ export default function BlockTools( {
 				event.preventDefault();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksUp( clientIds, rootClientId );
+				speak( __( 'Block moved up.' ) );
 			}
 		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -116,6 +117,7 @@ export default function BlockTools( {
 				event.preventDefault();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 				moveBlocksDown( clientIds, rootClientId );
+				speak( __( 'Block moved down.' ) );
 			}
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
