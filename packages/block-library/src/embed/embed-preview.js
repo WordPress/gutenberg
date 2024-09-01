@@ -96,34 +96,26 @@ class EmbedPreview extends Component {
 			);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 
-		return (
-			<figure
-				className={ clsx( className, 'wp-block-embed', {
-					'is-type-video': 'video' === type,
-				} ) }
+		return previewable ? (
+			embedWrapper
+		) : (
+			<Placeholder
+				icon={ <BlockIcon icon={ icon } showColors /> }
+				label={ label }
 			>
-				{ previewable ? (
-					embedWrapper
-				) : (
-					<Placeholder
-						icon={ <BlockIcon icon={ icon } showColors /> }
-						label={ label }
-					>
-						<p className="components-placeholder__error">
-							<a href={ url }>{ url }</a>
-						</p>
-						<p className="components-placeholder__error">
-							{ sprintf(
-								/* translators: %s: host providing embed content e.g: www.youtube.com */
-								__(
-									"Embedded content from %s can't be previewed in the editor."
-								),
-								embedSourceUrl
-							) }
-						</p>
-					</Placeholder>
-				) }
-			</figure>
+				<p className="components-placeholder__error">
+					<a href={ url }>{ url }</a>
+				</p>
+				<p className="components-placeholder__error">
+					{ sprintf(
+						/* translators: %s: host providing embed content e.g: www.youtube.com */
+						__(
+							"Embedded content from %s can't be previewed in the editor."
+						),
+						embedSourceUrl
+					) }
+				</p>
+			</Placeholder>
 		);
 	}
 }

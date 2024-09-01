@@ -262,7 +262,12 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<View { ...blockProps }>
+			<figure
+				{ ...blockProps }
+				className={ clsx( className, 'wp-block-embed', {
+					'is-type-video': 'video' === type,
+				} ) }
+			>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -270,13 +275,9 @@ const EmbedEdit = ( props ) => {
 					url={ url }
 					type={ type }
 					caption={ caption }
-					onCaptionChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
 					isSelected={ isSelected }
 					icon={ icon }
 					label={ label }
-					insertBlocksAfter={ insertBlocksAfter }
 				/>
 				<Caption
 					attributes={ attributes }
@@ -286,7 +287,7 @@ const EmbedEdit = ( props ) => {
 					label={ __( 'Embed caption text' ) }
 					showToolbarButton={ isSelected }
 				/>
-			</View>
+			</figure>
 		</>
 	);
 };
