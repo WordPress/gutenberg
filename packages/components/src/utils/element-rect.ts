@@ -126,6 +126,11 @@ export type ElementOffsetRect = {
 	 */
 	left: number;
 	/**
+	 * The distance from the right edge of the offset parent to the right edge of
+	 * the element.
+	 */
+	right: number;
+	/**
 	 * The distance from the top edge of the offset parent to the top edge of
 	 * the element.
 	 */
@@ -145,6 +150,7 @@ export type ElementOffsetRect = {
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
 	left: 0,
+	right: 0,
 	top: 0,
 	width: 0,
 	height: 0,
@@ -163,17 +169,31 @@ export const NULL_ELEMENT_OFFSET_RECT = {
 export function getElementOffsetRect(
 	element: HTMLElement
 ): ElementOffsetRect {
+	// This is a workaround to obtain these values with a sub-pixel precision,
+	// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
+	const width = parseFloat( getComputedStyle( element ).width );
+	const height = parseFloat( getComputedStyle( element ).height );
+	const parentElementWidth = element?.parentElement
+		? parseFloat( getComputedStyle( element.parentElement ).width )
+		: 0;
+
+	// The adjustments mentioned in the documentation above are necessary
+	// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
+	// which can result in a position mismatch that causes unwanted overflow.
+	// For context, see: https://github.com/WordPress/gutenberg/pull/61979
+	const left = Math.max( element.offsetLeft - 1, 0 );
+	const top = Math.max( element.offsetTop - 1, 0 );
+	const right = Math.max(
+		Math.round( parentElementWidth - width ) - element.offsetLeft - 1,
+		0
+	);
+
 	return {
-		// The adjustments mentioned in the documentation above are necessary
-		// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
-		// which can result in a position mismatch that causes unwanted overflow.
-		// For context, see: https://github.com/WordPress/gutenberg/pull/61979
-		left: Math.max( element.offsetLeft - 1, 0 ),
-		top: Math.max( element.offsetTop - 1, 0 ),
-		// This is a workaround to obtain these values with a sub-pixel precision,
-		// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
-		width: parseFloat( getComputedStyle( element ).width ),
-		height: parseFloat( getComputedStyle( element ).height ),
+		left,
+		top,
+		right,
+		width,
+		height,
 	};
 }
 

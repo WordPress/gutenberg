@@ -24,7 +24,7 @@ export const TabListWrapper = styled.div`
 
 	@media not ( prefers-reduced-motion: reduce ) {
 		&.is-animation-enabled::after {
-			transition-property: left, top, width, height;
+			transition-property: inset-inline-start, top, width, height;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -40,7 +40,7 @@ export const TabListWrapper = styled.div`
 	}
 	&:not( [aria-orientation='vertical'] )::after {
 		bottom: 0;
-		left: var( --indicator-left );
+		inset-inline-start: var( --indicator-inset-inline-start );
 		width: var( --indicator-width );
 		height: 0;
 		border-bottom: var( --wp-admin-border-width-focus ) solid

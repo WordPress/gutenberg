@@ -9,6 +9,7 @@ import { useStoreState } from '@ariakit/react';
  */
 import warning from '@wordpress/warning';
 import { forwardRef, useState } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -78,7 +79,9 @@ export const TabList = forwardRef<
 			onBlur={ onBlur }
 			{ ...otherProps }
 			style={ {
-				'--indicator-left': `${ indicatorPosition.left }px`,
+				'--indicator-inset-inline-start': `${
+					isRTL() ? indicatorPosition.right : indicatorPosition.left
+				}px`,
 				'--indicator-top': `${ indicatorPosition.top }px`,
 				'--indicator-width': `${ indicatorPosition.width }px`,
 				'--indicator-height': `${ indicatorPosition.height }px`,
