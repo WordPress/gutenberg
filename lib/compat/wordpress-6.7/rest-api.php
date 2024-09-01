@@ -24,6 +24,12 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 		if ( false !== $parts_key ) {
 			$paths[ $parts_key ] = '/wp/v2/types/wp_template_part?context=edit';
 		}
+
+		$page_options_path = array( rest_get_route_for_post_type_items( 'page' ), 'OPTIONS' );
+		$page_options_key  = array_search( $page_options_path, $paths, true );
+		if ( false === $page_options_key ) {
+			$paths[] = $page_options_path;
+		}
 	}
 
 	if ( 'core/edit-post' === $context->name ) {
@@ -98,3 +104,13 @@ function gutenberg_register_wp_rest_templates_controller_plugin_field() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_wp_rest_templates_controller_plugin_field' );
+
+/**
+ * Overrides the default 'WP_REST_Server' class.
+ *
+ * @return string The name of the custom server class.
+ */
+function gutenberg_override_default_rest_server() {
+	return 'Gutenberg_REST_Server';
+}
+add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );

@@ -13,34 +13,15 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
-import { Composite, useCompositeStore } from '../composite';
-import { Root, Row } from './styles/alignment-matrix-control-styles';
+import { Composite } from '../composite';
+import { useCompositeStore } from '../composite/store';
+import { GridContainer, GridRow } from './styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
 import type { AlignmentMatrixControlProps } from './types';
 
-/**
- *
- * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
- *
- * ```jsx
- * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
- *
- * const Example = () => {
- * 	const [ alignment, setAlignment ] = useState( 'center center' );
- *
- * 	return (
- * 		<AlignmentMatrixControl
- * 			value={ alignment }
- * 			onChange={ setAlignment }
- * 		/>
- * 	);
- * };
- * ```
- */
-export function AlignmentMatrixControl( {
+function UnforwardedAlignmentMatrixControl( {
 	className,
 	id,
 	label = __( 'Alignment Matrix Control' ),
@@ -51,7 +32,7 @@ export function AlignmentMatrixControl( {
 	...props
 }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
 	const baseId = useInstanceId(
-		AlignmentMatrixControl,
+		UnforwardedAlignmentMatrixControl,
 		'alignment-matrix-control',
 		id
 	);
@@ -68,15 +49,13 @@ export function AlignmentMatrixControl( {
 		rtl: isRTL(),
 	} );
 
-	const activeId = compositeStore.useState( 'activeId' );
-
 	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite
 			store={ compositeStore }
 			render={
-				<Root
+				<GridContainer
 					{ ...props }
 					aria-label={ label }
 					className={ classes }
@@ -87,26 +66,55 @@ export function AlignmentMatrixControl( {
 			}
 		>
 			{ GRID.map( ( cells, index ) => (
-				<Composite.Row render={ <Row role="row" /> } key={ index }>
-					{ cells.map( ( cell ) => {
-						const cellId = getItemId( baseId, cell );
-						const isActive = cellId === activeId;
-
-						return (
-							<Cell
-								id={ cellId }
-								isActive={ isActive }
-								key={ cell }
-								value={ cell }
-							/>
-						);
-					} ) }
+				<Composite.Row render={ <GridRow role="row" /> } key={ index }>
+					{ cells.map( ( cell ) => (
+						<Cell
+							id={ getItemId( baseId, cell ) }
+							key={ cell }
+							value={ cell }
+						/>
+					) ) }
 				</Composite.Row>
 			) ) }
 		</Composite>
 	);
 }
 
-AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+/**
+ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ *
+ * ```jsx
+ * import { AlignmentMatrixControl } from '@wordpress/components';
+ * import { useState } from '@wordpress/element';
+ *
+ * const Example = () => {
+ * 	const [ alignment, setAlignment ] = useState( 'center center' );
+ *
+ * 	return (
+ * 		<AlignmentMatrixControl
+ * 			value={ alignment }
+ * 			onChange={ setAlignment }
+ * 		/>
+ * 	);
+ * };
+ * ```
+ */
+export const AlignmentMatrixControl = Object.assign(
+	UnforwardedAlignmentMatrixControl,
+	{
+		/**
+		 * Render an alignment matrix as an icon.
+		 *
+		 * ```jsx
+		 * import { AlignmentMatrixControl } from '@wordpress/components';
+		 *
+		 * <Icon icon={<AlignmentMatrixControl.Icon value="top left" />} />
+		 * ```
+		 */
+		Icon: Object.assign( AlignmentMatrixControlIcon, {
+			displayName: 'AlignmentMatrixControl.Icon',
+		} ),
+	}
+);
 
 export default AlignmentMatrixControl;

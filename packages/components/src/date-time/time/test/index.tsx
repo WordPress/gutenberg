@@ -281,12 +281,9 @@ describe( 'TimePicker', () => {
 		expect(
 			( screen.getByLabelText( 'Minutes' ) as HTMLInputElement ).value
 		).toBe( '00' );
-		/**
-		 * This is not ideal, but best of we can do for now until we refactor
-		 * AM/PM into accessible elements, like radio buttons.
-		 */
-		expect( screen.getByText( 'AM' ) ).not.toHaveClass( 'is-primary' );
-		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
+
+		expect( screen.getByRole( 'radio', { name: 'AM' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
 	} );
 
 	it( 'should have different layouts/orders for 12/24 hour formats', () => {

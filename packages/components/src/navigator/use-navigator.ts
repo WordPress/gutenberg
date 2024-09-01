@@ -12,7 +12,7 @@ import type { Navigator } from './types';
 /**
  * Retrieves a `navigator` instance.
  */
-function useNavigator(): Navigator {
+export function useNavigator(): Navigator {
 	const { location, params, goTo, goBack, goToParent } =
 		useContext( NavigatorContext );
 
@@ -24,5 +24,3 @@ function useNavigator(): Navigator {
 		params,
 	};
 }
-
-export default useNavigator;

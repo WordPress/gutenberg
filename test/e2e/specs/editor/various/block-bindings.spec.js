@@ -41,7 +41,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Paragraph', () => {
-			test( 'should show the value of the custom field', async ( {
+			test( 'should show the key of the custom field in post meta', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -64,6 +64,53 @@ test.describe( 'Block bindings', () => {
 				await expect( paragraphBlock ).toHaveText(
 					'text_custom_field'
 				);
+			} );
+
+			test( 'should show the key of the custom field in server sources with key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'text_custom_field'
+				);
+			} );
+
+			test( 'should show the source label in server sources without key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText( 'Server Source' );
 			} );
 
 			test( 'should lock the appropriate controls with a registered source', async ( {
