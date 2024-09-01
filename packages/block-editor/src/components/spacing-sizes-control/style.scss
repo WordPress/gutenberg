@@ -18,17 +18,7 @@
 
 	.spacing-sizes-control__range-control,
 	.spacing-sizes-control__custom-value-range {
-		height: 40px;
-		/* Vertically center the RangeControl until it has true 40px height. */
-		display: flex;
-		align-items: center;
-		margin-bottom: 0;
 		flex: 1;
-
-		> .components-base-control__field {
-			/* Fixes RangeControl contents when the outer wrapper is flex */
-			flex: 1;
-		}
 	}
 
 	.components-range-control__mark {

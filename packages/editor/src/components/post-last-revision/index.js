@@ -36,6 +36,8 @@ function PostLastRevision() {
 	return (
 		<PostLastRevisionCheck>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ) }

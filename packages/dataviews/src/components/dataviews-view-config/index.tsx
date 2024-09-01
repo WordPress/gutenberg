@@ -21,26 +21,30 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
+	BaseControl,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
-import { cog, seen, unseen } from '@wordpress/icons';
+import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
+import {
+	SORTING_DIRECTIONS,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	sortIcons,
+	sortLabels,
+} from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
-import type { SupportedLayouts } from '../../types';
+import type { NormalizedField, SupportedLayouts, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
+import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
@@ -56,7 +60,7 @@ function ViewTypeMenu( {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			trigger={
 				<Button
 					size="compact"
@@ -71,7 +75,7 @@ function ViewTypeMenu( {
 					return null;
 				}
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuV2.RadioItem
 						key={ layout }
 						value={ layout }
 						name="view-actions-available-view"
@@ -91,18 +95,14 @@ function ViewTypeMenu( {
 							warning( 'Invalid dataview' );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ config.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.RadioItem>
 				);
 			} ) }
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
-}
-
-interface ViewActionsProps {
-	defaultLayouts?: SupportedLayouts;
 }
 
 function SortFieldControl() {
@@ -140,7 +140,19 @@ function SortFieldControl() {
 }
 
 function SortDirectionControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
+	if ( sortableFields.length === 0 ) {
+		return null;
+	}
+
+	let value = view.sort?.direction;
+	if ( ! value && view.sort?.field ) {
+		value = 'desc';
+	}
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
@@ -148,18 +160,20 @@ function SortDirectionControl() {
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
-			value={ view.sort?.direction || 'desc' }
-			disabled={ ! view?.sort?.field }
+			value={ value }
 			onChange={ ( newDirection ) => {
-				if ( ! view?.sort?.field ) {
-					return;
-				}
 				if ( newDirection === 'asc' || newDirection === 'desc' ) {
 					onChangeView( {
 						...view,
 						sort: {
 							direction: newDirection,
-							field: view.sort.field,
+							field:
+								view.sort?.field ||
+								// If there is no field assigned as the sorting field assign the first sortable field.
+								fields.find(
+									( field ) => field.enableSorting !== false
+								)?.id ||
+								'',
 						},
 					} );
 					return;
@@ -218,50 +232,268 @@ function ItemsPerPageControl() {
 	);
 }
 
+function FieldItem( {
+	fields,
+	fieldId,
+	mandatoryFields,
+	viewFields,
+	view,
+	onChangeView,
+}: {
+	fields: NormalizedField< any >[];
+	fieldId: string;
+	mandatoryFields: string | any[];
+	viewFields: string[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+} ) {
+	let fieldLabel;
+	let fieldIsHidable;
+	const fieldObject = fields.find(
+		( f ) => f.id === fieldId
+	) as NormalizedField< any >;
+	if ( fieldObject ) {
+		fieldLabel = fieldObject.label;
+		fieldIsHidable =
+			fieldObject.enableHiding !== false &&
+			! mandatoryFields.includes( fieldId );
+	} else if ( view.type === LAYOUT_TABLE ) {
+		const combinedFieldObject = view.layout?.combinedFields?.find(
+			( f ) => f.id === fieldId
+		);
+		if ( combinedFieldObject ) {
+			fieldLabel = combinedFieldObject.label;
+			fieldIsHidable = ! mandatoryFields.includes( fieldId );
+		}
+	}
+
+	const index = view.fields?.indexOf( fieldId ) as number;
+	const isVisible = viewFields.includes( fieldId );
+	return (
+		<Item key={ fieldId }>
+			<HStack
+				expanded
+				className={ `dataviews-field-control__field dataviews-field-control__field-${ fieldId }` }
+			>
+				<span>{ fieldLabel }</span>
+				<HStack
+					justify="flex-end"
+					expanded={ false }
+					className="dataviews-field-control__actions"
+				>
+					{ view.type === LAYOUT_TABLE && isVisible && (
+						<>
+							<Button
+								disabled={ ! isVisible || index < 1 }
+								accessibleWhenDisabled
+								size="compact"
+								onClick={ () => {
+									if ( ! view.fields || index < 1 ) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index - 1
+											) ?? [] ),
+											fieldId,
+											view.fields[ index - 1 ],
+											...view.fields.slice( index + 1 ),
+										],
+									} );
+								} }
+								icon={ chevronUp }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s up' ),
+									fieldLabel
+								) }
+							/>
+							<Button
+								disabled={
+									! isVisible ||
+									! view.fields ||
+									index >= view.fields.length - 1
+								}
+								accessibleWhenDisabled
+								size="compact"
+								onClick={ () => {
+									if (
+										! view.fields ||
+										index >= view.fields.length - 1
+									) {
+										return;
+									}
+									onChangeView( {
+										...view,
+										fields: [
+											...( view.fields.slice(
+												0,
+												index
+											) ?? [] ),
+											view.fields[ index + 1 ],
+											fieldId,
+											...view.fields.slice( index + 2 ),
+										],
+									} );
+								} }
+								icon={ chevronDown }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s down' ),
+									fieldLabel
+								) }
+							/>{ ' ' }
+						</>
+					) }
+					<Button
+						className="dataviews-field-control__field-visibility-button"
+						disabled={ ! fieldIsHidable }
+						accessibleWhenDisabled
+						size="compact"
+						onClick={ () => {
+							onChangeView( {
+								...view,
+								fields: isVisible
+									? viewFields.filter(
+											( id ) => id !== fieldId
+									  )
+									: [ ...viewFields, fieldId ],
+							} );
+							// Focus the visibility button to avoid focus loss.
+							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+							setTimeout( () => {
+								const element = document.querySelector(
+									`.dataviews-field-control__field-${ fieldId } .dataviews-field-control__field-visibility-button`
+								);
+								if ( element instanceof HTMLElement ) {
+									element.focus();
+								}
+							}, 50 );
+						} }
+						icon={ isVisible ? seen : unseen }
+						label={
+							isVisible
+								? sprintf(
+										/* translators: %s: field label */
+										__( 'Hide %s' ),
+										fieldLabel
+								  )
+								: sprintf(
+										/* translators: %s: field label */
+										__( 'Show %s' ),
+										fieldLabel
+								  )
+						}
+					/>
+				</HStack>
+			</HStack>
+		</Item>
+	);
+}
+
+function FieldList( {
+	fields,
+	fieldIds,
+	mandatoryFields,
+	viewFields,
+	view,
+	onChangeView,
+}: Omit< Parameters< typeof FieldItem >[ 0 ], 'fieldId' > & {
+	fieldIds: string[];
+} ) {
+	return fieldIds.map( ( fieldId ) => (
+		<FieldItem
+			key={ fieldId }
+			fields={ fields }
+			fieldId={ fieldId }
+			mandatoryFields={ mandatoryFields }
+			viewFields={ viewFields }
+			view={ view }
+			onChangeView={ onChangeView }
+		/>
+	) );
+}
+
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
-	const mandatoryFields = getMandatoryFields( view );
-	const hidableFields = fields.filter(
-		( field ) =>
-			field.enableHiding !== false &&
-			! mandatoryFields.includes( field.id )
+	const mandatoryFields = useMemo(
+		() => getMandatoryFields( view ),
+		[ view ]
 	);
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	if ( ! hidableFields?.length ) {
+	const visibleFields = view.fields;
+	const hiddenFields = useMemo( () => {
+		const nonViewFieldsList = fields
+			.filter(
+				( field ) =>
+					! viewFields.includes( field.id ) &&
+					! mandatoryFields?.includes( field.id )
+			)
+			.map( ( field ) => field.id );
+
+		if ( view.type !== LAYOUT_TABLE ) {
+			return nonViewFieldsList;
+		}
+		const nonViewFieldsAndNonCombinedList = nonViewFieldsList.filter(
+			( fieldId ) => {
+				return ! view.layout?.combinedFields?.some( ( combinedField ) =>
+					combinedField.children.includes( fieldId )
+				);
+			}
+		);
+		const nonViewFieldsCombinedFieldsList =
+			view.layout?.combinedFields
+				?.filter(
+					( combinedField ) =>
+						! viewFields.includes( combinedField.id )
+				)
+				.map( ( combinedField ) => combinedField.id ) || [];
+		return [
+			...nonViewFieldsAndNonCombinedList,
+			...nonViewFieldsCombinedFieldsList,
+		];
+	}, [ view, mandatoryFields, fields, viewFields ] );
+	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
 		return null;
 	}
 	return (
-		<ItemGroup isBordered isSeparated>
-			{ hidableFields?.map( ( field ) => {
-				const isVisible = viewFields.includes( field.id );
-				return (
-					<Item key={ field.id }>
-						<HStack expanded>
-							<span>{ field.label }</span>
-							<Button
-								size="compact"
-								onClick={ () =>
-									onChangeView( {
-										...view,
-										fields: isVisible
-											? viewFields.filter(
-													( id ) => id !== field.id
-											  )
-											: [ ...viewFields, field.id ],
-									} )
-								}
-								icon={ isVisible ? seen : unseen }
-								label={
-									isVisible
-										? __( 'Hide field' )
-										: __( 'Show field' )
-								}
+		<VStack spacing={ 6 } className="dataviews-field-control">
+			{ !! visibleFields?.length && (
+				<ItemGroup isBordered isSeparated>
+					<FieldList
+						fields={ fields }
+						fieldIds={ visibleFields }
+						mandatoryFields={ mandatoryFields }
+						viewFields={ viewFields }
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
+				</ItemGroup>
+			) }
+			{ !! hiddenFields?.length && (
+				<>
+					<VStack spacing={ 4 }>
+						<BaseControl.VisualLabel style={ { margin: 0 } }>
+							{ __( 'Hidden' ) }
+						</BaseControl.VisualLabel>
+						<ItemGroup isBordered isSeparated>
+							<FieldList
+								fields={ fields }
+								fieldIds={ hiddenFields }
+								mandatoryFields={ mandatoryFields }
+								viewFields={ viewFields }
+								view={ view }
+								onChangeView={ onChangeView }
 							/>
-						</HStack>
-					</Item>
-				);
-			} ) }
-		</ItemGroup>
+						</ItemGroup>
+					</VStack>
+				</>
+			) }
+		</VStack>
 	);
 }
 
@@ -303,7 +535,14 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent() {
+function DataviewsViewConfigContent( {
+	density,
+	setDensity,
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+} ) {
+	const { view } = useContext( DataViewsContext );
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection title={ __( 'Appearance' ) }>
@@ -311,6 +550,12 @@ function DataviewsViewConfigContent() {
 					<SortFieldControl />
 					<SortDirectionControl />
 				</HStack>
+				{ view.type === LAYOUT_GRID && (
+					<DensityPicker
+						density={ density }
+						setDensity={ setDensity }
+					/>
+				) }
 				<ItemsPerPageControl />
 			</SettingsSection>
 			<SettingsSection title={ __( 'Properties' ) }>
@@ -321,8 +566,14 @@ function DataviewsViewConfigContent() {
 }
 
 function _DataViewsViewConfig( {
+	density,
+	setDensity,
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+	defaultLayouts?: SupportedLayouts;
+} ) {
 	const [ isShowingViewPopover, setIsShowingViewPopover ] =
 		useState< boolean >( false );
 
@@ -344,7 +595,10 @@ function _DataViewsViewConfig( {
 						} }
 						focusOnMount
 					>
-						<DataviewsViewConfigContent />
+						<DataviewsViewConfigContent
+							density={ density }
+							setDensity={ setDensity }
+						/>
 					</Popover>
 				) }
 			</div>

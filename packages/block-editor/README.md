@@ -811,20 +811,11 @@ _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
 -   _wrapperSelector_ `string`: Wrapper selector.
+-   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
 -   `Array`: converted rules.
-
-_Type Definition_
-
--   _EditorStyle_ `Object`
-
-_Properties_
-
--   _css_ `string`: the CSS block(s), as a single string.
--   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
--   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -920,20 +911,15 @@ _Usage_
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
+	const blockProps = useBlockProps( {
+		className: 'my-custom-class',
+		style: {
+			color: '#222222',
+			backgroundColor: '#eeeeee',
+		},
+	} );
 
-  const blockProps = useBlockProps(
-    className: 'my-custom-class',
-    style: {
-      color: '#222222',
-      backgroundColor: '#eeeeee'
-    }
-  )
-
-  return (
-    <div { ...blockProps }>
-
-    </div>
-  )
+	return <div { ...blockProps }></div>;
 }
 ```
 

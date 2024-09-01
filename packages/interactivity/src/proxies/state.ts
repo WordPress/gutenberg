@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { signal, type Signal } from '@preact/signals';
+import { batch, signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
@@ -11,9 +11,11 @@ import {
 	getProxyFromObject,
 	getNamespaceFromProxy,
 	shouldProxy,
+	getObjectFromProxy,
 } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../namespaces';
+import { isPlainObject } from '../utils';
 
 /**
  * Set of built-in symbols.
@@ -32,6 +34,17 @@ const proxyToProps: WeakMap<
 	object,
 	Map< string | symbol, PropSignal >
 > = new WeakMap();
+
+/**
+ *  Checks wether a {@link PropSignal | `PropSignal`} instance exists for the
+ *  given property in the passed proxy.
+ *
+ * @param proxy Proxy of a state object or array.
+ * @param key   The property key.
+ * @return `true` when it exists; false otherwise.
+ */
+export const hasPropSignal = ( proxy: object, key: string ) =>
+	proxyToProps.has( proxy ) && proxyToProps.get( proxy )!.has( key );
 
 /**
  * Returns the {@link PropSignal | `PropSignal`} instance associated with the
@@ -152,7 +165,7 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const receiver = getProxyFromObject( target );
+			const receiver = getProxyFromObject( target )!;
 			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
@@ -189,7 +202,7 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getPropSignal( getProxyFromObject( target ), key );
+			const prop = getPropSignal( getProxyFromObject( target )!, key );
 			prop.setValue( undefined );
 
 			if ( objToIterable.has( target ) ) {
@@ -248,3 +261,82 @@ export const peek = < T extends object, K extends keyof T >(
 		peeking = false;
 	}
 };
+
+/**
+ * Internal recursive implementation for {@link deepMerge | `deepMerge`}.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
+const deepMergeRecursive = (
+	target: any,
+	source: any,
+	override: boolean = true
+) => {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		for ( const key in source ) {
+			const desc = Object.getOwnPropertyDescriptor( source, key );
+			if (
+				typeof desc?.get === 'function' ||
+				typeof desc?.set === 'function'
+			) {
+				if ( override || ! ( key in target ) ) {
+					Object.defineProperty( target, key, {
+						...desc,
+						configurable: true,
+						enumerable: true,
+					} );
+
+					const proxy = getProxyFromObject( target );
+					if ( desc?.get && proxy && hasPropSignal( proxy, key ) ) {
+						const propSignal = getPropSignal( proxy, key );
+						propSignal.setGetter( desc.get );
+					}
+				}
+			} else if ( isPlainObject( source[ key ] ) ) {
+				if ( ! ( key in target ) ) {
+					target[ key ] = {};
+				}
+
+				deepMergeRecursive( target[ key ], source[ key ], override );
+			} else if ( override || ! ( key in target ) ) {
+				Object.defineProperty( target, key, desc! );
+
+				const proxy = getProxyFromObject( target );
+				if ( desc?.value && proxy && hasPropSignal( proxy, key ) ) {
+					const propSignal = getPropSignal( proxy, key );
+					propSignal.setValue( desc.value );
+				}
+			}
+		}
+	}
+};
+
+/**
+ * Recursively update prop values inside the passed `target` and nested plain
+ * objects, using the values present in `source`. References to plain objects
+ * are kept, only updating props containing primitives or arrays. Arrays are
+ * replaced instead of merged or concatenated.
+ *
+ * If the `override` parameter is set to `false`, then all values in `target`
+ * are preserved, and only new properties from `source` are added.
+ *
+ * @param target   The target object.
+ * @param source   The source object containing new values and props.
+ * @param override Whether existing props should be overwritten or not (`true`
+ *                 by default).
+ */
+export const deepMerge = (
+	target: any,
+	source: any,
+	override: boolean = true
+) =>
+	batch( () =>
+		deepMergeRecursive(
+			getObjectFromProxy( target ) || target,
+			source,
+			override
+		)
+	);

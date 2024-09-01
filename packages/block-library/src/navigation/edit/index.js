@@ -591,6 +591,8 @@ function Navigation( {
 						{ isResponsive && (
 							<>
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									className={ overlayMenuPreviewClasses }
 									onClick={ () => {
 										setOverlayMenuPreview(
@@ -626,10 +628,11 @@ function Navigation( {
 								</div>
 							</>
 						) }
-						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Configure overlay menu' ) }
+							label={ __( 'Overlay Menu' ) }
+							aria-label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
 								'Collapses the navigation options in a menu icon opening an overlay.'
@@ -638,7 +641,6 @@ function Navigation( {
 								setAttributes( { overlayMenu: value } )
 							}
 							isBlock
-							hideLabelFromVision
 						>
 							<ToggleGroupControlOption
 								value="never"

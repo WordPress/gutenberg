@@ -20,6 +20,7 @@ import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getGrammar,
 } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
@@ -291,19 +292,18 @@ export const getInserterMediaCategories = createSelector(
 export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
-			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( STORE_NAME )
-			);
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-			return patterns.some( ( { name, inserter = true } ) => {
+			return patterns.some( ( pattern ) => {
+				const { inserter = true } = pattern;
 				if ( ! inserter ) {
 					return false;
 				}
-				const { blocks } = __experimentalGetParsedPattern( name );
+				const grammar = getGrammar( pattern );
 				return (
-					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
-					blocks.every( ( { name: blockName } ) =>
+					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
+					grammar.every( ( { name: blockName } ) =>
 						canInsertBlockType( state, blockName, rootClientId )
 					)
 				);
@@ -510,4 +510,36 @@ export function getTemporarilyEditingAsBlocks( state ) {
  */
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
+}
+
+/**
+ * Returns the style attributes of multiple blocks.
+ *
+ * @param {Object}   state     Global application state.
+ * @param {string[]} clientIds An array of block client IDs.
+ *
+ * @return {Object} An object where keys are client IDs and values are the corresponding block styles or undefined.
+ */
+export const getBlockStyles = createSelector(
+	( state, clientIds ) =>
+		clientIds.reduce( ( styles, clientId ) => {
+			styles[ clientId ] = state.blocks.attributes.get( clientId )?.style;
+			return styles;
+		}, {} ),
+	( state, clientIds ) => [
+		...clientIds.map(
+			( clientId ) => state.blocks.attributes.get( clientId )?.style
+		),
+	]
+);
+
+/**
+ * Returns whether zoom out mode is enabled.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Is zoom out mode enabled.
+ */
+export function isZoomOutMode( state ) {
+	return state.editorMode === 'zoom-out';
 }

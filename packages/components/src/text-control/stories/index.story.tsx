@@ -52,7 +52,9 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
-Default.args = {};
+Default.args = {
+	__nextHasNoMarginBottom: true,
+};
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
 	DefaultTemplate.bind( {} );
