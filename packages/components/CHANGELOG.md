@@ -60,6 +60,7 @@
 ### Bug Fixes
 
 -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
+-   `Tabs`: Fix indicator misalignment when the browser width changes in RTL languages ([#64965](https://github.com/WordPress/gutenberg/pull/64965)).
 
 ### Internal
 
