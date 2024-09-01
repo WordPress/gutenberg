@@ -65,7 +65,11 @@ export default function QueryInspectorControls( props ) {
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
-	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const {
+		postTypesTaxonomiesMap,
+		postTypesSelectOptions,
+		postFormatSupportMap,
+	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
@@ -94,6 +98,13 @@ export default function QueryInspectorControls( props ) {
 		}
 		// We need to reset `parents` because they are tied to each post type.
 		updateQuery.parents = [];
+		// Post types can register post format support with `add_post_type_support`.
+		// But we need to reset the `format` property when switching to post types
+		// that do not support post formats.
+		const hasFormatSupport = postFormatSupportMap[ newValue ];
+		if ( ! hasFormatSupport ) {
+			updateQuery.format = [];
+		}
 		setQuery( updateQuery );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
@@ -141,14 +152,20 @@ export default function QueryInspectorControls( props ) {
 	// Check if post formats are supported.
 	// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
 	// and in this case the control should not be shown since the user has no other formats to choose from.
-	const showFormatControl = useSelect( ( select ) => {
-		const themeSupports = select( coreStore ).getThemeSupports();
-		return (
-			themeSupports.formats &&
-			themeSupports.formats.length > 0 &&
-			themeSupports.formats.some( ( type ) => type !== 'standard' )
-		);
-	}, [] );
+	const showFormatControl = useSelect(
+		( select ) => {
+			const themeSupports = select( coreStore ).getThemeSupports();
+			const postTypeHasFormatSupport = postFormatSupportMap[ postType ];
+			return (
+				isControlAllowed( allowedControls, 'format' ) && // First check if the control is allowed
+				postTypeHasFormatSupport &&
+				themeSupports.formats &&
+				themeSupports.formats.length > 0 &&
+				themeSupports.formats.some( ( type ) => type !== 'standard' )
+			);
+		},
+		[ allowedControls, postFormatSupportMap, postType ]
+	);
 
 	const showFiltersPanel =
 		showTaxControl ||

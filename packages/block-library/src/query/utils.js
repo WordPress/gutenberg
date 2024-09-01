@@ -94,6 +94,7 @@ export const mapToIHasNameAndId = ( entities, path ) => {
  * Returns a helper object that contains:
  * 1. An `options` object from the available post types, to be passed to a `SelectControl`.
  * 2. A helper map with available taxonomies per post type.
+ * 3. A helper map with post format support per post type.
  *
  * @return {Object} The helper object related to post types.
  */
@@ -124,7 +125,21 @@ export const usePostTypes = () => {
 			} ) ),
 		[ postTypes ]
 	);
-	return { postTypesTaxonomiesMap, postTypesSelectOptions };
+	const postFormatSupportMap = useMemo( () => {
+		if ( ! postTypes?.length ) {
+			return {};
+		}
+		return postTypes.reduce( ( accumulator, type ) => {
+			accumulator[ type.slug ] =
+				type.supports?.[ 'post-formats' ] || false;
+			return accumulator;
+		}, {} );
+	}, [ postTypes ] );
+	return {
+		postTypesTaxonomiesMap,
+		postTypesSelectOptions,
+		postFormatSupportMap,
+	};
 };
 
 /**
