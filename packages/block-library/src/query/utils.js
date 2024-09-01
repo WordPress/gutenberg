@@ -125,7 +125,7 @@ export const usePostTypes = () => {
 			} ) ),
 		[ postTypes ]
 	);
-	const postFormatSupportMap = useMemo( () => {
+	const postTypeFormatSupportMap = useMemo( () => {
 		if ( ! postTypes?.length ) {
 			return {};
 		}
@@ -138,7 +138,7 @@ export const usePostTypes = () => {
 	return {
 		postTypesTaxonomiesMap,
 		postTypesSelectOptions,
-		postFormatSupportMap,
+		postTypeFormatSupportMap,
 	};
 };
 

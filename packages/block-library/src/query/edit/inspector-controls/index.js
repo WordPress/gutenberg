@@ -68,7 +68,7 @@ export default function QueryInspectorControls( props ) {
 	const {
 		postTypesTaxonomiesMap,
 		postTypesSelectOptions,
-		postFormatSupportMap,
+		postTypeFormatSupportMap,
 	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
@@ -101,7 +101,7 @@ export default function QueryInspectorControls( props ) {
 		// Post types can register post format support with `add_post_type_support`.
 		// But we need to reset the `format` property when switching to post types
 		// that do not support post formats.
-		const hasFormatSupport = postFormatSupportMap[ newValue ];
+		const hasFormatSupport = postTypeFormatSupportMap[ newValue ];
 		if ( ! hasFormatSupport ) {
 			updateQuery.format = [];
 		}
@@ -155,7 +155,8 @@ export default function QueryInspectorControls( props ) {
 	const showFormatControl = useSelect(
 		( select ) => {
 			const themeSupports = select( coreStore ).getThemeSupports();
-			const postTypeHasFormatSupport = postFormatSupportMap[ postType ];
+			const postTypeHasFormatSupport =
+				postTypeFormatSupportMap[ postType ];
 			return (
 				isControlAllowed( allowedControls, 'format' ) && // First check if the control is allowed
 				postTypeHasFormatSupport &&
@@ -164,7 +165,7 @@ export default function QueryInspectorControls( props ) {
 				themeSupports.formats.some( ( type ) => type !== 'standard' )
 			);
 		},
-		[ allowedControls, postFormatSupportMap, postType ]
+		[ allowedControls, postTypeFormatSupportMap, postType ]
 	);
 
 	const showFiltersPanel =
