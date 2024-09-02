@@ -17,7 +17,10 @@ import type { DropdownMenuContext } from './types';
 const ANIMATION_PARAMS = {
 	SCALE_AMOUNT_OUTER: 0.82,
 	SCALE_AMOUNT_CONTENT: 0.9,
-	DURATION: '400ms',
+	DURATION: {
+		IN: '400ms',
+		OUT: '200ms',
+	},
 	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
 };
 
@@ -58,13 +61,17 @@ export const MenuPopoverOuterWrapper = styled.div<
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
 		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
-		transition-duration: ${ ANIMATION_PARAMS.DURATION };
+		transition-duration: ${ ANIMATION_PARAMS.DURATION.IN };
 		will-change: transform, opacity;
 
 		/* Regardless of the side, fade in and out. */
 		opacity: 0;
 		&:has( [data-enter] ) {
 			opacity: 1;
+		}
+
+		&:has( [data-leave] ) {
+			transition-duration: ${ ANIMATION_PARAMS.DURATION.OUT };
 		}
 
 		/* For menus opening on top and bottom side, animate the scale Y too. */
