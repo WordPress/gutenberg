@@ -72,9 +72,9 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight)
 -	**Attributes:** month, year
 
-## Categories List
+## Terms List
 
-Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
+Display a list of all terms of a given taxonomy. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
 -	**Name:** core/categories
 -	**Category:** widgets

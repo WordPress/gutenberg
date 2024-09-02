@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/categories",
-	"title": "Categories List",
+	"title": "Terms List",
 	"category": "widgets",
-	"description": "Display a list of all categories.",
+	"description": "Display a list of all terms of a given taxonomy.",
 	"textdomain": "default",
 	"attributes": {
 		"taxonomy": {
