@@ -2,17 +2,21 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
+import { Button } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useContext } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import isURLLike from '../components/link-control/is-url-like';
 import { unlock } from '../lock-unlock';
+import { Warning } from '../components';
 import BlockContext from '../components/block-context';
+import { useBlockBindingsUtils } from '../utils/block-bindings';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -103,6 +107,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
+		const { updateBlockBindings } = useBlockBindingsUtils();
 		const { name, clientId } = props;
 		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
@@ -121,9 +126,9 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// used purposely here to ensure `boundAttributes` is updated whenever
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
-		const boundAttributes = useSelect( () => {
+		const { boundAttributes, invalidBinding } = useSelect( () => {
 			if ( ! blockBindings ) {
-				return;
+				return {};
 			}
 
 			const attributes = {};
@@ -135,7 +140,15 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = sources[ sourceName ];
-				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
+				if ( ! source ) {
+					return {
+						invalidBinding: {
+							source: sourceName,
+							attribute: attributeName,
+						},
+					};
+				}
+				if ( ! canBindAttribute( name, attributeName ) ) {
 					continue;
 				}
 
@@ -190,7 +203,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				}
 			}
 
-			return attributes;
+			return { boundAttributes: attributes };
 		}, [ blockBindings, name, clientId, blockContext, registry, sources ] );
 
 		const { setAttributes } = props;
@@ -285,6 +298,38 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				hasParentPattern,
 			]
 		);
+
+		// Throw a warning if the block is connected to an invalid source.
+		if ( invalidBinding ) {
+			const removeAllBindingsButton = (
+				<Button
+					__next40pxDefaultSize={ false }
+					key="remove-all-bindings"
+					onClick={ () =>
+						updateBlockBindings( {
+							[ invalidBinding.attribute ]: undefined,
+						} )
+					}
+					variant="primary"
+				>
+					{ __( 'Remove connection' ) }
+				</Button>
+			);
+			return (
+				<div className="has-warning">
+					<Warning actions={ [ removeAllBindingsButton ] }>
+						{ sprintf(
+							/* translators: %1$s: block attribute, %2$s: invalid block bindings source. */
+							__(
+								'Attribute "%1$s" is connected to undefined "%2$s" block bindings source. You can leave this block intact, modify the connection, or remove it.'
+							),
+							invalidBinding.attribute,
+							invalidBinding.source
+						) }
+					</Warning>
+				</div>
+			);
+		}
 
 		return (
 			<>
