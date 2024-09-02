@@ -190,7 +190,7 @@ export function RichTextWrapper(
 				? relevantBinding?.args?.key || blockBindingsSource?.label
 				: sprintf(
 						/* translators: %s: source label or key */
-						__( 'Add %s value' ),
+						__( 'Add %s' ),
 						relevantBinding?.args?.key || blockBindingsSource?.label
 				  );
 
