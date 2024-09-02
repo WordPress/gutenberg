@@ -94,7 +94,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     <p
       class="edit-post-preferences-modal__custom-fields-confirmation-message"
     >
-      Connected attributes cannot be edited in the block editor while this interface is active.
+      Custom fields connected to block attributes cannot be edited in the block editor while this interface is active.
     </p>
     <p
       class="edit-post-preferences-modal__custom-fields-confirmation-message"
@@ -206,7 +206,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
     <p
       class="edit-post-preferences-modal__custom-fields-confirmation-message"
     >
-      Connected attributes cannot be edited in the block editor while this interface is active.
+      Custom fields connected to block attributes cannot be edited in the block editor while this interface is active.
     </p>
   </div>
 </div>
