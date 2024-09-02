@@ -60,6 +60,7 @@
 ### Bug Fixes
 
 -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
+-   `ColorPalette` utils: do not normalize undefined color values ([#64969](https://github.com/WordPress/gutenberg/pull/64969)).
 
 ### Internal
 
