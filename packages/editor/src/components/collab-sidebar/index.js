@@ -4,11 +4,11 @@
 // eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
-
 import { addFilter } from '@wordpress/hooks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -49,19 +49,145 @@ addFilter(
  * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
-	// Check if the experimental flag is enabled.
-	if ( ! isBlockCommentExperimentEnabled ) {
-		return null; // or maybe return some message indicating no threads are available.
-	}
+	const { createNotice } = useDispatch( noticesStore );
 
 	const [ threads, setThreads ] = useState( () => [] );
-	const [ reloadComments, setReloadComments ] = useState( false );
 	const postId = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( 'core/editor' ).getCurrentPostId();
 	}, [] );
 
-	useEffect( () => {
+	const currentUserData = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core' ).getCurrentUser();
+	}, [] );
+
+	// Get the dispatch functions to save the comment and update the block attributes.
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+
+	const clientId = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/block-editor' ).getSelectedBlockClientId();
+	}, [] );
+
+	// Function to save the comment.
+	const addNewComment = ( comment ) => {
+		apiFetch( {
+			path: '/wp/v2/comments',
+			method: 'POST',
+			data: {
+				post: postId,
+				content: comment,
+				comment_date: new Date().toISOString(),
+				comment_type: 'block_comment',
+				comment_author: currentUserData?.name ?? null,
+				comment_approved: 0,
+			},
+		} ).then( ( response ) => {
+			updateBlockAttributes( clientId, {
+				blockCommentId: response?.id,
+			} );
+			fetchComments();
+		} );
+	};
+
+	const onCommentResolve = ( commentId ) => {
+		apiFetch( {
+			path: '/wp/v2/comments/' + commentId,
+			method: 'POST',
+			data: {
+				status: 'approved',
+			},
+		} ).then( ( response ) => {
+			if ( 'approved' === response.status ) {
+				createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+			}
+			fetchComments();
+		} );
+	};
+
+	const onEditComment = ( threadID, comment ) => {
+		if ( threadID && comment.length > 0 ) {
+			const editedComment = comment.replace( /^<p>|<\/p>$/g, '' );
+
+			apiFetch( {
+				path: '/wp/v2/comments/' + threadID,
+				method: 'POST',
+				data: {
+					content: editedComment,
+				},
+			} ).then( ( response ) => {
+				if ( 'trash' !== response.status && '' !== response.id ) {
+					createNotice(
+						'snackbar',
+						__( 'Thread edited successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				}
+				fetchComments();
+			} );
+		}
+	};
+
+	const onAddReply = ( threadID, comment ) => {
+		if ( threadID ) {
+			apiFetch( {
+				path: '/wp/v2/comments/',
+				method: 'POST',
+				data: {
+					parent: threadID,
+					post: postId,
+					content: comment,
+					comment_date: new Date().toISOString(),
+					comment_type: 'block_comment',
+					comment_author: currentUserData?.name ?? null,
+					comment_approved: 0,
+				},
+			} ).then( ( response ) => {
+				if ( 'trash' !== response.status && '' !== response.id ) {
+					createNotice(
+						'snackbar',
+						__( 'Reply added successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				}
+				fetchComments();
+			} );
+		}
+	};
+
+	const onCommentDelete = ( threadID ) => {
+		if ( threadID ) {
+			apiFetch( {
+				path: '/wp/v2/comments/' + threadID,
+				method: 'DELETE',
+			} ).then( ( response ) => {
+				if ( 'trash' === response.status && '' !== response.id ) {
+					createNotice(
+						'snackbar',
+						__( 'Thread deleted successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+				}
+				fetchComments();
+			} );
+		}
+	};
+
+	const fetchComments = () => {
 		if ( postId ) {
 			apiFetch( {
 				path:
@@ -101,7 +227,16 @@ export default function CollabSidebar() {
 				);
 			} );
 		}
-	}, [ postId, reloadComments ] );
+	};
+
+	useEffect( () => {
+		fetchComments();
+	}, [ postId ] );
+
+	// Check if the experimental flag is enabled.
+	if ( ! isBlockCommentExperimentEnabled ) {
+		return null; // or maybe return some message indicating no threads are available.
+	}
 
 	const resultThreads = threads.map( ( thread ) => thread ).reverse();
 
@@ -114,9 +249,15 @@ export default function CollabSidebar() {
 			<div className="editor-collab-sidebar__activities">
 				<AddComment
 					threads={ resultThreads }
-					setReloadComments={ setReloadComments }
+					onSubmit={ addNewComment }
 				/>
-				<Comments threads={ resultThreads } />
+				<Comments
+					threads={ resultThreads }
+					onEditComment={ onEditComment }
+					onAddReply={ onAddReply }
+					onCommentDelete={ onCommentDelete }
+					onCommentResolve={ onCommentResolve }
+				/>
 			</div>
 		</PluginSidebar>
 	);
