@@ -34,24 +34,25 @@ export const TabListWrapper = styled.div`
 		position: absolute;
 		pointer-events: none;
 
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
-		outline-offset: -1px;
-	}
-	&:not( [aria-orientation='vertical'] ) {
 		--direction-factor: 1;
 		--indicator-start: var( --indicator-left );
 		&:dir( rtl ) {
 			--direction-factor: -1;
 			--indicator-start: var( --indicator-right );
 		}
+		transform-origin: calc( ( 1 - var( --direction-factor ) ) * 50% ) 0%;
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
+	}
+	&:not( [aria-orientation='vertical'] ) {
 		&::after {
 			bottom: 0;
 			height: 0;
 			/* Using a large value to avoid antialiasing rounding issues
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 			width: 100px;
-			transform-origin: calc( ( 1 - var( --direction-factor ) ) * 50% ) 0%;
 			transform: translateX(
 					calc(
 						var( --indicator-start ) * var( --direction-factor ) *
