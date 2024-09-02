@@ -18,10 +18,18 @@
 }
 
 .dataviews-filters__summary-popover {
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
 	.components-popover__content {
 		width: 230px;
-		padding: 0;
 		border-radius: $grid-unit-05;
+	}
+
+	&.components-dropdown__content {
+		.components-popover__content {
+			padding: 0;
+		}
 	}
 }
 
@@ -57,6 +65,7 @@
 		position: relative;
 		display: flex;
 		align-items: center;
+		box-sizing: border-box;
 
 		&.has-reset {
 			padding-inline-end: $button-size-small + $grid-unit-05;
@@ -275,6 +284,7 @@
 	font-size: 11px;
 	outline: var(--wp-admin-border-width-focus) solid $white;
 	color: $white;
+	box-sizing: border-box;
 }
 
 .dataviews-search {
