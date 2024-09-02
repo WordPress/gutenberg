@@ -39,6 +39,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
+		$args['name']             = $taxonomy->query_var;
+		$args['value_field']      = 'slug';
 		$args['show_option_none'] = sprintf(
 			/* translators: %s: taxonomy's singular name */
 			__( 'Select %s' ),
@@ -99,8 +101,8 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	( function() {
 		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
 		function onCatChange() {
-			if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
-				location.href = "<?php echo esc_url( home_url() ); ?>/?cat=" + dropdown.options[ dropdown.selectedIndex ].value;
+			if ( dropdown.options[ dropdown.selectedIndex ].value !== -1 ) {
+				location.href = "<?php echo esc_url( home_url() ); ?>/?" + dropdown.name + '=' + dropdown.options[ dropdown.selectedIndex ].value;
 			}
 		}
 		dropdown.onchange = onCatChange;
