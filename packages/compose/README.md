@@ -518,6 +518,7 @@ useEffect( () => {
 	const element = document.querySelector(
 		`[data-element-id="${ elementId }"]`
 	);
+	setTargetElement( element );
 }, [ elementId ] );
 ```
 
