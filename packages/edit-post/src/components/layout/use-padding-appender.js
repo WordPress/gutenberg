@@ -18,12 +18,12 @@ export function usePaddingAppender() {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 
-				const paddingBottom = defaultView.parseInt(
-					defaultView.getComputedStyle( node ).paddingBottom,
+				const pseudoHeight = defaultView.parseInt(
+					defaultView.getComputedStyle( node, ':after' ).height,
 					10
 				);
 
-				if ( ! paddingBottom ) {
+				if ( ! pseudoHeight ) {
 					return;
 				}
 
