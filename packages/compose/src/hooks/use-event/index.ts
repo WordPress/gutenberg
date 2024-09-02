@@ -31,7 +31,9 @@ export default function useEvent< T extends AnyFunction >(
 	callback?: T
 ) {
 	const ref = useRef< AnyFunction | undefined >( () => {
-		throw new Error( 'Cannot call an event handler while rendering.' );
+		throw new Error(
+			'Callbacks created with `useEvent` cannot be called during rendering.'
+		);
 	} );
 	useInsertionEffect( () => {
 		ref.current = callback;
