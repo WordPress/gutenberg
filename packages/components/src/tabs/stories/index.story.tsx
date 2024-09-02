@@ -70,6 +70,15 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 
 export const Default = Template.bind( {} );
 
+export const RTL = () => {
+	return (
+		<div dir="rtl" style={ { padding: '1rem' } }>
+			{ /* @ts-expect-error - This is a temporary hack until we migrate to CSF 3 and my sanity is restored. */ }
+			<Template />
+		</div>
+	);
+};
+
 const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs orientation="vertical" { ...props }>

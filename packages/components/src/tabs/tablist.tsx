@@ -78,8 +78,9 @@ export const TabList = forwardRef<
 			onBlur={ onBlur }
 			{ ...otherProps }
 			style={ {
-				'--indicator-left': indicatorPosition.left,
 				'--indicator-top': indicatorPosition.top,
+				'--indicator-right': indicatorPosition.right,
+				'--indicator-left': indicatorPosition.left,
 				'--indicator-width': indicatorPosition.width,
 				'--indicator-height': indicatorPosition.height,
 				...otherProps.style,

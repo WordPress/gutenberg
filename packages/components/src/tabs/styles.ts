@@ -33,20 +33,29 @@ export const TabListWrapper = styled.div`
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		transform-origin: 0 0;
+		transform-origin: top left;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
-	&:not( [aria-orientation='vertical'] )::after {
-		bottom: 0;
-		height: 0;
-		width: 1px;
-		transform: translateX( calc( var( --indicator-left ) * 1px ) )
-			scaleX( var( --indicator-width ) );
-		border-bottom: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
+	&:not( [aria-orientation='vertical'] ) {
+		&::after {
+			bottom: 0;
+			height: 0;
+			width: 1px;
+			transform: translateX( calc( var( --indicator-left ) * 1px ) )
+				scaleX( var( --indicator-width ) );
+			border-bottom: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+		}
+
+		&:dir( rtl )::after {
+			right: 0;
+			transform-origin: top right;
+			transform: translateX( calc( var( --indicator-right ) * -1px ) )
+				scaleX( var( --indicator-width ) );
+		}
 	}
 	&[aria-orientation='vertical']::after {
 		z-index: -1;

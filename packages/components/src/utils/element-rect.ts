@@ -119,15 +119,25 @@ export function useResizeObserver(
  */
 export type ElementOffsetRect = {
 	/**
-	 * The distance from the left edge of the offset parent to the left edge of
-	 * the element.
-	 */
-	left: number;
-	/**
 	 * The distance from the top edge of the offset parent to the top edge of
 	 * the element.
 	 */
 	top: number;
+	/**
+	 * The distance from the right edge of the offset parent to the right edge
+	 * of the element.
+	 */
+	right: number;
+	/**
+	 * The distance from the bottom edge of the offset parent to the bottom edge
+	 * of the element.
+	 */
+	bottom: number;
+	/**
+	 * The distance from the left edge of the offset parent to the left edge of
+	 * the element.
+	 */
+	left: number;
 	/**
 	 * The width of the element.
 	 */
@@ -142,8 +152,10 @@ export type ElementOffsetRect = {
  * An `ElementOffsetRect` object with all values set to zero.
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
-	left: 0,
 	top: 0,
+	right: 0,
+	bottom: 0,
+	left: 0,
 	width: 0,
 	height: 0,
 } satisfies ElementOffsetRect;
@@ -183,8 +195,10 @@ export function getElementOffsetRect(
 		// To obtain the right values for the position:
 		// 1. Compute the element's position relative to the offset parent.
 		// 2. Correct for the scale factor.
-		left: ( rect.left - offsetParentRect?.left ) * scaleX,
 		top: ( rect.top - offsetParentRect?.top ) * scaleY,
+		right: ( offsetParentRect?.right - rect.right ) * scaleX,
+		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
+		left: ( rect.left - offsetParentRect?.left ) * scaleX,
 		// Computed dimensions don't need any adjustments.
 		width: computedWidth,
 		height: computedHeight,
