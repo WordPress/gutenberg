@@ -44,11 +44,14 @@ export default function CategoriesEdit( {
 		query.parent = 0;
 	}
 
-	const { record: taxonomy } = useEntityRecord(
+	const { record: taxonomy, isResolvingTaxonomy } = useEntityRecord(
 		'root',
 		'taxonomy',
 		taxonomySlug
 	);
+
+	const isHierarchicalTaxonomy =
+		! isResolvingTaxonomy && taxonomy?.hierarchical;
 
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
@@ -195,19 +198,21 @@ export default function CategoriesEdit( {
 						checked={ showPostCounts }
 						onChange={ toggleAttribute( 'showPostCounts' ) }
 					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Show only top level categories' ) }
-						checked={ showOnlyTopLevel }
-						onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
-					/>
+					{ isHierarchicalTaxonomy && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show only top level categories' ) }
+							checked={ showOnlyTopLevel }
+							onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show empty categories' ) }
 						checked={ showEmpty }
 						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
-					{ ! showOnlyTopLevel && (
+					{ isHierarchicalTaxonomy && ! showOnlyTopLevel && (
 						<ToggleControl
 							__nextHasNoMarginBottom
 							label={ __( 'Show hierarchy' ) }
