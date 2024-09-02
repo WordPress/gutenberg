@@ -46,12 +46,13 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			__( 'Select %s' ),
 			$taxonomy->labels->singular_name
 		);
-		$show_label               = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
-		$default_label            = $taxonomy->label;
-		$label_text               = ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
-		$wrapper_markup           = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">' . $label_text . '</label>%2$s</div>';
-		$items_markup             = wp_dropdown_categories( $args );
-		$type                     = 'dropdown';
+
+		$show_label     = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
+		$default_label  = $taxonomy->label;
+		$label_text     = ! empty( $attributes['label'] ) ? $attributes['label'] : $default_label;
+		$wrapper_markup = '<div %1$s><label class="wp-block-categories__label' . $show_label . '" for="' . esc_attr( $id ) . '">' . $label_text . '</label>%2$s</div>';
+		$items_markup   = wp_dropdown_categories( $args );
+		$type           = 'dropdown';
 
 		if ( ! is_admin() ) {
 			// Inject the dropdown script immediately after the select dropdown.
