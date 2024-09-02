@@ -337,7 +337,7 @@ Each "virtual field", has to provide an `id` and `label` (optionally a `header` 
 Additionally, they need to provide:
 
 -   `children`: a list of field's `id` to combine
--   `direction`: how should they be stacked, `vertically` or `horizontally`
+-   `direction`: how should they be stacked, `vertical` or `horizontal`
 
 For example, this is how you'd define a `site` field which is a combination of a `title` and `description` fields, which are not displayed:
 
