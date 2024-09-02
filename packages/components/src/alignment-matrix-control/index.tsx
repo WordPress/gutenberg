@@ -8,13 +8,13 @@ import clsx from 'clsx';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Cell from './cell';
 import { Composite } from '../composite';
-import { useCompositeStore } from '../composite/store';
 import { GridContainer, GridRow } from './styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
@@ -37,23 +37,26 @@ function UnforwardedAlignmentMatrixControl( {
 		id
 	);
 
-	const compositeStore = useCompositeStore( {
-		defaultActiveId: getItemId( baseId, defaultValue ),
-		activeId: getItemId( baseId, value ),
-		setActiveId: ( nextActiveId ) => {
+	const setActiveId = useCallback<
+		NonNullable< React.ComponentProps< typeof Composite >[ 'setActiveId' ] >
+	>(
+		( nextActiveId ) => {
 			const nextValue = getItemValue( baseId, nextActiveId );
 			if ( nextValue ) {
 				onChange?.( nextValue );
 			}
 		},
-		rtl: isRTL(),
-	} );
+		[ baseId, onChange ]
+	);
 
 	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite
-			store={ compositeStore }
+			defaultActiveId={ getItemId( baseId, defaultValue ) }
+			activeId={ getItemId( baseId, value ) }
+			setActiveId={ setActiveId }
+			rtl={ isRTL() }
 			render={
 				<GridContainer
 					{ ...props }
