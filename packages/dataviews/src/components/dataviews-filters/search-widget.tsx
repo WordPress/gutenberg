@@ -8,6 +8,7 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
+import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
 import {
@@ -27,7 +28,6 @@ import type { Filter, NormalizedFilter, View } from '../../types';
 const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
 } = unlock( componentsPrivateApis );
 
 interface SearchWidgetProps {
@@ -84,22 +84,35 @@ const getNewValue = (
 	return [ value ];
 };
 
+function generateCompositeItemId(
+	prefix: string,
+	filterElement: NormalizedFilter[ 'elements' ][ number ]
+) {
+	return `${ prefix }-${ filterElement.value }`;
+}
+
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
-	const compositeStore = useCompositeStore( {
-		virtualFocus: true,
-		focusLoop: true,
+	const baseId = useInstanceId( ListBox, 'dataviews-filter-list-box' );
+
+	const [ activeCompositeId, setActiveCompositeId ] = useState<
+		string | null | undefined
+	>(
 		// When we have no or just one operator, we can set the first item as active.
-		// We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
-		// so the first item is not selected, since the focus is on the operators control.
-		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
-	} );
+		// We do that by setting the initial `activeId` to `undefined`.Otherwise,
+		// we set it to `null`, so the first item is not selected,
+		// since the focus is on the operators control.
+		filter.operators?.length === 1 ? undefined : null
+	);
 	const currentFilter = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
 	return (
 		<Composite
-			store={ compositeStore }
+			virtualFocus
+			focusLoop
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
 			role="listbox"
 			className="dataviews-filters__search-widget-listbox"
 			aria-label={ sprintf(
@@ -108,8 +121,13 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 				filter.name
 			) }
 			onFocusVisible={ () => {
-				if ( ! compositeStore.getState().activeId ) {
-					compositeStore.move( compositeStore.first() );
+				// `onFocusVisible` needs the `Composite` component to be focusable,
+				// which is implicitly achieved via the `virtualFocus: true` option
+				// in the `useCompositeStore` hook.
+				if ( ! activeCompositeId && filter.elements.length ) {
+					setActiveCompositeId(
+						generateCompositeItemId( baseId, filter.elements[ 0 ] )
+					);
 				}
 			} }
 			render={ <Ariakit.CompositeTypeahead store={ compositeStore } /> }
@@ -120,6 +138,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 					key={ element.value }
 					render={
 						<CompositeItem
+							id={ generateCompositeItemId( baseId, element ) }
 							render={
 								<div
 									aria-label={ element.label }
