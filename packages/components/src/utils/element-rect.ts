@@ -192,7 +192,7 @@ export function getElementOffsetRect(
 	const scaleY = computedHeight / rect.height;
 
 	return {
-		// To obtain the right values for the position:
+		// To obtain the adjusted values for the position:
 		// 1. Compute the element's position relative to the offset parent.
 		// 2. Correct for the scale factor.
 		top: ( rect.top - offsetParentRect?.top ) * scaleY,

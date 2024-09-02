@@ -51,7 +51,6 @@ export const TabListWrapper = styled.div`
 		}
 
 		&:dir( rtl )::after {
-			right: 0;
 			transform-origin: top right;
 			transform: translateX( calc( var( --indicator-right ) * -1px ) )
 				scaleX( var( --indicator-width ) );
