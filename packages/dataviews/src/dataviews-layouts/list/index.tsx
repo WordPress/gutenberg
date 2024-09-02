@@ -2,17 +2,11 @@
  * External dependencies
  */
 import clsx from 'clsx';
-// TODO: use the @wordpress/components one once public
-// eslint-disable-next-line no-restricted-imports
-import { useStoreState } from '@ariakit/react';
-// Import CompositeStore type, which is not exported from @wordpress/components.
-// eslint-disable-next-line no-restricted-imports
-import type { CompositeStore } from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -44,23 +38,27 @@ import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
-	id?: string;
+	id: string;
 	isSelected: boolean;
 	item: Item;
 	mediaField?: NormalizedField< Item >;
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField< Item >;
-	store: CompositeStore;
 	visibleFields: NormalizedField< Item >[];
+	selectPreviousItemDropdownTrigger: () => void;
+	selectNextItemDropdownTrigger: () => void;
 }
 
 const {
-	useCompositeStoreV2: useCompositeStore,
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
+
+function generateDropdownTriggerCompositeId( domId: string ) {
+	return `${ domId }-dropdown`;
+}
 
 function ListItem< Item >( {
 	actions,
@@ -70,8 +68,9 @@ function ListItem< Item >( {
 	mediaField,
 	onSelect,
 	primaryField,
-	store,
 	visibleFields,
+	selectPreviousItemDropdownTrigger,
+	selectNextItemDropdownTrigger,
 }: ListViewItemProps< Item > ) {
 	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
@@ -147,7 +146,6 @@ function ListItem< Item >( {
 			>
 				<div role="gridcell">
 					<CompositeItem
-						store={ store }
 						render={ <div /> }
 						role="button"
 						id={ id }
@@ -213,7 +211,7 @@ function ListItem< Item >( {
 						{ primaryAction && 'RenderModal' in primaryAction && (
 							<div role="gridcell">
 								<CompositeItem
-									store={ store }
+									id={ `${ id }-${ primaryAction.id }` }
 									render={
 										<Button
 											label={ primaryActionLabel }
@@ -244,7 +242,7 @@ function ListItem< Item >( {
 							! ( 'RenderModal' in primaryAction ) && (
 								<div role="gridcell" key={ primaryAction.id }>
 									<CompositeItem
-										store={ store }
+										id={ `${ id }-${ primaryAction.id }` }
 										render={
 											<Button
 												label={ primaryActionLabel }
@@ -268,7 +266,9 @@ function ListItem< Item >( {
 							<DropdownMenu
 								trigger={
 									<CompositeItem
-										store={ store }
+										id={ generateDropdownTriggerCompositeId(
+											id
+										) }
 										render={
 											<Button
 												size="small"
@@ -276,28 +276,24 @@ function ListItem< Item >( {
 												label={ __( 'Actions' ) }
 												accessibleWhenDisabled
 												disabled={ ! actions.length }
-												onKeyDown={ ( event: {
-													key: string;
-													preventDefault: () => void;
-												} ) => {
+												// Prevent the default behavior (open dropdown menu)
+												// and instead move the composite item selection.
+												// https://github.com/ariakit/ariakit/issues/3768
+												onKeyDown={ (
+													event: React.KeyboardEvent< HTMLButtonElement >
+												) => {
 													if (
 														event.key ===
 														'ArrowDown'
 													) {
-														// Prevent the default behaviour (open dropdown menu) and go down.
 														event.preventDefault();
-														store.move(
-															store.down()
-														);
+														selectNextItemDropdownTrigger();
 													}
 													if (
 														event.key === 'ArrowUp'
 													) {
-														// Prevent the default behavior (open dropdown menu) and go up.
 														event.preventDefault();
-														store.move(
-															store.up()
-														);
+														selectPreviousItemDropdownTrigger();
 													}
 												} }
 											/>
@@ -331,8 +327,30 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		view,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
+
+	const getItemDomId = useCallback(
+		( item?: Item ) => {
+			if ( ! item ) {
+				return;
+			}
+
+			return `${ baseId }-${ getItemId( item ) }`;
+		},
+		[ baseId, getItemId ]
+	);
+
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
+	);
+
+	const onSelect = ( item: Item ) =>
+		onChangeSelection( [ getItemId( item ) ] );
+
+	const [ activeCompositeId, setActiveCompositeId ] = useState<
+		string | null | undefined
+	>(
+		// By default, the active composite item is the selected one.
+		getItemDomId( selectedItem )
 	);
 
 	const mediaField = fields.find(
@@ -350,37 +368,70 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			)
 	);
 
-	const onSelect = ( item: Item ) =>
-		onChangeSelection( [ getItemId( item ) ] );
+	const activeItemIndex = data.findIndex( ( item ) => {
+		const itemCompositeIdPrefix = getItemDomId( item );
+		return (
+			!! itemCompositeIdPrefix &&
+			activeCompositeId?.startsWith( itemCompositeIdPrefix )
+		);
+	} );
+	const previousActiveItemIndex = usePrevious( activeItemIndex );
+	const isActiveIdInList = activeItemIndex !== -1;
 
-	const getItemDomId = useCallback(
-		( item?: Item ) =>
-			item ? `${ baseId }-${ getItemId( item ) }` : undefined,
-		[ baseId, getItemId ]
-	);
-
-	const store = useCompositeStore( {
-		defaultActiveId: getItemDomId( selectedItem ),
-	} ) as CompositeStore; // TODO, remove once composite APIs are public
-
-	// Manage focused item, when the active one is removed from the list.
-	const isActiveIdInList = useStoreState(
-		store,
-		( state: { items: any[]; activeId: any } ) =>
-			state.items.some(
-				( item: { id: any } ) => item.id === state.activeId
-			)
-	);
 	useEffect( () => {
 		if ( ! isActiveIdInList ) {
-			// Prefer going down, except if there is no item below (last item), then go up (last item in list).
-			if ( store.down() ) {
-				store.move( store.down() );
-			} else if ( store.up() ) {
-				store.move( store.up() );
-			}
+			// Prefer going down, except if there is no item below (last item),
+			// then go up (last item in list).
+			// By picking previousActiveItemIndex as the next item index, we are
+			// basically picking the item after the deleted one.
+			// Clamping between 0 and data.length - 1 to avoid out of bounds.
+			const nextActiveDataItem =
+				data[
+					Math.max(
+						0,
+						Math.min(
+							previousActiveItemIndex ?? 0,
+							data.length - 1
+						)
+					)
+				];
+
+			const nextCompositeActiveId = getItemDomId( nextActiveDataItem );
+			setActiveCompositeId( nextCompositeActiveId );
+			(
+				document.querySelector( `#${ nextCompositeActiveId }` ) as
+					| HTMLElement
+					| undefined
+			 )?.focus();
 		}
-	}, [ isActiveIdInList ] );
+	}, [ data, previousActiveItemIndex, getItemDomId, isActiveIdInList ] );
+
+	const selectItemDropdownTrigger = ( itemIndex: number ) => {
+		const item = data[ itemIndex ];
+		const itemDomId = getItemDomId( item );
+		if ( ! itemDomId ) {
+			return;
+		}
+		const nextCompositeActiveId =
+			generateDropdownTriggerCompositeId( itemDomId );
+		setActiveCompositeId( nextCompositeActiveId );
+		(
+			document.querySelector( `#${ nextCompositeActiveId }` ) as
+				| HTMLElement
+				| undefined
+		 )?.focus();
+	};
+
+	const selectPreviousItemDropdownTrigger = () => {
+		selectItemDropdownTrigger(
+			Math.min( data.length - 1, Math.max( 0, activeItemIndex - 1 ) )
+		);
+	};
+	const selectNextItemDropdownTrigger = () => {
+		selectItemDropdownTrigger(
+			Math.min( data.length - 1, Math.max( 0, activeItemIndex + 1 ) )
+		);
+	};
 
 	const hasData = data?.length;
 	if ( ! hasData ) {
@@ -404,10 +455,13 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			render={ <ul /> }
 			className="dataviews-view-list"
 			role="grid"
-			store={ store }
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
 		>
 			{ data.map( ( item ) => {
-				const id = getItemDomId( item );
+				// Since `item` is guaranteed not to be undefined, we can safely
+				// let typescript know that `id` is not undefined either.
+				const id = getItemDomId( item )!;
 				return (
 					<ListItem
 						key={ id }
@@ -418,8 +472,13 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						onSelect={ onSelect }
 						mediaField={ mediaField }
 						primaryField={ primaryField }
-						store={ store }
 						visibleFields={ visibleFields }
+						selectPreviousItemDropdownTrigger={
+							selectPreviousItemDropdownTrigger
+						}
+						selectNextItemDropdownTrigger={
+							selectNextItemDropdownTrigger
+						}
 					/>
 				);
 			} ) }
