@@ -33,6 +33,22 @@ export const Default = ( props ) => {
 		/>
 	);
 };
+
+export const Empty = ( props ) => {
+	const [ view, setView ] = useState( DEFAULT_VIEW );
+
+	return (
+		<DataViews
+			{ ...props }
+			paginationInfo={ { totalItems: 0, totalPages: 0 } }
+			data={ [] }
+			view={ view }
+			fields={ fields }
+			onChangeView={ setView }
+		/>
+	);
+};
+
 Default.args = {
 	actions,
 	defaultLayouts: {
