@@ -82,9 +82,9 @@ export default function useObserveElementSize(
 
 	useLayoutEffect( () => {
 		const element =
-			targetElement instanceof HTMLElement
-				? targetElement
-				: targetElement?.current;
+			targetElement && 'current' in targetElement
+				? targetElement?.current
+				: targetElement;
 		if ( element === observedElementRef.current ) {
 			return;
 		}
