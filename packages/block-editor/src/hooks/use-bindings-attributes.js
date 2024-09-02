@@ -301,7 +301,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 		// Throw a warning if the block is connected to an invalid source.
 		if ( invalidBinding ) {
-			const removeAllBindingsButton = (
+			const removeInvalidBindingButton = (
 				<Button
 					__next40pxDefaultSize={ false }
 					key="remove-all-bindings"
@@ -317,7 +317,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			);
 			return (
 				<div className="has-warning">
-					<Warning actions={ [ removeAllBindingsButton ] }>
+					<Warning actions={ [ removeInvalidBindingButton ] }>
 						{ sprintf(
 							/* translators: %1$s: block attribute, %2$s: invalid block bindings source. */
 							__(
