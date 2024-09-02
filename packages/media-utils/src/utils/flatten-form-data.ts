@@ -11,6 +11,7 @@ export function flattenFormData(
 	data: string | undefined | Record< string, string >
 ) {
 	if (
+		data !== null &&
 		typeof data === 'object' &&
 		Object.getPrototypeOf( data ) === Object.prototype
 	) {
