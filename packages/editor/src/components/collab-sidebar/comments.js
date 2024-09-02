@@ -286,6 +286,15 @@ export function Comments( {
 	);
 }
 
+/**
+ * EditComment component.
+ *
+ * @param {Object}   props          - The component props.
+ * @param {Object}   props.thread   - The comment thread object.
+ * @param {Function} props.onUpdate - The function to call when updating the comment.
+ * @param {Function} props.onCancel - The function to call when canceling the comment update.
+ * @return {JSX.Element} The EditComment component.
+ */
 function EditComment( { thread, onUpdate, onCancel } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread.content.rendered.replace( /<[^>]+>/g, '' )
@@ -324,6 +333,14 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 	);
 }
 
+/**
+ * Renders a component to add a reply.
+ *
+ * @param {Object}   props          - The component props.
+ * @param {Function} props.onSubmit - The function to be called when the reply is submitted.
+ * @param {Function} props.onCancel - The function to be called when the reply is canceled.
+ * @return {JSX.Element} The JSX element representing the AddReply component.
+ */
 function AddReply( { onSubmit, onCancel } ) {
 	const [ inputComment, setInputComment ] = useState( '' );
 
@@ -366,6 +383,15 @@ function AddReply( { onSubmit, onCancel } ) {
 	);
 }
 
+/**
+ * Renders a confirmation notice component.
+ *
+ * @param {Object}   props               - The component props.
+ * @param {string}   props.cofirmMessage - The confirmation message to display. Defaults to 'Are you sure?' if not provided.
+ * @param {Function} props.confirmAction - The action to perform when the confirm button is clicked.
+ * @param {Function} props.discardAction - The action to perform when the discard button is clicked.
+ * @return {JSX.Element} The confirmation notice component.
+ */
 function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
@@ -391,6 +417,18 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	);
 }
 
+/**
+ * Renders the header of a comment in the collaboration sidebar.
+ *
+ * @param {Object}   props           - The component props.
+ * @param {Object}   props.thread    - The comment thread object.
+ * @param {Function} props.onResolve - The function to resolve the comment.
+ * @param {Function} props.onEdit    - The function to edit the comment.
+ * @param {Function} props.onDelete  - The function to delete the comment.
+ * @param {Function} props.onReply   - The function to reply to the comment.
+ * @param {string}   props.status    - The status of the comment.
+ * @return {JSX.Element} The rendered comment header.
+ */
 function CommentHeader( {
 	thread,
 	onResolve,
