@@ -88,10 +88,8 @@ function ResizeElement( { onResize }: ResizeElementProps ) {
 	const resizeCallbackEvent = useEvent( onResize );
 
 	useObserveElementSize( resizeElementRef, ( entries ) => {
-		for ( const entry of entries ) {
-			const newSize = extractSize( entry );
-			resizeCallbackEvent( newSize );
-		}
+		const newSize = extractSize( entries.at( -1 )! ); // Entries are never empty.
+		resizeCallbackEvent( newSize );
 	} );
 
 	return (
