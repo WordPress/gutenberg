@@ -18,14 +18,14 @@ export type AnyFunction = ( ...args: any ) => any;
  * @example
  *
  * ```tsx
- * function Component(props) {
- *   const onClick = useEvent(props.onClick);
- *   React.useEffect(() => {
+ * function Component( props ) {
+ *   const onClick = useEvent( props.onClick );
+ *   useEffect( () => {
  *     onClick();
  *     // Won't trigger the effect again when props.onClick is updated.
- *   }, [onClick]);
- *   // Won't re-render Button when props.onClick is updated (if Button is
- *   // wrapped in React.memo).
+ *   }, [ onClick ] );
+ *   // Won't re-render Button when props.onClick is updated (if `Button` is
+ *   // wrapped in `React.memo`).
  *   return <Button onClick={ onClick } />;
  * }
  * ```
