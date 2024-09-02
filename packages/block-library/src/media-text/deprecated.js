@@ -280,6 +280,7 @@ const v7Supports = {
 };
 
 // Version with 'none' as the default alignment.
+// See: https://github.com/WordPress/gutenberg/pull/64981
 const v7 = {
 	attributes: v7Attributes,
 	supports: v7Supports,
