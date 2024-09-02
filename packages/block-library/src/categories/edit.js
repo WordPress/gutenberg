@@ -205,14 +205,14 @@ export default function CategoriesEdit( {
 					{ isHierarchicalTaxonomy && (
 						<ToggleControl
 							__nextHasNoMarginBottom
-							label={ __( 'Show only top level categories' ) }
+							label={ __( 'Show only top level terms' ) }
 							checked={ showOnlyTopLevel }
 							onChange={ toggleAttribute( 'showOnlyTopLevel' ) }
 						/>
 					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show empty categories' ) }
+						label={ __( 'Show empty terms' ) }
 						checked={ showEmpty }
 						onChange={ toggleAttribute( 'showEmpty' ) }
 					/>
