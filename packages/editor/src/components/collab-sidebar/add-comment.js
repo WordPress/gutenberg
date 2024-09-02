@@ -10,6 +10,8 @@ import {
 	Button,
 	TextControl,
 } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Renders the new comment form.
@@ -22,13 +24,12 @@ export function AddComment( { onSubmit } ) {
 	const [ inputComment, setInputComment ] = useState( '' );
 
 	const currentUserData = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core' ).getCurrentUser();
+		return select( coreStore ).getCurrentUser();
 	}, [] );
 
 	const useDefaultAvatar = () => {
 		const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 			const { __experimentalDiscussionSettings } = getSettings();
 			return __experimentalDiscussionSettings;
 		} );
@@ -40,33 +41,23 @@ export function AddComment( { onSubmit } ) {
 
 	const currentUser = currentUserData?.name || null;
 
-	const clientId = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
-		return getSelectedBlockClientId();
-	}, [] );
-
-	const blockCommentId = useSelect( ( select ) => {
-		const clientID =
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			select( 'core/block-editor' ).getSelectedBlockClientId();
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
-			?.blockCommentId;
-	}, [] );
-
-	const showAddCommentBoard = useSelect( ( select ) => {
-		const clientID =
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			select( 'core/block-editor' ).getSelectedBlockClientId();
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( clientID )?.attributes
-			?.showCommentBoard;
-	}, [] );
+	const { clientId, blockCommentId, showAddCommentBoard } = useSelect(
+		( select ) => {
+			const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+			const selectedBlockClientID =
+				select( blockEditorStore ).getSelectedBlockClientId();
+			return {
+				clientId: selectedBlockClientID,
+				blockCommentId: selectedBlock?.attributes?.blockCommentId,
+				showAddCommentBoard:
+					selectedBlock?.attributes?.showCommentBoard,
+			};
+		},
+		[]
+	);
 
 	// Get the dispatch functions to save the comment and update the block attributes.
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const handleCancel = () => {
 		updateBlockAttributes( clientId, {

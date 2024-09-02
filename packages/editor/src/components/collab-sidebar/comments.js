@@ -24,6 +24,7 @@ import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Renders the Comments component.
@@ -46,12 +47,9 @@ export function Comments( {
 	const [ actionState, setActionState ] = useState( false );
 
 	const blockCommentId = useSelect( ( select ) => {
-		const clientID =
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			select( 'core/block-editor' ).getSelectedBlockClientId();
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const clientID = select( blockEditorStore ).getSelectedBlockClientId();
 		return (
-			select( 'core/block-editor' ).getBlock( clientID )?.attributes
+			select( blockEditorStore ).getBlock( clientID )?.attributes
 				?.blockCommentId ?? false
 		);
 	}, [] );
