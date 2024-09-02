@@ -173,25 +173,25 @@ export function RichTextWrapper(
 				return {};
 			}
 
-			const relevantBinding = blockBindings[ identifier ];
+			const relatedBinding = blockBindings[ identifier ];
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const blockBindingsSource = getBlockBindingsSource(
-				relevantBinding.source
+				relatedBinding.source
 			);
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
 					select,
 					context: blockContext,
-					args: relevantBinding.args,
+					args: relatedBinding.args,
 				} );
 
 			const _bindingsPlaceholder = _disableBoundBlock
-				? relevantBinding?.args?.key || blockBindingsSource?.label
+				? relatedBinding?.args?.key || blockBindingsSource?.label
 				: sprintf(
 						/* translators: %s: source label or key */
 						__( 'Add %s' ),
-						relevantBinding?.args?.key || blockBindingsSource?.label
+						relatedBinding?.args?.key || blockBindingsSource?.label
 				  );
 
 			return {
