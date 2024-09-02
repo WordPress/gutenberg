@@ -177,24 +177,32 @@ export const getEntityRecord =
 					response.headers?.get( 'allow' )
 				);
 
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+					receiveUserPermissionArgs[
+						getUserPermissionCacheKey( action, {
+							kind,
+							name,
+							id: key,
+						} )
+					] = permissions[ action ];
+
+					canUserResolutionsArgs.push( [
+						action,
+						{ kind, name, id: key },
+					] );
+				}
+
 				registry.batch( () => {
 					dispatch.receiveEntityRecords( kind, name, record, query );
-
-					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-						const permissionKey = getUserPermissionCacheKey(
-							action,
-							{ kind, name, id: key }
-						);
-
-						dispatch.receiveUserPermission(
-							permissionKey,
-							permissions[ action ]
-						);
-						dispatch.finishResolution( 'canUser', [
-							action,
-							{ kind, name, id: key },
-						] );
-					}
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
 				} );
 			}
 		} finally {
@@ -273,6 +281,10 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
 			}
 
 			// If we request fields but the result doesn't contain the fields,
@@ -321,6 +333,7 @@ export const getEntityRecords =
 						} ) );
 
 					const canUserResolutionsArgs = [];
+					const receiveUserPermissionArgs = {};
 					for ( const targetHint of targetHints ) {
 						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 							canUserResolutionsArgs.push( [
@@ -328,17 +341,19 @@ export const getEntityRecords =
 								{ kind, name, id: targetHint.id },
 							] );
 
-							dispatch.receiveUserPermission(
+							receiveUserPermissionArgs[
 								getUserPermissionCacheKey( action, {
 									kind,
 									name,
 									id: targetHint.id,
-								} ),
-								targetHint.permissions[ action ]
-							);
+								} )
+							] = targetHint.permissions[ action ];
 						}
 					}
 
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
 					dispatch.finishResolutions(
 						'getEntityRecord',
 						resolutionsArgs

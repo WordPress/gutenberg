@@ -36,8 +36,8 @@ describe( 'getEntityRecord', () => {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
-			receiveUserPermission: jest.fn(),
-			finishResolution: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
 	} );
@@ -181,7 +181,7 @@ describe( 'getEntityRecords', () => {
 			{},
 			false,
 			undefined,
-			undefined
+			{ totalItems: 2, totalPages: 1 }
 		);
 	} );
 
@@ -219,7 +219,7 @@ describe( 'getEntityRecords', () => {
 		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
-			receiveUserPermission: jest.fn(),
+			receiveUserPermissions: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 			finishResolutions,

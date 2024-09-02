@@ -33,6 +33,46 @@ export const Default = ( props ) => {
 		/>
 	);
 };
+
+export const Empty = ( props ) => {
+	const [ view, setView ] = useState( DEFAULT_VIEW );
+
+	return (
+		<DataViews
+			{ ...props }
+			paginationInfo={ { totalItems: 0, totalPages: 0 } }
+			data={ [] }
+			view={ view }
+			fields={ fields }
+			onChangeView={ setView }
+		/>
+	);
+};
+
+export const FieldsNoSortableNoHidable = ( props ) => {
+	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+
+	const _fields = fields.map( ( field ) => ( {
+		...field,
+		enableSorting: false,
+		enableHiding: false,
+	} ) );
+
+	return (
+		<DataViews
+			{ ...props }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ _fields }
+			onChangeView={ setView }
+		/>
+	);
+};
+
 Default.args = {
 	actions,
 	defaultLayouts: {

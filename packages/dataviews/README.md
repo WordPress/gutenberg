@@ -124,7 +124,7 @@ Each field is an object with the following properties:
 
     -   `value`: The id of the value to filter to (for internal use)
     -   `label`: The text that will be displayed in the UI for the item.
-    -    `description`: A longer description that describes the element, to also be displayed. Optional.
+    -   `description`: A longer description that describes the element, to also be displayed. Optional.
 
     To enable the filter by a field we just need to set a proper value to the `elements` property of the field we'd like to filter by.
 
@@ -172,20 +172,23 @@ Properties:
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
+
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
 
 -   `fields`: the `id` of the fields that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
-| Properties of `layout` | Table | Grid | List |
-| --- | --- | --- | --- |
-| `primaryField`: the field's `id` to be highlighted in each layout. It's not hidable. | &check; | &check; | &check; |
-| `mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable. | | &check; | &check; |
-| `columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default). | | &check; | |
-| `badgeFields`: a list of field's `id` to render without label and styled as badges. | | &check; | |
-| `combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | &check; | | |
-| `styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column. | &check; | | |
+#### Properties of `layout`
+
+| Properties of `layout`                                                                                          | Table | Grid | List |
+| --------------------------------------------------------------------------------------------------------------- | ----- | ---- | ---- |
+| `primaryField`: the field's `id` to be highlighted in each layout. It's not hidable.                            | ✓     | ✓    | ✓    |
+| `mediaField`: the field's `id` to be used for rendering each card's media. It's not hiddable.                   |       | ✓    | ✓    |
+| `columnFields`: a list of field's `id` to render vertically stacked instead of horizontally (the default).      |       | ✓    |      |
+| `badgeFields`: a list of field's `id` to render without label and styled as badges.                             |       | ✓    |      |
+| `combinedFields`: a list of "virtual" fields that are made by combining others. See "Combining fields" section. | ✓     |      |      |
+| `styles`: additional `width`, `maxWidth`, `minWidth` styles for each field column.                              | ✓     |      |      |
 
 ### `onChangeView`: `function`
 
@@ -307,6 +310,8 @@ const defaultLayouts = {
 };
 ```
 
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, or `list`. Each of these properties should contain a `layout` property, which holds the configuration for each specific layout type. Check [here](#properties-of-layout) the full list of properties available for each layout's configuration
+
 ### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
@@ -331,8 +336,8 @@ Each "virtual field", has to provide an `id` and `label` (optionally a `header` 
 
 Additionally, they need to provide:
 
-- `children`: a list of field's `id` to combine
-- `direction`: how should they be stacked, `vertically` or `horizontally`
+-   `children`: a list of field's `id` to combine
+-   `direction`: how should they be stacked, `vertical` or `horizontal`
 
 For example, this is how you'd define a `site` field which is a combination of a `title` and `description` fields, which are not displayed:
 
