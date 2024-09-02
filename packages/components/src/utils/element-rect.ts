@@ -191,16 +191,30 @@ export function getElementOffsetRect(
 	const scaleX = computedWidth / rect.width;
 	const scaleY = computedHeight / rect.height;
 
+	// To obtain the adjusted values for the position:
+	// 1. Compute the element's position relative to the offset parent.
+	// 2. Correct for the scale factor.
+	const top = ( rect.top - offsetParentRect?.top ) * scaleY;
+	const right = ( offsetParentRect?.right - rect.right ) * scaleX;
+	const bottom = ( offsetParentRect?.bottom - rect.bottom ) * scaleY;
+	const left = ( rect.left - offsetParentRect?.left ) * scaleX;
+
+	// We need to correct for the eager antialiasing rounding applied by some browsers,
+	// which affects scaling resulting in distorted dimensions under certain zoom levels.
+	// See: https://stackoverflow.com/a/52159123
+	const devicePixelRatio =
+		typeof window !== 'undefined' ? window.devicePixelRatio : 1;
+	const antialiasingRatio = devicePixelRatio / Math.round( devicePixelRatio );
+	const antialiasingAdjustedWidth = computedWidth * antialiasingRatio;
+	const antialiasingAdjustedRight =
+		right + ( computedWidth - antialiasingAdjustedWidth );
+
 	return {
-		// To obtain the adjusted values for the position:
-		// 1. Compute the element's position relative to the offset parent.
-		// 2. Correct for the scale factor.
-		top: ( rect.top - offsetParentRect?.top ) * scaleY,
-		right: ( offsetParentRect?.right - rect.right ) * scaleX,
-		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
-		left: ( rect.left - offsetParentRect?.left ) * scaleX,
-		// Computed dimensions don't need any adjustments.
-		width: computedWidth,
+		top,
+		right: antialiasingAdjustedRight,
+		bottom,
+		left,
+		width: antialiasingAdjustedWidth,
 		height: computedHeight,
 	};
 }
