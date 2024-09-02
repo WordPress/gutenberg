@@ -99,10 +99,12 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
 	>(
-		// When we have no or just one operator, we can set the first item as active.
-		// We do that by setting the initial `activeId` to `undefined`.Otherwise,
-		// we set it to `null`, so the first item is not selected,
-		// since the focus is on the operators control.
+		// When there are one or less operators, the first item is set as active
+		// (by setting the initial `activeId` to `undefined`).
+		// With 2 or more operators, the focus is moved on the operators control
+		// (by setting the initial `activeId` to `null`), meaning that there won't
+		// be an active item initially. Focus is then managed via the
+		// `onFocusVisible` callback.
 		filter.operators?.length === 1 ? undefined : null
 	);
 	const currentFilter = view.filters?.find(
