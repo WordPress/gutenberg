@@ -9,6 +9,8 @@ import { useState, useEffect } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,6 +19,7 @@ import PluginSidebar from '../plugin-sidebar';
 import { collabSidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
+import { store as editorStore } from '../../store';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
@@ -53,22 +56,18 @@ export default function CollabSidebar() {
 
 	const [ threads, setThreads ] = useState( () => [] );
 	const postId = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/editor' ).getCurrentPostId();
+		return select( editorStore ).getCurrentPostId();
 	}, [] );
 
 	const currentUserData = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core' ).getCurrentUser();
+		return select( coreStore ).getCurrentUser();
 	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const clientId = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getSelectedBlockClientId();
+		return select( blockEditorStore ).getSelectedBlockClientId();
 	}, [] );
 
 	// Function to save the comment.
@@ -173,6 +172,10 @@ export default function CollabSidebar() {
 				method: 'DELETE',
 			} ).then( ( response ) => {
 				if ( 'trash' === response.status && '' !== response.id ) {
+					updateBlockAttributes( clientId, {
+						blockCommentId: undefined,
+						showCommentBoard: undefined,
+					} );
 					createNotice(
 						'snackbar',
 						__( 'Thread deleted successfully.' ),
