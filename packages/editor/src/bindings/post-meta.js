@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -82,59 +81,46 @@ export default {
 
 		return true;
 	},
-	getFieldsList: function GetFieldsList( { registry, context } ) {
+	getFieldsList( { registry, context } ) {
 		let metaFields = {};
 		const {
 			type,
 			is_custom: isCustom,
 			slug,
 		} = registry.select( editorStore ).getCurrentPost();
-		const { getPostTypes, getEditedEntityRecord } =
+		const { getEntityConfig, getPostTypes, getEditedEntityRecord } =
 			registry.select( coreDataStore );
 
-		let postType = context?.postType;
-
-		// useSelect prevents needing a blockBindingsPanel render to fetch the data.
-		const fields = useSelect(
-			( select ) => {
-				const entityRecord = select( coreDataStore ).getEntityRecord(
-					'root',
-					'postType',
-					postType
-				);
-				return entityRecord?.meta;
-			},
-			[ postType ]
-		);
-
-		// If it is a template, use the default values.
+		// Inherit the postType from the slug if it is a template.
 		if ( ! context?.postType && type === 'wp_template' ) {
-			let isGlobalTemplate = false;
 			// Get the 'kind' from the start of the slug.
-			const [ kind ] = slug.split( '-' );
-			if ( isCustom || slug === 'index' ) {
-				isGlobalTemplate = true;
-				// Use 'post' as the default.
-				postType = 'post';
-			} else if ( kind === 'page' ) {
-				postType = 'page';
-			} else if ( kind === 'single' ) {
-				const postTypes =
-					getPostTypes( { per_page: -1 } )?.map(
-						( entity ) => entity.slug
-					) || [];
+			// Use 'post' as the default.
+			let postType = 'post';
+			const isGlobalTemplate = isCustom || slug === 'index';
+			if ( ! isGlobalTemplate ) {
+				const [ kind ] = slug.split( '-' );
+				if ( kind === 'page' ) {
+					postType = 'page';
+				} else if ( kind === 'single' ) {
+					const postTypes =
+						getPostTypes( { per_page: -1 } )?.map(
+							( entity ) => entity.slug
+						) || [];
 
-				// Infer the post type from the slug.
-				// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
-				const match = slug.match(
-					`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
-				);
-				postType = match ? match[ 1 ] : 'post';
+					// Infer the post type from the slug.
+					// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
+					const match = slug.match(
+						`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
+					);
+					postType = match ? match[ 1 ] : 'post';
+				}
 			}
+			const fields = getEntityConfig( 'postType', postType )?.meta;
 
 			// Populate the `metaFields` object with the default values.
 			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
 				// If the template is global, skip the fields with a subtype.
+				// TODO: Add subtype to schema to be able to filter.
 				if ( isGlobalTemplate && props.subtype ) {
 					return;
 				}

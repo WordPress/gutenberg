@@ -182,11 +182,56 @@ function EditableBlockBindingsPanelItems( {
 export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
-	const { bindings } = metadata || {};
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	// While this hook doesn't directly call any selectors, `useSelect` is
+	// used purposely here to ensure `getFieldsList` is updated whenever
+	// there are attribute updates.
+	// `source.getFieldsList` may also call a selector via `registry.select`.
+	const { fieldsList } = useSelect( () => {
+		if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+			return {};
+		}
+		const _fieldsList = {};
+		const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+		const registeredSources = getBlockBindingsSources();
+		Object.entries( registeredSources ).forEach(
+			( [ sourceName, { getFieldsList, usesContext } ] ) => {
+				if ( getFieldsList ) {
+					// Populate context.
+					const context = {};
+					if ( usesContext?.length ) {
+						for ( const key of usesContext ) {
+							context[ key ] = blockContext[ key ];
+						}
+					}
+					const sourceList = getFieldsList( {
+						registry,
+						context,
+					} );
+					// Only add source if the list is not empty.
+					if ( sourceList ) {
+						_fieldsList[ sourceName ] = { ...sourceList };
+					}
+				}
+			}
+		);
+		return { fieldsList: _fieldsList };
+	}, [ blockContext, bindableAttributes, registry ] );
+	// Return early if there are no bindable attributes.
+	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
+		return null;
+	}
+	// Remove empty sources from the list of fields.
+	Object.entries( fieldsList ).forEach( ( [ key, value ] ) => {
+		if ( ! Object.keys( value ).length ) {
+			delete fieldsList[ key ];
+		}
+	} );
+	// Filter bindings to only show bindable attributes and remove pattern overrides.
+	const { bindings } = metadata || {};
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
@@ -208,7 +253,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		return null;
 	}
 
-	const fieldsList = {};
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
 	Object.entries( registeredSources ).forEach(
@@ -240,6 +284,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	} );
 
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
+	// Lock the UI when the experiment is not enabled or there are no fields to connect to.
 	const readOnly =
 		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
 
