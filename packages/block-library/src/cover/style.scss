@@ -12,8 +12,6 @@
 	overflow: hidden;
 	// Use clip instead of overflow: hidden so that sticky position works on child elements.
 	overflow: clip;
-	// This block has customizable padding, border-box makes that more predictable.
-	box-sizing: border-box;
 	// Keep the flex layout direction to the physical direction (LTR) in RTL languages.
 	/*rtl:raw: direction: ltr; */
 
