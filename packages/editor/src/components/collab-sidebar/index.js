@@ -233,12 +233,26 @@ export default function CollabSidebar() {
 		fetchComments();
 	}, [ postId ] );
 
+	const allBlocks = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/block-editor' ).getBlocks();
+	}, [] );
+	
+	const filteredBlocks = allBlocks?.filter(block => 
+		block.attributes.blockCommentId !== 0
+	);
+
+	const blockCommentIds = filteredBlocks?.map(block => block.attributes.blockCommentId);
+	const resultThreads = threads?.slice().reverse();
+	const threadIdMap = new Map(resultThreads?.map(thread => [thread.id, thread]));
+	const sortedThreads = blockCommentIds
+	.map(id => threadIdMap.get(id))
+	.filter(thread => thread !== undefined);
+
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
 		return null; // or maybe return some message indicating no threads are available.
 	}
-
-	const resultThreads = threads.map( ( thread ) => thread ).reverse();
 
 	return (
 		<PluginSidebar
@@ -248,11 +262,11 @@ export default function CollabSidebar() {
 		>
 			<div className="editor-collab-sidebar__activities">
 				<AddComment
-					threads={ resultThreads }
+					threads={ sortedThreads }
 					onSubmit={ addNewComment }
 				/>
 				<Comments
-					threads={ resultThreads }
+					threads={ sortedThreads }
 					onEditComment={ onEditComment }
 					onAddReply={ onAddReply }
 					onCommentDelete={ onCommentDelete }
