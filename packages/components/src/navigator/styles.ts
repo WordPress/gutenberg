@@ -94,7 +94,7 @@ const ANIMATION = {
 		`,
 		out: css`
 			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.IN }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
+				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
 		`,
 	},
 	backwards: {
