@@ -15,6 +15,8 @@
  */
 class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
+	protected $test;
+
 	/**
 	 * Post type.
 	 *
