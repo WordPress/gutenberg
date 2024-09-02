@@ -30,16 +30,18 @@ export const TabListWrapper = styled.div`
 		}
 	}
 	--direction-factor: 1;
+	--direction-origin-x: left;
 	--indicator-start: var( --indicator-left );
 	&:dir( rtl ) {
 		--direction-factor: -1;
+		--direction-origin-x: right;
 		--indicator-start: var( --indicator-right );
 	}
 	&::after {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		transform-origin: calc( ( 1 - var( --direction-factor ) ) * 50% ) 0%;
+		transform-origin: var( --direction-origin-x ) top;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
