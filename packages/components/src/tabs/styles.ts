@@ -43,9 +43,11 @@ export const TabListWrapper = styled.div`
 		&::after {
 			bottom: 0;
 			height: 0;
-			width: 1px;
+			/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+			width: 100px;
 			transform: translateX( calc( var( --indicator-left ) * 1px ) )
-				scaleX( var( --indicator-width ) );
+				scaleX( calc( var( --indicator-width ) / 100 ) );
 			border-bottom: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
 		}
@@ -53,7 +55,7 @@ export const TabListWrapper = styled.div`
 		&:dir( rtl )::after {
 			transform-origin: top right;
 			transform: translateX( calc( var( --indicator-right ) * -1px ) )
-				scaleX( var( --indicator-width ) );
+				scaleX( calc( var( --indicator-width ) / 100 ) );
 		}
 	}
 	&[aria-orientation='vertical']::after {
@@ -61,9 +63,11 @@ export const TabListWrapper = styled.div`
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 1px;
+		/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+		height: 100px;
 		transform: translateY( calc( var( --indicator-top ) * 1px ) )
-			scaleY( var( --indicator-height ) );
+			scaleY( calc( var( --indicator-height ) / 100 ) );
 		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;

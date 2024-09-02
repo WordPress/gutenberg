@@ -161,24 +161,6 @@ export const NULL_ELEMENT_OFFSET_RECT = {
 } satisfies ElementOffsetRect;
 
 /**
- * `getElementOffsetRect` options.
- */
-export type GetElementOffsetRectOptions = {
-	/**
-	 * Whether to correct for the eager antialiasing rounding applied by some
-	 * browsers, which affects scaling resulting in distorted dimensions under
-	 * certain zoom levels.
-	 *
-	 * This option should only be enabled when affected by the antialiasing
-	 * rounding, such as when the element is transformed. Otherwise, it can
-	 * result in incorrect dimensions or positioning values.
-	 *
-	 * See: https://stackoverflow.com/a/52159123
-	 */
-	correctForAntialiasing?: boolean;
-};
-
-/**
  * Returns the position and dimensions of an element, relative to its offset
  * parent, with subpixel precision. Values reflect the real measures before any
  * potential scaling distortions along the X and Y axes.
@@ -188,8 +170,7 @@ export type GetElementOffsetRectOptions = {
  * `element.offset<Top|Left|Width|Height>` methods are not precise enough.
  */
 export function getElementOffsetRect(
-	element: HTMLElement,
-	{ correctForAntialiasing }: GetElementOffsetRectOptions = {}
+	element: HTMLElement
 ): ElementOffsetRect {
 	// Position and dimension values computed with `getBoundingClientRect` have
 	// subpixel precision, but are affected by distortions since they represent
@@ -210,51 +191,32 @@ export function getElementOffsetRect(
 	const scaleX = computedWidth / rect.width;
 	const scaleY = computedHeight / rect.height;
 
-	// To obtain the adjusted values for the position:
-	// 1. Compute the element's position relative to the offset parent.
-	// 2. Correct for the scale factor.
-	const top = ( rect.top - offsetParentRect?.top ) * scaleY;
-	let right = ( offsetParentRect?.right - rect.right ) * scaleX;
-	const bottom = ( offsetParentRect?.bottom - rect.bottom ) * scaleY;
-	const left = ( rect.left - offsetParentRect?.left ) * scaleX;
-
-	// Computed dimensions don't need any adjustments.
-	let width = computedWidth;
-	const height = computedHeight;
-
-	if ( correctForAntialiasing ) {
-		// We need to correct for the eager antialiasing rounding applied by some browsers,
-		// which affects scaling resulting in distorted dimensions under certain zoom levels.
-		// See: https://stackoverflow.com/a/52159123
-		const devicePixelRatio =
-			typeof window !== 'undefined' ? window.devicePixelRatio : 1;
-		const antialiasingRatio =
-			devicePixelRatio / Math.round( devicePixelRatio );
-		width = computedWidth * antialiasingRatio;
-		right = right + ( computedWidth - width );
-	}
-
-	return { top, right, bottom, left, width, height };
+	return {
+		// To obtain the adjusted values for the position:
+		// 1. Compute the element's position relative to the offset parent.
+		// 2. Correct for the scale factor.
+		top: ( rect.top - offsetParentRect?.top ) * scaleY,
+		right: ( offsetParentRect?.right - rect.right ) * scaleX,
+		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
+		left: ( rect.left - offsetParentRect?.left ) * scaleX,
+		// Computed dimensions don't need any adjustments.
+		width: computedWidth,
+		height: computedHeight,
+	};
 }
-
-/**
- * `useTrackElementOffsetRect` options.
- */
-export type UseTrackElementOffsetRectOptions = GetElementOffsetRectOptions;
 
 /**
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
  */
 export function useTrackElementOffsetRect(
-	targetElement: HTMLElement | undefined | null,
-	options?: UseTrackElementOffsetRectOptions
+	targetElement: HTMLElement | undefined | null
 ) {
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
 
 	useResizeObserver( targetElement, ( _, element ) =>
-		setIndicatorPosition( getElementOffsetRect( element, options ) )
+		setIndicatorPosition( getElementOffsetRect( element ) )
 	);
 
 	return indicatorPosition;
