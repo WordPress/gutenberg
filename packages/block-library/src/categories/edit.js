@@ -20,9 +20,9 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -33,7 +33,7 @@ export default function CategoriesEdit( {
 		showEmpty,
 		label,
 		showLabel,
-		taxonomy,
+		taxonomy: taxonomySlug,
 	},
 	setAttributes,
 	className,
@@ -44,9 +44,15 @@ export default function CategoriesEdit( {
 		query.parent = 0;
 	}
 
+	const { record: taxonomy } = useEntityRecord(
+		'root',
+		'taxonomy',
+		taxonomySlug
+	);
+
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
-		taxonomy,
+		taxonomySlug,
 		query
 	);
 
@@ -103,7 +109,7 @@ export default function CategoriesEdit( {
 					<RichText
 						className="wp-block-categories__label"
 						aria-label={ __( 'Label text' ) }
-						placeholder={ __( 'Categories' ) }
+						placeholder={ taxonomy.name }
 						withoutInteractiveFormatting
 						value={ label }
 						onChange={ ( html ) =>
@@ -112,11 +118,17 @@ export default function CategoriesEdit( {
 					/>
 				) : (
 					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ label ? label : __( 'Categories' ) }
+						{ label ? label : taxonomy.name }
 					</VisuallyHidden>
 				) }
 				<select id={ selectId }>
-					<option>{ __( 'Select Category' ) }</option>
+					<option>
+						{ sprintf(
+							/* translators: %s: taxonomy's singular name */
+							__( 'Select %s' ),
+							taxonomy.labels.singular_name
+						) }
+					</option>
 					{ categoriesList.map( ( category ) =>
 						renderCategoryDropdownItem( category, 0 )
 					) }
