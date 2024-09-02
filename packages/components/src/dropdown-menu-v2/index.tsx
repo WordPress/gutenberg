@@ -32,6 +32,7 @@ import { DropdownMenuItem } from './item';
 import { DropdownMenuCheckboxItem } from './checkbox-item';
 import { DropdownMenuRadioItem } from './radio-item';
 import { DropdownMenuGroup } from './group';
+import { DropdownMenuGroupLabel } from './group-label';
 import { DropdownMenuSeparator } from './separator';
 import { DropdownMenuItemLabel } from './item-label';
 import { DropdownMenuItemHelpText } from './item-help-text';
@@ -214,6 +215,9 @@ export const DropdownMenuV2 = Object.assign(
 		} ),
 		Group: Object.assign( DropdownMenuGroup, {
 			displayName: 'DropdownMenuV2.Group',
+		} ),
+		GroupLabel: Object.assign( DropdownMenuGroupLabel, {
+			displayName: 'DropdownMenuV2.GroupLabel',
 		} ),
 		Separator: Object.assign( DropdownMenuSeparator, {
 			displayName: 'DropdownMenuV2.Separator',

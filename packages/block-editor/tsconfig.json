@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../a11y" },
 		{ "path": "../api-fetch" },
+		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
 		{ "path": "../components" },
 		{ "path": "../compose" },

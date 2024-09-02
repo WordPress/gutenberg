@@ -432,6 +432,10 @@ function BackgroundImageControls( {
 				}
 				variant="secondary"
 				onError={ onUploadError }
+				onReset={ () => {
+					closeAndFocus();
+					onResetImage();
+				} }
 			>
 				{ canRemove && (
 					<MenuItem
@@ -442,16 +446,6 @@ function BackgroundImageControls( {
 						} }
 					>
 						{ __( 'Remove' ) }
-					</MenuItem>
-				) }
-				{ hasValue && (
-					<MenuItem
-						onClick={ () => {
-							closeAndFocus();
-							onResetImage();
-						} }
-					>
-						{ __( 'Reset' ) }
 					</MenuItem>
 				) }
 			</MediaReplaceFlow>
@@ -692,16 +686,14 @@ function BackgroundToolsPanel( {
 	};
 
 	return (
-		<VStack
-			as={ ToolsPanel }
-			spacing={ 2 }
+		<ToolsPanel
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</VStack>
+		</ToolsPanel>
 	);
 }
 

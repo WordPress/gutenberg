@@ -128,11 +128,11 @@ export type CompositeStoreProps = {
 	rtl?: Ariakit.CompositeStoreProps[ 'rtl' ];
 };
 
-export type CompositeProps = {
+export type CompositeProps = CompositeStoreProps & {
 	/**
 	 * Object returned by the `useCompositeStore` hook.
 	 */
-	store: Ariakit.CompositeStore;
+	store?: Ariakit.CompositeStore;
 	/**
 	 * Allows the component to be rendered as a different HTML element or React
 	 * component. The value can be a React element or a function that takes in the

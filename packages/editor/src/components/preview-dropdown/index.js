@@ -39,14 +39,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getDeviceType, getCurrentPostType } = select( editorStore );
-		const { getUnstableBase, getPostType } = select( coreStore );
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const _currentPostType = getCurrentPostType();
 		return {
 			deviceType: getDeviceType(),
 			editorMode: __unstableGetEditorMode(),
-			homeUrl: getUnstableBase()?.home,
+			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
