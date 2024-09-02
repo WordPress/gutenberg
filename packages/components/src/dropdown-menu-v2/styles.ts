@@ -39,27 +39,6 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-const scaleYOuter = keyframes( {
-	from: {
-		transform: `scaleY(${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER })`,
-	},
-} );
-
-const scaleYContent = keyframes( {
-	// Cause the content to scale at a different rate than the outer container:
-	// - counter the outer scale factor by doing "1 / scaleAmountOuter"
-	// - then apply the content scale factor
-	from: {
-		transform: `scaleY(calc(1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } * ${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }))`,
-	},
-} );
-
-const fadeIn = keyframes( {
-	from: {
-		opacity: 0,
-	},
-} );
-
 export const MenuPopoverOuterWrapper = styled.div<
 	Pick< DropdownMenuContext, 'variant' >
 >`
@@ -75,29 +54,36 @@ export const MenuPopoverOuterWrapper = styled.div<
 
 	overflow: hidden;
 
-	/* Animation */
+	/* Open/close animation (outer wrapper) */
 	@media not ( prefers-reduced-motion ) {
-		&:has( [data-open] ) {
-			animation-duration: ${ ANIMATION_PARAMS.DURATION };
-			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-			will-change: transform, opacity;
+		transition-property: transform, opacity;
+		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
+		transition-duration: ${ ANIMATION_PARAMS.DURATION };
+		will-change: transform, opacity;
+
+		/* Regardless of the side, fade in and out. */
+		opacity: 0;
+		&:has( [data-enter] ) {
+			opacity: 1;
 		}
 
-		&:has( [data-open][data-side='bottom'] ) {
+		/* For menus opening on top and bottom side, animate the scale Y too. */
+		&:has( [data-side='bottom'] ),
+		&:has( [data-side='top'] ) {
+			transform: scaleY( ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } );
+		}
+		&:has( [data-side='bottom'] ) {
 			transform-origin: top;
 		}
-		&:has( [data-open][data-side='top'] ) {
+		&:has( [data-side='top'] ) {
 			transform-origin: bottom;
 		}
-
-		&:has( [data-open][data-side='bottom'] ),
-		&:has( [data-open][data-side='top'] ) {
-			animation-name: ${ fadeIn }, ${ scaleYOuter };
-		}
-
-		&:has( [data-open][data-side='left'] ),
-		&:has( [data-open][data-side='right'] ) {
-			animation-name: ${ fadeIn };
+		&:has( [data-enter][data-side='bottom'] ),
+		&:has( [data-enter][data-side='top'] ),
+		/* Do not animate the scaleY when closing the menu */
+		&:has( [data-leave][data-side='bottom'] ),
+		&:has( [data-leave][data-side='top'] ) {
+			transform: scaleY( 1 );
 		}
 	}
 `;
@@ -125,16 +111,32 @@ export const MenuPopoverInnerWrapper = styled.div`
 	/* Only visible in Windows High Contrast mode */
 	outline: 2px solid transparent !important;
 
-	/* Animation */
+	/* Open/close animation (inner content wrapper) */
 	@media not ( prefers-reduced-motion ) {
-		&[data-open] {
-			animation-duration: inherit;
-			animation-timing-function: inherit;
-			transform-origin: inherit;
+		transition: inherit;
+		transform-origin: inherit;
+
+		/*
+		 * For menus opening on top and bottom side, animate the scale Y too.
+		 * The content scales at a different rate than the outer container:
+	   * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
+	   * - then, apply the content scale factor.
+		 */
+		&[data-side='bottom'],
+		&[data-side='top'] {
+			transform: scaleY(
+				calc(
+					1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } *
+						${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }
+				)
+			);
 		}
-		&[data-open][data-side='bottom'],
-		&[data-open][data-side='top'] {
-			animation-name: ${ fadeIn }, ${ scaleYContent };
+		&[data-enter][data-side='bottom'],
+		&[data-enter][data-side='top'],
+		/* Do not animate the scaleY when closing the menu */
+		&[data-leave][data-side='bottom'],
+		&[data-leave][data-side='top'] {
+			transform: scaleY( 1 );
 		}
 	}
 `;
