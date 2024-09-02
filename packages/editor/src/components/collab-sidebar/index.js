@@ -103,7 +103,20 @@ export default function CollabSidebar() {
 		}
 	}, [ postId, reloadComments ] );
 
-	const resultThreads = threads.map( ( thread ) => thread ).reverse();
+	const allBlocks = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getBlocks();
+	}, [] );
+	
+	const filteredBlocks = allBlocks?.filter(block => 
+		block.attributes.blockCommentId !== 0
+	);
+
+	const blockCommentIds = filteredBlocks?.map(block => block.attributes.blockCommentId);
+	const resultThreads = threads?.slice().reverse();
+	const threadIdMap = new Map(resultThreads?.map(thread => [thread.id, thread]));
+	const sortedThreads = blockCommentIds
+	.map(id => threadIdMap.get(id))
+	.filter(thread => thread !== undefined);
 
 	return (
 		<PluginSidebar
@@ -113,10 +126,10 @@ export default function CollabSidebar() {
 		>
 			<div className="editor-collab-sidebar__activities">
 				<AddComment
-					threads={ resultThreads }
+					threads={ sortedThreads }
 					setReloadComments={ setReloadComments }
 				/>
-				<Comments threads={ resultThreads } />
+				<Comments threads={ sortedThreads } />
 			</div>
 		</PluginSidebar>
 	);

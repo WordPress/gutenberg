@@ -183,11 +183,11 @@ export function Comments( { threads } ) {
 
 			{ Array.isArray( threads ) &&
 				threads.length > 0 &&
-				threads.reverse().map( ( thread ) => (
+				threads.map( ( thread ) => (
 					<VStack
 						key={ thread.id }
 						className={ clsx( 'editor-collab-sidebar__thread', {
-							'is-focused':
+							'editor-collab-sidebar__activethread':
 								blockCommentId && blockCommentId === thread.id,
 						} ) }
 						id={ thread.id }
