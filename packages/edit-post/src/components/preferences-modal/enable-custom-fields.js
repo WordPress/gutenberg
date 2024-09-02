@@ -63,24 +63,22 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
 	return (
-		<>
-			<PreferenceBaseOption
-				label={ label }
-				isChecked={ isChecked }
-				onChange={ setIsChecked }
-			>
-				{ isChecked && (
-					<p className="edit-post-preferences-modal__custom-fields-confirmation-message">
-						{ __(
-							'Connected attributes cannot be edited in the block editor while this interface is active.'
-						) }
-					</p>
-				) }
-				{ isChecked !== areCustomFieldsEnabled && (
-					<CustomFieldsConfirmation willEnable={ isChecked } />
-				) }
-			</PreferenceBaseOption>
-		</>
+		<PreferenceBaseOption
+			label={ label }
+			isChecked={ isChecked }
+			onChange={ setIsChecked }
+		>
+			{ isChecked && (
+				<p className="edit-post-preferences-modal__custom-fields-confirmation-message">
+					{ __(
+						'Custom fields connected to block attributes cannot be edited in the block editor while this interface is active.'
+					) }
+				</p>
+			) }
+			{ isChecked !== areCustomFieldsEnabled && (
+				<CustomFieldsConfirmation willEnable={ isChecked } />
+			) }
+		</PreferenceBaseOption>
 	);
 }
 
