@@ -249,8 +249,6 @@ function FieldItem( {
 	view: View;
 	onChangeView: ( view: View ) => void;
 } ) {
-	const visibleFields = view.fields || []; // TODO: review logic
-
 	return (
 		<Item key={ id }>
 			<HStack
@@ -339,10 +337,10 @@ function FieldItem( {
 							onChangeView( {
 								...view,
 								fields: isVisible
-									? visibleFields.filter(
+									? ( view.fields || [] ).filter(
 											( fieldId ) => fieldId !== id
 									  )
-									: [ ...visibleFields, id ],
+									: [ ...( view.fields || [] ), id ],
 							} );
 							// Focus the visibility button to avoid focus loss.
 							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
@@ -385,8 +383,19 @@ function FieldControl() {
 		[ view ]
 	);
 
-	// TODO: process combinedFields.
-	const visibleFieldIds = [ ...( view.fields || [] ), ...mandatoryFieldIds ];
+	// If a field is combined to made another,
+	// it should not be listed in the properties control.
+	const fieldsToExclude: string[] = [];
+	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		view.layout.combinedFields.forEach( ( combination ) => {
+			fieldsToExclude.push( ...combination.children );
+		} );
+	}
+
+	const visibleFieldIds = [
+		...( view.fields || [] ),
+		...mandatoryFieldIds,
+	].filter( ( fieldId ) => ! fieldsToExclude.includes( fieldId ) );
 	const visibleFields = fields
 		.filter( ( { id } ) =>
 			visibleFieldIds.includes( id ) ? true : false
@@ -406,7 +415,9 @@ function FieldControl() {
 	const hiddenFields = fields
 		.filter(
 			( { id, enableHiding } ) =>
-				! visibleFieldIds.includes( id ) && enableHiding
+				! visibleFieldIds.includes( id ) &&
+				! fieldsToExclude.includes( id ) &&
+				enableHiding
 		)
 		.map( ( { id, label }, index ) => {
 			return {
