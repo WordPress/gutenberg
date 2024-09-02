@@ -31,7 +31,6 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 			blockPatterns={ availableTemplates }
 			shownPatterns={ shownTemplates }
 			onClickPattern={ onSelect }
-			showTitlesAsTooltip
 		/>
 	);
 }
