@@ -30,7 +30,8 @@ export const TabList = forwardRef<
 	const tabStoreState = useStoreState( context?.store );
 	const selectedId = tabStoreState?.selectedId;
 	const indicatorPosition = useTrackElementOffsetRect(
-		context?.store.item( selectedId )?.element
+		context?.store.item( selectedId )?.element,
+		{ correctForAntialiasing: true }
 	);
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
