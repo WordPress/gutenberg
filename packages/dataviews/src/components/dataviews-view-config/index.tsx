@@ -417,6 +417,8 @@ function FieldControl() {
 			( { id, enableHiding } ) =>
 				! visibleFieldIds.includes( id ) &&
 				! fieldsToExclude.includes( id ) &&
+				// If a field is not visible neither hidable,
+				// it should not be listed in the properties control.
 				enableHiding
 		)
 		.map( ( { id, label }, index ) => {
