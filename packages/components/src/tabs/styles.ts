@@ -29,17 +29,16 @@ export const TabListWrapper = styled.div`
 			transition-timing-function: ease-out;
 		}
 	}
+	--direction-factor: 1;
+	--indicator-start: var( --indicator-left );
+	&:dir( rtl ) {
+		--direction-factor: -1;
+		--indicator-start: var( --indicator-right );
+	}
 	&::after {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-
-		--direction-factor: 1;
-		--indicator-start: var( --indicator-left );
-		&:dir( rtl ) {
-			--direction-factor: -1;
-			--indicator-start: var( --indicator-right );
-		}
 		transform-origin: calc( ( 1 - var( --direction-factor ) ) * 50% ) 0%;
 
 		// Windows high contrast mode.
