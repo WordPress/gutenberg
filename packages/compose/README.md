@@ -493,16 +493,32 @@ Tracks a given element's size and calls `onUpdate` for all of its discrete value
 _Usage_
 
 ```tsx
-const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
+const targetElementRef = useRef< HTMLElement >( null );
 useObserveElementSize(
-	targetElement,
+	targetElementRef,
 	( resizeObserverEntries, element ) => {
 		console.log( 'Resize observer entries:', resizeObserverEntries );
 		console.log( 'Element that was resized:', element );
 	},
 	{ box: 'border-box' }
 );
+<div ref={ targetElementRef } />;
+
+// Alternatively, if the target element can change dynamically, you can pass it
+// directly as a state:
+const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
+useObserveElementSize(
+	targetElement
+	// ...
+);
 <div ref={ setTargetElement } />;
+
+// The element could be obtained through other means, for example:
+useEffect( () => {
+	const element = document.querySelector(
+		`[data-element-id="${ elementId }"]`
+	);
+}, [ elementId ] );
 ```
 
 _Parameters_
