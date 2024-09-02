@@ -2,6 +2,7 @@
 	{
 		"blockName": "core/media-text",
 		"attrs": {
+			"align": "wide",
 			"mediaType": "image",
 			"imageFill": true,
 			"focalPoint": {
