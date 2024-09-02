@@ -96,6 +96,22 @@ export default function CalendarEdit( { attributes } ) {
 				<ServerSideRender
 					block="core/calendar"
 					attributes={ { ...attributes, ...getYearMonth( date ) } }
+					/**
+					 * The `key` prop is set to a combination of `backgroundColor` and `textColor` attributes.
+					 * This forces the <ServerSideRender> component to update.
+					 *
+					 * Reason: The <ServerSideRender> component typically fetches its content from
+					 * the server based on the provided attributes. Without forcing a re-render,
+					 * the component might not immediately reflect changes in background or text colors
+					 * selected by the user in the admin panel. By using the `key` prop in this way,
+					 * we ensure that the component re-renders and correctly displays the updated styles.
+					 *
+					 * This approach ensures that the block remains in sync with the color settings
+					 * chosen in the editor without requiring a manual refresh.
+					 */
+					key={ `${ attributes.backgroundColor || 'default' }-${
+						attributes.textColor || 'default'
+					}` }
 				/>
 			</Disabled>
 		</div>
