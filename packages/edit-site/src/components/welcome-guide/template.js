@@ -6,38 +6,36 @@ import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
-import { useState } from '@wordpress/element';
-import { useDebounce } from '@wordpress/compose';
-
+import { usePrevious } from '@wordpress/compose';
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const visibility = useSelect( ( select ) => {
-		const isTemplateActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuideTemplate'
-		);
-		const isEditorActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuide'
-		);
-		const { getCurrentPostType, getEditorSettings } = select( editorStore );
-		const hasBackNavigation =
-			!! getEditorSettings().onNavigateToPreviousEntityRecord;
-		return (
-			isTemplateActive &&
-			! isEditorActive &&
-			getCurrentPostType() === 'wp_template' &&
-			hasBackNavigation
-		);
+	const {
+		postId,
+		isEditorActive,
+		isTemplateActive,
+		isPostTypeTemplate,
+		hasBackNavigation,
+	} = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
+			select( editorStore );
+		const { get } = select( preferencesStore );
+		return {
+			postId: getCurrentPostId(),
+			isEditorActive: get( 'core/edit-site', 'welcomeGuide' ),
+			isTemplateActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
+			isPostTypeTemplate: getCurrentPostType() === 'wp_template',
+			hasBackNavigation:
+				!! getEditorSettings().onNavigateToPreviousEntityRecord,
+		};
 	}, [] );
-
-	// The visibility conditions change in such a way that it’s tricky to avoid
-	// an unexpected flash of the component. Using state and debouncing writes
-	// to it works around the issue.
-	const [ isVisible, setIsVisible ] = useState();
-	const debouncedSetIsVisible = useDebounce( setIsVisible, 32 );
-	debouncedSetIsVisible( visibility );
+	const priorPostId = usePrevious( postId );
+	const isVisible =
+		postId !== priorPostId &&
+		isTemplateActive &&
+		! isEditorActive &&
+		isPostTypeTemplate &&
+		hasBackNavigation;
 
 	if ( ! isVisible ) {
 		return null;
