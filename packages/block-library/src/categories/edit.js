@@ -39,10 +39,6 @@ export default function CategoriesEdit( {
 	className,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
-	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
-	if ( showOnlyTopLevel ) {
-		query.parent = 0;
-	}
 
 	const { record: taxonomy, isResolvingTaxonomy } = useEntityRecord(
 		'root',
@@ -52,6 +48,11 @@ export default function CategoriesEdit( {
 
 	const isHierarchicalTaxonomy =
 		! isResolvingTaxonomy && taxonomy?.hierarchical;
+
+	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
+	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
+		query.parent = 0;
+	}
 
 	const { records: categories, isResolving } = useEntityRecords(
 		'taxonomy',
@@ -76,7 +77,7 @@ export default function CategoriesEdit( {
 		! name ? __( '(Untitled)' ) : decodeEntities( name ).trim();
 
 	const renderCategoryList = () => {
-		const parentId = showHierarchy ? 0 : null;
+		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return categoriesList.map( ( category ) =>
 			renderCategoryListItem( category )
@@ -92,19 +93,21 @@ export default function CategoriesEdit( {
 					{ renderCategoryName( name ) }
 				</a>
 				{ showPostCounts && ` (${ count })` }
-				{ showHierarchy && !! childCategories.length && (
-					<ul className="children">
-						{ childCategories.map( ( childCategory ) =>
-							renderCategoryListItem( childCategory )
-						) }
-					</ul>
-				) }
+				{ isHierarchicalTaxonomy &&
+					showHierarchy &&
+					!! childCategories.length && (
+						<ul className="children">
+							{ childCategories.map( ( childCategory ) =>
+								renderCategoryListItem( childCategory )
+							) }
+						</ul>
+					) }
 			</li>
 		);
 	};
 
 	const renderCategoryDropdown = () => {
-		const parentId = showHierarchy ? 0 : null;
+		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
 		return (
 			<>
@@ -149,7 +152,8 @@ export default function CategoriesEdit( {
 				{ renderCategoryName( name ) }
 				{ showPostCounts && ` (${ count })` }
 			</option>,
-			showHierarchy &&
+			isHierarchicalTaxonomy &&
+				showHierarchy &&
 				!! childCategories.length &&
 				childCategories.map( ( childCategory ) =>
 					renderCategoryDropdownItem( childCategory, level + 1 )
