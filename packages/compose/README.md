@@ -314,7 +314,13 @@ _Usage_
 ```tsx
 function Component( props ) {
 	const onClick = useEvent( props.onClick );
-	React.useEffect( () => {}, [ onClick ] );
+	React.useEffect( () => {
+		onClick();
+		// Won't trigger the effect again when props.onClick is updated.
+	}, [ onClick ] );
+	// Won't re-render Button when props.onClick is updated (if Button is
+	// wrapped in React.memo).
+	return <Button onClick={ onClick } />;
 }
 ```
 
