@@ -484,7 +484,7 @@ function CommentHeader( {
 			<span className="editor-collab-sidebar__commentUpdate">
 				{ status !== 'approved' && (
 					<HStack alignment="right" justify="flex-end" spacing="0">
-						{ onResolve && (
+						{ 0 === thread.parent && onResolve && (
 							<Tooltip text={ __( 'Resolve' ) }>
 								<Button
 									__next40pxDefaultSize
