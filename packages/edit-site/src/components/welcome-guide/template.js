@@ -6,36 +6,27 @@ import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
-import { usePrevious } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import useEditedEntityRecord from '../use-edited-entity-record';
+
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const {
-		postId,
-		isEditorActive,
-		isTemplateActive,
-		isPostTypeTemplate,
-		hasBackNavigation,
-	} = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType, getEditorSettings } =
-			select( editorStore );
+	const edited = useEditedEntityRecord();
+	const isPostTypeTemplate = edited.record.type === 'wp_template';
+	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
 		const { get } = select( preferencesStore );
 		return {
-			postId: getCurrentPostId(),
-			isEditorActive: get( 'core/edit-site', 'welcomeGuide' ),
-			isTemplateActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
-			isPostTypeTemplate: getCurrentPostType() === 'wp_template',
-			hasBackNavigation:
+			isActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
+			hasPreviousEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
-	const priorPostId = usePrevious( postId );
-	const isVisible =
-		postId !== priorPostId &&
-		isTemplateActive &&
-		! isEditorActive &&
-		isPostTypeTemplate &&
-		hasBackNavigation;
+	const isVisible = isActive && isPostTypeTemplate && hasPreviousEntity;
 
 	if ( ! isVisible ) {
 		return null;
