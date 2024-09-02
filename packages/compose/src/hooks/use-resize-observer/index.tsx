@@ -84,12 +84,10 @@ type ResizeElementProps = {
 };
 
 function ResizeElement( { onResize }: ResizeElementProps ) {
+	const resizeElementRef = useRef< HTMLDivElement >( null );
 	const resizeCallbackEvent = useEvent( onResize );
 
-	const [ resizeElement, setResizeElement ] =
-		useState< HTMLDivElement | null >();
-
-	useObserveElementSize( resizeElement, ( entries ) => {
+	useObserveElementSize( resizeElementRef, ( entries ) => {
 		for ( const entry of entries ) {
 			const newSize = extractSize( entry );
 			resizeCallbackEvent( newSize );
@@ -98,7 +96,7 @@ function ResizeElement( { onResize }: ResizeElementProps ) {
 
 	return (
 		<div
-			ref={ setResizeElement }
+			ref={ resizeElementRef }
 			style={ RESIZE_ELEMENT_STYLES }
 			aria-hidden="true"
 		/>
