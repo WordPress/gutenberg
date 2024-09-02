@@ -119,8 +119,8 @@ export const MenuPopoverInnerWrapper = styled.div`
 		/*
 		 * For menus opening on top and bottom side, animate the scale Y too.
 		 * The content scales at a different rate than the outer container:
-	   * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
-	   * - then, apply the content scale factor.
+		 * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
+		 * - then, apply the content scale factor.
 		 */
 		&[data-side='bottom'],
 		&[data-side='top'] {
