@@ -218,7 +218,7 @@ export default function CategoriesEdit( {
 				</PanelBody>
 			</InspectorControls>
 			{ isResolving && (
-				<Placeholder icon={ pin } label={ __( 'Categories' ) }>
+				<Placeholder icon={ pin } label={ __( 'Terms' ) }>
 					<Spinner />
 				</Placeholder>
 			) }
