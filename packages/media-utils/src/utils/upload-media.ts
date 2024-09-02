@@ -20,8 +20,6 @@ import { validateMimeTypeForUser } from './validate-mime-type-for-user';
 import { validateFileSize } from './validate-file-size';
 import { UploadError } from './upload-error';
 
-const noop = () => {};
-
 interface UploadMediaArgs {
 	// Additional data to include in the request.
 	additionalData?: AdditionalData;
@@ -63,7 +61,7 @@ export function uploadMedia( {
 	additionalData = {},
 	filesList,
 	maxUploadFileSize,
-	onError = noop,
+	onError,
 	onFileChange,
 	signal,
 }: UploadMediaArgs ) {
@@ -86,7 +84,7 @@ export function uploadMedia( {
 		try {
 			validateMimeTypeForUser( mediaFile, wpAllowedMimeTypes );
 		} catch ( error: unknown ) {
-			onError( error as Error );
+			onError?.( error as Error );
 			continue;
 		}
 
@@ -95,7 +93,7 @@ export function uploadMedia( {
 		try {
 			validateMimeType( mediaFile, allowedTypes );
 		} catch ( error: unknown ) {
-			onError( error as Error );
+			onError?.( error as Error );
 			continue;
 		}
 
@@ -103,7 +101,7 @@ export function uploadMedia( {
 		try {
 			validateFileSize( mediaFile, maxUploadFileSize );
 		} catch ( error: unknown ) {
-			onError( error as Error );
+			onError?.( error as Error );
 			continue;
 		}
 
@@ -137,7 +135,8 @@ export function uploadMedia( {
 					file.name
 				);
 			}
-			onError(
+
+			onError?.(
 				new UploadError( {
 					code: 'GENERAL',
 					message,
