@@ -58,7 +58,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
 
-		if ( ! empty ( $block->context['enhancedPagination'] ) ) {
+		if ( ! empty( $block->context['enhancedPagination'] ) ) {
 			$p = new WP_HTML_Tag_Processor( $items_markup );
 			while ( $p->next_tag( 'a' ) ) {
 				$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
