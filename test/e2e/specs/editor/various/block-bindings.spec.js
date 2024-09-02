@@ -159,9 +159,8 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'should lock the appropriate controls when source is not defined', async ( {
+			test( 'should throw a warning when source is not defined', async ( {
 				editor,
-				page,
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/paragraph',
@@ -177,32 +176,10 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await paragraphBlock.click();
-
-				// Alignment controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Align text' } )
-				).toBeVisible();
-
-				// Format controls don't exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Bold',
-						} )
-				).toBeHidden();
-
-				// Paragraph is not editable.
-				await expect( paragraphBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
+				const warningMessage = editor.canvas.locator(
+					'.block-editor-warning__message'
 				);
+				await expect( warningMessage ).toBeVisible();
 			} );
 		} );
 
@@ -242,52 +219,6 @@ test.describe( 'Block bindings', () => {
 							bindings: {
 								content: {
 									source: 'core/post-meta',
-									args: { key: 'text_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const headingBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Heading',
-				} );
-				await headingBlock.click();
-
-				// Alignment controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Align text' } )
-				).toBeVisible();
-
-				// Format controls don't exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Bold',
-						} )
-				).toBeHidden();
-
-				// Heading is not editable.
-				await expect( headingBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
-				);
-			} );
-
-			test( 'should lock the appropriate controls when source is not defined', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/heading',
-					attributes: {
-						content: 'heading default content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'plugin/undefined-source',
 									args: { key: 'text_custom_field' },
 								},
 							},
@@ -416,68 +347,6 @@ test.describe( 'Block bindings', () => {
 				).toBeVisible();
 			} );
 
-			test( 'should lock text controls when text is bound to an undefined source', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/buttons',
-					innerBlocks: [
-						{
-							name: 'core/button',
-							attributes: {
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										text: {
-											source: 'plugin/undefined-source',
-											args: { key: 'text_custom_field' },
-										},
-									},
-								},
-							},
-						},
-					],
-				} );
-				const buttonBlock = editor.canvas
-					.getByRole( 'document', {
-						name: 'Block: Button',
-						exact: true,
-					} )
-					.getByRole( 'textbox' );
-				await buttonBlock.click();
-
-				// Alignment controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Align text' } )
-				).toBeVisible();
-
-				// Format controls don't exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Bold',
-						} )
-				).toBeHidden();
-
-				// Button is not editable.
-				await expect( buttonBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
-				);
-
-				// Link controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Unlink' } )
-				).toBeVisible();
-			} );
-
 			test( 'should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
@@ -494,66 +363,6 @@ test.describe( 'Block bindings', () => {
 									bindings: {
 										url: {
 											source: 'core/post-meta',
-											args: { key: 'url_custom_field' },
-										},
-									},
-								},
-							},
-						},
-					],
-				} );
-				const buttonBlock = editor.canvas
-					.getByRole( 'document', {
-						name: 'Block: Button',
-						exact: true,
-					} )
-					.getByRole( 'textbox' );
-				await buttonBlock.click();
-
-				// Format controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Bold',
-						} )
-				).toBeVisible();
-
-				// Button is editable.
-				await expect( buttonBlock ).toHaveAttribute(
-					'contenteditable',
-					'true'
-				);
-
-				// Link controls don't exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Link' } )
-				).toBeHidden();
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', { name: 'Unlink' } )
-				).toBeHidden();
-			} );
-
-			test( 'should lock url controls when url is bound to an undefined source', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/buttons',
-					innerBlocks: [
-						{
-							name: 'core/button',
-							attributes: {
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										url: {
-											source: 'plugin/undefined-source',
 											args: { key: 'url_custom_field' },
 										},
 									},
@@ -712,34 +521,6 @@ test.describe( 'Block bindings', () => {
 				).toBeHidden();
 			} );
 
-			test( 'should NOT show the upload form when url is bound to an undefined source', async ( {
-				editor,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/image',
-					attributes: {
-						url: imagePlaceholderSrc,
-						alt: 'default alt value',
-						title: 'default title value',
-						metadata: {
-							bindings: {
-								url: {
-									source: 'plugin/undefined-source',
-									args: { key: 'url_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const imageBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Image',
-				} );
-				await imageBlock.click();
-				await expect(
-					imageBlock.getByRole( 'button', { name: 'Upload' } )
-				).toBeHidden();
-			} );
-
 			test( 'should lock url controls when url is bound to a registered source', async ( {
 				editor,
 				page,
@@ -754,75 +535,6 @@ test.describe( 'Block bindings', () => {
 							bindings: {
 								url: {
 									source: 'core/post-meta',
-									args: { key: 'url_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const imageBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Image',
-				} );
-				await imageBlock.click();
-
-				// Replace controls don't exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Replace',
-						} )
-				).toBeHidden();
-
-				// Image placeholder doesn't show the upload button.
-				await expect(
-					imageBlock.getByRole( 'button', { name: 'Upload' } )
-				).toBeHidden();
-
-				// Alt textarea is enabled and with the original value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toBeEnabled();
-				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Alternative text' )
-					.inputValue();
-				expect( altValue ).toBe( 'default alt value' );
-
-				// Title input is enabled and with the original value.
-				await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByRole( 'button', { name: 'Advanced' } )
-					.click();
-
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Title attribute' )
-				).toBeEnabled();
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'default title value' );
-			} );
-
-			test( 'should lock url controls when url is bound to an undefined source', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/image',
-					attributes: {
-						url: imagePlaceholderSrc,
-						alt: 'default alt value',
-						title: 'default title value',
-						metadata: {
-							bindings: {
-								url: {
-									source: 'plugin/undefined-source',
 									args: { key: 'url_custom_field' },
 								},
 							},
@@ -941,69 +653,6 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
-			test( 'should disable alt textarea when alt is bound to an undefined source', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/image',
-					attributes: {
-						url: imagePlaceholderSrc,
-						alt: 'default alt value',
-						title: 'default title value',
-						metadata: {
-							bindings: {
-								alt: {
-									source: 'plguin/undefined-source',
-									args: { key: 'text_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const imageBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Image',
-				} );
-				await imageBlock.click();
-
-				// Replace controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Replace',
-						} )
-				).toBeVisible();
-
-				// Alt textarea is disabled and with the custom field value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toHaveAttribute( 'readonly' );
-				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Alternative text' )
-					.inputValue();
-				expect( altValue ).toBe( 'default alt value' );
-
-				// Title input is enabled and with the original value.
-				await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByRole( 'button', { name: 'Advanced' } )
-					.click();
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Title attribute' )
-				).toBeEnabled();
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'default title value' );
-			} );
-
 			test( 'should disable title input when title is bound to a registered source', async ( {
 				editor,
 				page,
@@ -1065,69 +714,6 @@ test.describe( 'Block bindings', () => {
 					.getByLabel( 'Title attribute' )
 					.inputValue();
 				expect( titleValue ).toBe( 'text_custom_field' );
-			} );
-
-			test( 'should disable title input when title is bound to an undefined source', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/image',
-					attributes: {
-						url: imagePlaceholderSrc,
-						alt: 'default alt value',
-						title: 'default title value',
-						metadata: {
-							bindings: {
-								title: {
-									source: 'plugin/undefined-source',
-									args: { key: 'text_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const imageBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Image',
-				} );
-				await imageBlock.click();
-
-				// Replace controls exist.
-				await expect(
-					page
-						.getByRole( 'toolbar', { name: 'Block tools' } )
-						.getByRole( 'button', {
-							name: 'Replace',
-						} )
-				).toBeVisible();
-
-				// Alt textarea is enabled and with the original value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toBeEnabled();
-				const altValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Alternative text' )
-					.inputValue();
-				expect( altValue ).toBe( 'default alt value' );
-
-				// Title input is disabled and with the custom field value.
-				await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByRole( 'button', { name: 'Advanced' } )
-					.click();
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Title attribute' )
-				).toHaveAttribute( 'readonly' );
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'default title value' );
 			} );
 
 			test( 'Multiple bindings should lock the appropriate controls', async ( {
