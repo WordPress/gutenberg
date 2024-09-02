@@ -15,7 +15,7 @@ export function flattenFormData(
 		Object.getPrototypeOf( data ) === Object.prototype
 	) {
 		for ( const name in data ) {
-			if ( Object.prototype.hasOwnProperty.call( data, name ) ) {
+			if ( Object.hasOwn( data, name ) ) {
 				flattenFormData(
 					formData,
 					`${ key }[${ name }]`,
