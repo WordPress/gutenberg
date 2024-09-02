@@ -11,6 +11,8 @@ import {
 	Notice,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	FormTokenField,
+	BaseControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -67,6 +69,56 @@ export default function QueryInspectorControls( props ) {
 	useEffect( () => {
 		setShowSticky( postType === 'post' );
 	}, [ postType ] );
+
+	const convertDisplayToSlugs = ( selectedPostTypes ) => {
+		const slugs = [];
+		selectedPostTypes.forEach( ( selectedLabel ) => {
+			const typeDef = postTypesSelectOptions.filter(
+				( { label } ) => label === selectedLabel
+			);
+
+			slugs.push( typeDef[ 0 ]?.value );
+		} );
+
+		return slugs;
+	};
+
+	// const convertSlugsToDisplay = useCallback( ( arrayOfSlugs ) => {
+	// 	console.log( 'arrayOfSlugs :', arrayOfSlugs, postTypesSelectOptions );
+	// 	const labels = [];
+	// 	if ( ! Array.isArray( arrayOfSlugs ) ) {
+	// 		return labels;
+	// 	}
+
+	// 	arrayOfSlugs.forEach( ( selectedSlug ) => {
+	// 		const typeDef = postTypesSelectOptions.filter(
+	// 			( { value } ) => value === selectedSlug
+	// 		);
+	// 		labels.push( typeDef[ 0 ]?.label );
+	// 	} );
+	// 	return labels;
+	// } );
+
+	/**
+	 * Track the selected post types in the form of slugs for the formTokenField
+	 */
+	const [ multiplePostTypes, setMultiplePostTypes ] = useState(
+		Array.isArray( postType ) ? postType : [ postType ]
+	);
+
+	// useEffect( () => {
+	// 	// const postTypes = convertDisplayToSlugs( multiplePostTypes );
+	// 	if ( postTypesSelectOptions.length > 0 ) {
+	// 		setMultiplePostTypes( convertSlugsToDisplay( multiplePostTypes ) );
+	// 		console.log( 'multiplePostTypes', multiplePostTypes );
+	// 		console.log( 'postTypesSelectOptions', postTypesSelectOptions );
+	// 	}
+	// }, [ multiplePostTypes, postTypesSelectOptions, convertSlugsToDisplay ] );
+
+	/**
+	 * Handle post type change and associated side effects
+	 * @param {*} newValue
+	 */
 	const onPostTypeChange = ( newValue ) => {
 		const updateQuery = { postType: newValue };
 		// We need to dynamically update the `taxQuery` property,
@@ -150,7 +202,6 @@ export default function QueryInspectorControls( props ) {
 
 	const showDisplayPanel =
 		showPostCountControl || showOffSetControl || showPagesControl;
-
 	return (
 		<>
 			{ !! postType && (
@@ -202,23 +253,57 @@ export default function QueryInspectorControls( props ) {
 								help={ postTypeControlHelp }
 							/>
 						) : (
-							<ToggleGroupControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								isBlock
-								value={ postType }
-								label={ postTypeControlLabel }
-								onChange={ onPostTypeChange }
-								help={ postTypeControlHelp }
-							>
-								{ postTypesSelectOptions.map( ( option ) => (
-									<ToggleGroupControlOption
-										key={ option.value }
-										value={ option.value }
-										label={ option.label }
+							<>
+								<BaseControl
+									help={ postTypeControlHelp }
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+								>
+									<FormTokenField
+										label={ postTypeControlLabel }
+										suggestions={ [
+											...postTypesSelectOptions?.map(
+												( { label } ) => label
+											),
+										] }
+										value={ [ ...multiplePostTypes ] }
+										onChange={ ( selectedPostTypes ) => {
+											setMultiplePostTypes(
+												selectedPostTypes
+											);
+
+											const dataTypes =
+												convertDisplayToSlugs(
+													selectedPostTypes
+												);
+											setQuery( {
+												postType: dataTypes,
+											} );
+										} }
+										__experimentalExpandOnFocus
+										__experimentalShowHowTo={ false }
 									/>
-								) ) }
-							</ToggleGroupControl>
+								</BaseControl>
+								{ /* <ToggleGroupControl
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
+									isBlock
+									value={ postType }
+									label={ postTypeControlLabel }
+									onChange={ onPostTypeChange }
+									help={ postTypeControlHelp }
+								>
+									{ postTypesSelectOptions.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl> */ }
+							</>
 						) ) }
 
 					{ showColumnsControl && (

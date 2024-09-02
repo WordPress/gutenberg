@@ -27,7 +27,7 @@ export const settings = {
 				perPage: 4,
 				pages: 1,
 				offset: 0,
-				postType: 'post',
+				postType: [ 'post' ],
 				order: 'desc',
 				orderBy: 'date',
 				author: '',
