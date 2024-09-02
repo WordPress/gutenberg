@@ -39,5 +39,24 @@ describe( 'ColorPalette: Utils', () => {
 				'#ff0000'
 			);
 		} );
+		test( 'should return the value as is if the color value undefined', () => {
+			const element = document.createElement( 'div' );
+			expect( normalizeColorValue( undefined, element ) ).toBe(
+				undefined
+			);
+		} );
+		test( 'should return the value as is if the element is null', () => {
+			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
+		} );
+		test( 'should return the value as is if the value is a color mix', () => {
+			const element = document.createElement( 'div' );
+			element.style.backgroundColor = '#ff0000';
+			expect(
+				normalizeColorValue(
+					'color-mix(in oklab, #a71e14, white)',
+					element
+				)
+			).toBe( '#ff0000' );
+		} );
 	} );
 } );
