@@ -62,7 +62,6 @@ export function useScreenAnimatePresence( {
 	setWrapperHeight?: ( height: number | undefined ) => void;
 } ) {
 	const isRTL = isRTLFn();
-	const animationTimeoutRef = useRef< number >();
 	const prefersReducedMotion = useReducedMotion();
 
 	const [ animationStatus, setAnimationStatus ] =
@@ -98,20 +97,6 @@ export function useScreenAnimatePresence( {
 			setWrapperHeight?.( undefined );
 		}
 	}, [ screenEl, animationStatus, setWrapperHeight ] );
-
-	// Fallback timeout to ensure the screen is removed from the DOM in case the
-	// `animationend` event is not triggered.
-	useEffect( () => {
-		if ( animationStatus === 'ANIMATING_OUT' ) {
-			animationTimeoutRef.current = window.setTimeout( () => {
-				// setAnimationStatus( 'OUT' );
-				animationTimeoutRef.current = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION_OUT );
-		} else if ( animationTimeoutRef.current ) {
-			window.clearTimeout( animationTimeoutRef.current );
-			animationTimeoutRef.current = undefined;
-		}
-	}, [ animationStatus ] );
 
 	// Styles
 	const animationDirection =
@@ -159,6 +144,31 @@ export function useScreenAnimatePresence( {
 		},
 		[ onAnimationEnd, animationStatus, animationDirection ]
 	);
+
+	// Fallback timeout to ensure that the logic is applied even if the
+	// `animationend` event is not triggered.
+	useEffect( () => {
+		let animationTimeout: number | undefined;
+
+		if ( isAnimatingOut ) {
+			animationTimeout = window.setTimeout( () => {
+				setAnimationStatus( 'OUT' );
+				animationTimeout = undefined;
+			}, styles.TOTAL_ANIMATION_DURATION.OUT );
+		} else if ( isAnimatingIn ) {
+			animationTimeout = window.setTimeout( () => {
+				setAnimationStatus( 'IN' );
+				animationTimeout = undefined;
+			}, styles.TOTAL_ANIMATION_DURATION.IN );
+		}
+
+		return () => {
+			if ( animationTimeout ) {
+				window.clearTimeout( animationTimeout );
+				animationTimeout = undefined;
+			}
+		};
+	}, [ isAnimatingOut, isAnimatingIn ] );
 
 	return {
 		animationStyles,

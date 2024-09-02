@@ -70,10 +70,10 @@ const SLIDE = {
 	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
 };
 
-export const TOTAL_ANIMATION_DURATION_OUT = Math.max(
-	FADE.DURATION + FADE.DELAY.OUT,
-	SLIDE.DURATION
-);
+export const TOTAL_ANIMATION_DURATION = {
+	IN: Math.max( FADE.DURATION + FADE.DELAY.IN, SLIDE.DURATION ),
+	OUT: Math.max( FADE.DURATION + FADE.DELAY.OUT, SLIDE.DURATION ),
+};
 
 export const ANIMATION_END_NAMES = {
 	forwards: {
