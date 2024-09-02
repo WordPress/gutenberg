@@ -72,63 +72,59 @@ export default {
 		return (
 			<>
 				{ allowCustomContentAndWideSize && (
-					<>
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								__next40pxDefaultSize
-								className="block-editor-hooks__layout-controls-unit-input"
-								label={ __( 'Content width' ) }
-								labelPosition="top"
-								value={ contentSize || wideSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									onChange( {
-										...layout,
-										contentSize: nextWidth,
-									} );
-								} }
-								units={ units }
-								prefix={
-									<InputControlPrefixWrapper variant="icon">
-										<Icon icon={ alignNone } />
-									</InputControlPrefixWrapper>
-								}
-							/>
-						</div>
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								__next40pxDefaultSize
-								className="block-editor-hooks__layout-controls-unit-input"
-								label={ __( 'Wide width' ) }
-								labelPosition="top"
-								value={ wideSize || contentSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									onChange( {
-										...layout,
-										wideSize: nextWidth,
-									} );
-								} }
-								units={ units }
-								prefix={
-									<InputControlPrefixWrapper variant="icon">
-										<Icon icon={ stretchWide } />
-									</InputControlPrefixWrapper>
-								}
-							/>
-						</div>
+					<div className="block-editor-hooks__layout-controls-units">
+						<UnitControl
+							__next40pxDefaultSize
+							className="block-editor-hooks__layout-controls-unit-input"
+							label={ __( 'Content width' ) }
+							labelPosition="top"
+							value={ contentSize || wideSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								onChange( {
+									...layout,
+									contentSize: nextWidth,
+								} );
+							} }
+							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ alignNone } />
+								</InputControlPrefixWrapper>
+							}
+						/>
+						<UnitControl
+							__next40pxDefaultSize
+							className="block-editor-hooks__layout-controls-unit-input"
+							label={ __( 'Wide width' ) }
+							labelPosition="top"
+							value={ wideSize || contentSize || '' }
+							onChange={ ( nextWidth ) => {
+								nextWidth =
+									0 > parseFloat( nextWidth )
+										? '0'
+										: nextWidth;
+								onChange( {
+									...layout,
+									wideSize: nextWidth,
+								} );
+							} }
+							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ stretchWide } />
+								</InputControlPrefixWrapper>
+							}
+						/>
 						<p className="block-editor-hooks__layout-controls-helptext">
 							{ __(
 								'Customize the width for all elements that are assigned to the center or wide columns.'
 							) }
 						</p>
-					</>
+					</div>
 				) }
 				{ allowJustification && (
 					<ToggleGroupControl

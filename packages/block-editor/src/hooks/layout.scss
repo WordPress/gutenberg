@@ -1,3 +1,9 @@
+.block-editor-hooks__layout-controls-units {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+}
+
 .block-editor-block-inspector .block-editor-hooks__layout-controls-unit-input {
 	margin-bottom: 0;
 }
