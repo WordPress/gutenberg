@@ -49,6 +49,30 @@ export const Empty = ( props ) => {
 	);
 };
 
+export const FieldsNoSortableNoHidable = ( props ) => {
+	const [ view, setView ] = useState( DEFAULT_VIEW );
+	const { data: shownData, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( data, view, fields );
+	}, [ view ] );
+
+	const _fields = fields.map( ( field ) => ( {
+		...field,
+		enableSorting: false,
+		enableHiding: false,
+	} ) );
+
+	return (
+		<DataViews
+			{ ...props }
+			paginationInfo={ paginationInfo }
+			data={ shownData }
+			view={ view }
+			fields={ _fields }
+			onChangeView={ setView }
+		/>
+	);
+};
+
 Default.args = {
 	actions,
 	defaultLayouts: {
