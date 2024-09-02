@@ -654,10 +654,10 @@ export default function LogoEdit( {
 			{ controls }
 			{ mediaInspectorPanel }
 			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
-			{ ( !! isLoading ||
+			{ ( isLoading ||
 				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
 				<Placeholder className="site-logo_placeholder" withIllustration>
-					{ !! isLoading && (
+					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>
