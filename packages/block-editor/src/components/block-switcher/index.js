@@ -237,6 +237,9 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 			} else {
 				const isSelectionOfSameType =
 					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
+				_hasTemplateLock = clientIds.some(
+					( id ) => getTemplateLock( id ) === 'contentOnly'
+				);
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
