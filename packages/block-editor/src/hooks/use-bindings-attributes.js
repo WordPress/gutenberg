@@ -321,7 +321,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						{ sprintf(
 							/* translators: %1$s: block attribute, %2$s: invalid block bindings source. */
 							__(
-								'Attribute "%1$s" is connected to undefined "%2$s" block bindings source. You can leave this block intact, modify the connection, or remove it.'
+								'Attribute "%1$s" is connected to unrecognized "%2$s" source. You can leave this block intact, modify the connection, or remove it.'
 							),
 							invalidBinding.attribute,
 							invalidBinding.source
