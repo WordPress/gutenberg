@@ -71,7 +71,7 @@
 		}
 	},
 	"selectors": {
-		"border": ".wp-block-audio audio, .wp-block-audio .components-placeholder"
+		"border": ".wp-block-audio audio"
 	},
 	"editorStyle": "wp-block-audio-editor",
 	"style": "wp-block-audio"

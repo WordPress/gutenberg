@@ -131,22 +131,6 @@ function AudioEdit( {
 	} );
 
 	if ( ! src && ! temporaryURL ) {
-		// Much of this description is duplicated from MediaPlaceholder.
-		const placeholder = ( content ) => {
-			return (
-				<Placeholder
-					withIllustration
-					className={ clsx( 'block-editor-media-placeholder', {
-						[ borderProps.className ]:
-							!! borderProps.className && ! isSingleSelected,
-					} ) }
-					style={ borderProps.style }
-				>
-					{ content }
-				</Placeholder>
-			);
-		};
-
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -157,7 +141,6 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
-					placeholder={ placeholder }
 				/>
 			</div>
 		);
