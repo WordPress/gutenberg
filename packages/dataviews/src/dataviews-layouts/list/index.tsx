@@ -380,21 +380,16 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 
 	useEffect( () => {
 		if ( ! isActiveIdInList ) {
-			// Prefer going down, except if there is no item below (last item),
-			// then go up (last item in list).
-			// By picking previousActiveItemIndex as the next item index, we are
-			// basically picking the item after the deleted one.
+			// By picking `previousActiveItemIndex` as the next item index, we are
+			// basically picking the item that would have been after the deleted one.
+			// If the previously active (and removed) item was the last of the list,
+			// we will select the item before it — which is the new last item.
 			// Clamping between 0 and data.length - 1 to avoid out of bounds.
-			const nextActiveDataItem =
-				data[
-					Math.max(
-						0,
-						Math.min(
-							previousActiveItemIndex ?? 0,
-							data.length - 1
-						)
-					)
-				];
+			const clampedPreviousActiveItemIndex = Math.max(
+				0,
+				Math.min( previousActiveItemIndex ?? 0, data.length - 1 )
+			);
+			const nextActiveDataItem = data[ clampedPreviousActiveItemIndex ];
 
 			const nextCompositeActiveId = getItemDomId( nextActiveDataItem );
 			setActiveCompositeId( nextCompositeActiveId );
