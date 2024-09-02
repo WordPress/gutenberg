@@ -28,6 +28,8 @@ import type { Filter, NormalizedFilter, View } from '../../types';
 const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
+	CompositeHoverV2: CompositeHover,
+	CompositeTypeaheadV2: CompositeTypeahead,
 } = unlock( componentsPrivateApis );
 
 interface SearchWidgetProps {
@@ -130,11 +132,10 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 					);
 				}
 			} }
-			render={ <Ariakit.CompositeTypeahead store={ compositeStore } /> }
+			render={ <CompositeTypeahead /> }
 		>
 			{ filter.elements.map( ( element ) => (
-				<Ariakit.CompositeHover
-					store={ compositeStore }
+				<CompositeHover
 					key={ element.value }
 					render={
 						<CompositeItem
@@ -204,7 +205,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 							) }
 					</span>
 					<span>{ element.label }</span>
-				</Ariakit.CompositeHover>
+				</CompositeHover>
 			) ) }
 		</Composite>
 	);
