@@ -49,11 +49,6 @@ addFilter(
  * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
-	// Check if the experimental flag is enabled.
-	if ( ! isBlockCommentExperimentEnabled ) {
-		return null; // or maybe return some message indicating no threads are available.
-	}
-
 	const [ threads, setThreads ] = useState( () => [] );
 	const [ reloadComments, setReloadComments ] = useState( false );
 	const postId = useSelect( ( select ) => {
@@ -102,6 +97,11 @@ export default function CollabSidebar() {
 			} );
 		}
 	}, [ postId, reloadComments ] );
+
+	// Check if the experimental flag is enabled.
+	if ( ! isBlockCommentExperimentEnabled ) {
+		return null; // or maybe return some message indicating no threads are available.
+	}
 
 	const resultThreads = threads.map( ( thread ) => thread ).reverse();
 

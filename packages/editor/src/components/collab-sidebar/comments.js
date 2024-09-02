@@ -12,7 +12,6 @@ import { useState, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
 	Button,
 	DropdownMenu,
 	TextareaControl,
@@ -25,22 +24,25 @@ import {
 } from '@wordpress/date';
 import { Icon, check, published, moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import {
+	Icon,
+	edit as editIcon,
+	trash as deleteIcon,
+	commentAuthorAvatar as userIcon,
+} from '@wordpress/icons';
 
 export function Comments( { threads } ) {
+	const { createNotice } = useDispatch( noticesStore );
+
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
 	const [ showConfirmationTabId, setShowConfirmationTabId ] = useState( 0 );
-	const [ commentConfirmation, setCommentConfirmation ] = useState( false );
 	const [ deleteCommentShowConfirmation, setDeleteCommentShowConfirmation ] =
 		useState( false );
-	const [ commentDeleteMessage, setCommentDeleteMessage ] = useState( false );
 	const [ commentEdit, setCommentEdit ] = useState( false );
-	const [ newEditedComment, setNewEditedComment ] = useState( '' );
-	const [ commentEditedMessage, setCommentEditedMessage ] = useState( false );
 	const [ hasCommentReply, setHasCommentReply ] = useState( false );
-	const [ commentReply, setCommentReply ] = useState( '' );
-	const [ replyMessage, setReplyMessage ] = useState( false );
 
 	const currentUserData = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
@@ -53,7 +55,6 @@ export function Comments( { threads } ) {
 	}, [] );
 
 	const confirmAndMarkThreadAsResolved = ( threadID ) => {
-		setCommentConfirmation( false );
 		if ( threadID ) {
 			apiFetch( {
 				path: '/wp/v2/comments/' + threadID,
@@ -64,25 +65,22 @@ export function Comments( { threads } ) {
 			} ).then( ( response ) => {
 				if ( 'approved' === response.status ) {
 					setShowConfirmation( false );
-					setCommentConfirmation( true );
+					createNotice(
+						'snackbar',
+						__( 'Thread marked as resolved.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
 				}
 			} );
 		}
 	};
 
-	const onEditComment = ( threadID ) => {
-		if ( threadID ) {
-			setHasCommentReply( false );
-			setCommentEdit( true );
-		}
-	};
-
-	const confirmEditComment = ( threadID ) => {
-		if ( threadID ) {
-			const editedComment = newEditedComment.replace(
-				/^<p>|<\/p>$/g,
-				''
-			);
+	const confirmEditComment = ( threadID, comment ) => {
+		if ( threadID && comment.length > 0 ) {
+			const editedComment = comment.replace( /^<p>|<\/p>$/g, '' );
 
 			apiFetch( {
 				path: '/wp/v2/comments/' + threadID,
@@ -93,7 +91,14 @@ export function Comments( { threads } ) {
 			} ).then( ( response ) => {
 				if ( 'trash' !== response.status && '' !== response.id ) {
 					setCommentEdit( false );
-					setCommentEditedMessage( true );
+					createNotice(
+						'snackbar',
+						__( 'Thread edited successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
 				}
 			} );
 		}
@@ -107,16 +112,16 @@ export function Comments( { threads } ) {
 				method: 'DELETE',
 			} ).then( ( response ) => {
 				if ( 'trash' === response.status && '' !== response.id ) {
-					setCommentDeleteMessage( true );
+					createNotice(
+						'snackbar',
+						__( 'Thread deleted successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
 				}
 			} );
-		}
-	};
-
-	const onReplyComment = ( threadID ) => {
-		if ( threadID ) {
-			setCommentEdit( false );
-			setHasCommentReply( true );
 		}
 	};
 
@@ -127,9 +132,9 @@ export function Comments( { threads } ) {
 		createdAt: new Date().toISOString(),
 	} );
 
-	const confirmReplyComment = ( threadID ) => {
+	const confirmReplyComment = ( threadID, comment ) => {
 		if ( threadID ) {
-			const newComment = generateReplyComment( commentReply );
+			const newComment = generateReplyComment( comment );
 			apiFetch( {
 				path: '/wp/v2/comments/',
 				method: 'POST',
@@ -144,7 +149,14 @@ export function Comments( { threads } ) {
 				},
 			} ).then( ( response ) => {
 				if ( 'trash' !== response.status && '' !== response.id ) {
-					setReplyMessage( true );
+					createNotice(
+						'snackbar',
+						__( 'Reply added successfully.' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
 				}
 			} );
 		}
@@ -160,6 +172,12 @@ export function Comments( { threads } ) {
 				?.blockCommentId ?? false
 		);
 	}, [] );
+
+	const onCancel = () => {
+		setHasCommentReply( false );
+		setCommentEdit( false );
+		setShowConfirmation( false );
+	}
 
 	return (
 		<>
@@ -196,13 +214,13 @@ export function Comments( { threads } ) {
 						<CommentHeader
 							thread={ thread }
 							onResolve={ () => {
-								setCommentConfirmation( false );
 								setShowConfirmation( true );
 								setShowConfirmationTabId( thread.id );
 							} }
 							onEdit={ () => {
 								setShowConfirmationTabId( thread.id );
-								onEditComment( thread.id );
+								setHasCommentReply( false );
+								setCommentEdit( true );
 							} }
 							onDelete={ () => {
 								setCommentEdit( false );
@@ -211,8 +229,10 @@ export function Comments( { threads } ) {
 							} }
 							onReply={ () => {
 								setShowConfirmationTabId( thread.id );
-								onReplyComment( thread.id );
+								setCommentEdit( false );
+								setHasCommentReply( true );
 							} }
+							status={ thread.status }
 						/>
 						<HStack
 							alignment="left"
@@ -226,162 +246,42 @@ export function Comments( { threads } ) {
 							>
 								{ commentEdit &&
 									thread.id === showConfirmationTabId && (
-										<>
-											<TextareaControl
-												__nextHasNoMarginBottom
-												className="editor-collab-sidebar__replyComment__textarea"
-												value={
-													'' !== newEditedComment
-														? newEditedComment.replace(
-																/<\/?p>/g,
-																''
-														  )
-														: thread.content.rendered.replace(
-																/<\/?p>/g,
-																''
-														  )
-												}
-												onChange={ ( value ) => {
-													setNewEditedComment(
-														value
-													);
-												} }
-											/>
-											<VStack
-												alignment="left"
-												spacing="3"
-												justify="flex-start"
-												className="editor-collab-sidebar__commentbtn"
-											>
-												<HStack
-													alignment="left"
-													spacing="3"
-													justify="flex-start"
-												>
-													<Button
-														__next40pxDefaultSize
-														variant="primary"
-														onClick={ () => {
-															confirmEditComment(
-																thread.id
-															);
-															setCommentEdit(
-																false
-															);
-														} }
-													>
-														{ __( 'Update' ) }
-													</Button>
-													<Button
-														__next40pxDefaultSize
-														onClick={ () => {
-															setCommentEdit(
-																false
-															);
-															setShowConfirmation(
-																false
-															);
-														} }
-													>
-														{ __( 'Cancel' ) }
-													</Button>
-												</HStack>
-											</VStack>
-										</>
+										<EditComment 
+											thread={ thread }
+											onUpdate={ ( inputComment ) => {
+												confirmEditComment( thread.id, inputComment );
+												setCommentEdit( false );
+											} }
+											onCancel={ onCancel }
+										/>
 									) }
-								<RawHTML>{ thread.content.rendered }</RawHTML>
+								{ ! commentEdit && (
+									<RawHTML>
+										{ thread.content.rendered }
+									</RawHTML>
+								) }
 							</VStack>
 						</HStack>
 
 						{ hasCommentReply &&
 							thread.id === showConfirmationTabId && (
-								<HStack
-									alignment="left"
-									spacing="3"
-									justify="flex-start"
-								>
-									<VStack
-										alignment="left"
-										spacing="3"
-										className="editor-collab-sidebar__replyComment"
-									>
-										<TextareaControl
-											__nextHasNoMarginBottom
-											className="editor-collab-sidebar__replyComment__textarea"
-											value={ commentReply ?? '' }
-											onChange={ ( value ) => {
-												setCommentReply( value );
-											} }
-										/>
-										<VStack
-											alignment="left"
-											spacing="3"
-											justify="flex-start"
-										>
-											<HStack
-												alignment="left"
-												spacing="3"
-												justify="flex-start"
-												className="editor-collab-sidebar__replybtn"
-											>
-												<Button
-													__next40pxDefaultSize
-													variant="primary"
-													onClick={ () => {
-														confirmReplyComment(
-															thread.id
-														);
-														setHasCommentReply(
-															false
-														);
-													} }
-												>
-													{ __( 'Reply' ) }
-												</Button>
-												<Button
-													__next40pxDefaultSize
-													onClick={ () => {
-														setHasCommentReply(
-															false
-														);
-														setShowConfirmation(
-															false
-														);
-													} }
-												>
-													{ __( 'Cancel' ) }
-												</Button>
-											</HStack>
-										</VStack>
-									</VStack>
-								</HStack>
+								<AddReply 
+									thread={ thread }
+									onSubmit={ (inputComment) => {
+										confirmReplyComment(
+											thread.id,
+											inputComment
+										);
+										setHasCommentReply(
+											false
+										);
+									} }
+									onCancel={ () => {
+										setHasCommentReply( false );
+										setShowConfirmation( false );
+									} }
+								/>
 							) }
-
-						{ commentConfirmation &&
-							thread.id === showConfirmationTabId && (
-								<Text>
-									{ __( 'Thread marked as resolved.' ) }
-								</Text>
-							) }
-						{ commentEditedMessage &&
-							thread.id === showConfirmationTabId && (
-								<Text>
-									{ __( 'Thread edited successfully.' ) }
-								</Text>
-							) }
-						{ commentDeleteMessage &&
-							thread.id === showConfirmationTabId && (
-								<Text>
-									{ __( 'Thread deleted successfully.' ) }
-								</Text>
-							) }
-						{ replyMessage &&
-							thread.id === showConfirmationTabId && (
-								<Text>
-									{ __( 'Reply added successfully.' ) }
-								</Text>
-							) }
-
 						{ showConfirmation &&
 							thread.id === showConfirmationTabId && (
 								<ConfirmNotice
@@ -427,7 +327,6 @@ export function Comments( { threads } ) {
 									<CommentHeader
 										thread={ reply }
 										onResolve={ () => {
-											setCommentConfirmation( false );
 											setShowConfirmation( true );
 											setShowConfirmationTabId(
 												reply.id
@@ -437,7 +336,8 @@ export function Comments( { threads } ) {
 											setShowConfirmationTabId(
 												reply.id
 											);
-											onEditComment( reply.id );
+											setHasCommentReply( false );
+											setCommentEdit( true );
 										} }
 										onDelete={ () => {
 											setCommentEdit( false );
@@ -448,6 +348,7 @@ export function Comments( { threads } ) {
 												true
 											);
 										} }
+										status={ thread.status }
 									/>
 									<HStack
 										alignment="left"
@@ -462,205 +363,23 @@ export function Comments( { threads } ) {
 											{ commentEdit &&
 												reply.id ===
 													showConfirmationTabId && (
-													<>
-														<TextareaControl
-															__nextHasNoMarginBottom
-															className="editor-collab-sidebar__replyComment__textarea"
-															value={
-																'' !==
-																newEditedComment
-																	? newEditedComment.replace(
-																			/<\/?p>/g,
-																			''
-																	  )
-																	: reply.content.rendered.replace(
-																			/<\/?p>/g,
-																			''
-																	  )
-															}
-															onChange={ (
-																value
-															) => {
-																setNewEditedComment(
-																	value
-																);
-															} }
-														/>
-														<VStack
-															alignment="left"
-															spacing="3"
-															justify="flex-start"
-															className="editor-collab-sidebar__commentbtn"
-														>
-															<HStack
-																alignment="left"
-																spacing="3"
-																justify="flex-start"
-															>
-																<Button
-																	__next40pxDefaultSize
-																	variant="primary"
-																	onClick={ () => {
-																		confirmEditComment(
-																			reply.id
-																		);
-																		setCommentEdit(
-																			false
-																		);
-																	} }
-																>
-																	{ __(
-																		'Update'
-																	) }
-																</Button>
-																<Button
-																	__next40pxDefaultSize
-																	onClick={ () => {
-																		setCommentEdit(
-																			false
-																		);
-																		setShowConfirmation(
-																			false
-																		);
-																	} }
-																>
-																	{ __(
-																		'Cancel'
-																	) }
-																</Button>
-															</HStack>
-														</VStack>
-													</>
-												) }
-											<RawHTML>
-												{ reply.content.rendered }
-											</RawHTML>
+													<EditComment 
+														thread={ reply }
+														onUpdate={ ( inputComment ) => {
+															confirmEditComment( reply.id, inputComment );
+															setCommentEdit( false );
+														} }
+														onCancel={ onCancel }
+													/>
+												) 
+											}
+											{ ! commentEdit && (
+												<RawHTML>
+													{ reply.content.rendered }
+												</RawHTML>
+											) }
 										</VStack>
 									</HStack>
-
-									{ hasCommentReply &&
-										reply.id === showConfirmationTabId && (
-											<HStack
-												alignment="left"
-												spacing="3"
-												justify="flex-start"
-											>
-												<VStack
-													spacing="3"
-													className="editor-collab-sidebar__replyComment"
-												>
-													<TextareaControl
-														__nextHasNoMarginBottom
-														className="editor-collab-sidebar__replyComment__textarea"
-														value={
-															commentReply ?? ''
-														}
-														onChange={ (
-															value
-														) => {
-															setCommentReply(
-																value
-															);
-														} }
-													/>
-													<VStack
-														alignment="left"
-														spacing="3"
-														justify="flex-start"
-													>
-														<HStack
-															alignment="left"
-															spacing="3"
-															justify="flex-start"
-															className="editor-collab-sidebar__replybtn"
-														>
-															<Button
-																__next40pxDefaultSize
-																variant="primary"
-																onClick={ () => {
-																	confirmReplyComment(
-																		reply.id
-																	);
-																	setHasCommentReply(
-																		false
-																	);
-																} }
-															>
-																{ __(
-																	'Reply'
-																) }
-															</Button>
-															<Button
-																__next40pxDefaultSize
-																onClick={ () => {
-																	setHasCommentReply(
-																		false
-																	);
-																	setShowConfirmation(
-																		false
-																	);
-																} }
-															>
-																{ __(
-																	'Cancel'
-																) }
-															</Button>
-														</HStack>
-													</VStack>
-												</VStack>
-											</HStack>
-										) }
-
-									{ commentConfirmation &&
-										reply.id === showConfirmationTabId && (
-											<Text>
-												{ __(
-													'Thread marked as resolved.'
-												) }
-											</Text>
-										) }
-									{ commentEditedMessage &&
-										reply.id === showConfirmationTabId && (
-											<Text>
-												{ __(
-													'Thread edited successfully.'
-												) }
-											</Text>
-										) }
-									{ commentDeleteMessage &&
-										reply.id === showConfirmationTabId && (
-											<Text>
-												{ __(
-													'Thread deleted successfully.'
-												) }
-											</Text>
-										) }
-									{ replyMessage &&
-										reply.id === showConfirmationTabId && (
-											<Text>
-												{ __(
-													'Reply added successfully.'
-												) }
-											</Text>
-										) }
-
-									{ showConfirmation &&
-										reply.id === showConfirmationTabId && (
-											<ConfirmNotice
-												confirmMessage={ __(
-													'Are you sure you want to mark this thread as resolved?'
-												) }
-												confirmAction={ () =>
-													confirmAndMarkThreadAsResolved(
-														reply.id
-													)
-												}
-												discardAction={ () =>
-													setShowConfirmation( false )
-												}
-											/>
-										) }
-
 									{ deleteCommentShowConfirmation &&
 										reply.id === showConfirmationTabId && (
 											<ConfirmNotice
@@ -682,8 +401,119 @@ export function Comments( { threads } ) {
 								</VStack>
 							) ) }
 					</VStack>
-				) ) }
+				) ) 
+			}
 		</>
+	);
+}
+
+function EditComment( { thread, onUpdate, onCancel } ) {
+	const [ inputComment, setInputComment ] = useState( thread.content.rendered.replace(
+		/<[^>]+>/g,
+		''
+	) );
+
+	return (
+		<>
+			<TextareaControl
+				__nextHasNoMarginBottom
+				className="editor-collab-sidebar__replyComment__textarea"
+				value={
+					inputComment ??
+					''
+				}
+				onChange={ (
+					value
+				) => {
+					setInputComment(
+						value
+					);
+				} }
+			/>
+			<VStack
+				alignment="left"
+				spacing="3"
+				justify="flex-start"
+				className="editor-collab-sidebar__commentbtn"
+			>
+				<HStack
+					alignment="left"
+					spacing="3"
+					justify="flex-start"
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => onUpdate( inputComment ) }
+					>
+						{ __(
+							'Update'
+						) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						onClick={ onCancel }
+					>
+						{ __(
+							'Cancel'
+						) }
+					</Button>
+				</HStack>
+			</VStack>
+		</>
+	);
+}
+
+function AddReply( { thread, onSubmit, onCancel } ) {
+	const [ inputComment, setInputComment ] = useState( '' );
+
+	return (
+		<HStack
+			alignment="left"
+			spacing="3"
+			justify="flex-start"
+		>
+			<VStack
+				alignment="left"
+				spacing="3"
+				className="editor-collab-sidebar__replyComment"
+			>
+				<TextareaControl
+					__nextHasNoMarginBottom
+					className="editor-collab-sidebar__replyComment__textarea"
+					value={ inputComment ?? '' }
+					onChange={ ( value ) => {
+						setInputComment( value );
+					} }
+				/>
+				<VStack
+					alignment="left"
+					spacing="3"
+					justify="flex-start"
+				>
+					<HStack
+						alignment="left"
+						spacing="3"
+						justify="flex-start"
+						className="editor-collab-sidebar__replybtn"
+					>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ () => onSubmit( inputComment ) }
+						>
+							{ __( 'Reply' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							onClick={ onCancel }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</VStack>
+		</HStack>
 	);
 }
 
@@ -712,7 +542,14 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	);
 }
 
-function CommentHeader( { thread, onResolve, onEdit, onDelete, onReply } ) {
+function CommentHeader( {
+	thread,
+	onResolve,
+	onEdit,
+	onDelete,
+	onReply,
+	status,
+} ) {
 	const dateSettings = getDateSettings();
 	const [ dateTimeFormat = dateSettings.formats.time ] = useEntityProp(
 		'root',
@@ -762,7 +599,7 @@ function CommentHeader( { thread, onResolve, onEdit, onDelete, onReply } ) {
 				</time>
 			</VStack>
 			<span className="editor-collab-sidebar__commentUpdate">
-				{ thread.status !== 'approved' && (
+				{ status !== 'approved' && (
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ onResolve && (
 							<Tooltip text={ __( 'Resolve' ) }>
@@ -785,7 +622,7 @@ function CommentHeader( { thread, onResolve, onEdit, onDelete, onReply } ) {
 						/>
 					</HStack>
 				) }
-				{ thread.status === 'approved' && (
+				{ status === 'approved' && (
 					<Tooltip text={ __( 'Resolved' ) }>
 						<Button __next40pxDefaultSize className="has-icon">
 							<Icon icon={ check } />
