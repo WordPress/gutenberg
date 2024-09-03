@@ -45,18 +45,13 @@ export function usePaddingAppender() {
 					.getBlockOrder( '' );
 				const lastBlockClientId = blockOrder[ blockOrder.length - 1 ];
 
-				// Do nothing when only default block appender is present.
-				if ( ! lastBlockClientId ) {
-					return;
-				}
-
 				const lastBlock = registry
 					.select( blockEditorStore )
 					.getBlock( lastBlockClientId );
 				const { selectBlock, insertDefaultBlock } =
 					registry.dispatch( blockEditorStore );
 
-				if ( isUnmodifiedDefaultBlock( lastBlock ) ) {
+				if ( lastBlock && isUnmodifiedDefaultBlock( lastBlock ) ) {
 					selectBlock( lastBlockClientId );
 				} else {
 					insertDefaultBlock();
