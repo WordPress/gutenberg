@@ -28,7 +28,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
-					// Prevent focus from moving to the block.
 					event.preventDefault();
 					__unstableSetEditorMode( 'edit' );
 				}
