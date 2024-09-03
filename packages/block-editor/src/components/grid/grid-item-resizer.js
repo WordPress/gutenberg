@@ -3,7 +3,7 @@
  */
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n'; // Import the isRTL utility
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -56,6 +56,7 @@ function GridItemResizerInner( {
 		left: false,
 		right: false,
 	} );
+
 	const rtl = isRTL();
 
 	useEffect( () => {
