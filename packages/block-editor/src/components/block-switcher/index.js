@@ -181,20 +181,31 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
-	<>
-		<BlockIcon
-			className="block-editor-block-switcher__toggle"
-			icon={ icon }
-			showColors
-		/>
-		{ showTitle && blockTitle && (
-			<span className="block-editor-block-switcher__toggle-text">
-				{ blockTitle }
-			</span>
-		) }
-	</>
-);
+const BlockIndicator = ( { icon, showTitle, blockTitle } ) => {
+	const mode = useSelect(
+		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
+		[]
+	);
+
+	if ( mode === 'zoom-out' ) {
+		return null;
+	}
+
+	return (
+		<>
+			<BlockIcon
+				className="block-editor-block-switcher__toggle"
+				icon={ icon }
+				showColors
+			/>
+			{ showTitle && blockTitle && (
+				<span className="block-editor-block-switcher__toggle-text">
+					{ blockTitle }
+				</span>
+			) }
+		</>
+	);
+};
 
 export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
@@ -204,9 +215,10 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		invalidBlocks,
 		isReusable,
 		isTemplate,
+		mode,
 	} = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks } =
+			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks, __unstableGetEditorMode } =
 				select( blockEditorStore );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -244,6 +256,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
 				isTemplate:
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
+				mode: __unstableGetEditorMode(),
 			};
 		},
 		[ clientIds ]
@@ -252,7 +265,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
 	} );
-	if ( invalidBlocks ) {
+	if ( invalidBlocks || mode === 'zoom-out' ) {
 		return null;
 	}
 

@@ -65,8 +65,8 @@ export function useShowBlockTools() {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBreadcrumb:
 				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
-			showBlockToolbarPopover: _showBlockToolbarPopover,
-			showZoomOutToolbar: _showZoomOutToolbar,
+			showBlockToolbarPopover: true,
+			showZoomOutToolbar: true,
 		};
 	}, [] );
 }

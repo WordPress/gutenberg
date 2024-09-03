@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 	const [
@@ -20,7 +20,6 @@ function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 	return (
 		<Button
 			variant="primary"
-			icon={ plus }
 			size="compact"
 			className={ clsx(
 				'block-editor-button-pattern-inserter__button',
@@ -40,7 +39,9 @@ function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 				'Add pattern',
 				'Generic label for pattern inserter button'
 			) }
-		/>
+		>
+			{ __( 'Add pattern' ) }
+		</Button>
 	);
 }
 

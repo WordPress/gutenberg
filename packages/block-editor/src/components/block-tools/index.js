@@ -231,15 +231,10 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showZoomOutToolbar && (
-					<ZoomOutPopover
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
-					/>
-				) }
+
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode && ! hasFixedToolbar && (
+				{  ! hasFixedToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }

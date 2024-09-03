@@ -339,7 +339,7 @@ function VisualEditor( {
 		isZoomOutMode && ! isTabletViewport
 			? {
 					scale: 'default',
-					frameSize: '48px',
+					frameSize: '60px',
 			  }
 			: {};
 

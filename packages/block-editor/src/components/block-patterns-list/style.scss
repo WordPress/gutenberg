@@ -16,6 +16,11 @@
 	}
 }
 
+#tabs-8-allPatterns,
+#tabs-8-myPatterns {
+	display: none !important;
+}
+
 .block-editor-block-patterns-list__item {
 	height: 100%;
 	// This is derived from the top padding set on
