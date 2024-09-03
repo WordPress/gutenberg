@@ -38,13 +38,17 @@ import { store as noticesStore } from '@wordpress/notices';
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
+import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function getMediaSourceUrlBySizeSlug( media, slug ) {
-	return (
-		media?.media_details?.sizes?.[ slug ]?.source_url || media?.source_url
-	);
+	return {
+		mediaUrl:
+			media?.media_details?.sizes?.[ slug ]?.source_url ||
+			media?.source_url,
+		mediaCaption: media?.caption?.rendered,
+	};
 }
 
 const disabledClickProps = {
@@ -69,7 +73,9 @@ export default function PostFeaturedImageEdit( {
 		rel,
 		linkTarget,
 		useFirstImageFromPost,
+		displayCaption,
 	} = attributes;
+
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
@@ -128,7 +134,10 @@ export default function PostFeaturedImageEdit( {
 		[ featuredImage, postTypeSlug, postId ]
 	);
 
-	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
+	const { mediaUrl, mediaCaption } = getMediaSourceUrlBySizeSlug(
+		media,
+		sizeSlug
+	);
 
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
@@ -239,6 +248,14 @@ export default function PostFeaturedImageEdit( {
 							/>
 						</>
 					) }
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Display Caption' ) }
+						onChange={ ( value ) =>
+							setAttributes( { displayCaption: value } )
+						}
+						checked={ displayCaption }
+					/>
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -383,6 +400,14 @@ export default function PostFeaturedImageEdit( {
 					</a>
 				) : (
 					image
+				) }
+				{ !! displayCaption && (
+					<Caption
+						attributes={ { caption: mediaCaption } }
+						setAttributes={ setAttributes }
+						label={ __( 'Image caption text' ) }
+						readOnly="true"
+					/>
 				) }
 				<Overlay
 					attributes={ attributes }
