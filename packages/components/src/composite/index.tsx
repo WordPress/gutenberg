@@ -67,15 +67,12 @@ export const Composite = Object.assign(
 			children,
 			disabled = false,
 
-			// To be removed
-			store: storeProp,
-
 			// Rest props
 			...props
 		},
 		ref
 	) {
-		const newStore = Ariakit.useCompositeStore( {
+		const store = Ariakit.useCompositeStore( {
 			activeId,
 			defaultActiveId,
 			setActiveId,
@@ -86,8 +83,6 @@ export const Composite = Object.assign(
 			orientation,
 			rtl,
 		} );
-
-		const store = storeProp || newStore;
 
 		const contextValue = useMemo(
 			() => ( {
