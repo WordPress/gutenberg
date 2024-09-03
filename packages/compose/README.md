@@ -524,8 +524,8 @@ useEffect( () => {
 
 _Parameters_
 
--   _targetElement_ `HTMLElement | undefined | null | RefObject< HTMLElement >`: The target element to observe. It can be changed dynamically. Alternatively, a ref containing the target element can be passed. However, any updates to the ref will be ignored.
--   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: HTMLElement ) => void`: Callback that will be called when the element is resized. It is passed the list of [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry) objects passed to the `ResizeObserver.observe` callback internally, and the element being tracked at the time of this update.
+-   _targetElement_ `T | undefined | null | RefObject< T >`: The target element to observe. It can be changed dynamically. Alternatively, a ref containing the target element can be passed. However, any updates to the ref will be ignored.
+-   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: T ) => void`: Callback that will be called when the element is resized. It is passed the list of [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry) objects passed to the `ResizeObserver.observe` callback internally, and the element being tracked at the time of this update.
 -   _resizeObserverOptions_ `ResizeObserverOptions`: Options to pass to `ResizeObserver.observe` when called internally. Updating this option will not cause the observer to be re-created, and it will only take effect if a new element is observed.
 
 ### usePrevious

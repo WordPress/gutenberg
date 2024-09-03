@@ -53,14 +53,14 @@ import useEvent from '../use-event';
  * }, [ elementId ] );
  * ```
  */
-export default function useObserveElementSize(
+export default function useObserveElementSize< T extends HTMLElement >(
 	/**
 	 * The target element to observe. It can be changed dynamically.
 	 *
 	 * Alternatively, a ref containing the target element can be passed. However, any updates
 	 * to the ref will be ignored.
 	 */
-	targetElement: HTMLElement | undefined | null | RefObject< HTMLElement >,
+	targetElement: T | undefined | null | RefObject< T >,
 	/**
 	 * Callback that will be called when the element is resized.
 	 */
@@ -74,7 +74,7 @@ export default function useObserveElementSize(
 		/**
 		 * The element being tracked at the time of this update.
 		 */
-		element: HTMLElement
+		element: T
 	) => void,
 	/**
 	 * Options to pass to `ResizeObserver.observe` when called internally.
@@ -86,7 +86,7 @@ export default function useObserveElementSize(
 ) {
 	const onUpdateEvent = useEvent( onUpdate );
 
-	const observedElementRef = useRef< HTMLElement | null >();
+	const observedElementRef = useRef< T | null >();
 	const resizeObserverRef = useRef< ResizeObserver >();
 
 	// Options are passed on `.observe` once and never updated, so we store them
