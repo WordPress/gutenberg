@@ -54,8 +54,12 @@ function ToolSelector( props, ref ) {
 		[]
 	);
 
-	const { __unstableSetEditorMode, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableSetEditorMode,
+		updateBlockAttributes,
+		setBlockEditingMode,
+		unsetBlockEditingMode,
+	} = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -88,6 +92,11 @@ function ToolSelector( props, ref ) {
 												getBlockAttributes( clientId );
 											originalLocks[ clientId ] =
 												attributes.templateLock;
+
+											setBlockEditingMode(
+												clientId,
+												'contentOnly'
+											);
 										}
 									);
 									setOriginalTemplateLocks( originalLocks );
@@ -107,10 +116,11 @@ function ToolSelector( props, ref ) {
 														clientId
 													],
 											} );
+											unsetBlockEditingMode( clientId );
 										}
 									);
 								}
-								__unstableSetEditorMode( newMode );
+								__unstableSetEditorMode( mode );
 							} }
 							choices={ [
 								{
