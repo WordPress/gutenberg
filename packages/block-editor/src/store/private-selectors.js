@@ -543,3 +543,8 @@ export const getBlockStyles = createSelector(
 export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
 }
+
+export function getSectionRootClientId( state ) {
+	const sectionRootClientIdKey = 'sectionRootClientId';
+	return state.settings[ sectionRootClientIdKey ] ?? null;
+}
