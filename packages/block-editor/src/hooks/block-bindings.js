@@ -102,12 +102,12 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 			<Truncate>{ attribute }</Truncate>
 			{ !! binding && (
 				<Text
-					variant={ ! isUndefined && 'muted' }
+					variant={ ! isSourceInvalid && 'muted' }
 					className="block-editor-bindings__item-explanation"
-					isDestructive={ isUndefined }
+					isDestructive={ isSourceInvalid }
 				>
 					<Truncate>
-						{ ! sourceProps
+						{ isSourceInvalid
 							? __( 'Invalid source' )
 							: args?.key || sourceProps?.label || sourceName }
 					</Truncate>
