@@ -13,7 +13,6 @@ define( 'IS_GUTENBERG_PLUGIN', true );
 
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
-require_once __DIR__ . '/experimental/collab.php';
 
 /**
  * Checks whether the Gutenberg experiment is enabled.
