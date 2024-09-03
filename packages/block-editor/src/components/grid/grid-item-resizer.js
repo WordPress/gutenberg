@@ -137,6 +137,8 @@ function GridItemResizerInner( {
 							setResizeDirection( 'right' );
 						} else if ( 'right' === direction ) {
 							setResizeDirection( 'left' );
+						} else {
+							setResizeDirection( direction );
 						}
 					} else {
 						/*
