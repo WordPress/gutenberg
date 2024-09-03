@@ -38,7 +38,12 @@ import {
 	sortIcons,
 	sortLabels,
 } from '../../constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
+import {
+	VIEW_LAYOUTS,
+	getNotHidableFieldIds,
+	getVisibleFieldIds,
+	getHiddenFieldIds,
+} from '../../dataviews-layouts';
 import type { SupportedLayouts, View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
@@ -378,56 +383,53 @@ function FieldItem( {
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
-	const mandatoryFieldIds = useMemo(
-		() => getMandatoryFields( view ),
+	const visibleFieldIds = useMemo(
+		() => getVisibleFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const hiddenFieldIds = useMemo(
+		() => getHiddenFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const notHidableFieldIds = useMemo(
+		() => getNotHidableFieldIds( view ),
 		[ view ]
 	);
 
-	// If a field is combined to made another,
-	// it should not be listed in the properties control.
-	const fieldsToExclude: string[] = [];
+	const visibleFields = fields
+		.filter( ( { id } ) => visibleFieldIds.includes( id ) )
+		.map( ( { id, label, enableHiding } ) => {
+			return {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id )
+					? false
+					: enableHiding,
+			};
+		} );
 	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
-		view.layout.combinedFields.forEach( ( combination ) => {
-			fieldsToExclude.push( ...combination.children );
+		view.layout.combinedFields.forEach( ( { id, label } ) => {
+			visibleFields.push( {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id ),
+			} );
 		} );
 	}
 
-	const visibleFieldIds = [
-		...( view.fields || [] ),
-		...mandatoryFieldIds,
-	].filter( ( fieldId ) => ! fieldsToExclude.includes( fieldId ) );
-	const visibleFields = fields
-		.filter( ( { id } ) =>
-			visibleFieldIds.includes( id ) ? true : false
-		)
+	const hiddenFields = fields
+		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
 		.map( ( { id, label, enableHiding }, index ) => {
 			return {
 				id,
 				label,
 				index,
-				isVisible: true,
-				isHidable: mandatoryFieldIds.includes( id )
-					? false
-					: enableHiding,
-			};
-		} );
-
-	const hiddenFields = fields
-		.filter(
-			( { id, enableHiding } ) =>
-				! visibleFieldIds.includes( id ) &&
-				! fieldsToExclude.includes( id ) &&
-				// If a field is not visible neither hidable,
-				// it should not be listed in the properties control.
-				enableHiding
-		)
-		.map( ( { id, label }, index ) => {
-			return {
-				id,
-				label,
-				index,
 				isVisible: false,
-				isHidable: true,
+				isHidable: enableHiding,
 			};
 		} );
 

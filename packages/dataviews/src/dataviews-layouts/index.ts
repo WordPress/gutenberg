@@ -16,7 +16,7 @@ import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../constants';
-import type { View } from '../types';
+import type { View, Field } from '../types';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -39,7 +39,7 @@ export const VIEW_LAYOUTS = [
 	},
 ];
 
-export function getMandatoryFields( view: View ): string[] {
+export function getNotHidableFieldIds( view: View ): string[] {
 	if ( view.type === 'table' ) {
 		return [ view.layout?.primaryField ]
 			.concat(
@@ -63,4 +63,45 @@ export function getMandatoryFields( view: View ): string[] {
 	}
 
 	return [];
+}
+
+function getCombinedFieldIds( view: View ): string[] {
+	const combinedFields: string[] = [];
+	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		view.layout.combinedFields.forEach( ( combination ) => {
+			combinedFields.push( ...combination.children );
+		} );
+	}
+	return combinedFields;
+}
+
+export function getVisibleFieldIds(
+	view: View,
+	fields: Field< any >[]
+): string[] {
+	const fieldsToExclude = getCombinedFieldIds( view );
+
+	return (
+		view.fields?.filter( ( id ) => ! fieldsToExclude.includes( id ) ) ||
+		fields
+			.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
+			.map( ( { id } ) => id )
+	);
+}
+
+export function getHiddenFieldIds(
+	view: View,
+	fields: Field< any >[]
+): string[] {
+	const fieldsToExclude = [
+		...getCombinedFieldIds( view ),
+		...getVisibleFieldIds( view, fields ),
+	];
+
+	return fields
+		.filter(
+			( { id, enableHiding } ) =>
+				! fieldsToExclude.includes( id ) && enableHiding
+		)
+		.map( ( { id } ) => id );
 }
