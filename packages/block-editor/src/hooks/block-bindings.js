@@ -96,7 +96,7 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
-	const isUndefined = ! sourceProps;
+	const isSourceInvalid = ! sourceProps;
 	return (
 		<VStack>
 			<Truncate>{ attribute }</Truncate>
