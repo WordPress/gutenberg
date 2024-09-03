@@ -49,7 +49,13 @@ export default function MissingEdit( { attributes, clientId } ) {
 	let messageHTML;
 
 	const convertToHtmlButton = (
-		<Button key="convert" onClick={ convertToHTML } variant="primary">
+		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
+			key="convert"
+			onClick={ convertToHTML }
+			variant="primary"
+		>
 			{ __( 'Keep as HTML' ) }
 		</Button>
 	);

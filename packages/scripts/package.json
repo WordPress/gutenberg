@@ -73,6 +73,7 @@
 		"npm-package-json-lint": "^6.4.0",
 		"npm-packlist": "^3.0.0",
 		"postcss": "^8.4.5",
+		"postcss-import": "^16.1.0",
 		"postcss-loader": "^6.2.1",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"puppeteer-core": "^13.2.0",

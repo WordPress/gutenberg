@@ -17,6 +17,7 @@ import { DropdownMenuContext } from './context';
 import type { DropdownMenuRadioItemProps } from './types';
 import * as Styled from './styles';
 import { SVG, Circle } from '@wordpress/primitives';
+import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -28,15 +29,18 @@ export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
 >( function DropdownMenuRadioItem(
-	{ suffix, children, hideOnClick = false, ...props },
+	{ suffix, children, onBlur, hideOnClick = false, ...props },
 	ref
 ) {
+	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
 	return (
 		<Styled.DropdownMenuRadioItem
 			ref={ ref }
 			{ ...props }
+			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
@@ -64,4 +68,3 @@ export const DropdownMenuRadioItem = forwardRef<
 		</Styled.DropdownMenuRadioItem>
 	);
 } );
-DropdownMenuRadioItem.displayName = 'DropdownMenuV2.RadioItem';

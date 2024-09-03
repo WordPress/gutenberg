@@ -32,6 +32,7 @@ import { DropdownMenuItem } from './item';
 import { DropdownMenuCheckboxItem } from './checkbox-item';
 import { DropdownMenuRadioItem } from './radio-item';
 import { DropdownMenuGroup } from './group';
+import { DropdownMenuGroupLabel } from './group-label';
 import { DropdownMenuSeparator } from './separator';
 import { DropdownMenuItemLabel } from './item-label';
 import { DropdownMenuItemHelpText } from './item-help-text';
@@ -108,9 +109,11 @@ const UnconnectedDropdownMenu = (
 	);
 
 	// Extract the side from the applied placement — useful for animations.
+	// Using `currentPlacement` instead of `placement` to make sure that we
+	// use the final computed placement (including "flips" etc).
 	const appliedPlacementSide = useStoreState(
 		dropdownMenuStore,
-		'placement'
+		'currentPlacement'
 	).split( '-' )[ 0 ];
 
 	if (
@@ -172,7 +175,7 @@ const UnconnectedDropdownMenu = (
 			/>
 
 			{ /* Menu popover */ }
-			<Styled.DropdownMenu
+			<Ariakit.Menu
 				{ ...otherProps }
 				modal={ modal }
 				store={ dropdownMenuStore }
@@ -184,15 +187,23 @@ const UnconnectedDropdownMenu = (
 				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
 				hideOnHoverOutside={ false }
 				data-side={ appliedPlacementSide }
-				variant={ variant }
 				wrapperProps={ wrapperProps }
 				hideOnEscape={ hideOnEscape }
 				unmountOnHide
+				render={ ( renderProps ) => (
+					// Two wrappers are needed for the entry animation, where the menu
+					// container scales with a different factor than its contents.
+					// The {...renderProps} are passed to the inner wrapper, so that the
+					// menu element is the direct parent of the menu item elements.
+					<Styled.MenuPopoverOuterWrapper variant={ variant }>
+						<Styled.MenuPopoverInnerWrapper { ...renderProps } />
+					</Styled.MenuPopoverOuterWrapper>
+				) }
 			>
 				<DropdownMenuContext.Provider value={ contextValue }>
 					{ children }
 				</DropdownMenuContext.Provider>
-			</Styled.DropdownMenu>
+			</Ariakit.Menu>
 		</>
 	);
 };
@@ -200,14 +211,33 @@ const UnconnectedDropdownMenu = (
 export const DropdownMenuV2 = Object.assign(
 	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
 	{
-		Context: DropdownMenuContext,
-		Item: DropdownMenuItem,
-		RadioItem: DropdownMenuRadioItem,
-		CheckboxItem: DropdownMenuCheckboxItem,
-		Group: DropdownMenuGroup,
-		Separator: DropdownMenuSeparator,
-		ItemLabel: DropdownMenuItemLabel,
-		ItemHelpText: DropdownMenuItemHelpText,
+		Context: Object.assign( DropdownMenuContext, {
+			displayName: 'DropdownMenuV2.Context',
+		} ),
+		Item: Object.assign( DropdownMenuItem, {
+			displayName: 'DropdownMenuV2.Item',
+		} ),
+		RadioItem: Object.assign( DropdownMenuRadioItem, {
+			displayName: 'DropdownMenuV2.RadioItem',
+		} ),
+		CheckboxItem: Object.assign( DropdownMenuCheckboxItem, {
+			displayName: 'DropdownMenuV2.CheckboxItem',
+		} ),
+		Group: Object.assign( DropdownMenuGroup, {
+			displayName: 'DropdownMenuV2.Group',
+		} ),
+		GroupLabel: Object.assign( DropdownMenuGroupLabel, {
+			displayName: 'DropdownMenuV2.GroupLabel',
+		} ),
+		Separator: Object.assign( DropdownMenuSeparator, {
+			displayName: 'DropdownMenuV2.Separator',
+		} ),
+		ItemLabel: Object.assign( DropdownMenuItemLabel, {
+			displayName: 'DropdownMenuV2.ItemLabel',
+		} ),
+		ItemHelpText: Object.assign( DropdownMenuItemHelpText, {
+			displayName: 'DropdownMenuV2.ItemHelpText',
+		} ),
 	}
 );
 

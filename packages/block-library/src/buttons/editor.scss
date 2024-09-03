@@ -52,12 +52,6 @@ $blocks-block__margin: 0.5em;
 			margin-bottom: 0;
 		}
 	}
-
-	.editor-styles-wrapper &.has-custom-font-size {
-		.wp-block-button__link {
-			font-size: inherit;
-		}
-	}
 }
 
 .wp-block[data-align="center"] > .wp-block-buttons {

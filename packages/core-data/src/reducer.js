@@ -521,6 +521,11 @@ export function userPermissions( state = {}, action ) {
 				...state,
 				[ action.key ]: action.isAllowed,
 			};
+		case 'RECEIVE_USER_PERMISSIONS':
+			return {
+				...state,
+				...action.permissions,
+			};
 	}
 
 	return state;

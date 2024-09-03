@@ -100,8 +100,8 @@ export function UnforwardedInputControl(
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
-					paddingInlineStart={ prefix ? space( 2 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					paddingInlineStart={ prefix ? space( 1 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 1 ) : undefined }
 					ref={ ref }
 					size={ size }
 					stateReducer={ stateReducer }

@@ -10,20 +10,24 @@ import type { WordPressComponentProps } from '../context';
 import type { DropdownMenuItemProps } from './types';
 import * as Styled from './styles';
 import { DropdownMenuContext } from './context';
+import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
 
 export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
 >( function DropdownMenuItem(
-	{ prefix, suffix, children, hideOnClick = true, ...props },
+	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
 	ref
 ) {
+	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
 	return (
 		<Styled.DropdownMenuItem
 			ref={ ref }
 			{ ...props }
+			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }
@@ -44,4 +48,3 @@ export const DropdownMenuItem = forwardRef<
 		</Styled.DropdownMenuItem>
 	);
 } );
-DropdownMenuItem.displayName = 'DropdownMenuV2.Item';

@@ -28,4 +28,3 @@ export const CompositeHover = forwardRef<
 		/>
 	);
 } );
-CompositeHover.displayName = 'Composite.Hover';

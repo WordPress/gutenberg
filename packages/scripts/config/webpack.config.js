@@ -119,6 +119,7 @@ const cssLoaders = [
 					plugins: isProduction
 						? [
 								...postcssPlugins,
+								require( 'postcss-import' ),
 								require( 'cssnano' )( {
 									// Provide a fallback configuration if there's not
 									// one explicitly available in the project.
@@ -147,6 +148,7 @@ const baseConfig = {
 	target,
 	output: {
 		filename: '[name].js',
+		chunkFilename: '[name].js?v=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
 	},
 	resolve: {

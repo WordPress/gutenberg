@@ -333,6 +333,7 @@ module.exports = {
 						'LineHeightControl',
 						'NumberControl',
 						'RangeControl',
+						'SelectControl',
 						'TextControl',
 						'ToggleGroupControl',
 					].map( ( componentName ) => ( {
@@ -350,15 +351,13 @@ module.exports = {
 							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
 					},
 					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'SelectControl', 'UnitControl' ].map(
-						( componentName ) => ( {
-							// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-							message:
-								componentName +
-								' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-						} )
-					),
+					...[ 'Button', 'UnitControl' ].map( ( componentName ) => ( {
+						// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
+						message:
+							componentName +
+							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					} ) ),
 				],
 			},
 		},

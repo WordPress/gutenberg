@@ -19,7 +19,7 @@ import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
 	getUserPermissionCacheKey,
-	getUserPermissionsFromResponse,
+	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 } from './utils';
 import { getSyncProvider } from './sync';
@@ -173,26 +173,36 @@ export const getEntityRecord =
 
 				const response = await apiFetch( { path, parse: false } );
 				const record = await response.json();
-				const permissions = getUserPermissionsFromResponse( response );
+				const permissions = getUserPermissionsFromAllowHeader(
+					response.headers?.get( 'allow' )
+				);
+
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+					receiveUserPermissionArgs[
+						getUserPermissionCacheKey( action, {
+							kind,
+							name,
+							id: key,
+						} )
+					] = permissions[ action ];
+
+					canUserResolutionsArgs.push( [
+						action,
+						{ kind, name, id: key },
+					] );
+				}
 
 				registry.batch( () => {
 					dispatch.receiveEntityRecords( kind, name, record, query );
-
-					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-						const permissionKey = getUserPermissionCacheKey(
-							action,
-							{ kind, name, id: key }
-						);
-
-						dispatch.receiveUserPermission(
-							permissionKey,
-							permissions[ action ]
-						);
-						dispatch.finishResolution( 'canUser', [
-							action,
-							{ kind, name, id: key },
-						] );
-					}
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
 				} );
 			}
 		} finally {
@@ -271,6 +281,10 @@ export const getEntityRecords =
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
+				meta = {
+					totalItems: records.length,
+					totalPages: 1,
+				};
 			}
 
 			// If we request fields but the result doesn't contain the fields,
@@ -299,18 +313,54 @@ export const getEntityRecords =
 					meta
 				);
 
-				// When requesting all fields, the list of results can be used to
-				// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+				// When requesting all fields, the list of results can be used to resolve
+				// the `getEntityRecord` and `canUser` selectors in addition to `getEntityRecords`.
 				// See https://github.com/WordPress/gutenberg/pull/26575
+				// See https://github.com/WordPress/gutenberg/pull/64504
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
+					const targetHints = records
+						.filter( ( record ) => record?.[ key ] )
+						.map( ( record ) => ( {
+							id: record[ key ],
+							permissions: getUserPermissionsFromAllowHeader(
+								record?._links?.self?.[ 0 ].targetHints.allow
+							),
+						} ) );
+
+					const canUserResolutionsArgs = [];
+					const receiveUserPermissionArgs = {};
+					for ( const targetHint of targetHints ) {
+						for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+							canUserResolutionsArgs.push( [
+								action,
+								{ kind, name, id: targetHint.id },
+							] );
+
+							receiveUserPermissionArgs[
+								getUserPermissionCacheKey( action, {
+									kind,
+									name,
+									id: targetHint.id,
+								} )
+							] = targetHint.permissions[ action ];
+						}
+					}
+
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
 					dispatch.finishResolutions(
 						'getEntityRecord',
 						resolutionsArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
 					);
 				}
 
@@ -440,7 +490,12 @@ export const canUser =
 			return;
 		}
 
-		const permissions = getUserPermissionsFromResponse( response );
+		// Optional chaining operator is used here because the API requests don't
+		// return the expected result in the React native version. Instead, API requests
+		// only return the result, without including response properties like the headers.
+		const permissions = getUserPermissionsFromAllowHeader(
+			response.headers?.get( 'allow' )
+		);
 		registry.batch( () => {
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				const key = getUserPermissionCacheKey( action, resource, id );
