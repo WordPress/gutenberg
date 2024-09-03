@@ -133,30 +133,30 @@ function ToolSelector( props, ref ) {
 								__unstableSetEditorMode( newMode );
 							} }
 							choices={ [
-								{
-									value: 'edit',
-									label: (
-										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
-										</>
-									),
-								},
-								{
-									value: 'navigation',
-									label: (
-										<>
-											{ selectIcon }
-											{ __( 'Select' ) }
-										</>
-									),
-								},
+								// {
+								// 	value: 'navigation',
+								// 	label: (
+								// 		<>
+								// 			{ selectIcon }
+								// 			{ __( 'Select' ) }
+								// 		</>
+								// 	),
+								// },
 								{
 									value: 'simple',
 									label: (
 										<>
 											<Icon icon={ brushIcon } />
 											{ __( 'Simple' ) }
+										</>
+									),
+								},
+								{
+									value: 'edit',
+									label: (
+										<>
+											<Icon icon={ editIcon } />
+											{ __( 'Advanced Mode' ) }
 										</>
 									),
 								},
