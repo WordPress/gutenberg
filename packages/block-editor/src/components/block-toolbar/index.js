@@ -179,18 +179,18 @@ export function PrivateBlockToolbar( {
 									disabled={ ! isDefaultEditingMode }
 									isUsingBindings={ isUsingBindings }
 								/>
-								{ isDefaultEditingMode && (
-									<>
-										{ ! isMultiToolbar && (
-											<BlockLockToolbar
-												clientId={ blockClientId }
-											/>
-										) }
-										<BlockMover
-											clientIds={ blockClientIds }
-											hideDragHandle={ hideDragHandle }
-										/>
-									</>
+								{ isDefaultEditingMode && ! isMultiToolbar && (
+									<BlockLockToolbar
+										clientId={ blockClientId }
+									/>
+								) }
+
+								{ ( isDefaultEditingMode ||
+									isContentOnlyEditingMode ) && (
+									<BlockMover
+										clientIds={ blockClientIds }
+										hideDragHandle={ hideDragHandle }
+									/>
 								) }
 							</ToolbarGroup>
 						</div>

@@ -1770,6 +1770,11 @@ export function canMoveBlock( state, clientId ) {
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
+
+	if ( getBlockEditingMode( state, clientId ) === 'contentOnly' ) {
+		return true;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
