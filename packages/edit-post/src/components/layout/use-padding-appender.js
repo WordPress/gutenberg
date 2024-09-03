@@ -38,7 +38,7 @@ export function usePaddingAppender() {
 					return;
 				}
 
-				event.preventDefault();
+				event.stopPropagation();
 
 				const blockOrder = registry
 					.select( blockEditorStore )
