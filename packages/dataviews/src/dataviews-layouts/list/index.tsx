@@ -354,70 +354,62 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const previousActiveItemIndex = usePrevious( activeItemIndex );
 	const isActiveIdInList = activeItemIndex !== -1;
 
+	const selectCompositeItem = useCallback(
+		(
+			targetIndex: number,
+			// Allows invokers to specify a custom function to generate the
+			// target composite item ID (e.g. for the dropdown menu trigger).
+			getCompositeId = ( id: string ) => id
+		) => {
+			// Clamping between 0 and data.length - 1 to avoid out of bounds.
+			const clampedIndex = Math.min(
+				data.length - 1,
+				Math.max( 0, targetIndex )
+			);
+			const domId = getItemDomId( data[ clampedIndex ] );
+			const targetCompositeItemId = getCompositeId( domId );
+
+			setActiveCompositeId( targetCompositeItemId );
+			document.getElementById( targetCompositeItemId )?.focus();
+		},
+		[ data, getItemDomId ]
+	);
+
+	// Select a new active composite item when the current active item
+	// is removed from the list.
 	useEffect( () => {
 		if ( ! isActiveIdInList ) {
 			// By picking `previousActiveItemIndex` as the next item index, we are
 			// basically picking the item that would have been after the deleted one.
 			// If the previously active (and removed) item was the last of the list,
 			// we will select the item before it — which is the new last item.
-			// Clamping between 0 and data.length - 1 to avoid out of bounds.
-			const clampedPreviousActiveItemIndex = Math.max(
-				0,
-				Math.min( previousActiveItemIndex ?? 0, data.length - 1 )
-			);
-			const nextActiveDataItem = data[ clampedPreviousActiveItemIndex ];
-
-			const nextCompositeActiveId = getItemDomId( nextActiveDataItem );
-			setActiveCompositeId( nextCompositeActiveId );
-			(
-				document.querySelector( `#${ nextCompositeActiveId }` ) as
-					| HTMLElement
-					| undefined
-			 )?.focus();
+			selectCompositeItem( previousActiveItemIndex ?? 0 );
 		}
-	}, [ data, previousActiveItemIndex, getItemDomId, isActiveIdInList ] );
+	}, [ previousActiveItemIndex, isActiveIdInList, selectCompositeItem ] );
 
 	// Prevent the default behavior (open dropdown menu) and instead select the
 	// dropdown menu trigger on the previous/next row.
 	// https://github.com/ariakit/ariakit/issues/3768
 	const onDropdownTriggerKeyDown = useCallback(
 		( event: React.KeyboardEvent< HTMLButtonElement > ) => {
-			function selectItemDropdownTrigger( itemIndex: number ) {
-				const item = data[ itemIndex ];
-				const itemDomId = getItemDomId( item );
-				if ( ! itemDomId ) {
-					return;
-				}
-				const targetCompositeActiveId =
-					generateDropdownTriggerCompositeId( itemDomId );
-				setActiveCompositeId( targetCompositeActiveId );
-				(
-					document.querySelector(
-						`#${ targetCompositeActiveId }`
-					) as HTMLElement | undefined
-				 )?.focus();
-			}
-
 			if ( event.key === 'ArrowDown' ) {
+				// Select the dropdown menu trigger item in the next row.
 				event.preventDefault();
-				selectItemDropdownTrigger(
-					Math.min(
-						data.length - 1,
-						Math.max( 0, activeItemIndex + 1 )
-					)
+				selectCompositeItem(
+					activeItemIndex + 1,
+					generateDropdownTriggerCompositeId
 				);
 			}
 			if ( event.key === 'ArrowUp' ) {
+				// Select the dropdown menu trigger item in the previous row.
 				event.preventDefault();
-				selectItemDropdownTrigger(
-					Math.min(
-						data.length - 1,
-						Math.max( 0, activeItemIndex - 1 )
-					)
+				selectCompositeItem(
+					activeItemIndex - 1,
+					generateDropdownTriggerCompositeId
 				);
 			}
 		},
-		[ activeItemIndex, data, getItemDomId ]
+		[ selectCompositeItem, activeItemIndex ]
 	);
 
 	const hasData = data?.length;
