@@ -90,8 +90,7 @@ export function BlockSettingsDropdown( {
 				_firstParentClientId && getBlockName( _firstParentClientId );
 
 			const commentID =
-				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				select( 'core/block-editor' ).getBlock( firstBlockClientId )
+				select( blockEditorStore ).getBlock( firstBlockClientId )
 					?.attributes?.blockCommentId;
 
 			return {

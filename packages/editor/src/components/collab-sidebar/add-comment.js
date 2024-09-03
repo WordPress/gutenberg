@@ -100,7 +100,7 @@ export function AddComment( { onSubmit } ) {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ inputComment }
-				onChange={ ( val ) => setInputComment( val ) }
+				onChange={ setInputComment }
 				placeholder={ __( 'Add comment' ) }
 				className="block-editor-format-toolbar__comment-input"
 			/>
@@ -110,7 +110,7 @@ export function AddComment( { onSubmit } ) {
 					className="block-editor-format-toolbar__cancel-button"
 					variant="tertiary"
 					text={ __( 'Cancel' ) }
-					onClick={ () => handleCancel() }
+					onClick={ handleCancel }
 					size="compact"
 				/>
 				<Button

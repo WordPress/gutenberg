@@ -11,6 +11,7 @@ import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -99,7 +100,7 @@ export default function CollabSidebar() {
 				status: 'approved',
 			},
 		} ).then( ( response ) => {
-			if ( 'approved' === response.status ) {
+			if ( response ) {
 				createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
 					type: 'snackbar',
 					isDismissible: true,
@@ -111,7 +112,7 @@ export default function CollabSidebar() {
 
 	const onEditComment = ( threadID, comment ) => {
 		if ( threadID && comment.length > 0 ) {
-			const editedComment = comment.replace( /^<p>|<\/p>$/g, '' );
+			const editedComment = removep( comment );
 
 			apiFetch( {
 				path: '/wp/v2/comments/' + threadID,
@@ -120,7 +121,7 @@ export default function CollabSidebar() {
 					content: editedComment,
 				},
 			} ).then( ( response ) => {
-				if ( 'trash' !== response.status && '' !== response.id ) {
+				if ( response ) {
 					createNotice(
 						'snackbar',
 						__( 'Thread edited successfully.' ),
@@ -150,7 +151,7 @@ export default function CollabSidebar() {
 					comment_approved: 0,
 				},
 			} ).then( ( response ) => {
-				if ( 'trash' !== response.status && '' !== response.id ) {
+				if ( response ) {
 					createNotice(
 						'snackbar',
 						__( 'Reply added successfully.' ),
@@ -171,7 +172,7 @@ export default function CollabSidebar() {
 				path: '/wp/v2/comments/' + threadID,
 				method: 'DELETE',
 			} ).then( ( response ) => {
-				if ( 'trash' === response.status && '' !== response.id ) {
+				if ( response ) {
 					updateBlockAttributes( clientId, {
 						blockCommentId: undefined,
 						showCommentBoard: undefined,
@@ -240,17 +241,21 @@ export default function CollabSidebar() {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( 'core/block-editor' ).getBlocks();
 	}, [] );
-	
-	const filteredBlocks = allBlocks?.filter(block => 
-		block.attributes.blockCommentId !== 0
+
+	const filteredBlocks = allBlocks?.filter(
+		( block ) => block.attributes.blockCommentId !== 0
 	);
 
-	const blockCommentIds = filteredBlocks?.map(block => block.attributes.blockCommentId);
+	const blockCommentIds = filteredBlocks?.map(
+		( block ) => block.attributes.blockCommentId
+	);
 	const resultThreads = threads?.slice().reverse();
-	const threadIdMap = new Map(resultThreads?.map(thread => [thread.id, thread]));
+	const threadIdMap = new Map(
+		resultThreads?.map( ( thread ) => [ thread.id, thread ] )
+	);
 	const sortedThreads = blockCommentIds
-	.map(id => threadIdMap.get(id))
-	.filter(thread => thread !== undefined);
+		.map( ( id ) => threadIdMap.get( id ) )
+		.filter( ( thread ) => thread !== undefined );
 
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
