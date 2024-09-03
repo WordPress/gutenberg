@@ -368,10 +368,18 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	// Controlled state for the active composite item.
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
-	>(
-		// By default, the active composite item is the selected one.
-		selectedItem ? generateCompositeItemIdPrefix( selectedItem ) : undefined
-	);
+	>( undefined );
+
+	// Update the active composite item when the selected item changes.
+	useEffect( () => {
+		if ( selectedItem ) {
+			setActiveCompositeId(
+				generateItemWrapperCompositeId(
+					generateCompositeItemIdPrefix( selectedItem )
+				)
+			);
+		}
+	}, [ selectedItem, generateCompositeItemIdPrefix ] );
 
 	const activeItemIndex = data.findIndex( ( item ) =>
 		isActiveCompositeItem( item, activeCompositeId ?? '' )
@@ -405,17 +413,20 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	// Select a new active composite item when the current active item
 	// is removed from the list.
 	useEffect( () => {
-		if ( ! isActiveIdInList ) {
+		const wasActiveIdInList =
+			previousActiveItemIndex !== undefined &&
+			previousActiveItemIndex !== -1;
+		if ( ! isActiveIdInList && wasActiveIdInList ) {
 			// By picking `previousActiveItemIndex` as the next item index, we are
 			// basically picking the item that would have been after the deleted one.
 			// If the previously active (and removed) item was the last of the list,
 			// we will select the item before it — which is the new last item.
 			selectCompositeItem(
-				previousActiveItemIndex ?? 0,
+				previousActiveItemIndex,
 				generateItemWrapperCompositeId
 			);
 		}
-	}, [ previousActiveItemIndex, isActiveIdInList, selectCompositeItem ] );
+	}, [ isActiveIdInList, selectCompositeItem, previousActiveItemIndex ] );
 
 	// Prevent the default behavior (open dropdown menu) and instead select the
 	// dropdown menu trigger on the previous/next row.
