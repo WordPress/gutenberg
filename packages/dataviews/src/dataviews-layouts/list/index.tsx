@@ -45,8 +45,7 @@ interface ListViewItemProps< Item > {
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField< Item >;
 	visibleFields: NormalizedField< Item >[];
-	selectPreviousItemDropdownTrigger: () => void;
-	selectNextItemDropdownTrigger: () => void;
+	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 }
 
 const {
@@ -69,8 +68,7 @@ function ListItem< Item >( {
 	onSelect,
 	primaryField,
 	visibleFields,
-	selectPreviousItemDropdownTrigger,
-	selectNextItemDropdownTrigger,
+	onDropdownTriggerKeyDown,
 }: ListViewItemProps< Item > ) {
 	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
@@ -276,26 +274,9 @@ function ListItem< Item >( {
 												label={ __( 'Actions' ) }
 												accessibleWhenDisabled
 												disabled={ ! actions.length }
-												// Prevent the default behavior (open dropdown menu)
-												// and instead move the composite item selection.
-												// https://github.com/ariakit/ariakit/issues/3768
-												onKeyDown={ (
-													event: React.KeyboardEvent< HTMLButtonElement >
-												) => {
-													if (
-														event.key ===
-														'ArrowDown'
-													) {
-														event.preventDefault();
-														selectNextItemDropdownTrigger();
-													}
-													if (
-														event.key === 'ArrowUp'
-													) {
-														event.preventDefault();
-														selectPreviousItemDropdownTrigger();
-													}
-												} }
+												onKeyDown={
+													onDropdownTriggerKeyDown
+												}
 											/>
 										}
 									/>
@@ -326,6 +307,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		selection,
 		view,
 	} = props;
+
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
 	const getItemDomId = useCallback(
@@ -401,32 +383,48 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		}
 	}, [ data, previousActiveItemIndex, getItemDomId, isActiveIdInList ] );
 
-	const selectItemDropdownTrigger = ( itemIndex: number ) => {
-		const item = data[ itemIndex ];
-		const itemDomId = getItemDomId( item );
-		if ( ! itemDomId ) {
-			return;
-		}
-		const nextCompositeActiveId =
-			generateDropdownTriggerCompositeId( itemDomId );
-		setActiveCompositeId( nextCompositeActiveId );
-		(
-			document.querySelector( `#${ nextCompositeActiveId }` ) as
-				| HTMLElement
-				| undefined
-		 )?.focus();
-	};
+	// Prevent the default behavior (open dropdown menu) and instead select the
+	// dropdown menu trigger on the previous/next row.
+	// https://github.com/ariakit/ariakit/issues/3768
+	const onDropdownTriggerKeyDown = useCallback(
+		( event: React.KeyboardEvent< HTMLButtonElement > ) => {
+			function selectItemDropdownTrigger( itemIndex: number ) {
+				const item = data[ itemIndex ];
+				const itemDomId = getItemDomId( item );
+				if ( ! itemDomId ) {
+					return;
+				}
+				const targetCompositeActiveId =
+					generateDropdownTriggerCompositeId( itemDomId );
+				setActiveCompositeId( targetCompositeActiveId );
+				(
+					document.querySelector(
+						`#${ targetCompositeActiveId }`
+					) as HTMLElement | undefined
+				 )?.focus();
+			}
 
-	const selectPreviousItemDropdownTrigger = () => {
-		selectItemDropdownTrigger(
-			Math.min( data.length - 1, Math.max( 0, activeItemIndex - 1 ) )
-		);
-	};
-	const selectNextItemDropdownTrigger = () => {
-		selectItemDropdownTrigger(
-			Math.min( data.length - 1, Math.max( 0, activeItemIndex + 1 ) )
-		);
-	};
+			if ( event.key === 'ArrowDown' ) {
+				event.preventDefault();
+				selectItemDropdownTrigger(
+					Math.min(
+						data.length - 1,
+						Math.max( 0, activeItemIndex + 1 )
+					)
+				);
+			}
+			if ( event.key === 'ArrowUp' ) {
+				event.preventDefault();
+				selectItemDropdownTrigger(
+					Math.min(
+						data.length - 1,
+						Math.max( 0, activeItemIndex - 1 )
+					)
+				);
+			}
+		},
+		[ activeItemIndex, data, getItemDomId ]
+	);
 
 	const hasData = data?.length;
 	if ( ! hasData ) {
@@ -468,12 +466,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						mediaField={ mediaField }
 						primaryField={ primaryField }
 						visibleFields={ visibleFields }
-						selectPreviousItemDropdownTrigger={
-							selectPreviousItemDropdownTrigger
-						}
-						selectNextItemDropdownTrigger={
-							selectNextItemDropdownTrigger
-						}
+						onDropdownTriggerKeyDown={ onDropdownTriggerKeyDown }
 					/>
 				);
 			} ) }
