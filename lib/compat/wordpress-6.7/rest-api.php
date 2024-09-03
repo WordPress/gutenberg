@@ -116,7 +116,6 @@ function gutenberg_override_default_rest_server() {
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
 
 /**
- * Updates comment metadata from a REST API request.
  *
  * This function is hooked to the `rest_prepare_comment` filter and is responsible for updating the comment metadata based on the data provided in the REST API request.
  *
@@ -134,7 +133,7 @@ add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 
 if ( ! function_exists( 'update_comment_meta_from_rest_request_6_7' ) ) {
 	function update_comment_meta_from_rest_request_6_7( $response, $comment, $request ) {
 
-		if ( isset( $request['comment_type'] ) && ! empty( $request['comment_type'] ) ) {
+		if ( ! empty( $request['comment_type'] ) ) {
 			$comment_data = array(
 				'comment_ID'       => $comment->comment_ID,
 				'comment_type'     => $request['comment_type'],
