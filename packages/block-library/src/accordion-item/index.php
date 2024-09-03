@@ -32,7 +32,8 @@ function block_core_accordion_item_render( $attributes, $content ) {
 	);
 
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-accordion-item' ) ) ) {
-		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '", "openByDefault": "' . (bool) $attributes['openByDefault'] . '" }' );
+		$open_by_default = $attributes['openByDefault'] ? 'true' : 'false';
+		$p->set_attribute( 'data-wp-context', '{ "id": "' . $unique_id . '", "openByDefault": ' . $open_by_default . ' }' );
 		$p->set_attribute( 'data-wp-class--is-open', 'state.isOpen' );
 		$p->set_attribute( 'data-wp-init', 'callbacks.initIsOpen' );
 
