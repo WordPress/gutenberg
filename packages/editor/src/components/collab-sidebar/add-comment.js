@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -61,6 +61,10 @@ export function AddComment( { onSubmit } ) {
 		[]
 	);
 
+	useEffect( () => {
+		setInputComment( '' );
+	}, [ clientId ] );
+
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -68,6 +72,7 @@ export function AddComment( { onSubmit } ) {
 		updateBlockAttributes( clientId, {
 			showCommentBoard: false,
 		} );
+		setInputComment( '' );
 	};
 
 	if ( ! showAddCommentBoard || ! clientId || 0 !== blockCommentId ) {
