@@ -1714,20 +1714,30 @@ export const __unstableSetEditorMode =
 
 		dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
-		if ( mode === 'navigation' ) {
-			speak(
-				__(
-					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-				)
-			);
-		} else if ( mode === 'edit' ) {
-			speak(
-				__(
-					'You are currently in edit mode. To return to the navigation mode, press Escape.'
-				)
-			);
-		} else if ( mode === 'zoom-out' ) {
-			speak( __( 'You are currently in zoom-out mode.' ) );
+		switch ( mode ) {
+			case 'navigation':
+				speak(
+					__(
+						'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
+					)
+				);
+				break;
+			case 'edit':
+				speak(
+					__(
+						'You are currently in edit mode. To return to the navigation mode, press Escape.'
+					)
+				);
+				break;
+			case 'zoom-out':
+				speak( __( 'You are currently in zoom-out mode.' ) );
+				break;
+			case 'simple':
+				speak( __( 'You are currently in simple editing mode.' ) );
+				break;
+			default:
+				// Optional: handle other cases or do nothing
+				break;
 		}
 	};
 

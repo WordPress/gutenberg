@@ -31,7 +31,6 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const [ isSimpleMode, setIsSimpleMode ] = useState( false );
 	const [ originalTemplateLocks, setOriginalTemplateLocks ] = useState( {} );
 	const { mode, blocksWithinMainBlockClientIds, getBlockAttributes } =
 		useSelect( ( select ) => {
@@ -75,7 +74,7 @@ function ToolSelector( props, ref ) {
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={ isSimpleMode ? 'simple' : mode }
+							value={ mode }
 							onSelect={ ( newMode ) => {
 								if ( newMode === 'simple' ) {
 									const originalLocks = {};
@@ -94,8 +93,6 @@ function ToolSelector( props, ref ) {
 											templateLock: 'contentOnly',
 										}
 									);
-									__unstableSetEditorMode( 'edit' );
-									setIsSimpleMode( true );
 								} else {
 									// Restore the original templateLock attributes
 									blocksWithinMainBlockClientIds.forEach(
@@ -108,9 +105,8 @@ function ToolSelector( props, ref ) {
 											} );
 										}
 									);
-									__unstableSetEditorMode( newMode );
-									setIsSimpleMode( false );
 								}
+								__unstableSetEditorMode( newMode );
 							} }
 							choices={ [
 								{
