@@ -14,6 +14,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
+ * Internal dependencies
+ */
+import { sanitizeCommentString } from './utils';
+
+/**
  * Renders the new comment form.
  *
  * @param {Object}   root0          The component props.
@@ -101,6 +106,7 @@ export function AddComment( { onSubmit } ) {
 					variant="tertiary"
 					text={ __( 'Cancel' ) }
 					onClick={ () => handleCancel() }
+					size="compact"
 				/>
 				<Button
 					__next40pxDefaultSize
@@ -108,8 +114,11 @@ export function AddComment( { onSubmit } ) {
 					className="block-editor-format-toolbar__comment-button"
 					variant="primary"
 					text={ __( 'Add Comment' ) }
-					disabled={ 0 === inputComment.length }
+					disabled={
+						0 === sanitizeCommentString( inputComment ).length
+					}
 					onClick={ () => onSubmit( inputComment ) }
+					size="compact"
 				/>
 			</HStack>
 		</VStack>
