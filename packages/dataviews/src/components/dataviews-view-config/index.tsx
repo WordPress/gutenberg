@@ -420,6 +420,7 @@ function FieldControl() {
 			} );
 		} );
 	}
+	visibleFields.sort( ( a, b ) => a.index - b.index );
 
 	const hiddenFields = fields
 		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
