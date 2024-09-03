@@ -21,10 +21,11 @@ import {
 	getSettings as getDateSettings,
 } from '@wordpress/date';
 import { Icon, check, published, moreVertical } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { removep } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -59,6 +60,59 @@ export function Comments( {
 		);
 	}, [] );
 
+	const CommentBoard = ( { thread, parentThread } ) => {
+		return (
+			<>
+				<CommentHeader
+					thread={ thread }
+					onResolve={ () => {
+						setActionState( {
+							action: 'resolve',
+							id: parentThread?.id ?? thread.id,
+						} );
+					} }
+					onEdit={ () => {
+						setActionState( { action: 'edit', id: thread.id } );
+					} }
+					onDelete={ () => {
+						setActionState( { action: 'delete', id: thread.id } );
+					} }
+					onReply={ () => {
+						setActionState( { action: 'reply', id: thread.id } );
+					} }
+					status={ parentThread?.status ?? thread.status }
+				/>
+				<HStack
+					alignment="left"
+					spacing="3"
+					justify="flex-start"
+					className="editor-collab-sidebar__usercomment"
+				>
+					<VStack
+						spacing="3"
+						className="editor-collab-sidebar__editarea"
+					>
+						{ 'edit' === actionState?.action &&
+							thread.id === actionState?.id && (
+								<EditComment
+									thread={ thread }
+									onUpdate={ ( value ) => {
+										onEditComment( thread.id, value );
+										setActionState( false );
+									} }
+									onCancel={ () => setActionState( false ) }
+								/>
+							) }
+						{ ( ! actionState ||
+							'edit' !== actionState?.action ) && (
+							<RawHTML>{ thread?.content?.rendered }</RawHTML>
+						) }
+					</VStack>
+				</HStack>
+			</>
+		);
+	};
+
 	return (
 		<>
 			{
@@ -87,69 +141,7 @@ export function Comments( {
 						id={ thread.id }
 						spacing="2"
 					>
-						<CommentHeader
-							thread={ thread }
-							onResolve={ () => {
-								setActionState( {
-									action: 'resolve',
-									id: thread.id,
-								} );
-							} }
-							onEdit={ () => {
-								setActionState( {
-									action: 'edit',
-									id: thread.id,
-								} );
-							} }
-							onDelete={ () => {
-								setActionState( {
-									action: 'delete',
-									id: thread.id,
-								} );
-							} }
-							onReply={ () => {
-								setActionState( {
-									action: 'reply',
-									id: thread.id,
-								} );
-							} }
-							status={ thread.status }
-						/>
-						<HStack
-							alignment="left"
-							spacing="3"
-							justify="flex-start"
-							className="editor-collab-sidebar__usercomment"
-						>
-							<VStack
-								spacing="3"
-								className="editor-collab-sidebar__editarea"
-							>
-								{ 'edit' === actionState?.action &&
-									thread.id === actionState?.id && (
-										<EditComment
-											thread={ thread }
-											onUpdate={ ( inputComment ) => {
-												onEditComment(
-													thread.id,
-													inputComment
-												);
-												setActionState( false );
-											} }
-											onCancel={ () => {
-												setActionState( false );
-											} }
-										/>
-									) }
-								{ ( ! actionState ||
-									'edit' !== actionState?.action ) && (
-									<RawHTML>
-										{ thread.content.rendered }
-									</RawHTML>
-								) }
-							</VStack>
-						</HStack>
-
+						<CommentBoard thread={ thread } />
 						{ 'reply' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<AddReply
@@ -157,9 +149,7 @@ export function Comments( {
 										onAddReply( thread.id, inputComment );
 										setActionState( false );
 									} }
-									onCancel={ () => {
-										setActionState( false );
-									} }
+									onCancel={ () => setActionState( false ) }
 								/>
 							) }
 						{ 'resolve' === actionState?.action &&
@@ -200,70 +190,10 @@ export function Comments( {
 									id={ reply.id }
 									spacing="2"
 								>
-									<CommentHeader
+									<CommentBoard
 										thread={ reply }
-										onResolve={ () => {
-											setActionState( {
-												action: 'resolve',
-												id: thread.id,
-											} );
-										} }
-										onEdit={ () => {
-											setActionState( {
-												action: 'edit',
-												id: reply.id,
-											} );
-										} }
-										onDelete={ () => {
-											setActionState( {
-												action: 'delete',
-												id: reply.id,
-											} );
-										} }
-										status={ thread.status }
+										parentThread={ thread }
 									/>
-									<HStack
-										alignment="left"
-										spacing="3"
-										justify="flex-start"
-										className="editor-collab-sidebar__usercomment"
-									>
-										<VStack
-											spacing="3"
-											className="editor-collab-sidebar__editarea"
-										>
-											{ 'edit' === actionState?.action &&
-												reply.id ===
-													actionState?.id && (
-													<EditComment
-														thread={ reply }
-														onUpdate={ (
-															inputComment
-														) => {
-															onEditComment(
-																reply.id,
-																inputComment
-															);
-															setActionState(
-																false
-															);
-														} }
-														onCancel={ () => {
-															setActionState(
-																false
-															);
-														} }
-													/>
-												) }
-											{ ( ! actionState ||
-												'edit' !==
-													actionState?.action ) && (
-												<RawHTML>
-													{ reply.content.rendered }
-												</RawHTML>
-											) }
-										</VStack>
-									</HStack>
 									{ 'delete' === actionState?.action &&
 										reply.id === actionState?.id && (
 											<ConfirmNotice
@@ -298,7 +228,7 @@ export function Comments( {
  */
 function EditComment( { thread, onUpdate, onCancel } ) {
 	const [ inputComment, setInputComment ] = useState(
-		thread.content.rendered.replace( /<[^>]+>/g, '' )
+		removep( thread.content.rendered )
 	);
 
 	return (
@@ -307,9 +237,7 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				__nextHasNoMarginBottom
 				className="editor-collab-sidebar__replyComment__textarea"
 				value={ inputComment ?? '' }
-				onChange={ ( value ) => {
-					setInputComment( value );
-				} }
+				onChange={ setInputComment }
 			/>
 			<VStack
 				alignment="left"
@@ -328,14 +256,14 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 							0 === sanitizeCommentString( inputComment ).length
 						}
 					>
-						{ __( 'Update' ) }
+						{ _x( 'Update', 'Update comment' ) }
 					</Button>
 					<Button
 						__next40pxDefaultSize
 						onClick={ onCancel }
 						size="compact"
 					>
-						{ __( 'Cancel' ) }
+						{ _x( 'Cancel', 'Cancel comment edit' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -365,9 +293,7 @@ function AddReply( { onSubmit, onCancel } ) {
 					__nextHasNoMarginBottom
 					className="editor-collab-sidebar__replyComment__textarea"
 					value={ inputComment ?? '' }
-					onChange={ ( value ) => {
-						setInputComment( value );
-					} }
+					onChange={ setInputComment }
 				/>
 				<VStack alignment="left" spacing="3" justify="flex-start">
 					<HStack
@@ -387,14 +313,14 @@ function AddReply( { onSubmit, onCancel } ) {
 								sanitizeCommentString( inputComment ).length
 							}
 						>
-							{ __( 'Reply' ) }
+							{ _x( 'Reply', 'Add reply comment' ) }
 						</Button>
 						<Button
 							__next40pxDefaultSize
 							onClick={ onCancel }
 							size="compact"
 						>
-							{ __( 'Cancel' ) }
+							{ _x( 'Cancel', 'Cancel adding a reply comment' ) }
 						</Button>
 					</HStack>
 				</VStack>
@@ -513,7 +439,10 @@ function CommentHeader( {
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ 0 === thread.parent && onResolve && (
 							<Button
-								label={ __( 'Resolve' ) }
+								label={ _x(
+									'Resolve',
+									'Mark comment as resolved'
+								) }
 								__next40pxDefaultSize
 								icon={ published }
 								onClick={ onResolve }
@@ -522,7 +451,10 @@ function CommentHeader( {
 						) }
 						<DropdownMenu
 							icon={ moreVertical }
-							label="Select an action"
+							label={ _x(
+								'Select an action',
+								'Select comment action'
+							) }
 							className="editor-collab-sidebar__commentDropdown"
 							controls={ moreActions }
 						/>
