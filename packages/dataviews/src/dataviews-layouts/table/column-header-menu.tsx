@@ -26,6 +26,7 @@ import type {
 	SortDirection,
 	ViewTable as ViewTableType,
 } from '../../types';
+import { getVisibleFieldIds } from '../index';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
@@ -60,10 +61,12 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
+	const visibleFieldIds = getVisibleFieldIds( view, fields );
+	const index = visibleFieldIds?.indexOf( fieldId ) as number;
+
 	const combinedField = view.layout?.combinedFields?.find(
 		( f ) => f.id === fieldId
 	);
-	const index = view.fields?.indexOf( fieldId ) as number;
 	if ( !! combinedField ) {
 		return combinedField.header || combinedField.label;
 	}
@@ -178,17 +181,16 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						prefix={ <Icon icon={ arrowLeft } /> }
 						disabled={ index < 1 }
 						onClick={ () => {
-							if ( ! view.fields || index < 1 ) {
-								return;
-							}
 							onChangeView( {
 								...view,
 								fields: [
-									...( view.fields.slice( 0, index - 1 ) ??
-										[] ),
+									...( visibleFieldIds.slice(
+										0,
+										index - 1
+									) ?? [] ),
 									fieldId,
-									view.fields[ index - 1 ],
-									...view.fields.slice( index + 1 ),
+									visibleFieldIds[ index - 1 ],
+									...visibleFieldIds.slice( index + 1 ),
 								],
 							} );
 						} }
@@ -199,23 +201,16 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					</DropdownMenuV2.Item>
 					<DropdownMenuV2.Item
 						prefix={ <Icon icon={ arrowRight } /> }
-						disabled={
-							! view.fields || index >= view.fields.length - 1
-						}
+						disabled={ index >= visibleFieldIds.length - 1 }
 						onClick={ () => {
-							if (
-								! view.fields ||
-								index >= view.fields.length - 1
-							) {
-								return;
-							}
 							onChangeView( {
 								...view,
 								fields: [
-									...( view.fields.slice( 0, index ) ?? [] ),
-									view.fields[ index + 1 ],
+									...( visibleFieldIds.slice( 0, index ) ??
+										[] ),
+									visibleFieldIds[ index + 1 ],
 									fieldId,
-									...view.fields.slice( index + 2 ),
+									...visibleFieldIds.slice( index + 2 ),
 								],
 							} );
 						} }
@@ -228,12 +223,10 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ unseen } /> }
 							onClick={ () => {
-								const viewFields =
-									view.fields || fields.map( ( f ) => f.id );
 								onHide( field );
 								onChangeView( {
 									...view,
-									fields: viewFields.filter(
+									fields: visibleFieldIds.filter(
 										( id ) => id !== fieldId
 									),
 								} );
