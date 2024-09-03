@@ -91,7 +91,7 @@ function PrimaryActionGridCell< Item >( {
 			: primaryAction.label( [ item ] );
 
 	return 'RenderModal' in primaryAction ? (
-		<div role="gridcell">
+		<div role="gridcell" key={ primaryAction.id }>
 			<CompositeItem
 				id={ compositeItemId }
 				render={
