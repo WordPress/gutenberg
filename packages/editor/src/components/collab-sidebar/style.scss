@@ -1,16 +1,15 @@
 .editor-collab-sidebar {
 	&__activities {
-		padding: 16px;
-		background-color: #f9f9f9;
+		padding: $grid-unit-20;
 	}
 
 	&__thread {
 		position: relative;
-		padding: 16px;
+		padding: $grid-unit-20;
 		border-radius: 8px;
 		border: 1px solid $gray-300;
 		background-color: $gray-100;
-		margin-bottom: 16px;
+		margin-bottom: $grid-unit-20;
 
 		.components-base-control__field {
 			margin-bottom: 0;
@@ -20,11 +19,6 @@
 			@include input-control;
 			border-radius: 6px;
 			padding: 8px 15px;
-		}
-
-		&.is-focused {
-			background: #fff;
-			box-shadow: 0 0 10px 1px #00000012;
 		}
 	}
 
