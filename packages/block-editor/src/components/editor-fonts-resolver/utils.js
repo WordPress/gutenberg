@@ -1,0 +1,147 @@
+/*
+ * Format the font face name to use in the font-family property of a font face.
+ *
+ * The input can be a string with the font face name or a string with multiple font face names separated by commas.
+ * It removes the leading and trailing quotes from the font face name.
+ *
+ * @param {string} input - The font face name.
+ * @return {string} The formatted font face name.
+ *
+ * Example:
+ * formatFontFaceName("Open Sans") => "Open Sans"
+ * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
+ * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
+ */
+export function formatFontFaceName( input ) {
+	if ( ! input ) {
+		return '';
+	}
+
+	let output = input.trim();
+	if ( output.includes( ',' ) ) {
+		output = output
+			.split( ',' )
+			// finds the first item that is not an empty string.
+			.find( ( item ) => item.trim() !== '' )
+			.trim();
+	}
+	// removes leading and trailing quotes.
+	output = output.replace( /^["']|["']$/g, '' );
+
+	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
+	if ( window.navigator.userAgent.toLowerCase().includes( 'firefox' ) ) {
+		output = `"${ output }"`;
+	}
+	return output;
+}
+
+/*
+ * Loads the font face from a URL and adds it to the browser.
+ * It also adds it to the iframe document.
+ */
+export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
+	let dataSource;
+
+	if ( typeof source === 'string' ) {
+		dataSource = `url(${ source })`;
+		// eslint-disable-next-line no-undef
+	} else if ( source instanceof File ) {
+		dataSource = await source.arrayBuffer();
+	} else {
+		return;
+	}
+
+	const newFont = new window.FontFace(
+		formatFontFaceName( fontFace.fontFamily ),
+		dataSource,
+		{
+			style: fontFace.fontStyle,
+			weight: fontFace.fontWeight,
+		}
+	);
+
+	const loadedFace = await newFont.load();
+
+	if ( addTo === 'document' || addTo === 'all' ) {
+		document.fonts.add( loadedFace );
+	}
+
+	if ( addTo === 'iframe' || addTo === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		iframeDocument.fonts.add( loadedFace );
+	}
+}
+
+/*
+ * Unloads the font face and remove it from the browser.
+ * It also removes it from the iframe document.
+ *
+ * Note that Font faces that were added to the set using the CSS @font-face rule
+ * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
+ */
+export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
+	const unloadFontFace = ( fonts ) => {
+		fonts.forEach( ( f ) => {
+			if (
+				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.weight === fontFace?.fontWeight &&
+				f.style === fontFace?.fontStyle
+			) {
+				fonts.delete( f );
+			}
+		} );
+	};
+
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
+		unloadFontFace( document.fonts );
+	}
+
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		unloadFontFace( iframeDocument.fonts );
+	}
+}
+
+function isUrlEncoded( url ) {
+	if ( typeof url !== 'string' ) {
+		return false;
+	}
+	return url !== decodeURIComponent( url );
+}
+
+/*
+ * Retrieves the display source from a font face src.
+ *
+ * @param {string|string[]} fontSrc - The font face src.
+ * @param {string} baseUrl - The base URL to resolve the src.
+ * @return {string|undefined} The display source or undefined if the input is invalid.
+ */
+export function getDisplaySrcFromFontFace( fontSrc, baseUrl ) {
+	if ( ! fontSrc ) {
+		return;
+	}
+
+	let src;
+	if ( Array.isArray( fontSrc ) ) {
+		src = fontSrc[ 0 ];
+	} else {
+		src = fontSrc;
+	}
+
+	if ( ! isUrlEncoded( src ) ) {
+		src = encodeURI( src );
+	}
+
+	// If baseUrl is provided, use it to resolve the src.
+	if ( src.startsWith( 'file:.' ) ) {
+		src = baseUrl + '/' + src.replace( 'file:./', '' );
+	}
+
+	return src;
+}

@@ -15,6 +15,7 @@ import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
+import EditorFontsResolver from '../editor-fonts-resolver';
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
@@ -43,6 +44,7 @@ export function ExperimentalBlockCanvas( {
 				__unstableContentRef={ localRef }
 				style={ { height, display: 'flex' } }
 			>
+				<EditorFontsResolver />
 				<EditorStyles
 					styles={ styles }
 					scope=":where(.editor-styles-wrapper)"
@@ -77,6 +79,7 @@ export function ExperimentalBlockCanvas( {
 				} }
 				name="editor-canvas"
 			>
+				<EditorFontsResolver />
 				<EditorStyles styles={ styles } />
 				{ children }
 			</Iframe>
