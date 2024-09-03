@@ -96,16 +96,20 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
+	const isSourceInvalid = ! sourceProps;
 	return (
 		<VStack>
 			<Truncate>{ attribute }</Truncate>
 			{ !! binding && (
 				<Text
-					variant="muted"
+					variant={ ! isSourceInvalid && 'muted' }
 					className="block-editor-bindings__item-explanation"
+					isDestructive={ isSourceInvalid }
 				>
 					<Truncate>
-						{ args?.key || sourceProps?.label || sourceName }
+						{ isSourceInvalid
+							? __( 'Invalid source' )
+							: args?.key || sourceProps?.label || sourceName }
 					</Truncate>
 				</Text>
 			) }
