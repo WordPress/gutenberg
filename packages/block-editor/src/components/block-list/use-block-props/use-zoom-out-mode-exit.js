@@ -15,8 +15,8 @@ import { unlock } from '../../../lock-unlock';
  *
  * @param {string} clientId Block client ID.
  */
-export function useZoomOutModeExit( { clientId, editorMode } ) {
-	const { __unstableSetEditorMode, selectBlock } = unlock(
+export function useZoomOutModeExit( { editorMode } ) {
+	const { __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -27,14 +27,10 @@ export function useZoomOutModeExit( { clientId, editorMode } ) {
 			}
 
 			function onDoubleClick( event ) {
-				// Don't select a block if it's already handled by a child
-				// block.
 				if ( ! event.defaultPrevented ) {
 					// Prevent focus from moving to the block.
 					event.preventDefault();
-
 					__unstableSetEditorMode( 'edit' );
-					selectBlock( clientId );
 				}
 			}
 
@@ -44,6 +40,6 @@ export function useZoomOutModeExit( { clientId, editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ clientId, editorMode, __unstableSetEditorMode, selectBlock ]
+		[ editorMode, __unstableSetEditorMode ]
 	);
 }

@@ -117,7 +117,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useZoomOutModeExit( { clientId, editorMode } ),
+		useZoomOutModeExit( { editorMode } ),
 		useIsHovered( { clientId } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
