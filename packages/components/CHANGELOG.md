@@ -66,6 +66,7 @@
 
 ### Internal
 
+-   `DropdownMenu` v2: expose CompositeTypeaheadV2 and CompositeHoverV2 via private APIs ([#64985](https://github.com/WordPress/gutenberg/pull/64985)).
 -   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873), [#64942](https://github.com/WordPress/gutenberg/pull/64942)).
 -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
 -   `DropdownMenu` v2: add `GroupLabel` subcomponent ([#64854](https://github.com/WordPress/gutenberg/pull/64854)).
