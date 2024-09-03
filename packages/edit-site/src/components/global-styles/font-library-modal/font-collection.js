@@ -28,7 +28,7 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
@@ -383,7 +383,9 @@ function FontCollection( { slug } ) {
 						<NavigatorScreen path="/fontFamily">
 							<Flex justify="flex-start">
 								<NavigatorBackButton
-									icon={ chevronLeft }
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										setSelectedFont( null );
@@ -498,7 +500,7 @@ function FontCollection( { slug } ) {
 								disabled={ page === 1 }
 								showTooltip
 								accessibleWhenDisabled
-								icon={ chevronLeft }
+								icon={ isRTL() ? chevronRight : chevronLeft }
 								tooltipPosition="top"
 							/>
 							<HStack
@@ -549,7 +551,7 @@ function FontCollection( { slug } ) {
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
 								accessibleWhenDisabled
-								icon={ chevronRight }
+								icon={ isRTL() ? chevronLeft : chevronRight }
 								tooltipPosition="top"
 							/>
 						</HStack>
