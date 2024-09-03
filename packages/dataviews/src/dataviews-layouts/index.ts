@@ -98,6 +98,15 @@ export function getHiddenFieldIds(
 		...getVisibleFieldIds( view, fields ),
 	];
 
+	// The media field does not need to be in the view.fields to be displayed.
+	if ( view.type === LAYOUT_GRID && view.layout?.mediaField ) {
+		fieldsToExclude.push( view.layout?.mediaField );
+	}
+
+	if ( view.type === LAYOUT_LIST && view.layout?.mediaField ) {
+		fieldsToExclude.push( view.layout?.mediaField );
+	}
+
 	return fields
 		.filter(
 			( { id, enableHiding } ) =>
