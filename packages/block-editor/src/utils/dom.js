@@ -71,27 +71,7 @@ export function rectUnion( rect1, rect2 ) {
 	const bottom = Math.max( rect1.bottom, rect2.bottom );
 	const top = Math.min( rect1.top, rect2.top );
 
-	return new window.DOMRect( left, top, right - left, bottom - top );
-}
-
-/**
- * Calculates the intersection of two rectangles. If there is no intersection,
- * it returns a DOMRect with zero width and height.
- *
- * @param {DOMRect} rect1 First rectangle.
- * @param {DOMRect} rect2 Second rectangle.
- * @return {DOMRect} Intersection of the two rectangles.
- */
-export function rectIntersect( rect1, rect2 ) {
-	const left = Math.max( rect1.left, rect2.left );
-	const top = Math.max( rect1.top, rect2.top );
-	const right = Math.min( rect1.right, rect2.right );
-	const bottom = Math.min( rect1.bottom, rect2.bottom );
-
-	const width = Math.max( 0, right - left );
-	const height = Math.max( 0, bottom - top );
-
-	return new window.DOMRect( left, top, width, height );
+	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
 }
 
 /**
@@ -142,7 +122,7 @@ function isElementVisible( element ) {
 export function getVisibleElementBounds( element ) {
 	const viewport = element.ownerDocument.defaultView;
 	if ( ! viewport ) {
-		return new window.DOMRect();
+		return new window.DOMRectReadOnly();
 	}
 
 	let bounds = element.getBoundingClientRect();
@@ -168,9 +148,13 @@ export function getVisibleElementBounds( element ) {
 	 * not to be counted in the visibility calculations. Top and bottom values
 	 * are not accounted for to accommodate vertical scroll.
 	 */
-	bounds = rectIntersect(
-		bounds,
-		new window.DOMRect( 0, -Infinity, viewport.innerWidth, Infinity )
+	const left = Math.max( bounds.left, 0 );
+	const right = Math.min( bounds.right, viewport.innerWidth );
+	bounds = new window.DOMRectReadOnly(
+		left,
+		bounds.top,
+		right - left,
+		bounds.height
 	);
 
 	return bounds;
