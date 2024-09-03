@@ -44,7 +44,7 @@ import {
 	getVisibleFieldIds,
 	getHiddenFieldIds,
 } from '../../dataviews-layouts';
-import type { SupportedLayouts, View } from '../../types';
+import type { SupportedLayouts, View, Field } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
@@ -247,13 +247,17 @@ interface FieldItemProps {
 
 function FieldItem( {
 	field: { id, label, index, isVisible, isHidable },
+	fields,
 	view,
 	onChangeView,
 }: {
 	field: FieldItemProps;
+	fields: Field< any >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
 } ) {
+	const fieldsInView = view.fields || fields.map( ( field ) => field.id );
+
 	return (
 		<Item key={ id }>
 			<HStack
@@ -269,23 +273,20 @@ function FieldItem( {
 					{ view.type === LAYOUT_TABLE && isVisible && (
 						<>
 							<Button
-								disabled={ ! isVisible || index < 1 }
+								disabled={ index < 1 }
 								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
-									if ( ! view.fields || index < 1 ) {
-										return;
-									}
 									onChangeView( {
 										...view,
 										fields: [
-											...( view.fields.slice(
+											...( fieldsInView.slice(
 												0,
 												index - 1
 											) ?? [] ),
 											id,
-											view.fields[ index - 1 ],
-											...view.fields.slice( index + 1 ),
+											fieldsInView[ index - 1 ],
+											...fieldsInView.slice( index + 1 ),
 										],
 									} );
 								} }
@@ -297,30 +298,20 @@ function FieldItem( {
 								) }
 							/>
 							<Button
-								disabled={
-									! isVisible ||
-									! view.fields ||
-									index >= view.fields.length - 1
-								}
+								disabled={ index >= fieldsInView.length - 1 }
 								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
-									if (
-										! view.fields ||
-										index >= view.fields.length - 1
-									) {
-										return;
-									}
 									onChangeView( {
 										...view,
 										fields: [
-											...( view.fields.slice(
+											...( fieldsInView.slice(
 												0,
 												index
 											) ?? [] ),
-											view.fields[ index + 1 ],
+											fieldsInView[ index + 1 ],
 											id,
-											...view.fields.slice( index + 2 ),
+											...fieldsInView.slice( index + 2 ),
 										],
 									} );
 								} }
@@ -342,10 +333,10 @@ function FieldItem( {
 							onChangeView( {
 								...view,
 								fields: isVisible
-									? ( view.fields || [] ).filter(
+									? fieldsInView.filter(
 											( fieldId ) => fieldId !== id
 									  )
-									: [ ...( view.fields || [] ), id ],
+									: [ ...fieldsInView, id ],
 							} );
 							// Focus the visibility button to avoid focus loss.
 							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
@@ -446,6 +437,7 @@ function FieldControl() {
 						<FieldItem
 							key={ field.id }
 							field={ field }
+							fields={ fields }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
@@ -463,6 +455,7 @@ function FieldControl() {
 								<FieldItem
 									key={ field.id }
 									field={ field }
+									fields={ fields }
 									view={ view }
 									onChangeView={ onChangeView }
 								/>
