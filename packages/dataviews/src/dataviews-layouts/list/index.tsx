@@ -38,7 +38,7 @@ import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
-	id: string;
+	idPrefix: string;
 	isSelected: boolean;
 	item: Item;
 	mediaField?: NormalizedField< Item >;
@@ -55,23 +55,35 @@ const {
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function generateDropdownTriggerCompositeId( domId: string ) {
-	return `${ domId }-dropdown`;
+function generateItemWrapperCompositeId( idPrefix: string ) {
+	return `${ idPrefix }-item-wrapper`;
+}
+function generatePrimaryActionCompositeId(
+	idPrefix: string,
+	primaryActionId: string
+) {
+	return `${ idPrefix }-primary-action-${ primaryActionId }`;
+}
+function generateDropdownTriggerCompositeId( idPrefix: string ) {
+	return `${ idPrefix }-dropdown`;
 }
 
 function PrimaryActionGridCell< Item >( {
+	idPrefix,
 	primaryAction,
-	id,
 	item,
 }: {
-	id: string;
+	idPrefix: string;
 	primaryAction: Action< Item >;
 	item: Item;
 } ) {
 	const registry = useRegistry();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
-	const compositeItemId = `${ id }-${ primaryAction.id }`;
+	const compositeItemId = generatePrimaryActionCompositeId(
+		idPrefix,
+		primaryAction.id
+	);
 
 	const label =
 		typeof primaryAction.label === 'string'
@@ -123,7 +135,7 @@ function PrimaryActionGridCell< Item >( {
 
 function ListItem< Item >( {
 	actions,
-	id,
+	idPrefix,
 	isSelected,
 	item,
 	mediaField,
@@ -133,8 +145,8 @@ function ListItem< Item >( {
 	onDropdownTriggerKeyDown,
 }: ListViewItemProps< Item > ) {
 	const itemRef = useRef< HTMLElement >( null );
-	const labelId = `${ id }-label`;
-	const descriptionId = `${ id }-description`;
+	const labelId = `${ idPrefix }-label`;
+	const descriptionId = `${ idPrefix }-description`;
 
 	const [ isHovered, setIsHovered ] = useState( false );
 	const handleMouseEnter = () => {
@@ -200,7 +212,7 @@ function ListItem< Item >( {
 					<CompositeItem
 						render={ <div /> }
 						role="button"
-						id={ id }
+						id={ generateItemWrapperCompositeId( idPrefix ) }
 						aria-pressed={ isSelected }
 						aria-labelledby={ labelId }
 						aria-describedby={ descriptionId }
@@ -262,7 +274,7 @@ function ListItem< Item >( {
 					>
 						{ primaryAction && (
 							<PrimaryActionGridCell
-								id={ id }
+								idPrefix={ idPrefix }
 								primaryAction={ primaryAction }
 								item={ item }
 							/>
@@ -272,7 +284,7 @@ function ListItem< Item >( {
 								trigger={
 									<CompositeItem
 										id={ generateDropdownTriggerCompositeId(
-											id
+											idPrefix
 										) }
 										render={
 											<Button
@@ -338,25 +350,32 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const onSelect = ( item: Item ) =>
 		onChangeSelection( [ getItemId( item ) ] );
 
-	const getItemDomId = useCallback(
+	const generateCompositeItemIdPrefix = useCallback(
 		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
 		[ baseId, getItemId ]
 	);
 
+	const isActiveCompositeItem = useCallback(
+		( item: Item, idToCheck: string ) => {
+			// All composite items use the same prefix in their IDs.
+			return idToCheck.startsWith(
+				generateCompositeItemIdPrefix( item )
+			);
+		},
+		[ generateCompositeItemIdPrefix ]
+	);
+
+	// Controlled state for the active composite item.
 	const [ activeCompositeId, setActiveCompositeId ] = useState<
 		string | null | undefined
 	>(
 		// By default, the active composite item is the selected one.
-		selectedItem ? getItemDomId( selectedItem ) : undefined
+		selectedItem ? generateCompositeItemIdPrefix( selectedItem ) : undefined
 	);
 
-	const activeItemIndex = data.findIndex( ( item ) => {
-		const itemCompositeIdPrefix = getItemDomId( item );
-		return (
-			!! itemCompositeIdPrefix &&
-			activeCompositeId?.startsWith( itemCompositeIdPrefix )
-		);
-	} );
+	const activeItemIndex = data.findIndex( ( item ) =>
+		isActiveCompositeItem( item, activeCompositeId ?? '' )
+	);
 	const previousActiveItemIndex = usePrevious( activeItemIndex );
 	const isActiveIdInList = activeItemIndex !== -1;
 
@@ -364,21 +383,23 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		(
 			targetIndex: number,
 			// Allows invokers to specify a custom function to generate the
-			// target composite item ID (e.g. for the dropdown menu trigger).
-			getCompositeId = ( id: string ) => id
+			// target composite item ID
+			generateCompositeId: ( idPrefix: string ) => string
 		) => {
 			// Clamping between 0 and data.length - 1 to avoid out of bounds.
 			const clampedIndex = Math.min(
 				data.length - 1,
 				Math.max( 0, targetIndex )
 			);
-			const domId = getItemDomId( data[ clampedIndex ] );
-			const targetCompositeItemId = getCompositeId( domId );
+			const itemIdPrefix = generateCompositeItemIdPrefix(
+				data[ clampedIndex ]
+			);
+			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
 			document.getElementById( targetCompositeItemId )?.focus();
 		},
-		[ data, getItemDomId ]
+		[ data, generateCompositeItemIdPrefix ]
 	);
 
 	// Select a new active composite item when the current active item
@@ -389,7 +410,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			// basically picking the item that would have been after the deleted one.
 			// If the previously active (and removed) item was the last of the list,
 			// we will select the item before it — which is the new last item.
-			selectCompositeItem( previousActiveItemIndex ?? 0 );
+			selectCompositeItem(
+				previousActiveItemIndex ?? 0,
+				generateItemWrapperCompositeId
+			);
 		}
 	}, [ previousActiveItemIndex, isActiveIdInList, selectCompositeItem ] );
 
@@ -444,11 +468,11 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			setActiveId={ setActiveCompositeId }
 		>
 			{ data.map( ( item ) => {
-				const id = getItemDomId( item );
+				const id = generateCompositeItemIdPrefix( item );
 				return (
 					<ListItem
 						key={ id }
-						id={ id }
+						idPrefix={ id }
 						actions={ actions }
 						item={ item }
 						isSelected={ item === selectedItem }
