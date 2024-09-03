@@ -9,6 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import {
 	cloneBlock,
 	getBlockSupport,
+	getBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
 
@@ -366,9 +367,10 @@ export const usePatterns = ( clientId, name ) => {
  * unsupported blocks present inside the Query block.
  *
  * @typedef  {Object}  UnsupportedBlocksInfo
- * @property {boolean} hasBlocksFromPlugins True if blocks from plugins are present.
- * @property {boolean} hasPostContentBlock  True if a 'core/post-content' block is present.
- * @property {boolean} hasUnsupportedBlocks True if there are any unsupported blocks.
+ * @property {boolean} hasBlocksFromPlugins  True if blocks from plugins are present.
+ * @property {boolean} hasPostContentBlock   True if a 'core/post-content' block is present.
+ * @property {boolean} hasUnsupportedBlocks  True if there are any unsupported blocks.
+ * @property {Array}   unsupportedBlocksList Array of unique, unsupported block titles.
  */
 
 /**
@@ -386,6 +388,7 @@ export const useUnsupportedBlocks = ( clientId ) => {
 			const { getClientIdsOfDescendants, getBlockName } =
 				select( blockEditorStore );
 			const blocks = {};
+			const unsupportedBlocksList = [];
 			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
@@ -408,6 +411,8 @@ export const useUnsupportedBlocks = ( clientId ) => {
 						blockSupportsInteractivityClientNavigation;
 					if ( ! blockInteractivity ) {
 						blocks.hasBlocksFromPlugins = true;
+						const blockType = getBlockType( blockName );
+						unsupportedBlocksList.push( blockType.title );
 					} else if ( blockName === 'core/post-content' ) {
 						blocks.hasPostContentBlock = true;
 					}
@@ -415,6 +420,9 @@ export const useUnsupportedBlocks = ( clientId ) => {
 			);
 			blocks.hasUnsupportedBlocks =
 				blocks.hasBlocksFromPlugins || blocks.hasPostContentBlock;
+			blocks.unsupportedBlocksList = [
+				...new Set( unsupportedBlocksList ),
+			];
 			return blocks;
 		},
 		[ clientId ]

@@ -6,7 +6,7 @@ import {
 	Modal,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 
 /**
@@ -17,14 +17,37 @@ import { useUnsupportedBlocks } from '../utils';
 const modalDescriptionId =
 	'wp-block-query-enhanced-pagination-modal__description';
 
+/**
+ * Function that takes an array of block titles and returns a formatted
+ * string with commas and 'and'.
+ *
+ * @param {Array} unsupportedBlocksList Array of unsupported blocks.
+ * @return {string} The formated list.
+ */
+
+const formatUnsupportedBlocksList = ( unsupportedBlocksList ) => {
+	if ( unsupportedBlocksList.length === 0 ) return '';
+	if ( unsupportedBlocksList.length === 1 ) return unsupportedBlocksList[ 0 ];
+	const andWord = __( 'and' );
+	if ( unsupportedBlocksList.length === 2 )
+		return unsupportedBlocksList.join( ' ' + andWord + ' ' );
+
+	const lastItem = unsupportedBlocksList.pop();
+	return unsupportedBlocksList.join( ', ' ) + ', ' + andWord + ' ' + lastItem;
+};
+
 export default function EnhancedPaginationModal( {
 	clientId,
 	attributes: { enhancedPagination },
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-	const { hasBlocksFromPlugins, hasPostContentBlock, hasUnsupportedBlocks } =
-		useUnsupportedBlocks( clientId );
+	const {
+		hasBlocksFromPlugins,
+		hasPostContentBlock,
+		hasUnsupportedBlocks,
+		unsupportedBlocksList,
+	} = useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
 		if (
@@ -41,13 +64,19 @@ export default function EnhancedPaginationModal( {
 		setOpen( false );
 	};
 
-	let notice = __(
-		'If you still want to prevent full page reloads, remove that block, then disable "Force page reload" again in the Query Block settings.'
+	let notice = _n(
+		'If you still want to prevent full page reloads, remove that block, then disable "Force page reload" again in the Query Block settings.',
+		'If you still want to prevent full page reloads, remove those blocks, then disable "Force page reload" again in the Query Block settings.',
+		unsupportedBlocksList.length
 	);
 	if ( hasBlocksFromPlugins ) {
 		notice =
-			__(
-				'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
+			_n( 'The ', 'The ', unsupportedBlocksList.length ) +
+			formatUnsupportedBlocksList( unsupportedBlocksList ) +
+			_n(
+				' block present inside the query block does not explicity support avoiding full page reloads.',
+				' blocks present inside the query block do not explicity support avoiding full page reloads.',
+				unsupportedBlocksList.length
 			) +
 			' ' +
 			notice;
