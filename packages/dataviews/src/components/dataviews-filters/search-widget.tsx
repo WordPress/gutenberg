@@ -86,11 +86,11 @@ const getNewValue = (
 	return [ value ];
 };
 
-function generateCompositeItemId(
+function generateFilterElementCompositeItemId(
 	prefix: string,
-	filterElement: NormalizedFilter[ 'elements' ][ number ]
+	filterElementValue: string
 ) {
-	return `${ prefix }-${ filterElement.value }`;
+	return `${ prefix }-${ filterElementValue }`;
 }
 
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
@@ -130,7 +130,10 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 				// in the `useCompositeStore` hook.
 				if ( ! activeCompositeId && filter.elements.length ) {
 					setActiveCompositeId(
-						generateCompositeItemId( baseId, filter.elements[ 0 ] )
+						generateFilterElementCompositeItemId(
+							baseId,
+							filter.elements[ 0 ].value
+						)
 					);
 				}
 			} }
@@ -141,7 +144,10 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 					key={ element.value }
 					render={
 						<CompositeItem
-							id={ generateCompositeItemId( baseId, element ) }
+							id={ generateFilterElementCompositeItemId(
+								baseId,
+								element.value
+							) }
 							render={
 								<div
 									aria-label={ element.label }
