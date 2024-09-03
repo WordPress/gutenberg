@@ -12,9 +12,29 @@ import {
 /**
  * Internal dependencies
  */
-import { LAYOUT_TABLE } from '../../../constants';
+import type { Field, Action } from '../../../types';
 
-export const data = [
+export type Theme = {
+	slug: string;
+	name: string;
+	description: string;
+	requires: string;
+	tested: string;
+	tags: string[];
+};
+
+export type SpaceObject = {
+	id: number;
+	title: string;
+	description: string;
+	image: string;
+	type: string;
+	categories: string[];
+	satellites: number;
+	date: string;
+};
+
+export const data: SpaceObject[] = [
 	{
 		id: 1,
 		title: 'Apollo',
@@ -127,7 +147,7 @@ export const data = [
 	},
 ];
 
-export const themeData = [
+export const themeData: Theme[] = [
 	{
 		slug: 'twentyeleven',
 		name: 'Twenty Eleven',
@@ -524,7 +544,7 @@ export const themeData = [
 	},
 ];
 
-export const themeFields = [
+export const themeFields: Field< Theme >[] = [
 	{ id: 'slug', label: 'Slug' },
 	{ id: 'name', label: 'Name' },
 	{ id: 'description', label: 'Description' },
@@ -538,7 +558,7 @@ export const themeFields = [
 ];
 
 export const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: 'table' as const,
 	search: '',
 	page: 1,
 	perPage: 10,
@@ -546,7 +566,7 @@ export const DEFAULT_VIEW = {
 	filters: [],
 };
 
-export const actions = [
+export const actions: Action< SpaceObject >[] = [
 	{
 		id: 'delete',
 		label: 'Delete item',
@@ -586,7 +606,7 @@ export const actions = [
 	},
 ];
 
-export const fields = [
+export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Image',
 		id: 'image',

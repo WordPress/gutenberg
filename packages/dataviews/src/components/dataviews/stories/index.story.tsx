@@ -17,6 +17,7 @@ import {
 } from './fixtures';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
+import type { View } from '../../../types';
 
 const meta = {
 	title: 'DataViews/DataViews',
@@ -24,8 +25,42 @@ const meta = {
 };
 export default meta;
 
-export const Default = ( props ) => {
-	const [ view, setView ] = useState( {
+const defaultLayouts = {
+	[ LAYOUT_TABLE ]: {
+		layout: {
+			primaryField: 'title',
+			styles: {
+				image: {
+					width: 50,
+				},
+				title: {
+					maxWidth: 400,
+				},
+				type: {
+					maxWidth: 400,
+				},
+				description: {
+					maxWidth: 200,
+				},
+			},
+		},
+	},
+	[ LAYOUT_GRID ]: {
+		layout: {
+			mediaField: 'image',
+			primaryField: 'title',
+		},
+	},
+	[ LAYOUT_LIST ]: {
+		layout: {
+			mediaField: 'image',
+			primaryField: 'title',
+		},
+	},
+};
+
+export const Default = () => {
+	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
 	} );
@@ -34,36 +69,40 @@ export const Default = ( props ) => {
 	}, [ view ] );
 	return (
 		<DataViews
-			{ ...props }
+			getItemId={ ( item ) => item.id.toString() }
 			paginationInfo={ paginationInfo }
 			data={ shownData }
 			view={ view }
 			fields={ fields }
 			onChangeView={ setView }
+			actions={ actions }
+			defaultLayouts={ defaultLayouts }
 		/>
 	);
 };
 
-export const Empty = ( props ) => {
-	const [ view, setView ] = useState( {
+export const Empty = () => {
+	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
 	} );
 
 	return (
 		<DataViews
-			{ ...props }
+			getItemId={ ( item ) => item.id.toString() }
 			paginationInfo={ { totalItems: 0, totalPages: 0 } }
 			data={ [] }
 			view={ view }
 			fields={ fields }
 			onChangeView={ setView }
+			actions={ actions }
+			defaultLayouts={ defaultLayouts }
 		/>
 	);
 };
 
-export const FieldsNoSortableNoHidable = ( props ) => {
-	const [ view, setView ] = useState( {
+export const FieldsNoSortableNoHidable = () => {
+	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'title', 'description', 'categories' ],
 	} );
@@ -79,86 +118,47 @@ export const FieldsNoSortableNoHidable = ( props ) => {
 
 	return (
 		<DataViews
-			{ ...props }
+			getItemId={ ( item ) => item.id.toString() }
 			paginationInfo={ paginationInfo }
 			data={ shownData }
 			view={ view }
 			fields={ _fields }
 			onChangeView={ setView }
+			defaultLayouts={ {
+				table: {},
+			} }
 		/>
 	);
 };
 
-export const CombinedFields = ( props ) => {
-	const [ view, setView ] = useState( {
+export const CombinedFields = () => {
+	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
 		fields: [ 'theme', 'requires', 'tested' ],
+		layout: {
+			combinedFields: [
+				{
+					id: 'theme',
+					label: 'Theme',
+					children: [ 'name', 'description' ],
+					direction: 'vertical',
+				},
+			],
+		},
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( themeData, view, themeFields );
 	}, [ view ] );
 
-	const defaultLayouts = {
-		table: {
-			layout: {
-				combinedFields: [
-					{
-						id: 'theme',
-						header: 'Theme',
-						children: [ 'name', 'description' ],
-						direction: 'vertical',
-					},
-				],
-			},
-		},
-	};
-
 	return (
 		<DataViews
-			{ ...props }
+			getItemId={ ( item ) => item.name }
 			paginationInfo={ paginationInfo }
 			data={ shownData }
 			view={ view }
 			fields={ themeFields }
 			onChangeView={ setView }
-			defaultLayouts={ defaultLayouts }
+			defaultLayouts={ { table: {} } }
 		/>
 	);
-};
-
-Default.args = {
-	actions,
-	defaultLayouts: {
-		[ LAYOUT_TABLE ]: {
-			layout: {
-				primaryField: 'title',
-				styles: {
-					image: {
-						width: 50,
-					},
-					title: {
-						maxWidth: 400,
-					},
-					type: {
-						maxWidth: 400,
-					},
-					description: {
-						maxWidth: 200,
-					},
-				},
-			},
-		},
-		[ LAYOUT_GRID ]: {
-			layout: {
-				mediaField: 'image',
-				primaryField: 'title',
-			},
-		},
-		[ LAYOUT_LIST ]: {
-			layout: {
-				mediaField: 'image',
-				primaryField: 'title',
-			},
-		},
-	},
 };
