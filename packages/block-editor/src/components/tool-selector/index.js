@@ -61,6 +61,16 @@ function ToolSelector( props, ref ) {
 		unsetBlockEditingMode,
 	} = useDispatch( blockEditorStore );
 
+	const modeIcons = {
+		edit: editIcon,
+		navigation: selectIcon,
+		simple: brushIcon,
+		default: editIcon, // Fallback icon if mode is not recognized
+	};
+
+	// Usage
+	const modeIcon = modeIcons[ mode ] || modeIcons.default;
+
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
@@ -69,7 +79,7 @@ function ToolSelector( props, ref ) {
 					__next40pxDefaultSize={ false }
 					{ ...props }
 					ref={ ref }
-					icon={ mode === 'navigation' ? selectIcon : editIcon }
+					icon={ modeIcon }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
@@ -120,7 +130,7 @@ function ToolSelector( props, ref ) {
 										}
 									);
 								}
-								__unstableSetEditorMode( mode );
+								__unstableSetEditorMode( newMode );
 							} }
 							choices={ [
 								{
