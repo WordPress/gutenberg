@@ -117,14 +117,12 @@
 		margin-left: auto;
 
 		button {
-			&.is-compact {
-				&.has-icon:not(.has-text) {
-					min-width: 24px;
-					padding: 0;
-					width: 24px;
-					height: 24px;
-					flex-shrink: 0;
-				}
+			&.has-icon:not(.has-text) {
+				min-width: 24px;
+				padding: 0;
+				width: 24px;
+				height: 24px;
+				flex-shrink: 0;
 			}
 		}
 	}

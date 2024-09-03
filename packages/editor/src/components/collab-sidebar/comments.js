@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, RawHTML } from '@wordpress/element';
+import { useState, useMemo, RawHTML } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -25,6 +25,11 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { sanitizeCommentString } from './utils';
 
 /**
  * Renders the Comments component.
@@ -60,16 +65,12 @@ export function Comments( {
 				// If there are no threads, show a message indicating no threads are available.
 				( ! Array.isArray( threads ) || threads.length === 0 ) && (
 					<VStack
+						alignment="left"
 						className="editor-collab-sidebar__thread"
+						justify="flex-start"
 						spacing="3"
 					>
-						<HStack
-							alignment="left"
-							spacing="3"
-							justify="flex-start"
-						>
-							{ __( 'No comments available' ) }
-						</HStack>
+						{ __( 'No comments available' ) }
 					</VStack>
 				)
 			}
@@ -319,12 +320,21 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				<HStack alignment="left" spacing="3" justify="flex-start">
 					<Button
 						__next40pxDefaultSize
+						accessibleWhenDisabled
 						variant="primary"
 						onClick={ () => onUpdate( inputComment ) }
+						size="compact"
+						disabled={
+							0 === sanitizeCommentString( inputComment ).length
+						}
 					>
 						{ __( 'Update' ) }
 					</Button>
-					<Button __next40pxDefaultSize onClick={ onCancel }>
+					<Button
+						__next40pxDefaultSize
+						onClick={ onCancel }
+						size="compact"
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 				</HStack>
@@ -368,12 +378,22 @@ function AddReply( { onSubmit, onCancel } ) {
 					>
 						<Button
 							__next40pxDefaultSize
+							accessibleWhenDisabled
 							variant="primary"
 							onClick={ () => onSubmit( inputComment ) }
+							size="compact"
+							disabled={
+								0 ===
+								sanitizeCommentString( inputComment ).length
+							}
 						>
 							{ __( 'Reply' ) }
 						</Button>
-						<Button __next40pxDefaultSize onClick={ onCancel }>
+						<Button
+							__next40pxDefaultSize
+							onClick={ onCancel }
+							size="compact"
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 					</HStack>
@@ -406,10 +426,15 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 					__next40pxDefaultSize
 					variant="primary"
 					onClick={ confirmAction }
+					size="compact"
 				>
 					{ __( 'Yes' ) }
 				</Button>
-				<Button __next40pxDefaultSize onClick={ discardAction }>
+				<Button
+					__next40pxDefaultSize
+					onClick={ discardAction }
+					size="compact"
+				>
 					{ __( 'No' ) }
 				</Button>
 			</HStack>
@@ -444,22 +469,24 @@ function CommentHeader( {
 		'time_format'
 	);
 
-	let moreActions = [
-		{
-			title: __( 'Edit' ),
-			onClick: onEdit,
-		},
-		{
-			title: __( 'Delete' ),
-			onClick: onDelete,
-		},
-		{
-			title: __( 'Reply' ),
-			onClick: onReply,
-		},
-	];
+	const memorizedMoreActions = useMemo( () => {
+		return [
+			{
+				title: __( 'Edit' ),
+				onClick: onEdit,
+			},
+			{
+				title: __( 'Delete' ),
+				onClick: onDelete,
+			},
+			{
+				title: __( 'Reply' ),
+				onClick: onReply,
+			},
+		];
+	}, [] );
 
-	moreActions = moreActions.filter( ( item ) => item.onClick );
+	const moreActions = memorizedMoreActions.filter( ( item ) => item.onClick );
 
 	return (
 		<HStack alignment="left" spacing="3" justify="flex-start">
@@ -485,17 +512,13 @@ function CommentHeader( {
 				{ status !== 'approved' && (
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ 0 === thread.parent && onResolve && (
-							<Tooltip text={ __( 'Resolve' ) }>
-								<Button
-									__next40pxDefaultSize
-									className="has-icon"
-								>
-									<Icon
-										icon={ published }
-										onClick={ onResolve }
-									/>
-								</Button>
-							</Tooltip>
+							<Button
+								label={ __( 'Resolve' ) }
+								__next40pxDefaultSize
+								icon={ published }
+								onClick={ onResolve }
+								showTooltip
+							/>
 						) }
 						<DropdownMenu
 							icon={ moreVertical }
@@ -507,9 +530,7 @@ function CommentHeader( {
 				) }
 				{ status === 'approved' && (
 					<Tooltip text={ __( 'Resolved' ) }>
-						<Button __next40pxDefaultSize className="has-icon">
-							<Icon icon={ check } />
-						</Button>
+						<Icon icon={ check } />
 					</Tooltip>
 				) }
 			</span>

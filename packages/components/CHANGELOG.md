@@ -56,6 +56,8 @@
     -   `TreeSelect`
     -   `UnitControl`
 -   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
+-   `AlignmentMatrixControl`: do not use composite store directly ([#64850](https://github.com/WordPress/gutenberg/pull/64850)).
+-   `CircularOptionPicker`: do not use composite store directly ([#64833](https://github.com/WordPress/gutenberg/pull/64833)).
 
 ### Bug Fixes
 

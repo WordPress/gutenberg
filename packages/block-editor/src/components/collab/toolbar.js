@@ -27,15 +27,13 @@ export default function BlockCommentToolbar( {} ) {
 	};
 
 	return (
-		<>
-			<ToolbarGroup className="block-editor-block-comment-toolbar">
-				<ToolbarButton
-					accessibleWhenDisabled
-					onClick={ openCollabBoard }
-					icon={ collabComment }
-					label={ __( 'Comment' ) }
-				/>
-			</ToolbarGroup>
-		</>
+		<ToolbarGroup className="block-editor-block-comment-toolbar">
+			<ToolbarButton
+				accessibleWhenDisabled
+				icon={ collabComment }
+				label={ __( 'Comment' ) }
+				onClick={ openCollabBoard }
+			/>
+		</ToolbarGroup>
 	);
 }
