@@ -6,24 +6,12 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
-export function usePaddingAppender() {
+export function usePaddingAppender( enabled ) {
 	const registry = useRegistry();
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
 				if ( event.target !== node ) {
-					return;
-				}
-
-				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-
-				const pseudoHeight = defaultView.parseInt(
-					defaultView.getComputedStyle( node, ':after' ).height,
-					10
-				);
-
-				if ( ! pseudoHeight ) {
 					return;
 				}
 
@@ -57,11 +45,13 @@ export function usePaddingAppender() {
 					insertDefaultBlock();
 				}
 			}
-			node.addEventListener( 'mousedown', onMouseDown );
-			return () => {
-				node.removeEventListener( 'mousedown', onMouseDown );
-			};
+			if ( enabled ) {
+				node.addEventListener( 'mousedown', onMouseDown );
+				return () => {
+					node.removeEventListener( 'mousedown', onMouseDown );
+				};
+			}
 		},
-		[ registry ]
+		[ enabled, registry ]
 	);
 }

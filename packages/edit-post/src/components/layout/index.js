@@ -84,24 +84,12 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
-function useEditorStyles() {
-	const {
-		hasThemeStyleSupport,
-		editorSettings,
-		isZoomedOutView,
-		renderingMode,
-		postType,
-	} = useSelect( ( select ) => {
-		const { __unstableGetEditorMode } = select( blockEditorStore );
-		const { getCurrentPostType, getRenderingMode } = select( editorStore );
-		const _postType = getCurrentPostType();
+function useEditorStyles( withPaddingAppender ) {
+	const { hasThemeStyleSupport, editorSettings } = useSelect( ( select ) => {
 		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
-			renderingMode: getRenderingMode(),
-			postType: _postType,
 		};
 	}, [] );
 
@@ -143,11 +131,7 @@ function useEditorStyles() {
 
 		// Add a space for the typewriter effect. When typing in the last block,
 		// there needs to be room to scroll up.
-		if (
-			! isZoomedOutView &&
-			renderingMode === 'post-only' &&
-			! DESIGN_POST_TYPES.includes( postType )
-		) {
+		if ( withPaddingAppender ) {
 			return [
 				...baseStyles,
 				{
@@ -162,7 +146,7 @@ function useEditorStyles() {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
-		postType,
+		withPaddingAppender,
 	] );
 }
 
@@ -394,7 +378,6 @@ function Layout( {
 } ) {
 	useCommands();
 	useEditPostCommands();
-	const paddingAppenderRef = usePaddingAppender();
 	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
@@ -418,6 +401,7 @@ function Layout( {
 		hasHistory,
 		isWelcomeGuideVisible,
 		templateId,
+		enablePaddingAppender,
 	} = useSelect(
 		( select ) => {
 			const { get } = select( preferencesStore );
@@ -433,9 +417,12 @@ function Layout( {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
+			const { __unstableGetEditorMode } = select( blockEditorStore );
+			const { getEditorMode, getRenderingMode } = select( editorStore );
+			const isRenderingPostOnly = getRenderingMode() === 'post-only';
 
 			return {
-				mode: select( editorStore ).getEditorMode(),
+				mode: getEditorMode(),
 				isFullscreenActive:
 					select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
 				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -445,7 +432,7 @@ function Layout( {
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				showMetaBoxes:
 					! DESIGN_POST_TYPES.includes( currentPostType ) &&
-					select( editorStore ).getRenderingMode() === 'post-only',
+					isRenderingPostOnly,
 				isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 				templateId:
 					supportsTemplateMode &&
@@ -454,10 +441,15 @@ function Layout( {
 					! isEditingTemplate
 						? getEditedPostTemplateId()
 						: null,
+				enablePaddingAppender:
+					__unstableGetEditorMode() !== 'zoom-out' &&
+					isRenderingPostOnly &&
+					! DESIGN_POST_TYPES.includes( currentPostType ),
 			};
 		},
 		[ currentPostType, isEditingTemplate, settings.supportsTemplateMode ]
 	);
+	const paddingAppenderRef = usePaddingAppender( enablePaddingAppender );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
@@ -473,7 +465,7 @@ function Layout( {
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
-	const styles = useEditorStyles();
+	const styles = useEditorStyles( enablePaddingAppender );
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
 	if ( showIconLabels ) {
