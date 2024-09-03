@@ -59,6 +59,68 @@ function generateDropdownTriggerCompositeId( domId: string ) {
 	return `${ domId }-dropdown`;
 }
 
+function PrimaryActionGridCell< Item >( {
+	primaryAction,
+	id,
+	item,
+}: {
+	id: string;
+	primaryAction: Action< Item >;
+	item: Item;
+} ) {
+	const registry = useRegistry();
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
+	const compositeItemId = `${ id }-${ primaryAction.id }`;
+
+	const label =
+		typeof primaryAction.label === 'string'
+			? primaryAction.label
+			: primaryAction.label( [ item ] );
+
+	return 'RenderModal' in primaryAction ? (
+		<div role="gridcell">
+			<CompositeItem
+				id={ compositeItemId }
+				render={
+					<Button
+						label={ label }
+						icon={ primaryAction.icon }
+						isDestructive={ primaryAction.isDestructive }
+						size="small"
+						onClick={ () => setIsModalOpen( true ) }
+					/>
+				}
+			>
+				{ isModalOpen && (
+					<ActionModal< Item >
+						action={ primaryAction }
+						items={ [ item ] }
+						closeModal={ () => setIsModalOpen( false ) }
+					/>
+				) }
+			</CompositeItem>
+		</div>
+	) : (
+		<div role="gridcell" key={ primaryAction.id }>
+			<CompositeItem
+				id={ compositeItemId }
+				render={
+					<Button
+						label={ label }
+						icon={ primaryAction.icon }
+						isDestructive={ primaryAction.isDestructive }
+						size="small"
+						onClick={ () => {
+							primaryAction.callback( [ item ], { registry } );
+						} }
+					/>
+				}
+			/>
+		</div>
+	);
+}
+
 function ListItem< Item >( {
 	actions,
 	id,
@@ -70,7 +132,6 @@ function ListItem< Item >( {
 	visibleFields,
 	onDropdownTriggerKeyDown,
 }: ListViewItemProps< Item > ) {
-	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
@@ -107,13 +168,6 @@ function ListItem< Item >( {
 			eligibleActions: _eligibleActions,
 		};
 	}, [ actions, item ] );
-
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const primaryActionLabel =
-		primaryAction &&
-		( typeof primaryAction.label === 'string'
-			? primaryAction.label
-			: primaryAction.label( [ item ] ) );
 
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render item={ item } />
@@ -206,60 +260,13 @@ function ListItem< Item >( {
 							width: 'auto',
 						} }
 					>
-						{ primaryAction && 'RenderModal' in primaryAction && (
-							<div role="gridcell">
-								<CompositeItem
-									id={ `${ id }-${ primaryAction.id }` }
-									render={
-										<Button
-											label={ primaryActionLabel }
-											icon={ primaryAction.icon }
-											isDestructive={
-												primaryAction.isDestructive
-											}
-											size="small"
-											onClick={ () =>
-												setIsModalOpen( true )
-											}
-										/>
-									}
-								>
-									{ isModalOpen && (
-										<ActionModal< Item >
-											action={ primaryAction }
-											items={ [ item ] }
-											closeModal={ () =>
-												setIsModalOpen( false )
-											}
-										/>
-									) }
-								</CompositeItem>
-							</div>
+						{ primaryAction && (
+							<PrimaryActionGridCell
+								id={ id }
+								primaryAction={ primaryAction }
+								item={ item }
+							/>
 						) }
-						{ primaryAction &&
-							! ( 'RenderModal' in primaryAction ) && (
-								<div role="gridcell" key={ primaryAction.id }>
-									<CompositeItem
-										id={ `${ id }-${ primaryAction.id }` }
-										render={
-											<Button
-												label={ primaryActionLabel }
-												icon={ primaryAction.icon }
-												isDestructive={
-													primaryAction.isDestructive
-												}
-												size="small"
-												onClick={ () => {
-													primaryAction.callback(
-														[ item ],
-														{ registry }
-													);
-												} }
-											/>
-										}
-									/>
-								</div>
-							) }
 						<div role="gridcell">
 							<DropdownMenu
 								trigger={
