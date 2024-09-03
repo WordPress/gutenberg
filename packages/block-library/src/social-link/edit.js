@@ -190,7 +190,7 @@ const SocialLinkEdit = ( {
 			>
 				<button
 					aria-haspopup="dialog"
-					aria-expanded={ isURLPopoverOpen.toString() }
+					aria-expanded={ isURLPopoverOpen }
 					{ ...blockProps }
 				>
 					<IconComponent />
