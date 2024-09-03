@@ -42,7 +42,7 @@ function ZoomOutModeInserters() {
 			blockInsertionPoint: getBlockInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
-			sectionRootClientId: getSectionRootClientId(),
+			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
