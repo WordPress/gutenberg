@@ -51,6 +51,7 @@ function useShallowMemo( value ) {
  * @param {string}               orientation                The direction in which the block
  *                                                          should face.
  * @param {Object}               layout                     The layout object for the block container.
+ * @param {?boolean}             contentOnlyInsertion       Whether inner blocks can be inserted in content only mode.
  */
 export default function useNestedSettingsUpdate(
 	clientId,
@@ -64,7 +65,8 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	layout
+	layout,
+	contentOnlyInsertion
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -145,6 +147,10 @@ export default function useNestedSettingsUpdate(
 				alternative: '`boolean` values',
 				since: '6.5',
 			} );
+		}
+
+		if ( contentOnlyInsertion !== undefined ) {
+			newSettings.contentOnlyInsertion = contentOnlyInsertion;
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders
