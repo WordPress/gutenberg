@@ -73,14 +73,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
-	const isSorted = view.sort?.field === field.id;
+	const isSorted = view.sort?.field === fieldId;
 	const operators = sanitizeOperators( field );
 	// Filter can be added:
 	// 1. If the field is not already part of a view's filters.
 	// 2. If the field meets the type and operator requirements.
 	// 3. If it's not primary. If it is, it should be already visible.
 	const canAddFilter =
-		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
+		! view.filters?.some( ( _filter ) => fieldId === _filter.field ) &&
 		!! field.elements?.length &&
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
@@ -115,7 +115,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									isSorted &&
 									view.sort.direction === direction;
 
-								const value = `${ field.id }-${ direction }`;
+								const value = `${ fieldId }-${ direction }`;
 
 								return (
 									<DropdownMenuV2.RadioItem
@@ -132,7 +132,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 											onChangeView( {
 												...view,
 												sort: {
-													field: field.id,
+													field: fieldId,
 													direction,
 												},
 											} );
@@ -152,14 +152,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
-								setOpenedFilter( field.id );
+								setOpenedFilter( fieldId );
 								onChangeView( {
 									...view,
 									page: 1,
 									filters: [
 										...( view.filters || [] ),
 										{
-											field: field.id,
+											field: fieldId,
 											value: undefined,
 											operator: operators[ 0 ],
 										},
@@ -186,7 +186,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								fields: [
 									...( view.fields.slice( 0, index - 1 ) ??
 										[] ),
-									field.id,
+									fieldId,
 									view.fields[ index - 1 ],
 									...view.fields.slice( index + 1 ),
 								],
@@ -214,7 +214,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								fields: [
 									...( view.fields.slice( 0, index ) ?? [] ),
 									view.fields[ index + 1 ],
-									field.id,
+									fieldId,
 									...view.fields.slice( index + 2 ),
 								],
 							} );
@@ -234,7 +234,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								onChangeView( {
 									...view,
 									fields: viewFields.filter(
-										( id ) => id !== field.id
+										( id ) => id !== fieldId
 									),
 								} );
 							} }
