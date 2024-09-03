@@ -88,7 +88,7 @@ export default {
 			is_custom: isCustom,
 			slug,
 		} = registry.select( editorStore ).getCurrentPost();
-		const { getEntityConfig, getPostTypes, getEditedEntityRecord } =
+		const { getRegisteredPostMeta, getPostTypes, getEditedEntityRecord } =
 			registry.select( coreDataStore );
 
 		// Inherit the postType from the slug if it is a template.
@@ -115,7 +115,7 @@ export default {
 					postType = match ? match[ 1 ] : 'post';
 				}
 			}
-			const fields = getEntityConfig( 'postType', postType )?.meta;
+			const fields = getRegisteredPostMeta( postType );
 
 			// Populate the `metaFields` object with the default values.
 			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
