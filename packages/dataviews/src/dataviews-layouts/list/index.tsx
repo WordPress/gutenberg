@@ -311,13 +311,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
 	const getItemDomId = useCallback(
-		( item?: Item ) => {
-			if ( ! item ) {
-				return;
-			}
-
-			return `${ baseId }-${ getItemId( item ) }`;
-		},
+		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
 		[ baseId, getItemId ]
 	);
 
@@ -332,7 +326,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		string | null | undefined
 	>(
 		// By default, the active composite item is the selected one.
-		getItemDomId( selectedItem )
+		selectedItem ? getItemDomId( selectedItem ) : undefined
 	);
 
 	const mediaField = fields.find(
@@ -452,9 +446,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			setActiveId={ setActiveCompositeId }
 		>
 			{ data.map( ( item ) => {
-				// Since `item` is guaranteed not to be undefined, we can safely
-				// let typescript know that `id` is not undefined either.
-				const id = getItemDomId( item )!;
+				const id = getItemDomId( item );
 				return (
 					<ListItem
 						key={ id }
