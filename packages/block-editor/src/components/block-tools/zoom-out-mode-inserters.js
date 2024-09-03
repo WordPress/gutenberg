@@ -10,7 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import ZoomOutModeInserterButton from './zoom-out-mode-inserter-button';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { sectionRootClientIdKey } from '../../store/private-keys';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
@@ -33,7 +33,7 @@ function ZoomOutModeInserters() {
 			getHoveredBlockClientId,
 			isBlockInsertionPointVisible,
 		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
+		const { [ sectionRootClientIdKey ]: root } = getSettings();
 		return {
 			hasSelection: !! getSelectionStart().clientId,
 			blockInsertionPoint: getBlockInsertionPoint(),

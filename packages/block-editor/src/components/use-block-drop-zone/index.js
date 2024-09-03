@@ -24,6 +24,7 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { sectionRootClientIdKey } from '../../store/private-keys';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
@@ -360,7 +361,8 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const { sectionRootClientId } = unlock( getSettings() );
+				const { [ sectionRootClientIdKey ]: sectionRootClientId } =
+					getSettings();
 
 				// In Zoom Out mode, if the target is not the section root provided by settings then
 				// do not allow dropping as the drop target is not within the root (that which is
