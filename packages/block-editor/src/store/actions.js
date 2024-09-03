@@ -21,6 +21,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -1672,6 +1673,8 @@ export const setNavigationMode =
 export const __unstableSetEditorMode =
 	( mode ) =>
 	( { dispatch, select, registry } ) => {
+		const { set: setPreference } = registry.dispatch( preferencesStore );
+
 		const { [ sectionRootClientIdKey ]: sectionRootClientId } = registry
 			.select( STORE_NAME )
 			.getSettings();
@@ -1721,6 +1724,9 @@ export const __unstableSetEditorMode =
 			sectionClientIds.forEach( ( clientId ) => {
 				dispatch.setBlockEditingMode( clientId, 'contentOnly' );
 			} );
+
+			// Set the preference
+			setPreference( 'core', '__experimentalEditorMode', 'simple' );
 		} else {
 			dispatch.updateBlockAttributes( sectionClientIds, {
 				templateLock: null,
@@ -1729,6 +1735,9 @@ export const __unstableSetEditorMode =
 			sectionClientIds.forEach( ( clientId ) => {
 				dispatch.unsetBlockEditingMode( clientId );
 			} );
+
+			// Remove the preference
+			setPreference( 'core', '__experimentalEditorMode', null );
 		}
 
 		dispatch( { type: 'SET_EDITOR_MODE', mode } );

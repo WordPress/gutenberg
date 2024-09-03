@@ -11,8 +11,9 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { Icon, edit as editIcon, brush as brushIcon } from '@wordpress/icons';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -50,6 +51,18 @@ function ToolSelector( props, ref ) {
 
 	// Usage
 	const modeIcon = modeIcons[ mode ] || modeIcons.default;
+
+	const { get: getPreference } = useSelect( ( select ) =>
+		select( preferencesStore )
+	);
+
+	// Todo - avoid effect.
+	useEffect( () => {
+		const editorMode = getPreference( 'core', '__experimentalEditorMode' );
+		if ( editorMode === 'simple' ) {
+			__unstableSetEditorMode( editorMode );
+		}
+	}, [ __unstableSetEditorMode, getPreference ] );
 
 	return (
 		<Dropdown
