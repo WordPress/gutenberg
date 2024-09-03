@@ -18,6 +18,7 @@ import { Icon, edit as editIcon, brush as brushIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { sectionRootClientIdKey } from '../../store/private-keys';
 
 const selectIcon = (
 	<SVG
@@ -32,23 +33,26 @@ const selectIcon = (
 
 function ToolSelector( props, ref ) {
 	const [ originalTemplateLocks, setOriginalTemplateLocks ] = useState( {} );
-	const { mode, blocksWithinMainBlockClientIds, getBlockAttributes } =
-		useSelect( ( select ) => {
+	const { mode, sectionBlocksClientIds, getBlockAttributes } = useSelect(
+		( select ) => {
 			const {
 				__unstableGetEditorMode,
 				getBlockOrder,
 				getBlockAttributes: _getBlockAttributes,
+				getSettings,
 			} = select( blockEditorStore );
 
-			const mainBlockClientId = getBlockOrder()[ 1 ];
+			const { [ sectionRootClientIdKey ]: sectionRootClientId } =
+				getSettings();
 
 			return {
 				mode: __unstableGetEditorMode(),
-				blocksWithinMainBlockClientIds:
-					getBlockOrder( mainBlockClientId ),
+				sectionBlocksClientIds: getBlockOrder( sectionRootClientId ),
 				getBlockAttributes: _getBlockAttributes,
 			};
-		}, [] );
+		},
+		[]
+	);
 
 	const { __unstableSetEditorMode, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -78,7 +82,7 @@ function ToolSelector( props, ref ) {
 							onSelect={ ( newMode ) => {
 								if ( newMode === 'simple' ) {
 									const originalLocks = {};
-									blocksWithinMainBlockClientIds.forEach(
+									sectionBlocksClientIds.forEach(
 										( clientId ) => {
 											const attributes =
 												getBlockAttributes( clientId );
@@ -88,14 +92,14 @@ function ToolSelector( props, ref ) {
 									);
 									setOriginalTemplateLocks( originalLocks );
 									updateBlockAttributes(
-										blocksWithinMainBlockClientIds,
+										sectionBlocksClientIds,
 										{
 											templateLock: 'contentOnly',
 										}
 									);
 								} else {
 									// Restore the original templateLock attributes
-									blocksWithinMainBlockClientIds.forEach(
+									sectionBlocksClientIds.forEach(
 										( clientId ) => {
 											updateBlockAttributes( clientId, {
 												templateLock:
