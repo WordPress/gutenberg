@@ -9,7 +9,6 @@ import {
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -98,19 +97,17 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
 	return (
-		<VStack>
-			<Truncate>{ attribute }</Truncate>
+		<VStack className="block-editor-bindings__item">
+			<Text truncate>{ attribute }</Text>
 			{ !! binding && (
 				<Text
+					truncate
 					variant={ ! isSourceInvalid && 'muted' }
-					className="block-editor-bindings__item-explanation"
 					isDestructive={ isSourceInvalid }
 				>
-					<Truncate>
-						{ isSourceInvalid
-							? __( 'Invalid source' )
-							: args?.key || sourceProps?.label || sourceName }
-					</Truncate>
+					{ isSourceInvalid
+						? __( 'Invalid source' )
+						: args?.key || sourceProps?.label || sourceName }
 				</Text>
 			) }
 		</VStack>
