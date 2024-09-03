@@ -256,7 +256,7 @@ function FieldItem( {
 	view: View;
 	onChangeView: ( view: View ) => void;
 } ) {
-	const fieldsInView = view.fields || fields.map( ( field ) => field.id );
+	const visibleFieldIds = getVisibleFieldIds( view, fields );
 
 	return (
 		<Item key={ id }>
@@ -280,13 +280,15 @@ function FieldItem( {
 									onChangeView( {
 										...view,
 										fields: [
-											...( fieldsInView.slice(
+											...( visibleFieldIds.slice(
 												0,
 												index - 1
 											) ?? [] ),
 											id,
-											fieldsInView[ index - 1 ],
-											...fieldsInView.slice( index + 1 ),
+											visibleFieldIds[ index - 1 ],
+											...visibleFieldIds.slice(
+												index + 1
+											),
 										],
 									} );
 								} }
@@ -298,20 +300,22 @@ function FieldItem( {
 								) }
 							/>
 							<Button
-								disabled={ index >= fieldsInView.length - 1 }
+								disabled={ index >= visibleFieldIds.length - 1 }
 								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
 									onChangeView( {
 										...view,
 										fields: [
-											...( fieldsInView.slice(
+											...( visibleFieldIds.slice(
 												0,
 												index
 											) ?? [] ),
-											fieldsInView[ index + 1 ],
+											visibleFieldIds[ index + 1 ],
 											id,
-											...fieldsInView.slice( index + 2 ),
+											...visibleFieldIds.slice(
+												index + 2
+											),
 										],
 									} );
 								} }
@@ -333,10 +337,10 @@ function FieldItem( {
 							onChangeView( {
 								...view,
 								fields: isVisible
-									? fieldsInView.filter(
+									? visibleFieldIds.filter(
 											( fieldId ) => fieldId !== id
 									  )
-									: [ ...fieldsInView, id ],
+									: [ ...visibleFieldIds, id ],
 							} );
 							// Focus the visibility button to avoid focus loss.
 							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.

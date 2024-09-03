@@ -81,12 +81,23 @@ export function getVisibleFieldIds(
 ): string[] {
 	const fieldsToExclude = getCombinedFieldIds( view );
 
-	return (
-		view.fields?.filter( ( id ) => ! fieldsToExclude.includes( id ) ) ||
-		fields
+	if ( view.fields ) {
+		return view.fields.filter( ( id ) => ! fieldsToExclude.includes( id ) );
+	}
+
+	const visibleFields = [];
+	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		visibleFields.push(
+			...view.layout.combinedFields.map( ( { id } ) => id )
+		);
+	}
+	visibleFields.push(
+		...fields
 			.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
 			.map( ( { id } ) => id )
 	);
+
+	return visibleFields;
 }
 
 export function getHiddenFieldIds(
