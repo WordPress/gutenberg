@@ -1672,20 +1672,20 @@ export const setNavigationMode =
 export const __unstableSetEditorMode =
 	( mode ) =>
 	( { dispatch, select, registry } ) => {
+		const { [ sectionRootClientIdKey ]: sectionRootClientId } = registry
+			.select( STORE_NAME )
+			.getSettings();
+
+		const sectionClientIds = select.getBlockOrder( sectionRootClientId );
+
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			const { [ sectionRootClientIdKey ]: sectionRootClientId } = registry
-				.select( STORE_NAME )
-				.getSettings();
 
 			if ( firstSelectedClientId ) {
 				let sectionClientId;
 
 				if ( sectionRootClientId ) {
-					const sectionClientIds =
-						select.getBlockOrder( sectionRootClientId );
-
 					// If the selected block is a section block, use it.
 					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
 						sectionClientId = firstSelectedClientId;
@@ -1710,6 +1710,25 @@ export const __unstableSetEditorMode =
 					dispatch.clearSelectedBlock();
 				}
 			}
+		}
+
+		// Insert the provided logic here
+		if ( mode === 'simple' ) {
+			dispatch.updateBlockAttributes( sectionClientIds, {
+				templateLock: 'contentOnly',
+			} );
+
+			sectionClientIds.forEach( ( clientId ) => {
+				dispatch.setBlockEditingMode( clientId, 'contentOnly' );
+			} );
+		} else {
+			dispatch.updateBlockAttributes( sectionClientIds, {
+				templateLock: null,
+			} );
+
+			sectionClientIds.forEach( ( clientId ) => {
+				dispatch.unsetBlockEditingMode( clientId );
+			} );
 		}
 
 		dispatch( { type: 'SET_EDITOR_MODE', mode } );

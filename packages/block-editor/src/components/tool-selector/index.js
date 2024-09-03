@@ -11,14 +11,13 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { Icon, edit as editIcon, brush as brushIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { sectionRootClientIdKey } from '../../store/private-keys';
 
 const selectIcon = (
 	<SVG
@@ -32,34 +31,15 @@ const selectIcon = (
 );
 
 function ToolSelector( props, ref ) {
-	const [ originalTemplateLocks, setOriginalTemplateLocks ] = useState( {} );
-	const { mode, sectionBlocksClientIds, getBlockAttributes } = useSelect(
-		( select ) => {
-			const {
-				__unstableGetEditorMode,
-				getBlockOrder,
-				getBlockAttributes: _getBlockAttributes,
-				getSettings,
-			} = select( blockEditorStore );
+	const { mode } = useSelect( ( select ) => {
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
-			const { [ sectionRootClientIdKey ]: sectionRootClientId } =
-				getSettings();
+		return {
+			mode: __unstableGetEditorMode(),
+		};
+	}, [] );
 
-			return {
-				mode: __unstableGetEditorMode(),
-				sectionBlocksClientIds: getBlockOrder( sectionRootClientId ),
-				getBlockAttributes: _getBlockAttributes,
-			};
-		},
-		[]
-	);
-
-	const {
-		__unstableSetEditorMode,
-		updateBlockAttributes,
-		setBlockEditingMode,
-		unsetBlockEditingMode,
-	} = useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	const modeIcons = {
 		edit: editIcon,
@@ -94,42 +74,6 @@ function ToolSelector( props, ref ) {
 						<MenuItemsChoice
 							value={ mode }
 							onSelect={ ( newMode ) => {
-								if ( newMode === 'simple' ) {
-									const originalLocks = {};
-									sectionBlocksClientIds.forEach(
-										( clientId ) => {
-											const attributes =
-												getBlockAttributes( clientId );
-											originalLocks[ clientId ] =
-												attributes.templateLock;
-
-											setBlockEditingMode(
-												clientId,
-												'contentOnly'
-											);
-										}
-									);
-									setOriginalTemplateLocks( originalLocks );
-									updateBlockAttributes(
-										sectionBlocksClientIds,
-										{
-											templateLock: 'contentOnly',
-										}
-									);
-								} else {
-									// Restore the original templateLock attributes
-									sectionBlocksClientIds.forEach(
-										( clientId ) => {
-											updateBlockAttributes( clientId, {
-												templateLock:
-													originalTemplateLocks[
-														clientId
-													],
-											} );
-											unsetBlockEditingMode( clientId );
-										}
-									);
-								}
 								__unstableSetEditorMode( newMode );
 							} }
 							choices={ [
