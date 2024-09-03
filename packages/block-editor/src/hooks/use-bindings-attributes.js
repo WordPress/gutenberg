@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import isURLLike from '../components/link-control/is-url-like';
 import { unlock } from '../lock-unlock';
-import { Warning } from '../components';
+import { Warning, useBlockProps } from '../components';
 import BlockContext from '../components/block-context';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
 
@@ -316,12 +316,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				</Button>
 			);
 			return (
-				<div className="has-warning">
+				<div { ...useBlockProps( { className: 'has-warning' } ) }>
 					<Warning actions={ [ removeInvalidBindingButton ] }>
 						{ sprintf(
 							/* translators: %1$s: block attribute, %2$s: invalid block bindings source. */
 							__(
-								'Attribute "%1$s" is connected to unrecognized "%2$s" source. You can leave this block intact, modify the connection, or remove it.'
+								'Attribute "%1$s" is connected to unrecognized "%2$s" source.'
 							),
 							invalidBinding.attribute,
 							invalidBinding.source
