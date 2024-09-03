@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useContext } from '@wordpress/element';
@@ -16,7 +15,6 @@ import isURLLike from '../components/link-control/is-url-like';
 import { unlock } from '../lock-unlock';
 import { Warning, useBlockProps } from '../components';
 import BlockContext from '../components/block-context';
-import { useBlockBindingsUtils } from '../utils/block-bindings';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -107,7 +105,6 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const { updateBlockBindings } = useBlockBindingsUtils();
 		const { name, clientId } = props;
 		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
@@ -301,23 +298,9 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 		// Throw a warning if the block is connected to an invalid source.
 		if ( invalidBinding ) {
-			const removeInvalidBindingButton = (
-				<Button
-					__next40pxDefaultSize={ false }
-					key="remove-all-bindings"
-					onClick={ () =>
-						updateBlockBindings( {
-							[ invalidBinding.attribute ]: undefined,
-						} )
-					}
-					variant="primary"
-				>
-					{ __( 'Remove connection' ) }
-				</Button>
-			);
 			return (
 				<div { ...useBlockProps( { className: 'has-warning' } ) }>
-					<Warning actions={ [ removeInvalidBindingButton ] }>
+					<Warning>
 						{ sprintf(
 							/* translators: %1$s: block attribute, %2$s: invalid block bindings source. */
 							__(
