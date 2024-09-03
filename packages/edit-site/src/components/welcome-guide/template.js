@@ -15,8 +15,8 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const edited = useEditedEntityRecord();
-	const isPostTypeTemplate = edited.record.type === 'wp_template';
+	const { isLoaded, record } = useEditedEntityRecord();
+	const isPostTypeTemplate = isLoaded && record.type === 'wp_template';
 	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
 		const { get } = select( preferencesStore );
