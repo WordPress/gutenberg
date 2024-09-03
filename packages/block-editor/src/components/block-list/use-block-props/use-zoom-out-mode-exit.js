@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -15,18 +15,21 @@ import { unlock } from '../../../lock-unlock';
  *
  * @param {string} clientId Block client ID.
  */
-export function useZoomOutModeExit( clientId ) {
-	const { isZoomOutMode } = unlock( useSelect( blockEditorStore ) );
+export function useZoomOutModeExit( { clientId, editorMode } ) {
 	const { __unstableSetEditorMode, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	return useRefEffect(
 		( node ) => {
+			if ( editorMode !== 'zoom-out' ) {
+				return;
+			}
+
 			function onDoubleClick( event ) {
 				// Don't select a block if it's already handled by a child
 				// block.
-				if ( isZoomOutMode() && ! event.defaultPrevented ) {
+				if ( ! event.defaultPrevented ) {
 					// Prevent focus from moving to the block.
 					event.preventDefault();
 
@@ -41,6 +44,6 @@ export function useZoomOutModeExit( clientId ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ clientId, isZoomOutMode, __unstableSetEditorMode ]
+		[ clientId, editorMode, __unstableSetEditorMode, selectBlock ]
 	);
 }
