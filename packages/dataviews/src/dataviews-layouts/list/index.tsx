@@ -314,26 +314,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		selection,
 		view,
 	} = props;
-
 	const baseId = useInstanceId( ViewList, 'view-list' );
-
-	const getItemDomId = useCallback(
-		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
-		[ baseId, getItemId ]
-	);
 
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
-	);
-
-	const onSelect = ( item: Item ) =>
-		onChangeSelection( [ getItemId( item ) ] );
-
-	const [ activeCompositeId, setActiveCompositeId ] = useState<
-		string | null | undefined
-	>(
-		// By default, the active composite item is the selected one.
-		selectedItem ? getItemDomId( selectedItem ) : undefined
 	);
 
 	const mediaField = fields.find(
@@ -349,6 +333,21 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			! [ view.layout?.primaryField, view.layout?.mediaField ].includes(
 				field.id
 			)
+	);
+
+	const onSelect = ( item: Item ) =>
+		onChangeSelection( [ getItemId( item ) ] );
+
+	const getItemDomId = useCallback(
+		( item: Item ) => `${ baseId }-${ getItemId( item ) }`,
+		[ baseId, getItemId ]
+	);
+
+	const [ activeCompositeId, setActiveCompositeId ] = useState<
+		string | null | undefined
+	>(
+		// By default, the active composite item is the selected one.
+		selectedItem ? getItemDomId( selectedItem ) : undefined
 	);
 
 	const activeItemIndex = data.findIndex( ( item ) => {
