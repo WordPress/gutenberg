@@ -40,6 +40,19 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
 		"html": false
-	}
+	},
+	"style": "wp-block-comment-reply-link"
 }
