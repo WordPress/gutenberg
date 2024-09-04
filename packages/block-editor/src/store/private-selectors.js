@@ -567,3 +567,24 @@ export function getSectionClientIds( state ) {
 	const sectionRootClientId = getSectionRootClientId( state );
 	return getBlockOrder( state, sectionRootClientId );
 }
+
+/**
+ * Retrieves the closest "section" block to the given client ID.
+ *
+ * @param {Object} state    - The current state.
+ * @param {string} clientId - The client ID to start the search from.
+ * @return {string|undefined} The client ID of the closest section block, or undefined if not found.
+ */
+export function getClosestSectionBlock( state, clientId ) {
+	let current = clientId;
+	let result;
+	const sectionClientIds = getSectionClientIds( state );
+	while ( current ) {
+		if ( sectionClientIds.includes( current ) ) {
+			result = current;
+			break;
+		}
+		current = state.blocks.parents.get( current );
+	}
+	return result;
+}

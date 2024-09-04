@@ -100,12 +100,23 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			getContentLockingParent,
 			getTemplateLock,
+			getClosestSectionBlock,
+			getBlockEditingMode,
 		} = unlock( select( blockEditorStore ) );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
 		const _blockType =
 			_selectedBlockName && getBlockType( _selectedBlockName );
+
+		const closestSectionBlock = getClosestSectionBlock(
+			_selectedBlockClientId
+		);
+
+		const closestContentOnlySectionBlock =
+			getBlockEditingMode( closestSectionBlock ) === 'contentOnly'
+				? closestSectionBlock
+				: undefined;
 
 		return {
 			count: getSelectedBlockCount(),
@@ -117,7 +128,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
 				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
-					: undefined ),
+					: undefined ) ||
+				closestContentOnlySectionBlock,
 		};
 	}, [] );
 
