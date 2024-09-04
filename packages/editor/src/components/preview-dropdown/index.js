@@ -22,6 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { ActionItem } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -206,6 +207,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							/>
 						</MenuGroup>
 					) }
+					<ActionItem.Slot
+						name="core/plugin-preview-menu"
+						as={ MenuGroup }
+						fillProps={ { onClick: onClose } }
+					/>
 				</>
 			) }
 		</DropdownMenu>

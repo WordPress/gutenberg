@@ -18,7 +18,9 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { PrivateInserterLibrary } = unlock( blockEditorPrivateApis );
+const { PrivateInserterLibrary, sectionRootClientIdKey } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function InserterSidebar() {
 	const {
@@ -44,7 +46,8 @@ export default function InserterSidebar() {
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings() );
+				const { [ sectionRootClientIdKey ]: sectionRootClientId } =
+					getSettings();
 				if ( sectionRootClientId ) {
 					return sectionRootClientId;
 				}
