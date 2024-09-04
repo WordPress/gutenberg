@@ -21,11 +21,11 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	}
 	$post_ID = $block->context['postId'];
 
-	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
-	$display_caption       = isset( $attributes['displayCaption'] ) && $attributes['displayCaption'];
-	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
-	$attr           = get_block_core_post_featured_image_border_attributes( $attributes );
-	$overlay_markup = get_block_core_post_featured_image_overlay_element_markup( $attributes );
+	$is_link         = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$display_caption = isset( $attributes['displayCaption'] ) && $attributes['displayCaption'];
+	$size_slug       = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$attr            = get_block_core_post_featured_image_border_attributes( $attributes );
+	$overlay_markup  = get_block_core_post_featured_image_overlay_element_markup( $attributes );
 
 	if ( $is_link ) {
 		if ( get_the_title( $post_ID ) ) {
@@ -114,9 +114,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	} else {
 		$featured_image = $featured_image . $overlay_markup;
 	}
-	
-	if ($display_caption) {
-		$caption = get_the_post_thumbnail_caption( $post_ID );
+
+	if ( $display_caption ) {
+		$caption         = get_the_post_thumbnail_caption( $post_ID );
 		$featured_image .= sprintf(
 			'<figcaption class="wp-element-caption">%1$s</figcaption>',
 			$caption
