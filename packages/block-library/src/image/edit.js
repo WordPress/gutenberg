@@ -159,46 +159,49 @@ export function ImageEdit( {
 		} );
 	}
 
-	function onSelectImage( media ) {
-		if ( Array.isArray( media ) ) {
-			const win = figureRef.current?.ownerDocument.defaultView;
+	function onSelectImagesList( images ) {
+		const win = figureRef.current?.ownerDocument.defaultView;
 
-			if ( media.every( ( file ) => file instanceof win.File ) ) {
-				const rootClientId = getBlockRootClientId( clientId );
+		if ( images.every( ( file ) => file instanceof win.File ) ) {
+			/** @type {File[]} */
+			const files = images;
+			const rootClientId = getBlockRootClientId( clientId );
 
-				if ( media.some( ( file ) => ! isValidFileType( file ) ) ) {
-					// Copied from the same notice in the gallery block.
-					createErrorNotice(
-						__(
-							'If uploading to a gallery all files need to be image formats'
-						),
-						{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
-					);
-				}
-
-				const imageBlocks = media
-					.filter( ( file ) => isValidFileType( file ) )
-					.map( ( file ) =>
-						createBlock( 'core/image', {
-							blob: createBlobURL( file ),
-						} )
-					);
-
-				if ( getBlockName( rootClientId ) === 'core/gallery' ) {
-					replaceBlock( clientId, imageBlocks );
-				} else if (
-					canInsertBlockType( 'core/gallery', rootClientId )
-				) {
-					const galleryBlock = createBlock(
-						'core/gallery',
-						{},
-						imageBlocks
-					);
-
-					replaceBlock( clientId, galleryBlock );
-				}
+			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
+				// Copied from the same notice in the gallery block.
+				createErrorNotice(
+					__(
+						'If uploading to a gallery all files need to be image formats'
+					),
+					{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+				);
 			}
 
+			const imageBlocks = files
+				.filter( ( file ) => isValidFileType( file ) )
+				.map( ( file ) =>
+					createBlock( 'core/image', {
+						blob: createBlobURL( file ),
+					} )
+				);
+
+			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
+				replaceBlock( clientId, imageBlocks );
+			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{},
+					imageBlocks
+				);
+
+				replaceBlock( clientId, galleryBlock );
+			}
+		}
+	}
+
+	function onSelectImage( media ) {
+		if ( Array.isArray( media ) ) {
+			onSelectImagesList( media );
 			return;
 		}
 
