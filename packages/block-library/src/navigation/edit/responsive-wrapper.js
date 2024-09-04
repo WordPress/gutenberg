@@ -101,8 +101,7 @@ export default function ResponsiveWrapper( {
 				>
 					<div { ...dialogProps }>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }
