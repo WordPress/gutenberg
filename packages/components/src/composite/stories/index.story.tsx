@@ -336,7 +336,7 @@ const Fill = ( { children } ) => {
 
 // In a separate component:
 
-<>
+<SlotFillProvider>
   ${
 		// Add one level of indentation to match the surrounding code.
 		code.replaceAll( '\n', '\n  ' )
@@ -350,7 +350,7 @@ const Fill = ( { children } ) => {
       Item three (from slot fill)
     </Composite.Item>
   </Fill>
-</>`;
+</SlotFillProvider>`;
 				},
 			},
 		},
