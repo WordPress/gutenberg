@@ -7,6 +7,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 export default {
 	name: 'core/post-meta',
@@ -88,8 +89,12 @@ export default {
 			is_custom: isCustom,
 			slug,
 		} = registry.select( editorStore ).getCurrentPost();
-		const { getRegisteredPostMeta, getPostTypes, getEditedEntityRecord } =
+		const { getPostTypes, getEditedEntityRecord } =
 			registry.select( coreDataStore );
+
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
 
 		// Inherit the postType from the slug if it is a template.
 		if ( ! context?.postType && type === 'wp_template' ) {
