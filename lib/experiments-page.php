@@ -140,18 +140,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-patterns-tab',
-		__( 'Enable zoomed out view when patterns are browsed in the inserter', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable zoomed out view when selecting a pattern category in the main inserter.', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-patterns-tab',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-new-posts-dashboard',
 		__( 'Redesigned posts dashboard', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
