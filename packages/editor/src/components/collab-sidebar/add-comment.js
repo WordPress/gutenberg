@@ -82,17 +82,17 @@ export function AddComment( { onSubmit } ) {
 	return (
 		<VStack
 			spacing="3"
-			className="editor-collab-sidebar__thread editor-collab-sidebar__activethread"
+			className="editor-collab-sidebar-panel__thread editor-collab-sidebar-panel__active-thread"
 		>
 			<HStack alignment="left" spacing="3">
 				<img
 					src={ userAvatar }
-					alt={ __( 'User Icon' ) }
-					className="editor-collab-sidebar__userIcon"
+					alt={ __( 'User Avatar' ) }
+					className="editor-collab-sidebar-panel__user-avatar"
 					width={ 32 }
 					height={ 32 }
 				/>
-				<span className="editor-collab-sidebar__userName">
+				<span className="editor-collab-sidebar-panel__user-name">
 					{ currentUser }
 				</span>
 			</HStack>
@@ -102,12 +102,10 @@ export function AddComment( { onSubmit } ) {
 				value={ inputComment }
 				onChange={ setInputComment }
 				placeholder={ __( 'Add comment' ) }
-				className="block-editor-format-toolbar__comment-input"
 			/>
 			<HStack alignment="right" spacing="3">
 				<Button
 					__next40pxDefaultSize
-					className="block-editor-format-toolbar__cancel-button"
 					variant="tertiary"
 					text={ __( 'Cancel' ) }
 					onClick={ handleCancel }
@@ -116,7 +114,6 @@ export function AddComment( { onSubmit } ) {
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled
-					className="block-editor-format-toolbar__comment-button"
 					variant="primary"
 					text={ __( 'Add Comment' ) }
 					disabled={
