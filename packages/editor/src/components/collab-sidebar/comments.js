@@ -124,7 +124,10 @@ export function Comments( {
 						justify="flex-start"
 						spacing="3"
 					>
-						{ __( 'No comments available' ) }
+						{ 
+							// translators: message displayed when there are no comments available
+							__( 'No comments available' ) 
+						}
 					</VStack>
 				)
 			}
@@ -155,9 +158,10 @@ export function Comments( {
 						{ 'resolve' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ __(
-										'Are you sure you want to mark this thread as resolved?'
-									) }
+									confirmMessage={ 
+										// translators: message displayed when marking a comment as resolved
+										__( 'Are you sure you want to mark this thread as resolved?' )
+									}
 									confirmAction={ () => {
 										onCommentResolve( thread.id );
 										setActionState( false );
@@ -170,9 +174,10 @@ export function Comments( {
 						{ 'delete' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ __(
-										'Are you sure you want to delete this thread?'
-									) }
+									confirmMessage={ 
+										// translators: message displayed when deleting a comment
+										__( 'Are you sure you want to delete this thread?' ) 
+									}
 									confirmAction={ () => {
 										onCommentDelete( thread.id );
 										setActionState( false );
@@ -197,9 +202,10 @@ export function Comments( {
 									{ 'delete' === actionState?.action &&
 										reply.id === actionState?.id && (
 											<ConfirmNotice
-												confirmMessage={ __(
-													'Are you sure you want to delete this thread?'
-												) }
+												confirmMessage={ 
+													// translators: message displayed when deleting a comment
+													__( 'Are you sure you want to delete this thread?' ) 
+												}
 												confirmAction={ () => {
 													onCommentDelete( reply.id );
 													setActionState( false );
@@ -339,12 +345,16 @@ function AddReply( { onSubmit, onCancel } ) {
 function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
+			// translators: title for the confirmation overlay
 			title={ __( 'Confirm' ) }
 			className="editor-collab-sidebar-panel__thread-overlay"
 			spacing="0"
 			justify="space-between"
 		>
-			<p>{ cofirmMessage ?? __( 'Are you sure?' ) }</p>
+			<p>{ cofirmMessage ?? 
+				// translators: message displayed when confirming an action
+				__( 'Are you sure?' ) 
+			}</p>
 			<HStack>
 				<Button
 					__next40pxDefaultSize
@@ -352,14 +362,14 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 					onClick={ confirmAction }
 					size="compact"
 				>
-					{ __( 'Yes' ) }
+					{ _x( 'Yes', 'confirm action' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
 					onClick={ discardAction }
 					size="compact"
 				>
-					{ __( 'No' ) }
+					{ _x( 'No', 'deny action' ) }
 				</Button>
 			</HStack>
 		</VStack>
@@ -396,15 +406,15 @@ function CommentHeader( {
 	const memorizedMoreActions = useMemo( () => {
 		return [
 			{
-				title: __( 'Edit' ),
+				title: _x( 'Edit', 'Edit comment' ),
 				onClick: onEdit,
 			},
 			{
-				title: __( 'Delete' ),
+				title: _x( 'Delete', 'Delete comment' ),
 				onClick: onDelete,
 			},
 			{
-				title: __( 'Reply' ),
+				title: _x( 'Reply', 'Reply on a comment' ),
 				onClick: onReply,
 			},
 		];
@@ -417,6 +427,7 @@ function CommentHeader( {
 			<img
 				src={ thread?.author_avatar_urls?.[ 48 ] }
 				className="editor-collab-sidebar-panel__user-avatar"
+				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
@@ -459,6 +470,7 @@ function CommentHeader( {
 					</HStack>
 				) }
 				{ status === 'approved' && (
+					// translators: tooltip for resolved comment
 					<Tooltip text={ __( 'Resolved' ) }>
 						<Icon icon={ check } />
 					</Tooltip>

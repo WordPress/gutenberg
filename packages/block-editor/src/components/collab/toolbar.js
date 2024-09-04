@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -27,13 +27,13 @@ export default function BlockCommentToolbar() {
 	};
 
 	return (
-		<ToolbarGroup className="block-editor-block-comment-toolbar">
-			<ToolbarButton
-				accessibleWhenDisabled
-				icon={ collabComment }
-				label={ __( 'Comment' ) }
-				onClick={ openCollabBoard }
-			/>
-		</ToolbarGroup>
+	
+		<ToolbarButton
+			accessibleWhenDisabled
+			icon={ collabComment }
+			label={ _x( 'Comment', 'Click to open sidebar and highlight comment board' ) }
+			onClick={ openCollabBoard }
+		/>
+	
 	);
 }
