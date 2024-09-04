@@ -20,7 +20,7 @@ import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
-	getGrammar,
+	getParsedPattern,
 } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
@@ -300,10 +300,10 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 				if ( ! inserter ) {
 					return false;
 				}
-				const grammar = getGrammar( pattern );
+				const { blocks } = getParsedPattern( pattern );
 				return (
-					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
-					grammar.every( ( { name: blockName } ) =>
+					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
+					blocks.every( ( { name: blockName } ) =>
 						canInsertBlockType( state, blockName, rootClientId )
 					)
 				);

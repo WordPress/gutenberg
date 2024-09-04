@@ -27,7 +27,6 @@ import {
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getParsedPattern,
-	getGrammar,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2377,27 +2376,17 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
+
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( pattern ) => {
-					return {
-						...pattern,
-						get blocks() {
-							return getParsedPattern( pattern ).blocks;
-						},
-					};
-				} );
-
+				.map( getParsedPattern );
 			const availableParsedPatterns = parsedPatterns.filter(
-				( pattern ) =>
-					checkAllowListRecursive(
-						getGrammar( pattern ),
-						allowedBlockTypes
-					)
+				( { blocks } ) =>
+					checkAllowListRecursive( blocks, allowedBlockTypes )
 			);
 			const patternsAllowed = availableParsedPatterns.filter(
-				( pattern ) =>
-					getGrammar( pattern ).every( ( { blockName: name } ) =>
+				( { blocks } ) =>
+					blocks.every( ( { name } ) =>
 						canInsertBlockType( state, name, rootClientId )
 					)
 			);
