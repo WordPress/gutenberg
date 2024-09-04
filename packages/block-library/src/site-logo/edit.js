@@ -423,7 +423,7 @@ export default function LogoEdit( {
 				context: 'view',
 			} );
 		const _isRequestingMediaItem =
-			_siteLogoId &&
+			!! _siteLogoId &&
 			! select( coreStore ).hasFinishedResolution( 'getMedia', [
 				_siteLogoId,
 				{ context: 'view' },
