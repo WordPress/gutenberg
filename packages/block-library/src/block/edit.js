@@ -292,7 +292,7 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ hasResolved && (
+			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }
