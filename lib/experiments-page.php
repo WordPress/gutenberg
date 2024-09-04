@@ -186,6 +186,19 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoom-out-experiment',
 		)
 	);
+
+	add_settings_field(
+		'gutenberg-simple-editing-mode',
+		__( 'Simple editing mode', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Add UI that lets you toggle between a simple and an advanced editing mode.', 'gutenberg' ),
+			'id'    => 'gutenberg-simple-editing-mode',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

@@ -34,6 +34,8 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import ContentOnlyLockSections from './content-only-lock-sections';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -302,9 +304,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
 									<ContentOnlySettingsMenu />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
+									{ mode === 'template-locked' &&
+										type === TEMPLATE_POST_TYPE && (
+											<ContentOnlyLockSections />
+										) }
+									{ mode === 'template-locked' &&
+										type !== TEMPLATE_POST_TYPE && (
+											<DisableNonPageContentBlocks />
+										) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }

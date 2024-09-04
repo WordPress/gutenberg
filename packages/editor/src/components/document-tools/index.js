@@ -27,6 +27,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
+import SimpleEditingModeSelector from '../simple-editing-mode-selector';
 
 function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
@@ -139,7 +140,11 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 					<>
 						{ isLargeViewport && ! hasFixedToolbar && (
 							<ToolbarItem
-								as={ ToolSelector }
+								as={
+									window.__experimentalSimpleEditingMode
+										? SimpleEditingModeSelector
+										: ToolSelector
+								}
 								showTooltip={ ! showIconLabels }
 								variant={
 									showIconLabels ? 'tertiary' : undefined
