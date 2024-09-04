@@ -15,23 +15,25 @@ const { baseConfig, plugins } = require( './shared' );
 
 module.exports = {
 	...baseConfig,
-	name: 'interactivity',
+	name: 'script-modules',
 	entry: {
-		index: './packages/interactivity',
-		debug: './packages/interactivity/src/debug',
-		router: './packages/interactivity-router',
-		navigation: './packages/block-library/src/navigation/view.js',
-		query: './packages/block-library/src/query/view.js',
-		image: './packages/block-library/src/image/view.js',
-		file: './packages/block-library/src/file/view.js',
-		search: './packages/block-library/src/search/view.js',
+		'interactivity/index': './packages/interactivity',
+		'interactivity/debug': './packages/interactivity/src/debug',
+		'interactivity/router': './packages/interactivity-router',
+
+		'block-library/file': './packages/block-library/src/file/view.js',
+		'block-library/image': './packages/block-library/src/image/view.js',
+		'block-library/navigation':
+			'./packages/block-library/src/navigation/view.js',
+		'block-library/query': './packages/block-library/src/query/view.js',
+		'block-library/search': './packages/block-library/src/search/view.js',
 	},
 	experiments: {
 		outputModule: true,
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/interactivity/[name].min.js',
+		filename: './build/script-modules/[name].min.js',
 		library: {
 			type: 'module',
 		},
