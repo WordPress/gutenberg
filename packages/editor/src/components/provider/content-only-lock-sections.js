@@ -35,11 +35,12 @@ export default function ContentOnlyLockSections() {
 			? getClientIdsOfDescendants( sectionRootClientId )
 			: getClientIdsWithDescendants();
 		return {
+			sectionRootClientId,
 			sectionClientIds,
 			allClientIds,
 		};
 	}, [] );
-	const { sectionClientIds, allClientIds } = selected;
+	const { sectionClientIds, allClientIds, sectionRootClientId } = selected;
 	const { getBlockOrder, getBlockName } = useSelect( blockEditorStore );
 	const { __experimentalHasContentRoleAttribute } = useSelect( blocksStore );
 
@@ -52,12 +53,20 @@ export default function ContentOnlyLockSections() {
 		);
 
 		registry.batch( () => {
+			// 1. The section root should hide non-content controls.
+			setBlockEditingMode( sectionRootClientId, 'contentOnly' );
+
+			// 2. Each section should hide non-content controls.
 			for ( const clientId of sectionClientIds ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
+
+			// 3. The children of the section should be disabled.
 			for ( const clientId of sectionChildrenClientIds ) {
 				setBlockEditingMode( clientId, 'disabled' );
 			}
+
+			// 4. ...except for the "content" blocks which should be content-only.
 			for ( const clientId of contentClientIds ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
@@ -66,6 +75,7 @@ export default function ContentOnlyLockSections() {
 		return () => {
 			registry.batch( () => {
 				for ( const clientId of [
+					sectionRootClientId,
 					...sectionClientIds,
 					...sectionChildrenClientIds,
 					...contentClientIds,
@@ -80,6 +90,7 @@ export default function ContentOnlyLockSections() {
 		getBlockName,
 		getBlockOrder,
 		registry,
+		sectionRootClientId,
 		sectionClientIds,
 		setBlockEditingMode,
 		unsetBlockEditingMode,
