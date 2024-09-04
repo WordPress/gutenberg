@@ -86,11 +86,11 @@ export function Comments( {
 					alignment="left"
 					spacing="3"
 					justify="flex-start"
-					className="editor-collab-sidebar__usercomment"
+					className="editor-collab-sidebar-panel__user-comment"
 				>
 					<VStack
 						spacing="3"
-						className="editor-collab-sidebar__editarea"
+						className="editor-collab-sidebar-panel__comment-field"
 					>
 						{ 'edit' === actionState?.action &&
 							thread.id === actionState?.id && (
@@ -120,7 +120,7 @@ export function Comments( {
 				( ! Array.isArray( threads ) || threads.length === 0 ) && (
 					<VStack
 						alignment="left"
-						className="editor-collab-sidebar__thread"
+						className="editor-collab-sidebar-panel__thread"
 						justify="flex-start"
 						spacing="3"
 					>
@@ -137,12 +137,12 @@ export function Comments( {
 				threads.map( ( thread ) => (
 					<VStack
 						key={ thread.id }
-						className={ clsx( 'editor-collab-sidebar__thread', {
-							'editor-collab-sidebar__activethread':
+						className={ clsx( 'editor-collab-sidebar-panel__thread', {
+							'editor-collab-sidebar-panel__active-thread':
 								blockCommentId && blockCommentId === thread.id,
 						} ) }
 						id={ thread.id }
-						spacing="2"
+						spacing="3"
 					>
 						<CommentBoard thread={ thread } />
 						{ 'reply' === actionState?.action &&
@@ -191,7 +191,7 @@ export function Comments( {
 							thread.reply.map( ( reply ) => (
 								<VStack
 									key={ reply.id }
-									className="editor-collab-sidebar__childThread"
+									className="editor-collab-sidebar-panel__child-thread"
 									id={ reply.id }
 									spacing="2"
 								>
@@ -241,7 +241,7 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 		<>
 			<TextareaControl
 				__nextHasNoMarginBottom
-				className="editor-collab-sidebar__replyComment__textarea"
+				className="editor-collab-sidebar-panel__comment-field-textarea"
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
 			/>
@@ -249,7 +249,6 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				alignment="left"
 				spacing="3"
 				justify="flex-start"
-				className="editor-collab-sidebar__commentbtn"
 			>
 				<HStack alignment="left" spacing="3" justify="flex-start">
 					<Button
@@ -293,11 +292,11 @@ function AddReply( { onSubmit, onCancel } ) {
 			<VStack
 				alignment="left"
 				spacing="3"
-				className="editor-collab-sidebar__replyComment"
+				className="editor-collab-sidebar-panel__comment-field"
 			>
 				<TextareaControl
 					__nextHasNoMarginBottom
-					className="editor-collab-sidebar__replyComment__textarea"
+					className="editor-collab-sidebar-panel__comment-field-textarea"
 					value={ inputComment ?? '' }
 					onChange={ setInputComment }
 				/>
@@ -306,7 +305,6 @@ function AddReply( { onSubmit, onCancel } ) {
 						alignment="left"
 						spacing="3"
 						justify="flex-start"
-						className="editor-collab-sidebar__replybtn"
 					>
 						<Button
 							__next40pxDefaultSize
@@ -347,11 +345,9 @@ function AddReply( { onSubmit, onCancel } ) {
 function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
-			title={
-				// translators: title for the confirmation overlay
-				__( 'Confirm' )
-			}
-			className="editor-collab-sidebar__useroverlay confirmation-overlay"
+			// translators: title for the confirmation overlay
+			title={ __( 'Confirm' ) }
+			className="editor-collab-sidebar-panel__thread-overlay"
 			spacing="0"
 			justify="space-between"
 		>
@@ -430,24 +426,24 @@ function CommentHeader( {
 		<HStack alignment="left" spacing="3" justify="flex-start">
 			<img
 				src={ thread?.author_avatar_urls?.[ 48 ] }
-				className="editor-collab-sidebar__userIcon"
+				className="editor-collab-sidebar-panel__user-avatar"
 				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
 			/>
 			<VStack spacing="0">
-				<span className="editor-collab-sidebar__userName">
+				<span className="editor-collab-sidebar-panel__user-name">
 					{ thread.author_name }
 				</span>
 				<time
 					dateTime={ format( 'h:i A', thread.date ) }
-					className="editor-collab-sidebar__usertime"
+					className="editor-collab-sidebar-panel__user-time"
 				>
 					{ dateI18n( dateTimeFormat, thread.date ) }
 				</time>
 			</VStack>
-			<span className="editor-collab-sidebar__commentUpdate">
+			<span className="editor-collab-sidebar-panel__comment-status">
 				{ status !== 'approved' && (
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ 0 === thread.parent && onResolve && (
@@ -468,7 +464,7 @@ function CommentHeader( {
 								'Select an action',
 								'Select comment action'
 							) }
-							className="editor-collab-sidebar__commentDropdown"
+							className="editor-collab-sidebar-panel__comment-dropdown-menu"
 							controls={ moreActions }
 						/>
 					</HStack>
