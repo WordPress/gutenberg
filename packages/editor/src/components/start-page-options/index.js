@@ -52,8 +52,14 @@ export function useStartPatterns() {
 	);
 
 	return useMemo( () => {
-		// filter patterns without postTypes declared if the current postType is page
-		// or patterns that declare the current postType in its post type array.
+		if ( ! blockPatternsWithPostContentBlockType?.length ) {
+			return [];
+		}
+
+		/*
+		 * Filter patterns without postTypes declared if the current postType is page
+		 * or patterns that declare the current postType in its post type array.
+		 */
 		return blockPatternsWithPostContentBlockType.filter( ( pattern ) => {
 			return (
 				( postType === 'page' && ! pattern.postTypes ) ||
