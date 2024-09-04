@@ -65,21 +65,27 @@ export function Comments( {
 			<>
 				<CommentHeader
 					thread={ thread }
-					onResolve={ () => {
+					onResolve={ () =>
 						setActionState( {
 							action: 'resolve',
 							id: parentThread?.id ?? thread.id,
-						} );
-					} }
-					onEdit={ () => {
-						setActionState( { action: 'edit', id: thread.id } );
-					} }
-					onDelete={ () => {
-						setActionState( { action: 'delete', id: thread.id } );
-					} }
-					onReply={ () => {
-						setActionState( { action: 'reply', id: thread.id } );
-					} }
+						} )
+					}
+					onEdit={ () =>
+						setActionState( { action: 'edit', id: thread.id } )
+					}
+					onDelete={ () =>
+						setActionState( { action: 'delete', id: thread.id } )
+					}
+					onReply={
+						! parentThread
+							? () =>
+									setActionState( {
+										action: 'reply',
+										id: thread.id,
+									} )
+							: undefined
+					}
 					status={ parentThread?.status ?? thread.status }
 				/>
 				<HStack

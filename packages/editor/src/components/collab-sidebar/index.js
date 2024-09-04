@@ -5,11 +5,11 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { removep } from '@wordpress/autop';
 
@@ -54,6 +54,12 @@ addFilter(
  */
 export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
+	const {
+		saveEntityRecord,
+		editEntityRecord,
+		saveEditedEntityRecord,
+		deleteEntityRecord,
+	} = useDispatch( coreStore );
 
 	const [ threads, setThreads ] = useState( () => [] );
 	const postId = useSelect( ( select ) => {
@@ -72,123 +78,107 @@ export default function CollabSidebar() {
 	}, [] );
 
 	// Function to save the comment.
-	const addNewComment = ( comment ) => {
-		apiFetch( {
-			path: '/wp/v2/comments',
-			method: 'POST',
-			data: {
-				post: postId,
-				content: comment,
-				comment_date: new Date().toISOString(),
-				comment_type: 'block_comment',
-				comment_author: currentUserData?.name ?? null,
-				comment_approved: 0,
-			},
-		} ).then( ( response ) => {
+	const addNewComment = async ( comment ) => {
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			post: postId,
+			content: comment,
+			comment_date: new Date().toISOString(),
+			comment_type: 'block_comment',
+			comment_author: currentUserData?.name ?? null,
+			comment_approved: 0,
+		} );
+
+		if ( savedRecord ) {
 			updateBlockAttributes( clientId, {
-				blockCommentId: response?.id,
+				blockCommentId: savedRecord?.id,
+			} );
+			createNotice( 'snackbar', __( 'New comment added.' ), {
+				type: 'snackbar',
+				isDismissible: true,
 			} );
 			fetchComments();
-		} );
+		}
 	};
 
-	const onCommentResolve = ( commentId ) => {
-		apiFetch( {
-			path: '/wp/v2/comments/' + commentId,
-			method: 'POST',
-			data: {
-				status: 'approved',
-			},
-		} ).then( ( response ) => {
-			if ( response ) {
-				createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
-			}
+	const onCommentResolve = async ( commentId ) => {
+		editEntityRecord( 'root', 'comment', commentId, {
+			status: 'approved',
+		} );
+
+		const savedRecord = await saveEditedEntityRecord(
+			'root',
+			'comment',
+			commentId
+		);
+
+		if ( savedRecord ) {
+			createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
 			fetchComments();
+		}
+	};
+
+	const onEditComment = async ( commentId, comment ) => {
+		const editedComment = removep( comment );
+
+		editEntityRecord( 'root', 'comment', commentId, {
+			content: editedComment,
 		} );
-	};
 
-	const onEditComment = ( threadID, comment ) => {
-		if ( threadID && comment.length > 0 ) {
-			const editedComment = removep( comment );
+		const savedRecord = await saveEditedEntityRecord(
+			'root',
+			'comment',
+			commentId
+		);
 
-			apiFetch( {
-				path: '/wp/v2/comments/' + threadID,
-				method: 'POST',
-				data: {
-					content: editedComment,
-				},
-			} ).then( ( response ) => {
-				if ( response ) {
-					createNotice(
-						'snackbar',
-						__( 'Thread edited successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
-				}
-				fetchComments();
+		if ( savedRecord ) {
+			createNotice( 'snackbar', __( 'Thread edited successfully.' ), {
+				type: 'snackbar',
+				isDismissible: true,
 			} );
+
+			fetchComments();
 		}
 	};
 
-	const onAddReply = ( threadID, comment ) => {
-		if ( threadID ) {
-			apiFetch( {
-				path: '/wp/v2/comments/',
-				method: 'POST',
-				data: {
-					parent: threadID,
-					post: postId,
-					content: comment,
-					comment_date: new Date().toISOString(),
-					comment_type: 'block_comment',
-					comment_author: currentUserData?.name ?? null,
-					comment_approved: 0,
-				},
-			} ).then( ( response ) => {
-				if ( response ) {
-					createNotice(
-						'snackbar',
-						__( 'Reply added successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
-				}
-				fetchComments();
+	const onAddReply = async ( parentCommentId, comment ) => {
+		const sanitisedComment = removep( comment );
+
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			parent: parentCommentId,
+			post: postId,
+			content: sanitisedComment,
+			comment_date: new Date().toISOString(),
+			comment_type: 'block_comment',
+			comment_author: currentUserData?.name ?? null,
+			comment_approved: 0,
+		} );
+
+		if ( savedRecord ) {
+			createNotice( 'snackbar', __( 'Reply added successfully.' ), {
+				type: 'snackbar',
+				isDismissible: true,
 			} );
+			fetchComments();
 		}
 	};
 
-	const onCommentDelete = ( threadID ) => {
-		if ( threadID ) {
-			apiFetch( {
-				path: '/wp/v2/comments/' + threadID,
-				method: 'DELETE',
-			} ).then( ( response ) => {
-				if ( response ) {
-					updateBlockAttributes( clientId, {
-						blockCommentId: undefined,
-						showCommentBoard: undefined,
-					} );
-					createNotice(
-						'snackbar',
-						__( 'Thread deleted successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
-				}
-				fetchComments();
-			} );
-		}
+	const onCommentDelete = async ( commentId ) => {
+		await deleteEntityRecord( 'root', 'comment', commentId );
+
+		updateBlockAttributes( clientId, {
+			blockCommentId: undefined,
+			showCommentBoard: undefined,
+		} );
+
+		createNotice( 'snackbar', __( 'Thread deleted successfully.' ), {
+			type: 'snackbar',
+			isDismissible: true,
+		} );
+		fetchComments();
 	};
 
 	const fetchComments = () => {
