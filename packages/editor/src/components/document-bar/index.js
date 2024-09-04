@@ -13,6 +13,7 @@ import {
 	__experimentalText as Text,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
+	Flex,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
@@ -69,6 +70,8 @@ export default function DocumentBar( props ) {
 		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
+		postTypeLabel,
+		postStatus, // Add this line
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
@@ -76,16 +79,17 @@ export default function DocumentBar( props ) {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
+		const { getEditedEntityRecord, isResolving: isResolvingSelector, getPostType } =
 			select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
 			'postType',
 			_postType,
-			_postId
+				_postId
 		);
 		const _templateInfo = getTemplateInfo( _document );
+		const postTypeObject = getPostType( _postType );
 		return {
 			postType: _postType,
 			documentTitle: _document.title,
@@ -107,6 +111,8 @@ export default function DocumentBar( props ) {
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
+			postTypeLabel: postTypeObject?.labels?.singular_name || _postType,
+			postStatus: _document.status, // Add this line
 		};
 	}, [] );
 
@@ -163,7 +169,8 @@ export default function DocumentBar( props ) {
 				<Button
 					className="editor-document-bar__command"
 					onClick={ () => openCommandCenter() }
-					size="compact"
+					size="large"
+					__next40pxDefaultSize
 				>
 					<motion.div
 						className="editor-document-bar__title"
@@ -187,7 +194,6 @@ export default function DocumentBar( props ) {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ icon } />
 						<Text
 							size="body"
 							as="h1"
@@ -202,6 +208,22 @@ export default function DocumentBar( props ) {
 								? decodeEntities( title )
 								: __( 'No title' ) }
 						</Text>
+						<Flex align="center" gap={1} justify="center">
+							<Text
+								size="body"
+								as="span"
+							>
+								{ postTypeLabel }
+							</Text>
+							<span style={{ fontWeight: '300' }}>•</span>
+							<Text
+								size="body"
+								as="span"
+								className="editor-document-bar__status"
+							>
+								{ `${ postStatus }` }
+							</Text>
+						</Flex>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
 						{ displayShortcut.primary( 'k' ) }

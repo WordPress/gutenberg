@@ -324,17 +324,18 @@ $block-inserter-tabs-height: 44px;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
-		background: $gray-100;
+		background: $white;
 		border-top: $border-width solid $gray-200;
 
 		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
-			padding: 0 $grid-unit-30 $grid-unit-20;
+			padding: $grid-unit-30 $grid-unit-20;
 		}
 	}
 }
 
 .block-editor-inserter__patterns-category-panel-header {
+	display: none !important;
 	padding: $grid-unit-10 0;
 	@include break-medium {
 		padding: $grid-unit-10 $grid-unit-30;

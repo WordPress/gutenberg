@@ -62,6 +62,9 @@
 		@include reduce-motion("transition");
 	}
 
+	.block-editor-patterns__pattern-details {
+		display: none !important;
+	}
 	.block-editor-patterns__pattern-details:not(:empty) {
 		align-items: center;
 		margin-top: $grid-unit-10;

@@ -80,16 +80,7 @@ function ToolSelector( props, ref ) {
 											{ __( 'Select' ) }
 										</>
 									),
-								},
-								{
-									value: 'zoom-out',
-									label: (
-										<>
-											{ selectIcon }
-											{ __( 'Zoom' ) }
-										</>
-									),
-								},
+								}
 							] }
 						/>
 					</NavigableMenu>
