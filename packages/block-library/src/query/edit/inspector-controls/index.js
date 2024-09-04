@@ -149,23 +149,28 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
-	// Check if post formats are supported.
-	// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
-	// and in this case the control should not be shown since the user has no other formats to choose from.
+	const postTypeHasFormatSupport = postTypeFormatSupportMap[ postType ];
 	const showFormatControl = useSelect(
 		( select ) => {
+			// Check if the post type supports post formats and if the control is allowed.
+			if (
+				! postTypeHasFormatSupport ||
+				! isControlAllowed( allowedControls, 'format' )
+			) {
+				return false;
+			}
+
 			const themeSupports = select( coreStore ).getThemeSupports();
-			const postTypeHasFormatSupport =
-				postTypeFormatSupportMap[ postType ];
+
+			// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
+			// and in this case the control should not be shown since the user has no other formats to choose from.
 			return (
-				isControlAllowed( allowedControls, 'format' ) && // First check if the control is allowed
-				postTypeHasFormatSupport &&
 				themeSupports.formats &&
 				themeSupports.formats.length > 0 &&
 				themeSupports.formats.some( ( type ) => type !== 'standard' )
 			);
 		},
-		[ allowedControls, postTypeFormatSupportMap, postType ]
+		[ allowedControls, postTypeHasFormatSupport ]
 	);
 
 	const showFiltersPanel =
