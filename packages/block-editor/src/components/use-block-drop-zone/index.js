@@ -275,6 +275,23 @@ export function isDropTargetValid(
 }
 
 /**
+ * Checks if the given element is an insertion point.
+ *
+ * @param {EventTarget|null} targetToCheck - The element to check.
+ * @param {Document}         ownerDocument - The owner document of the element.
+ * @return {boolean} True if the element is a insertion point, false otherwise.
+ */
+function isInsertionPoint( targetToCheck, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+
+	return !! (
+		defaultView &&
+		targetToCheck instanceof defaultView.HTMLElement &&
+		targetToCheck.dataset.isInsertionPoint
+	);
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -514,23 +531,6 @@ export default function useBlockDropZone( {
 		),
 		200
 	);
-
-	/**
-	 * Checks if the given element is an insertion point.
-	 *
-	 * @param {EventTarget|null} targetToCheck - The element to check.
-	 * @param {Document}         ownerDocument - The owner document of the element.
-	 * @return {boolean} True if the element is a insertion point, false otherwise.
-	 */
-	function isInsertionPoint( targetToCheck, ownerDocument ) {
-		const { defaultView } = ownerDocument;
-
-		return !! (
-			defaultView &&
-			targetToCheck instanceof defaultView.HTMLElement &&
-			targetToCheck.dataset.isInsertionPoint
-		);
-	}
 
 	return useDropZone( {
 		dropZoneElement,
