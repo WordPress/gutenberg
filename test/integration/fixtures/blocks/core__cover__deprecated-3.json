@@ -4,10 +4,14 @@
 		"isValid": true,
 		"attributes": {
 			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"useFeaturedImage": false,
 			"id": 35,
+			"alt": "",
 			"hasParallax": false,
+			"isRepeated": false,
 			"dimRatio": 50,
 			"backgroundType": "image",
+			"isDark": true,
 			"tagName": "div"
 		},
 		"innerBlocks": [

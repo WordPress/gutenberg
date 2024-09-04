@@ -3,11 +3,30 @@
 		"name": "core/gallery",
 		"isValid": true,
 		"attributes": {
+			"images": [
+				{
+					"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+					"alt": "title",
+					"id": "1",
+					"caption": ""
+				},
+				{
+					"url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+					"alt": "title",
+					"id": "2",
+					"caption": ""
+				}
+			],
+			"ids": [],
+			"shortCodeTransforms": [],
 			"columns": 2,
+			"caption": "",
 			"imageCrop": true,
+			"fixedHeight": true,
 			"linkTo": "none",
-			"align": "wide",
-			"allowResize": false
+			"sizeSlug": "large",
+			"allowResize": false,
+			"align": "wide"
 		},
 		"innerBlocks": [
 			{

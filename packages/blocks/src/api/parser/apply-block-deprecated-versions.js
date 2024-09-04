@@ -3,7 +3,10 @@
  */
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
 import { validateBlock } from '../validation';
-import { getBlockAttributes } from './get-block-attributes';
+import {
+	applyDefaultAttributes,
+	getBlockAttributes,
+} from './get-block-attributes';
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 import { omit } from '../utils';
 
@@ -113,7 +116,7 @@ export function applyBlockDeprecatedVersions( block, rawBlock, blockType ) {
 
 		block = {
 			...block,
-			attributes: migratedAttributes,
+			attributes: applyDefaultAttributes( blockType, migratedAttributes ),
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],

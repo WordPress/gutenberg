@@ -4,6 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"level": 1,
+			"showPrefix": true,
+			"showSearchTerm": true,
 			"fontFamily": "cambria-georgia"
 		},
 		"innerBlocks": []

@@ -295,3 +295,28 @@ export function getBlockAttributes(
 		attributes
 	);
 }
+
+/**
+ * Applies default attributes from a block type to a set of attributes.
+ *
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {?Object}       attributes      Known block attributes (from delimiters).
+ *
+ * @return {Object} Block attributes with defaults applied.
+ */
+export function applyDefaultAttributes( blockTypeOrName, attributes = {} ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
+
+	const blockAttributes = Object.fromEntries(
+		Object.entries( blockType.attributes ?? {} ).map(
+			( [ key, schema ] ) => [
+				key,
+				attributes[ key ] === undefined
+					? schema.default
+					: attributes[ key ],
+			]
+		)
+	);
+
+	return blockAttributes;
+}

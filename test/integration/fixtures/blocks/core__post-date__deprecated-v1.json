@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"isLink": false,
+			"displayType": "date",
 			"fontFamily": "cambria-georgia"
 		},
 		"innerBlocks": []
