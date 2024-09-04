@@ -545,6 +545,25 @@ export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
 }
 
+/**
+ * Retrieves the client ID for the block that is acting as the element
+ * which contains the "sections" of a template/post.
+ *
+ * @param {Object} state - The current state.
+ * @return {string|undefined} The root client ID for the section, or undefined if not set.
+ */
 export function getSectionRootClientId( state ) {
 	return state.settings?.[ sectionRootClientIdKey ];
+}
+
+/**
+ * Retrieves the client IDs for the individual "sections"
+ * within the current template/post.
+ *
+ * @param {Object} state - The current state.
+ * @return {Array} An array of client IDs for the blocks within the section.
+ */
+export function getSectionClientIds( state ) {
+	const sectionRootClientId = getSectionRootClientId( state );
+	return getBlockOrder( sectionRootClientId );
 }
