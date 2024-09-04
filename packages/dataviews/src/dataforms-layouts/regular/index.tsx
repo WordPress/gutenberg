@@ -11,7 +11,7 @@ import { normalizeFields } from '../../normalize-fields';
 import type { DataFormProps, Field, NormalizedField } from '../../types';
 
 type MemoizedFieldEditProps< Item > = {
-	value: any;
+	value: Item[ keyof Item ];
 	field: NormalizedField< Item >;
 	onChange: Pick< DataFormProps< Item >, 'onChange' >[ 'onChange' ];
 };
