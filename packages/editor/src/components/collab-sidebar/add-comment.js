@@ -87,6 +87,7 @@ export function AddComment( { onSubmit } ) {
 			<HStack alignment="left" spacing="3">
 				<img
 					src={ userAvatar }
+					// translators: alt text for user avatar image
 					alt={ __( 'User Icon' ) }
 					className="editor-collab-sidebar__userIcon"
 					width={ 32 }
@@ -101,7 +102,8 @@ export function AddComment( { onSubmit } ) {
 				__nextHasNoMarginBottom
 				value={ inputComment }
 				onChange={ setInputComment }
-				placeholder={ __( 'Add comment' ) }
+				// translators: placeholder text for comment input
+				placeholder={ _x( 'Add comment' ) }
 				className="block-editor-format-toolbar__comment-input"
 			/>
 			<HStack alignment="right" spacing="3">
@@ -109,7 +111,7 @@ export function AddComment( { onSubmit } ) {
 					__next40pxDefaultSize
 					className="block-editor-format-toolbar__cancel-button"
 					variant="tertiary"
-					text={ __( 'Cancel' ) }
+					text={ _x( 'Cancel', 'Cancel comment' ) }
 					onClick={ handleCancel }
 					size="compact"
 				/>
@@ -118,7 +120,7 @@ export function AddComment( { onSubmit } ) {
 					accessibleWhenDisabled
 					className="block-editor-format-toolbar__comment-button"
 					variant="primary"
-					text={ __( 'Add Comment' ) }
+					text={ _x( 'Add Comment', 'Add comment button' ) }
 					disabled={
 						0 === sanitizeCommentString( inputComment ).length
 					}
