@@ -181,8 +181,8 @@ export type Form = {
 };
 
 export type DataFormControlProps< Item > = {
-	data: Item;
 	field: NormalizedField< Item >;
+	value: any;
 	onChange: ( value: Record< string, any > ) => void;
 	hideLabelFromVision?: boolean;
 };
