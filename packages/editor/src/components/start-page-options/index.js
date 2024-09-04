@@ -8,7 +8,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
@@ -151,36 +151,23 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isClosed, setIsClosed ] = useState( false );
-	const { shouldEnableModal, postType, postId } = useSelect( ( select ) => {
-		const {
-			isEditedPostDirty,
-			isEditedPostEmpty,
-			getCurrentPostType,
-			getCurrentPostId,
-		} = select( editorStore );
-		const _postType = getCurrentPostType();
+	const shouldEnableModal = useSelect( ( select ) => {
+		const { isEditedPostDirty, isEditedPostEmpty, getCurrentPostType } =
+			select( editorStore );
 		const preferencesModalActive =
 			select( interfaceStore ).isModalActive( 'editor/preferences' );
 		const choosePatternModalEnabled = select( preferencesStore ).get(
 			'core',
 			'enableChoosePatternModal'
 		);
-		return {
-			shouldEnableModal:
-				choosePatternModalEnabled &&
-				! preferencesModalActive &&
-				! isEditedPostDirty() &&
-				isEditedPostEmpty() &&
-				TEMPLATE_POST_TYPE !== _postType,
-			postType: _postType,
-			postId: getCurrentPostId(),
-		};
+		return (
+			choosePatternModalEnabled &&
+			! preferencesModalActive &&
+			! isEditedPostDirty() &&
+			isEditedPostEmpty() &&
+			TEMPLATE_POST_TYPE !== getCurrentPostType()
+		);
 	}, [] );
-
-	useEffect( () => {
-		// Should reset the modal state when navigating to a new page/post.
-		setIsClosed( false );
-	}, [ postType, postId ] );
 
 	if ( ! shouldEnableModal || isClosed ) {
 		return null;
