@@ -1327,6 +1327,25 @@ describe( 'typography utils', () => {
 					nearestFontWeight: '400',
 				},
 			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for normal/400 when fontFamilyFaces contain undefined fontWeight value',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+				],
+				fontStyle: 'normal',
+				fontWeight: '400',
+				expected: {
+					nearestFontStyle: 'normal',
+					nearestFontWeight: '700',
+				},
+			},
 		].forEach(
 			( {
 				message,
