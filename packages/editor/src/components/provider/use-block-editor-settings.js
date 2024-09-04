@@ -25,6 +25,7 @@ import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 const EMPTY_BLOCKS_LIST = [];
 const EMPTY_OBJECT = {};
@@ -142,7 +143,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined;
 
 			function getSectionRootBlock() {
-				if ( renderingMode === 'template-locked' ) {
+				if (
+					renderingMode === 'template-locked' &&
+					postType !== TEMPLATE_POST_TYPE
+				) {
 					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
 				}
 
