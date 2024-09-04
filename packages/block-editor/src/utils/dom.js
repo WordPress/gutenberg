@@ -96,7 +96,7 @@ function isElementVisible( element ) {
 		return false;
 	}
 
-	return element.checkVisibility( {
+	return element.checkVisibility?.( {
 		opacityProperty: true,
 		contentVisibilityAuto: true,
 		visibilityProperty: true,
