@@ -55,9 +55,13 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 				return;
 			}
 
-			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+			if (
+				! event.target.classList.contains( 'is-root-container' ) ||
+				event.target.dataset?.type === 'core/template-part'
+			) {
 				return;
 			}
+			event.stopImmediatePropagation();
 			setIsDialogOpen( true );
 		};
 
