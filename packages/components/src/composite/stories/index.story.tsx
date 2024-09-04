@@ -108,6 +108,7 @@ export const Default: StoryObj< typeof Composite > = {
 export const Groups: StoryObj< typeof Composite > = {
 	...Default,
 	args: {
+		...Default.args,
 		children: (
 			<>
 				<Composite.Group>
@@ -128,6 +129,7 @@ export const Groups: StoryObj< typeof Composite > = {
 export const Grid: StoryObj< typeof Composite > = {
 	...Default,
 	args: {
+		...Default.args,
 		role: 'grid',
 		'aria-label': 'Composite',
 		children: (
@@ -155,6 +157,7 @@ export const Grid: StoryObj< typeof Composite > = {
 export const Hover: StoryObj< typeof Composite > = {
 	...Default,
 	args: {
+		...Default.args,
 		children: (
 			<>
 				<Composite.Hover render={ <Composite.Item /> }>
@@ -180,6 +183,7 @@ export const Hover: StoryObj< typeof Composite > = {
 
 export const Typeahead: StoryObj< typeof Composite > = {
 	args: {
+		...Default.args,
 		render: <Composite.Typeahead />,
 		children: (
 			<>
