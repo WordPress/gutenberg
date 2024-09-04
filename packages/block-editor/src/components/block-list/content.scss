@@ -89,11 +89,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		&::after {
 			@include selected-block-focus();
 			z-index: 1;
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 
@@ -112,7 +107,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			right: 0;
 			left: 0;
 			top: -$default-block-margin * 0.5;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			border-top: 4px solid $gray-400;
 			bottom: auto;
 			box-shadow: none;
@@ -220,7 +215,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: $radius-block-ui;
 		background-color: rgba($white, 0.4);
 	}
 
@@ -255,11 +249,13 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 
-	&.is-selected {
+	&.is-selected,
+	&.is-hovered {
 		cursor: default;
 
-		&.rich-text {
-			cursor: unset;
+		&.rich-text,
+		.rich-text {
+			cursor: auto;
 		}
 	}
 
@@ -285,11 +281,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
 			outline-color: var(--wp-block-synced-color);
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				outline-color: $dark-theme-focus;
-			}
 		}
 	}
 }
@@ -429,7 +420,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	width: 100%;
 	border: none;
 	outline: none;
-	border-radius: 2px;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;

@@ -41,7 +41,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Paragraph', () => {
-			test( 'should show the value of the custom field', async ( {
+			test( 'should show the key of the custom field in post meta', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -64,6 +64,53 @@ test.describe( 'Block bindings', () => {
 				await expect( paragraphBlock ).toHaveText(
 					'text_custom_field'
 				);
+			} );
+
+			test( 'should show the key of the custom field in server sources with key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'text_custom_field'
+				);
+			} );
+
+			test( 'should show the source label in server sources without key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText( 'Server Source' );
 			} );
 
 			test( 'should lock the appropriate controls with a registered source', async ( {
@@ -1390,6 +1437,70 @@ test.describe( 'Block bindings', () => {
 					'false'
 				);
 			} );
+			test( 'should show a selector for content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} );
+				await expect( contentAttribute ).toBeVisible();
+			} );
+			test( 'should use a selector to update the content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'undefined_field' },
+								},
+							},
+						},
+					},
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByRole( 'button', { name: 'content' } )
+					.click();
+
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'text_custom_field' } )
+					.click();
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
 		} );
 
 		test.describe( 'Heading', () => {
@@ -1470,6 +1581,29 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( newEmptyParagraph ).toHaveText( '' );
 				await expect( newEmptyParagraph ).toBeEditable();
+			} );
+			test( 'should show a selector for content', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/heading',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show content',
+				} );
+				await expect( contentAttribute ).toBeVisible();
 			} );
 		} );
 
@@ -1647,6 +1781,56 @@ test.describe( 'Block bindings', () => {
 				// Second block should be an empty paragraph block.
 				await expect( newEmptyButton ).toHaveText( '' );
 				await expect( newEmptyButton ).toBeEditable();
+			} );
+			test( 'should show a selector for url, text, linkTarget and rel', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+						},
+					],
+				} );
+				await editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' )
+					.click();
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show url',
+				} );
+				await expect( urlAttribute ).toBeVisible();
+				const textAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show text',
+				} );
+				await expect( textAttribute ).toBeVisible();
+				const linkTargetAttribute = page.getByRole(
+					'menuitemcheckbox',
+					{
+						name: 'Show linkTarget',
+					}
+				);
+				await expect( linkTargetAttribute ).toBeVisible();
+				const relAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show rel',
+				} );
+				await expect( relAttribute ).toBeVisible();
 			} );
 		} );
 
@@ -1933,6 +2117,41 @@ test.describe( 'Block bindings', () => {
 					'default title value'
 				);
 			} );
+			test( 'should show a selector for url, id, title and alt', async ( {
+				editor,
+				page,
+			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/image',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show url',
+				} );
+				await expect( urlAttribute ).toBeVisible();
+				const idAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show id',
+				} );
+				await expect( idAttribute ).toBeVisible();
+				const titleAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show title',
+				} );
+				await expect( titleAttribute ).toBeVisible();
+				const altAttribute = page.getByRole( 'menuitemcheckbox', {
+					name: 'Show alt',
+				} );
+				await expect( altAttribute ).toBeVisible();
+			} );
 		} );
 
 		test.describe( 'Edit custom fields', () => {
@@ -2195,10 +2414,12 @@ test.describe( 'Block bindings', () => {
 				},
 			} );
 
-			const bindingLabel = page.locator(
-				'.components-item__block-bindings-source'
-			);
-			await expect( bindingLabel ).toHaveText( 'Server Source' );
+			const bindingsPanel = page
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.locator( '.block-editor-bindings__panel' );
+			await expect( bindingsPanel ).toContainText( 'Server Source' );
 		} );
 	} );
 } );

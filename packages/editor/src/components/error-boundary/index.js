@@ -29,7 +29,11 @@ function getContent() {
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button variant="secondary" ref={ ref } __next40pxDefaultSize>
+		<Button
+			__next40pxDefaultSize
+			variant="secondary"
+			ref={ ref }
+		>
 			{ children }
 		</Button>
 	);

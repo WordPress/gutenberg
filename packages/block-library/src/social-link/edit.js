@@ -58,7 +58,6 @@ const SocialLinkURLPopover = ( {
 			>
 				<div className="block-editor-url-input">
 					<URLInput
-						__nextHasNoMarginBottom
 						value={ url }
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
@@ -82,6 +81,8 @@ const SocialLinkURLPopover = ( {
 					/>
 				</div>
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					icon={ keyboardReturn }
 					label={ __( 'Apply' ) }
 					type="submit"
@@ -140,6 +141,7 @@ const SocialLinkEdit = ( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							label={ __( 'Text' ) }
 							help={ __(
@@ -156,6 +158,7 @@ const SocialLinkEdit = ( {
 			</InspectorControls>
 			<InspectorControls group="advanced">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Link rel' ) }
 					value={ rel || '' }

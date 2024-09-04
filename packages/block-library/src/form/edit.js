@@ -77,8 +77,8 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<SelectControl
-						// __nextHasNoMarginBottom
-						// size={ '__unstable-large' }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Submissions method' ) }
 						options={ [
 							// TODO: Allow plugins to add their own submission methods.
@@ -108,6 +108,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 					{ submissionMethod === 'email' && (
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							autoComplete="off"
 							label={ __( 'Email for form submissions' ) }
 							value={ email }
@@ -129,6 +130,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 			{ submissionMethod !== 'email' && (
 				<InspectorControls group="advanced">
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Method' ) }
 						options={ [
@@ -144,6 +146,7 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						) }
 					/>
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						autoComplete="off"
 						label={ __( 'Form action' ) }

@@ -42,11 +42,36 @@ import Media from '../media';
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
 const STATUSES = [
-	{ value: 'draft', label: __( 'Draft' ), icon: drafts },
-	{ value: 'future', label: __( 'Scheduled' ), icon: scheduled },
-	{ value: 'pending', label: __( 'Pending Review' ), icon: pending },
-	{ value: 'private', label: __( 'Private' ), icon: notAllowed },
-	{ value: 'publish', label: __( 'Published' ), icon: published },
+	{
+		value: 'draft',
+		label: __( 'Draft' ),
+		icon: drafts,
+		description: __( 'Not ready to publish.' ),
+	},
+	{
+		value: 'future',
+		label: __( 'Scheduled' ),
+		icon: scheduled,
+		description: __( 'Publish automatically on a chosen date.' ),
+	},
+	{
+		value: 'pending',
+		label: __( 'Pending Review' ),
+		icon: pending,
+		description: __( 'Waiting for review before publishing.' ),
+	},
+	{
+		value: 'private',
+		label: __( 'Private' ),
+		icon: notAllowed,
+		description: __( 'Only visible to site admins and editors.' ),
+	},
+	{
+		value: 'publish',
+		label: __( 'Published' ),
+		icon: published,
+		description: __( 'Visible to everyone.' ),
+	},
 	{ value: 'trash', label: __( 'Trash' ), icon: trash },
 ];
 
@@ -186,6 +211,10 @@ function usePostFields( viewType ) {
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( viewType ) &&
 						item.status !== 'trash';
+					const renderedTitle =
+						typeof item.title === 'string'
+							? item.title
+							: item.title?.rendered;
 					const title = addLink ? (
 						<Link
 							params={ {
@@ -194,12 +223,12 @@ function usePostFields( viewType ) {
 								canvas: 'edit',
 							} }
 						>
-							{ decodeEntities( item.title?.rendered ) ||
+							{ decodeEntities( renderedTitle ) ||
 								__( '(no title)' ) }
 						</Link>
 					) : (
 						<span>
-							{ decodeEntities( item.title?.rendered ) ||
+							{ decodeEntities( renderedTitle ) ||
 								__( '(no title)' ) }
 						</span>
 					);
@@ -235,22 +264,29 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Author' ),
 				id: 'author',
-				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				type: 'integer',
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
 						label: name,
 					} ) ) || [],
 				render: PostAuthorField,
+				sort: ( a, b, direction ) => {
+					const nameA = a._embedded?.author?.[ 0 ]?.name || '';
+					const nameB = b._embedded?.author?.[ 0 ]?.name || '';
+
+					return direction === 'asc'
+						? nameA.localeCompare( nameB )
+						: nameB.localeCompare( nameA );
+				},
 			},
 			{
 				label: __( 'Status' ),
 				id: 'status',
-				getValue: ( { item } ) =>
-					STATUSES.find( ( { value } ) => value === item.status )
-						?.label ?? item.status,
+				type: 'text',
 				elements: STATUSES,
 				render: PostStatusField,
+				Edit: 'radio',
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
@@ -259,6 +295,7 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Date' ),
 				id: 'date',
+				type: 'datetime',
 				render: ( { item } ) => {
 					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
 						item.status
@@ -292,7 +329,22 @@ function usePostFields( viewType ) {
 						);
 					}
 
-					// Pending & Published posts show the modified date if it's newer.
+					const isPublished = item.status === 'publish';
+					if ( isPublished ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation time */
+								__( '<span>Published: <time>%s</time></span>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					// Pending posts show the modified date if it's newer.
 					const dateToDisplay =
 						getDate( item.modified ) > getDate( item.date )
 							? item.modified
@@ -313,24 +365,35 @@ function usePostFields( viewType ) {
 						);
 					}
 
-					const isPublished = item.status === 'publish';
-					if ( isPublished ) {
-						return createInterpolateElement(
-							sprintf(
-								/* translators: %s: the newest of created or modified date for the page */
-								__( '<span>Published: <time>%s</time></span>' ),
-								getFormattedDate( dateToDisplay )
-							),
-							{
-								span: <span />,
-								time: <time />,
-							}
-						);
-					}
-
 					// Unknow status.
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
+			},
+			{
+				id: 'comment_status',
+				label: __( 'Discussion' ),
+				type: 'text',
+				Edit: 'radio',
+				enableSorting: false,
+				filterBy: {
+					operators: [],
+				},
+				elements: [
+					{
+						value: 'open',
+						label: __( 'Open' ),
+						description: __(
+							'Visitors can add new comments and replies.'
+						),
+					},
+					{
+						value: 'closed',
+						label: __( 'Closed' ),
+						description: __(
+							'Visitors cannot add new comments or replies. Existing comments remain visible.'
+						),
+					},
+				],
 			},
 		],
 		[ authors, viewType, frontPageId, postsPageId ]

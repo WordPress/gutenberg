@@ -13,6 +13,7 @@ import {
 	Button,
 	Popover,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { applyFormat, removeFormat, useAnchor } from '@wordpress/rich-text';
@@ -78,7 +79,9 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 			anchor={ popoverAnchor }
 			onClose={ onClose }
 		>
-			<form
+			<VStack
+				as="form"
+				spacing={ 4 }
 				className="block-editor-format-toolbar__language-container-content"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
@@ -95,6 +98,8 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				} }
 			>
 				<TextControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					label={ title }
 					value={ lang }
 					onChange={ ( val ) => setLang( val ) }
@@ -103,6 +108,8 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 					) }
 				/>
 				<SelectControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					label={ __( 'Text direction' ) }
 					value={ dir }
 					options={ [
@@ -119,12 +126,13 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 				/>
 				<HStack alignment="right">
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						text={ __( 'Apply' ) }
 					/>
 				</HStack>
-			</form>
+			</VStack>
 		</Popover>
 	);
 }

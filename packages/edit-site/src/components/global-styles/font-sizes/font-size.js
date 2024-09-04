@@ -21,17 +21,14 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import ScreenHeader from '../header';
 import FontSizePreview from './font-size-preview';
 import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
 import RenameFontSizeDialog from './rename-font-size-dialog';
 import SizeControl from '../size-control';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontSize() {
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
@@ -47,14 +44,17 @@ function FontSize() {
 		'typography.fontSizes'
 	);
 
+	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
+
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
 
-	// Whether fluid is true or an object, set it to true, otherwise false.
-	const isFluid = !! fontSize.fluid ?? false;
+	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
+	const isFluid =
+		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 
 	// Whether custom fluid values are used.
 	const isCustomFluid = typeof fontSize.fluid === 'object';
@@ -160,7 +160,7 @@ function FontSize() {
 								marginBottom={ 0 }
 								paddingX={ 4 }
 							>
-								<DropdownMenu
+								<DropdownMenuV2
 									trigger={
 										<Button
 											size="small"
@@ -169,21 +169,21 @@ function FontSize() {
 										/>
 									}
 								>
-									<DropdownMenuItem
+									<DropdownMenuV2.Item
 										onClick={ toggleRenameDialog }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Rename' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-									<DropdownMenuItem
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+									<DropdownMenuV2.Item
 										onClick={ toggleDeleteConfirm }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ __( 'Delete' ) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-								</DropdownMenu>
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.Item>
+								</DropdownMenuV2>
 							</Spacer>
 						</FlexItem>
 					) }

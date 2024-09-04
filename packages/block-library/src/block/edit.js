@@ -29,6 +29,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -247,14 +248,15 @@ function ReusableBlockEdit( {
 		),
 	} );
 
-	// Use `blocks` variable until `innerBlocks` is populated, which has the proper clientIds.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'all',
 		layout,
-		value: innerBlocks.length > 0 ? innerBlocks : blocks,
+		value: blocks,
 		onInput: NOOP,
 		onChange: NOOP,
-		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const handleEditOriginal = () => {
@@ -292,7 +294,7 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ hasResolved && (
+			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }

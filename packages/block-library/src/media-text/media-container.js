@@ -23,23 +23,15 @@ import { store as noticesStore } from '@wordpress/notices';
 import { media as icon } from '@wordpress/icons';
 
 /**
+ * Internal dependencies
+ */
+import { imageFillStyles } from './image-fill';
+
+/**
  * Constants
  */
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const noop = () => {};
-
-export function imageFillStyles( url, focalPoint ) {
-	return url
-		? {
-				backgroundImage: `url(${ url })`,
-				backgroundPosition: focalPoint
-					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
-							focalPoint.y * 100
-					  ) }%`
-					: `50% 50%`,
-		  }
-		: {};
-}
 
 const ResizableBoxContainer = forwardRef(
 	( { isSelected, isStackedOnMobile, ...props }, ref ) => {
@@ -62,22 +54,18 @@ function ToolbarEditButton( {
 	onSelectMedia,
 	toggleUseFeaturedImage,
 	useFeaturedImage,
-	featuredImageURL,
 } ) {
 	return (
 		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
-				mediaUrl={
-					useFeaturedImage && featuredImageURL
-						? featuredImageURL
-						: mediaUrl
-				}
+				mediaURL={ mediaUrl }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				accept="image/*,video/*"
 				onSelect={ onSelectMedia }
 				onToggleFeaturedImage={ toggleUseFeaturedImage }
 				useFeaturedImage={ useFeaturedImage }
+				onReset={ () => onSelectMedia( undefined ) }
 			/>
 		</BlockControls>
 	);
@@ -133,6 +121,7 @@ function MediaContainer( props, ref ) {
 		useFeaturedImage,
 		featuredImageURL,
 		featuredImageAlt,
+		refMedia,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -155,7 +144,7 @@ function MediaContainer( props, ref ) {
 			left: enableResize && mediaPosition === 'right',
 		};
 
-		const backgroundStyles =
+		const positionStyles =
 			mediaType === 'image' && imageFill
 				? imageFillStyles( mediaUrl || featuredImageURL, focalPoint )
 				: {};
@@ -163,11 +152,23 @@ function MediaContainer( props, ref ) {
 		const mediaTypeRenderers = {
 			image: () =>
 				useFeaturedImage && featuredImageURL ? (
-					<img src={ featuredImageURL } alt={ featuredImageAlt } />
+					<img
+						ref={ refMedia }
+						src={ featuredImageURL }
+						alt={ featuredImageAlt }
+						style={ positionStyles }
+					/>
 				) : (
-					mediaUrl && <img src={ mediaUrl } alt={ mediaAlt } />
+					mediaUrl && (
+						<img
+							ref={ refMedia }
+							src={ mediaUrl }
+							alt={ mediaAlt }
+							style={ positionStyles }
+						/>
+					)
 				),
-			video: () => <video controls src={ mediaUrl } />,
+			video: () => <video controls ref={ refMedia } src={ mediaUrl } />,
 		};
 
 		return (
@@ -178,7 +179,6 @@ function MediaContainer( props, ref ) {
 					'editor-media-container__resizer',
 					{ 'is-transient': isTemporaryMedia }
 				) }
-				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
 				minWidth="10%"
 				maxWidth="100%"
@@ -200,7 +200,6 @@ function MediaContainer( props, ref ) {
 					}
 					mediaId={ mediaId }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
-					useFeaturedImage={ useFeaturedImage }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
 				{ isTemporaryMedia && <Spinner /> }
@@ -208,6 +207,7 @@ function MediaContainer( props, ref ) {
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-media-text--placeholder-image"
+						style={ positionStyles }
 						withIllustration
 					/>
 				) }

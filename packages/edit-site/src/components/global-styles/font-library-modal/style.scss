@@ -69,6 +69,7 @@ $footer-height: 70px;
 	color: $gray-900;
 }
 
+// TODO: See if this can be removed after https://github.com/WordPress/gutenberg/issues/38730
 .font-library-modal__tabpanel-layout .components-base-control__field {
 	margin-bottom: 0;
 }
@@ -91,7 +92,7 @@ $footer-height: 70px;
 }
 
 .font-library-modal__font-card {
-	border: 1px solid $gray-200;
+	border: $border-width solid $gray-200;
 	width: 100%;
 	height: auto;
 	padding: $grid-unit-20;

@@ -29,7 +29,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ title, setTitle ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const DEFAULT_VIEWS = useDefaultViews( { postType: type } );
+	const defaultViews = useDefaultViews( { postType: type } );
 	return (
 		<form
 			onSubmit={ async ( event ) => {
@@ -61,9 +61,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 						title,
 						status: 'publish',
 						wp_dataviews_type: dataViewTaxonomyId,
-						content: JSON.stringify(
-							DEFAULT_VIEWS[ type ][ 0 ].view
-						),
+						content: JSON.stringify( defaultViews[ 0 ].view ),
 					}
 				);
 				const {
@@ -80,6 +78,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -89,6 +88,8 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 				/>
 				<HStack justify="right">
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="tertiary"
 						onClick={ () => {
 							setIsAdding( false );
@@ -98,6 +99,8 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 					</Button>
 
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSaving }

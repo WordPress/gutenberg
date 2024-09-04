@@ -181,6 +181,8 @@ function PostFeaturedImage( {
 											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
 									aria-haspopup="dialog"
+									disabled={ isLoading }
+									accessibleWhenDisabled
 								>
 									{ !! featuredImageId && media && (
 										<img
@@ -199,7 +201,7 @@ function PostFeaturedImage( {
 								{ !! featuredImageId && (
 									<HStack className="editor-post-featured-image__actions">
 										<Button
-											// __next40pxDefaultSize
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ open }
 											aria-haspopup="dialog"
@@ -207,7 +209,7 @@ function PostFeaturedImage( {
 											{ __( 'Replace' ) }
 										</Button>
 										<Button
-											// __next40pxDefaultSize
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ () => {
 												onRemoveImage();

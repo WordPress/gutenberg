@@ -32,11 +32,9 @@ import { unlock } from '../../lock-unlock';
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-const {
-	CompositeItemV2: CompositeItem,
-	CompositeV2: Composite,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
+const { CompositeItemV2: CompositeItem, CompositeV2: Composite } = unlock(
+	componentsPrivateApis
+);
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
@@ -52,6 +50,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 				/>
 				<div className="block-editor-global-styles__clear-shadow">
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
 					>
@@ -64,10 +64,8 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 }
 
 export function ShadowPresets( { presets, activeShadow, onSelect } ) {
-	const compositeStore = useCompositeStore();
 	return ! presets ? null : (
 		<Composite
-			store={ compositeStore }
 			role="listbox"
 			className="block-editor-global-styles__shadow__list"
 			aria-label={ __( 'Drop shadows' ) }
@@ -99,6 +97,8 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 			} ) }
 			render={
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					className={ clsx(
 						'block-editor-global-styles__shadow-indicator',
 						{
@@ -151,7 +151,11 @@ function renderShadowToggle() {
 		};
 
 		return (
-			<Button { ...toggleProps }>
+			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
+				{ ...toggleProps }
+			>
 				<HStack justify="flex-start">
 					<Icon
 						className="block-editor-global-styles__toggle-icon"

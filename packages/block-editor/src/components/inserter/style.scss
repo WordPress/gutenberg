@@ -1,5 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -24,13 +24,19 @@ $block-inserter-tabs-height: 44px;
 	&.show-as-tabs {
 		gap: 0;
 	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__popover.is-quick {
 	.components-popover__content {
 		border: none;
 		outline: none;
-		box-shadow: $shadow-popover;
+		box-shadow: $elevation-x-small;
 
 		.block-editor-inserter__quick-inserter > * {
 			border-left: $border-width solid $gray-400;
@@ -38,12 +44,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
-				border-radius: $radius-block-ui $radius-block-ui 0 0;
+				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
-				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+				border-radius: 0 0 $radius-medium $radius-medium;
 			}
 
 			&.components-button {
@@ -85,6 +91,12 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -264,7 +276,7 @@ $block-inserter-tabs-height: 44px;
 				bottom: 0;
 				left: 0;
 				right: 0;
-				border-radius: $radius-block-ui;
+				border-radius: $radius-small;
 				opacity: 0.04;
 				background: var(--wp-admin-theme-color);
 				height: 100%;
@@ -273,7 +285,7 @@ $block-inserter-tabs-height: 44px;
 
 		&:focus-visible,
 		&:focus:not(:disabled) {
-			border-radius: 2px;
+			border-radius: $radius-small;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
@@ -299,14 +311,13 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
-		width: 300px;
+		left: $secondary-sidebar-width;
+		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
 		background: $gray-100;
 		border-top: $border-width solid $gray-200;
-		box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 
 		.block-editor-inserter__media-list,
 		.block-editor-block-patterns-list {
@@ -348,7 +359,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
@@ -366,7 +377,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
@@ -566,7 +577,6 @@ $block-inserter-tabs-height: 44px;
 
 		> button {
 			background: $white;
-			border-radius: $radius-block-ui;
 			display: none;
 
 			// These styles are important so as focus isn't lost
@@ -593,14 +603,13 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: 2px;
+		border-radius: $radius-small;
 
 		> * {
 			margin: 0 auto;
 			max-width: 100%;
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-block-ui;
 		}
 
 		.block-editor-inserter__media-list__item-preview-spinner {
@@ -678,12 +687,6 @@ $block-inserter-tabs-height: 44px;
 			width: 300px;
 			height: 100%;
 		}
-	}
-
-	// Remove doubled-up shadow that occurs when categories panel is opened, only in zoom out.
-	// Shadow cannot be removed from the source, as it is required when not zoomed out.
-	.block-editor-inserter__category-panel {
-		box-shadow: none;
 	}
 }
 

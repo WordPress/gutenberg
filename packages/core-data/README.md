@@ -182,7 +182,7 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the deleted entity.
 -   _name_ `string`: Name of the deleted entity.
--   _recordId_ `string`: Record ID of the deleted entity.
+-   _recordId_ `number|string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
 -   _options_ `[Object]`: Delete options.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
@@ -264,7 +264,7 @@ _Parameters_
 
 ### receiveThemeSupports
 
-> **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
+> **Deprecated** since WP 5.9, this is not useful anymore, use the selector directly.
 
 Returns an action object used in signalling that the index has been received.
 
@@ -1011,7 +1011,7 @@ _Parameters_
 -   _kind_ `string`: The entity kind.
 -   _name_ `string`: The entity name.
 -   _prop_ `string`: The property name.
--   _\_id_ `[string]`: An entity ID to use instead of the context-provided one.
+-   _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 

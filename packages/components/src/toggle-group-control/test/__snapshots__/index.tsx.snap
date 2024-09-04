@@ -13,10 +13,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -33,7 +29,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -88,7 +84,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -156,7 +152,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: 1px;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -175,7 +171,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -258,7 +254,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             aria-checked="true"
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-active-item=""
+            data-active-item="true"
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
@@ -349,10 +345,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -369,7 +361,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -424,7 +416,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -573,10 +565,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -593,7 +581,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -648,7 +636,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -716,7 +704,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: 1px;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -735,7 +723,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -818,7 +806,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             aria-checked="true"
             aria-label="Uppercase"
             class="emotion-12 components-toggle-group-control-option-base"
-            data-active-item=""
+            data-active-item="true"
             data-value="uppercase"
             data-wp-c16t="true"
             data-wp-component="ToggleGroupControlOptionBase"
@@ -903,10 +891,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   box-sizing: inherit;
 }
 
-.emotion-2 {
-  margin-bottom: calc(4px * 2);
-}
-
 .components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
@@ -923,7 +907,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  display: inline-block;
+  display: block;
   margin-bottom: calc(4px * 2);
   padding: 0;
 }
@@ -978,7 +962,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: 1px;
   color: #757575;
   fill: currentColor;
   cursor: pointer;

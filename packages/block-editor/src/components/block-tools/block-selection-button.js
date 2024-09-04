@@ -37,7 +37,7 @@ import BlockTitle from '../block-title';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -257,9 +257,10 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									icon={ dragHandle }
 									className="block-selection-button_drag-handle"
-									aria-hidden="true"
 									label={ dragHandleLabel }
 									// Should not be able to tab to drag handle as this
 									// button can only be used with a pointer device.
@@ -273,6 +274,8 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				{ editorMode === 'navigation' && (
 					<FlexItem>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							ref={ ref }
 							onClick={
 								editorMode === 'navigation'

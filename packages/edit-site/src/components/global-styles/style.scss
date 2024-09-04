@@ -19,7 +19,7 @@
 	min-height: 100px;
 	margin-bottom: $grid-unit-20;
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	overflow: hidden;
 }
 
@@ -45,7 +45,7 @@
 	display: flex !important;
 	align-items: center;
 	justify-content: center;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-x-small;
 }
 
 .edit-site-global-styles-screen-typography__font-variants-count {
@@ -113,14 +113,14 @@
 	position: relative;
 	width: 100%;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-medium;
 	overflow: hidden;
 }
 
 .edit-site-global-styles__shadow-preview-panel {
 	height: $grid-unit-60 * 3;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-medium;
 	overflow: auto;
 	background-image: repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5), repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
 	background-position: 0 0, 8px 8px;
@@ -128,23 +128,20 @@
 
 	.edit-site-global-styles__shadow-preview-block {
 		border: $gray-200 $border-width solid;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 		background-color: $white;
 		width: 60%;
 		height: 60px;
 	}
 }
 
-.edit-site-global-styles__shadow-editor-panel {
+.edit-site-global-styles__shadow-editor__dropdown-content {
 	width: 280px;
-	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles__shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: $grid-unit-05;
-
-	& .edit-site-global-styles__shadow-editor-color-palette {
-		// color palette adds empty .components-circular-option-picker
-		margin-bottom: -1 * $grid-unit-05;
-	}
 }
 
 .edit-site-global-styles__shadow-editor__dropdown {

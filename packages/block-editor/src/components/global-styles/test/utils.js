@@ -7,6 +7,9 @@ import {
 	getPresetVariableFromValue,
 	getValueFromVariable,
 	scopeFeatureSelectors,
+	getResolvedThemeFilePath,
+	getResolvedRefValue,
+	getResolvedValue,
 } from '../utils';
 
 describe( 'editor utils', () => {
@@ -51,6 +54,46 @@ describe( 'editor utils', () => {
 					secondary: 'var(--wp--preset--color--secondary)',
 				},
 			},
+		},
+		styles: {
+			background: {
+				backgroundImage: {
+					url: 'file:./assets/image.jpg',
+				},
+				backgroundAttachment: 'fixed',
+				backgroundPosition: 'top left',
+			},
+			blocks: {
+				'core/group': {
+					background: {
+						backgroundImage: {
+							ref: 'styles.background.backgroundImage',
+						},
+					},
+					dimensions: {
+						minHeight: '100px',
+					},
+					spacing: {
+						padding: {
+							top: 0,
+						},
+					},
+				},
+			},
+		},
+		_links: {
+			'wp:theme-file': [
+				{
+					name: 'file:./assets/image.jpg',
+					href: 'https://wordpress.org/assets/image.jpg',
+					target: 'styles.background.backgroundImage.url',
+				},
+				{
+					name: 'file:./assets/other/image.jpg',
+					href: 'https://wordpress.org/assets/other/image.jpg',
+					target: "styles.blocks.['core/group'].background.backgroundImage.url",
+				},
+			],
 		},
 		isGlobalStylesUserThemeJSON: true,
 	};
@@ -365,5 +408,92 @@ describe( 'editor utils', () => {
 				},
 			} );
 		} );
+	} );
+
+	describe( 'getResolvedThemeFilePath()', () => {
+		it.each( [
+			[
+				'file:./assets/image.jpg',
+				'https://wordpress.org/assets/image.jpg',
+				'Should return absolute URL if found in themeFileURIs',
+			],
+			[
+				'file:./misc/image.jpg',
+				'file:./misc/image.jpg',
+				'Should return value if not found in themeFileURIs',
+			],
+			[
+				'https://wordpress.org/assets/image.jpg',
+				'https://wordpress.org/assets/image.jpg',
+				'Should not match absolute URLs',
+			],
+		] )(
+			'Given file %s and return value %s: %s',
+			( file, returnedValue ) => {
+				expect(
+					getResolvedThemeFilePath(
+						file,
+						themeJson._links[ 'wp:theme-file' ]
+					) === returnedValue
+				).toBe( true );
+			}
+		);
+	} );
+
+	describe( 'getResolvedRefValue()', () => {
+		it.each( [
+			[ 'blue', 'blue', null ],
+			[ 0, 0, themeJson ],
+			[
+				{ ref: 'styles.background.backgroundImage' },
+				{ url: 'file:./assets/image.jpg' },
+				themeJson,
+			],
+			[
+				{ ref: 'styles.blocks.core/group.spacing.padding.top' },
+				0,
+				themeJson,
+			],
+			[
+				{
+					ref: 'styles.blocks.core/group.background.backgroundImage',
+				},
+				undefined,
+				themeJson,
+			],
+		] )(
+			'Given ruleValue %s return expected value of %s',
+			( ruleValue, returnedValue, tree ) => {
+				expect( getResolvedRefValue( ruleValue, tree ) ).toEqual(
+					returnedValue
+				);
+			}
+		);
+	} );
+
+	describe( 'getResolvedValue()', () => {
+		it.each( [
+			[ 'blue', 'blue', null ],
+			[ 0, 0, themeJson ],
+			[
+				{ ref: 'styles.background.backgroundImage' },
+				{ url: 'https://wordpress.org/assets/image.jpg' },
+				themeJson,
+			],
+			[
+				{
+					ref: 'styles.blocks.core/group.background.backgroundImage',
+				},
+				undefined,
+				themeJson,
+			],
+		] )(
+			'Given ruleValue %s return expected value of %s',
+			( ruleValue, returnedValue, tree ) => {
+				expect( getResolvedValue( ruleValue, tree ) ).toEqual(
+					returnedValue
+				);
+			}
+		);
 	} );
 } );
