@@ -2,20 +2,12 @@
  * External dependencies
  */
 import { useLilius } from 'use-lilius';
-import {
-	format,
-	subMonths,
-	addMonths,
-	startOfDay,
-	isSameMonth,
-} from 'date-fns';
+import { format, startOfDay, isSameMonth } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
-import { arrowLeft, arrowRight } from '@wordpress/icons';
-import { dateI18n } from '@wordpress/date';
+import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
 /**
@@ -23,9 +15,8 @@ import { useState } from '@wordpress/element';
  */
 import Calendar from './calendar';
 import type { DatePickerProps } from '../types';
-import { Wrapper, Navigator, NavigatorHeading } from './styles';
+import { Wrapper } from './styles';
 import { inputToDate } from '../utils';
-import Button from '../../button';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -90,57 +81,18 @@ export function DatePicker( {
 			role="application"
 			aria-label={ __( 'Calendar' ) }
 		>
-			<Navigator>
-				<Button
-					icon={ isRTL() ? arrowRight : arrowLeft }
-					variant="tertiary"
-					aria-label={ __( 'View previous month' ) }
-					onClick={ () => {
-						viewPreviousMonth();
-						setFocusable( subMonths( focusable, 1 ) );
-						onMonthPreviewed?.(
-							format(
-								subMonths( viewing, 1 ),
-								TIMEZONELESS_FORMAT
-							)
-						);
-					} }
-				/>
-				<NavigatorHeading level={ 3 }>
-					<strong>
-						{ dateI18n(
-							'F',
-							viewing,
-							-viewing.getTimezoneOffset()
-						) }
-					</strong>{ ' ' }
-					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
-				</NavigatorHeading>
-				<Button
-					icon={ isRTL() ? arrowLeft : arrowRight }
-					variant="tertiary"
-					aria-label={ __( 'View next month' ) }
-					onClick={ () => {
-						viewNextMonth();
-						setFocusable( addMonths( focusable, 1 ) );
-						onMonthPreviewed?.(
-							format(
-								addMonths( viewing, 1 ),
-								TIMEZONELESS_FORMAT
-							)
-						);
-					} }
-				/>
-			</Navigator>
 			<Calendar
 				calendar={ calendar }
-				isInvalidDate={ isInvalidDate }
-				viewing={ viewing }
-				isSelected={ isSelected }
 				events={ events }
+				isInvalidDate={ isInvalidDate }
+				isSelected={ isSelected }
+				onMonthPreviewed={ onMonthPreviewed }
+				setFocusable={ setFocusable }
+				viewing={ viewing }
+				viewPreviousMonth={ viewPreviousMonth }
+				viewNextMonth={ viewNextMonth }
 				onDayClick={ ( day ) => {
 					setSelected( [ day ] );
-					setFocusable( day );
 					onChange?.(
 						format(
 							// Don't change the selected date's time fields.
@@ -158,7 +110,6 @@ export function DatePicker( {
 					);
 				} }
 				onDayKeyDown={ ( nextFocusable ) => {
-					setFocusable( nextFocusable );
 					if ( ! isSameMonth( nextFocusable, viewing ) ) {
 						setViewing( nextFocusable );
 						onMonthPreviewed?.(
