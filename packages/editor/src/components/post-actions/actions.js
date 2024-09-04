@@ -1055,10 +1055,15 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		resource,
 		cachedCanUserResolvers,
 		userCanCreatePostType,
+		isBlockBasedTheme,
 	} = useSelect(
 		( select ) => {
-			const { getPostType, getCachedResolvers, canUser } =
-				select( coreStore );
+			const {
+				getPostType,
+				getCachedResolvers,
+				canUser,
+				getCurrentTheme,
+			} = select( coreStore );
 			const _postTypeObject = getPostType( postType );
 			const _resource = _postTypeObject?.rest_base || '';
 			return {
@@ -1066,6 +1071,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				resource: _resource,
 				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 				userCanCreatePostType: canUser( 'create', _resource ),
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
 			};
 		},
 		[ postType ]
@@ -1099,6 +1105,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				: false,
 			isTemplateOrTemplatePart &&
 				userCanCreatePostType &&
+				isBlockBasedTheme &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,

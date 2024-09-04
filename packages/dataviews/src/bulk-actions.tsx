@@ -94,6 +94,11 @@ function ActionWithModal< Item extends AnyItem >( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+
+	if ( ! eligibleItems.length ) {
+		return null;
+	}
+
 	const label =
 		typeof action.label === 'string'
 			? action.label
