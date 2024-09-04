@@ -210,8 +210,6 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-zoom-out-experiment',
 		)
 	);
-
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
