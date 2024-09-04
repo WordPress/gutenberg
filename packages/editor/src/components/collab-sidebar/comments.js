@@ -92,11 +92,11 @@ export function Comments( {
 					alignment="left"
 					spacing="3"
 					justify="flex-start"
-					className="editor-collab-sidebar__usercomment"
+					className="editor-collab-sidebar-panel__user-comment"
 				>
 					<VStack
 						spacing="3"
-						className="editor-collab-sidebar__editarea"
+						className="editor-collab-sidebar-panel__comment-field"
 					>
 						{ 'edit' === actionState?.action &&
 							thread.id === actionState?.id && (
@@ -126,11 +126,14 @@ export function Comments( {
 				( ! Array.isArray( threads ) || threads.length === 0 ) && (
 					<VStack
 						alignment="left"
-						className="editor-collab-sidebar__thread"
+						className="editor-collab-sidebar-panel__thread"
 						justify="flex-start"
 						spacing="3"
 					>
-						{ __( 'No comments available' ) }
+						{ 
+							// translators: message displayed when there are no comments available
+							__( 'No comments available' ) 
+						}
 					</VStack>
 				)
 			}
@@ -140,12 +143,12 @@ export function Comments( {
 				threads.map( ( thread ) => (
 					<VStack
 						key={ thread.id }
-						className={ clsx( 'editor-collab-sidebar__thread', {
-							'editor-collab-sidebar__activethread':
+						className={ clsx( 'editor-collab-sidebar-panel__thread', {
+							'editor-collab-sidebar-panel__active-thread':
 								blockCommentId && blockCommentId === thread.id,
 						} ) }
 						id={ thread.id }
-						spacing="2"
+						spacing="3"
 					>
 						<CommentBoard thread={ thread } />
 						{ 'reply' === actionState?.action &&
@@ -161,9 +164,10 @@ export function Comments( {
 						{ 'resolve' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ __(
-										'Are you sure you want to mark this thread as resolved?'
-									) }
+									confirmMessage={ 
+										// translators: message displayed when marking a comment as resolved
+										__( 'Are you sure you want to mark this thread as resolved?' )
+									}
 									confirmAction={ () => {
 										onCommentResolve( thread.id );
 										setActionState( false );
@@ -176,9 +180,10 @@ export function Comments( {
 						{ 'delete' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ __(
-										'Are you sure you want to delete this thread?'
-									) }
+									confirmMessage={ 
+										// translators: message displayed when deleting a comment
+										__( 'Are you sure you want to delete this thread?' ) 
+									}
 									confirmAction={ () => {
 										onCommentDelete( thread.id );
 										setActionState( false );
@@ -192,7 +197,7 @@ export function Comments( {
 							thread.reply.map( ( reply ) => (
 								<VStack
 									key={ reply.id }
-									className="editor-collab-sidebar__childThread"
+									className="editor-collab-sidebar-panel__child-thread"
 									id={ reply.id }
 									spacing="2"
 								>
@@ -203,9 +208,10 @@ export function Comments( {
 									{ 'delete' === actionState?.action &&
 										reply.id === actionState?.id && (
 											<ConfirmNotice
-												confirmMessage={ __(
-													'Are you sure you want to delete this thread?'
-												) }
+												confirmMessage={ 
+													// translators: message displayed when deleting a comment
+													__( 'Are you sure you want to delete this thread?' ) 
+												}
 												confirmAction={ () => {
 													onCommentDelete( reply.id );
 													setActionState( false );
@@ -241,7 +247,7 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 		<>
 			<TextareaControl
 				__nextHasNoMarginBottom
-				className="editor-collab-sidebar__replyComment__textarea"
+				className="editor-collab-sidebar-panel__comment-field-textarea"
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
 			/>
@@ -249,7 +255,6 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				alignment="left"
 				spacing="3"
 				justify="flex-start"
-				className="editor-collab-sidebar__commentbtn"
 			>
 				<HStack alignment="left" spacing="3" justify="flex-start">
 					<Button
@@ -293,11 +298,11 @@ function AddReply( { onSubmit, onCancel } ) {
 			<VStack
 				alignment="left"
 				spacing="3"
-				className="editor-collab-sidebar__replyComment"
+				className="editor-collab-sidebar-panel__comment-field"
 			>
 				<TextareaControl
 					__nextHasNoMarginBottom
-					className="editor-collab-sidebar__replyComment__textarea"
+					className="editor-collab-sidebar-panel__comment-field-textarea"
 					value={ inputComment ?? '' }
 					onChange={ setInputComment }
 				/>
@@ -306,7 +311,6 @@ function AddReply( { onSubmit, onCancel } ) {
 						alignment="left"
 						spacing="3"
 						justify="flex-start"
-						className="editor-collab-sidebar__replybtn"
 					>
 						<Button
 							__next40pxDefaultSize
@@ -347,12 +351,16 @@ function AddReply( { onSubmit, onCancel } ) {
 function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
+			// translators: title for the confirmation overlay
 			title={ __( 'Confirm' ) }
-			className="editor-collab-sidebar__useroverlay confirmation-overlay"
+			className="editor-collab-sidebar-panel__thread-overlay"
 			spacing="0"
 			justify="space-between"
 		>
-			<p>{ cofirmMessage ?? __( 'Are you sure?' ) }</p>
+			<p>{ cofirmMessage ?? 
+				// translators: message displayed when confirming an action
+				__( 'Are you sure?' ) 
+			}</p>
 			<HStack>
 				<Button
 					__next40pxDefaultSize
@@ -360,14 +368,14 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 					onClick={ confirmAction }
 					size="compact"
 				>
-					{ __( 'Yes' ) }
+					{ _x( 'Yes', 'confirm action' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
 					onClick={ discardAction }
 					size="compact"
 				>
-					{ __( 'No' ) }
+					{ _x( 'No', 'deny action' ) }
 				</Button>
 			</HStack>
 		</VStack>
@@ -404,15 +412,15 @@ function CommentHeader( {
 	const memorizedMoreActions = useMemo( () => {
 		return [
 			{
-				title: __( 'Edit' ),
+				title: _x( 'Edit', 'Edit comment' ),
 				onClick: onEdit,
 			},
 			{
-				title: __( 'Delete' ),
+				title: _x( 'Delete', 'Delete comment' ),
 				onClick: onDelete,
 			},
 			{
-				title: __( 'Reply' ),
+				title: _x( 'Reply', 'Reply on a comment' ),
 				onClick: onReply,
 			},
 		];
@@ -424,23 +432,24 @@ function CommentHeader( {
 		<HStack alignment="left" spacing="3" justify="flex-start">
 			<img
 				src={ thread?.author_avatar_urls?.[ 48 ] }
-				className="editor-collab-sidebar__userIcon"
+				className="editor-collab-sidebar-panel__user-avatar"
+				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
 				width={ 32 }
 				height={ 32 }
 			/>
 			<VStack spacing="0">
-				<span className="editor-collab-sidebar__userName">
+				<span className="editor-collab-sidebar-panel__user-name">
 					{ thread.author_name }
 				</span>
 				<time
 					dateTime={ format( 'h:i A', thread.date ) }
-					className="editor-collab-sidebar__usertime"
+					className="editor-collab-sidebar-panel__user-time"
 				>
 					{ dateI18n( dateTimeFormat, thread.date ) }
 				</time>
 			</VStack>
-			<span className="editor-collab-sidebar__commentUpdate">
+			<span className="editor-collab-sidebar-panel__comment-status">
 				{ status !== 'approved' && (
 					<HStack alignment="right" justify="flex-end" spacing="0">
 						{ 0 === thread.parent && onResolve && (
@@ -461,12 +470,13 @@ function CommentHeader( {
 								'Select an action',
 								'Select comment action'
 							) }
-							className="editor-collab-sidebar__commentDropdown"
+							className="editor-collab-sidebar-panel__comment-dropdown-menu"
 							controls={ moreActions }
 						/>
 					</HStack>
 				) }
 				{ status === 'approved' && (
+					// translators: tooltip for resolved comment
 					<Tooltip text={ __( 'Resolved' ) }>
 						<Icon icon={ check } />
 					</Tooltip>

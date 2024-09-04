@@ -1,12 +1,10 @@
-.editor-collab-sidebar {
-	&__activities {
-		padding: $grid-unit-20;
-	}
+.editor-collab-sidebar-panel {
+	padding: $grid-unit-20;
 
 	&__thread {
 		position: relative;
 		padding: $grid-unit-20;
-		border-radius: 8px;
+		border-radius: $radius-large;
 		border: 1px solid $gray-300;
 		background-color: $gray-100;
 		margin-bottom: $grid-unit-20;
@@ -22,34 +20,32 @@
 		}
 	}
 
-	&__activethread {
+	&__active-thread {
 		border: 1.5px solid #3858e9;
 		background-color: $white;
 		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
 	}
 
-
-	&__editarea,
-	&__replyComment {
+	&__comment-field {
 		flex: 1;
+	}
 
-		&__textarea {
-			width: 100%;
-		}
+	&__comment-field-textarea {
+		width: 100%;
 
 		textarea {
 			border: 1px solid $gray-300;
-			border-radius: 8px;
+			border-radius: $radius-large;
 			padding: 10px 15px;
-			background-color: #fff;
+			background-color: $white;
 		}
 	}
 
-	&__childThread {
+	&__child-thread {
 		margin-top: 15px;
 	}
 
-	&__userName {
+	&__user-name {
 		font-size: 12px;
 		font-weight: 400;
 		line-height: 16px;
@@ -58,7 +54,7 @@
 		text-transform: capitalize;
 	}
 
-	&__usertime {
+	&__user-time {
 		font-size: 12px;
 		font-weight: 400;
 		line-height: 16px;
@@ -66,7 +62,7 @@
 		color: $gray-700;
 	}
 
-	&__usercomment {
+	&__user-comment {
 		font-size: 13px;
 		font-weight: 400;
 		line-height: 20px;
@@ -78,12 +74,12 @@
 		}
 	}
 
-	&__userIcon {
-		border-radius: 50%;
+	&__user-avatar {
+		border-radius: $radius-round;
 		flex-shrink: 0;
 	}
 
-	&__useroverlay {
+	&__thread-overlay {
 		background-color: rgba(0, 0, 0, 0.7);
 		width: 100%;
 		height: 100%;
@@ -93,7 +89,7 @@
 		left: 0;
 		z-index: 1;
 		padding: 15px;
-		border-radius: 8px;
+		border-radius: $radius-large;
 		color: $white;
 
 		p {
@@ -107,7 +103,7 @@
 		}
 	}
 
-	&__commentUpdate {
+	&__comment-status {
 		margin-left: auto;
 
 		button {
@@ -120,7 +116,8 @@
 			}
 		}
 	}
-	&__commentDropdown {
+	
+	&__comment-dropdown-menu {
 		flex-shrink: 0;
 
 		button {

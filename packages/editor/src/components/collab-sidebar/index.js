@@ -112,6 +112,7 @@ export default function CollabSidebar() {
 		);
 
 		if ( savedRecord ) {
+			// translators: Comment resolved successfully
 			createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
 				type: 'snackbar',
 				isDismissible: true,
@@ -135,10 +136,15 @@ export default function CollabSidebar() {
 		);
 
 		if ( savedRecord ) {
-			createNotice( 'snackbar', __( 'Thread edited successfully.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createNotice(
+				'snackbar',
+				// translators: Comment edited successfully
+				__( 'Thread edited successfully.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
 
 			fetchComments();
 		}
@@ -158,10 +164,15 @@ export default function CollabSidebar() {
 		} );
 
 		if ( savedRecord ) {
-			createNotice( 'snackbar', __( 'Reply added successfully.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createNotice(
+				'snackbar',
+				// translators: Reply added successfully
+				__( 'Reply added successfully.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
 			fetchComments();
 		}
 	};
@@ -174,10 +185,15 @@ export default function CollabSidebar() {
 			showCommentBoard: undefined,
 		} );
 
-		createNotice( 'snackbar', __( 'Thread deleted successfully.' ), {
-			type: 'snackbar',
-			isDismissible: true,
-		} );
+		createNotice(
+			'snackbar',
+			// translators: Comment deleted successfully
+			__( 'Thread deleted successfully.' ),
+			{
+				type: 'snackbar',
+				isDismissible: true,
+			}
+		);
 		fetchComments();
 	};
 
@@ -255,10 +271,11 @@ export default function CollabSidebar() {
 	return (
 		<PluginSidebar
 			identifier={ collabSidebarName }
+			// translators: Comments sidebar title
 			title={ __( 'Comments' ) }
 			icon={ commentIcon }
 		>
-			<div className="editor-collab-sidebar__activities">
+			<div className="editor-collab-sidebar-panel">
 				<AddComment
 					threads={ sortedThreads }
 					onSubmit={ addNewComment }
