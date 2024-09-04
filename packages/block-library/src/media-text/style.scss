@@ -80,7 +80,7 @@
 	vertical-align: middle;
 }
 
-/* Old image fill, for versions 1-7 of the block */
+/* `is-image-fill` is deprecated and the styles are kept for backwards compatibility. */
 .wp-block-media-text.is-image-fill > .wp-block-media-text__media {
 	height: 100%;
 	min-height: 250px;
