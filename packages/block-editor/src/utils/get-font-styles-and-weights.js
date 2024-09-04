@@ -116,7 +116,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		const fontStyle = formatFontStyle( face.fontStyle );
 
 		// Create font style and font weight lists without duplicates.
-		if ( fontStyle ) {
+		if ( fontStyle && Object.keys( fontStyle ).length ) {
 			if (
 				! fontStyles.some(
 					( style ) => style.value === fontStyle.value
@@ -126,7 +126,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 			}
 		}
 
-		if ( Object.keys( fontWeight ).length ) {
+		if ( fontWeight && Object.keys( fontWeight ).length ) {
 			if (
 				! fontWeights.some(
 					( weight ) => weight.value === fontWeight.value
