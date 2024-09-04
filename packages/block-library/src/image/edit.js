@@ -6,8 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
-import { store as blocksStore } from '@wordpress/blocks';
+import { isBlobURL, createBlobURL } from '@wordpress/blob';
+import { store as blocksStore, createBlock } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -109,6 +109,7 @@ export function ImageEdit( {
 		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const figureRef = useRef();
 
 	const [ contentResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
@@ -123,7 +124,7 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -138,7 +139,8 @@ export function ImageEdit( {
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
-	const { getSettings } = useSelect( blockEditorStore );
+	const { getSettings, getBlockRootClientId, getBlockName } =
+		useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -153,6 +155,33 @@ export function ImageEdit( {
 	}
 
 	function onSelectImage( media ) {
+		if ( Array.isArray( media ) ) {
+			const win = figureRef.current?.ownerDocument.defaultView;
+
+			if ( media.every( ( file ) => file instanceof win.File ) ) {
+				const imageBlocks = media.map( ( file ) =>
+					createBlock( 'core/image', { blob: createBlobURL( file ) } )
+				);
+
+				if (
+					getBlockName( getBlockRootClientId( clientId ) ) ===
+					'core/gallery'
+				) {
+					replaceBlock( clientId, imageBlocks );
+				} else {
+					const galleryBlock = createBlock(
+						'core/gallery',
+						{},
+						imageBlocks
+					);
+
+					replaceBlock( clientId, galleryBlock );
+				}
+			}
+
+			return;
+		}
+
 		if ( ! media || ! media.url ) {
 			setAttributes( {
 				url: undefined,
@@ -296,7 +325,7 @@ export function ImageEdit( {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const blockProps = useBlockProps( { className: classes } );
+	const blockProps = useBlockProps( { ref: figureRef, className: classes } );
 
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
@@ -394,6 +423,7 @@ export function ImageEdit( {
 					placeholder={ placeholder }
 					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }
 					mediaPreview={ mediaPreview }
 					disableMediaButtons={ temporaryURL || url }
