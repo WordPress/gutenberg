@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 
