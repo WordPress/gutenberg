@@ -994,9 +994,12 @@ export const getRegisteredPostMeta =
 	( postType ) =>
 	async ( { select, dispatch } ) => {
 		try {
-			const restBase = select.getPostType( postType )?.rest_base;
+			const {
+				rest_namespace: restNamespace = 'wp/v2',
+				rest_base: restBase,
+			} = select.getPostType( postType ) || {};
 			const options = await apiFetch( {
-				path: `wp/v2/${ restBase }/?context=edit`,
+				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
 			dispatch.receiveRegisteredPostMeta(
