@@ -32,9 +32,19 @@ const POST_FORMATS = [
 	return 0;
 } );
 
-export default function FormatControls( { onChange, query } ) {
-	const format = query?.format?.map( ( item ) => item.toLowerCase() ) || [];
+// A helper function to convert translatable post format names into their static values.
+function formatNamesToValues( names, formats ) {
+	return names
+		.map( ( name ) => {
+			return formats.find(
+				( item ) =>
+					item.label.toLocaleLowerCase() === name.toLocaleLowerCase()
+			)?.value;
+		} )
+		.filter( Boolean );
+}
 
+export default function FormatControls( { onChange, query: { format } } ) {
 	const { supportedFormats } = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
 		return {
@@ -46,6 +56,12 @@ export default function FormatControls( { onChange, query } ) {
 		supportedFormats.includes( item.value )
 	);
 
+	const values = format
+		.map(
+			( name ) => formats.find( ( item ) => item.value === name )?.label
+		)
+		.filter( Boolean );
+
 	const suggestions = formats
 		.filter( ( item ) => ! format.includes( item.value ) )
 		.map( ( item ) => item.label );
@@ -53,19 +69,12 @@ export default function FormatControls( { onChange, query } ) {
 	return (
 		<FormTokenField
 			label={ __( 'Formats' ) }
-			value={ format }
+			value={ values }
 			suggestions={ suggestions }
-			onChange={ ( value ) => {
-				const normalizedValue = value.map( ( item ) =>
-					item.toLowerCase()
-				);
-				// Only allow the post formats that are in the 'formats' constant.
-				const values = normalizedValue.filter( ( item ) =>
-					formats.some(
-						( supportedFormat ) => supportedFormat.value === item
-					)
-				);
-				onChange( { format: values } );
+			onChange={ ( newValues ) => {
+				onChange( {
+					format: formatNamesToValues( newValues, formats ),
+				} );
 			} }
 			__experimentalShowHowTo={ false }
 			__experimentalExpandOnFocus
