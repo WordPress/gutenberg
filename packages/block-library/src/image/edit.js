@@ -31,6 +31,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import { unlock } from '../lock-unlock';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
+import { isValidFileType } from './utils';
 
 /**
  * Module constants
@@ -139,8 +140,12 @@ export function ImageEdit( {
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
-	const { getSettings, getBlockRootClientId, getBlockName } =
-		useSelect( blockEditorStore );
+	const {
+		getSettings,
+		getBlockRootClientId,
+		getBlockName,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -159,16 +164,31 @@ export function ImageEdit( {
 			const win = figureRef.current?.ownerDocument.defaultView;
 
 			if ( media.every( ( file ) => file instanceof win.File ) ) {
-				const imageBlocks = media.map( ( file ) =>
-					createBlock( 'core/image', { blob: createBlobURL( file ) } )
-				);
+				const rootClientId = getBlockRootClientId( clientId );
 
-				if (
-					getBlockName( getBlockRootClientId( clientId ) ) ===
-					'core/gallery'
-				) {
+				if ( media.some( ( file ) => ! isValidFileType( file ) ) ) {
+					// Copied from the same notice in the gallery block.
+					createErrorNotice(
+						__(
+							'If uploading to a gallery all files need to be image formats'
+						),
+						{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+					);
+				}
+
+				const imageBlocks = media
+					.filter( ( file ) => isValidFileType( file ) )
+					.map( ( file ) =>
+						createBlock( 'core/image', {
+							blob: createBlobURL( file ),
+						} )
+					);
+
+				if ( getBlockName( rootClientId ) === 'core/gallery' ) {
 					replaceBlock( clientId, imageBlocks );
-				} else {
+				} else if (
+					canInsertBlockType( 'core/gallery', rootClientId )
+				) {
 					const galleryBlock = createBlock(
 						'core/gallery',
 						{},
