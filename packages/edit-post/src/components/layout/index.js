@@ -117,8 +117,8 @@ function useEditorStyles() {
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a constant padding for the typewriter effect. When typing at the
-		// bottom, there needs to be room to scroll up.
+		// Add a space for the typewriter effect. When typing in the last block,
+		// there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
 			renderingMode === 'post-only' &&
