@@ -22,7 +22,7 @@
 }
 
 .block-editor-iframe__html {
-	border: 0 solid $gray-300;
+	border: 0 solid $gray-100;
 	transform-origin: top center;
 	@include editor-canvas-resize-animation;
 }
@@ -36,11 +36,11 @@
 
 	transform: scale(#{$scale});
 
-	background-color: $gray-300;
+	background-color: $gray-100;
 
 	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
 	// layout, so we use border matching the background instead of margins.
-	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
+	border: calc(#{$frame-size} / #{$scale}) solid $gray-100;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
