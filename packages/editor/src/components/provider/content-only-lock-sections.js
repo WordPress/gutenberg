@@ -9,7 +9,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Component that when rendered, makes it so that the editor allows only
@@ -26,9 +26,10 @@ export default function ContentOnlyLockSections() {
 			getBlockOrder,
 			getClientIdsOfDescendants,
 			getClientIdsWithDescendants,
-		} = select( blockEditorStore );
-		const { getEditorSettings } = select( editorStore );
-		const { sectionRootClientId } = getEditorSettings();
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
+		const sectionRootClientId = getSectionRootClientId();
 		const sectionClientIds = getBlockOrder( sectionRootClientId );
 		const allClientIds = sectionRootClientId
 			? getClientIdsOfDescendants( sectionRootClientId )
