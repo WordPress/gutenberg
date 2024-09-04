@@ -19,6 +19,7 @@
 	.spacing-sizes-control__range-control,
 	.spacing-sizes-control__custom-value-range {
 		flex: 1;
+		margin-bottom: 0; // Needed for some instances of the range control, such as the Spacer block.
 	}
 
 	.components-range-control__mark {
