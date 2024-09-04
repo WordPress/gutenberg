@@ -101,12 +101,14 @@ function InserterMenu(
 			window.requestAnimationFrame( () => {
 				if (
 					! shouldFocusBlock &&
-					! blockTypesTabRef?.current.contains(
+					! blockTypesTabRef?.current?.contains(
 						ref.current.ownerDocument.activeElement
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
-					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+					blockTypesTabRef?.current
+						?.querySelector( 'button' )
+						.focus();
 				}
 			} );
 		},
