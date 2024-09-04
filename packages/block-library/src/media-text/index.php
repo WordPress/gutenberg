@@ -42,9 +42,9 @@ function render_block_core_media_text( $attributes, $content ) {
 
 	while ( $block_tag_processor->next_tag( $block_query ) ) {
 		if ( $image_fill ) {
-			// The markup below uses v8+ of the block, so adjust classes accordingly.
+			// The markup below does not work with the deprecated `is-image-fill` class.
 			$block_tag_processor->remove_class( 'is-image-fill' );
-			$block_tag_processor->add_class( 'is-image-fill-v8' );
+			$block_tag_processor->add_class( 'is-image-fill-element' );
 		}
 	}
 

@@ -76,7 +76,7 @@ export default function save( { attributes } ) {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill-v8': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
 
 	let gridTemplateColumns;

@@ -243,7 +243,7 @@ function MediaTextEdit( {
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill-v8': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
 	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 	const gridTemplateColumns =
