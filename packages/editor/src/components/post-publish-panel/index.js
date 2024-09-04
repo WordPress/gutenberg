@@ -78,8 +78,7 @@ export class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							onClick={ onClose }
 							icon={ closeSmall }
 							label={ __( 'Close panel' ) }
