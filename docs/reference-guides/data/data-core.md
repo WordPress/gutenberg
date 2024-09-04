@@ -521,19 +521,6 @@ _Returns_
 
 -   A value whose reference will change only when an edit occurs.
 
-### getRegisteredPostMeta
-
-Returns the registered post meta fields for a given post type.
-
-_Parameters_
-
--   _state_ `State`: Data state.
--   _postType_ `string`: Post type.
-
-_Returns_
-
--   Registered post meta fields.
-
 ### getRevision
 
 Returns a single, specific revision of a parent entity.
@@ -846,19 +833,6 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 _Parameters_
 
 -   _fallbackId_ `integer`: the id of the fallback Navigation Menu
-
-_Returns_
-
--   `Object`: Action object.
-
-### receiveRegisteredPostMeta
-
-Returns an action object used in signalling that the registered post meta fields for a post type have been received.
-
-_Parameters_
-
--   _postType_ `string`: Post type slug.
--   _registeredPostMeta_ `Object`: Registered post meta.
 
 _Returns_
 
