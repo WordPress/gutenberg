@@ -29,6 +29,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -254,7 +255,9 @@ function ReusableBlockEdit( {
 		value: innerBlocks.length > 0 ? innerBlocks : blocks,
 		onInput: NOOP,
 		onChange: NOOP,
-		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const handleEditOriginal = () => {
