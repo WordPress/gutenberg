@@ -23,14 +23,14 @@ export default function ContentOnlyLockSections() {
 
 	const selected = useSelect( ( select ) => {
 		const {
-			getBlockOrder,
 			getClientIdsOfDescendants,
 			getClientIdsWithDescendants,
 			getSectionRootClientId,
+			getSectionClientIds,
 		} = unlock( select( blockEditorStore ) );
 
 		const sectionRootClientId = getSectionRootClientId();
-		const sectionClientIds = getBlockOrder( sectionRootClientId );
+		const sectionClientIds = getSectionClientIds();
 		const allClientIds = sectionRootClientId
 			? getClientIdsOfDescendants( sectionRootClientId )
 			: getClientIdsWithDescendants();

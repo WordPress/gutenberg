@@ -565,5 +565,5 @@ export function getSectionRootClientId( state ) {
  */
 export function getSectionClientIds( state ) {
 	const sectionRootClientId = getSectionRootClientId( state );
-	return getBlockOrder( sectionRootClientId );
+	return getBlockOrder( state, sectionRootClientId );
 }
