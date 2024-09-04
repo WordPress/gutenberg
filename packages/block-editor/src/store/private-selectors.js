@@ -546,5 +546,5 @@ export function isZoomOutMode( state ) {
 }
 
 export function getSectionRootClientId( state ) {
-	return state.settings[ sectionRootClientIdKey ] ?? null;
+	return state.settings?.[ sectionRootClientIdKey ];
 }
