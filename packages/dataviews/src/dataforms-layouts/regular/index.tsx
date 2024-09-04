@@ -16,9 +16,12 @@ type MemoizedFieldEditProps< Item > = {
 	onChange: Pick< DataFormProps< Item >, 'onChange' >[ 'onChange' ];
 };
 
-const MemoizedFieldEdit = memo( ( { field, value, onChange } ) => (
-	<field.Edit value={ value } field={ field } onChange={ onChange } />
-) ) as < Item >( props: MemoizedFieldEditProps< Item > ) => JSX.Element;
+const MemoizedFieldEdit = memo(
+	( { field, value, onChange } ) => (
+		<field.Edit value={ value } field={ field } onChange={ onChange } />
+	),
+	( prevProps, nextProps ) => prevProps.value === nextProps.value
+) as < Item >( props: MemoizedFieldEditProps< Item > ) => JSX.Element;
 
 export default function FormRegular< Item >( {
 	data,
