@@ -12,7 +12,7 @@
  * formatFontFaceName("'Open Sans', sans-serif") => "Open Sans"
  * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
  */
-export function formatFontFaceName( input ) {
+function formatFontFaceName( input ) {
 	if ( ! input ) {
 		return '';
 	}
@@ -45,8 +45,6 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	if ( typeof source === 'string' ) {
 		dataSource = `url(${ source })`;
 		// eslint-disable-next-line no-undef
-	} else if ( source instanceof File ) {
-		dataSource = await source.arrayBuffer();
 	} else {
 		return;
 	}
@@ -71,40 +69,6 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 			'iframe[name="editor-canvas"]'
 		).contentDocument;
 		iframeDocument.fonts.add( loadedFace );
-	}
-}
-
-/*
- * Unloads the font face and remove it from the browser.
- * It also removes it from the iframe document.
- *
- * Note that Font faces that were added to the set using the CSS @font-face rule
- * remain connected to the corresponding CSS, and cannot be deleted.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
- */
-export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
-	const unloadFontFace = ( fonts ) => {
-		fonts.forEach( ( f ) => {
-			if (
-				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
-				f.weight === fontFace?.fontWeight &&
-				f.style === fontFace?.fontStyle
-			) {
-				fonts.delete( f );
-			}
-		} );
-	};
-
-	if ( removeFrom === 'document' || removeFrom === 'all' ) {
-		unloadFontFace( document.fonts );
-	}
-
-	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
-		const iframeDocument = document.querySelector(
-			'iframe[name="editor-canvas"]'
-		).contentDocument;
-		unloadFontFace( iframeDocument.fonts );
 	}
 }
 
