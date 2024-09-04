@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Add `--silent` option to `run` command to omit command tips and spinner text. This avoids needing to send that text to STDERR.
+
 ## 10.6.0 (2024-08-21)
 
 ## 10.5.0 (2024-08-07)

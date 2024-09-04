@@ -30,17 +30,20 @@ const wpYellow = boldWhite.bgHex( '#f0b849' );
 const withSpinner =
 	( command ) =>
 	( ...args ) => {
-		const spinner = ora().start();
+		const silent = args[ 0 ].silent;
+		const spinner = silent ? {} : ora().start();
 		args[ 0 ].spinner = spinner;
 		let time = process.hrtime();
 		return command( ...args ).then(
 			( message ) => {
-				time = process.hrtime( time );
-				spinner.succeed(
-					`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
-						time[ 1 ] / 1e6
-					).toFixed( 0 ) }ms)`
-				);
+				if ( ! silent ) {
+					time = process.hrtime( time );
+					spinner.succeed(
+						`${ message || spinner.text } (in ${ time[ 0 ] }s ${ (
+							time[ 1 ] / 1e6
+						).toFixed( 0 ) }ms)`
+					);
+				}
 				process.exit( 0 );
 			},
 			( error ) => {
@@ -49,7 +52,9 @@ const withSpinner =
 					error instanceof env.LifecycleScriptError
 				) {
 					// Error is a configuration error. That means the user did something wrong.
-					spinner.fail( error.message );
+					if ( ! silent ) {
+						spinner.fail( error.message );
+					}
 					process.exit( 1 );
 				} else if (
 					error &&
@@ -60,26 +65,32 @@ const withSpinner =
 				) {
 					// Error is a docker compose error. That means something docker-related failed.
 					// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
-					spinner.fail(
-						'Error while running docker compose command.'
-					);
-					if ( error.out ) {
-						process.stdout.write( error.out );
-					}
-					if ( error.err ) {
-						process.stderr.write( error.err );
+					if ( ! silent ) {
+						spinner.fail(
+							'Error while running docker compose command.'
+						);
+						if ( error.out ) {
+							process.stdout.write( error.out );
+						}
+						if ( error.err ) {
+							process.stderr.write( error.err );
+						}
 					}
 					process.exit( error.exitCode );
 				} else if ( error ) {
 					// Error is an unknown error. That means there was a bug in our code.
-					spinner.fail(
-						typeof error === 'string' ? error : error.message
-					);
-					// Disable reason: Using console.error() means we get a stack trace.
-					console.error( error );
+					if ( ! silent ) {
+						spinner.fail(
+							typeof error === 'string' ? error : error.message
+						);
+						// Disable reason: Using console.error() means we get a stack trace.
+						console.error( error );
+					}
 					process.exit( 1 );
 				} else {
-					spinner.fail( 'An unknown error occurred.' );
+					if ( ! silent ) {
+						spinner.fail( 'An unknown error occurred.' );
+					}
 					process.exit( 1 );
 				}
 			}
@@ -205,6 +216,12 @@ module.exports = function cli() {
 				default: '.',
 				describe:
 					"The command's working directory inside of the container. Paths without a leading slash are relative to the WordPress root.",
+			} );
+			args.option( 'silent', {
+				type: 'boolean',
+				requiresArg: false,
+				default: false,
+				describe: 'Whether to omit the command tip and spinner text.',
 			} );
 			args.positional( 'container', {
 				type: 'string',

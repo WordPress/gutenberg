@@ -25,6 +25,7 @@ const getHostUser = require( '../get-host-user' );
  * @param {string}   options.envCwd    The working directory for the command to be executed from.
  * @param {Object}   options.spinner   A CLI spinner which indicates progress.
  * @param {boolean}  options.debug     True if debug mode is enabled.
+ * @param {boolean}  options.silent    If present, the command tips and spinner text are omitted.
  */
 module.exports = async function run( {
 	container,
@@ -33,6 +34,7 @@ module.exports = async function run( {
 	envCwd,
 	spinner,
 	debug,
+	silent,
 } ) {
 	const config = await initConfig( { spinner, debug } );
 
@@ -44,7 +46,9 @@ module.exports = async function run( {
 
 	// Shows a contextual tip for the given command.
 	const joinedCommand = command.join( ' ' );
-	showCommandTips( joinedCommand, container, spinner );
+	if ( ! silent ) {
+		showCommandTips( joinedCommand, container, spinner );
+	}
 
 	await spawnCommandDirectly( config, container, command, envCwd, spinner );
 
