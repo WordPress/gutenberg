@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "2.0.6",
+	"version": "2.0.7",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
