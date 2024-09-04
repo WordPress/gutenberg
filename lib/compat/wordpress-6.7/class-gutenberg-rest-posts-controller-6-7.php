@@ -485,7 +485,6 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 
 		if ( post_type_supports( $this->post_type, 'post-formats' ) ) {
 			$query_params['format'] = array(
-				'default'     => 'standard',
 				'description' => __( 'Limit result set to items assigned one or more formats.' ),
 				'type'        => 'array',
 				'items'       => array(
