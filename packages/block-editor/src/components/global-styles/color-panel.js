@@ -33,7 +33,7 @@ import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
@@ -97,7 +97,7 @@ export function useHasButtonPanel( settings ) {
 	);
 }
 
-export function useHasBackgroundPanel( settings ) {
+export function useHasBackgroundColorPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -347,7 +347,7 @@ export default function ColorPanel( {
 	};
 
 	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
