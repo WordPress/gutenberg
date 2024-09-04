@@ -41,9 +41,11 @@ module.exports = {
 		environment: { module: true },
 		module: true,
 		chunkFormat: 'module',
+		asyncChunks: false,
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
+		mainFields: [ 'wp-module' ],
 	},
 	module: {
 		rules: [
