@@ -67,7 +67,8 @@ export function PrivateBlockToolbar( {
 		showParentSelector,
 		isUsingBindings,
 		canRemove,
-		mode, // Add this line
+		mode,
+		patternCategory,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -79,52 +80,50 @@ export function PrivateBlockToolbar( {
 			getBlockEditingMode,
 			getBlockAttributes,
 			canRemoveBlock,
-			__unstableGetEditorMode, // Add this line
+			__unstableGetEditorMode,
 		} = select( blockEditorStore );
-		const selectedBlockClientIds = getSelectedBlockClientIds();
-		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
-		const parents = getBlockParents( selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
-		const parentBlockType = getBlockType( parentBlockName );
-		const editingMode = getBlockEditingMode( selectedBlockClientId );
-		const _isDefaultEditingMode = editingMode === 'default';
-		const _blockName = getBlockName( selectedBlockClientId );
-		const isValid = selectedBlockClientIds.every( ( id ) =>
-			isBlockValid( id )
-		);
-		const isVisual = selectedBlockClientIds.every(
-			( id ) => getBlockMode( id ) === 'visual'
-		);
-		const _isUsingBindings = selectedBlockClientIds.every(
-			( clientId ) =>
-				!! getBlockAttributes( clientId )?.metadata?.bindings
-		);
+		const selectedBlockClientIds = getSelectedBlockClientIds() || [];
+		const selectedBlockClientId = selectedBlockClientIds[0];
+
+		if (!selectedBlockClientId) {
+			console.log('No block selected');
+			return {};
+		}
+
+		const blockName = getBlockName( selectedBlockClientId );
+		const blockType = getBlockType( blockName );
+		const blockAttributes = getBlockAttributes( selectedBlockClientId ) || {};
+		const metadata = blockAttributes.metadata || {};
+		const categories = Array.isArray(metadata.categories) ? metadata.categories : [];
+		const firstCategory = categories[0];
+
+		console.log('Selected Block ID:', selectedBlockClientId);
+		console.log('Block Attributes:', blockAttributes);
+		console.log('Metadata:', metadata);
+		console.log('Categories:', categories);
+		console.log('First Category:', firstCategory);
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
-			isContentOnlyEditingMode: editingMode === 'contentOnly',
-			isDefaultEditingMode: _isDefaultEditingMode,
-			blockType: selectedBlockClientId && getBlockType( _blockName ),
-			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
-			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
-			showParentSelector:
-				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
-				hasBlockSupport(
-					parentBlockType,
-					'__experimentalParentSelector',
-					true
-				) &&
-				selectedBlockClientIds.length === 1 &&
-				_isDefaultEditingMode,
-			isUsingBindings: _isUsingBindings,
+			isContentOnlyEditingMode: getBlockEditingMode( selectedBlockClientId ) === 'contentOnly',
+			isDefaultEditingMode: getBlockEditingMode( selectedBlockClientId ) === 'default',
+			blockType,
+			toolbarKey: selectedBlockClientId,
+			shouldShowVisualToolbar: isBlockValid( selectedBlockClientId ),
+			showParentSelector: (getBlockParents( selectedBlockClientId ) || []).length > 0,
+			isUsingBindings: !!blockAttributes.__unstableBindings,
 			canRemove: canRemoveBlock( selectedBlockClientId ),
-			mode: __unstableGetEditorMode(), // Add this line
+			mode: __unstableGetEditorMode(),
+			patternCategory: firstCategory,
 		};
 	}, [] );
+
+	console.log('Rendering PrivateBlockToolbar');
+	console.log('shouldShowVisualToolbar:', shouldShowVisualToolbar);
+	// Debugging
+	console.log('Current mode:', mode);
+	console.log('Pattern Category:', patternCategory);
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -157,6 +156,11 @@ export function PrivateBlockToolbar( {
 		'is-connected': isUsingBindings,
 	} );
 
+	console.log('Rendering PrivateBlockToolbar');
+	console.log('shouldShowVisualToolbar:', shouldShowVisualToolbar);
+	console.log('mode:', mode);
+	console.log('patternCategory:', patternCategory);
+
 	return (
 		<NavigableToolbar
 			focusEditorOnEscape
@@ -173,6 +177,7 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
+
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
@@ -192,6 +197,14 @@ export function PrivateBlockToolbar( {
 								/>
 								{ isDefaultEditingMode && (
 									<>
+									{mode === 'zoom-out' && patternCategory && (
+										<span
+											className="block-editor-block-toolbar__pattern-category"
+												>
+													{patternCategory}
+												</span>
+											)}
+
 										{ ! isMultiToolbar && (
 											<BlockLockToolbar
 												clientId={ blockClientId }
@@ -206,9 +219,9 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				{ ! isMultiToolbar && canRemove && (
+				{  mode === 'zoom-out' ? (
 					<Shuffle clientId={ blockClientId } />
-				) }
+				) : null }
 				{ shouldShowVisualToolbar && isMultiToolbar && (
 					<BlockGroupToolbar />
 				) }
@@ -238,6 +251,7 @@ export function PrivateBlockToolbar( {
 						</__unstableBlockNameContext.Provider>
 					</>
 				) }
+
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				{ isDefaultEditingMode && (
 					<BlockSettingsMenu clientIds={ blockClientIds } />

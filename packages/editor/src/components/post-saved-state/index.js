@@ -125,7 +125,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 	}
 
 	/* translators: button label text should, if possible, be under 16 characters. */
-	const label = isPending ? __( 'Save as pending' ) : __( 'Save draft' );
+	const label = isPending ? __( 'Save' ) : __( 'Save' );
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const shortLabel = __( 'Save' );
@@ -136,9 +136,9 @@ export default function PostSavedState( { forceIsDirty } ) {
 	let text;
 
 	if ( isSaving ) {
-		text = isAutosaving ? __( 'Autosaving' ) : __( 'Saving' );
+		text = isAutosaving ? __( 'Save' ) : __( 'Save' );
 	} else if ( isSaved ) {
-		text = __( 'Saved' );
+		text = __( 'Save' );
 	} else if ( isLargeViewport ) {
 		text = label;
 	} else if ( showIconLabels ) {
@@ -171,11 +171,10 @@ export default function PostSavedState( { forceIsDirty } ) {
 			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
 			variant="tertiary"
 			size="compact"
-			icon={ isLargeViewport ? undefined : cloudUpload }
+			// icon={ isLargeViewport ? undefined : cloudUpload }
 			label={ text || label }
 			aria-disabled={ isDisabled }
 		>
-			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
 			{ text }
 		</Button>
 	);

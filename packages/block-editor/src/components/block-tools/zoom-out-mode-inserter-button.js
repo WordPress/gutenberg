@@ -28,6 +28,7 @@ function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 					'is-visible': isVisible || zoomOutModeInserterButtonHovered,
 				}
 			) }
+			icon={ plus }
 			onClick={ onClick }
 			onMouseOver={ () => {
 				setZoomOutModeInserterButtonHovered( true );
@@ -40,7 +41,6 @@ function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 				'Generic label for pattern inserter button'
 			) }
 		>
-			{ __( 'Add pattern' ) }
 		</Button>
 	);
 }

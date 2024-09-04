@@ -1,13 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
-import { __unstableMotion as motion } from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { chevronUpDown } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+
+// Add this import at the top of the file
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -39,6 +44,12 @@ const backButtonVariations = {
 	visible: { x: 0 },
 	hidden: { x: 0 },
 };
+
+const ZoomOutIcon = (
+	<SVG width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<Path fill="none" d="M5.75 12.75V18.25H11.25M12.75 5.75H18.25V11.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+	</SVG>
+);
 
 function Header( {
 	customSaveButton,
@@ -83,6 +94,17 @@ function Header( {
 	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { editorMode } = useSelect( ( select ) => ({
+		editorMode: select( blockEditorStore ).__unstableGetEditorMode(),
+	}) );
+
+	const handleZoomOut = () => {
+		__unstableSetEditorMode( editorMode === 'zoom-out' ? 'edit' : 'zoom-out' );
+	};
+
+	const isZoomedOut = editorMode === 'zoom-out';
+
 	// The edit-post-header classname is only kept for backward compatibilty
 	// as some plugins might be relying on its presence.
 	return (
@@ -125,7 +147,39 @@ function Header( {
 				transition={ { type: 'tween' } }
 				className="editor-header__settings"
 			>
-				{ ! customSaveButton && ! isPublishSidebarOpened && (
+
+
+
+
+				<PreviewDropdown
+					forceIsAutosaveable={ forceIsDirty }
+					disabled={ isNestedEntity }
+				/>
+
+<Button
+					onClick={ handleZoomOut }
+					icon={ ZoomOutIcon }
+					label={ __('Zoom Out') }
+					isPressed={ isZoomedOut }
+					size="compact"
+
+				>
+				</Button>
+
+<PostViewLink />
+
+
+				<PostPreviewButton
+					className="editor-header__post-preview-button"
+					forceIsAutosaveable={ forceIsDirty }
+				/>
+
+
+				{ ( isWideViewport || ! showIconLabels ) && (
+					<PinnedItems.Slot scope="core" />
+				) }
+
+{ ! customSaveButton && ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
 					// We can't hide the whole toolbar when the publish sidebar is open because
 					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
@@ -133,15 +187,8 @@ function Header( {
 					// when the publish sidebar has been closed.
 					<PostSavedState forceIsDirty={ forceIsDirty } />
 				) }
-				<PreviewDropdown
-					forceIsAutosaveable={ forceIsDirty }
-					disabled={ isNestedEntity }
-				/>
-				<PostPreviewButton
-					className="editor-header__post-preview-button"
-					forceIsAutosaveable={ forceIsDirty }
-				/>
-				<PostViewLink />
+
+
 				{ ! customSaveButton && (
 					<PostPublishButtonOrToggle
 						forceIsDirty={ forceIsDirty }
@@ -151,9 +198,6 @@ function Header( {
 					/>
 				) }
 				{ customSaveButton }
-				{ ( isWideViewport || ! showIconLabels ) && (
-					<PinnedItems.Slot scope="core" />
-				) }
 				<MoreMenu />
 			</motion.div>
 		</div>

@@ -113,11 +113,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			icon: desktop,
 		},
 		{
-			value: 'ZoomOut',
-			label: __( 'Desktop (50%)' ),
-			icon: desktop,
-		},
-		{
 			value: 'Tablet',
 			label: __( 'Tablet' ),
 			icon: tablet,
@@ -159,7 +154,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			toggleProps={ toggleProps }
 			menuProps={ menuProps }
 			icon={ deviceIcons[ deviceType.toLowerCase() ] }
-			text={ editorMode === 'zoom-out' ? __( '50%' ) : undefined }
 			label={ __( 'View' ) }
 			disableOpenOnArrowDown={ disabled }
 		>

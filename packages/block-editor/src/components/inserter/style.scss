@@ -16,6 +16,14 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+
+.block-editor-patterns__pattern-icon-wrapper,
+.block-editor-block-patterns-list__item-title,
+.block-editor-patterns__grid-pagination-wrapper,
+.block-editor-inserter__patterns-explore-button {
+	display: none !important;
+}
+
 .block-editor-inserter__main-area {
 	height: 100%;
 	gap: $grid-unit-20;
@@ -679,7 +687,12 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 }
 
+.block-editor-block-contextual-toolbar.is-zoom-out.has-parent {
+	margin-left: 0 !important;
+}
+
 .block-editor-inserter__menu.is-zoom-out {
+	margin-left: px;
 	display: flex;
 	&.show-panel::after {
 		// Makes space for the inserter flyout panel

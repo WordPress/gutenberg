@@ -27,3 +27,8 @@
 	// Gap between pinned items.
 	gap: $grid-unit-10;
 }
+
+
+.interface-pinned-items {
+	flex-direction: row-reverse ;
+}

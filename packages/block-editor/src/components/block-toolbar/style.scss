@@ -57,6 +57,18 @@
 	}
 }
 
+.is-zoom-out .block-editor-block-mover {
+
+}
+
+.block-editor-block-toolbar__pattern-category {
+	justify-content: center;
+    display: flex;
+    align-items: center;
+    height: auto;
+	padding-right: 8px;
+	text-transform: capitalize;
+}
 .block-editor-block-contextual-toolbar {
 	position: sticky;
 	top: 0;
