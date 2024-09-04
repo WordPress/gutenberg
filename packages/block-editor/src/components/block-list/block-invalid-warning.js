@@ -101,7 +101,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 			<Warning
 				actions={ [
 					<Button
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						key="recover"
 						onClick={ convert.toRecoveredBlock }
 						variant="primary"
