@@ -25,7 +25,7 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
 			{ commentID && (
 				<BlockCommentToolbar
 					clientId={ selectedBlockClientId }
-					blockClassName={ commentID }
+					blockClassName={ commentID }					
 				/>
 			) }
 
