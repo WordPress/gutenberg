@@ -26,6 +26,7 @@ import PageAttributesCheck from '../page-attributes/check';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { useStartPatterns } from '../start-page-options';
 
 const {
 	PreferencesModal,
@@ -57,6 +58,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
+	const starterPatterns = useStartPatterns();
 
 	const sections = useMemo(
 		() =>
@@ -208,6 +210,16 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
+							{ starterPatterns?.length && (
+								<PreferenceToggleControl
+									scope="core"
+									featureName="enableChoosePatternModal"
+									help={ __(
+										'Shows starter patterns when creating a new page.'
+									) }
+									label={ __( 'Show starter patterns' ) }
+								/>
+							) }
 							{ extraSections?.appearance }
 						</PreferencesModalSection>
 					),
@@ -314,6 +326,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			setIsListViewOpened,
 			setPreference,
 			isLargeViewport,
+			starterPatterns,
 		]
 	);
 
