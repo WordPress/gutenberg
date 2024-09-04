@@ -118,7 +118,6 @@ const SocialLinkEdit = ( {
 		// Manually adding this class for backwards compatibility of CSS when moving the
 		// blockProps from the li to the button: https://github.com/WordPress/gutenberg/pull/64883
 		'wp-block-social-link',
-		'wp-social-link__list-item',
 		'wp-social-link-' + service,
 		{
 			'wp-social-link__is-incomplete': ! url,
