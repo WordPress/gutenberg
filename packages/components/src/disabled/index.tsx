@@ -63,7 +63,7 @@ function Disabled( {
 		<Provider value={ isDisabled }>
 			<div
 				// @ts-ignore Reason: inert is a recent HTML attribute
-				inert={ isDisabled ? 'true' : undefined }
+				inert={ isDisabled ? true : undefined }
 				className={
 					isDisabled
 						? cx( disabledStyles, className, 'components-disabled' )

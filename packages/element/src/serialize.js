@@ -608,7 +608,9 @@ export function renderElement( element, context, legacyContext = {} ) {
 
 		case Consumer.$$typeof:
 			return renderElement(
-				props.children( context || type._currentValue ),
+				props.children(
+					context || type._currentValue || type._context._currentValue
+				),
 				context,
 				legacyContext
 			);
@@ -717,9 +719,9 @@ export function renderComponent(
 /**
  * Serializes an array of children to string.
  *
- * @param {import('react').ReactNodeArray} children        Children to serialize.
- * @param {Object}                         [context]       Context object.
- * @param {Object}                         [legacyContext] Legacy context object.
+ * @param {ReadonlyArray<import('react').ReactNode>} children        Children to serialize.
+ * @param {Object}                                   [context]       Context object.
+ * @param {Object}                                   [legacyContext] Legacy context object.
  *
  * @return {string} Serialized children.
  */
