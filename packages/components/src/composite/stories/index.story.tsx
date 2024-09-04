@@ -283,5 +283,57 @@ WithSlotFill.parameters = {
 		description: {
 			story: 'When rendering Composite components across a SlotFill, the Composite.Context should be manually forwarded from the Slot to the Fill component.',
 		},
+		source: {
+			transform: ( code: string, storyContext: StoryContext ) => {
+				return `const ExampleSlotFill = createSlotFill( 'Example' );
+
+const Slot = () => {
+	const compositeContext = useContext( Composite.Context );
+
+	// Forward the Slot's composite context to the Fill via fillProps, so that
+	// Composite components rendered inside the Fill can work as expected.
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ Composite.Context.Provider, { value: compositeContext } ],
+			],
+		} ),
+		[ compositeContext ]
+	);
+
+	return (
+		<ExampleSlotFill.Slot
+			fillProps={ fillProps }
+			bubblesVirtually
+			style={ { display: 'contents' } }
+		/>
+	);
+};
+
+const Fill = ( { children } ) => {
+	const innerMarkup = <>{ children }</>;
+
+	return (
+		<ExampleSlotFill.Fill>
+			{ ( fillProps ) => {
+				const { forwardedContext = [] } = fillProps;
+
+				// Render all context providers forwarded by the Slot via fillProps.
+				return forwardedContext.reduce(
+					( inner, [ Provider, props ] ) => (
+						<Provider { ...props }>{ inner }</Provider>
+					),
+					innerMarkup
+				);
+			} }
+		</ExampleSlotFill.Fill>
+	);
+};
+
+// In a separate component:
+
+${ transform( code, storyContext ) }`;
+			},
+		},
 	},
 };
