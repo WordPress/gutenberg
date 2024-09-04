@@ -268,7 +268,7 @@ export default function CollabSidebar() {
 			title={ __( 'Comments' ) }
 			icon={ commentIcon }
 		>
-			<div className="editor-collab-sidebar__activities">
+			<div className="editor-collab-sidebar-panel">
 				<AddComment
 					threads={ sortedThreads }
 					onSubmit={ addNewComment }
