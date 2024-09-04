@@ -31,6 +31,8 @@ const meta: Meta< typeof Composite > = {
 		'Composite.Hover': Composite.Hover,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Composite.Typeahead': Composite.Typeahead,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Composite.Context': Composite.Context,
 	},
 	argTypes: {
 		children: { control: { type: null } },
