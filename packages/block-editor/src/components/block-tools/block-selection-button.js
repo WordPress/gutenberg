@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { dragHandle } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -90,15 +90,20 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		[ clientId, rootClientId ]
 	);
 	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
-	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	// Focus the breadcrumb in navigation mode.
+	const labelRef = useRef( label );
+	useEffect( () => {
+		labelRef.current = label;
+	}, [ label ] );
 	useEffect( () => {
 		if ( editorMode === 'navigation' ) {
 			ref.current.focus();
-			speak( label );
+			speak( labelRef.current );
 		}
-	}, [ label, editorMode ] );
+	}, [ editorMode ] );
+
 	const blockElement = useBlockElement( clientId );
 
 	const {
@@ -279,7 +284,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 							ref={ ref }
 							onClick={
 								editorMode === 'navigation'
-									? () => setNavigationMode( false )
+									? () => blockElement?.focus()
 									: undefined
 							}
 							onKeyDown={ onKeyDown }

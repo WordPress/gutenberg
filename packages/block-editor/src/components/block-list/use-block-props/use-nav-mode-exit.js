@@ -22,14 +22,12 @@ export function useNavModeExit( clientId ) {
 			function onMouseDown( event ) {
 				// Don't select a block if it's already handled by a child
 				// block.
-				if ( isNavigationMode() && ! event.defaultPrevented ) {
-					// Prevent focus from moving to the block.
-					event.preventDefault();
+				event.stopPropagation();
 
-					// When clicking on a selected block, exit navigation mode.
-					if ( isBlockSelected( clientId ) ) {
-						setNavigationMode( false );
-					} else {
+				if ( isNavigationMode() && ! event.defaultPrevented ) {
+					if ( ! isBlockSelected( clientId ) ) {
+						// Prevent focus from moving to the block.
+						event.preventDefault();
 						selectBlock( clientId );
 					}
 				}

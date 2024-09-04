@@ -574,7 +574,6 @@ function BlockListBlockProvider( props ) {
 				hasBlockMovingClientId,
 				canInsertBlockType,
 				__unstableHasActiveBlockOverlayActive,
-				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
@@ -678,12 +677,9 @@ function BlockListBlockProvider( props ) {
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
-				initialPosition:
-					_isSelected &&
-					( __unstableGetEditorMode() === 'edit' ||
-						__unstableGetEditorMode() === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
-						? getSelectedBlocksInitialCaretPosition()
-						: undefined,
+				initialPosition: _isSelected
+					? getSelectedBlocksInitialCaretPosition()
+					: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
 				isMultiSelected,
 				isPartiallySelected:
