@@ -96,7 +96,7 @@ function isElementVisible( element ) {
 		return false;
 	}
 
-	// Older browsers, e.g. Safari may not have `checkVisibility` method.
+	// Older browsers, e.g. Safari < 17.4 may not support the `checkVisibility` method.
 	if ( element.checkVisibility ) {
 		return element.checkVisibility?.( {
 			opacityProperty: true,
