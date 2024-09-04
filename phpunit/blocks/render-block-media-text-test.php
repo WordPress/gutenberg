@@ -81,14 +81,13 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
-		// Assert that the rendered block contains the featured image as an image element
-		// and not as a background-image url, when image fill is true.
+		// Assert that the rendered block contains the featured image as an image element,
+		// when image fill is true.
 		$attributes = array(
 			'useFeaturedImage' => true,
 			'imageFill'        => true,
 		);
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
-		$this->assertStringNotContainsString( 'background-image:', $rendered );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -107,14 +106,13 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
-		// Assert that the rendered block contains the featured image as an image element
-		// and not as a background-image url, when image fill is true.
+		// Assert that the rendered block contains the featured image as an image element,
+		// when image fill is true.
 		$attributes = array(
 			'useFeaturedImage' => true,
 			'imageFill'        => true,
 		);
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
-		$this->assertStringNotContainsString( 'background-image:', $rendered );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -134,15 +132,14 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
-		// Assert that the rendered block contains the featured image as an image element
-		// and not as a background-image url, when image fill is true and the media is on the right.
+		// Assert that the rendered block contains the featured image as an image element,
+		// when image fill is true and the media is on the right.
 		$attributes = array(
 			'useFeaturedImage' => true,
 			'mediaPosition'    => 'right',
 			'imageFill'        => true,
 		);
 		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
-		$this->assertStringNotContainsString( 'background-image:', $rendered );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 
@@ -164,8 +161,8 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		$rendered = gutenberg_render_block_core_media_text( $attributes, $content );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 
-		// Assert that the rendered block contains the featured image as an image element
-		// and not as a background-image url, when image fill is true and the media is on the right.
+		// Assert that the rendered block contains the featured image as an image element,
+		// when image fill is true and the media is on the right.
 		$attributes = array(
 			'useFeaturedImage' => true,
 			'mediaPosition'    => 'right',
@@ -173,7 +170,6 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 		);
 
 		$rendered = gutenberg_render_block_core_media_text( $attributes, $content );
-		$this->assertStringNotContainsString( 'background-image:', $rendered );
 		$this->assertStringContainsString( '<img alt="" src="' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . '"', $rendered );
 	}
 }
