@@ -11,11 +11,13 @@ import {
 	Card,
 	CardDivider,
 	CardMedia,
+	createSlotFill,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { Fragment } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -28,6 +30,23 @@ import PreviewStyles from './preview-styles';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
+const { Slot: GlobalStylesScreenRootSlot } = createSlotFill(
+	'GlobalStylesScreenRoot'
+);
+
+const ScreenRootSlot = () => (
+	<GlobalStylesScreenRootSlot>
+		{ ( fills ) =>
+			fills.map( ( fill, index ) => (
+				<Fragment key={ index }>
+					<CardBody>{ fill }</CardBody>
+					<CardDivider />
+				</Fragment>
+			) )
+		}
+	</GlobalStylesScreenRootSlot>
+);
 
 function ScreenRoot() {
 	const [ customCSS ] = useGlobalStyle( 'css' );
@@ -54,6 +73,8 @@ function ScreenRoot() {
 
 	return (
 		<Card size="small" className="edit-site-global-styles-screen-root">
+			<ScreenRootSlot />
+
 			<CardBody>
 				<VStack spacing={ 4 }>
 					<Card>
