@@ -13,6 +13,13 @@
  * @see WP_REST_Controller
  */
 class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
+	/**
+	 * Post type.
+	 *
+	 * @since 4.7.0
+	 * @var string
+	 */
+	protected $post_type;
 
 	/**
 	 * Retrieves a collection of posts.
