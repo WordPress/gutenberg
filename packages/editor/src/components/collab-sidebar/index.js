@@ -207,34 +207,7 @@ export default function CollabSidebar() {
 					'&status=any&per_page=100',
 				method: 'GET',
 			} ).then( ( data ) => {
-				// Create a compare to store the references to all objects by id
-				const compare = {};
-				const result = [];
-
-				// Initialize each object with an empty `reply` array
-				data.forEach( ( item ) => {
-					compare[ item.id ] = { ...item, reply: [] };
-				} );
-
-				// Iterate over the data to build the tree structure
-				data.forEach( ( item ) => {
-					if ( item.parent === 0 ) {
-						// If parent is 0, it's a root item, push it to the result array
-						result.push( compare[ item.id ] );
-					} else if (
-						compare[ item.parent ] &&
-						'trash' !== item.status
-					) {
-						// Otherwise, find its parent and push it to the parent's `reply` array
-						compare[ item.parent ].reply.push( compare[ item.id ] );
-					}
-				} );
-				const filteredComments = result.filter(
-					( comment ) => comment.status !== 'trash'
-				);
-				setThreads(
-					Array.isArray( filteredComments ) ? filteredComments : []
-				);
+				setThreads( Array.isArray( data ) ? data : [] );
 			} );
 		}
 	};
@@ -244,24 +217,51 @@ export default function CollabSidebar() {
 	}, [ postId ] );
 
 	const allBlocks = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlocks();
+		return select( blockEditorStore ).getBlocks();
 	}, [] );
 
-	const filteredBlocks = allBlocks?.filter(
-		( block ) => block.attributes.blockCommentId !== 0
-	);
+	// Process comments to build the tree structure
+	const resultComments = useMemo( () => {
+		// Create a compare to store the references to all objects by id
+		const compare = {};
+		const result = [];
 
-	const blockCommentIds = filteredBlocks?.map(
-		( block ) => block.attributes.blockCommentId
-	);
-	const resultThreads = threads?.slice().reverse();
-	const threadIdMap = new Map(
-		resultThreads?.map( ( thread ) => [ thread.id, thread ] )
-	);
-	const sortedThreads = blockCommentIds
-		.map( ( id ) => threadIdMap.get( id ) )
-		.filter( ( thread ) => thread !== undefined );
+		const filteredComments = threads.filter(
+			( comment ) => comment.status !== 'trash'
+		);
+
+		// Initialize each object with an empty `reply` array
+		filteredComments.forEach( ( item ) => {
+			compare[ item.id ] = { ...item, reply: [] };
+		} );
+
+		// Iterate over the data to build the tree structure
+		filteredComments.forEach( ( item ) => {
+			if ( item.parent === 0 ) {
+				// If parent is 0, it's a root item, push it to the result array
+				result.push( compare[ item.id ] );
+			} else if ( compare[ item.parent ] ) {
+				// Otherwise, find its parent and push it to the parent's `reply` array
+				compare[ item.parent ].reply.push( compare[ item.id ] );
+			}
+		} );
+
+		const filteredBlocks = allBlocks?.filter(
+			( block ) => block.attributes.blockCommentId !== 0
+		);
+
+		const blockCommentIds = filteredBlocks?.map(
+			( block ) => block.attributes.blockCommentId
+		);
+		const threadIdMap = new Map(
+			result?.map( ( thread ) => [ thread.id, thread ] )
+		);
+		const sortedThreads = blockCommentIds
+			.map( ( id ) => threadIdMap.get( id ) )
+			.filter( ( thread ) => thread !== undefined );
+
+		return sortedThreads;
+	}, [ threads ] );
 
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
@@ -277,11 +277,11 @@ export default function CollabSidebar() {
 		>
 			<div className="editor-collab-sidebar-panel">
 				<AddComment
-					threads={ sortedThreads }
+					threads={ resultComments }
 					onSubmit={ addNewComment }
 				/>
 				<Comments
-					threads={ sortedThreads }
+					threads={ resultComments }
 					onEditComment={ onEditComment }
 					onAddReply={ onAddReply }
 					onCommentDelete={ onCommentDelete }

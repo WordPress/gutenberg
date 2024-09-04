@@ -193,7 +193,6 @@ export function PrivateBlockToolbar( {
 										/>
 									</>
 								) }
-
 							</ToolbarGroup>
 						</div>
 					) }

@@ -33,7 +33,10 @@ export default function BlockCommentMenuItem( { onClose } ) {
 			onClick={ openCollabBoard }
 			aria-haspopup="dialog"
 		>
-			{ _x( 'Add Comment', 'Click to open comment sidebar and add comment' ) }
+			{ _x(
+				'Add Comment',
+				'Click to open comment sidebar and add comment'
+			) }
 		</MenuItem>
 	);
 }
