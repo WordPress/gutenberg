@@ -94,11 +94,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     <p
       class="edit-post-preferences-modal__custom-fields-confirmation-message"
     >
-      Custom fields connected to block attributes cannot be edited in the block editor while this interface is active.
-    </p>
-    <p
-      class="edit-post-preferences-modal__custom-fields-confirmation-message"
-    >
       A page reload is required for this change. Make sure your content is saved before reloading.
     </p>
     <button
@@ -203,11 +198,6 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
         </div>
       </div>
     </div>
-    <p
-      class="edit-post-preferences-modal__custom-fields-confirmation-message"
-    >
-      Custom fields connected to block attributes cannot be edited in the block editor while this interface is active.
-    </p>
   </div>
 </div>
 `;
