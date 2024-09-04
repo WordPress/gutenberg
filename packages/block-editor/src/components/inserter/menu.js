@@ -106,9 +106,7 @@ function InserterMenu(
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
-					blockTypesTabRef.current
-						?.querySelector( 'button' )
-						.focus();
+					blockTypesTabRef.current?.querySelector( 'button' ).focus();
 				}
 			} );
 		},
