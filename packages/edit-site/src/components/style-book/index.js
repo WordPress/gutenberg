@@ -48,7 +48,6 @@ const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
 	Tabs,
 } = unlock( componentsPrivateApis );
 
@@ -383,11 +382,9 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
-		const compositeStore = useCompositeStore( { orientation: 'vertical' } );
-
 		return (
 			<Composite
-				store={ compositeStore }
+				orientation="vertical"
 				className={ className }
 				aria-label={ label }
 				role="grid"
