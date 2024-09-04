@@ -1436,6 +1436,36 @@ describe( 'blocks', () => {
 				},
 			] );
 		} );
+
+		it( 'should warn when registering block variation array without a name', () => {
+			registerBlockType( 'core/variation-block', defaultBlockSettings );
+			registerBlockVariation( 'core/variation-block', [
+				{
+					title: 'Variation Title',
+					description: 'Variation description',
+				},
+				{
+					name: 'variation-name-2',
+					title: 'Variation Title 2',
+					description: 'Variation description 2',
+				},
+			] );
+
+			expect( console ).toHaveWarnedWith(
+				'Variation names must be unique strings.'
+			);
+			expect( getBlockVariations( 'core/variation-block' ) ).toEqual( [
+				{
+					title: 'Variation Title',
+					description: 'Variation description',
+				},
+				{
+					name: 'variation-name-2',
+					title: 'Variation Title 2',
+					description: 'Variation description 2',
+				},
+			] );
+		} );
 	} );
 
 	describe( 'registerBlockBindingsSource', () => {
