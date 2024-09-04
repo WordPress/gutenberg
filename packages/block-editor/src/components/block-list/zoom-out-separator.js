@@ -26,13 +26,13 @@ export function ZoomOutSeparator( {
 		blockInsertionPointVisible,
 	} = useSelect( ( select ) => {
 		const {
-			getSettings,
 			getBlockInsertionPoint,
 			getBlockOrder,
 			isBlockInsertionPointVisible,
+			getSectionRootClientId,
 		} = unlock( select( blockEditorStore ) );
 
-		const { sectionRootClientId: root } = unlock( getSettings() );
+		const root = getSectionRootClientId();
 		const sectionRootClientIds = getBlockOrder( root );
 		return {
 			sectionRootClientId: root,
