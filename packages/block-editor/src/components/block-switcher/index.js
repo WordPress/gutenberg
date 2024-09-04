@@ -198,7 +198,7 @@ const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
 
 export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
-		selectedHasTemplateLock,
+		hasContentOnlyLocking,
 		canRemove,
 		hasBlockStyles,
 		icon,
@@ -255,7 +255,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
 				isTemplate:
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
-				selectedHasTemplateLock: _hasTemplateLock,
+				hasContentOnlyLocking: _hasTemplateLock,
 			};
 		},
 		[ clientIds ]
@@ -265,7 +265,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		maximumLength: 35,
 	} );
 
-	if ( invalidBlocks || selectedHasTemplateLock ) {
+	if ( invalidBlocks ) {
 		return null;
 	}
 
@@ -274,7 +274,10 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		? blockTitle
 		: __( 'Multiple blocks selected' );
 
-	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
+	const hideDropdown =
+		disabled ||
+		( ! hasBlockStyles && ! canRemove ) ||
+		hasContentOnlyLocking;
 
 	if ( hideDropdown ) {
 		return (
