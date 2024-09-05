@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.7.0 (2024-09-05)
+
 ### Deprecations
 
 -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
@@ -64,6 +66,7 @@
 
 -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
 -   `ColorPalette` utils: do not normalize undefined color values ([#64969](https://github.com/WordPress/gutenberg/pull/64969)).
+-   `DatePicker` restore round radius for event dot ([#65031](https://github.com/WordPress/gutenberg/pull/65031)).
 
 ### Internal
 
@@ -73,6 +76,7 @@
 -   `DropdownMenu` v2: add `GroupLabel` subcomponent ([#64854](https://github.com/WordPress/gutenberg/pull/64854)).
 -   `DropdownMenuV2`: update animation ([#64868](https://github.com/WordPress/gutenberg/pull/64868)).
 -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
+-   `Composite` V2: add "With Slot Fill" example ([#65051](https://github.com/WordPress/gutenberg/pull/65051)).
 -   `Composite` V2: accept store props on top-level component ([#64832](https://github.com/WordPress/gutenberg/pull/64832)).
 
 ## 28.6.0 (2024-08-21)

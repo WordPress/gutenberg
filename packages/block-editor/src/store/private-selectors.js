@@ -28,6 +28,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	sectionRootClientIdKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -542,4 +543,8 @@ export const getBlockStyles = createSelector(
  */
 export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
+}
+
+export function getSectionRootClientId( state ) {
+	return state.settings?.[ sectionRootClientIdKey ];
 }

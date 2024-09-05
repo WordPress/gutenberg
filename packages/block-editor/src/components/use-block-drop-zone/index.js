@@ -24,7 +24,6 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey } from '../../store/private-keys';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
@@ -314,8 +313,8 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
-		getSettings,
 		isZoomOutMode,
+		getSectionRootClientId,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -361,8 +360,7 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const { [ sectionRootClientIdKey ]: sectionRootClientId } =
-					getSettings();
+				const sectionRootClientId = getSectionRootClientId();
 
 				// In Zoom Out mode, if the target is not the section root provided by settings then
 				// do not allow dropping as the drop target is not within the root (that which is
@@ -494,6 +492,8 @@ export default function useBlockDropZone( {
 				getBlockNamesByClientId,
 				getDraggedBlockClientIds,
 				getBlockType,
+				getSectionRootClientId,
+				isZoomOutMode,
 				getBlocks,
 				getBlockListSettings,
 				dropZoneElement,
@@ -506,8 +506,6 @@ export default function useBlockDropZone( {
 				isGroupable,
 				getBlockVariations,
 				getGroupingBlockName,
-				getSettings,
-				isZoomOutMode,
 			]
 		),
 		200
