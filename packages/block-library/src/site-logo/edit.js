@@ -423,7 +423,7 @@ export default function LogoEdit( {
 				context: 'view',
 			} );
 		const _isRequestingMediaItem =
-			_siteLogoId &&
+			!! _siteLogoId &&
 			! select( coreStore ).hasFinishedResolution( 'getMedia', [
 				_siteLogoId,
 				{ context: 'view' },
@@ -654,16 +654,17 @@ export default function LogoEdit( {
 			{ controls }
 			{ mediaInspectorPanel }
 			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
-			{ ! temporaryURL && ! logoUrl && ! canUserEdit && (
-				<Placeholder className="site-logo_placeholder">
-					{ !! isLoading && (
+			{ ( isLoading ||
+				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
+				<Placeholder className="site-logo_placeholder" withIllustration>
+					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<Spinner />
 						</span>
 					) }
 				</Placeholder>
 			) }
-			{ ! temporaryURL && ! logoUrl && canUserEdit && (
+			{ ! isLoading && ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }

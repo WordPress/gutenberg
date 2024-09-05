@@ -6,6 +6,8 @@
 
 -   Rewrite in TypeScript, exporting all the individual utility functions.
 
+## 5.7.0 (2024-09-05)
+
 ## 5.6.0 (2024-08-21)
 
 ## 5.5.0 (2024-08-07)

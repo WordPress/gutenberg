@@ -107,6 +107,7 @@ export const DayButton = styled( Button, {
 		`
 		::before {
 			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
+			border-radius: ${ CONFIG.radiusRound };
 			bottom: 2px;
 			content: " ";
 			height: 4px;

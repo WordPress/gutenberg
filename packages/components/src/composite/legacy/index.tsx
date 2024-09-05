@@ -14,6 +14,11 @@
  */
 
 /**
+ * External dependencies
+ */
+import * as Ariakit from '@ariakit/react';
+
+/**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
@@ -22,7 +27,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Composite as Current } from '..';
-import { useCompositeStore } from '../store';
 import { useInstanceId } from '@wordpress/compose';
 
 type Orientation = 'horizontal' | 'vertical';
@@ -79,7 +83,7 @@ export interface LegacyStateOptions {
 
 type Component = React.FunctionComponent< any >;
 
-type CompositeStore = ReturnType< typeof useCompositeStore >;
+type CompositeStore = ReturnType< typeof Ariakit.useCompositeStore >;
 type CompositeStoreState = { store: CompositeStore };
 export type CompositeState = CompositeStoreState &
 	Required< Pick< LegacyStateOptions, 'baseId' > >;
@@ -180,7 +184,7 @@ export function useCompositeState(
 
 	return {
 		baseId: useInstanceId( Composite, 'composite', baseId ),
-		store: useCompositeStore( {
+		store: Ariakit.useCompositeStore( {
 			defaultActiveId,
 			rtl,
 			orientation,

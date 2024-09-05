@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import { Composite } from './composite';
-import { useCompositeStore } from './composite/store';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
 import { DropdownMenuV2 } from './dropdown-menu-v2';
@@ -18,7 +17,8 @@ lock( privateApis, {
 	CompositeGroupV2: Composite.Group,
 	CompositeItemV2: Composite.Item,
 	CompositeRowV2: Composite.Row,
-	useCompositeStoreV2: useCompositeStore,
+	CompositeTypeaheadV2: Composite.Typeahead,
+	CompositeHoverV2: Composite.Hover,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,

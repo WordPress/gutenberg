@@ -104,7 +104,6 @@
 		background: $gray-900;
 		padding: 0;
 		width: $button-size-small;
-		border-radius: $radius-block-ui;
 		margin-right: 0;
 		margin-left: auto;
 	}
@@ -326,7 +325,7 @@ $color-control-label-height: 20px;
 }
 
 .wp-block-navigation-placeholder__controls {
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	display: none;
