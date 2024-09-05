@@ -1,7 +1,7 @@
 /**
  * This source is a local copy of the use-lilius library.
  *
- * use-lilius
+ * use-lilius@2.0.5
  * https://github.com/its-danny/use-lilius
  *
  * The MIT License (MIT)
