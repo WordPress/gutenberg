@@ -126,7 +126,9 @@ export default function CollabSidebar() {
 					createNotice(
 						'snackbar',
 						// translators: Comment edited successfully
-						__( 'Thread edited successfully.' ),
+						__(
+							'Thread edited successfully.'
+						),
 						{
 							type: 'snackbar',
 							isDismissible: true,
@@ -157,7 +159,9 @@ export default function CollabSidebar() {
 					createNotice(
 						'snackbar',
 						// translators: Reply added successfully
-						__( 'Reply added successfully.' ),
+						__(
+							'Reply added successfully.'
+						),
 						{
 							type: 'snackbar',
 							isDismissible: true,
@@ -183,7 +187,9 @@ export default function CollabSidebar() {
 					createNotice(
 						'snackbar',
 						// translators: Comment deleted successfully
-						__( 'Thread deleted successfully.' ),
+						__(
+							'Thread deleted successfully.'
+						),
 						{
 							type: 'snackbar',
 							isDismissible: true,
@@ -241,10 +247,10 @@ export default function CollabSidebar() {
 		fetchComments();
 	}, [ postId ] );
 
-	const allBlocks = useSelect( ( select ) => {
+	const allBlocks = useSelect((select) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlocks();
-	}, [] );
+		return select('core/block-editor').getBlocks();
+	}, []);
 
 	const filteredBlocks = allBlocks?.filter(
 		( block ) => block.attributes.blockCommentId !== 0

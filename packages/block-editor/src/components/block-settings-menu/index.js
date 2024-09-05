@@ -12,12 +12,14 @@ import BlockCommentToolbar from '../collab/toolbar';
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	
 	const selectedBlockClientId = clientIds[ 0 ];
-	const commentID = useSelect( ( select ) => {
+	const commentID = useSelect((select) => {
+		return (
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlock( selectedBlockClientId )
-			?.attributes?.blockCommentId || null;
-	}, [] );
-			
+		  select('core/block-editor')
+			.getBlock(selectedBlockClientId)
+			?.attributes?.blockCommentId || null
+		);
+	  },);
 
 	return (
 		<ToolbarGroup>
