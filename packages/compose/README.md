@@ -486,48 +486,6 @@ _Returns_
 
 -   `V | undefined`: The value corresponding to the map key requested.
 
-### useObserveElementSize
-
-Tracks a given element's size and calls `onUpdate` for all of its discrete values using a `ResizeObserver`. Pass the returned ref to the element or pass the element to the `targetElement` option directly.
-
-_Usage_
-
-```tsx
-const targetElementRef = useObserveElementSize(
-	( resizeObserverEntries, element ) => {
-		console.log( 'Resize observer entries:', resizeObserverEntries );
-		console.log( 'Element that was measured:', element );
-	},
-	{ box: 'border-box' }
-);
-<div ref={ targetElementRef } />;
-
-// Alternatively, pass the element directly as an argument:
-const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
-useObserveElementSize(
-	// ...
-	{
-		targetElement,
-		// ...
-	}
-);
-<div ref={ setTargetElement } />;
-
-// The element could be obtained through other means, for example:
-useEffect( () => {
-	const element = document.querySelector(
-		`[data-element-id="${ elementId }"]`
-	);
-	setTargetElement( element );
-}, [ elementId ] );
-```
-
-_Parameters_
-
--   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: T ) => void`: Callback that will be called when the element is measured (initially and after resizes).
--   _resizeObserverOptions_ `ObserveElementSizeOptions< T >`: Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
--   _resizeObserverOptions.targetElement_ `ObserveElementSizeOptions< T >[ 'targetElement' ]`: The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
-
 ### usePrevious
 
 Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.
