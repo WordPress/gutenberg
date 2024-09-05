@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.7.0 (2024-09-05)
+
 ### Deprecations
 
 -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).

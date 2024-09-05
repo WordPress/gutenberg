@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.7.0 (2024-09-05)
+
 ### Enhancements
 
 -   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
