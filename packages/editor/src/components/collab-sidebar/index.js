@@ -101,15 +101,10 @@ export default function CollabSidebar() {
 	};
 
 	const onCommentResolve = async ( commentId ) => {
-		editEntityRecord( 'root', 'comment', commentId, {
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+ 			id: commentId,
 			status: 'approved',
 		} );
-
-		const savedRecord = await saveEditedEntityRecord(
-			'root',
-			'comment',
-			commentId
-		);
 
 		if ( savedRecord ) {
 			// translators: Comment resolved successfully
@@ -125,15 +120,10 @@ export default function CollabSidebar() {
 	const onEditComment = async ( commentId, comment ) => {
 		const editedComment = removep( comment );
 
-		editEntityRecord( 'root', 'comment', commentId, {
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			id: commentId,
 			content: editedComment,
-		} );
-
-		const savedRecord = await saveEditedEntityRecord(
-			'root',
-			'comment',
-			commentId
-		);
+	   	} );
 
 		if ( savedRecord ) {
 			createNotice(
