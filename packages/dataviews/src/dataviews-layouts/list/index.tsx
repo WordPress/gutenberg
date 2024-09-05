@@ -140,7 +140,7 @@ function ListItem< Item >( {
 	visibleFields,
 	onDropdownTriggerKeyDown,
 }: ListViewItemProps< Item > ) {
-	const itemRef = useRef< HTMLElement >( null );
+	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
 
