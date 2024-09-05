@@ -6,6 +6,10 @@ import type * as Ariakit from '@ariakit/react';
 export type CompositeContextProps = {
 	/**
 	 * The component store, used for advanced usage of the component.
+	 *
+	 * _Note: Using the store directly is not recommended. Instead, use the props
+	 * exposed by the `Composite` component._
+	 *
 	 */
 	store?: unknown;
 };
