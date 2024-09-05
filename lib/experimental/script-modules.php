@@ -223,5 +223,12 @@ function gutenberg_register_script_modules() {
 		array(),
 		$default_version
 	);
+	add_filter(
+		'script_module_data_@wordpress/a11y',
+		function ( $data ) {
+			$data['i18n'] = array( 'Notifications' => __( 'Notifications', 'gutenberg' ) );
+			return $data;
+		}
+	);
 }
 add_action( 'init', 'gutenberg_register_script_modules' );
