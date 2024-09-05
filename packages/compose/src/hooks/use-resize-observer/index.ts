@@ -7,7 +7,7 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
  */
 import useEvent from '../use-event';
 
-/** `useObserveElementSize` options. */
+/** `useResizeObserver` options. */
 export type ObserveElementSizeOptions< T extends HTMLElement > =
 	ResizeObserverOptions & {
 		/**
@@ -25,7 +25,7 @@ export type ObserveElementSizeOptions< T extends HTMLElement > =
  * @example
  *
  * ```tsx
- * const targetElementRef = useObserveElementSize(
+ * const targetElementRef = useResizeObserver(
  * 	( resizeObserverEntries, element ) => {
  * 		console.log( 'Resize observer entries:', resizeObserverEntries );
  * 		console.log( 'Element that was measured:', element );
@@ -36,7 +36,7 @@ export type ObserveElementSizeOptions< T extends HTMLElement > =
  *
  * // Alternatively, pass the element directly as an argument:
  * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
- * useObserveElementSize(
+ * useResizeObserver(
  * 	// ...
  * 	{
  * 		targetElement,
@@ -58,7 +58,7 @@ export type ObserveElementSizeOptions< T extends HTMLElement > =
  * @param resizeObserverOptions               Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
  * @param resizeObserverOptions.targetElement The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
  */
-export default function useObserveElementSize< T extends HTMLElement >(
+export default function useResizeObserver< T extends HTMLElement >(
 	/**
 	 * Callback that will be called when the element is measured (initially and
 	 * after resizes).

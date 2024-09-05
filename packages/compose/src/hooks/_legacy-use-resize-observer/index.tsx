@@ -10,7 +10,7 @@ import { useCallback, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useObserveElementSize from '../use-observe-element-size';
+import useResizeObserver from '../use-resize-observer';
 
 type ObservedSize = {
 	width: number | null;
@@ -83,7 +83,7 @@ type ResizeElementProps = {
 };
 
 function ResizeElement( { onResize }: ResizeElementProps ) {
-	const resizeElementRef = useObserveElementSize( ( entries ) => {
+	const resizeElementRef = useResizeObserver( ( entries ) => {
 		const newSize = extractSize( entries.at( -1 )! ); // Entries are never empty.
 		onResize( newSize );
 	} );
@@ -122,7 +122,10 @@ const NULL_SIZE: ObservedSize = { width: null, height: null };
  * };
  * ```
  */
-export default function useResizeObserver(): [ ReactElement, ObservedSize ] {
+export default function useLegacyResizeObserver(): [
+	ReactElement,
+	ObservedSize,
+] {
 	const [ size, setSize ] = useState( NULL_SIZE );
 
 	// Using a ref to track the previous width / height to avoid unnecessary renders.
