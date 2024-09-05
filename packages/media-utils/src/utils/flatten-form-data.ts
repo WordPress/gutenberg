@@ -25,9 +25,7 @@ export function flattenFormData(
 ) {
 	if ( isPlainObject( data ) ) {
 		for ( const [ name, value ] of Object.entries( data ) ) {
-			if ( Object.hasOwn( data, name ) ) {
-				flattenFormData( formData, `${ key }[${ name }]`, value );
-			}
+			flattenFormData( formData, `${ key }[${ name }]`, value );
 		}
 	} else if ( data !== undefined ) {
 		formData.append( key, String( data ) );
