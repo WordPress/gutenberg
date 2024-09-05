@@ -13,11 +13,6 @@
 			margin-bottom: 0;
 		}
 
-		input[type="text"] {
-			@include input-control;
-			border-radius: 6px;
-			padding: 8px 15px;
-		}
 	}
 
 	&__active-thread {
@@ -32,13 +27,6 @@
 
 	&__comment-field-textarea {
 		width: 100%;
-
-		textarea {
-			border: 1px solid $gray-300;
-			border-radius: $radius-large;
-			padding: 10px 15px;
-			background-color: $white;
-		}
 	}
 
 	&__child-thread {
@@ -130,8 +118,4 @@
 		}
 	}
 
-}
-
-.is-collab-block-selected {
-	background-color: color-mix(in srgb, currentColor 5%, #182f97 20%);
 }
