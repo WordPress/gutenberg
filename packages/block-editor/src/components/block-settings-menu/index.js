@@ -8,13 +8,14 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockSettingsDropdown from './block-settings-dropdown';
 import BlockCommentToolbar from '../collab/toolbar';
+import { store as blockEditorStore } from '../../store';
 
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	const selectedBlockClientId = clientIds[ 0 ];
 	const commentID = useSelect( ( select ) => {
 		return (
 			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			select( 'core/block-editor' ).getBlock( selectedBlockClientId )
+			select( blockEditorStore ).getBlock( selectedBlockClientId )
 				?.attributes?.blockCommentId || null
 		);
 	} );

@@ -92,9 +92,16 @@ export default function CollabSidebar() {
 			} );
 			fetchComments();
 		} else {
-			createNotice( 'error', __( 'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.' ), {
-				isDismissible: true,
-			} );
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -113,9 +120,16 @@ export default function CollabSidebar() {
 
 			fetchComments();
 		} else {
-			createNotice( 'error', __( 'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.' ), {
-				isDismissible: true,
-			} );
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -140,9 +154,16 @@ export default function CollabSidebar() {
 
 			fetchComments();
 		} else {
-			createNotice( 'error', __( 'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.' ), {
-				isDismissible: true,
-			} );
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -171,9 +192,16 @@ export default function CollabSidebar() {
 			);
 			fetchComments();
 		} else {
-			createNotice( 'error', __( 'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.' ), {
-				isDismissible: true,
-			} );
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 

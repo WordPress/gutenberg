@@ -257,7 +257,7 @@
 		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.3.9",
-		"typescript": "5.5.3",
+		"typescript": "5.1.5",
 		"uglify-js": "3.13.7",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
