@@ -34,9 +34,9 @@ export default function BlockCommentMenuItem( { onClose } ) {
 			aria-haspopup="dialog"
 		>
 			{ _x(
-                'Add Comment', 
-                'Click to open comment sidebar and add comment'
-            ) }
+				'Add Comment',
+				'Click to open comment sidebar and add comment'
+			) }
 		</MenuItem>
 	);
 }
