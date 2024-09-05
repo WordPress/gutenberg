@@ -1,4 +1,17 @@
 /**
+ * Determines whether the passed argument appears to be a plain object.
+ *
+ * @param data The object to inspect.
+ */
+function isPlainObject( data: unknown ): data is Record< string, unknown > {
+	return (
+		data !== null &&
+		typeof data === 'object' &&
+		Object.getPrototypeOf( data ) === Object.prototype
+	);
+}
+
+/**
  * Recursively flatten data passed to form data, to allow using multi-level objects.
  *
  * @param {FormData}      formData Form data object.
@@ -10,12 +23,7 @@ export function flattenFormData(
 	key: string,
 	data: string | undefined | Record< string, string >
 ) {
-	if (
-		data !== null &&
-		typeof data === 'object' &&
-		Object.getPrototypeOf( data ) === Object.prototype
-	) {
-		for ( const name in data ) {
+	if ( isPlainObject( data ) ) {
 			if ( Object.hasOwn( data, name ) ) {
 				flattenFormData(
 					formData,
