@@ -22,7 +22,7 @@ function EditorFontsResolver() {
 	}, [] );
 
 	//Get the fonts from merged theme.json settings.fontFamilies
-	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const [ fontFamilies = [] ] = useGlobalSetting( 'typography.fontFamilies' );
 
 	const fontFaces = useMemo( () => {
 		return Object.values( fontFamilies )
