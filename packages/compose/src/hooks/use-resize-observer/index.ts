@@ -86,7 +86,7 @@ export default function useResizeObserver< T extends HTMLElement >(
 		targetElement,
 		...resizeObserverOptions
 	}: ObserveElementSizeOptions< T > = {}
-) {
+): ( element?: T | null | undefined ) => void {
 	const onUpdateEvent = useEvent( onUpdate );
 
 	const observedElementRef = useRef< T | null >();
