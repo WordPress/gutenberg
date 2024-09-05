@@ -29,7 +29,7 @@ export default function EnhancedPaginationControl( {
 		);
 	} else if ( hasUnsupportedBlocks ) {
 		help = __(
-			"Force page reload can't be disabled because there are non-compatible blocks inside the Query block."
+			"Reload full page can't be disabled because there are non-compatible blocks inside the Query block."
 		);
 	}
 
