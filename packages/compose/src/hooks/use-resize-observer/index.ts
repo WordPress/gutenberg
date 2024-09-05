@@ -6,6 +6,12 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import useEvent from '../use-event';
+import type { ObservedSize } from '../_legacy-use-resize-observer';
+import _useLegacyResizeObserver from '../_legacy-use-resize-observer';
+/**
+ * External dependencies
+ */
+import type { ReactElement } from 'react';
 
 /** `useResizeObserver` options. */
 export type ObserveElementSizeOptions< T extends HTMLElement > =
@@ -85,7 +91,46 @@ export default function useResizeObserver< T extends HTMLElement >(
 	options?: ObserveElementSizeOptions< T >
 ): ( element?: T | null | undefined ) => void;
 
+/**
+ * **This is a legacy API and should not be used.**
+ *
+ * @deprecated Use the other `useResizeObserver` API instead: `const ref = useResizeObserver( ( entries ) => { ... } )`.
+ *
+ * Hook which allows to listen to the resize event of any target element when it changes size.
+ * _Note: `useResizeObserver` will report `null` sizes until after first render.
+ *
+ * @example
+ *
+ * ```js
+ * const App = () => {
+ * 	const [ resizeListener, sizes ] = useResizeObserver();
+ *
+ * 	return (
+ * 		<div>
+ * 			{ resizeListener }
+ * 			Your content here
+ * 		</div>
+ * 	);
+ * };
+ * ```
+ */
+export default function useResizeObserver(): [ ReactElement, ObservedSize ];
+
 export default function useResizeObserver< T extends HTMLElement >(
+	onUpdate?: (
+		resizeObserverEntries: ResizeObserverEntry[],
+		element: T
+	) => void,
+	options: ObserveElementSizeOptions< T > = {}
+):
+	| ( ( element?: T | null | undefined ) => void )
+	| [ ReactElement, ObservedSize ] {
+	return onUpdate
+		? _useResizeObserver( onUpdate, options )
+		: _useLegacyResizeObserver();
+}
+
+function _useResizeObserver< T extends HTMLElement >(
 	onUpdate: (
 		resizeObserverEntries: ResizeObserverEntry[],
 		element: T
