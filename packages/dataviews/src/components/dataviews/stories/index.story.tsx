@@ -138,6 +138,7 @@ export const CombinedFields = () => {
 		...DEFAULT_VIEW,
 		fields: [ 'theme', 'requires', 'tested' ],
 		layout: {
+			primaryField: 'name',
 			combinedFields: [
 				{
 					id: 'theme',
@@ -165,7 +166,7 @@ export const CombinedFields = () => {
 			view={ view }
 			fields={ themeFields }
 			onChangeView={ setView }
-			defaultLayouts={ { table: {} } }
+			defaultLayouts={ { table: {}, grid: {}, list: {} } }
 		/>
 	);
 };
