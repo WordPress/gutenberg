@@ -34,10 +34,14 @@ export default function PostTrashCheck( { children } ) {
 			: false;
 
 		return {
-			canTrashPost: ( ! isNew || postId ) && canUserDelete,
+			canTrashPost:
+				( ! isNew || postId ) &&
+				canUserDelete &&
+				postType !== 'wp_template' &&
+				postType !== 'wp_block' &&
+				postType !== 'wp_template_part',
 		};
 	}, [] );
-
 	if ( ! canTrashPost ) {
 		return null;
 	}
