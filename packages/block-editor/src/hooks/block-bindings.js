@@ -92,14 +92,16 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding } ) {
+function BlockBindingsAttribute( { attribute, binding, readOnly } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
 	return (
 		<VStack className="block-editor-bindings__item">
-			<Text truncate>{ attribute }</Text>
+			<Text truncate variant={ readOnly ? 'muted' : '' }>
+				{ attribute }
+			</Text>
 			{ !! binding && (
 				<Text
 					truncate
@@ -123,6 +125,7 @@ function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
+						readOnly
 					/>
 				</Item>
 			) ) }
