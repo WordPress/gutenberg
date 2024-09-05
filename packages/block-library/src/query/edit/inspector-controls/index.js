@@ -42,8 +42,7 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } =
-		props;
+	const { attributes, setQuery, setDisplayLayout } = props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
