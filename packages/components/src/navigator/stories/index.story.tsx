@@ -41,7 +41,7 @@ const meta: Meta< typeof NavigatorProvider > = {
 						 * its source code.
 						 */
 						[data-wp-component="NavigatorProvider"] {
-							height: calc(100vh - 2rem);
+							height: 250px;
 						}
 						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
 							padding: 8px;

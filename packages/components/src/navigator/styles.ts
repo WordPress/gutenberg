@@ -12,6 +12,11 @@ export const navigatorProviderWrapper = css`
 	 * providing performance benefits.
 	 */
 	contain: layout;
+
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	align-items: start;
 `;
 
 const fadeIn = keyframes( {
@@ -115,7 +120,6 @@ export const navigatorScreenAnimation = ( {
 	isAnimatingIn,
 }: NavigatorScreenAnimationProps ) => {
 	return css`
-		position: ${ isAnimatingOut ? 'absolute' : 'relative' };
 		z-index: ${ isAnimatingOut ? 0 : 1 };
 		inset-block-start: ${ isAnimatingOut ? 0 : 'initial' };
 		inset-inline-start: ${ isAnimatingOut ? 0 : 'initial' };
@@ -139,4 +143,9 @@ export const navigatorScreen = css`
 	/* In case the root has a height, it should not be exceeded */
 	max-height: 100%;
 	box-sizing: border-box;
+
+	position: relative;
+
+	grid-column: 1 / -1;
+	grid-row: 1 / -1;
 `;

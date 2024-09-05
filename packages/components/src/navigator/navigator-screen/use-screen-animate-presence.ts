@@ -3,7 +3,6 @@
  */
 import {
 	useEffect,
-	useRef,
 	useState,
 	useLayoutEffect,
 	useCallback,
@@ -52,14 +51,12 @@ export function useScreenAnimatePresence( {
 	isBack,
 	onAnimationEnd,
 	screenEl,
-	setWrapperHeight,
 }: {
 	isMatch: boolean;
 	skipAnimation: boolean;
 	isBack?: boolean;
 	onAnimationEnd?: React.AnimationEventHandler< Element >;
 	screenEl?: HTMLElement | null;
-	setWrapperHeight?: ( height: number | undefined ) => void;
 } ) {
 	const isRTL = isRTLFn();
 	const prefersReducedMotion = useReducedMotion();
@@ -69,34 +66,20 @@ export function useScreenAnimatePresence( {
 
 	const wasMatch = usePrevious( isMatch );
 
-	const screenHeightRef = useRef< number | undefined >();
-
 	// Start enter and exit animations when the screen is selected or deselected.
 	// The animation status is set to `*_END` immediately if the animation should
 	// be skipped.
 	useLayoutEffect( () => {
 		if ( ! wasMatch && isMatch ) {
-			screenHeightRef.current = undefined;
 			setAnimationStatus(
 				skipAnimation || prefersReducedMotion ? 'IN' : 'ANIMATING_IN'
 			);
 		} else if ( wasMatch && ! isMatch ) {
-			screenHeightRef.current = screenEl?.offsetHeight;
 			setAnimationStatus(
 				skipAnimation || prefersReducedMotion ? 'OUT' : 'ANIMATING_OUT'
 			);
 		}
 	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion, screenEl ] );
-
-	// When starting an animation, set the wrapper height to the screen height,
-	// to prevent layout shifts during the animation.
-	useEffect( () => {
-		if ( animationStatus === 'ANIMATING_OUT' ) {
-			setWrapperHeight?.( screenHeightRef.current ?? 0 );
-		} else if ( animationStatus === 'OUT' ) {
-			setWrapperHeight?.( undefined );
-		}
-	}, [ screenEl, animationStatus, setWrapperHeight ] );
 
 	// Styles
 	const animationDirection =

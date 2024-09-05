@@ -84,7 +84,6 @@ export type NavigatorContext = Navigator & {
 	addScreen: ( screen: Screen ) => void;
 	removeScreen: ( screen: Screen ) => void;
 	match?: string;
-	setWrapperHeight?: ( height: number | undefined ) => void;
 };
 
 export type NavigatorProviderProps = {
