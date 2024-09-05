@@ -27,13 +27,14 @@ export default function BlockCommentToolbar() {
 	};
 
 	return (
-	
 		<ToolbarButton
 			accessibleWhenDisabled
 			icon={ collabComment }
-			label={ _x( 'Comment', 'Click to open sidebar and highlight comment board' ) }
+			label={ _x(
+				'Comment',
+				'Click to open sidebar and highlight comment board'
+			) }
 			onClick={ openCollabBoard }
 		/>
-	
 	);
 }

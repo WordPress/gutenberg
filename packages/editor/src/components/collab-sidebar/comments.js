@@ -65,21 +65,27 @@ export function Comments( {
 			<>
 				<CommentHeader
 					thread={ thread }
-					onResolve={ () => {
+					onResolve={ () =>
 						setActionState( {
 							action: 'resolve',
 							id: parentThread?.id ?? thread.id,
-						} );
-					} }
-					onEdit={ () => {
-						setActionState( { action: 'edit', id: thread.id } );
-					} }
-					onDelete={ () => {
-						setActionState( { action: 'delete', id: thread.id } );
-					} }
-					onReply={ () => {
-						setActionState( { action: 'reply', id: thread.id } );
-					} }
+						} )
+					}
+					onEdit={ () =>
+						setActionState( { action: 'edit', id: thread.id } )
+					}
+					onDelete={ () =>
+						setActionState( { action: 'delete', id: thread.id } )
+					}
+					onReply={
+						! parentThread
+							? () =>
+									setActionState( {
+										action: 'reply',
+										id: thread.id,
+									} )
+							: undefined
+					}
 					status={ parentThread?.status ?? thread.status }
 				/>
 				<HStack
@@ -124,9 +130,9 @@ export function Comments( {
 						justify="flex-start"
 						spacing="3"
 					>
-						{ 
+						{
 							// translators: message displayed when there are no comments available
-							__( 'No comments available' ) 
+							__( 'No comments available' )
 						}
 					</VStack>
 				)
@@ -137,10 +143,14 @@ export function Comments( {
 				threads.map( ( thread ) => (
 					<VStack
 						key={ thread.id }
-						className={ clsx( 'editor-collab-sidebar-panel__thread', {
-							'editor-collab-sidebar-panel__active-thread':
-								blockCommentId && blockCommentId === thread.id,
-						} ) }
+						className={ clsx(
+							'editor-collab-sidebar-panel__thread',
+							{
+								'editor-collab-sidebar-panel__active-thread':
+									blockCommentId &&
+									blockCommentId === thread.id,
+							}
+						) }
 						id={ thread.id }
 						spacing="3"
 					>
@@ -158,9 +168,11 @@ export function Comments( {
 						{ 'resolve' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ 
+									confirmMessage={
 										// translators: message displayed when marking a comment as resolved
-										__( 'Are you sure you want to mark this thread as resolved?' )
+										__(
+											'Are you sure you want to mark this thread as resolved?'
+										)
 									}
 									confirmAction={ () => {
 										onCommentResolve( thread.id );
@@ -174,9 +186,11 @@ export function Comments( {
 						{ 'delete' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ 
+									confirmMessage={
 										// translators: message displayed when deleting a comment
-										__( 'Are you sure you want to delete this thread?' ) 
+										__(
+											'Are you sure you want to delete this thread?'
+										)
 									}
 									confirmAction={ () => {
 										onCommentDelete( thread.id );
@@ -202,9 +216,11 @@ export function Comments( {
 									{ 'delete' === actionState?.action &&
 										reply.id === actionState?.id && (
 											<ConfirmNotice
-												confirmMessage={ 
+												confirmMessage={
 													// translators: message displayed when deleting a comment
-													__( 'Are you sure you want to delete this thread?' ) 
+													__(
+														'Are you sure you want to delete this thread?'
+													)
 												}
 												confirmAction={ () => {
 													onCommentDelete( reply.id );
@@ -245,11 +261,7 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
 			/>
-			<VStack
-				alignment="left"
-				spacing="3"
-				justify="flex-start"
-			>
+			<VStack alignment="left" spacing="3" justify="flex-start">
 				<HStack alignment="left" spacing="3" justify="flex-start">
 					<Button
 						__next40pxDefaultSize
@@ -301,11 +313,7 @@ function AddReply( { onSubmit, onCancel } ) {
 					onChange={ setInputComment }
 				/>
 				<VStack alignment="left" spacing="3" justify="flex-start">
-					<HStack
-						alignment="left"
-						spacing="3"
-						justify="flex-start"
-					>
+					<HStack alignment="left" spacing="3" justify="flex-start">
 						<Button
 							__next40pxDefaultSize
 							accessibleWhenDisabled
@@ -351,10 +359,11 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 			spacing="0"
 			justify="space-between"
 		>
-			<p>{ cofirmMessage ?? 
-				// translators: message displayed when confirming an action
-				__( 'Are you sure?' ) 
-			}</p>
+			<p>
+				{ cofirmMessage ??
+					// translators: message displayed when confirming an action
+					__( 'Are you sure?' ) }
+			</p>
 			<HStack>
 				<Button
 					__next40pxDefaultSize

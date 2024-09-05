@@ -5,7 +5,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -54,6 +54,10 @@ addFilter(
  */
 export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
+	const {
+		saveEntityRecord,
+		deleteEntityRecord,
+	} = useDispatch( coreStore );
 
 	const [ threads, setThreads ] = useState( () => [] );
 	const postId = useSelect( ( select ) => {
@@ -72,127 +76,113 @@ export default function CollabSidebar() {
 	}, [] );
 
 	// Function to save the comment.
-	const addNewComment = ( comment ) => {
-		apiFetch( {
-			path: '/wp/v2/comments',
-			method: 'POST',
-			data: {
-				post: postId,
-				content: comment,
-				comment_date: new Date().toISOString(),
-				comment_type: 'block_comment',
-				comment_author: currentUserData?.name ?? null,
-				comment_approved: 0,
-			},
-		} ).then( ( response ) => {
+	const addNewComment = async ( comment ) => {
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			post: postId,
+			content: comment,
+			comment_date: new Date().toISOString(),
+			comment_type: 'block_comment',
+			comment_author: currentUserData?.name ?? null,
+			comment_approved: 0,
+		} );
+
+		if ( savedRecord ) {
 			updateBlockAttributes( clientId, {
-				blockCommentId: response?.id,
+				blockCommentId: savedRecord?.id,
+			} );
+			createNotice( 'snackbar', __( 'New comment added.' ), {
+				type: 'snackbar',
+				isDismissible: true,
 			} );
 			fetchComments();
-		} );
+		}
 	};
 
-	const onCommentResolve = ( commentId ) => {
-		apiFetch( {
-			path: '/wp/v2/comments/' + commentId,
-			method: 'POST',
-			data: {
-				status: 'approved',
-			},
-		} ).then( ( response ) => {
-			if ( response ) {
-				// translators: Comment resolved successfully
-				createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
+	const onCommentResolve = async ( commentId ) => {
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			id: commentId,
+			status: 'approved',
+		} );
+
+		if ( savedRecord ) {
+			// translators: Comment resolved successfully
+			createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+			fetchComments();
+		}
+	};
+
+	const onEditComment = async ( commentId, comment ) => {
+		const editedComment = removep( comment );
+
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			id: commentId,
+			content: editedComment,
+		} );
+
+		if ( savedRecord ) {
+			createNotice(
+				'snackbar',
+				// translators: Comment edited successfully
+				__( 'Thread edited successfully.' ),
+				{
 					type: 'snackbar',
 					isDismissible: true,
-				} );
-			}
+				}
+			);
+
 			fetchComments();
+		}
+	};
+
+	const onAddReply = async ( parentCommentId, comment ) => {
+		const sanitisedComment = removep( comment );
+
+		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+			parent: parentCommentId,
+			post: postId,
+			content: sanitisedComment,
+			comment_date: new Date().toISOString(),
+			comment_type: 'block_comment',
+			comment_author: currentUserData?.name ?? null,
+			comment_approved: 0,
 		} );
-	};
 
-	const onEditComment = ( threadID, comment ) => {
-		if ( threadID && comment.length > 0 ) {
-			const editedComment = removep( comment );
-
-			apiFetch( {
-				path: '/wp/v2/comments/' + threadID,
-				method: 'POST',
-				data: {
-					content: editedComment,
-				},
-			} ).then( ( response ) => {
-				if ( response ) {
-					createNotice(
-						'snackbar',
-						// translators: Comment edited successfully
-						__( 'Thread edited successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
+		if ( savedRecord ) {
+			createNotice(
+				'snackbar',
+				// translators: Reply added successfully
+				__( 'Reply added successfully.' ),
+				{
+					type: 'snackbar',
+					isDismissible: true,
 				}
-				fetchComments();
-			} );
+			);
+			fetchComments();
 		}
 	};
 
-	const onAddReply = ( threadID, comment ) => {
-		if ( threadID ) {
-			apiFetch( {
-				path: '/wp/v2/comments/',
-				method: 'POST',
-				data: {
-					parent: threadID,
-					post: postId,
-					content: comment,
-					comment_date: new Date().toISOString(),
-					comment_type: 'block_comment',
-					comment_author: currentUserData?.name ?? null,
-					comment_approved: 0,
-				},
-			} ).then( ( response ) => {
-				if ( response ) {
-					createNotice(
-						'snackbar',
-						// translators: Reply added successfully
-						__( 'Reply added successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
-				}
-				fetchComments();
-			} );
-		}
-	};
+	const onCommentDelete = async ( commentId ) => {
+		await deleteEntityRecord( 'root', 'comment', commentId );
 
-	const onCommentDelete = ( threadID ) => {
-		if ( threadID ) {
-			apiFetch( {
-				path: '/wp/v2/comments/' + threadID,
-				method: 'DELETE',
-			} ).then( ( response ) => {
-				if ( response ) {
-					updateBlockAttributes( clientId, {
-						blockCommentId: undefined,
-						showCommentBoard: undefined,
-					} );
-					createNotice(
-						'snackbar',
-						// translators: Comment deleted successfully
-						__( 'Thread deleted successfully.' ),
-						{
-							type: 'snackbar',
-							isDismissible: true,
-						}
-					);
-				}
-				fetchComments();
-			} );
-		}
+		updateBlockAttributes( clientId, {
+			blockCommentId: undefined,
+			showCommentBoard: undefined,
+		} );
+
+		createNotice(
+			'snackbar',
+			// translators: Comment deleted successfully
+			__( 'Thread deleted successfully.' ),
+			{
+				type: 'snackbar',
+				isDismissible: true,
+			}
+		);
+		fetchComments();
 	};
 
 	const fetchComments = () => {
@@ -205,34 +195,7 @@ export default function CollabSidebar() {
 					'&status=any&per_page=100',
 				method: 'GET',
 			} ).then( ( data ) => {
-				// Create a compare to store the references to all objects by id
-				const compare = {};
-				const result = [];
-
-				// Initialize each object with an empty `reply` array
-				data.forEach( ( item ) => {
-					compare[ item.id ] = { ...item, reply: [] };
-				} );
-
-				// Iterate over the data to build the tree structure
-				data.forEach( ( item ) => {
-					if ( item.parent === 0 ) {
-						// If parent is 0, it's a root item, push it to the result array
-						result.push( compare[ item.id ] );
-					} else if (
-						compare[ item.parent ] &&
-						'trash' !== item.status
-					) {
-						// Otherwise, find its parent and push it to the parent's `reply` array
-						compare[ item.parent ].reply.push( compare[ item.id ] );
-					}
-				} );
-				const filteredComments = result.filter(
-					( comment ) => comment.status !== 'trash'
-				);
-				setThreads(
-					Array.isArray( filteredComments ) ? filteredComments : []
-				);
+				setThreads( Array.isArray( data ) ? data : [] );
 			} );
 		}
 	};
@@ -242,24 +205,51 @@ export default function CollabSidebar() {
 	}, [ postId ] );
 
 	const allBlocks = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/block-editor' ).getBlocks();
+		return select( blockEditorStore ).getBlocks();
 	}, [] );
 
-	const filteredBlocks = allBlocks?.filter(
-		( block ) => block.attributes.blockCommentId !== 0
-	);
+	// Process comments to build the tree structure
+	const resultComments = useMemo( () => {
+		// Create a compare to store the references to all objects by id
+		const compare = {};
+		const result = [];
 
-	const blockCommentIds = filteredBlocks?.map(
-		( block ) => block.attributes.blockCommentId
-	);
-	const resultThreads = threads?.slice().reverse();
-	const threadIdMap = new Map(
-		resultThreads?.map( ( thread ) => [ thread.id, thread ] )
-	);
-	const sortedThreads = blockCommentIds
-		.map( ( id ) => threadIdMap.get( id ) )
-		.filter( ( thread ) => thread !== undefined );
+		const filteredComments = threads.filter(
+			( comment ) => comment.status !== 'trash'
+		);
+
+		// Initialize each object with an empty `reply` array
+		filteredComments.forEach( ( item ) => {
+			compare[ item.id ] = { ...item, reply: [] };
+		} );
+
+		// Iterate over the data to build the tree structure
+		filteredComments.forEach( ( item ) => {
+			if ( item.parent === 0 ) {
+				// If parent is 0, it's a root item, push it to the result array
+				result.push( compare[ item.id ] );
+			} else if ( compare[ item.parent ] ) {
+				// Otherwise, find its parent and push it to the parent's `reply` array
+				compare[ item.parent ].reply.push( compare[ item.id ] );
+			}
+		} );
+
+		const filteredBlocks = allBlocks?.filter(
+			( block ) => block.attributes.blockCommentId !== 0
+		);
+
+		const blockCommentIds = filteredBlocks?.map(
+			( block ) => block.attributes.blockCommentId
+		);
+		const threadIdMap = new Map(
+			result?.map( ( thread ) => [ thread.id, thread ] )
+		);
+		const sortedThreads = blockCommentIds
+			.map( ( id ) => threadIdMap.get( id ) )
+			.filter( ( thread ) => thread !== undefined );
+
+		return sortedThreads;
+	}, [ threads ] );
 
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
@@ -275,11 +265,11 @@ export default function CollabSidebar() {
 		>
 			<div className="editor-collab-sidebar-panel">
 				<AddComment
-					threads={ sortedThreads }
+					threads={ resultComments }
 					onSubmit={ addNewComment }
 				/>
 				<Comments
-					threads={ sortedThreads }
+					threads={ resultComments }
 					onEditComment={ onEditComment }
 					onAddReply={ onAddReply }
 					onCommentDelete={ onCommentDelete }

@@ -21,11 +21,9 @@ import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
 import { unlock } from '../../lock-unlock';
 
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
+const { CompositeV2: Composite, CompositeItemV2: CompositeItem } = unlock(
+	componentsPrivateApis
+);
 
 function PatternTransformationsMenu( {
 	blocks,
@@ -82,10 +80,8 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 }
 
 function BlockPatternsList( { patterns, onSelect } ) {
-	const composite = useCompositeStore();
 	return (
 		<Composite
-			store={ composite }
 			role="listbox"
 			className="block-editor-block-switcher__preview-patterns-container"
 			aria-label={ __( 'Patterns list' ) }

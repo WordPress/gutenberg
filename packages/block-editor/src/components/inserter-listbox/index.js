@@ -12,17 +12,11 @@ export { default as InserterListboxGroup } from './group';
 export { default as InserterListboxRow } from './row';
 export { default as InserterListboxItem } from './item';
 
-const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
-	unlock( componentsPrivateApis );
+const { CompositeV2: Composite } = unlock( componentsPrivateApis );
 
 function InserterListbox( { children } ) {
-	const store = useCompositeStore( {
-		focusShift: true,
-		focusWrap: 'horizontal',
-	} );
-
 	return (
-		<Composite store={ store } render={ <></> }>
+		<Composite focusShift focusWrap="horizontal" render={ <></> }>
 			{ children }
 		</Composite>
 	);

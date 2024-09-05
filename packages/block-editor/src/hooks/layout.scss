@@ -1,15 +1,7 @@
-.block-editor-hooks__layout-controls {
+.block-editor-hooks__layout-controls-units {
 	display: flex;
-	margin-bottom: $grid-unit-10;
-
-	.block-editor-hooks__layout-controls-unit {
-		display: flex;
-		margin-right: $grid-unit-30;
-
-		svg {
-			margin: auto 0 $grid-unit-05 $grid-unit-10;
-		}
-	}
+	flex-direction: column;
+	gap: $grid-unit-20;
 }
 
 .block-editor-block-inspector .block-editor-hooks__layout-controls-unit-input {

@@ -107,12 +107,12 @@ export default function BlockInvalidWarning( { clientId } ) {
 						onClick={ convert.toRecoveredBlock }
 						variant="primary"
 					>
-						{ __( 'Attempt Block Recovery' ) }
+						{ __( 'Attempt recovery' ) }
 					</Button>,
 				] }
 				secondaryActions={ secondaryActions }
 			>
-				{ __( 'This block contains unexpected or invalid content.' ) }
+				{ __( 'Block contains unexpected or invalid content.' ) }
 			</Warning>
 			{ compare && (
 				<Modal
