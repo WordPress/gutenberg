@@ -155,7 +155,7 @@ export const getEntityRecord =
 					}
 				);
 
-				if ( query !== undefined ) {
+				if ( query !== undefined && query._fields ) {
 					query = { ...query, include: [ key ] };
 
 					// The resolution cache won't consider query as reusable based on the
