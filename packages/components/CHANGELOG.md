@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+
+### Internal
+
+-   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+
 ## 28.7.0 (2024-09-05)
 
 ### Deprecations
