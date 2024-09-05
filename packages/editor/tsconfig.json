@@ -25,6 +25,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../plugins" },
 		{ "path": "../private-apis" },
