@@ -94,7 +94,7 @@ function ZoomOutModeInserters() {
 						onClick={ () => {
 							setInserterIsOpened( {
 								rootClientId: sectionRootClientId,
-								insertionIndex: index,
+								index,
 								tab: 'patterns',
 								category: 'all',
 							} );
