@@ -33,6 +33,7 @@ import {
 	DayOfWeek,
 	Navigator,
 	NavigatorHeading,
+	Wrapper,
 } from './styles';
 import { TIMEZONELESS_FORMAT } from '../constants';
 import Button from '../../button';
@@ -77,7 +78,11 @@ export function Calendar( {
 		useState( false );
 
 	return (
-		<>
+		<Wrapper
+			className="components-datetime__date"
+			role="application"
+			aria-label={ __( 'Calendar' ) }
+		>
 			<Navigator>
 				{ calendarIndex === 0 && (
 					<Button
@@ -204,7 +209,7 @@ export function Calendar( {
 					} )
 				) }
 			</StyledCalendar>
-		</>
+		</Wrapper>
 	);
 }
 

@@ -7,7 +7,6 @@ import { format, startOfDay, isSameMonth } from 'date-fns';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
 /**
@@ -15,7 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import Calendar from './calendar';
 import type { DatePickerProps } from '../types';
-import { Wrapper } from './styles';
 import { inputToDate } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
@@ -76,50 +74,44 @@ export function DatePicker( {
 	}
 
 	return (
-		<Wrapper
-			className="components-datetime__date"
-			role="application"
-			aria-label={ __( 'Calendar' ) }
-		>
-			<Calendar
-				calendar={ calendar }
-				events={ events }
-				isInvalidDate={ isInvalidDate }
-				isSelected={ isSelected }
-				onMonthPreviewed={ onMonthPreviewed }
-				setFocusable={ setFocusable }
-				viewing={ viewing }
-				viewPreviousMonth={ viewPreviousMonth }
-				viewNextMonth={ viewNextMonth }
-				onDayClick={ ( day ) => {
-					setSelected( [ day ] );
-					onChange?.(
-						format(
-							// Don't change the selected date's time fields.
-							new Date(
-								day.getFullYear(),
-								day.getMonth(),
-								day.getDate(),
-								date.getHours(),
-								date.getMinutes(),
-								date.getSeconds(),
-								date.getMilliseconds()
-							),
-							TIMEZONELESS_FORMAT
-						)
+		<Calendar
+			calendar={ calendar }
+			events={ events }
+			isInvalidDate={ isInvalidDate }
+			isSelected={ isSelected }
+			onMonthPreviewed={ onMonthPreviewed }
+			setFocusable={ setFocusable }
+			viewing={ viewing }
+			viewPreviousMonth={ viewPreviousMonth }
+			viewNextMonth={ viewNextMonth }
+			onDayClick={ ( day ) => {
+				setSelected( [ day ] );
+				onChange?.(
+					format(
+						// Don't change the selected date's time fields.
+						new Date(
+							day.getFullYear(),
+							day.getMonth(),
+							day.getDate(),
+							date.getHours(),
+							date.getMinutes(),
+							date.getSeconds(),
+							date.getMilliseconds()
+						),
+						TIMEZONELESS_FORMAT
+					)
+				);
+			} }
+			onDayKeyDown={ ( nextFocusable ) => {
+				if ( ! isSameMonth( nextFocusable, viewing ) ) {
+					setViewing( nextFocusable );
+					onMonthPreviewed?.(
+						format( nextFocusable, TIMEZONELESS_FORMAT )
 					);
-				} }
-				onDayKeyDown={ ( nextFocusable ) => {
-					if ( ! isSameMonth( nextFocusable, viewing ) ) {
-						setViewing( nextFocusable );
-						onMonthPreviewed?.(
-							format( nextFocusable, TIMEZONELESS_FORMAT )
-						);
-					}
-				} }
-				focusable={ focusable }
-			/>
-		</Wrapper>
+				}
+			} }
+			focusable={ focusable }
+		/>
 	);
 }
 
