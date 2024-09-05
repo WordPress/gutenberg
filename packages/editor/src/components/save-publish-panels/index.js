@@ -71,8 +71,7 @@ export default function SavePublishPanels( {
 		unmountableContent = (
 			<div className="editor-layout__toggle-publish-panel">
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					className="editor-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
@@ -86,8 +85,7 @@ export default function SavePublishPanels( {
 		unmountableContent = (
 			<div className="editor-layout__toggle-entities-saved-states-panel">
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					className="editor-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }

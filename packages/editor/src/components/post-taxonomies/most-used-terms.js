@@ -62,8 +62,7 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 				{ terms.map( ( term ) => (
 					<li key={ term.id }>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="link"
 							onClick={ () => onSelect( term ) }
 						>
