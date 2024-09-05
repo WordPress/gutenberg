@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+
+### Internal
+
+-   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+
 ## 28.7.0 (2024-09-05)
 
 ### Deprecations
@@ -159,10 +167,6 @@
 -   `CustomSelectControl`: Improve type inferring ([#64412](https://github.com/WordPress/gutenberg/pull/64412)).
 -   Update `ariakit` to version `0.4.10` ([#64637](https://github.com/WordPress/gutenberg/pull/64637)).
 -   Ariakit: Use `useStoreState()` instead of `store.useState()` ([#64648](https://github.com/WordPress/gutenberg/pull/64648)).
-
-### Internal
-
--   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 
 ## 28.5.0 (2024-08-07)
 
