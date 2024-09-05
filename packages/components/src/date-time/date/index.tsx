@@ -1,7 +1,10 @@
 /**
  * External dependencies
  */
-import { useLilius } from 'use-lilius';
+/**
+ * Internal dependencies
+ */
+import { useLilius } from './use-lilius';
 import {
 	format,
 	isSameDay,
