@@ -52,7 +52,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @return array   The filtered query vars.
  */
 function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $block ) {
-	// Return early if there is no format:
+	// Return early if there is no format.
 	if ( empty( $block->context['query']['format'] ) ) {
 		return $query;
 	}
