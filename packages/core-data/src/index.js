@@ -10,6 +10,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
 import * as actions from './actions';
+import * as privateActions from './private-actions';
 import * as resolvers from './resolvers';
 import createLocksActions from './locks/actions';
 import {
@@ -79,6 +80,7 @@ const storeConfig = () => ( {
  */
 export const store = createReduxStore( STORE_NAME, storeConfig() );
 unlock( store ).registerPrivateSelectors( privateSelectors );
+unlock( store ).registerPrivateActions( privateActions );
 register( store ); // Register store after unlocking private selectors to allow resolvers to use them.
 
 export { default as EntityProvider } from './entity-provider';
