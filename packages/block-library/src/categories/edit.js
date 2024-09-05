@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	PanelBody,
 	Placeholder,
+	SelectControl,
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
@@ -39,6 +40,10 @@ export default function CategoriesEdit( {
 	className,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
+
+	const { records: taxonomies } = useEntityRecords( 'root', 'taxonomy', {
+		type: 'post',
+	} );
 
 	const { record: taxonomy, isResolvingTaxonomy } = useEntityRecord(
 		'root',
@@ -181,6 +186,21 @@ export default function CategoriesEdit( {
 		<TagName { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
+					{ Array.isArray( taxonomies ) && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Taxonomy' ) }
+							options={ taxonomies.map( ( t ) => ( {
+								label: t.name,
+								value: t.slug,
+							} ) ) }
+							value={ taxonomy }
+							onChange={ ( selectedTaxonomy ) =>
+								setAttributes( { taxonomy: selectedTaxonomy } )
+							}
+						/>
+					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
