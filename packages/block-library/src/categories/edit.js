@@ -23,7 +23,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -41,18 +41,18 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
-	const { records: taxonomies } = useEntityRecords( 'root', 'taxonomy', {
-		type: 'post',
-	} );
-
-	const { record: taxonomy, isResolvingTaxonomy } = useEntityRecord(
+	const { records: taxonomies, isResolvingTaxonomies } = useEntityRecords(
 		'root',
 		'taxonomy',
-		taxonomySlug
+		{
+			type: 'post',
+		}
 	);
 
+	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
+
 	const isHierarchicalTaxonomy =
-		! isResolvingTaxonomy && taxonomy?.hierarchical;
+		! isResolvingTaxonomies && taxonomy?.hierarchical;
 
 	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
 	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
