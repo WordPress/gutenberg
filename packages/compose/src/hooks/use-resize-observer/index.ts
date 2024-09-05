@@ -6,8 +6,8 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import useEvent from '../use-event';
-import type { ObservedSize } from '../_legacy-use-resize-observer';
-import _useLegacyResizeObserver from '../_legacy-use-resize-observer';
+import type { ObservedSize } from './_legacy';
+import _useLegacyResizeObserver from './_legacy';
 /**
  * External dependencies
  */
