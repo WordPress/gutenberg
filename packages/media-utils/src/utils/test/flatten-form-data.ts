@@ -7,6 +7,12 @@ describe( 'flattenFormData', () => {
 	it( 'should flatten nested data structure', () => {
 		const data = new FormData();
 
+		class RichTextData {
+			toString() {
+				return 'i am rich text';
+			}
+		}
+
 		const additionalData = {
 			foo: null,
 			bar: 1234,
@@ -18,6 +24,7 @@ describe( 'flattenFormData', () => {
 					nested: 'baz',
 				},
 			},
+			customClass: new RichTextData(),
 		};
 
 		for ( const [ key, value ] of Object.entries( additionalData ) ) {
@@ -36,6 +43,7 @@ describe( 'flattenFormData', () => {
 			'meta[dothis]': 'true',
 			'meta[nested]': 'foo',
 			'meta[supermeta][nested]': 'baz',
+			customClass: 'i am rich text',
 		} );
 	} );
 } );
