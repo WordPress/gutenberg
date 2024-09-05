@@ -20,6 +20,9 @@
 
 		&.dataviews-view-table__actions-column {
 			text-align: right;
+			position: sticky;
+			inset-inline-end: 0;
+			background-color: $white;
 		}
 
 		&.dataviews-view-table__checkbox-column {
