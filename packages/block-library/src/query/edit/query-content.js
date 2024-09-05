@@ -46,14 +46,10 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	const { postsPerPage, currentPostType } = useSelect( ( select ) => {
+	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, getEntityRecordEdits, canUser } =
 			select( coreStore );
-		// @wordpress/block-library should not depend on @wordpress/editor.
-		// However, we need to get the current post type in order to inherit the correct query.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const { getCurrentPostType } = select( 'core/editor' );
 		const settingPerPage = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
@@ -72,7 +68,6 @@ export default function QueryContent( {
 				editedSettingPerPage ||
 				settingPerPage ||
 				DEFAULTS_POSTS_PER_PAGE,
-			currentPostType: getCurrentPostType(),
 		};
 	}, [] );
 	// There are some effects running where some initialization logic is
@@ -102,24 +97,12 @@ export default function QueryContent( {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-		// When we inherit from global query we should check if the current post type
-		// is different from the query post type, excluding templates and patterns.
-		// We should default to posts if the current post type is not valid.
-		let newPostType = 'post';
-		const excludedPostTypes = [ 'wp_template', 'wp_block' ];
-		if ( ! excludedPostTypes.includes( currentPostType ) ) {
-			newPostType = currentPostType;
-		}
-		if ( inherit && newPostType !== query.postType ) {
-			query.postType = newPostType;
-		}
 	}, [
 		query,
 		postsPerPage,
 		inherit,
 		__unstableMarkNextChangeAsNotPersistent,
 		updateQuery,
-		currentPostType,
 	] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
