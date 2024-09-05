@@ -304,7 +304,6 @@ async function loadPostTypeEntities() {
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.name,
-			meta: postType.meta,
 			transientEdits: {
 				blocks: true,
 				selection: true,
