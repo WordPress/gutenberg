@@ -24,12 +24,9 @@ export function flattenFormData(
 	data: string | undefined | Record< string, string >
 ) {
 	if ( isPlainObject( data ) ) {
+		for ( const [ name, value ] of Object.entries( data ) ) {
 			if ( Object.hasOwn( data, name ) ) {
-				flattenFormData(
-					formData,
-					`${ key }[${ name }]`,
-					data[ name ]
-				);
+				flattenFormData( formData, `${ key }[${ name }]`, value );
 			}
 		}
 	} else if ( data !== undefined ) {
