@@ -200,3 +200,28 @@ function gutenberg_dequeue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_dequeue_script_module' );
 	wp_script_modules()->dequeue( $module_identifier );
 }
+
+/**
+ * Registers vendor JavaScript files to be used as dependencies of the editor
+ * and plugins.
+ *
+ * This function is called from a script during the plugin build process, so it
+ * should not call any WordPress PHP functions.
+ *
+ * @since 13.0
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance.
+ */
+function gutenberg_register_script_modules() {
+	// When in production, use the plugin's version as the default asset version;
+	// else (for development or test) default to use the current time.
+	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+
+	wp_register_script_module(
+		'@wordpress/a11y',
+		gutenberg_url( 'build-module/a11y.min.js' ),
+		array(),
+		$default_version
+	);
+}
+add_action( 'init', 'gutenberg_register_script_modules' );
