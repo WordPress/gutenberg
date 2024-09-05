@@ -103,7 +103,7 @@ export function AddComment( { onSubmit } ) {
 				value={ inputComment }
 				onChange={ setInputComment }
 				// translators: placeholder text for comment input
-				placeholder={ __( 'Add comment' ) }
+				placeholder={ __( 'Comment' ) }
 			/>
 			<HStack alignment="right" spacing="3">
 				<Button
@@ -117,7 +117,7 @@ export function AddComment( { onSubmit } ) {
 					__next40pxDefaultSize
 					accessibleWhenDisabled
 					variant="primary"
-					text={ _x( 'Add Comment', 'Add comment button' ) }
+					text={ _x( 'Comment', 'Add comment button' ) }
 					disabled={
 						0 === sanitizeCommentString( inputComment ).length
 					}

@@ -34,8 +34,8 @@ export default function BlockCommentMenuItem( { onClose } ) {
 			aria-haspopup="dialog"
 		>
 			{ _x(
-				'Add Comment',
-				'Click to open comment sidebar and add comment'
+				'Comment',
+				'Click to open new comment form in comment sidebar'
 			) }
 		</MenuItem>
 	);

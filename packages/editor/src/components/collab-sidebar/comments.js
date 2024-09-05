@@ -427,7 +427,7 @@ function CommentHeader( {
 				onClick: onReply,
 			},
 		];
-	}, [] );
+	}, [ onEdit, onDelete, onReply ] );
 
 	const moreActions = memorizedMoreActions.filter( ( item ) => item.onClick );
 
