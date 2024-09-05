@@ -182,7 +182,7 @@ export const rootEntitiesConfig = [
 		name: 'globalStyles',
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
-		baseURLParams: {},
+		baseURLParams: { context: 'edit' },
 		plural: 'globalStylesVariations', // Should be different from name.
 		getTitle: ( record ) => record?.title?.rendered || record?.title,
 		getRevisionsUrl: ( parentId, revisionId ) =>
