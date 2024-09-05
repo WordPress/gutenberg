@@ -48,8 +48,22 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 		if ( false !== $reusable_blocks_key ) {
 			unset( $paths[ $reusable_blocks_key ] );
 		}
-	}
 
+		/*
+		 * Removes the `context=edit` query parameter from the global styles preload path added in gutenberg_block_editor_preload_paths_6_6().
+		 * Uses array_filter because it may have been added again in WordPress Core 6.6 in src/wp-admin/edit-form-blocks.php
+		 * Reason: because GET requests to global styles items are accessible to roles with the `edit_posts` capability.
+		 */
+		$global_styles_edit_path = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() . '?context=edit';
+		$paths                   = array_filter(
+			$paths,
+			function ( $value ) use ( $global_styles_edit_path ) {
+				return $value !== $global_styles_edit_path;
+			}
+		);
+
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+	}
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_7', 10, 2 );
@@ -114,3 +128,24 @@ function gutenberg_override_default_rest_server() {
 	return 'Gutenberg_REST_Server';
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
+
+
+/**
+ * Filters the arguments for registering a wp_global_styles post type.
+ * Note when syncing to Core: the capabilities should be updates for `wp_global_styles` in the wp-includes/post.php.
+ *
+ * @since 6.7.0
+ *
+ * @param array  $args      Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ * @param string $post_type Post type key.
+ */
+function gutenberg_register_post_type_args_for_wp_global_styles( $args, $post_type ) {
+	if ( $post_type === 'wp_global_styles' ) {
+		$args['capabilities']['read'] = 'edit_posts';
+	}
+
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_register_post_type_args_for_wp_global_styles', 10, 2 );
