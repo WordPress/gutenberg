@@ -22,6 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { ActionItem } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -39,14 +40,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getDeviceType, getCurrentPostType } = select( editorStore );
-		const { getUnstableBase, getPostType } = select( coreStore );
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const _currentPostType = getCurrentPostType();
 		return {
 			deviceType: getDeviceType(),
 			editorMode: __unstableGetEditorMode(),
-			homeUrl: getUnstableBase()?.home,
+			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 			isTemplate: _currentPostType === 'wp_template',
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -58,18 +59,18 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	/**
 	 * Save the original editing mode in a ref to restore it when we exit zoom out.
 	 */
-	const originalEditingMode = useRef( editorMode );
+	const originalEditingModeRef = useRef( editorMode );
 	useEffect( () => {
 		if ( editorMode !== 'zoom-out' ) {
-			originalEditingMode.current = editorMode;
+			originalEditingModeRef.current = editorMode;
 		}
 
 		return () => {
 			if (
 				editorMode === 'zoom-out' &&
-				editorMode !== originalEditingMode.current
+				editorMode !== originalEditingModeRef.current
 			) {
-				__unstableSetEditorMode( originalEditingMode.current );
+				__unstableSetEditorMode( originalEditingModeRef.current );
 			}
 		};
 	}, [ editorMode, __unstableSetEditorMode ] );
@@ -111,22 +112,24 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 		},
-		{
+	];
+	if ( window.__experimentalEnableZoomOutExperiment ) {
+		choices.push( {
 			value: 'ZoomOut',
 			label: __( 'Desktop (50%)' ),
 			icon: desktop,
-		},
-		{
-			value: 'Tablet',
-			label: __( 'Tablet' ),
-			icon: tablet,
-		},
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-		},
-	];
+		} );
+	}
+	choices.push( {
+		value: 'Tablet',
+		label: __( 'Tablet' ),
+		icon: tablet,
+	} );
+	choices.push( {
+		value: 'Mobile',
+		label: __( 'Mobile' ),
+		icon: mobile,
+	} );
 
 	const previewValue = editorMode === 'zoom-out' ? 'ZoomOut' : deviceType;
 
@@ -136,7 +139,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 * @param {string} value The device type.
 	 */
 	const onSelect = ( value ) => {
-		let newEditorMode = originalEditingMode.current;
+		let newEditorMode = originalEditingModeRef.current;
 
 		if ( value === 'ZoomOut' ) {
 			newEditorMode = 'zoom-out';
@@ -206,6 +209,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 							/>
 						</MenuGroup>
 					) }
+					<ActionItem.Slot
+						name="core/plugin-preview-menu"
+						as={ MenuGroup }
+						fillProps={ { onClick: onClose } }
+					/>
 				</>
 			) }
 		</DropdownMenu>

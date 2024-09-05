@@ -24,18 +24,18 @@ export const useUpdatePostLinkListener = () => {
 		} ),
 		[]
 	);
-	const nodeToUpdate = useRef();
+	const nodeToUpdateRef = useRef();
 
 	useEffect( () => {
-		nodeToUpdate.current =
+		nodeToUpdateRef.current =
 			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
 			document.querySelector( VIEW_AS_LINK_SELECTOR );
 	}, [] );
 
 	useEffect( () => {
-		if ( ! newPermalink || ! nodeToUpdate.current ) {
+		if ( ! newPermalink || ! nodeToUpdateRef.current ) {
 			return;
 		}
-		nodeToUpdate.current.setAttribute( 'href', newPermalink );
+		nodeToUpdateRef.current.setAttribute( 'href', newPermalink );
 	}, [ newPermalink ] );
 };

@@ -41,7 +41,7 @@ test.describe( 'Block bindings', () => {
 		} );
 
 		test.describe( 'Paragraph', () => {
-			test( 'should show the value of the custom field', async ( {
+			test( 'should show the key of the custom field in post meta', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -64,6 +64,53 @@ test.describe( 'Block bindings', () => {
 				await expect( paragraphBlock ).toHaveText(
 					'text_custom_field'
 				);
+			} );
+
+			test( 'should show the key of the custom field in server sources with key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'text_custom_field'
+				);
+			} );
+
+			test( 'should show the source label in server sources without key', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/server-source',
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText( 'Server Source' );
 			} );
 
 			test( 'should lock the appropriate controls with a registered source', async ( {
@@ -1394,20 +1441,10 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByLabel( 'Attributes options' )
-					.click();
+				await page.getByLabel( 'Attributes options' ).click();
 				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
 					name: 'Show content',
 				} );
@@ -1417,11 +1454,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
@@ -1436,12 +1468,7 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByRole( 'button', { name: 'content' } )
-					.click();
+				await page.getByRole( 'button', { name: 'content' } ).click();
 
 				await page
 					.getByRole( 'menuitemradio' )
@@ -1539,20 +1566,10 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/heading',
 				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByLabel( 'Attributes options' )
-					.click();
+				await page.getByLabel( 'Attributes options' ).click();
 				const contentAttribute = page.getByRole( 'menuitemcheckbox', {
 					name: 'Show content',
 				} );
@@ -1739,11 +1756,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/buttons',
 					innerBlocks: [
@@ -2074,11 +2086,6 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
-				// Activate the block bindings UI experiment.
-				await page.evaluate( () => {
-					window.__experimentalBlockBindingsUI = true;
-				} );
-
 				await editor.insertBlock( {
 					name: 'core/image',
 				} );
@@ -2367,11 +2374,9 @@ test.describe( 'Block bindings', () => {
 				},
 			} );
 
-			const bindingsPanel = page
-				.getByRole( 'tabpanel', {
-					name: 'Settings',
-				} )
-				.locator( '.block-editor-bindings__panel' );
+			const bindingsPanel = page.locator(
+				'.block-editor-bindings__panel'
+			);
 			await expect( bindingsPanel ).toContainText( 'Server Source' );
 		} );
 	} );

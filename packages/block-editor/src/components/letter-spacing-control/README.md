@@ -38,12 +38,19 @@ The current value of the letter spacing setting.
 
 A callback function invoked when the value is changed.
 
-### `_unstableInputWidth`
+### `__unstableInputWidth`
 
 -   **Type:** `string|number|undefined`
 -   **Default:** `undefined`
 
 Input width to pass through to inner UnitControl. Should be a valid CSS value.
+
+#### `__next40pxDefaultSize`
+
+- **Type:** `boolean`
+- **Default:** `false`
+
+Start opting into the larger default height that will become the default size in a future version.
 
 ## Related components
 

@@ -22,11 +22,9 @@ import usePatternsSetup from './use-patterns-setup';
 import { VIEWMODES } from './constants';
 import { unlock } from '../../lock-unlock';
 
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
+const { CompositeV2: Composite, CompositeItemV2: CompositeItem } = unlock(
+	componentsPrivateApis
+);
 
 const SetupContent = ( {
 	viewMode,
@@ -35,7 +33,6 @@ const SetupContent = ( {
 	onBlockPatternSelect,
 	showTitles,
 } ) => {
-	const compositeStore = useCompositeStore();
 	const containerClass = 'block-editor-block-pattern-setup__container';
 
 	if ( viewMode === VIEWMODES.carousel ) {
@@ -65,7 +62,6 @@ const SetupContent = ( {
 	return (
 		<div className="block-editor-block-pattern-setup__grid">
 			<Composite
-				store={ compositeStore }
 				role="listbox"
 				className={ containerClass }
 				aria-label={ __( 'Patterns list' ) }

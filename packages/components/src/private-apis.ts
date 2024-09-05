@@ -1,19 +1,11 @@
 /**
  * Internal dependencies
  */
-import { Composite, useCompositeStore } from './composite';
+import { Composite } from './composite';
+import { useCompositeStore } from './composite/store';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
-import {
-	DropdownMenu as DropdownMenuV2,
-	DropdownMenuGroup as DropdownMenuGroupV2,
-	DropdownMenuItem as DropdownMenuItemV2,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
-	DropdownMenuSeparator as DropdownMenuSeparatorV2,
-	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
-} from './dropdown-menu-v2';
+import { DropdownMenuV2 } from './dropdown-menu-v2';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
@@ -26,6 +18,8 @@ lock( privateApis, {
 	CompositeGroupV2: Composite.Group,
 	CompositeItemV2: Composite.Item,
 	CompositeRowV2: Composite.Row,
+	CompositeTypeaheadV2: Composite.Typeahead,
+	CompositeHoverV2: Composite.Hover,
 	useCompositeStoreV2: useCompositeStore,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
@@ -33,12 +27,5 @@ lock( privateApis, {
 	Tabs,
 	Theme,
 	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpTextV2,
 	kebabCase,
 } );

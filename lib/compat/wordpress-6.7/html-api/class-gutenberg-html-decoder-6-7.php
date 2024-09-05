@@ -196,6 +196,8 @@ class Gutenberg_HTML_Decoder_6_7 {
 	 *
 	 * @since 6.6.0
 	 *
+	 * @global WP_Token_Map $html5_named_character_references
+	 *
 	 * @param string $context            `attribute` for decoding attribute values, `data` otherwise.
 	 * @param string $text               Text document containing span of text to decode.
 	 * @param int    $at                 Optional. Byte offset into text where span begins, defaults to the beginning (0).

@@ -107,7 +107,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			right: 0;
 			left: 0;
 			top: -$default-block-margin * 0.5;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			border-top: 4px solid $gray-400;
 			bottom: auto;
 			box-shadow: none;
@@ -215,7 +215,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		right: 0;
 		bottom: 0;
 		left: 0;
-		border-radius: $radius-block-ui;
 		background-color: rgba($white, 0.4);
 	}
 
@@ -421,7 +420,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	width: 100%;
 	border: none;
 	outline: none;
-	border-radius: 2px;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;

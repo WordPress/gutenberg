@@ -10,9 +10,6 @@ import { store as editorStore } from '../store';
 
 export default {
 	name: 'core/post-meta',
-	getPlaceholder( { args } ) {
-		return args.key;
-	},
 	getValues( { registry, context, bindings } ) {
 		const meta = registry
 			.select( coreDataStore )
@@ -23,7 +20,9 @@ export default {
 			)?.meta;
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			newValues[ attributeName ] = meta?.[ source.args.key ];
+			// Use the key if the value is not set.
+			newValues[ attributeName ] =
+				meta?.[ source.args.key ] || source.args.key;
 		}
 		return newValues;
 	},
@@ -53,13 +52,20 @@ export default {
 		}
 
 		// Check that the custom field is not protected and available in the REST API.
-		const isFieldExposed = !! select( coreDataStore ).getEntityRecord(
+		// Empty string or `false` could be a valid value, so we need to check if the field value is undefined.
+		const fieldValue = select( coreDataStore ).getEntityRecord(
 			'postType',
 			postType,
 			context?.postId
 		)?.meta?.[ args.key ];
 
-		if ( ! isFieldExposed ) {
+		if ( fieldValue === undefined ) {
+			return false;
+		}
+		// Check that custom fields metabox is not enabled.
+		const areCustomFieldsEnabled =
+			select( editorStore ).getEditorSettings().enableCustomFields;
+		if ( areCustomFieldsEnabled ) {
 			return false;
 		}
 

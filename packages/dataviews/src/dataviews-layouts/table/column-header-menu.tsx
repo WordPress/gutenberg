@@ -25,16 +25,11 @@ import type {
 	NormalizedField,
 	SortDirection,
 	ViewTable as ViewTableType,
+	Operator,
 } from '../../types';
+import { getVisibleFieldIds } from '../index';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
 	fieldId: string;
@@ -50,7 +45,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 		.filter( Boolean )
 		.map( ( child, i ) => (
 			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
+				{ i > 0 && <DropdownMenuV2.Separator /> }
 				{ child }
 			</Fragment>
 		) );
@@ -67,33 +62,46 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
+	const visibleFieldIds = getVisibleFieldIds( view, fields );
+	const index = visibleFieldIds?.indexOf( fieldId ) as number;
+	const isSorted = view.sort?.field === fieldId;
+	let isHidable = false;
+	let isSortable = false;
+	let canAddFilter = false;
+	let header;
+	let operators: Operator[] = [];
+
 	const combinedField = view.layout?.combinedFields?.find(
 		( f ) => f.id === fieldId
 	);
-	const index = view.fields?.indexOf( fieldId ) as number;
-	if ( !! combinedField ) {
-		return combinedField.header || combinedField.label;
-	}
 	const field = fields.find( ( f ) => f.id === fieldId );
-	if ( ! field ) {
-		return null;
+
+	if ( ! combinedField ) {
+		if ( ! field ) {
+			// No combined or regular field found.
+			return null;
+		}
+
+		isHidable = field.enableHiding !== false;
+		isSortable = field.enableSorting !== false;
+		header = field.header;
+
+		operators = sanitizeOperators( field );
+		// Filter can be added:
+		// 1. If the field is not already part of a view's filters.
+		// 2. If the field meets the type and operator requirements.
+		// 3. If it's not primary. If it is, it should be already visible.
+		canAddFilter =
+			! view.filters?.some( ( _filter ) => fieldId === _filter.field ) &&
+			!! field.elements?.length &&
+			!! operators.length &&
+			! field.filterBy?.isPrimary;
+	} else {
+		header = combinedField.header || combinedField.label;
 	}
-	const isHidable = field.enableHiding !== false;
-	const isSortable = field.enableSorting !== false;
-	const isSorted = view.sort?.field === field.id;
-	const operators = sanitizeOperators( field );
-	// Filter can be added:
-	// 1. If the field is not already part of a view's filters.
-	// 2. If the field meets the type and operator requirements.
-	// 3. If it's not primary. If it is, it should be already visible.
-	const canAddFilter =
-		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
-		!! field.elements?.length &&
-		!! operators.length &&
-		! field.filterBy?.isPrimary;
 
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			align="start"
 			trigger={
 				<Button
@@ -102,7 +110,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					ref={ ref }
 					variant="tertiary"
 				>
-					{ field.header }
+					{ header }
 					{ view.sort && isSorted && (
 						<span aria-hidden="true">
 							{ sortArrows[ view.sort.direction ] }
@@ -114,7 +122,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		>
 			<WithDropDownMenuSeparators>
 				{ isSortable && (
-					<DropdownMenuGroup>
+					<DropdownMenuV2.Group>
 						{ SORTING_DIRECTIONS.map(
 							( direction: SortDirection ) => {
 								const isChecked =
@@ -122,10 +130,10 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 									isSorted &&
 									view.sort.direction === direction;
 
-								const value = `${ field.id }-${ direction }`;
+								const value = `${ fieldId }-${ direction }`;
 
 								return (
-									<DropdownMenuRadioItem
+									<DropdownMenuV2.RadioItem
 										key={ value }
 										// All sorting radio items share the same name, so that
 										// selecting a sorting option automatically deselects the
@@ -139,34 +147,34 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 											onChangeView( {
 												...view,
 												sort: {
-													field: field.id,
+													field: fieldId,
 													direction,
 												},
 											} );
 										} }
 									>
-										<DropdownMenuItemLabel>
+										<DropdownMenuV2.ItemLabel>
 											{ sortLabels[ direction ] }
-										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
+										</DropdownMenuV2.ItemLabel>
+									</DropdownMenuV2.RadioItem>
 								);
 							}
 						) }
-					</DropdownMenuGroup>
+					</DropdownMenuV2.Group>
 				) }
 				{ canAddFilter && (
-					<DropdownMenuGroup>
-						<DropdownMenuItem
+					<DropdownMenuV2.Group>
+						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ funnel } /> }
 							onClick={ () => {
-								setOpenedFilter( field.id );
+								setOpenedFilter( fieldId );
 								onChangeView( {
 									...view,
 									page: 1,
 									filters: [
 										...( view.filters || [] ),
 										{
-											field: field.id,
+											field: fieldId,
 											value: undefined,
 											operator: operators[ 0 ],
 										},
@@ -174,86 +182,76 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								} );
 							} }
 						>
-							<DropdownMenuItemLabel>
+							<DropdownMenuV2.ItemLabel>
 								{ __( 'Add filter' ) }
-							</DropdownMenuItemLabel>
-						</DropdownMenuItem>
-					</DropdownMenuGroup>
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.Item>
+					</DropdownMenuV2.Group>
 				) }
-				<DropdownMenuGroup>
-					<DropdownMenuItem
+				<DropdownMenuV2.Group>
+					<DropdownMenuV2.Item
 						prefix={ <Icon icon={ arrowLeft } /> }
 						disabled={ index < 1 }
 						onClick={ () => {
-							if ( ! view.fields || index < 1 ) {
-								return;
-							}
 							onChangeView( {
 								...view,
 								fields: [
-									...( view.fields.slice( 0, index - 1 ) ??
-										[] ),
-									field.id,
-									view.fields[ index - 1 ],
-									...view.fields.slice( index + 1 ),
+									...( visibleFieldIds.slice(
+										0,
+										index - 1
+									) ?? [] ),
+									fieldId,
+									visibleFieldIds[ index - 1 ],
+									...visibleFieldIds.slice( index + 1 ),
 								],
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ __( 'Move left' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
-					<DropdownMenuItem
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					<DropdownMenuV2.Item
 						prefix={ <Icon icon={ arrowRight } /> }
-						disabled={
-							! view.fields || index >= view.fields.length - 1
-						}
+						disabled={ index >= visibleFieldIds.length - 1 }
 						onClick={ () => {
-							if (
-								! view.fields ||
-								index >= view.fields.length - 1
-							) {
-								return;
-							}
 							onChangeView( {
 								...view,
 								fields: [
-									...( view.fields.slice( 0, index ) ?? [] ),
-									view.fields[ index + 1 ],
-									field.id,
-									...view.fields.slice( index + 2 ),
+									...( visibleFieldIds.slice( 0, index ) ??
+										[] ),
+									visibleFieldIds[ index + 1 ],
+									fieldId,
+									...visibleFieldIds.slice( index + 2 ),
 								],
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ __( 'Move right' ) }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
-					{ isHidable && (
-						<DropdownMenuItem
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
+					{ isHidable && field && (
+						<DropdownMenuV2.Item
 							prefix={ <Icon icon={ unseen } /> }
 							onClick={ () => {
-								const viewFields =
-									view.fields || fields.map( ( f ) => f.id );
 								onHide( field );
 								onChangeView( {
 									...view,
-									fields: viewFields.filter(
-										( id ) => id !== field.id
+									fields: visibleFieldIds.filter(
+										( id ) => id !== fieldId
 									),
 								} );
 							} }
 						>
-							<DropdownMenuItemLabel>
+							<DropdownMenuV2.ItemLabel>
 								{ __( 'Hide column' ) }
-							</DropdownMenuItemLabel>
-						</DropdownMenuItem>
+							</DropdownMenuV2.ItemLabel>
+						</DropdownMenuV2.Item>
 					) }
-				</DropdownMenuGroup>
+				</DropdownMenuV2.Group>
 			</WithDropDownMenuSeparators>
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 } );
 
