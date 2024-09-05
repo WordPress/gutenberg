@@ -488,28 +488,28 @@ _Returns_
 
 ### useObserveElementSize
 
-Tracks a given element's size and calls `onUpdate` for all of its discrete values using a `ResizeObserver`. The element can change dynamically. Alternatively, a ref containing the target element can be passed. However, any updates to the ref will be ignored.
+Tracks a given element's size and calls `onUpdate` for all of its discrete values using a `ResizeObserver`. Pass the returned ref to the element or pass the element to the `targetElement` option directly.
 
 _Usage_
 
 ```tsx
-const targetElementRef = useRef< HTMLElement >( null );
-useObserveElementSize(
-	targetElementRef,
+const targetElementRef = useObserveElementSize(
 	( resizeObserverEntries, element ) => {
 		console.log( 'Resize observer entries:', resizeObserverEntries );
-		console.log( 'Element that was resized:', element );
+		console.log( 'Element that was measured:', element );
 	},
 	{ box: 'border-box' }
 );
 <div ref={ targetElementRef } />;
 
-// Alternatively, if the target element can change dynamically, you can pass it
-// directly as a state:
+// Alternatively, pass the element directly as an argument:
 const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
 useObserveElementSize(
-	targetElement
 	// ...
+	{
+		targetElement,
+		// ...
+	}
 );
 <div ref={ setTargetElement } />;
 
@@ -524,9 +524,9 @@ useEffect( () => {
 
 _Parameters_
 
--   _targetElement_ `T | undefined | null | RefObject< T >`: The target element to observe. It can be changed dynamically. Alternatively, a ref containing the target element can be passed. However, any updates to the ref will be ignored.
--   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: T ) => void`: Callback that will be called when the element is resized. It is passed the list of [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry) objects passed to the `ResizeObserver.observe` callback internally, and the element being tracked at the time of this update.
--   _resizeObserverOptions_ `ResizeObserverOptions`: Options to pass to `ResizeObserver.observe` when called internally. Updating this option will not cause the observer to be re-created, and it will only take effect if a new element is observed.
+-   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: T ) => void`: Callback that will be called when the element is measured (initially and after resizes).
+-   _resizeObserverOptions_ `ObserveElementSizeOptions< T >`: Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
+-   _resizeObserverOptions.targetElement_ `ObserveElementSizeOptions< T >[ 'targetElement' ]`: The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
 
 ### usePrevious
 

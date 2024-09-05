@@ -10,7 +10,6 @@ import { useCallback, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useEvent from '../use-event';
 import useObserveElementSize from '../use-observe-element-size';
 
 type ObservedSize = {
@@ -84,12 +83,9 @@ type ResizeElementProps = {
 };
 
 function ResizeElement( { onResize }: ResizeElementProps ) {
-	const resizeElementRef = useRef< HTMLDivElement >( null );
-	const resizeCallbackEvent = useEvent( onResize );
-
-	useObserveElementSize( resizeElementRef, ( entries ) => {
+	const resizeElementRef = useObserveElementSize( ( entries ) => {
 		const newSize = extractSize( entries.at( -1 )! ); // Entries are never empty.
-		resizeCallbackEvent( newSize );
+		onResize( newSize );
 	} );
 
 	return (
