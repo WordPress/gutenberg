@@ -15,7 +15,7 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 
 const meta: Meta< typeof Composite > = {
-	title: 'Components/Composite (V2)',
+	title: 'Components/Composite',
 	component: Composite,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -46,7 +46,6 @@ const meta: Meta< typeof Composite > = {
 			options: [ true, false, 'horizontal', 'vertical', 'both' ],
 		},
 	},
-	tags: [ 'status-private' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: {
