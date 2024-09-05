@@ -195,7 +195,7 @@ export default function CategoriesEdit( {
 								label: t.name,
 								value: t.slug,
 							} ) ) }
-							value={ taxonomy }
+							value={ taxonomySlug }
 							onChange={ ( selectedTaxonomy ) =>
 								setAttributes( { taxonomy: selectedTaxonomy } )
 							}
