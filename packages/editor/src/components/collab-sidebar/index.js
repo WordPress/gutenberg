@@ -82,7 +82,6 @@ export default function CollabSidebar() {
 			comment_author: currentUserData?.name ?? null,
 			comment_approved: 0,
 		} );
-
 		if ( savedRecord ) {
 			updateBlockAttributes( clientId, {
 				blockCommentId: savedRecord?.id,
@@ -92,6 +91,17 @@ export default function CollabSidebar() {
 				isDismissible: true,
 			} );
 			fetchComments();
+		} else {
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -109,6 +119,17 @@ export default function CollabSidebar() {
 			} );
 
 			fetchComments();
+		} else {
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -132,6 +153,17 @@ export default function CollabSidebar() {
 			);
 
 			fetchComments();
+		} else {
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
@@ -159,6 +191,17 @@ export default function CollabSidebar() {
 				}
 			);
 			fetchComments();
+		} else {
+			createNotice(
+				'error',
+				// translators: Error message when comment submission fails
+				__(
+					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+				),
+				{
+					isDismissible: true,
+				}
+			);
 		}
 	};
 
