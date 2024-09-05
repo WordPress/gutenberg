@@ -199,7 +199,7 @@ export default function CollabSidebar() {
 
 	useEffect( () => {
 		fetchComments();
-	}, [ postId ] );
+	}, [ postId, fetchComments ] );
 
 	const allBlocks = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlocks();
