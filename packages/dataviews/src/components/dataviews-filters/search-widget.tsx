@@ -126,8 +126,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 			) }
 			onFocusVisible={ () => {
 				// `onFocusVisible` needs the `Composite` component to be focusable,
-				// which is implicitly achieved via the `virtualFocus: true` option
-				// in the `useCompositeStore` hook.
+				// which is implicitly achieved via the `virtualFocus` prop.
 				if ( ! activeCompositeId && filter.elements.length ) {
 					setActiveCompositeId(
 						generateFilterElementCompositeItemId(

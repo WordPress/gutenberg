@@ -9,10 +9,9 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
-import { Composite, useCompositeStore } from '@wordpress/components';
+import { Composite } from '@wordpress/components';
 
-const store = useCompositeStore();
-<Composite store={store}>
+<Composite>
   <Composite.Group>
     <Composite.GroupLabel>Label</Composite.GroupLabel>
     <Composite.Item>Item 1</Composite.Item>
@@ -21,11 +20,11 @@ const store = useCompositeStore();
 </Composite>
 ```
 
-## Hooks
+## Components
 
-### `useCompositeStore`
+### `Composite`
 
-Creates a composite store.
+Renders a composite widget.
 
 #### Props
 
@@ -130,20 +129,6 @@ This only affects the composite widget behavior. You still need to set `dir="rtl
 
 -   Required: no
 -   Default: `false`
-
-## Components
-
-### `Composite`
-
-Renders a composite widget.
-
-#### Props
-
-##### `store`: `CompositeStore<CompositeStoreItem>`
-
-Object returned by the `useCompositeStore` hook.
-
--   Required: yes
 
 ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
 
