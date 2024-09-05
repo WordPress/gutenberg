@@ -165,4 +165,55 @@ END;
 
 		$this->assertSame( $expected, $output, 'Unexpected parsed post content' );
 	}
+
+	/**
+	 * Tests that the `core/post-template` block rewinds the default query when not in a single post of any post type.
+	 */
+	public function test_rendering_post_template_with_main_query_loop_not_single_post() {
+		global $wp_query, $wp_the_query;
+
+		// Query block with post template block.
+		$content  = '<!-- wp:query {"query":{"inherit":true}} -->';
+		$content .= '<!-- wp:post-template {"align":"wide"} -->';
+		$content .= '<!-- wp:post-title /-->';
+		$content .= '<!-- /wp:post-template -->';
+		$content .= '<!-- /wp:query -->';
+
+		$expected = '<ul class="alignwide wp-block-post-template is-layout-flow wp-block-post-template-is-layout-flow wp-block-query-is-layout-flow">';
+
+		// Find all the posts of the 'post' post type.
+		$wp_query_posts = new WP_Query( array( 'post_type' => 'post' ) );
+
+		while ( $wp_query_posts->have_posts() ) {
+			$wp_query_posts->the_post();
+			$expected .= '<li class="wp-block-post post-' . get_the_ID() . ' post type-post status-publish format-standard hentry category-uncategorized">';
+			$expected .= '<h2 class="wp-block-post-title">' . get_the_title() . '</h2>';
+			$expected .= '</li>';
+		}
+
+		$expected .= '</ul>';
+
+		// Update the post's content to have a query block for the same query as the main query.
+		wp_update_post(
+			array(
+				'ID'                    => self::$post->ID,
+				'post_content'          => $content,
+				'post_content_filtered' => $content,
+			)
+		);
+
+		// Set main query to all posts.
+		$wp_query     = new WP_Query( array( 'post_type' => 'post' ) );
+		$wp_the_query = $wp_query;
+
+		// Get post content within main query loop.
+		$output = '';
+		while ( $wp_query->have_posts() ) {
+			$wp_query->the_post();
+
+			$output = get_echo( 'the_content' );
+		}
+
+		$this->assertSame( $expected, $output, 'Unexpected parsed post content' );
+	}
 }
