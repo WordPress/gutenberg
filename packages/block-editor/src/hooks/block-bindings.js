@@ -249,40 +249,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
-	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-		return null;
-	}
-
-	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
-	const registeredSources = getBlockBindingsSources();
-	Object.entries( registeredSources ).forEach(
-		( [ sourceName, { getFieldsList, usesContext } ] ) => {
-			if ( getFieldsList ) {
-				// Populate context.
-				const context = {};
-				if ( usesContext?.length ) {
-					for ( const key of usesContext ) {
-						context[ key ] = blockContext[ key ];
-					}
-				}
-				const sourceList = getFieldsList( {
-					registry,
-					context,
-				} );
-				// Only add source if the list is not empty.
-				if ( sourceList ) {
-					fieldsList[ sourceName ] = { ...sourceList };
-				}
-			}
-		}
-	);
-	// Remove empty sources.
-	Object.entries( fieldsList ).forEach( ( [ key, value ] ) => {
-		if ( ! Object.keys( value ).length ) {
-			delete fieldsList[ key ];
-		}
-	} );
-
 	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly =
 		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
