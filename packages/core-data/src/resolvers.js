@@ -976,3 +976,29 @@ export const getRevision =
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};
+
+/**
+ * Requests a specific post type options from the REST API.
+ *
+ * @param {string} postType Post type slug.
+ */
+export const getRegisteredPostMeta =
+	( postType ) =>
+	async ( { select, dispatch } ) => {
+		try {
+			const {
+				rest_namespace: restNamespace = 'wp/v2',
+				rest_base: restBase,
+			} = select.getPostType( postType ) || {};
+			const options = await apiFetch( {
+				path: `${ restNamespace }/${ restBase }/?context=edit`,
+				method: 'OPTIONS',
+			} );
+			dispatch.receiveRegisteredPostMeta(
+				postType,
+				options?.schema?.properties?.meta?.properties
+			);
+		} catch {
+			dispatch.receiveRegisteredPostMeta( postType, false );
+		}
+	};

@@ -47,6 +47,7 @@ export interface State {
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
+	registeredPostMeta: Record< string, { postType: string } >;
 }
 
 type EntityRecordKey = string | number;
