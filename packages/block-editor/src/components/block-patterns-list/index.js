@@ -27,11 +27,9 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
+const { CompositeV2: Composite, CompositeItemV2: CompositeItem } = unlock(
+	componentsPrivateApis
+);
 
 const WithToolTip = ( { showTooltip, title, children } ) => {
 	if ( showTooltip ) {
@@ -206,19 +204,23 @@ function BlockPatternsList(
 	},
 	ref
 ) {
-	const compositeStore = useCompositeStore( { orientation } );
-	const { setActiveId } = compositeStore;
+	const [ activeCompositeId, setActiveCompositeId ] = useState( undefined );
 
 	useEffect( () => {
-		// We reset the active composite item whenever the
-		// available patterns change, to make sure that
-		// focus is put back to the start.
-		setActiveId( undefined );
-	}, [ setActiveId, shownPatterns, blockPatterns ] );
+		// Reset the active composite item whenever the available patterns change,
+		// to make sure that Composite widget can receive focus correctly when its
+		// composite items change. The first composite item will receive focus.
+		const firstCompositeItemId = blockPatterns.find( ( pattern ) =>
+			shownPatterns.includes( pattern )
+		)?.name;
+		setActiveCompositeId( firstCompositeItemId );
+	}, [ shownPatterns, blockPatterns ] );
 
 	return (
 		<Composite
-			store={ compositeStore }
+			orientation={ orientation }
+			activeId={ activeCompositeId }
+			setActiveId={ setActiveCompositeId }
 			role="listbox"
 			className="block-editor-block-patterns-list"
 			aria-label={ label }
