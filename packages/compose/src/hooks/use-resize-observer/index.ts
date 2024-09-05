@@ -54,9 +54,9 @@ export type ObserveElementSizeOptions< T extends HTMLElement > =
  * }, [ elementId ] );
  * ```
  *
- * @param onUpdate                            Callback that will be called when the element is measured (initially and after resizes).
- * @param resizeObserverOptions               Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
- * @param resizeObserverOptions.targetElement The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
+ * @param onUpdate              Callback that will be called when the element is measured (initially and after resizes).
+ * @param options               Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
+ * @param options.targetElement The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
  */
 export default function useResizeObserver< T extends HTMLElement >(
 	/**
@@ -82,6 +82,14 @@ export default function useResizeObserver< T extends HTMLElement >(
 	 * Updating them will not cause the observer to be re-created, and they will
 	 * only take effect if a new element is observed.
 	 */
+	options?: ObserveElementSizeOptions< T >
+): ( element?: T | null | undefined ) => void;
+
+export default function useResizeObserver< T extends HTMLElement >(
+	onUpdate: (
+		resizeObserverEntries: ResizeObserverEntry[],
+		element: T
+	) => void,
 	{
 		targetElement,
 		...resizeObserverOptions
