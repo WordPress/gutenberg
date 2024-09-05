@@ -397,6 +397,7 @@ const v13 = {
 // Note: The v12 deprecation was removed so as to no longer prevent the auto overlay color
 // from overriding previously set values. The desired behavior now is to allow the auto
 // overlay color to override any previously set values, unless `isUserOverlayColor` is set.
+// See: https://github.com/WordPress/gutenberg/pull/65077
 
 // Deprecation for blocks that does not have a HTML tag option.
 const v11 = {
