@@ -104,7 +104,7 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 
 // Copied as is from packages/dataviews/src/item-actions.js
 // With an added onClose prop.
-function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
+export function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -132,7 +132,9 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 						items={ [ item ] }
 						closeModal={ () => {
 							setIsModalOpen( false );
-							onClose();
+							if ( onClose ) {
+								onClose();
+							}
 						} }
 					/>
 				</Modal>

@@ -3,11 +3,14 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import trashPost from '../../dataviews/actions/trash-post';
 
 /**
  * Wrapper component that renders its children only if the post can trashed.
@@ -18,29 +21,33 @@ import { store as editorStore } from '../../store';
  * @return {Component|null} The rendered child components or null if the post can not trashed.
  */
 export default function PostTrashCheck( { children } ) {
-	const { canTrashPost } = useSelect( ( select ) => {
-		const { isEditedPostNew, getCurrentPostId, getCurrentPostType } =
-			select( editorStore );
-		const { canUser } = select( coreStore );
-		const postType = getCurrentPostType();
-		const postId = getCurrentPostId();
-		const isNew = isEditedPostNew();
-		const canUserDelete = !! postId
-			? canUser( 'delete', {
-					kind: 'postType',
-					name: postType,
-					id: postId,
-			  } )
-			: false;
-
+	const { item, permissions } = useSelect( ( select ) => {
+		const store = select( editorStore );
+		const { getEditedEntityRecord, getEntityRecordPermissions } = unlock(
+			select( coreStore )
+		);
+		const postId = store.getCurrentPostId();
+		const _postType = store.getCurrentPostType();
 		return {
-			canTrashPost: ( ! isNew || postId ) && canUserDelete,
+			item: getEditedEntityRecord( 'postType', _postType, postId ),
+			permissions: getEntityRecordPermissions(
+				'postType',
+				_postType,
+				postId
+			),
 		};
 	}, [] );
-
-	if ( ! canTrashPost ) {
+	const itemWithPermissions = useMemo( () => {
+		return {
+			...item,
+			permissions,
+		};
+	}, [ item, permissions ] );
+	if (
+		! itemWithPermissions ||
+		! trashPost.isEligible( itemWithPermissions )
+	) {
 		return null;
 	}
-
 	return children;
 }
