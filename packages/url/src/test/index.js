@@ -88,6 +88,12 @@ describe( 'isPhoneNumber', () => {
 		'+1 123 456 7890',
 		'1234567890',
 		'+44 791 112 3456',
+		'(123) 4567',
+		'+1 (123) 45678901',
+		'12-34-56',
+		'123456789012345',
+		'+12 3456789012345',
+		'tel:+1-123-456-7890',
 	] )(
 		'returns true when given things that look like a phone number: %s',
 		( phoneNumber ) => {
@@ -100,12 +106,12 @@ describe( 'isPhoneNumber', () => {
 		'123',
 		'1234',
 		'12345',
+		'+91 123',
 		'abc-def-ghij',
-		'1234567890123456',
 		'a123456789b',
-		'12-34-56',
-		'(123) 4567',
-		'+1 (123) 45678901',
+		'12-34-5',
+		'tel:911',
+		'tel:12345',
 	] )(
 		"returns false when given things that don't look like a phone number: %s",
 		( phoneNumber ) => {

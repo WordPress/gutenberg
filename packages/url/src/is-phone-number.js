@@ -1,5 +1,4 @@
-const PHONE_REGEXP =
-	/^\+?(\d{1,3})?[-.\s]?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/;
+const PHONE_REGEXP = /^(tel:)?(\+)?\d{6,15}$/;
 
 /**
  * Determines whether the given string looks like a phone number.
@@ -14,5 +13,7 @@ const PHONE_REGEXP =
  * @return {boolean} Whether or not it looks like a phone number.
  */
 export function isPhoneNumber( phoneNumber ) {
+	// Remove any seperator from phone number.
+	phoneNumber = phoneNumber.replace( /[-.() ]/g, '' );
 	return PHONE_REGEXP.test( phoneNumber );
 }
