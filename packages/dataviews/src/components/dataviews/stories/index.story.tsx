@@ -19,6 +19,8 @@ import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
 import type { View } from '../../../types';
 
+import './style.css';
+
 const meta = {
 	title: 'DataViews/DataViews',
 	component: DataViews,
@@ -144,6 +146,11 @@ export const CombinedFields = () => {
 					direction: 'vertical',
 				},
 			],
+			styles: {
+				theme: {
+					maxWidth: 300,
+				},
+			},
 		},
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
