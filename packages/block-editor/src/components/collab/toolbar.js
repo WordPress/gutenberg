@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -31,9 +31,9 @@ export default function BlockCommentToolbar() {
 			accessibleWhenDisabled
 			icon={ collabComment }
 			label={ _x(
-				'Comment',
+				'Comment', 
 				'Click to open sidebar and highlight comment board'
-			) }
+            ) }
 			onClick={ openCollabBoard }
 		/>
 	);

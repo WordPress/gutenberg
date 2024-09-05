@@ -90,10 +90,16 @@ export default function CollabSidebar() {
 			updateBlockAttributes( clientId, {
 				blockCommentId: savedRecord?.id,
 			} );
-			createNotice( 'snackbar', __( 'New comment added.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createNotice(
+				'snackbar',
+				__(
+				  'New comment added.'
+				),
+				{
+				  type: 'snackbar',
+				  isDismissible: true,
+				}
+			);
 			fetchComments();
 		}
 	};
@@ -106,10 +112,16 @@ export default function CollabSidebar() {
 
 		if ( savedRecord ) {
 			// translators: Comment resolved successfully
-			createNotice( 'snackbar', __( 'Thread marked as resolved.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createNotice(
+				'snackbar',
+				__(
+				  'Thread marked as resolved.'
+				),
+				{
+				  type: 'snackbar',
+				  isDismissible: true,
+				}
+			);
 
 			fetchComments();
 		}

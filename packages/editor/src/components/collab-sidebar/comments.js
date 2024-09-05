@@ -52,13 +52,14 @@ export function Comments( {
 } ) {
 	const [ actionState, setActionState ] = useState( false );
 
-	const blockCommentId = useSelect( ( select ) => {
-		const clientID = select( blockEditorStore ).getSelectedBlockClientId();
+	const blockCommentId = useSelect((select) => {
+		const clientID = select(blockEditorStore).getSelectedBlockClientId();
 		return (
-			select( blockEditorStore ).getBlock( clientID )?.attributes
-				?.blockCommentId ?? false
+		  select(blockEditorStore)
+			.getBlock(clientID)
+			?.attributes?.blockCommentId ?? false
 		);
-	}, [] );
+	  }, []);
 
 	const CommentBoard = ( { thread, parentThread } ) => {
 		return (
@@ -132,7 +133,9 @@ export function Comments( {
 					>
 						{
 							// translators: message displayed when there are no comments available
-							__( 'No comments available' )
+							__(
+								'No comments available'
+							)
 						}
 					</VStack>
 				)
@@ -143,14 +146,13 @@ export function Comments( {
 				threads.map( ( thread ) => (
 					<VStack
 						key={ thread.id }
-						className={ clsx(
+						className={clsx(
 							'editor-collab-sidebar-panel__thread',
 							{
 								'editor-collab-sidebar-panel__active-thread':
-									blockCommentId &&
-									blockCommentId === thread.id,
+									blockCommentId && blockCommentId === thread.id,
 							}
-						) }
+						)}
 						id={ thread.id }
 						spacing="3"
 					>
@@ -190,7 +192,7 @@ export function Comments( {
 										// translators: message displayed when deleting a comment
 										__(
 											'Are you sure you want to delete this thread?'
-										)
+										) 
 									}
 									confirmAction={ () => {
 										onCommentDelete( thread.id );
@@ -273,14 +275,22 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 							0 === sanitizeCommentString( inputComment ).length
 						}
 					>
-						{ _x( 'Update', 'Update comment' ) }
+						{
+							_x(
+								'Update',
+								'Update comment'
+							)
+						}
 					</Button>
 					<Button
 						__next40pxDefaultSize
 						onClick={ onCancel }
 						size="compact"
 					>
-						{ _x( 'Cancel', 'Cancel comment edit' ) }
+						{ _x(
+							'Cancel',
+							'Cancel comment edit'
+						) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -325,14 +335,24 @@ function AddReply( { onSubmit, onCancel } ) {
 								sanitizeCommentString( inputComment ).length
 							}
 						>
-							{ _x( 'Reply', 'Add reply comment' ) }
+							{
+								_x(
+									'Reply',
+									'Add reply comment'
+								)
+							}
 						</Button>
 						<Button
 							__next40pxDefaultSize
 							onClick={ onCancel }
 							size="compact"
 						>
-							{ _x( 'Cancel', 'Cancel adding a reply comment' ) }
+							{
+								_x(
+									'Cancel',
+									'Cancel adding a reply comment'
+								)
+							}
 						</Button>
 					</HStack>
 				</VStack>
@@ -359,11 +379,12 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 			spacing="0"
 			justify="space-between"
 		>
-			<p>
-				{ cofirmMessage ??
-					// translators: message displayed when confirming an action
-					__( 'Are you sure?' ) }
-			</p>
+			<p>{ cofirmMessage ?? 
+				// translators: message displayed when confirming an action
+				__(
+					'Are you sure?'
+				)
+			}</p>
 			<HStack>
 				<Button
 					__next40pxDefaultSize
@@ -371,14 +392,24 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 					onClick={ confirmAction }
 					size="compact"
 				>
-					{ _x( 'Yes', 'confirm action' ) }
+					{
+						_x(
+							'Yes',
+							'confirm action'
+						)
+					}
 				</Button>
 				<Button
 					__next40pxDefaultSize
 					onClick={ discardAction }
 					size="compact"
 				>
-					{ _x( 'No', 'deny action' ) }
+					{
+						_x(
+							'No',
+							'deny action'
+						)
+					}
 				</Button>
 			</HStack>
 		</VStack>
@@ -415,18 +446,27 @@ function CommentHeader( {
 	const memorizedMoreActions = useMemo( () => {
 		return [
 			{
-				title: _x( 'Edit', 'Edit comment' ),
-				onClick: onEdit,
+			  title: _x(
+				'Edit',
+				'Edit comment'
+			  ),
+			  onClick: onEdit,
 			},
 			{
-				title: _x( 'Delete', 'Delete comment' ),
-				onClick: onDelete,
+			  title: _x(
+				'Delete',
+				'Delete comment'
+			  ),
+			  onClick: onDelete,
 			},
 			{
-				title: _x( 'Reply', 'Reply on a comment' ),
-				onClick: onReply,
+			  title: _x(
+				'Reply',
+				'Reply on a comment'
+			  ),
+			  onClick: onReply,
 			},
-		];
+		  ];
 	}, [] );
 
 	const moreActions = memorizedMoreActions.filter( ( item ) => item.onClick );
@@ -480,7 +520,9 @@ function CommentHeader( {
 				) }
 				{ status === 'approved' && (
 					// translators: tooltip for resolved comment
-					<Tooltip text={ __( 'Resolved' ) }>
+					<Tooltip text={ __(
+						'Resolved'
+					) }>
 						<Icon icon={ check } />
 					</Tooltip>
 				) }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { collabComment } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -34,9 +34,9 @@ export default function BlockCommentMenuItem( { onClose } ) {
 			aria-haspopup="dialog"
 		>
 			{ _x(
-				'Add Comment',
-				'Click to open comment sidebar and add comment'
-			) }
+                'Add Comment', 
+                'Click to open comment sidebar and add comment'
+            ) }
 		</MenuItem>
 	);
 }
