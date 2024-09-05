@@ -5,7 +5,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
@@ -197,7 +197,7 @@ export default function CollabSidebar() {
 		fetchComments();
 	};
 
-	const fetchComments = () => {
+	const fetchComments = useCallback( () => {
 		if ( postId ) {
 			apiFetch( {
 				path:
@@ -210,11 +210,11 @@ export default function CollabSidebar() {
 				setThreads( Array.isArray( data ) ? data : [] );
 			} );
 		}
-	};
+	}, [ postId ] );
 
 	useEffect( () => {
 		fetchComments();
-	}, [ postId ] );
+	}, [ postId, fetchComments ] );
 
 	const allBlocks = useSelect( ( select ) => {
 		return select( blockEditorStore ).getBlocks();
@@ -261,7 +261,7 @@ export default function CollabSidebar() {
 			.filter( ( thread ) => thread !== undefined );
 
 		return sortedThreads;
-	}, [ threads ] );
+	}, [ threads, allBlocks ] );
 
 	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
