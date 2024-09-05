@@ -18,12 +18,12 @@ export function usePaddingAppender() {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 
-				const paddingBottom = defaultView.parseInt(
-					defaultView.getComputedStyle( node ).paddingBottom,
+				const pseudoHeight = defaultView.parseInt(
+					defaultView.getComputedStyle( node, ':after' ).height,
 					10
 				);
 
-				if ( ! paddingBottom ) {
+				if ( ! pseudoHeight ) {
 					return;
 				}
 
@@ -38,17 +38,12 @@ export function usePaddingAppender() {
 					return;
 				}
 
-				event.preventDefault();
+				event.stopPropagation();
 
 				const blockOrder = registry
 					.select( blockEditorStore )
 					.getBlockOrder( '' );
 				const lastBlockClientId = blockOrder[ blockOrder.length - 1 ];
-
-				// Do nothing when only default block appender is present.
-				if ( ! lastBlockClientId ) {
-					return;
-				}
 
 				const lastBlock = registry
 					.select( blockEditorStore )
@@ -56,7 +51,7 @@ export function usePaddingAppender() {
 				const { selectBlock, insertDefaultBlock } =
 					registry.dispatch( blockEditorStore );
 
-				if ( isUnmodifiedDefaultBlock( lastBlock ) ) {
+				if ( lastBlock && isUnmodifiedDefaultBlock( lastBlock ) ) {
 					selectBlock( lastBlockClientId );
 				} else {
 					insertDefaultBlock();

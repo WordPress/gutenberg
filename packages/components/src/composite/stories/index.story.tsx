@@ -1,16 +1,18 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn, StoryContext } from '@storybook/react';
 
 /**
  * WordPress dependencies
  */
 import { isRTL } from '@wordpress/i18n';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { Composite } from '..';
 import { useCompositeStore } from '../store';
 import { UseCompositeStorePlaceholder, transform } from './utils';
@@ -201,6 +203,137 @@ Typeahead.parameters = {
 	docs: {
 		description: {
 			story: 'When focus in on the composite widget, hitting printable character keys will move focus to the next composite item that begins with the input characters.',
+		},
+	},
+};
+
+const ExampleSlotFill = createSlotFill( 'Example' );
+
+const Slot = () => {
+	const compositeContext = useContext( Composite.Context );
+
+	// Forward the Slot's composite context to the Fill via fillProps, so that
+	// Composite components rendered inside the Fill can work as expected.
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ Composite.Context.Provider, { value: compositeContext } ],
+			],
+		} ),
+		[ compositeContext ]
+	);
+
+	return (
+		<ExampleSlotFill.Slot
+			fillProps={ fillProps }
+			bubblesVirtually
+			style={ { display: 'contents' } }
+		/>
+	);
+};
+
+type ForwardedContextTuple< P = {} > = [
+	React.ComponentType< React.PropsWithChildren< P > >,
+	P,
+];
+
+const Fill = ( { children }: { children: React.ReactNode } ) => {
+	const innerMarkup = <>{ children }</>;
+
+	return (
+		<ExampleSlotFill.Fill>
+			{ ( fillProps: { forwardedContext?: ForwardedContextTuple[] } ) => {
+				const { forwardedContext = [] } = fillProps;
+
+				// Render all context providers forwarded by the Slot via fillProps.
+				return forwardedContext.reduce(
+					( inner: JSX.Element, [ Provider, props ] ) => (
+						<Provider { ...props }>{ inner }</Provider>
+					),
+					innerMarkup
+				);
+			} }
+		</ExampleSlotFill.Fill>
+	);
+};
+
+export const WithSlotFill: StoryFn< typeof UseCompositeStorePlaceholder > = (
+	props
+) => {
+	return (
+		<SlotFillProvider>
+			<Composite { ...props }>
+				<Composite.Item>Item one (direct child)</Composite.Item>
+				<Slot />
+				<Composite.Item>Item four (direct child)</Composite.Item>
+			</Composite>
+
+			<Fill>
+				<Composite.Item>Item two (from slot fill)</Composite.Item>
+				<Composite.Item>Item three (from slot fill)</Composite.Item>
+			</Fill>
+		</SlotFillProvider>
+	);
+};
+WithSlotFill.args = {
+	...Default.args,
+};
+WithSlotFill.parameters = {
+	docs: {
+		description: {
+			story: 'When rendering Composite components across a SlotFill, the Composite.Context should be manually forwarded from the Slot to the Fill component.',
+		},
+		source: {
+			transform: ( code: string, storyContext: StoryContext ) => {
+				return `const ExampleSlotFill = createSlotFill( 'Example' );
+
+const Slot = () => {
+	const compositeContext = useContext( Composite.Context );
+
+	// Forward the Slot's composite context to the Fill via fillProps, so that
+	// Composite components rendered inside the Fill can work as expected.
+	const fillProps = useMemo(
+		() => ( {
+			forwardedContext: [
+				[ Composite.Context.Provider, { value: compositeContext } ],
+			],
+		} ),
+		[ compositeContext ]
+	);
+
+	return (
+		<ExampleSlotFill.Slot
+			fillProps={ fillProps }
+			bubblesVirtually
+			style={ { display: 'contents' } }
+		/>
+	);
+};
+
+const Fill = ( { children } ) => {
+	const innerMarkup = <>{ children }</>;
+
+	return (
+		<ExampleSlotFill.Fill>
+			{ ( fillProps ) => {
+				const { forwardedContext = [] } = fillProps;
+
+				// Render all context providers forwarded by the Slot via fillProps.
+				return forwardedContext.reduce(
+					( inner, [ Provider, props ] ) => (
+						<Provider { ...props }>{ inner }</Provider>
+					),
+					innerMarkup
+				);
+			} }
+		</ExampleSlotFill.Fill>
+	);
+};
+
+// In a separate component:
+
+${ transform( code, storyContext ) }`;
+			},
 		},
 	},
 };

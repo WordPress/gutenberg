@@ -65,7 +65,7 @@ function getDownloadableBlockLabel(
 	);
 }
 
-function DownloadableBlockListItem( { composite, item, onClick } ) {
+function DownloadableBlockListItem( { item, onClick } ) {
 	const { author, description, icon, rating, title } = item;
 	// getBlockType returns a block object if this block exists, or null if not.
 	const isInstalled = !! getBlockType( item.name );
@@ -116,7 +116,6 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 					tooltipPosition="top center"
 				/>
 			}
-			store={ composite }
 			disabled={ isInstalling || ! isInstallable }
 		>
 			<div className="block-directory-downloadable-block-list-item__icon">
