@@ -124,18 +124,14 @@ export function ImageEdit( {
 	};
 
 	const parsedWidth = parseWidth( width );
-	const parsedPlaceholderWidth = placeholderWidth || null;
 
 	// Get the effective width of the image placeholder use the minimum of placeholder width
 	// or image attribute width if both are defined. If only one is defined, use that one.
-
 	const getEffectiveWidth = () => {
-		if ( parsedPlaceholderWidth !== null && parsedWidth !== null ) {
-			return Math.min( parsedPlaceholderWidth, parsedWidth );
+		if ( placeholderWidth !== null && parsedWidth !== null ) {
+			return Math.min( placeholderWidth, parsedWidth );
 		}
-		return parsedPlaceholderWidth !== null
-			? parsedPlaceholderWidth
-			: parsedWidth;
+		return placeholderWidth !== null ? placeholderWidth : parsedWidth;
 	};
 
 	const effectiveWidth = getEffectiveWidth();
@@ -392,13 +388,12 @@ export function ImageEdit( {
 						...shadowProps.style,
 					} }
 				>
-					{ lockUrlControls ? (
+					{ lockUrlControls && isLargeContainer && (
 						<span className="block-bindings-media-placeholder-message">
 							{ lockUrlControlsMessage }
 						</span>
-					) : (
-						isLargeContainer && content
 					) }
+					{ ! lockUrlControls && isLargeContainer && content }
 				</Placeholder>
 			</>
 		);

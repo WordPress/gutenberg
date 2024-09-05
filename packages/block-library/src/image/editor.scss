@@ -4,19 +4,6 @@
 	.block-editor-media-placeholder.is-small {
 		min-height: 60px;
 	}
-
-	.block-bindings-media-placeholder-message {
-		opacity: 0;
-	}
-
-	// Remove the transition while we still have a legacy placeholder style.
-	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
-	// parent border that may get applied when you deselect.
-	.components-placeholder__label,
-	.components-placeholder__instructions,
-	.components-button {
-		transition: none;
-	}
 }
 
 figure.wp-block-image:not(.wp-block) {
@@ -74,9 +61,7 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.block-editor-block-list__block[data-type="core/image"]
-.block-editor-block-toolbar
-.block-editor-url-input__button-modal {
+.block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
 	right: 0;
