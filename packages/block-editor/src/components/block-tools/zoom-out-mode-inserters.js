@@ -32,8 +32,11 @@ function ZoomOutModeInserters() {
 			getSelectedBlockClientId,
 			getHoveredBlockClientId,
 			isBlockInsertionPointVisible,
-		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
+		const root = getSectionRootClientId();
+
 		return {
 			hasSelection: !! getSelectionStart().clientId,
 			blockInsertionPoint: getBlockInsertionPoint(),

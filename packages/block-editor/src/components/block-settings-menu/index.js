@@ -10,7 +10,6 @@ import BlockSettingsDropdown from './block-settings-dropdown';
 import BlockCommentToolbar from '../collab/toolbar';
 
 export function BlockSettingsMenu( { clientIds, ...props } ) {
-	
 	const selectedBlockClientId = clientIds[ 0 ];
 	const commentID = useSelect((select) => {
 		return (
@@ -23,11 +22,10 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
 
 	return (
 		<ToolbarGroup>
-
 			{ commentID && (
 				<BlockCommentToolbar
 					clientId={ selectedBlockClientId }
-					blockClassName={ commentID }					
+					blockClassName={ commentID }
 				/>
 			) }
 

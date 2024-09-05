@@ -66,21 +66,27 @@ export function Comments( {
 			<>
 				<CommentHeader
 					thread={ thread }
-					onResolve={ () => {
+					onResolve={ () =>
 						setActionState( {
 							action: 'resolve',
 							id: parentThread?.id ?? thread.id,
-						} );
-					} }
-					onEdit={ () => {
-						setActionState( { action: 'edit', id: thread.id } );
-					} }
-					onDelete={ () => {
-						setActionState( { action: 'delete', id: thread.id } );
-					} }
-					onReply={ () => {
-						setActionState( { action: 'reply', id: thread.id } );
-					} }
+						} )
+					}
+					onEdit={ () =>
+						setActionState( { action: 'edit', id: thread.id } )
+					}
+					onDelete={ () =>
+						setActionState( { action: 'delete', id: thread.id } )
+					}
+					onReply={
+						! parentThread
+							? () =>
+									setActionState( {
+										action: 'reply',
+										id: thread.id,
+									} )
+							: undefined
+					}
 					status={ parentThread?.status ?? thread.status }
 				/>
 				<HStack
@@ -164,7 +170,7 @@ export function Comments( {
 						{ 'resolve' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ 
+									confirmMessage={
 										// translators: message displayed when marking a comment as resolved
 										__(
 											'Are you sure you want to mark this thread as resolved?'
@@ -182,7 +188,7 @@ export function Comments( {
 						{ 'delete' === actionState?.action &&
 							thread.id === actionState?.id && (
 								<ConfirmNotice
-									confirmMessage={ 
+									confirmMessage={
 										// translators: message displayed when deleting a comment
 										__(
 											'Are you sure you want to delete this thread?'
@@ -212,7 +218,7 @@ export function Comments( {
 									{ 'delete' === actionState?.action &&
 										reply.id === actionState?.id && (
 											<ConfirmNotice
-												confirmMessage={ 
+												confirmMessage={
 													// translators: message displayed when deleting a comment
 													__(
 														'Are you sure you want to delete this thread?'
@@ -257,11 +263,7 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				value={ inputComment ?? '' }
 				onChange={ setInputComment }
 			/>
-			<VStack
-				alignment="left"
-				spacing="3"
-				justify="flex-start"
-			>
+			<VStack alignment="left" spacing="3" justify="flex-start">
 				<HStack alignment="left" spacing="3" justify="flex-start">
 					<Button
 						__next40pxDefaultSize
@@ -321,11 +323,7 @@ function AddReply( { onSubmit, onCancel } ) {
 					onChange={ setInputComment }
 				/>
 				<VStack alignment="left" spacing="3" justify="flex-start">
-					<HStack
-						alignment="left"
-						spacing="3"
-						justify="flex-start"
-					>
+					<HStack alignment="left" spacing="3" justify="flex-start">
 						<Button
 							__next40pxDefaultSize
 							accessibleWhenDisabled

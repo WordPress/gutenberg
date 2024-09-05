@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.6.0",
+	"version": "14.7.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,6 +34,7 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/autop": "^4.7.0",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",

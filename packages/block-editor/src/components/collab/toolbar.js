@@ -27,7 +27,6 @@ export default function BlockCommentToolbar() {
 	};
 
 	return (
-	
 		<ToolbarButton
 			accessibleWhenDisabled
 			icon={ collabComment }
@@ -37,6 +36,5 @@ export default function BlockCommentToolbar() {
             ) }
 			onClick={ openCollabBoard }
 		/>
-	
 	);
 }
