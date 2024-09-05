@@ -61,7 +61,6 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			) {
 				return;
 			}
-			event.stopImmediatePropagation();
 			setIsDialogOpen( true );
 		};
 
