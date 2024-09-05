@@ -167,7 +167,7 @@ describe( 'Shows a deprecation warning', () => {
 	it( 'useCompositeState', () => {
 		renderHook( () => useCompositeState() );
 		expect( console ).toHaveWarnedWith(
-			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite.useStore instead.'
+			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use Composite instead.'
 		);
 	} );
 	it( 'Composite', () => {

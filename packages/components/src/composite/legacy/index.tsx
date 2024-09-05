@@ -224,7 +224,7 @@ export function useCompositeState(
 ): CompositeState {
 	deprecated( `wp.components.__unstableUseCompositeState`, {
 		since: '6.7',
-		alternative: `Composite.useStore`,
+		alternative: LEGACY_TO_NEW_DISPLAY_NAME.__unstableUseCompositeState,
 	} );
 
 	const {
