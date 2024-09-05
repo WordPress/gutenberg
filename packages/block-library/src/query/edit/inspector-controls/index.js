@@ -25,7 +25,6 @@ import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
 import StickyControl from './sticky-control';
-import EnhancedPaginationControl from './enhanced-pagination-control';
 import CreateNewPostLink from './create-new-post-link';
 import PerPageControl from './per-page-control';
 import OffsetControl from './offset-controls';
@@ -43,9 +42,9 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =
+	const { attributes, setQuery, setDisplayLayout } =
 		props;
-	const { query, displayLayout, enhancedPagination } = attributes;
+	const { query, displayLayout } = attributes;
 	const {
 		order,
 		orderBy,
@@ -262,11 +261,6 @@ export default function QueryInspectorControls( props ) {
 							}
 						/>
 					) }
-					<EnhancedPaginationControl
-						enhancedPagination={ enhancedPagination }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
 				</PanelBody>
 			) }
 			{ ! inherit && showDisplayPanel && (
