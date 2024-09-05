@@ -17,9 +17,9 @@ module.exports = {
 	...baseConfig,
 	name: 'script-modules',
 	entry: {
-		'interactivity/index': './packages/interactivity',
-		'interactivity/debug': './packages/interactivity/src/debug',
-		'interactivity/router': './packages/interactivity-router',
+		interactivity: './packages/interactivity',
+		'interactivity-debug': './packages/interactivity/src/debug',
+		'interactivity-router': './packages/interactivity-router',
 
 		'block-library/file': './packages/block-library/src/file/view.js',
 		'block-library/image': './packages/block-library/src/image/view.js',
@@ -33,7 +33,7 @@ module.exports = {
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/script-modules/[name].min.js',
+		filename: './build-module/[name].min.js',
 		library: {
 			type: 'module',
 		},
