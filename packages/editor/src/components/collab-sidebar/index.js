@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { removep } from '@wordpress/autop';
 
@@ -56,8 +56,6 @@ export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const {
 		saveEntityRecord,
-		editEntityRecord,
-		saveEditedEntityRecord,
 		deleteEntityRecord,
 	} = useDispatch( coreStore );
 
@@ -102,7 +100,7 @@ export default function CollabSidebar() {
 
 	const onCommentResolve = async ( commentId ) => {
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
- 			id: commentId,
+			id: commentId,
 			status: 'approved',
 		} );
 
@@ -123,7 +121,7 @@ export default function CollabSidebar() {
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			id: commentId,
 			content: editedComment,
-	   	} );
+		} );
 
 		if ( savedRecord ) {
 			createNotice(
