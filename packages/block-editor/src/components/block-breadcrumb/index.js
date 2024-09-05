@@ -66,7 +66,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 			>
 				{ hasSelection && (
 					<Button
-						__next40pxDefaultSize
+						size="small"
 						className="block-editor-block-breadcrumb__button"
 						variant="tertiary"
 						onClick={ () => {
@@ -95,7 +95,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 			{ parents.map( ( parentClientId ) => (
 				<li key={ parentClientId }>
 					<Button
-						__next40pxDefaultSize
+						size="small"
 						className="block-editor-block-breadcrumb__button"
 						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
