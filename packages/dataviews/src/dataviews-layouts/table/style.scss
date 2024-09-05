@@ -132,9 +132,6 @@
 			display: flex;
 			align-items: center;
 		}
-		.dataviews-view-table__cell-content-wrapper:empty {
-			display: none;
-		}
 
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
 			min-height: 0;
