@@ -6,7 +6,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { isRTL } from '@wordpress/i18n';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -94,7 +93,6 @@ export default meta;
 
 export const Default: StoryObj< typeof Composite > = {
 	args: {
-		rtl: isRTL(),
 		children: (
 			<>
 				<Composite.Item>Item one</Composite.Item>

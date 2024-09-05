@@ -119,13 +119,13 @@ type CompositeStoreProps = {
 	 */
 	orientation?: Ariakit.CompositeStoreProps[ 'orientation' ];
 	/**
-	 * Determines how the `store`'s `next` and `previous` functions will behave.
+	 * Controls how the previous and next items are determined.
 	 * If `rtl` is set to `true`, they will be inverted.
 	 *
 	 * This only affects the composite widget behavior. You still need to set
 	 * `dir="rtl"` on HTML/CSS.
 	 *
-	 * @default false
+	 * @default `isRtl()`
 	 */
 	rtl?: Ariakit.CompositeStoreProps[ 'rtl' ];
 };

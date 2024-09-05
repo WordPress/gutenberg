@@ -16,6 +16,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
+import { isRTL } from '@wordpress/i18n';
 import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
@@ -61,7 +62,7 @@ export const Composite = Object.assign(
 			focusShift = false,
 			virtualFocus = false,
 			orientation = 'both',
-			rtl = false,
+			rtl = isRTL(),
 
 			// Composite component props
 			children,
