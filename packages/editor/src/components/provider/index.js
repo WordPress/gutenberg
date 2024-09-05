@@ -179,10 +179,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					isReady: __unstableIsEditorReady(),
 					mode: getRenderingMode(),
 					selection: getEditorSelection(),
-					postTypes:
-						getPostTypes( { per_page: -1 } )?.map(
-							( entity ) => entity.slug
-						) || [],
+					postTypes: getPostTypes( { per_page: -1 } ),
 				};
 			}, [] );
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
@@ -199,8 +196,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							break;
 						case 'single':
 							// Infer the post type from the slug.
+							const postTypesSlugs =
+								postTypes?.map( ( entity ) => entity.slug ) ||
+								[];
 							const match = post.slug.match(
-								`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
+								`^single-(${ postTypesSlugs.join(
+									'|'
+								) })(?:-.+)?$`
 							);
 							if ( match ) {
 								postContext.postType = match[ 1 ];
