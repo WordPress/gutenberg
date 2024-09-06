@@ -81,8 +81,7 @@ const SocialLinkURLPopover = ( {
 					/>
 				</div>
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					icon={ keyboardReturn }
 					label={ __( 'Apply' ) }
 					type="submit"
