@@ -275,7 +275,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasFinished = false;
 				}
 				if ( screenReaderAnnouncement ) {
-					navigation.message = navigation.texts.loading;
+					a11yAnnounce( navigation.texts.loading );
 				}
 			}, 400 );
 
@@ -315,14 +315,7 @@ export const { state, actions } = store( 'core/router', {
 				}
 
 				if ( screenReaderAnnouncement ) {
-					// Announce that the page has been loaded. If the message is the
-					// same, we use a no-break space similar to the @wordpress/a11y
-					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
-					navigation.message =
-						navigation.texts.loaded +
-						( navigation.message === navigation.texts.loaded
-							? '\u00A0'
-							: '' );
+					a11yAnnounce( navigation.texts.loaded );
 				}
 
 				// Scroll to the anchor if exits in the link.
@@ -362,6 +355,23 @@ export const { state, actions } = store( 'core/router', {
 		},
 	},
 } );
+
+/**
+ * Announces a message to screen readers.
+ *
+ * This is a wrapper around the `@wordpress/a11y` package's `speak` function. It handles importing
+ * the package on demand and should be used instead of calling `ally.speak` direacly.
+ *
+ * @param message  The message to be announced by assistive technologies.
+ * @param ariaLive The politeness level for aria-live; default: 'polite'.
+ */
+function a11yAnnounce( message: string, ariaLive?: 'polite' | 'assertive' ) {
+	import( '@wordpress/a11y' ).then(
+		( { speak } ) => speak( message, ariaLive ),
+		// Silence errors.
+		() => undefined
+	);
+}
 
 // Add click and prefetch to all links.
 if ( globalThis.IS_GUTENBERG_PLUGIN ) {
