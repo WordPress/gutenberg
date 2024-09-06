@@ -125,8 +125,7 @@ export default {
 			// Populate the `metaFields` object with the default values.
 			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
 				// If the template is global, skip the fields with a subtype.
-				// TODO: Add subtype to schema to be able to filter.
-				if ( isGlobalTemplate && props.subtype ) {
+				if ( isGlobalTemplate && props.object_subtype ) {
 					return;
 				}
 				metaFields[ key ] = props.default;
