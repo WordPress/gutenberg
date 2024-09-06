@@ -116,19 +116,16 @@ function gutenberg_override_default_rest_server() {
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
 
 /**
+ * Updates comment meta from REST request in WordPress 6.7.
  *
- * This function is hooked to the `rest_prepare_comment` filter and is responsible for updating the comment metadata based on the data provided in the REST API request.
+ * This function is used to update comment meta data based on the REST request in WordPress 6.7.
+ * It checks if the comment type is provided in the request and updates the comment accordingly.
+ * It also updates the author avatar URLs in the response data.
  *
- * It performs the following tasks:
- * - Updates the `block_comment` metadata for the comment based on the `meta` field in the request.
- * - Updates the `comment_type` and `comment_approved` fields for the comment based on the corresponding fields in the request.
- * - Retrieves the author's avatar URLs and adds them to the response data.
- * - Retrieves the `block_comment` metadata for the comment and adds it to the response data.
- *
- * @param WP_REST_Response $response The response object.
+ * @param WP_REST_Response $response The REST response object.
  * @param WP_Comment       $comment  The comment object.
- * @param WP_REST_Request  $request  The request object.
- * @return WP_REST_Response The updated response object.
+ * @param WP_REST_Request  $request  The REST request object.
+ * @return WP_REST_Response The updated REST response object.
  */
 if ( ! function_exists( 'update_comment_meta_from_rest_request_6_7' ) ) {
 	function update_comment_meta_from_rest_request_6_7( $response, $comment, $request ) {
@@ -144,11 +141,10 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request_6_7' ) ) {
 		}
 
 		if ( $response->data['author'] ) {
-			$avatar_url                           = get_avatar_url( $response->data['author'] );
 			$response->data['author_avatar_urls'] = array(
-				'default' => $avatar_url,
-				'48'      => add_query_arg( 's', 48, $avatar_url ),
-				'96'      => add_query_arg( 's', 96, $avatar_url ),
+				'default' => get_avatar_url( $response->data['author'] ),
+				'48'      => add_query_arg( 's', 48, get_avatar_url( $response->data['author'], array( 'size' => 48 ) ) ),
+				'96'      => add_query_arg( 's', 96, get_avatar_url( $response->data['author'], array( 'size' => 96 ) ) ),
 			);
 		}
 
