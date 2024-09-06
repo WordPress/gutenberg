@@ -90,8 +90,27 @@ export const DayButton = styled( Button, {
 		${ ( props ) =>
 			props.isSelected &&
 			`
-			background: ${ COLORS.theme.accent };
-			color: ${ COLORS.white };
+				background: ${ COLORS.theme.accent };
+
+				&,
+				&:hover:not(:disabled, [aria-disabled=true]) {
+					color: ${ COLORS.white };
+				}
+
+				&:focus:not(:disabled),
+				&:focus:not(:disabled) {
+					border: ${ CONFIG.borderWidthFocus } solid currentColor;
+				}
+
+				/* Highlight the selected day for high-contrast mode */
+				&::before {
+					content: '';
+					position: absolute;
+					pointer-events: none;
+					inset: 0;
+					border-radius: inherit;
+					border: 1px solid transparent;
+				}
 			` }
 
 		${ ( props ) =>
