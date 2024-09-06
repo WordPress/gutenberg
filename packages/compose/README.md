@@ -523,22 +523,45 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen to the resize event of any target element when it changes size. \_Note: `useResizeObserver` will report `null` sizes until after first render.
+Tracks a given element's size and calls `onUpdate` for all of its discrete values using a `ResizeObserver`. Pass the returned ref to the element or pass the element to the `targetElement` option directly.
 
 _Usage_
 
-```js
-const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+```tsx
+const targetElementRef = useResizeObserver(
+	( resizeObserverEntries, element ) => {
+		console.log( 'Resize observer entries:', resizeObserverEntries );
+		console.log( 'Element that was measured:', element );
+	},
+	{ box: 'border-box' }
+);
+<div ref={ targetElementRef } />;
 
-	return (
-		<div>
-			{ resizeListener }
-			Your content here
-		</div>
+// Alternatively, pass the element directly as an argument:
+const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
+useResizeObserver(
+	// ...
+	{
+		targetElement,
+		// ...
+	}
+);
+<div ref={ setTargetElement } />;
+
+// The element could be obtained through other means, for example:
+useEffect( () => {
+	const element = document.querySelector(
+		`[data-element-id="${ elementId }"]`
 	);
-};
+	setTargetElement( element );
+}, [ elementId ] );
 ```
+
+_Parameters_
+
+-   _onUpdate_ `( resizeObserverEntries: ResizeObserverEntry[], element: T ) => void`: Callback that will be called when the element is measured (initially and after resizes).
+-   _options_ `ObserveElementSizeOptions< T >`: Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
+-   _options.targetElement_ `ObserveElementSizeOptions< T >`: The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
 
 ### useStateWithHistory
 
