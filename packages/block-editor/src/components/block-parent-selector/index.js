@@ -14,14 +14,16 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
+import ZoomOutToolbarButton from '../block-toolbar/zoom-out';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
+ * @param {boolean} showZoomOutToolbarButton Whether to show the zoom out toolbar button.
  * @return {Component} Parent block selector.
  */
-export default function BlockParentSelector() {
+export default function BlockParentSelector( { showZoomOutToolbarButton } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { firstParentClientId, isVisible } = useSelect( ( select ) => {
 		const {
@@ -69,17 +71,24 @@ export default function BlockParentSelector() {
 			ref={ nodeRef }
 			{ ...showHoveredOrFocusedGestures }
 		>
-			<ToolbarButton
-				className="block-editor-block-parent-selector__button"
-				onClick={ () => selectBlock( firstParentClientId ) }
-				label={ sprintf(
-					/* translators: %s: Name of the block's parent. */
-					__( 'Select parent block: %s' ),
-					blockInformation?.title
-				) }
-				showTooltip
-				icon={ <BlockIcon icon={ blockInformation?.icon } /> }
-			/>
+			{ showZoomOutToolbarButton && (
+				<ZoomOutToolbarButton
+					onClick={ () => selectBlock( firstParentClientId ) }
+				/>
+			) }
+			{ ! showZoomOutToolbarButton && (
+				<ToolbarButton
+					className="block-editor-block-parent-selector__button"
+					onClick={ () => selectBlock( firstParentClientId ) }
+					label={ sprintf(
+						/* translators: %s: Name of the block's parent. */
+						__( 'Select parent block: %s' ),
+						blockInformation?.title
+					) }
+					showTooltip
+					icon={ <BlockIcon icon={ blockInformation?.icon } /> }
+				/>
+			) }
 		</div>
 	);
 }

@@ -35,6 +35,8 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import ZoomOutToolbarButton from './zoom-out';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Renders the block toolbar.
@@ -60,6 +62,8 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isContentOnlyEditingMode,
 		isDefaultEditingMode,
+		isDirectChildOfSectionRoot,
+		isSectionRootSelected,
 		blockType,
 		toolbarKey,
 		shouldShowVisualToolbar,
@@ -76,7 +80,8 @@ export function PrivateBlockToolbar( {
 			getBlockEditingMode,
 			getBlockAttributes,
 			getBlockParentsByBlockName,
-		} = select( blockEditorStore );
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const parents = getBlockParents( selectedBlockClientId );
@@ -103,6 +108,8 @@ export function PrivateBlockToolbar( {
 					.length > 0
 		);
 
+		const sectionRootClientId = getSectionRootClientId();
+
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -123,6 +130,10 @@ export function PrivateBlockToolbar( {
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
 			hasParentPattern: _hasParentPattern,
+			isSectionRootSelected:
+				sectionRootClientId === selectedBlockClientId,
+			isDirectChildOfSectionRoot:
+				sectionRootClientId === firstParentClientId,
 		};
 	}, [] );
 
@@ -174,7 +185,13 @@ export function PrivateBlockToolbar( {
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
-					isDefaultEditingMode && <BlockParentSelector /> }
+					isDefaultEditingMode && (
+						<BlockParentSelector
+							showZoomOutToolbarButton={
+								isDirectChildOfSectionRoot
+							}
+						/>
+					) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode ||
 						( isContentOnlyEditingMode && ! hasParentPattern ) ||
@@ -184,11 +201,18 @@ export function PrivateBlockToolbar( {
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher
-									clientIds={ blockClientIds }
-									disabled={ ! isDefaultEditingMode }
-									isUsingBindings={ isUsingBindings }
-								/>
+								{ /* Show a button to enter zoom out mode instead of the block switcher for main content group block */ }
+								{ window.__experimentalEnableZoomOutExperiment &&
+									isSectionRootSelected && (
+										<ZoomOutToolbarButton />
+									) }
+								{ ! isSectionRootSelected && (
+									<BlockSwitcher
+										clientIds={ blockClientIds }
+										disabled={ ! isDefaultEditingMode }
+										isUsingBindings={ isUsingBindings }
+									/>
+								) }
 								{ isDefaultEditingMode && (
 									<>
 										{ ! isMultiToolbar && (
