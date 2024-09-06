@@ -460,6 +460,11 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
 	margin-left: -1px;
 	margin-right: -1px;
+	transition: background-color 0.3s ease;
+
+	&.is-dragged-over {
+		background: $gray-400;
+	}
 }
 
 // In Post Editor allow the separator to occupy the full width by ignoring (cancelling out) the global padding.

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +25,7 @@ export function ZoomOutSeparator( {
 	rootClientId = '',
 	position = 'top',
 } ) {
+	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
 	const {
 		sectionRootClientId,
 		sectionClientIds,
@@ -77,6 +84,7 @@ export function ZoomOutSeparator( {
 		<AnimatePresence>
 			{ isVisible && (
 				<motion.div
+					as="button"
 					layout={ ! isReducedMotion }
 					initial={ { height: 0 } }
 					animate={ { height: '120px' } }
@@ -86,10 +94,15 @@ export function ZoomOutSeparator( {
 						duration: 0.2,
 						ease: [ 0.6, 0, 0.4, 1 ],
 					} }
-					className="block-editor-block-list__zoom-out-separator"
-					// Indicate that this is an insertion point and should not trigger
-					// dropleave events for any parent drop zone.
+					className={ clsx(
+						'block-editor-block-list__zoom-out-separator',
+						{
+							'is-dragged-over': isDraggedOver,
+						}
+					) }
 					data-is-insertion-point="true"
+					onDragOver={ () => setIsDraggedOver( true ) }
+					onDragLeave={ () => setIsDraggedOver( false ) }
 				></motion.div>
 			) }
 		</AnimatePresence>
