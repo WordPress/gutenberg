@@ -35,10 +35,7 @@ export default function BlockCommentToolbar() {
 		<ToolbarButton
 			accessibleWhenDisabled
 			icon={ collabComment }
-			label={ _x(
-				'Comment',
-				'Click to open sidebar and highlight comment board'
-			) }
+			label={ _x( 'Comment', 'Open comment button' ) }
 			onClick={ openCollabBoard }
 		/>
 	);
