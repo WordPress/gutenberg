@@ -22,7 +22,7 @@ export default {
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				meta?.[ source.args.key ] || source.args.key;
+				meta?.[ source.args.key ] ?? source.args.key;
 		}
 		return newValues;
 	},

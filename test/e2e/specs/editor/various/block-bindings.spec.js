@@ -1278,6 +1278,38 @@ test.describe( 'Block bindings', () => {
 				).toHaveText( 'fallback value' );
 			} );
 
+			test( 'should show the prompt placeholder in field with empty value', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'empty_field' },
+								},
+							},
+						},
+					},
+				} );
+
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					// Aria-label is changed for empty paragraphs.
+					name: 'Add empty_field',
+				} );
+
+				await expect( paragraphBlock ).toBeEmpty();
+
+				const placeholder = paragraphBlock.locator( 'span' );
+				await expect( placeholder ).toHaveAttribute(
+					'data-rich-text-placeholder',
+					'Add empty_field'
+				);
+			} );
+
 			test( 'should not show the value of a protected meta field', async ( {
 				editor,
 			} ) => {
