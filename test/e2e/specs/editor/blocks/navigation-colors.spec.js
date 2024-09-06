@@ -146,7 +146,7 @@ test.describe( 'Navigation colors', () => {
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
 			.click();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Link' } ).click();
+		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
 			.getByRole( 'option', { name: 'Color: Vivid red' } )
