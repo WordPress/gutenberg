@@ -207,21 +207,11 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	}
 
 	// Register the runtime script.
-	gutenberg_override_script(
-		$scripts,
-		'wp-runtime',
-		gutenberg_url( 'build/runtime.min.js' ),
-		array()
-	);
+	$scripts->add( 'wp-runtime', gutenberg_url( 'build/runtime.min.js' ) );
 
 	// Register development dependencies for Hot Module Replacement.
 	if ( gutenberg_is_hmr_enabled() ) {
-		gutenberg_override_script(
-			$scripts,
-			'🔥hot',
-			gutenberg_url( 'build/🔥hot.js' ),
-			array( 'wp-runtime' )
-		);
+		$scripts->add( '🔥hot', gutenberg_url( 'build/🔥hot.js' ), array( 'wp-runtime' ) );
 	}
 
 	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
