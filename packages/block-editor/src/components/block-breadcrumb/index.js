@@ -68,7 +68,6 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					<Button
 						size="small"
 						className="block-editor-block-breadcrumb__button"
-						variant="tertiary"
 						onClick={ () => {
 							// Find the block editor wrapper for the selected block
 							const blockEditor = blockRef.current?.closest(
@@ -97,7 +96,6 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					<Button
 						size="small"
 						className="block-editor-block-breadcrumb__button"
-						variant="tertiary"
 						onClick={ () => selectBlock( parentClientId ) }
 					>
 						<BlockTitle
