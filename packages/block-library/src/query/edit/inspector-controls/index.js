@@ -9,6 +9,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
+	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -58,6 +59,7 @@ export default function QueryInspectorControls( props ) {
 		inherit,
 		taxQuery,
 		parents,
+		excludeCurrent,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -119,6 +121,8 @@ export default function QueryInspectorControls( props ) {
 		! inherit &&
 		showSticky &&
 		isControlAllowed( allowedControls, 'sticky' );
+	const showExcludeCurrentControl =
+		! inherit && isControlAllowed( allowedControls, 'excludeCurrent' );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
@@ -260,6 +264,21 @@ export default function QueryInspectorControls( props ) {
 							onChange={ ( value ) =>
 								setQuery( { sticky: value } )
 							}
+						/>
+					) }
+					{ showExcludeCurrentControl && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Exclude current post' ) }
+							help={ __(
+								'Exclude the current post from the query.'
+							) }
+							checked={ excludeCurrent }
+							onChange={ ( value ) => {
+								setQuery( {
+									excludeCurrent: !! value,
+								} );
+							} }
 						/>
 					) }
 					<EnhancedPaginationControl

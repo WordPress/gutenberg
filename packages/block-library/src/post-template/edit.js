@@ -85,6 +85,7 @@ export default function PostTemplateEdit( {
 			author,
 			search,
 			exclude,
+			excludeCurrent,
 			sticky,
 			inherit,
 			taxQuery,
@@ -109,6 +110,16 @@ export default function PostTemplateEdit( {
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
+			// @wordpress/block-library should not depend on @wordpress/editor.
+			// Blocks can be loaded into a *non-post* block editor, so to avoid
+			// declaring @wordpress/editor as a dependency, we must access its
+			// store by string.
+			// getCurrentPostId also returns a string in the site editor and a
+			// number in the post editor, it's only useful to us if it's a number.
+			const currentPostId = parseInt(
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				select( 'core/editor' )?.getCurrentPostId()
+			);
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -159,6 +170,13 @@ export default function PostTemplateEdit( {
 			}
 			if ( exclude?.length ) {
 				query.exclude = exclude;
+			}
+			if ( excludeCurrent && currentPostId ) {
+				if ( query.exclude ) {
+					query.exclude = [ ...query.exclude, currentPostId ];
+				} else {
+					query.exclude = [ currentPostId ];
+				}
 			}
 			if ( parents?.length ) {
 				query.parent = parents;
