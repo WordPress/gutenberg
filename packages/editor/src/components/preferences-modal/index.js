@@ -58,7 +58,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const starterPatterns = useStartPatterns();
+	const hasStarterPatterns = !! useStartPatterns().length;
 
 	const sections = useMemo(
 		() =>
@@ -99,6 +99,16 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 										'Allow right-click contextual menus'
 									) }
 								/>
+								{ hasStarterPatterns && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="enableChoosePatternModal"
+										help={ __(
+											'Shows starter patterns when creating a new page.'
+										) }
+										label={ __( 'Show starter patterns' ) }
+									/>
+								) }
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
@@ -247,16 +257,6 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 										'Show text instead of icons on buttons across the interface.'
 									) }
 								/>
-								{ !! starterPatterns?.length && (
-									<PreferenceToggleControl
-										scope="core"
-										featureName="enableChoosePatternModal"
-										help={ __(
-											'Shows starter patterns when creating a new page.'
-										) }
-										label={ __( 'Show starter patterns' ) }
-									/>
-								) }
 							</PreferencesModalSection>
 						</>
 					),
@@ -326,7 +326,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			setIsListViewOpened,
 			setPreference,
 			isLargeViewport,
-			starterPatterns,
+			hasStarterPatterns,
 		]
 	);
 
