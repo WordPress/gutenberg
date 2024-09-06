@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { forwardRef, useRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -78,9 +78,6 @@ function ButtonBlockAppender(
 						label={ label }
 						showTooltip
 					>
-						{ ! hasSingleBlockType && (
-							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-						) }
 						<Icon icon={ plus } />
 					</Button>
 				);
