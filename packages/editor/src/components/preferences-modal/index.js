@@ -154,18 +154,6 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 											'Enable pre-publish checks'
 										) }
 									/>
-									{ starterPatterns?.length && (
-										<PreferenceToggleControl
-											scope="core"
-											featureName="enableChoosePatternModal"
-											help={ __(
-												'Shows starter patterns when creating a new page.'
-											) }
-											label={ __(
-												'Show starter patterns'
-											) }
-										/>
-									) }
 								</PreferencesModalSection>
 							) }
 							{ extraSections?.general }
@@ -259,6 +247,16 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 										'Show text instead of icons on buttons across the interface.'
 									) }
 								/>
+								{ !! starterPatterns?.length && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="enableChoosePatternModal"
+										help={ __(
+											'Shows starter patterns when creating a new page.'
+										) }
+										label={ __( 'Show starter patterns' ) }
+									/>
+								) }
 							</PreferencesModalSection>
 						</>
 					),
