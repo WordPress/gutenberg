@@ -89,9 +89,10 @@ function defaultRequestToExternalModule( request ) {
 		return `module ${ request }`;
 	}
 
-	if ( request === '@wordpress/interactivity-router' ) {
-		// Assumes this is usually going to be used as a dynamic import.
-		return `import ${ request }`;
+	switch ( request ) {
+		case '@wordpress/interactivity-router':
+		case '@wordpress/a11y':
+			return `import ${ request }`;
 	}
 
 	const isWordPressScript = Boolean( defaultRequestToExternal( request ) );
