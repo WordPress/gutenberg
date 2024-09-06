@@ -101,6 +101,7 @@ export default {
 			// Get the 'kind' from the start of the slug.
 			// Use 'post' as the default.
 			let postType = 'post';
+			// A global template can be used with any post type.
 			const isGlobalTemplate = isCustom || slug === 'index';
 			if ( ! isGlobalTemplate ) {
 				const [ kind ] = slug.split( '-' );
