@@ -119,10 +119,10 @@ add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 
  * Add `object_subtype` to schema.
  *
  * @param array  $args Array of arguments for registering meta.
- * @return array Modified arguments array including `label`.
+ * @return array Modified arguments array including `object_subtype`.
  */
 function gutenberg_add_object_subtype_to_schema( $args ) {
-	// Don't update schema when label isn't provided.
+	// Don't update schema when object_subtype isn't provided.
 	if ( ! isset( $args['object_subtype'] ) ) {
 		return $args;
 	}
@@ -144,5 +144,5 @@ function gutenberg_add_object_subtype_to_schema( $args ) {
 	return $args;
 }
 
-// Priority must be lower than 10 to ensure the label is not removed.
+// Priority must be lower than 10 to ensure the object_subtype is not removed.
 add_filter( 'register_meta_args', 'gutenberg_add_object_subtype_to_schema', 5, 1 );
