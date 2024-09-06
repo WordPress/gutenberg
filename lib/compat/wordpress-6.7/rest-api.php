@@ -139,8 +139,8 @@ if ( ! function_exists( 'add_user_avatar_urls_in_rest_response_6_7' ) && gutenbe
 
 		return $response;
 	}
+	add_filter( 'rest_prepare_comment', 'add_user_avatar_urls_in_rest_response_6_7', 10, 1 );
 }
-add_filter( 'rest_prepare_comment', 'add_user_avatar_urls_in_rest_response_6_7', 10, 1 );
 
 /**
  * Updates the comment type in the REST API for WordPress version 6.7.
@@ -162,5 +162,5 @@ if ( ! function_exists( 'update_comment_type_in_rest_api_6_7' ) && gutenberg_is_
 
 		return $prepared_comment;
 	}
+	add_filter( 'rest_pre_insert_comment', 'update_comment_type_in_rest_api_6_7', 10, 2 );
 }
-add_filter( 'rest_pre_insert_comment', 'update_comment_type_in_rest_api_6_7', 10, 2 );
