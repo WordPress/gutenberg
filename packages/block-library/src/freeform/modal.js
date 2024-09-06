@@ -9,6 +9,7 @@ import {
 	Button,
 	Flex,
 	FlexItem,
+	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
 import { useEffect, useState, RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -24,18 +25,20 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
 	}
 
 	return (
-		<Button
-			// TODO: Switch to `true` (40px size) if possible
-			__next40pxDefaultSize={ false }
-			onClick={ onClick }
-			icon={ fullscreen }
-			isPressed={ isModalFullScreen }
-			label={
-				isModalFullScreen
-					? __( 'Exit fullscreen' )
-					: __( 'Enter fullscreen' )
-			}
-		/>
+		<>
+			<Button
+				size="small"
+				onClick={ onClick }
+				icon={ fullscreen }
+				isPressed={ isModalFullScreen }
+				label={
+					isModalFullScreen
+						? __( 'Exit fullscreen' )
+						: __( 'Enter fullscreen' )
+				}
+			/>
+			<Spacer marginBottom={ 0 } marginRight={ 3 } />
+		</>
 	);
 }
 
