@@ -78,7 +78,7 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors styles"i]' );
+		await page.click( 'role=button[name="Colors"i]' );
 
 		await expect(
 			page.locator(
@@ -93,7 +93,7 @@ test.describe( 'Global styles variations', () => {
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Typography styles"i]' );
+		await page.click( 'role=button[name="Typography"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
 		await expect(
@@ -114,7 +114,7 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors styles"i]' );
+		await page.click( 'role=button[name="Colors"i]' );
 
 		await expect(
 			page.locator(
@@ -129,7 +129,7 @@ test.describe( 'Global styles variations', () => {
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Typography styles"i]' );
+		await page.click( 'role=button[name="Typography"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
 		// TODO: to avoid use classnames to locate these elements,
@@ -156,7 +156,7 @@ test.describe( 'Global styles variations', () => {
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Colors styles"i]' );
+		await page.click( 'role=button[name="Colors"i]' );
 		await page.click( 'role=button[name="Edit palette"i]' );
 
 		await expect(
