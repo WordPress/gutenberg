@@ -30,10 +30,16 @@ function flattenBlocks( blocks ) {
 	return result;
 }
 
-// Determine whether a block has external media.
-// Different blocks use different attribute names (and potentially
-// different logic as well) in determining whether the media is
-// present, and whether it's external.
+/**
+ * Determine whether a block has external media.
+ *
+ * Different blocks use different attribute names (and potentially
+ * different logic as well) in determining whether the media is
+ * present, and whether it's external.
+ *
+ * @param {{name: string, attributes: Object}} block The block.
+ * @return {boolean?} Whether the block has external media
+ */
 function hasExternalMedia( block ) {
 	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
 		return block.attributes.url && ! block.attributes.id;
@@ -42,11 +48,19 @@ function hasExternalMedia( block ) {
 	if ( block.name === 'core/media-text' ) {
 		return block.attributes.mediaUrl && ! block.attributes.mediaId;
 	}
+
+	return undefined;
 }
 
-// Retrieve media info from a block.
-// Different blocks use different attribute names, so we need this
-// function to normalize things into a consistent naming scheme.
+/**
+ * Retrieve media info from a block.
+ *
+ * Different blocks use different attribute names, so we need this
+ * function to normalize things into a consistent naming scheme.
+ *
+ * @param {{name: string, attributes: Object}} block The block.
+ * @return {{url: ?string, alt: ?string, id: ?string}} The media info for the block.
+ */
 function getMediaInfo( block ) {
 	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
 		const { url, alt, id } = block.attributes;
@@ -57,6 +71,8 @@ function getMediaInfo( block ) {
 		const { mediaUrl: url, mediaAlt: alt, mediaId: id } = block.attributes;
 		return { url, alt, id };
 	}
+
+	return {};
 }
 
 // Image component to represent a single image in the upload dialog.
@@ -122,19 +138,25 @@ export default function MaybeUploadMediaPanel() {
 		</span>,
 	];
 
-	// Update an individual block to point to newly-added library media.
-	// Different blocks use different attribute names, so we need this
-	// function to ensure we modify the correct attributes for each type.
+	/**
+	 * Update an individual block to point to newly-added library media.
+	 *
+	 * Different blocks use different attribute names, so we need this
+	 * function to ensure we modify the correct attributes for each type.
+	 *
+	 * @param {{name: string, attributes: Object}} block The block.
+	 * @param {{id: string, url: string}}          media Media library file info.
+	 */
 	function updateBlockWithUploadedMedia( block, media ) {
 		if ( block.name === 'core/image' || block.name === 'core/cover' ) {
-			return updateBlockAttributes( block.clientId, {
+			updateBlockAttributes( block.clientId, {
 				id: media.id,
 				url: media.url,
 			} );
 		}
 
 		if ( block.name === 'core/media-text' ) {
-			return updateBlockAttributes( block.clientId, {
+			updateBlockAttributes( block.clientId, {
 				mediaId: media.id,
 				mediaUrl: media.url,
 			} );
