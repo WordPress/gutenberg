@@ -43,7 +43,7 @@
 	}
 
 	&.is-selected {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 
 		// Only visible in Windows High Contrast mode.
 		outline: 3px solid transparent;

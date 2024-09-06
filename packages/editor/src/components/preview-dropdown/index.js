@@ -112,22 +112,24 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 		},
-		{
+	];
+	if ( window.__experimentalEnableZoomOutExperiment ) {
+		choices.push( {
 			value: 'ZoomOut',
 			label: __( 'Desktop (50%)' ),
 			icon: desktop,
-		},
-		{
-			value: 'Tablet',
-			label: __( 'Tablet' ),
-			icon: tablet,
-		},
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-		},
-	];
+		} );
+	}
+	choices.push( {
+		value: 'Tablet',
+		label: __( 'Tablet' ),
+		icon: tablet,
+	} );
+	choices.push( {
+		value: 'Mobile',
+		label: __( 'Mobile' ),
+		icon: mobile,
+	} );
 
 	const previewValue = editorMode === 'zoom-out' ? 'ZoomOut' : deviceType;
 

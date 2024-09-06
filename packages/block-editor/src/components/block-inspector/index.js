@@ -322,6 +322,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot group="styles" />
 					<PositionControls />
+					<InspectorControls.Slot group="bindings" />
 					<div>
 						<AdvancedControls />
 					</div>

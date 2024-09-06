@@ -17,7 +17,9 @@ import {
 } from './fixtures';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../../constants';
 import { filterSortAndPaginate } from '../../../filter-and-sort-data-view';
-import type { View } from '../../../types';
+import type { CombinedField, View } from '../../../types';
+
+import './style.css';
 
 const meta = {
 	title: 'DataViews/DataViews',
@@ -132,19 +134,39 @@ export const FieldsNoSortableNoHidable = () => {
 };
 
 export const CombinedFields = () => {
+	const defaultLayoutsThemes = {
+		table: {
+			fields: [ 'theme', 'requires', 'tested' ],
+			layout: {
+				primaryField: 'name',
+				combinedFields: [
+					{
+						id: 'theme',
+						label: 'Theme',
+						children: [ 'name', 'description' ],
+						direction: 'vertical',
+					},
+				] as CombinedField[],
+				styles: {
+					theme: {
+						maxWidth: 300,
+					},
+				},
+			},
+		},
+		grid: {
+			fields: [ 'description', 'requires', 'tested' ],
+			layout: { primaryField: 'name', columnFields: [ 'description' ] },
+		},
+		list: {
+			fields: [ 'requires', 'tested' ],
+			layout: { primaryField: 'name' },
+		},
+	};
 	const [ view, setView ] = useState< View >( {
 		...DEFAULT_VIEW,
-		fields: [ 'theme', 'requires', 'tested' ],
-		layout: {
-			combinedFields: [
-				{
-					id: 'theme',
-					label: 'Theme',
-					children: [ 'name', 'description' ],
-					direction: 'vertical',
-				},
-			],
-		},
+		fields: defaultLayoutsThemes.table.fields,
+		layout: defaultLayoutsThemes.table.layout,
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( themeData, view, themeFields );
@@ -158,7 +180,7 @@ export const CombinedFields = () => {
 			view={ view }
 			fields={ themeFields }
 			onChangeView={ setView }
-			defaultLayouts={ { table: {} } }
+			defaultLayouts={ defaultLayoutsThemes }
 		/>
 	);
 };
