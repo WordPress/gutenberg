@@ -28,38 +28,27 @@ export function AddComment( { onSubmit } ) {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 
-	const currentUserData = useSelect( ( select ) => {
-		return select( coreStore ).getCurrentUser();
-	}, [] );
+	const {
+		defaultAvatar,
+		clientId,
+		blockCommentId,
+		showAddCommentBoard,
+		currentUser,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+		const userData = select( coreStore ).getCurrentUser();
+		return {
+			defaultAvatar: __experimentalDiscussionSettings?.avatarURL,
+			clientId: selectedBlock?.clientId,
+			blockCommentId: selectedBlock?.attributes?.blockCommentId,
+			showAddCommentBoard: selectedBlock?.attributes?.showCommentBoard,
+			currentUser: userData,
+		};
+	} );
 
-	const useDefaultAvatar = () => {
-		const { avatarURL: defaultAvatarUrl } = useSelect( ( select ) => {
-			const { getSettings } = select( blockEditorStore );
-			const { __experimentalDiscussionSettings } = getSettings();
-			return __experimentalDiscussionSettings;
-		} );
-		return defaultAvatarUrl;
-	};
-
-	const defaultAvatar = useDefaultAvatar();
-	const userAvatar = currentUserData?.avatar_urls[ 48 ] ?? defaultAvatar;
-
-	const currentUser = currentUserData?.name || null;
-
-	const { clientId, blockCommentId, showAddCommentBoard } = useSelect(
-		( select ) => {
-			const selectedBlock = select( blockEditorStore ).getSelectedBlock();
-			const selectedBlockClientID =
-				select( blockEditorStore ).getSelectedBlockClientId();
-			return {
-				clientId: selectedBlockClientID,
-				blockCommentId: selectedBlock?.attributes?.blockCommentId,
-				showAddCommentBoard:
-					selectedBlock?.attributes?.showCommentBoard,
-			};
-		},
-		[]
-	);
+	const userAvatar = currentUser?.avatar_urls[ 48 ] ?? defaultAvatar;
 
 	useEffect( () => {
 		setInputComment( '' );
@@ -94,7 +83,7 @@ export function AddComment( { onSubmit } ) {
 					height={ 32 }
 				/>
 				<span className="editor-collab-sidebar-panel__user-name">
-					{ currentUser }
+					{ currentUser?.name ?? '' }
 				</span>
 			</HStack>
 			<TextControl
@@ -102,14 +91,13 @@ export function AddComment( { onSubmit } ) {
 				__nextHasNoMarginBottom
 				value={ inputComment }
 				onChange={ setInputComment }
-				// translators: placeholder text for comment input
-				placeholder={ __( 'Comment' ) }
+				placeholder={ _x( 'Comment', 'noun' ) }
 			/>
 			<HStack alignment="right" spacing="3">
 				<Button
 					__next40pxDefaultSize
 					variant="tertiary"
-					text={ _x( 'Cancel', 'Cancel comment' ) }
+					text={ _x( 'Cancel', 'Cancel comment button' ) }
 					onClick={ handleCancel }
 					size="compact"
 				/>

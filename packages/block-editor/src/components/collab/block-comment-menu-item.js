@@ -15,11 +15,9 @@ export default function BlockCommentMenuItem( { onClose } ) {
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const clientId = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return getSelectedBlockClientId();
 	}, [] );
@@ -38,10 +36,7 @@ export default function BlockCommentMenuItem( { onClose } ) {
 			onClick={ openCollabBoard }
 			aria-haspopup="dialog"
 		>
-			{ _x(
-				'Comment',
-				'Click to open new comment form in comment sidebar'
-			) }
+			{ _x( 'Comment', 'Add comment button' ) }
 		</MenuItem>
 	);
 }
