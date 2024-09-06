@@ -154,17 +154,19 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 											'Enable pre-publish checks'
 										) }
 									/>
-								</PreferencesModalSection>
-							) }
-							{ starterPatterns?.length && (
-								<PreferenceToggleControl
-									scope="core"
-									featureName="enableChoosePatternModal"
-									help={ __(
-										'Shows starter patterns when creating a new page.'
+									{ starterPatterns?.length && (
+										<PreferenceToggleControl
+											scope="core"
+											featureName="enableChoosePatternModal"
+											help={ __(
+												'Shows starter patterns when creating a new page.'
+											) }
+											label={ __(
+												'Show starter patterns'
+											) }
+										/>
 									) }
-									label={ __( 'Show starter patterns' ) }
-								/>
+								</PreferencesModalSection>
 							) }
 							{ extraSections?.general }
 						</>
