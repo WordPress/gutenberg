@@ -125,15 +125,14 @@ export const DayButton = styled( Button, {
 		props.hasEvents &&
 		`
 		::before {
-			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
+			border: 2px solid ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
 			border-radius: ${ CONFIG.radiusRound };
+			box-sizing: border-box;
 			bottom: 2px;
 			content: " ";
-			height: 4px;
 			left: 50%;
-			margin-left: -2px;
 			position: absolute;
-			width: 4px;
+			transform: translateX(-50%);
 		}
 		` }
 `;
