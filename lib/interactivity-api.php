@@ -28,5 +28,21 @@ function gutenberg_reregister_interactivity_script_modules() {
 		$default_version
 	);
 }
-
 add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
+
+function gutenberg_register_interactivity_script_module_data_hooks() {
+		if ( ! has_filter( 'script_module_data_@wordpress/interactivity-router', array( wp_interactivity(), 'filter_script_module_interactivity_router_data' ) ) ) {
+			add_filter(
+				'script_module_data_@wordpress/interactivity-router',
+				function ( $data ) {
+					if ( ! isset( $data['i18n'] ) ) {
+						$data['i18n'] = array();
+					}
+					$data['i18n']['loading'] = __( 'Loading page, please wait.', 'gutenberg' );
+					$data['i18n']['loaded']  = __( 'Page Loaded.', 'gutenberg' );
+					return $data;
+				}
+			);
+		}
+}
+add_action( 'after_setup_theme', 'gutenberg_register_interactivity_script_module_data_hooks', 20 );

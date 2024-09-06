@@ -209,16 +209,31 @@ const isValidEvent = ( event: MouseEvent ) =>
 // Variable to store the current navigation.
 let navigatingTo = '';
 
+const navigationTexts = {
+	loading: 'Loading page, please wait.',
+	loaded: 'Page Loaded.',
+};
+try {
+	const content = document.getElementById(
+		'wp-script-module-data-@wordpress/interactivity-router'
+	)?.textContent;
+	if ( content ) {
+		const parsed = JSON.parse( content );
+		if ( typeof parsed?.i18n?.loading === 'string' ) {
+			navigationTexts.loading = parsed.i18n.loading;
+		}
+		if ( typeof parsed?.i18n?.loaded === 'string' ) {
+			navigationTexts.loaded = parsed.i18n.loaded;
+		}
+	}
+} catch {}
+
 export const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
 		navigation: {
 			hasStarted: false,
 			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
 			message: '',
 		},
 	},
@@ -275,7 +290,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasFinished = false;
 				}
 				if ( screenReaderAnnouncement ) {
-					navigation.message = navigation.texts.loading;
+					navigation.message = navigationTexts.loading;
 				}
 			}, 400 );
 
@@ -319,8 +334,8 @@ export const { state, actions } = store( 'core/router', {
 					// same, we use a no-break space similar to the @wordpress/a11y
 					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
 					navigation.message =
-						navigation.texts.loaded +
-						( navigation.message === navigation.texts.loaded
+						navigationTexts.loaded +
+						( navigation.message === navigationTexts.loaded
 							? '\u00A0'
 							: '' );
 				}
