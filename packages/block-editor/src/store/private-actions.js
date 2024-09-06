@@ -360,6 +360,20 @@ export function expandBlock( clientId ) {
 }
 
 /**
+ * @param {Object} value
+ * @param {string} value.rootClientId   The root client ID to insert at.
+ * @param {number} value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setInserterInsertionPoint( value ) {
+	return {
+		type: 'SET_INSERTER_INSERTION_POINT',
+		value,
+	};
+}
+
+/**
  * Temporarily modify/unlock the content-only block for editions.
  *
  * @param {string} clientId The client id of the block.
