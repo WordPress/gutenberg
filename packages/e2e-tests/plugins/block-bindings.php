@@ -28,7 +28,7 @@ function gutenberg_test_block_bindings_registration() {
 			'show_in_rest' => true,
 			'type'         => 'string',
 			'single'       => true,
-			'default'      => 'Value of the text_custom_field',
+			'default'      => 'Value of the text custom field',
 		)
 	);
 	register_meta(

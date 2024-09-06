@@ -62,7 +62,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					'text_custom_field'
+					'Value of the text custom field'
 				);
 			} );
 
@@ -922,7 +922,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Title input is enabled and with the original value.
 				await page
@@ -1064,7 +1064,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( 'text_custom_field' );
+				expect( titleValue ).toBe( 'Value of the text custom field' );
 			} );
 
 			test( 'should disable title input when title is bound to an undefined source', async ( {
@@ -1231,14 +1231,14 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 
 				// Check the frontend shows the value of the custom field.
 				const previewPage = await editor.openPreviewPage();
 				await expect(
 					previewPage.locator( '#paragraph-binding' )
-				).toHaveText( 'Value of the text_custom_field' );
+				).toHaveText( 'Value of the text custom field' );
 			} );
 
 			test( "should show the value of the key when custom field doesn't exist", async ( {
@@ -1368,7 +1368,7 @@ test.describe( 'Block bindings', () => {
 						.locator( '[data-type="core/paragraph"]' )
 						.all();
 				await expect( initialParagraph ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				await expect( newEmptyParagraph ).toHaveText( '' );
 				await expect( newEmptyParagraph ).toBeEditable();
@@ -1478,7 +1478,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 			} );
 		} );
@@ -1506,14 +1506,14 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Heading',
 				} );
 				await expect( headingBlock ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 
 				// Check the frontend shows the value of the custom field.
 				const previewPage = await editor.openPreviewPage();
 				await expect(
 					previewPage.locator( '#heading-binding' )
-				).toHaveText( 'Value of the text_custom_field' );
+				).toHaveText( 'Value of the text custom field' );
 			} );
 
 			test( 'should add empty paragraph block when pressing enter', async ( {
@@ -1552,7 +1552,7 @@ test.describe( 'Block bindings', () => {
 					'core/heading'
 				);
 				await expect( initialHeading ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				// Second block should be an empty paragraph block.
 				await expect( newEmptyParagraph ).toHaveAttribute(
@@ -1610,7 +1610,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'textbox' );
 				await buttonBlock.click();
 				await expect( buttonBlock ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 
 				// Check the frontend shows the value of the custom field.
@@ -1619,7 +1619,7 @@ test.describe( 'Block bindings', () => {
 					'#button-text-binding a'
 				);
 				await expect( buttonDom ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
@@ -1699,7 +1699,7 @@ test.describe( 'Block bindings', () => {
 					'#button-multiple-bindings a'
 				);
 				await expect( buttonDom ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				await expect( buttonDom ).toHaveAttribute(
 					'href',
@@ -1746,7 +1746,7 @@ test.describe( 'Block bindings', () => {
 					.all();
 				// First block should be the original block.
 				await expect( initialButton ).toHaveText(
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				// Second block should be an empty paragraph block.
 				await expect( newEmptyButton ).toHaveText( '' );
@@ -1911,7 +1911,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'Value of the text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Check the frontend uses the value of the custom field.
 				const previewPage = await editor.openPreviewPage();
@@ -1924,7 +1924,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
@@ -1981,7 +1981,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( 'Value of the text_custom_field' );
+				expect( titleValue ).toBe( 'Value of the text custom field' );
 
 				// Check the frontend uses the value of the custom field.
 				const previewPage = await editor.openPreviewPage();
@@ -1998,7 +1998,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 			} );
 
@@ -2045,7 +2045,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'Value of the text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Title input should have the original value.
 				const advancedButton = page
@@ -2075,7 +2075,7 @@ test.describe( 'Block bindings', () => {
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'alt',
-					'Value of the text_custom_field'
+					'Value of the text custom field'
 				);
 				await expect( imageDom ).toHaveAttribute(
 					'title',
