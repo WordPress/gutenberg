@@ -324,6 +324,7 @@ function UnforwardedModal(
 								{ headerActions }
 								{ isDismissible && (
 									<Button
+										size="small"
 										onClick={ onRequestClose }
 										icon={ close }
 										label={
