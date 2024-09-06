@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	CheckboxControl,
-	Modal,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import {
@@ -98,52 +93,24 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 }
 
 function StartPageOptionsModal( { onClose } ) {
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const [ disablePreference, setDisablePreference ] = useState( false );
 	const startPatterns = useStartPatterns();
+	const hasStartPattern = startPatterns.length > 0;
 
-	if ( ! startPatterns.length ) {
-		return;
+	if ( ! hasStartPattern ) {
+		return null;
 	}
 
 	return (
 		<Modal
 			title={ __( 'Choose a pattern' ) }
 			isFullScreen
-			isDismissible={ false }
+			onRequestClose={ onClose }
 		>
 			<div className="editor-start-page-options__modal-content">
 				<PatternSelection
 					blockPatterns={ startPatterns }
 					onChoosePattern={ onClose }
 				/>
-			</div>
-			<div className="editor-start-page-options__modal-footer">
-				<HStack justify="space-between" spacing={ 8 }>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						label={ __( 'Do not show me this again' ) }
-						onChange={ ( newValue ) =>
-							setDisablePreference( newValue )
-						}
-					/>
-					<Button
-						__next40pxDefaultSize={ false }
-						variant="secondary"
-						onClick={ () => {
-							if ( disablePreference ) {
-								setPreference(
-									'core',
-									'enableChoosePatternModal',
-									false
-								);
-							}
-							onClose();
-						} }
-					>
-						{ __( 'Skip' ) }
-					</Button>
-				</HStack>
 			</div>
 		</Modal>
 	);

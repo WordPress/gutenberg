@@ -156,6 +156,16 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 									/>
 								</PreferencesModalSection>
 							) }
+							{ starterPatterns?.length && (
+								<PreferenceToggleControl
+									scope="core"
+									featureName="enableChoosePatternModal"
+									help={ __(
+										'Shows starter patterns when creating a new page.'
+									) }
+									label={ __( 'Show starter patterns' ) }
+								/>
+							) }
 							{ extraSections?.general }
 						</>
 					),
@@ -210,16 +220,6 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
-							{ starterPatterns?.length && (
-								<PreferenceToggleControl
-									scope="core"
-									featureName="enableChoosePatternModal"
-									help={ __(
-										'Shows starter patterns when creating a new page.'
-									) }
-									label={ __( 'Show starter patterns' ) }
-								/>
-							) }
 							{ extraSections?.appearance }
 						</PreferencesModalSection>
 					),
