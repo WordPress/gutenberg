@@ -37,6 +37,7 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { Spacer } from '../spacer';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
@@ -323,14 +324,21 @@ function UnforwardedModal(
 								</div>
 								{ headerActions }
 								{ isDismissible && (
-									<Button
-										size="small"
-										onClick={ onRequestClose }
-										icon={ close }
-										label={
-											closeButtonLabel || __( 'Close' )
-										}
-									/>
+									<>
+										<Spacer
+											marginBottom={ 0 }
+											marginLeft={ 3 }
+										/>
+										<Button
+											size="small"
+											onClick={ onRequestClose }
+											icon={ close }
+											label={
+												closeButtonLabel ||
+												__( 'Close' )
+											}
+										/>
+									</>
 								) }
 							</div>
 						) }

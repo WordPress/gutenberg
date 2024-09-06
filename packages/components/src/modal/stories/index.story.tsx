@@ -16,7 +16,6 @@ import Button from '../../button';
 import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
-import { Spacer } from '../../spacer';
 
 const meta: Meta< typeof Modal > = {
 	component: Modal,
@@ -111,10 +110,7 @@ export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
 WithHeaderActions.args = {
 	...Default.args,
 	headerActions: (
-		<>
-			<Button icon={ fullscreen } label="Fullscreen mode" size="small" />
-			<Spacer marginBottom={ 0 } marginRight={ 3 } />
-		</>
+		<Button icon={ fullscreen } label="Fullscreen mode" size="small" />
 	),
 	children: <div style={ { height: '200px' } } />,
 };
