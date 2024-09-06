@@ -8,12 +8,13 @@ import clsx from 'clsx';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeStore } from '../composite';
+import { Composite } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -85,24 +86,30 @@ function ListboxCircularOptionPicker(
 		...additionalProps
 	} = props;
 
-	const compositeStore = useCompositeStore( {
-		focusLoop: loop,
-		rtl: isRTL(),
-	} );
+	const [ activeId, setActiveId ] = useState< string | null | undefined >(
+		undefined
+	);
 
-	const compositeContext = {
-		baseId,
-		compositeStore,
-	};
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			activeId,
+			setActiveId,
+		} ),
+		[ baseId, activeId, setActiveId ]
+	);
 
 	return (
 		<div className={ className }>
-			<CircularOptionPickerContext.Provider value={ compositeContext }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				<Composite
 					{ ...additionalProps }
 					id={ baseId }
-					store={ compositeStore }
+					focusLoop={ loop }
+					rtl={ isRTL() }
 					role="listbox"
+					activeId={ activeId }
+					setActiveId={ setActiveId }
 				>
 					{ options }
 				</Composite>
@@ -118,9 +125,16 @@ function ButtonsCircularOptionPicker(
 ) {
 	const { actions, options, children, baseId, ...additionalProps } = props;
 
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+		} ),
+		[ baseId ]
+	);
+
 	return (
 		<div { ...additionalProps } id={ baseId }>
-			<CircularOptionPickerContext.Provider value={ { baseId } }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				{ options }
 				{ children }
 				{ actions }

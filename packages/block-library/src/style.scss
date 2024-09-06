@@ -11,6 +11,10 @@
 @import "./comments-pagination/style.scss";
 @import "./comment-template/style.scss";
 @import "./comment-date/style.scss";
+@import "./comment-content/style.scss";
+@import "./comment-author-name/style.scss";
+@import "./comment-edit-link/style.scss";
+@import "./comment-reply-link/style.scss";
 @import "./cover/style.scss";
 @import "./details/style.scss";
 @import "./embed/style.scss";
@@ -30,6 +34,7 @@
 @import "./page-list/style.scss";
 @import "./paragraph/style.scss";
 @import "./post-author/style.scss";
+@import "./post-author-biography/style.scss";
 @import "./post-comments-form/style.scss";
 @import "./post-content/style.scss";
 @import "./post-date/style.scss";
@@ -39,6 +44,7 @@
 @import "./post-terms/style.scss";
 @import "./post-time-to-read/style.scss";
 @import "./post-title/style.scss";
+@import "./post-author-name/style.scss";
 @import "./preformatted/style.scss";
 @import "./pullquote/style.scss";
 @import "./post-template/style.scss";

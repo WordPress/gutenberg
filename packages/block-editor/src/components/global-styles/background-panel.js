@@ -23,6 +23,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
+	Placeholder,
+	Spinner,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -34,6 +36,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
@@ -42,11 +45,15 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps, getResolvedValue } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-import { getResolvedThemeFilePath } from './theme-file-uri-utils';
+
+import {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+} from '../../store/private-keys';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -263,6 +270,14 @@ function BackgroundControlsPanel( {
 	);
 }
 
+function LoadingSpinner() {
+	return (
+		<Placeholder className="block-editor-global-styles-background-panel__loading">
+			<Spinner />
+		</Placeholder>
+	);
+}
+
 function BackgroundImageControls( {
 	onChange,
 	style,
@@ -270,13 +285,10 @@ function BackgroundImageControls( {
 	onRemoveImage = noop,
 	onResetImage = noop,
 	displayInPanel,
-	themeFileURIs,
 	defaultValues,
 } ) {
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const [ isUploading, setIsUploading ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { id, title, url } = style?.background?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
@@ -285,6 +297,7 @@ function BackgroundImageControls( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setIsUploading( false );
 	};
 
 	const resetBackgroundImage = () =>
@@ -299,10 +312,12 @@ function BackgroundImageControls( {
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
+			setIsUploading( false );
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
+			setIsUploading( true );
 			return;
 		}
 
@@ -345,16 +360,21 @@ function BackgroundImageControls( {
 				backgroundSize: sizeValue,
 			} )
 		);
+		setIsUploading( false );
 	};
 
+	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
-		mediaUpload( {
+		if ( filesList?.length > 1 ) {
+			onUploadError(
+				__( 'Only one image can be used as a background image.' )
+			);
+			return;
+		}
+		getSettings().mediaUpload( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
-				if ( isBlobURL( image?.url ) ) {
-					return;
-				}
 				onSelectMedia( image );
 			},
 			onError: onUploadError,
@@ -389,6 +409,7 @@ function BackgroundImageControls( {
 			ref={ replaceContainerRef }
 			className="block-editor-global-styles-background-panel__image-tools-panel-item"
 		>
+			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
 				mediaId={ id }
 				mediaURL={ url }
@@ -404,15 +425,17 @@ function BackgroundImageControls( {
 				name={
 					<InspectorImagePreviewItem
 						className="block-editor-global-styles-background-panel__image-preview"
-						imgUrl={ getResolvedThemeFilePath(
-							url,
-							themeFileURIs
-						) }
+						imgUrl={ url }
 						filename={ title }
 						label={ imgLabel }
 					/>
 				}
 				variant="secondary"
+				onError={ onUploadError }
+				onReset={ () => {
+					closeAndFocus();
+					onResetImage();
+				} }
 			>
 				{ canRemove && (
 					<MenuItem
@@ -423,16 +446,6 @@ function BackgroundImageControls( {
 						} }
 					>
 						{ __( 'Remove' ) }
-					</MenuItem>
-				) }
-				{ hasValue && (
-					<MenuItem
-						onClick={ () => {
-							closeAndFocus();
-							onResetImage();
-						} }
-					>
-						{ __( 'Reset ' ) }
 					</MenuItem>
 				) }
 			</MediaReplaceFlow>
@@ -449,7 +462,6 @@ function BackgroundSizeControls( {
 	style,
 	inheritedValue,
 	defaultValues,
-	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -587,7 +599,7 @@ function BackgroundSizeControls( {
 			<FocalPointPicker
 				__nextHasNoMarginBottom
 				label={ __( 'Focal point' ) }
-				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
+				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
@@ -674,16 +686,14 @@ function BackgroundToolsPanel( {
 	};
 
 	return (
-		<VStack
-			as={ ToolsPanel }
-			spacing={ 2 }
+		<ToolsPanel
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
-		</VStack>
+		</ToolsPanel>
 	);
 }
 
@@ -697,8 +707,44 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background image' ),
-	themeFileURIs,
 } ) {
+	/*
+	 * Resolve any inherited "ref" pointers.
+	 * Should the block editor need resolved, inherited values
+	 * across all controls, this could be abstracted into a hook,
+	 * e.g., useResolveGlobalStyle
+	 */
+	const { globalStyles, _links } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const _settings = getSettings();
+		return {
+			globalStyles: _settings[ globalStylesDataKey ],
+			_links: _settings[ globalStylesLinksDataKey ],
+		};
+	}, [] );
+	const resolvedInheritedValue = useMemo( () => {
+		const resolvedValues = {
+			background: {},
+		};
+
+		if ( ! inheritedValue?.background ) {
+			return inheritedValue;
+		}
+
+		Object.entries( inheritedValue?.background ).forEach(
+			( [ key, backgroundValue ] ) => {
+				resolvedValues.background[ key ] = getResolvedValue(
+					backgroundValue,
+					{
+						styles: globalStyles,
+						_links,
+					}
+				);
+			}
+		);
+		return resolvedValues;
+	}, [ globalStyles, _links, inheritedValue ] );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -710,11 +756,11 @@ export default function BackgroundPanel( {
 		onChange( setImmutably( value, [ 'background' ], {} ) );
 
 	const { title, url } = value?.background?.backgroundImage || {
-		...inheritedValue?.background?.backgroundImage,
+		...resolvedInheritedValue?.background?.backgroundImage,
 	};
 	const hasImageValue =
 		hasBackgroundImageValue( value ) ||
-		hasBackgroundImageValue( inheritedValue );
+		hasBackgroundImageValue( resolvedInheritedValue );
 
 	const imageValue =
 		value?.background?.backgroundImage ||
@@ -756,10 +802,7 @@ export default function BackgroundPanel( {
 						<BackgroundControlsPanel
 							label={ title }
 							filename={ title }
-							url={ getResolvedThemeFilePath(
-								url,
-								themeFileURIs
-							) }
+							url={ url }
 							onToggle={ setIsDropDownOpen }
 							hasImageValue={ hasImageValue }
 						>
@@ -767,8 +810,7 @@ export default function BackgroundPanel( {
 								<BackgroundImageControls
 									onChange={ onChange }
 									style={ value }
-									inheritedValue={ inheritedValue }
-									themeFileURIs={ themeFileURIs }
+									inheritedValue={ resolvedInheritedValue }
 									displayInPanel
 									onResetImage={ () => {
 										setIsDropDownOpen( false );
@@ -784,8 +826,7 @@ export default function BackgroundPanel( {
 									panelId={ panelId }
 									style={ value }
 									defaultValues={ defaultValues }
-									inheritedValue={ inheritedValue }
-									themeFileURIs={ themeFileURIs }
+									inheritedValue={ resolvedInheritedValue }
 								/>
 							</VStack>
 						</BackgroundControlsPanel>
@@ -793,8 +834,7 @@ export default function BackgroundPanel( {
 						<BackgroundImageControls
 							onChange={ onChange }
 							style={ value }
-							inheritedValue={ inheritedValue }
-							themeFileURIs={ themeFileURIs }
+							inheritedValue={ resolvedInheritedValue }
 							defaultValues={ defaultValues }
 							onResetImage={ () => {
 								setIsDropDownOpen( false );

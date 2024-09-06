@@ -27,7 +27,9 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 			/>
 
 			<ToggleGroupControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
+				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }
 				onChange={ ( value ) => setAttributes( { icon: value } ) }

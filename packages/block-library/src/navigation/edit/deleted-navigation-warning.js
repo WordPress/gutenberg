@@ -14,7 +14,13 @@ function DeletedNavigationWarning( { onCreateNew } ) {
 					'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
 				),
 				{
-					button: <Button onClick={ onCreateNew } variant="link" />,
+					button: (
+						<Button
+							__next40pxDefaultSize
+							onClick={ onCreateNew }
+							variant="link"
+						/>
+					),
 				}
 			) }
 		</Warning>

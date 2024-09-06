@@ -32,21 +32,21 @@ export default function ClipboardButton( {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	const timeoutId = useRef< NodeJS.Timeout >();
+	const timeoutIdRef = useRef< NodeJS.Timeout >();
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
-		if ( timeoutId.current ) {
-			clearTimeout( timeoutId.current );
+		if ( timeoutIdRef.current ) {
+			clearTimeout( timeoutIdRef.current );
 		}
 
 		if ( onFinishCopy ) {
-			timeoutId.current = setTimeout( () => onFinishCopy(), TIMEOUT );
+			timeoutIdRef.current = setTimeout( () => onFinishCopy(), TIMEOUT );
 		}
 	} );
 
 	useEffect( () => {
-		if ( timeoutId.current ) {
-			clearTimeout( timeoutId.current );
+		if ( timeoutIdRef.current ) {
+			clearTimeout( timeoutIdRef.current );
 		}
 	}, [] );
 

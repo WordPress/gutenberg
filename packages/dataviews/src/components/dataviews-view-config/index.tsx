@@ -21,26 +21,35 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
+	BaseControl,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useState, useMemo } from '@wordpress/element';
-import { cog, seen, unseen } from '@wordpress/icons';
+import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
-import type { SupportedLayouts } from '../../types';
+import {
+	SORTING_DIRECTIONS,
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	sortIcons,
+	sortLabels,
+} from '../../constants';
+import {
+	VIEW_LAYOUTS,
+	getNotHidableFieldIds,
+	getVisibleFieldIds,
+	getHiddenFieldIds,
+} from '../../dataviews-layouts';
+import type { SupportedLayouts, View, Field } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
+import DensityPicker from '../../dataviews-layouts/grid/density-picker';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
@@ -56,7 +65,7 @@ function ViewTypeMenu( {
 	}
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
+		<DropdownMenuV2
 			trigger={
 				<Button
 					size="compact"
@@ -71,7 +80,7 @@ function ViewTypeMenu( {
 					return null;
 				}
 				return (
-					<DropdownMenuRadioItem
+					<DropdownMenuV2.RadioItem
 						key={ layout }
 						value={ layout }
 						name="view-actions-available-view"
@@ -91,18 +100,14 @@ function ViewTypeMenu( {
 							warning( 'Invalid dataview' );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ config.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.RadioItem>
 				);
 			} ) }
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
-}
-
-interface ViewActionsProps {
-	defaultLayouts?: SupportedLayouts;
 }
 
 function SortFieldControl() {
@@ -140,7 +145,19 @@ function SortFieldControl() {
 }
 
 function SortDirectionControl() {
-	const { view, onChangeView } = useContext( DataViewsContext );
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	const sortableFields = fields.filter(
+		( field ) => field.enableSorting !== false
+	);
+	if ( sortableFields.length === 0 ) {
+		return null;
+	}
+
+	let value = view.sort?.direction;
+	if ( ! value && view.sort?.field ) {
+		value = 'desc';
+	}
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
@@ -148,18 +165,20 @@ function SortDirectionControl() {
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
-			value={ view.sort?.direction || 'desc' }
-			disabled={ ! view?.sort?.field }
+			value={ value }
 			onChange={ ( newDirection ) => {
-				if ( ! view?.sort?.field ) {
-					return;
-				}
 				if ( newDirection === 'asc' || newDirection === 'desc' ) {
 					onChangeView( {
 						...view,
 						sort: {
 							direction: newDirection,
-							field: view.sort.field,
+							field:
+								view.sort?.field ||
+								// If there is no field assigned as the sorting field assign the first sortable field.
+								fields.find(
+									( field ) => field.enableSorting !== false
+								)?.id ||
+								'',
 						},
 					} );
 					return;
@@ -218,50 +237,238 @@ function ItemsPerPageControl() {
 	);
 }
 
-function FieldControl() {
-	const { view, fields, onChangeView } = useContext( DataViewsContext );
-	const mandatoryFields = getMandatoryFields( view );
-	const hidableFields = fields.filter(
-		( field ) =>
-			field.enableHiding !== false &&
-			! mandatoryFields.includes( field.id )
-	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	if ( ! hidableFields?.length ) {
-		return null;
-	}
+interface FieldItemProps {
+	id: any;
+	label: string;
+	index: number;
+	isVisible: boolean;
+	isHidable: boolean;
+}
+
+function FieldItem( {
+	field: { id, label, index, isVisible, isHidable },
+	fields,
+	view,
+	onChangeView,
+}: {
+	field: FieldItemProps;
+	fields: Field< any >[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+} ) {
+	const visibleFieldIds = getVisibleFieldIds( view, fields );
+
 	return (
-		<ItemGroup isBordered isSeparated>
-			{ hidableFields?.map( ( field ) => {
-				const isVisible = viewFields.includes( field.id );
-				return (
-					<Item key={ field.id }>
-						<HStack expanded>
-							<span>{ field.label }</span>
+		<Item key={ id }>
+			<HStack
+				expanded
+				className={ `dataviews-field-control__field dataviews-field-control__field-${ id }` }
+			>
+				<span>{ label }</span>
+				<HStack
+					justify="flex-end"
+					expanded={ false }
+					className="dataviews-field-control__actions"
+				>
+					{ view.type === LAYOUT_TABLE && isVisible && (
+						<>
 							<Button
+								disabled={ index < 1 }
+								accessibleWhenDisabled
 								size="compact"
-								onClick={ () =>
+								onClick={ () => {
 									onChangeView( {
 										...view,
-										fields: isVisible
-											? viewFields.filter(
-													( id ) => id !== field.id
-											  )
-											: [ ...viewFields, field.id ],
-									} )
-								}
-								icon={ isVisible ? seen : unseen }
-								label={
-									isVisible
-										? __( 'Hide field' )
-										: __( 'Show field' )
-								}
+										fields: [
+											...( visibleFieldIds.slice(
+												0,
+												index - 1
+											) ?? [] ),
+											id,
+											visibleFieldIds[ index - 1 ],
+											...visibleFieldIds.slice(
+												index + 1
+											),
+										],
+									} );
+								} }
+								icon={ chevronUp }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s up' ),
+									label
+								) }
 							/>
-						</HStack>
-					</Item>
-				);
-			} ) }
-		</ItemGroup>
+							<Button
+								disabled={ index >= visibleFieldIds.length - 1 }
+								accessibleWhenDisabled
+								size="compact"
+								onClick={ () => {
+									onChangeView( {
+										...view,
+										fields: [
+											...( visibleFieldIds.slice(
+												0,
+												index
+											) ?? [] ),
+											visibleFieldIds[ index + 1 ],
+											id,
+											...visibleFieldIds.slice(
+												index + 2
+											),
+										],
+									} );
+								} }
+								icon={ chevronDown }
+								label={ sprintf(
+									/* translators: %s: field label */
+									__( 'Move %s down' ),
+									label
+								) }
+							/>{ ' ' }
+						</>
+					) }
+					<Button
+						className="dataviews-field-control__field-visibility-button"
+						disabled={ ! isHidable }
+						accessibleWhenDisabled
+						size="compact"
+						onClick={ () => {
+							onChangeView( {
+								...view,
+								fields: isVisible
+									? visibleFieldIds.filter(
+											( fieldId ) => fieldId !== id
+									  )
+									: [ ...visibleFieldIds, id ],
+							} );
+							// Focus the visibility button to avoid focus loss.
+							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
+							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+							setTimeout( () => {
+								const element = document.querySelector(
+									`.dataviews-field-control__field-${ id } .dataviews-field-control__field-visibility-button`
+								);
+								if ( element instanceof HTMLElement ) {
+									element.focus();
+								}
+							}, 50 );
+						} }
+						icon={ isVisible ? seen : unseen }
+						label={
+							isVisible
+								? sprintf(
+										/* translators: %s: field label */
+										__( 'Hide %s' ),
+										label
+								  )
+								: sprintf(
+										/* translators: %s: field label */
+										__( 'Show %s' ),
+										label
+								  )
+						}
+					/>
+				</HStack>
+			</HStack>
+		</Item>
+	);
+}
+
+function FieldControl() {
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
+
+	const visibleFieldIds = useMemo(
+		() => getVisibleFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const hiddenFieldIds = useMemo(
+		() => getHiddenFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const notHidableFieldIds = useMemo(
+		() => getNotHidableFieldIds( view ),
+		[ view ]
+	);
+
+	const visibleFields = fields
+		.filter( ( { id } ) => visibleFieldIds.includes( id ) )
+		.map( ( { id, label, enableHiding } ) => {
+			return {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id )
+					? false
+					: enableHiding,
+			};
+		} );
+	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		view.layout.combinedFields.forEach( ( { id, label } ) => {
+			visibleFields.push( {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id ),
+			} );
+		} );
+	}
+	visibleFields.sort( ( a, b ) => a.index - b.index );
+
+	const hiddenFields = fields
+		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
+		.map( ( { id, label, enableHiding }, index ) => {
+			return {
+				id,
+				label,
+				index,
+				isVisible: false,
+				isHidable: enableHiding,
+			};
+		} );
+
+	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
+		return null;
+	}
+
+	return (
+		<VStack spacing={ 6 } className="dataviews-field-control">
+			{ !! visibleFields?.length && (
+				<ItemGroup isBordered isSeparated>
+					{ visibleFields.map( ( field ) => (
+						<FieldItem
+							key={ field.id }
+							field={ field }
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					) ) }
+				</ItemGroup>
+			) }
+			{ !! hiddenFields?.length && (
+				<>
+					<VStack spacing={ 4 }>
+						<BaseControl.VisualLabel style={ { margin: 0 } }>
+							{ __( 'Hidden' ) }
+						</BaseControl.VisualLabel>
+						<ItemGroup isBordered isSeparated>
+							{ hiddenFields.map( ( field ) => (
+								<FieldItem
+									key={ field.id }
+									field={ field }
+									fields={ fields }
+									view={ view }
+									onChangeView={ onChangeView }
+								/>
+							) ) }
+						</ItemGroup>
+					</VStack>
+				</>
+			) }
+		</VStack>
 	);
 }
 
@@ -303,7 +510,14 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent() {
+function DataviewsViewConfigContent( {
+	density,
+	setDensity,
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+} ) {
+	const { view } = useContext( DataViewsContext );
 	return (
 		<VStack className="dataviews-view-config" spacing={ 6 }>
 			<SettingsSection title={ __( 'Appearance' ) }>
@@ -311,6 +525,12 @@ function DataviewsViewConfigContent() {
 					<SortFieldControl />
 					<SortDirectionControl />
 				</HStack>
+				{ view.type === LAYOUT_GRID && (
+					<DensityPicker
+						density={ density }
+						setDensity={ setDensity }
+					/>
+				) }
 				<ItemsPerPageControl />
 			</SettingsSection>
 			<SettingsSection title={ __( 'Properties' ) }>
@@ -321,8 +541,14 @@ function DataviewsViewConfigContent() {
 }
 
 function _DataViewsViewConfig( {
+	density,
+	setDensity,
 	defaultLayouts = { list: {}, grid: {}, table: {} },
-}: ViewActionsProps ) {
+}: {
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
+	defaultLayouts?: SupportedLayouts;
+} ) {
 	const [ isShowingViewPopover, setIsShowingViewPopover ] =
 		useState< boolean >( false );
 
@@ -344,7 +570,10 @@ function _DataViewsViewConfig( {
 						} }
 						focusOnMount
 					>
-						<DataviewsViewConfigContent />
+						<DataviewsViewConfigContent
+							density={ density }
+							setDensity={ setDensity }
+						/>
 					</Popover>
 				) }
 			</div>

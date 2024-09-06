@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import PostTrashCheck from './check';
 
 /**
  * Displays the Post Trash Button and Confirm Dialog in the Editor.
@@ -20,12 +21,13 @@ import { store as editorStore } from '../../store';
  * @return {JSX.Element|null} The rendered PostTrash component.
  */
 export default function PostTrash() {
-	const { isNew, isDeleting, postId } = useSelect( ( select ) => {
+	const { isNew, isDeleting, postId, title } = useSelect( ( select ) => {
 		const store = select( editorStore );
 		return {
 			isNew: store.isEditedPostNew(),
 			isDeleting: store.isDeletingPost(),
 			postId: store.getCurrentPostId(),
+			title: store.getCurrentPostAttribute( 'title' ),
 		};
 	}, [] );
 	const { trashPost } = useDispatch( editorStore );
@@ -41,7 +43,7 @@ export default function PostTrash() {
 	};
 
 	return (
-		<>
+		<PostTrashCheck>
 			<Button
 				__next40pxDefaultSize
 				className="editor-post-trash"
@@ -60,12 +62,14 @@ export default function PostTrash() {
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
 				confirmButtonText={ __( 'Move to trash' ) }
-				size="medium"
+				size="small"
 			>
-				{ __(
-					'Are you sure you want to move this post to the trash?'
+				{ sprintf(
+					// translators: %s: The item's title.
+					__( 'Are you sure you want to move "%s" to the trash?' ),
+					title
 				) }
 			</ConfirmDialog>
-		</>
+		</PostTrashCheck>
 	);
 }

@@ -88,6 +88,12 @@ export type Field< Item > = {
 	label?: string;
 
 	/**
+	 * The header of the field. Defaults to the label.
+	 * It allows the usage of a React Element to render the field labels.
+	 */
+	header?: string | ReactElement;
+
+	/**
 	 * A description of the field.
 	 */
 	description?: string;
@@ -151,11 +157,14 @@ export type Field< Item > = {
 
 export type NormalizedField< Item > = Field< Item > & {
 	label: string;
+	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	Edit: ComponentType< DataFormControlProps< Item > >;
 	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
+	enableHiding: boolean;
+	enableSorting: boolean;
 };
 
 /**
@@ -288,6 +297,8 @@ export interface CombinedField {
 	id: string;
 
 	label: string;
+
+	header?: string | ReactElement;
 
 	/**
 	 * The fields to use as columns.

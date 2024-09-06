@@ -18,25 +18,6 @@
 		padding: $grid-unit-20;
 	}
 
-	.editor-change-status__options {
-		.components-base-control__field > .components-v-stack {
-			gap: $grid-unit-15;
-		}
-
-		// TODO: it's not great to override component styles.. This might be resolved
-		// by the new radio control component.
-		.components-radio-control__option {
-			align-items: flex-start;
-		}
-
-		label {
-			.components-text {
-				display: block;
-				margin-top: $grid-unit-05;
-			}
-		}
-	}
-
 	.editor-change-status__password-legend {
 		padding: 0;
 		margin-bottom: $grid-unit-10;
