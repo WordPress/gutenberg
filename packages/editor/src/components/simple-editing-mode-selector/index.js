@@ -84,14 +84,14 @@ function SimpleEditingModeSelector( props, ref ) {
 						choices={ [
 							{
 								value: 'advanced',
-								label: __( 'Advanced' ),
+								label: __( 'Design' ),
 								info: __(
 									'Full control over layout and styling'
 								),
 							},
 							{
 								value: 'simple',
-								label: __( 'Simple' ),
+								label: __( 'Edit' ),
 								info: __(
 									'Focus on page structure and content'
 								),
