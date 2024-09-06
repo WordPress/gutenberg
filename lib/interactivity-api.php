@@ -24,7 +24,10 @@ function gutenberg_reregister_interactivity_script_modules() {
 	wp_register_script_module(
 		'@wordpress/interactivity-router',
 		gutenberg_url( '/build-module/interactivity-router/index.min.js' ),
-		array( '@wordpress/interactivity' ),
+		array(
+			array( 'id' => '@wordpress/a11y', 'import' => 'dynamic' ),
+			'@wordpress/interactivity',
+		),
 		$default_version
 	);
 }
