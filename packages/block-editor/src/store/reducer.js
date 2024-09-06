@@ -2085,6 +2085,25 @@ export function hoveredBlockClientId( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer setting the insertion point
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function inserterInsertionPoint( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTER_INSERTION_POINT':
+			return action.value;
+		case 'SELECT_BLOCK':
+			return null;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2097,6 +2116,7 @@ const combinedReducers = combineReducers( {
 	initialPosition,
 	blocksMode,
 	blockListSettings,
+	inserterInsertionPoint,
 	insertionPoint,
 	template,
 	settings,

@@ -50,7 +50,9 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	const { showInsertionPoint } = useDispatch( blockEditorStore );
+	const { showInsertionPoint, setInserterInsertionPoint } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -93,10 +95,12 @@ function ZoomOutModeInserters() {
 						isVisible={ isSelected || isHovered }
 						onClick={ () => {
 							setInserterIsOpened( {
-								rootClientId: sectionRootClientId,
-								insertionIndex: index,
 								tab: 'patterns',
 								category: 'all',
+							} );
+							setInserterInsertionPoint( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',
