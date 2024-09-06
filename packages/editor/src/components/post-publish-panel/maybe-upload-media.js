@@ -59,7 +59,7 @@ function hasExternalMedia( block ) {
  * function to normalize things into a consistent naming scheme.
  *
  * @param {{name: string, attributes: Object}} block The block.
- * @return {{url: ?string, alt: ?string, id: ?string}} The media info for the block.
+ * @return {{url: ?string, alt: ?string, id: ?number}} The media info for the block.
  */
 function getMediaInfo( block ) {
 	if ( block.name === 'core/image' || block.name === 'core/cover' ) {
@@ -145,7 +145,7 @@ export default function MaybeUploadMediaPanel() {
 	 * function to ensure we modify the correct attributes for each type.
 	 *
 	 * @param {{name: string, attributes: Object}} block The block.
-	 * @param {{id: string, url: string}}          media Media library file info.
+	 * @param {{id: number, url: string}}          media Media library file info.
 	 */
 	function updateBlockWithUploadedMedia( block, media ) {
 		if ( block.name === 'core/image' || block.name === 'core/cover' ) {
