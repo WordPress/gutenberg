@@ -2,7 +2,7 @@
  * This source is a local copy of the use-lilius library.
  *
  * use-lilius@2.0.5
- * https://github.com/its-danny/use-lilius
+ * https://github.com/Avarios/use-lilius
  *
  * The MIT License (MIT)
  *
