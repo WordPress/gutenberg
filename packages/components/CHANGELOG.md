@@ -13,6 +13,7 @@
 ### Internal
 
 -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+-   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
 
 ## 28.7.0 (2024-09-05)
 
