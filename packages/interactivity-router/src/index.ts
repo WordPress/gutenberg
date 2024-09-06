@@ -209,16 +209,18 @@ const isValidEvent = ( event: MouseEvent ) =>
 // Variable to store the current navigation.
 let navigatingTo = '';
 
+const navigationTexts = {
+	loadedFromServer: false,
+	loading: 'Loading page, please wait.',
+	loaded: 'Page Loaded.',
+};
+
 export const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
 		navigation: {
 			hasStarted: false,
 			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
 			message: '',
 		},
 	},
@@ -275,7 +277,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasFinished = false;
 				}
 				if ( screenReaderAnnouncement ) {
-					a11yAnnounce( navigation.texts.loading );
+					a11yAnnounce( 'loading' );
 				}
 			}, 400 );
 
@@ -315,7 +317,7 @@ export const { state, actions } = store( 'core/router', {
 				}
 
 				if ( screenReaderAnnouncement ) {
-					a11yAnnounce( navigation.texts.loaded );
+					a11yAnnounce( 'loaded' );
 				}
 
 				// Scroll to the anchor if exits in the link.
@@ -362,10 +364,33 @@ export const { state, actions } = store( 'core/router', {
  * This is a wrapper around the `@wordpress/a11y` package's `speak` function. It handles importing
  * the package on demand and should be used instead of calling `ally.speak` direacly.
  *
- * @param message  The message to be announced by assistive technologies.
- * @param ariaLive The politeness level for aria-live; default: 'polite'.
+ * @param messageKey The message to be announced by assistive technologies.
+ * @param ariaLive   The politeness level for aria-live; default: 'polite'.
  */
-function a11yAnnounce( message: string, ariaLive?: 'polite' | 'assertive' ) {
+function a11yAnnounce(
+	messageKey: 'loading' | 'loaded',
+	ariaLive?: 'polite' | 'assertive'
+) {
+	if ( ! navigationTexts.loadedFromServer ) {
+		navigationTexts.loadedFromServer = true;
+		const content = document.getElementById(
+			'wp-script-module-data-@wordpress/interactivity-router'
+		)?.textContent;
+		if ( content ) {
+			try {
+				const parsed = JSON.parse( content );
+				if ( typeof parsed?.i18n?.loading === 'string' ) {
+					navigationTexts.loading = parsed.i18n.loading;
+				}
+				if ( typeof parsed?.i18n?.loaded === 'string' ) {
+					navigationTexts.loaded = parsed.i18n.loaded;
+				}
+			} catch {}
+		}
+	}
+
+	const message = navigationTexts[ messageKey ];
+
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		import( '@wordpress/a11y' ).then(
 			( { speak } ) => speak( message, ariaLive ),
