@@ -96,12 +96,12 @@ export function getExtensionFromMimeType( mime ) {
 	return extension || '';
 }
 
-// Returns an array of { url, blobPromise } objects, where the promise
-// points to a fetched blob. Blobs will have unique filenames.
+// Returns an array of { url, filePromise } objects, where the promise
+// points to a file built from a fetched blob. Filenames should be unique.
 export function fetchMedia( urls ) {
 	return generateUniqueFilenames( urls ).map(
 		( { url, basename, extension } ) => {
-			const blobPromise = window
+			const filePromise = window
 				.fetch( url.includes( '?' ) ? url : url + '?' )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
@@ -110,11 +110,12 @@ export function fetchMedia( urls ) {
 					if ( ! extension ) {
 						extension = getExtensionFromMimeType( blob.type );
 					}
-					blob.name = `${ basename }.${ extension }`;
-					return blob;
+					return new File( [ blob ], `${ basename }.${ extension }`, {
+						type: blob.type,
+					} );
 				} );
 
-			return { url, blobPromise };
+			return { url, filePromise };
 		}
 	);
 }

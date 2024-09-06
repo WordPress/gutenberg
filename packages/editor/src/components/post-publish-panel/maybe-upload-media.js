@@ -158,8 +158,8 @@ export default function MaybeUploadMediaPanel() {
 		// Create an upload promise for each URL, that we can wait for in all
 		// blocks that make use of that media.
 		const uploadPromises = Object.fromEntries(
-			fetchMedia( [ ...mediaUrls ] ).map( ( { url, blobPromise } ) => {
-				const uploadPromise = blobPromise.then(
+			fetchMedia( [ ...mediaUrls ] ).map( ( { url, filePromise } ) => {
+				const uploadPromise = filePromise.then(
 					( blob ) =>
 						new Promise( ( resolve, reject ) => {
 							mediaUpload( {
