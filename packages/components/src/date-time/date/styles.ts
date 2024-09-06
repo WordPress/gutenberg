@@ -103,7 +103,7 @@ export const DayButton = styled( Button, {
 				}
 
 				/* Highlight the selected day for high-contrast mode */
-				&::before {
+				&::after {
 					content: '';
 					position: absolute;
 					pointer-events: none;
