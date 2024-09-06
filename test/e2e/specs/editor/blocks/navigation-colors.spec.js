@@ -91,14 +91,12 @@ test.describe( 'Navigation colors', () => {
 		// In the sidebar inspector we add a link color and link hover color to the group block.
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Color Text styles' } ).click();
+		await page.getByRole( 'button', { name: 'Text' } ).click();
 		await page
 			.getByRole( 'option', { name: 'Color: White' } )
 			.click( { force: true } );
 
-		await page
-			.getByRole( 'button', { name: 'Color Background styles' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Background' } ).click();
 		await page
 			.getByRole( 'option', { name: 'Color: Black' } )
 			.click( { force: true } );
@@ -148,7 +146,7 @@ test.describe( 'Navigation colors', () => {
 			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
 			.click();
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Color Link styles' } ).click();
+		await page.getByRole( 'button', { name: 'Link' } ).click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
 			.getByRole( 'option', { name: 'Color: Vivid red' } )

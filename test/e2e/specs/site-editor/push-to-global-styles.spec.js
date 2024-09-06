@@ -32,10 +32,8 @@ test.describe( 'Push to Global Styles button', () => {
 
 		// Navigate to Styles -> Blocks -> Heading -> Typography
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Heading block styles' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Blocks' } ).click();
+		await page.getByRole( 'button', { name: 'Heading' } ).click();
 
 		// Headings should not have uppercase
 		await expect(
@@ -95,7 +93,7 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
+		await page.getByRole( 'button', { name: 'Blocks' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Heading block styles' } )
 			.click();

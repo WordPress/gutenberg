@@ -3,7 +3,7 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	FlexItem,
+	Flex,
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
@@ -51,35 +51,37 @@ function Palette( { name } ) {
 		[ customColors, themeColors, defaultColors, defaultPaletteEnabled ]
 	);
 
+	const hasColors = colors.length > 0;
+
 	const screenPath = ! name
 		? '/colors/palette'
 		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
-	const paletteButtonText =
-		colors.length > 0 ? __( 'Edit palette' ) : __( 'Add colors' );
+	const paletteButtonText = hasColors
+		? __( 'Edit palette' )
+		: __( 'Add colors' );
 
 	return (
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Palette' ) }</Subtitle>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButtonAsItem
-					path={ screenPath }
-					aria-label={ paletteButtonText }
-				>
+				<NavigationButtonAsItem path={ screenPath }>
 					<HStack direction="row">
-						{ colors.length <= 0 && (
-							<FlexItem>{ __( 'Add colors' ) }</FlexItem>
-						) }
-						<ZStack isLayered={ false } offset={ -8 }>
-							{ colors
-								.slice( 0, 5 )
-								.map( ( { color }, index ) => (
-									<ColorIndicatorWrapper
-										key={ `${ color }-${ index }` }
-									>
-										<ColorIndicator colorValue={ color } />
-									</ColorIndicatorWrapper>
-								) ) }
-						</ZStack>
+						<Flex direction="column" gap={ hasColors ? 2 : 0 }>
+							<div>{ paletteButtonText }</div>
+							<ZStack isLayered={ false } offset={ -8 }>
+								{ colors
+									.slice( 0, 5 )
+									.map( ( { color }, index ) => (
+										<ColorIndicatorWrapper
+											key={ `${ color }-${ index }` }
+										>
+											<ColorIndicator
+												colorValue={ color }
+											/>
+										</ColorIndicatorWrapper>
+									) ) }
+							</ZStack>
+						</Flex>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>
 				</NavigationButtonAsItem>

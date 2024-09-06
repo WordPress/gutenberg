@@ -28,7 +28,7 @@ test.describe( 'Global styles sidebar', () => {
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks styles' } )
+			.getByRole( 'button', { name: 'Blocks' } )
 			.click();
 
 		await page

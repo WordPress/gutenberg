@@ -40,7 +40,7 @@ test.describe( 'Styles', () => {
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		// Navigate to Styles -> Blocks -> Heading -> Typography
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
-		await page.getByRole( 'button', { name: 'Blocks styles' } ).click();
+		await page.getByRole( 'button', { name: 'Blocks' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Social Icons block styles' } )
 			.click();

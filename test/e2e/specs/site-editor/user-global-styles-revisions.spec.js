@@ -76,9 +76,7 @@ test.describe( 'Style Revisions', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
 		await page.getByRole( 'button', { name: 'Colors' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Color Background styles' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Background' } ).click();
 		await page
 			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
