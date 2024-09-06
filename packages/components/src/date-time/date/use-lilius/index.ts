@@ -1,5 +1,7 @@
 /**
- * This source is a local copy of the use-lilius library.
+ * This source is a local copy of the use-lilius library, since the original
+ * library is not actively maintained.
+ * @see https://github.com/WordPress/gutenberg/discussions/64968
  *
  * use-lilius@2.0.5
  * https://github.com/Avarios/use-lilius
