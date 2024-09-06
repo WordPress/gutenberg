@@ -16,7 +16,10 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	FlexBlock,
+	Icon,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,6 +35,7 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
 
 const noop = () => {};
 
@@ -42,6 +46,11 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
+	const isZoomOutMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		[]
+	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -165,20 +174,35 @@ export function PatternCategoryPreviews( {
 			</VStack>
 
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternsList
-					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
-					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHover }
-					label={ category.label }
-					orientation="vertical"
-					category={ category.name }
-					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternSourceFilter }
-					pagingProps={ pagingProps }
-				/>
+				<>
+					{ isZoomOutMode && (
+						<HStack
+							align="top"
+							className="block-editor-inserter__help-text"
+						>
+							<Icon icon={ info } />
+							<p>
+								{ __(
+									'Drag and drop any pattern into the canvas.'
+								) }
+							</p>
+						</HStack>
+					) }
+					<BlockPatternsList
+						ref={ scrollContainerRef }
+						shownPatterns={ pagingProps.categoryPatternsAsyncList }
+						blockPatterns={ pagingProps.categoryPatterns }
+						onClickPattern={ onClickPattern }
+						onHover={ onHover }
+						label={ category.label }
+						orientation="vertical"
+						category={ category.name }
+						isDraggable
+						showTitlesAsTooltip={ showTitlesAsTooltip }
+						patternFilter={ patternSourceFilter }
+						pagingProps={ pagingProps }
+					/>
+				</>
 			) }
 		</>
 	);

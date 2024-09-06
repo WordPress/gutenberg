@@ -709,3 +709,11 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 }
+
+.block-editor-inserter__help-text {
+	padding: 0 $grid-unit-30;
+
+	p:first-of-type {
+		margin-top: 0;
+	}
+}
