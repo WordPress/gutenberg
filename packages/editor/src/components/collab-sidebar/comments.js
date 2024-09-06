@@ -100,13 +100,13 @@ export function Comments( {
 					>
 						{ 'edit' === actionState?.action &&
 							thread.id === actionState?.id && (
-								<EditComment
-									thread={ thread }
-									onUpdate={ ( value ) => {
+								<CommentForm
+									onSubmit={ ( value ) => {
 										onEditComment( thread.id, value );
 										setActionState( false );
 									} }
 									onCancel={ () => setActionState( false ) }
+									thread={ thread }
 								/>
 							) }
 						{ ( ! actionState ||
@@ -115,6 +115,38 @@ export function Comments( {
 						) }
 					</VStack>
 				</HStack>
+				{ 'resolve' === actionState?.action &&
+					thread.id === actionState?.id && (
+						<ConfirmNotice
+							confirmMessage={
+								// translators: message displayed when marking a comment as resolved
+								__(
+									'Are you sure you want to mark this thread as resolved?'
+								)
+							}
+							confirmAction={ () => {
+								onCommentResolve( thread.id );
+								setActionState( false );
+							} }
+							discardAction={ () => setActionState( false ) }
+						/>
+					) }
+				{ 'delete' === actionState?.action &&
+					thread.id === actionState?.id && (
+						<ConfirmNotice
+							confirmMessage={
+								// translators: message displayed when deleting a comment
+								__(
+									'Are you sure you want to delete this thread?'
+								)
+							}
+							confirmAction={ () => {
+								onCommentDelete( thread.id );
+								setActionState( false );
+							} }
+							discardAction={ () => setActionState( false ) }
+						/>
+					) }
 			</>
 		);
 	};
@@ -157,49 +189,25 @@ export function Comments( {
 						<CommentBoard thread={ thread } />
 						{ 'reply' === actionState?.action &&
 							thread.id === actionState?.id && (
-								<AddReply
-									onSubmit={ ( inputComment ) => {
-										onAddReply( thread.id, inputComment );
-										setActionState( false );
-									} }
-									onCancel={ () => setActionState( false ) }
-								/>
-							) }
-						{ 'resolve' === actionState?.action &&
-							thread.id === actionState?.id && (
-								<ConfirmNotice
-									confirmMessage={
-										// translators: message displayed when marking a comment as resolved
-										__(
-											'Are you sure you want to mark this thread as resolved?'
-										)
-									}
-									confirmAction={ () => {
-										onCommentResolve( thread.id );
-										setActionState( false );
-									} }
-									discardAction={ () =>
-										setActionState( false )
-									}
-								/>
-							) }
-						{ 'delete' === actionState?.action &&
-							thread.id === actionState?.id && (
-								<ConfirmNotice
-									confirmMessage={
-										// translators: message displayed when deleting a comment
-										__(
-											'Are you sure you want to delete this thread?'
-										)
-									}
-									confirmAction={ () => {
-										onCommentDelete( thread.id );
-										setActionState( false );
-									} }
-									discardAction={ () =>
-										setActionState( false )
-									}
-								/>
+								<VStack
+									alignment="left"
+									spacing="3"
+									justify="flex-start"
+									className="editor-collab-sidebar-panel__comment-field"
+								>
+									<CommentForm
+										onSubmit={ ( inputComment ) => {
+											onAddReply(
+												inputComment,
+												thread.id
+											);
+											setActionState( false );
+										} }
+										onCancel={ () =>
+											setActionState( false )
+										}
+									/>
+								</VStack>
 							) }
 						{ 0 < thread?.reply?.length &&
 							thread.reply.map( ( reply ) => (
@@ -213,24 +221,6 @@ export function Comments( {
 										thread={ reply }
 										parentThread={ thread }
 									/>
-									{ 'delete' === actionState?.action &&
-										reply.id === actionState?.id && (
-											<ConfirmNotice
-												confirmMessage={
-													// translators: message displayed when deleting a comment
-													__(
-														'Are you sure you want to delete this thread?'
-													)
-												}
-												confirmAction={ () => {
-													onCommentDelete( reply.id );
-													setActionState( false );
-												} }
-												discardAction={ () =>
-													setActionState( false )
-												}
-											/>
-										) }
 								</VStack>
 							) ) }
 					</VStack>
@@ -243,14 +233,14 @@ export function Comments( {
  * EditComment component.
  *
  * @param {Object}   props          - The component props.
- * @param {Object}   props.thread   - The comment thread object.
- * @param {Function} props.onUpdate - The function to call when updating the comment.
+ * @param {Function} props.onSubmit - The function to call when updating the comment.
  * @param {Function} props.onCancel - The function to call when canceling the comment update.
- * @return {JSX.Element} The EditComment component.
+ * @param {Object}   props.thread   - The comment thread object.
+ * @return {JSX.Element} The CommentForm component.
  */
-function EditComment( { thread, onUpdate, onCancel } ) {
+function CommentForm( { onSubmit, onCancel, thread } ) {
 	const [ inputComment, setInputComment ] = useState(
-		removep( thread.content.rendered )
+		removep( thread?.content?.rendered ?? '' )
 	);
 
 	return (
@@ -267,13 +257,15 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 						__next40pxDefaultSize
 						accessibleWhenDisabled
 						variant="primary"
-						onClick={ () => onUpdate( inputComment ) }
+						onClick={ () => onSubmit( inputComment ) }
 						size="compact"
 						disabled={
 							0 === sanitizeCommentString( inputComment ).length
 						}
 					>
-						{ _x( 'Update', 'Update comment' ) }
+						{ thread
+							? _x( 'Update', 'Update comment' )
+							: _x( 'Reply', 'Add reply comment' ) }
 					</Button>
 					<Button
 						__next40pxDefaultSize
@@ -285,59 +277,6 @@ function EditComment( { thread, onUpdate, onCancel } ) {
 				</HStack>
 			</VStack>
 		</>
-	);
-}
-
-/**
- * Renders a component to add a reply.
- *
- * @param {Object}   props          - The component props.
- * @param {Function} props.onSubmit - The function to be called when the reply is submitted.
- * @param {Function} props.onCancel - The function to be called when the reply is canceled.
- * @return {JSX.Element} The JSX element representing the AddReply component.
- */
-function AddReply( { onSubmit, onCancel } ) {
-	const [ inputComment, setInputComment ] = useState( '' );
-
-	return (
-		<HStack alignment="left" spacing="3" justify="flex-start">
-			<VStack
-				alignment="left"
-				spacing="3"
-				className="editor-collab-sidebar-panel__comment-field"
-			>
-				<TextareaControl
-					__nextHasNoMarginBottom
-					className="editor-collab-sidebar-panel__comment-field-textarea"
-					value={ inputComment ?? '' }
-					onChange={ setInputComment }
-				/>
-				<VStack alignment="left" spacing="3" justify="flex-start">
-					<HStack alignment="left" spacing="3" justify="flex-start">
-						<Button
-							__next40pxDefaultSize
-							accessibleWhenDisabled
-							variant="primary"
-							onClick={ () => onSubmit( inputComment ) }
-							size="compact"
-							disabled={
-								0 ===
-								sanitizeCommentString( inputComment ).length
-							}
-						>
-							{ _x( 'Reply', 'Add reply comment' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							onClick={ onCancel }
-							size="compact"
-						>
-							{ _x( 'Cancel', 'Cancel adding a reply comment' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</VStack>
-		</HStack>
 	);
 }
 

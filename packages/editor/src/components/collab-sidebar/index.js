@@ -67,35 +67,40 @@ export default function CollabSidebar() {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Function to save the comment.
-	const addNewComment = async ( comment ) => {
+	const addNewComment = async ( comment, parentCommentId ) => {
 		const sanitisedComment = removep( comment );
 
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
+		const args = {
 			post: postId,
 			content: sanitisedComment,
 			comment_type: 'block_comment',
-		} );
+		};
+
+		if ( parentCommentId ) {
+			args.parent = parentCommentId;
+		}
+
+		const savedRecord = await saveEntityRecord( 'root', 'comment', args );
 
 		if ( savedRecord ) {
 			updateBlockAttributes( clientId, {
 				blockCommentId: savedRecord?.id,
 			} );
-			createNotice( 'snackbar', __( 'New comment added.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-			fetchComments();
-		} else {
 			createNotice(
-				'error',
-				// translators: Error message when comment submission fails
-				__(
-					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-				),
+				'snackbar',
+				parentCommentId
+					? // translators: Reply added successfully
+					  __( 'Reply added successfully.' )
+					: // translators: Comment added successfully
+					  __( 'Comment added successfully.' ),
 				{
+					type: 'snackbar',
 					isDismissible: true,
 				}
 			);
+			fetchComments();
+		} else {
+			onError();
 		}
 	};
 
@@ -114,16 +119,7 @@ export default function CollabSidebar() {
 
 			fetchComments();
 		} else {
-			createNotice(
-				'error',
-				// translators: Error message when comment submission fails
-				__(
-					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-				),
-				{
-					isDismissible: true,
-				}
-			);
+			onError();
 		}
 	};
 
@@ -148,52 +144,21 @@ export default function CollabSidebar() {
 
 			fetchComments();
 		} else {
-			createNotice(
-				'error',
-				// translators: Error message when comment submission fails
-				__(
-					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-				),
-				{
-					isDismissible: true,
-				}
-			);
+			onError();
 		}
 	};
 
-	const onAddReply = async ( parentCommentId, comment ) => {
-		const sanitisedComment = removep( comment );
-
-		const savedRecord = await saveEntityRecord( 'root', 'comment', {
-			parent: parentCommentId,
-			post: postId,
-			content: sanitisedComment,
-			comment_type: 'block_comment',
-		} );
-
-		if ( savedRecord ) {
-			createNotice(
-				'snackbar',
-				// translators: Reply added successfully
-				__( 'Reply added successfully.' ),
-				{
-					type: 'snackbar',
-					isDismissible: true,
-				}
-			);
-			fetchComments();
-		} else {
-			createNotice(
-				'error',
-				// translators: Error message when comment submission fails
-				__(
-					'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
-				),
-				{
-					isDismissible: true,
-				}
-			);
-		}
+	const onError = () => {
+		createNotice(
+			'error',
+			// translators: Error message when comment submission fails
+			__(
+				'Something went wrong. Please try publishing the post, or you may have already submitted your comment earlier.'
+			),
+			{
+				isDismissible: true,
+			}
+		);
 	};
 
 	const onCommentDelete = async ( commentId ) => {
@@ -302,7 +267,7 @@ export default function CollabSidebar() {
 				<Comments
 					threads={ resultComments }
 					onEditComment={ onEditComment }
-					onAddReply={ onAddReply }
+					onAddReply={ addNewComment }
 					onCommentDelete={ onCommentDelete }
 					onCommentResolve={ onCommentResolve }
 				/>

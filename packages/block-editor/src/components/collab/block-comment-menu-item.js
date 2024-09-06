@@ -12,6 +12,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 export default function BlockCommentMenuItem( { onClose } ) {
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
