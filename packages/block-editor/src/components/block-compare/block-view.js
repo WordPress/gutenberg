@@ -31,8 +31,7 @@ export default function BlockView( {
 
 			<div className="block-editor-block-compare__action">
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					tabIndex="0"
 					onClick={ action }
