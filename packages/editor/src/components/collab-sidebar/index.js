@@ -1,10 +1,8 @@
 /**
  * WordPress dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, resolveSelect } from '@wordpress/data';
 import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import { comment as commentIcon } from '@wordpress/icons';
 import { addFilter } from '@wordpress/hooks';
@@ -55,33 +53,29 @@ addFilter(
 export default function CollabSidebar() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
+	const { getEntityRecords } = resolveSelect( coreStore );
 
 	const [ threads, setThreads ] = useState( () => [] );
-	const postId = useSelect( ( select ) => {
-		return select( editorStore ).getCurrentPostId();
-	}, [] );
-
-	const currentUserData = useSelect( ( select ) => {
-		return select( coreStore ).getCurrentUser();
+	const { postId, clientId } = useSelect( ( select ) => {
+		return {
+			postId: select( editorStore ).getCurrentPostId(),
+			clientId: select( blockEditorStore ).getSelectedBlockClientId(),
+		};
 	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const clientId = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSelectedBlockClientId();
-	}, [] );
-
 	// Function to save the comment.
 	const addNewComment = async ( comment ) => {
+		const sanitisedComment = removep( comment );
+
 		const savedRecord = await saveEntityRecord( 'root', 'comment', {
 			post: postId,
-			content: comment,
-			comment_date: new Date().toISOString(),
+			content: sanitisedComment,
 			comment_type: 'block_comment',
-			comment_author: currentUserData?.name ?? null,
-			comment_approved: 0,
 		} );
+
 		if ( savedRecord ) {
 			updateBlockAttributes( clientId, {
 				blockCommentId: savedRecord?.id,
@@ -174,10 +168,7 @@ export default function CollabSidebar() {
 			parent: parentCommentId,
 			post: postId,
 			content: sanitisedComment,
-			comment_date: new Date().toISOString(),
 			comment_type: 'block_comment',
-			comment_author: currentUserData?.name ?? null,
-			comment_approved: 0,
 		} );
 
 		if ( savedRecord ) {
@@ -225,20 +216,20 @@ export default function CollabSidebar() {
 		fetchComments();
 	};
 
-	const fetchComments = useCallback( () => {
+	const fetchComments = useCallback( async () => {
 		if ( postId ) {
-			apiFetch( {
-				path:
-					'/wp/v2/comments?post=' +
-					postId +
-					'&type=block_comment' +
-					'&status=any&per_page=100',
-				method: 'GET',
-			} ).then( ( data ) => {
-				setThreads( Array.isArray( data ) ? data : [] );
+			const data = await getEntityRecords( 'root', 'comment', {
+				post: postId,
+				type: 'block_comment',
+				status: 'any',
+				per_page: 100,
 			} );
+
+			if ( data ) {
+				setThreads( Array.isArray( data ) ? data : [] );
+			}
 		}
-	}, [ postId ] );
+	}, [ postId, getEntityRecords ] );
 
 	useEffect( () => {
 		fetchComments();

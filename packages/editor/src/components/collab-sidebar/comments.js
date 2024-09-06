@@ -344,13 +344,13 @@ function AddReply( { onSubmit, onCancel } ) {
 /**
  * Renders a confirmation notice component.
  *
- * @param {Object}   props               - The component props.
- * @param {string}   props.cofirmMessage - The confirmation message to display. Defaults to 'Are you sure?' if not provided.
- * @param {Function} props.confirmAction - The action to perform when the confirm button is clicked.
- * @param {Function} props.discardAction - The action to perform when the discard button is clicked.
+ * @param {Object}   props                - The component props.
+ * @param {string}   props.confirmMessage - The confirmation message to display. Defaults to 'Are you sure?' if not provided.
+ * @param {Function} props.confirmAction  - The action to perform when the confirm button is clicked.
+ * @param {Function} props.discardAction  - The action to perform when the discard button is clicked.
  * @return {JSX.Element} The confirmation notice component.
  */
-function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
+function ConfirmNotice( { confirmMessage, confirmAction, discardAction } ) {
 	return (
 		<VStack
 			// translators: title for the confirmation overlay
@@ -360,7 +360,7 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 			justify="space-between"
 		>
 			<p>
-				{ cofirmMessage ??
+				{ confirmMessage ??
 					// translators: message displayed when confirming an action
 					__( 'Are you sure?' ) }
 			</p>
@@ -371,14 +371,14 @@ function ConfirmNotice( { cofirmMessage, confirmAction, discardAction } ) {
 					onClick={ confirmAction }
 					size="compact"
 				>
-					{ _x( 'Yes', 'confirm action' ) }
+					{ __( 'Yes' ) }
 				</Button>
 				<Button
 					__next40pxDefaultSize
 					onClick={ discardAction }
 					size="compact"
 				>
-					{ _x( 'No', 'deny action' ) }
+					{ __( 'No' ) }
 				</Button>
 			</HStack>
 		</VStack>
