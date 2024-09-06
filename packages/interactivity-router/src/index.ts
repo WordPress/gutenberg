@@ -366,11 +366,19 @@ export const { state, actions } = store( 'core/router', {
  * @param ariaLive The politeness level for aria-live; default: 'polite'.
  */
 function a11yAnnounce( message: string, ariaLive?: 'polite' | 'assertive' ) {
-	import( '@wordpress/a11y' ).then(
-		( { speak } ) => speak( message, ariaLive ),
-		// Silence errors.
-		() => undefined
-	);
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		import( '@wordpress/a11y' ).then(
+			( { speak } ) => speak( message, ariaLive ),
+			// Silence errors.
+			() => undefined
+		);
+	} else {
+		state.navigation.message =
+			// Announce that the page has been loaded. If the message is the
+			// same, we use a no-break space similar to the @wordpress/a11y
+			// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
+			message + ( state.navigation.message === message ? '\u00A0' : '' );
+	}
 }
 
 // Add click and prefetch to all links.
