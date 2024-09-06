@@ -11,7 +11,7 @@
 	}
 
 	.components-base-control {
-		&:not(:last-child) {
+		&:where(:not(:last-child)) {
 			margin-bottom: $grid-unit-20;
 		}
 	}
