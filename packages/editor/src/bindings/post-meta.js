@@ -9,21 +9,75 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
+function getMetadata( registry, context ) {
+	let metaFields = {};
+	const {
+		type,
+		is_custom: isCustom,
+		slug,
+	} = registry.select( editorStore ).getCurrentPost();
+	const { getPostTypes, getEditedEntityRecord } =
+		registry.select( coreDataStore );
+
+	const { getRegisteredPostMeta } = unlock(
+		registry.select( coreDataStore )
+	);
+
+	// Inherit the postType from the slug if it is a template.
+	if ( ! context?.postType && type === 'wp_template' ) {
+		// Get the 'kind' from the start of the slug.
+		// Use 'post' as the default.
+		let postType = 'post';
+		const isGlobalTemplate = isCustom || slug === 'index';
+		if ( ! isGlobalTemplate ) {
+			const [ kind ] = slug.split( '-' );
+			if ( kind === 'page' ) {
+				postType = 'page';
+			} else if ( kind === 'single' ) {
+				const postTypes =
+					getPostTypes( { per_page: -1 } )?.map(
+						( entity ) => entity.slug
+					) || [];
+
+				// Infer the post type from the slug.
+				// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
+				const match = slug.match(
+					`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
+				);
+				postType = match ? match[ 1 ] : 'post';
+			}
+		}
+		const fields = getRegisteredPostMeta( postType );
+
+		// Populate the `metaFields` object with the default values.
+		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
+			// If the template is global, skip the fields with a subtype.
+			if ( isGlobalTemplate && props.object_subtype ) {
+				return;
+			}
+			metaFields[ key ] = props.default;
+		} );
+	} else {
+		metaFields = getEditedEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId
+		).meta;
+	}
+
+	return metaFields;
+}
+
 export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
-		const meta = registry
-			.select( coreDataStore )
-			.getEditedEntityRecord(
-				'postType',
-				context?.postType,
-				context?.postId
-			)?.meta;
+		const metaFields = getMetadata( registry, context );
+
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				meta?.[ source.args.key ] || source.args.key;
+				metaFields?.[ source.args.key ] || source.args.key;
 		}
 		return newValues;
 	},
@@ -83,61 +137,7 @@ export default {
 		return true;
 	},
 	getFieldsList( { registry, context } ) {
-		let metaFields = {};
-		const {
-			type,
-			is_custom: isCustom,
-			slug,
-		} = registry.select( editorStore ).getCurrentPost();
-		const { getPostTypes, getEditedEntityRecord } =
-			registry.select( coreDataStore );
-
-		const { getRegisteredPostMeta } = unlock(
-			registry.select( coreDataStore )
-		);
-
-		// Inherit the postType from the slug if it is a template.
-		if ( ! context?.postType && type === 'wp_template' ) {
-			// Get the 'kind' from the start of the slug.
-			// Use 'post' as the default.
-			let postType = 'post';
-			// A global template can be used with any post type.
-			const isGlobalTemplate = isCustom || slug === 'index';
-			if ( ! isGlobalTemplate ) {
-				const [ kind ] = slug.split( '-' );
-				if ( kind === 'page' ) {
-					postType = 'page';
-				} else if ( kind === 'single' ) {
-					const postTypes =
-						getPostTypes( { per_page: -1 } )?.map(
-							( entity ) => entity.slug
-						) || [];
-
-					// Infer the post type from the slug.
-					// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
-					const match = slug.match(
-						`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
-					);
-					postType = match ? match[ 1 ] : 'post';
-				}
-			}
-			const fields = getRegisteredPostMeta( postType );
-
-			// Populate the `metaFields` object with the default values.
-			Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
-				// If the template is global, skip the fields with a subtype.
-				if ( isGlobalTemplate && props.object_subtype ) {
-					return;
-				}
-				metaFields[ key ] = props.default;
-			} );
-		} else {
-			metaFields = getEditedEntityRecord(
-				'postType',
-				context?.postType,
-				context?.postId
-			).meta;
-		}
+		const metaFields = getMetadata( registry, context );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
