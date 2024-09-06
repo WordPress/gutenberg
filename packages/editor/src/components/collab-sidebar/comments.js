@@ -264,7 +264,7 @@ function CommentForm( { onSubmit, onCancel, thread } ) {
 						}
 					>
 						{ thread
-							? _x( 'Update', 'Update comment' )
+							? _x( 'Update', 'verb' )
 							: _x( 'Reply', 'Add reply comment' ) }
 					</Button>
 					<Button
