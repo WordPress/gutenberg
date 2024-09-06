@@ -58,8 +58,7 @@ export const slideToRight = keyframes( {
 type NavigatorScreenAnimationProps = {
 	skipAnimation: boolean;
 	animationDirection: 'forwards' | 'backwards';
-	isAnimatingOut: boolean;
-	isAnimatingIn: boolean;
+	animationType: 'in' | 'out' | undefined;
 };
 
 const FADE = {
@@ -116,26 +115,17 @@ const ANIMATION = {
 export const navigatorScreenAnimation = ( {
 	animationDirection,
 	skipAnimation,
-	isAnimatingOut,
-	isAnimatingIn,
-}: NavigatorScreenAnimationProps ) => {
-	return css`
-		z-index: ${ isAnimatingOut ? 0 : 1 };
-		inset-block-start: ${ isAnimatingOut ? 0 : 'initial' };
-		inset-inline-start: ${ isAnimatingOut ? 0 : 'initial' };
-		inset-inline-end: ${ isAnimatingOut ? 0 : 'initial' };
+	animationType,
+}: NavigatorScreenAnimationProps ) => css`
+	z-index: ${ animationType === 'out' ? 0 : 1 };
+	animation: ${ skipAnimation || ! animationType
+		? 'none'
+		: ANIMATION[ animationDirection ][ animationType ] };
 
-		animation: ${ skipAnimation || ( ! isAnimatingOut && ! isAnimatingIn )
-			? 'none'
-			: ANIMATION[ animationDirection ][
-					isAnimatingOut ? 'out' : 'in'
-			  ] };
-
-		@media ( prefers-reduced-motion ) {
-			animation: none;
-		}
-	`;
-};
+	@media ( prefers-reduced-motion ) {
+		animation: none;
+	}
+`;
 
 export const navigatorScreen = css`
 	/* Ensures horizontal overflow is visually accessible */

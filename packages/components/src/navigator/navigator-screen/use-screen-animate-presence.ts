@@ -86,17 +86,22 @@ export function useScreenAnimatePresence( {
 		( isRTL && isBack ) || ( ! isRTL && ! isBack )
 			? 'forwards'
 			: 'backwards';
-	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
 	const isAnimatingIn = animationStatus === 'ANIMATING_IN';
+	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
+	let animationType: 'in' | 'out' | undefined;
+	if ( isAnimatingIn ) {
+		animationType = 'in';
+	} else if ( isAnimatingOut ) {
+		animationType = 'out';
+	}
 	const animationStyles = useMemo(
 		() =>
 			styles.navigatorScreenAnimation( {
 				skipAnimation,
 				animationDirection,
-				isAnimatingIn,
-				isAnimatingOut,
+				animationType,
 			} ),
-		[ skipAnimation, animationDirection, isAnimatingOut, isAnimatingIn ]
+		[ skipAnimation, animationDirection, animationType ]
 	);
 
 	const onScreenAnimationEnd = useCallback(
