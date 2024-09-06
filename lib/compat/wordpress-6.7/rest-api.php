@@ -115,30 +115,19 @@ function gutenberg_override_default_rest_server() {
 }
 add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 );
 
+
 /**
- * Updates comment meta from REST request in WordPress 6.7.
+ * Adds user avatar URLs to the REST API response for WordPress version 6.7 and below.
  *
- * This function is used to update comment meta data based on the REST request in WordPress 6.7.
- * It checks if the comment type is provided in the request and updates the comment accordingly.
- * It also updates the author avatar URLs in the response data.
+ * This function is used to add avatar URLs for the author of a post in the REST API response.
+ * It checks if the function 'add_user_avatar_urls_in_rest_response_6_7' does not already exist,
+ * and if not, defines the function.
  *
- * @param WP_REST_Response $response The REST response object.
- * @param WP_Comment       $comment  The comment object.
- * @param WP_REST_Request  $request  The REST request object.
- * @return WP_REST_Response The updated REST response object.
+ * @param object $response The REST API response object.
+ * @return object The modified REST API response object with added avatar URLs.
  */
-if ( ! function_exists( 'update_comment_meta_from_rest_request_6_7' ) ) {
-	function update_comment_meta_from_rest_request_6_7( $response, $comment, $request ) {
-
-		if ( ! empty( $request['comment_type'] ) ) {
-			$comment_data = array(
-				'comment_ID'       => $comment->comment_ID,
-				'comment_type'     => $request['comment_type'],
-				'comment_approved' => isset( $request['comment_approved'] ) ? $request['comment_approved'] : 0,
-			);
-
-			wp_update_comment( $comment_data );
-		}
+if ( ! function_exists( 'add_user_avatar_urls_in_rest_response_6_7' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
+	function add_user_avatar_urls_in_rest_response_6_7( $response ) {
 
 		if ( $response->data['author'] ) {
 			$response->data['author_avatar_urls'] = array(
@@ -151,4 +140,27 @@ if ( ! function_exists( 'update_comment_meta_from_rest_request_6_7' ) ) {
 		return $response;
 	}
 }
-add_filter( 'rest_prepare_comment', 'update_comment_meta_from_rest_request_6_7', 10, 3 );
+add_filter( 'rest_prepare_comment', 'add_user_avatar_urls_in_rest_response_6_7', 10, 1 );
+
+/**
+ * Updates the comment type in the REST API for WordPress version 6.7.
+ *
+ * This function is used as a filter callback for the 'rest_pre_insert_comment' hook.
+ * It checks if the 'comment_type' parameter is set to 'block_comment' in the REST API request,
+ * and if so, updates the 'comment_type' and 'comment_approved' properties of the prepared comment.
+ *
+ * @param array $prepared_comment The prepared comment data.
+ * @param WP_REST_Request $request The REST API request object.
+ * @return array The updated prepared comment data.
+ */
+if ( ! function_exists( 'update_comment_type_in_rest_api_6_7' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
+	function update_comment_type_in_rest_api_6_7( $prepared_comment, $request ) {
+		if ( ! empty( $request['comment_type'] ) && 'block_comment' === $request['comment_type'] ) {
+			$prepared_comment['comment_type']     = $request['comment_type'];
+			$prepared_comment['comment_approved'] = $request['comment_approved'];
+		}
+
+		return $prepared_comment;
+	}
+}
+add_filter( 'rest_pre_insert_comment', 'update_comment_type_in_rest_api_6_7', 10, 2 );

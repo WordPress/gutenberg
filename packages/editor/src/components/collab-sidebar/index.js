@@ -74,6 +74,7 @@ export default function CollabSidebar() {
 			post: postId,
 			content: sanitisedComment,
 			comment_type: 'block_comment',
+			comment_approved: 0,
 		};
 
 		if ( parentCommentId ) {
