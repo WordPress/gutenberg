@@ -105,7 +105,7 @@ export function PrivateBlockToolbar( {
 					.length > 0
 		);
 
-		// If one or more selected blocks re locked, do not show the BlockGroupToolbar.
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
 			( id ) => getTemplateLock( id ) === 'contentOnly'
 		);
