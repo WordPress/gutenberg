@@ -1,6 +1,6 @@
 # How the Interactivity API works: An In-Depth Look
 
-To get a complete picture of how the Interactivity API works, let's review a request to an imagined `/interactive` page.
+To get a complete picture of how the Interactivity API works, let's review a request to a hypothetical `/interactive` page.
 
 The `/interactive` page is a standard page that contains an accordion block among static content. In this
 case, the request will pass through the following phases:
@@ -148,7 +148,7 @@ import {store, getContext, getElement} from '@wordpress/interactivity';
 ```
 
 If the block has no JS code, the interactivity JS won't be enqueued. It may look confusing, but after considering it,
-it becomes clear that no block JS means no actions and no client-side states, so the server will deliver the final
+it becomes clear that no block JS means no actions and no client-side state, so the server will deliver the final
 markup, which won't have any changes down the line.
 
 As soon as some client changes are necessary, JS code is added, and the script is enqueued.
