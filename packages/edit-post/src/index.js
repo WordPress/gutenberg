@@ -70,6 +70,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 	} );
 
