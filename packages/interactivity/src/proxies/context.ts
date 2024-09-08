@@ -1,5 +1,6 @@
 const contextObjectToProxy = new WeakMap();
 const contextObjectToFallback = new WeakMap();
+const contextProxies = new WeakSet();
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
@@ -51,11 +52,15 @@ export const proxifyContext = (
 	current: object,
 	inherited: object = {}
 ): object => {
+	if ( contextProxies.has( current ) ) {
+		throw Error( 'This object cannot be proxified.' );
+	}
 	// Update the fallback object reference when it changes.
 	contextObjectToFallback.set( current, inherited );
 	if ( ! contextObjectToProxy.has( current ) ) {
 		const proxy = new Proxy( current, contextHandlers );
 		contextObjectToProxy.set( current, proxy );
+		contextProxies.add( proxy );
 	}
 	return contextObjectToProxy.get( current );
 };
