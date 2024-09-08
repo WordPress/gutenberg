@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -13,83 +13,41 @@ import _useLegacyResizeObserver from './_legacy';
  */
 import type { ReactElement } from 'react';
 
-/** `useResizeObserver` options. */
-export type ObserveElementSizeOptions< T extends HTMLElement > =
-	ResizeObserverOptions & {
-		/**
-		 * The target element to observe. This parameter is an alternative to the
-		 * returned ref. The element can be changed dynamically.
-		 */
-		targetElement?: T | undefined | null;
-	};
-
 /**
- * Tracks a given element's size and calls `onUpdate` for all of its discrete
- * values using a `ResizeObserver`. Pass the returned ref to the element or
- * pass the element to the `targetElement` option directly.
+ * Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API)
+ * for an HTML or SVG element.
+ *
+ * Pass the returned setter as a callback ref to the React element you want
+ * to observe, or use it in layout effects for advanced use cases.
  *
  * @example
  *
  * ```tsx
- * const targetElementRef = useResizeObserver(
- * 	( resizeObserverEntries, element ) => {
- * 		console.log( 'Resize observer entries:', resizeObserverEntries );
- * 		console.log( 'Element that was measured:', element );
- * 	},
+ * const setElement = useResizeObserver(
+ * 	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
  * 	{ box: 'border-box' }
  * );
- * <div ref={ targetElementRef } />;
+ * <div ref={ setElement } />;
  *
- * // Alternatively, pass the element directly as an argument:
- * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
- * useResizeObserver(
- * 	// ...
- * 	{
- * 		targetElement,
- * 		// ...
- * 	}
- * );
- * <div ref={ setTargetElement } />;
- *
- * // The element could be obtained through other means, for example:
- * useEffect( () => {
- * 	const element = document.querySelector(
- * 		`[data-element-id="${ elementId }"]`
- * 	);
- * 	setTargetElement( element );
+ * // The setter can be used in other ways, for example:
+ * useLayoutEffect( () => {
+ * 	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
  * }, [ elementId ] );
  * ```
  *
- * @param onUpdate              Callback that will be called when the element is measured (initially and after resizes).
- * @param options               Options that, with the exception of `targetElement`, will be passed to `ResizeObserver.observe` when called internally. Updating them will not cause the observer to be re-created, and they will only take effect if a new element is observed.
- * @param options.targetElement The target element to observe. This parameter is an alternative to the returned ref. The element can be changed dynamically.
+ * @param callback The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
+ * @param options  Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
  */
-export default function useResizeObserver< T extends HTMLElement >(
+export default function useResizeObserver< T extends Element >(
 	/**
-	 * Callback that will be called when the element is measured (initially and
-	 * after resizes).
+	 * The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
 	 */
-	onUpdate: (
-		/**
-		 * The list of
-		 * [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
-		 * objects passed to the `ResizeObserver.observe` callback internally.
-		 */
-		resizeObserverEntries: ResizeObserverEntry[],
-		/**
-		 * The element being tracked at the time of this update.
-		 */
-		element: T
-	) => void,
+	callback: ResizeObserverCallback,
 	/**
-	 * Options that, with the exception of `targetElement`, will be passed to
-	 * `ResizeObserver.observe` when called internally.
-	 *
-	 * Updating them will not cause the observer to be re-created, and they will
-	 * only take effect if a new element is observed.
+	 * Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 	 */
-	options?: ObserveElementSizeOptions< T >
-): ( element?: T | null | undefined ) => void;
+	options?: ResizeObserverOptions
+): ( element?: T | null ) => void;
 
 /**
  * **This is a legacy API and should not be used.**
@@ -117,47 +75,30 @@ export default function useResizeObserver< T extends HTMLElement >(
 export default function useResizeObserver(): [ ReactElement, ObservedSize ];
 
 export default function useResizeObserver< T extends HTMLElement >(
-	onUpdate?: (
-		resizeObserverEntries: ResizeObserverEntry[],
-		element: T
-	) => void,
-	options: ObserveElementSizeOptions< T > = {}
-):
-	| ( ( element?: T | null | undefined ) => void )
-	| [ ReactElement, ObservedSize ] {
-	return onUpdate
-		? _useResizeObserver( onUpdate, options )
+	callback?: ResizeObserverCallback,
+	options: ResizeObserverOptions = {}
+): ( ( element?: T | null ) => void ) | [ ReactElement, ObservedSize ] {
+	return callback
+		? _useResizeObserver( callback, options )
 		: _useLegacyResizeObserver();
 }
 
 function _useResizeObserver< T extends HTMLElement >(
-	onUpdate: (
-		resizeObserverEntries: ResizeObserverEntry[],
-		element: T
-	) => void,
-	{
-		targetElement,
-		...resizeObserverOptions
-	}: ObserveElementSizeOptions< T > = {}
-): ( element?: T | null | undefined ) => void {
-	const onUpdateEvent = useEvent( onUpdate );
+	callback: ResizeObserverCallback,
+	resizeObserverOptions: ResizeObserverOptions = {}
+): ( element?: T | null ) => void {
+	const callbackEvent = useEvent( callback );
 
 	const observedElementRef = useRef< T | null >();
 	const resizeObserverRef = useRef< ResizeObserver >();
-	const setElement = useEvent( ( element?: T | null | undefined ) => {
+	return useEvent( ( element?: T | null ) => {
 		if ( element === observedElementRef.current ) {
 			return;
 		}
 		observedElementRef.current = element;
 
 		// Set up `ResizeObserver`.
-		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( ( entries ) => {
-				if ( observedElementRef.current ) {
-					onUpdateEvent( entries, observedElementRef.current );
-				}
-			} );
-		}
+		resizeObserverRef.current ??= new ResizeObserver( callbackEvent );
 		const { current: resizeObserver } = resizeObserverRef;
 
 		// Unobserve previous element.
@@ -170,17 +111,4 @@ function _useResizeObserver< T extends HTMLElement >(
 			resizeObserver.observe( element, resizeObserverOptions );
 		}
 	} );
-
-	// Handle `targetElement` option.
-	const isArgumentRef = useRef( Boolean( targetElement ) );
-	useLayoutEffect( () => {
-		if ( targetElement || isArgumentRef.current ) {
-			isArgumentRef.current = true;
-			setElement( targetElement );
-			return setElement;
-		}
-		return undefined;
-	}, [ setElement, targetElement ] );
-
-	return setElement;
 }
