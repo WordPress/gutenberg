@@ -1,21 +1,18 @@
 # How the Interactivity API works: An In-Depth Look
 
-To get a complete picture of how the Interactivity API works, let's review a request to a hypothetical `/interactive` page.
+To fully understand how the Interactivity API works, let's examine a request to a hypothetical `/interactive` page.
 
-The `/interactive` page is a standard page that contains an accordion block among static content. In this
-case, the request will pass through the following phases:
+The `/interactive` page is a standard page that includes an accordion block within its static content. In this scenario, the request will go through the following phases:
 
 ## Server-side processing begins
 
 ### 1. Initial processing
 
-The initial request to the `/interactive` page is processed by WordPress, and all the hooks are fired as usual.
+WordPress handles the initial request to the `/interactive` page, triggering all the usual hooks during processing.
 
 ### 2. HTML DOM processing
 
-At this stage, the current theme generates a markup for the current request. During it, the place with the interactive
-accordion block
-is reached:
+At this stage, the current theme generates the markup for the request. During this process, the section containing the interactive accordion block is rendered:
 
 ```php
 // render.php
@@ -56,48 +53,45 @@ is reached:
 </div> 
 ```
 
-Note: The `wp_interactivity_state` and `wp_interactivity_data_wp_context` calls are optional,
-while `data-wp-interactive="accordion"` is a required directive to tell the Interactivity API that we want this element and its nested DOM elements to be recognized by the Interactivity API.
+Note: The `wp_interactivity_state` and `wp_interactivity_data_wp_context` calls are necessary for this example but are not required for the Interactivity API to function in general. 
+On the other hand, the `data-wp-interactive="accordion"` directive is required and informs the Interactivity API that the element and its nested DOM elements should be recognized by the API.
 
 The following will happen:
 
 #### 2.1) The `wp_interactivity_state` call initializes some server-side state for the block.
 
-It's stored in a global variable that keeps the state of all blocks throughout the request.
+This state is stored in a global variable that maintains the state of all blocks throughout the request.
 
-#### 2.2) The `wp_interactivity_data_wp_context` call turns the passed variables into a data attribute with JSON.
+#### 2.2) The `wp_interactivity_data_wp_context` call converts the passed variables into a data attribute with JSON.
 
-In this example, the defined strings will be translated (if needed) and turned into the `data-wp-context` attribute:
+In this example, the defined strings are translated (if necessary) and converted into the `data-wp-context` attribute:
 
 ```html
 data-wp-context='{"openItemMessage":"Current open item is","closedItemMessage":"Items are closed","lastOpenItemMessage":"Last opened item is"}
 ```
 
-#### 2.3) WordPress, upon encountering `data-wp-interactive="accordion"`, processes the block directives.
+#### 2.3) When WordPress encounters `data-wp-interactive="accordion"`, it processes the block directives.
 
-In this case, there are 7 directives to be processed: 2 `data-wp-bind--hidden`, 5 `data-wp-text`
-and `data-wp-class--dark`. Using the HTML
-API and defined data (state in the global block-related PHP variable and variables as JSON attributes), WordPress will
-process them and change the markup.
+In this case, there are 7 directives to be processed: 2 `data-wp-bind--hidden`, 5 `data-wp-text`, and `data-wp-class--dark`. 
+Using the [HTML API](https://developer.wordpress.org/reference/classes/wp_html_tag_processor/) and the defined data (the state from the global block-related PHP variable and variables as JSON attributes), WordPress processes these directives and updates the markup.
 
-As a result, the span will contain the translated text and the hidden attribute
-will be added to the matching (first) item. The `data-wp-class--dark` directive will be skipped, as no such state is
-available. This is a client-only state, which will be defined on the client side.
+As a result, the `<span>` will contain the translated text, and the `hidden` attribute will be added to the matching (first) item. 
+The `data-wp-class--dark` directive will be processed but its value is unset so the dark class will not be applied. This directive represents a client-only state, which will be defined on the client side.
 
 ### 3. Scripts enqueuing
 
-#### 3.1) WP automatically adds the `interactivity.min.js` script alias.
+#### 3.1) WordPress automatically adds the `interactivity.min.js` script alias.
 
-Besides adding the `<script>` tags for all the
-assets used on the page, WP will automatically add the `@wordpress/interactivity` alias, pointing to
-the `/wp-includes/js/dist/interactivity.min.js` script. This happens only on pages that have used at least one
-interactive block.
-[how-it-works-scheme-overview.md](how-it-works-scheme-overview.md)
+In addition to adding the `<script>` tags for all assets used on the page, WordPress will automatically include the `@wordpress/interactivity` alias, 
+which points to the `/wp-includes/js/dist/interactivity.min.js` script. This occurs only on pages that contain at least one interactive block.
 
-#### 3.2) WP automatically enqueues the block script (only for Gutenberg blocks).
+Note: Alias refers to the [ImportMap browser feature](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap), which allows defining short and clear names for import statements within the page. 
+The Interactivity alias is automatically added by WordPress. To learn more, read about [script modules in WordPress](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/).
 
-The Interactivity API blocks have their own JavaScript, which defines actions, and this JavaScript is automatically
-enqueued by WordPress. In the case of the accordion block, the JS code defines both the state variables and actions:
+#### 3.2) WordPress automatically enqueues the block script (only for Gutenberg blocks).
+
+Blocks using the Interactivity API can define the state and actions in JavaScript files. This JS is automatically enqueued by WordPress.
+For the accordion block, the JavaScript code handles both the state and actions:
 
 ```js
 import {store, getContext, getElement} from '@wordpress/interactivity';
@@ -137,25 +131,22 @@ const {state} = store('accordion', {
 });
 ```
 
-Pay attention, that automatic enqueueing happens only within Gutenberg blocks. Otherwise, the script should be enqueued
-manually.
+Note: Automatic enqueueing of the block script occurs only within Gutenberg blocks. For other cases, the script must be enqueued manually.
 
-Note: the fact that the API script alias was added, doesn't mean loading the asset in the browser. The API script will
-be loaded (once) during the import command processing in the block JS:
+Additionally, adding the API script alias does not mean the asset is loaded in the browser. The API script will be loaded (once) during the import command processing within the block's JavaScript:
 
 ```javascript
 import {store, getContext, getElement} from '@wordpress/interactivity';
 ```
 
-If the block has no JS code, the interactivity JS won't be enqueued. It may look confusing, but after considering it,
-it becomes clear that no block JS means no actions and no client-side state, so the server will deliver the final
-markup, which won't have any changes down the line.
+If the block does not have any JavaScript code, the interactivity JavaScript will not be enqueued. 
+This might seem confusing at first, but it makes sense upon closer consideration: no block JavaScript means no actions or client-side state, so the server delivers the final markup without any further changes.
 
-As soon as some client changes are necessary, JS code is added, and the script is enqueued.
+Once client-side interactions are required, JavaScript code is added to the block, and the general interactivity script is enqueued.
 
-#### 3.2) State variables are added as JSON:
+#### 3.3) State variables are added as JSON:
 
-State variables of all the blocks appeared on the page, are added as JSON inside a dedicated `<script>` tag:
+State variables for all blocks on the page are included as JSON within a dedicated `<script>` tag:
 
  ```html
 
@@ -164,7 +155,7 @@ State variables of all the blocks appeared on the page, are added as JSON inside
 </script>
    ```
 
-In this case, the single accordion block state is added.
+In this case, the state for the single accordion block is added.
 
 ### 4. HTML sending
 
@@ -172,20 +163,15 @@ After this, the generated HTML is sent to the client side.
 
 ## Part B: Client side
 
-On the client side, the page will be processed as usual: the markup is parsed, JS & CSS are loaded, and the
-usual `DOMContentLoaded` and `window.load` events are fired.
+On the client side, the page is processed as usual: the markup is parsed, JavaScript and CSS are loaded, and the `DOMContentLoaded` and `window.load` events are fired.
 
 ### 1. Interactivity script initial processing
 
-After being loaded by the browser, during initialization, the script will read all the data, attach listeners, and
-process directives that contain JS-only state variables.
+After being loaded by the browser, the script initializes by reading all the data, attaching listeners, and processing directives that include JavaScript-only state.
 
-A block can have directives with state variables defined only in the block's JS. In the accordion example, the dark
-class directive was used (`data-wp-class--dark="state.isDark"`).
+A block can have directives with a state defined solely in the block's JavaScript. In the accordion example, the `data-wp-class--dark="state.isDark"` directive was used.
 
-It was omitted on the server side due to the
-missing state variable. Now, on the client side, the related directive will be processed, and if the dark theme is in
-use, the class will be added:
+This directive was omitted on the server side due to the missing variable in the state. On the client side, the related directive will now be processed. If the dark theme is in use, the class will be added accordingly:
 
 ```javascript
 import {store, getContext, getElement} from '@wordpress/interactivity';
@@ -198,79 +184,10 @@ const {state} = store('accordion', {
 });
 ```
 
-The client-side-only approach for state variables should only be used when there are specific requirements, unlike
-server-processed directives, it isn't SEO-friendly.
+The client-side-only approach for the state should be used only when there are specific requirements. Unlike server-processed directives, this approach is not SEO-friendly.
 
 ### 2. Interactivity actions and changes processing
 
-Then, the usual DOM lifecycle happens, with events and DOM changes. Thanks to the Interactivity API, which provides a
-great abstraction and eliminates the need for manual querying and changes of DOM nodes, it's easy to fully focus on the
-logic itself.
-
-## Part 3: How to 'Enable' the Interactivity API
-
-It's important to highlight that adding the `data-wp-interactive="accordion"` directive is necessary for a block
-declaration but doesn't cause the directives to be processed or the Interactivity script to be enqueued by default.
-
-In case it's been added right now in some place on a new page, nothing will happen. This is because for performance
-reasons,
-the Interactivity API isn't applied to all the HTML, and requires 'activation'.
-
-There are two ways to do so:
-
-### 1. Inside the custom Gutenberg blocks
-
-When using the Interactivity API inside Gutenberg blocks, it's necessary to enable the related option
-in `block.json`. After that, WordPress will look for the `data-wp-interactive` directive and process it.
-
-### 2. In any place to any HTML
-
-Fortunately, Interactivity API is public, and besides Gutenberg blocks, it can be used in any place. However, in
-addition to the
-above-mentioned snippet, it'll require a couple of things to be done manually:
-
-#### 2.1) Call of the `wp_interactivity_process_directives` function on the target markup.
-
-In a straightforward way, it can be done as follows:
-
-```php
-wp_interactivity_state('accordion', [
-  'isOpen'             => false,
-  'isLastItemSet'      => false,
-  'lastOpenedItemName' => "",
-]);
-
-ob_start();
- ?>
-
-<div class="accordion" data-wp-interactive="accordion">
-	<!-- inner HTML elements here -->
-</div>
-
-<?php
-$html = (string) ob_get_clean();
-echo wp_interactivity_process_directives($html);
-```
-
-#### 2.2) Enqueueing the block's JS and using the full path to `interactivity.min.js`.
-
-Since no Gutenberg block with the Interactivity API is present, WordPress won't create the `@wordpress/interactivity`
-alias, and won't enqueue the block's JavaScript code automatically.
-
-This means that the block's JS code should be added to the theme's JavaScript file and enqueued manually.
-Additionally, in the block's JS snippet, the full path should be used:
-
-```javascript
-import {store, getContext, getElement} from '/wp-includes/js/dist/interactivity.min.js';
-
-const {state} = store('accordion', {
-	state: {
-		isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
-		// ...
-	}
-});
-
-// the other theme's JS code
-```
-
-That's allow to apply the Interactivity API to any HTML, even if it has no relation to Gutenberg blocks.
+Following this, the usual DOM lifecycle occurs, including events and DOM changes. 
+The Interactivity API simplifies this process by providing a powerful abstraction, eliminating the need for manual querying and manipulation of DOM nodes. 
+This allows you to focus more on the logic itself.
