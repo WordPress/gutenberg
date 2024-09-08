@@ -2,7 +2,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -22,96 +22,61 @@ export type UseTrackElementRectUpdatesOptions = {
 };
 
 /**
- * Tracks a given element's size and calls `onUpdate` for all of its discrete
- * values using a `ResizeObserver`. The element can change dynamically and **it
- * must not be stored in a ref**. Instead, it should be stored in a React
- * state or equivalent.
+ * Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API)
+ * for an HTML or SVG element.
+ *
+ * Pass the returned setter as a callback ref to the React element you want
+ * to observe, or use it in layout effects for advanced use cases.
  *
  * @example
  *
  * ```tsx
- * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
- * useResizeObserver( targetElement, ( resizeObserverEntries, element, { box: "border-box" } ) => {
- *   console.log( 'Resize observer entries:', resizeObserverEntries );
- *   console.log( 'Element that was resized:', element );
- * } );
- * <div ref={ setTargetElement } />;
+ * const setElement = useResizeObserver(
+ * 	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
+ * 	{ box: 'border-box' }
+ * );
+ * <div ref={ setElement } />;
+ *
+ * // The setter can be used in other ways, for example:
+ * useLayoutEffect( () => {
+ * 	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
+ * }, [ elementId ] );
  * ```
  */
-export function useResizeObserver(
+export function useResizeObserver< T extends Element >(
 	/**
-	 * The target element to observe. It can be changed dynamically.
+	 * The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
 	 */
-	targetElement: HTMLElement | undefined | null,
+	callback: ResizeObserverCallback,
 	/**
-	 * Callback that will be called when the element is resized.
+	 * Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 	 */
-	onUpdate: (
-		/**
-		 * The list of
-		 * [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
-		 * objects passed to the `ResizeObserver.observe` callback internally.
-		 */
-		resizeObserverEntries: ResizeObserverEntry[],
-		/**
-		 * The element being tracked at the time of this update.
-		 */
-		element: HTMLElement
-	) => void,
-	/**
-	 * Options to pass to `ResizeObserver.observe` when called internally.
-	 *
-	 * Updating this option will not cause the observer to be re-created, and it
-	 * will only take effect if a new element is observed.
-	 */
-	resizeObserverOptions?: ResizeObserverOptions
-) {
-	const onUpdateEvent = useEvent( onUpdate );
+	resizeObserverOptions: ResizeObserverOptions = {}
+): ( element?: T | null ) => void {
+	const callbackEvent = useEvent( callback );
 
-	const observedElementRef = useRef< HTMLElement | null >();
+	const observedElementRef = useRef< T | null >();
 	const resizeObserverRef = useRef< ResizeObserver >();
-
-	// Options are passed on `.observe` once and never updated, so we store them
-	// in an up-to-date ref to avoid unnecessary cycles of the effect due to
-	// unstable option objects such as inlined literals.
-	const resizeObserverOptionsRef = useRef( resizeObserverOptions );
-	useEffect( () => {
-		resizeObserverOptionsRef.current = resizeObserverOptions;
-	}, [ resizeObserverOptions ] );
-
-	// TODO: could/should this be a layout effect?
-	useEffect( () => {
-		if ( targetElement === observedElementRef.current ) {
+	return useEvent( ( element?: T | null ) => {
+		if ( element === observedElementRef.current ) {
 			return;
 		}
+		observedElementRef.current = element;
 
-		observedElementRef.current = targetElement;
-
-		// Set up a ResizeObserver.
-		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( ( entries ) => {
-				if ( observedElementRef.current ) {
-					onUpdateEvent( entries, observedElementRef.current );
-				}
-			} );
-		}
+		// Set up `ResizeObserver`.
+		resizeObserverRef.current ??= new ResizeObserver( callbackEvent );
 		const { current: resizeObserver } = resizeObserverRef;
 
-		// Observe new element.
-		if ( targetElement ) {
-			resizeObserver.observe(
-				targetElement,
-				resizeObserverOptionsRef.current
-			);
+		// Unobserve previous element.
+		if ( observedElementRef.current ) {
+			resizeObserver.unobserve( observedElementRef.current );
 		}
 
-		return () => {
-			// Unobserve previous element.
-			if ( observedElementRef.current ) {
-				resizeObserver.unobserve( observedElementRef.current );
-			}
-		};
-	}, [ onUpdateEvent, targetElement ] );
+		// Observe new element.
+		if ( element ) {
+			resizeObserver.observe( element, resizeObserverOptions );
+		}
+	} );
 }
 
 /**
@@ -168,15 +133,22 @@ export const NULL_ELEMENT_OFFSET_RECT = {
  * Useful in contexts where plain `getBoundingClientRect` calls or `ResizeObserver`
  * entries are not suitable, such as when the element is transformed, and when
  * `element.offset<Top|Left|Width|Height>` methods are not precise enough.
+ *
+ * **Note:** in some contexts, like when the scale is 0, this method will fail
+ * because it's impossible to calculate a scaling ratio. When that happens, it
+ * will return `undefined`.
  */
 export function getElementOffsetRect(
 	element: HTMLElement
-): ElementOffsetRect {
+): ElementOffsetRect | undefined {
 	// Position and dimension values computed with `getBoundingClientRect` have
 	// subpixel precision, but are affected by distortions since they represent
 	// the "real" measures, or in other words, the actual final values as rendered
 	// by the browser.
 	const rect = element.getBoundingClientRect();
+	if ( rect.width === 0 || rect.height === 0 ) {
+		return;
+	}
 	const offsetParentRect =
 		element.offsetParent?.getBoundingClientRect() ??
 		NULL_ELEMENT_OFFSET_RECT;
@@ -205,18 +177,51 @@ export function getElementOffsetRect(
 	};
 }
 
+const POLL_RATE = 100;
+
 /**
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
+ *
+ * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
+ * documentation for more details). When that happens, this hook will attempt
+ * to measure again after a frame, and if that fails, it will poll every 100
+ * milliseconds until it succeeds.
  */
 export function useTrackElementOffsetRect(
 	targetElement: HTMLElement | undefined | null
 ) {
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
+	const intervalRef = useRef< ReturnType< typeof setInterval > >();
 
-	useResizeObserver( targetElement, ( _, element ) =>
-		setIndicatorPosition( getElementOffsetRect( element ) )
+	const measure = useEvent( () => {
+		if ( targetElement ) {
+			const elementOffsetRect = getElementOffsetRect( targetElement );
+			if ( elementOffsetRect ) {
+				setIndicatorPosition( elementOffsetRect );
+				clearInterval( intervalRef.current );
+				return true;
+			}
+		} else {
+			clearInterval( intervalRef.current );
+		}
+		return false;
+	} );
+
+	const setElement = useResizeObserver( () => {
+		if ( ! measure() ) {
+			requestAnimationFrame( () => {
+				if ( ! measure() ) {
+					intervalRef.current = setInterval( measure, POLL_RATE );
+				}
+			} );
+		}
+	} );
+
+	useLayoutEffect(
+		() => setElement( targetElement ),
+		[ setElement, targetElement ]
 	);
 
 	return indicatorPosition;
