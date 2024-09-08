@@ -6,10 +6,6 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-/**
- * Internal dependencies
- */
-import { proxifyState, proxifyContext, peek } from './proxies';
 
 /**
  * Internal dependencies
@@ -24,25 +20,7 @@ import {
 } from './utils';
 import { directive, getEvaluate, type DirectiveEntry } from './hooks';
 import { getScope } from './scopes';
-
-/**
- * Recursively update values within a context object.
- *
- * @param target A context instance.
- * @param source Object with properties to update in `target`.
- */
-const updateContext = ( target: any, source: any ) => {
-	for ( const k in source ) {
-		if (
-			isPlainObject( peek( target, k ) ) &&
-			isPlainObject( source[ k ] )
-		) {
-			updateContext( peek( target, k ) as object, source[ k ] );
-		} else if ( ! ( k in target ) ) {
-			target[ k ] = source[ k ];
-		}
-	}
-};
+import { proxifyState, proxifyContext, deepMerge } from './proxies';
 
 /**
  * Recursively clone the passed object.
@@ -180,9 +158,10 @@ export default () => {
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}
-					updateContext(
+					deepMerge(
 						currentValue.current,
-						deepClone( value ) as object
+						deepClone( value ) as object,
+						false
 					);
 					result[ namespace ] = proxifyContext(
 						currentValue.current,
