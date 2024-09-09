@@ -172,7 +172,10 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
-		if ( ! handleUpload ) {
+		if (
+			! handleUpload ||
+			( typeof handleUpload === 'function' && ! handleUpload( files ) )
+		) {
 			return onSelect( files );
 		}
 		onFilesPreUpload( files );

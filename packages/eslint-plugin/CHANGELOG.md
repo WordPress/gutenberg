@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.0.0 (2024-09-05)
+
 ### Breaking Changes
 
 - Add [`@wordpress/i18n-no-flanking-whitespace`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md) to the recommended i18n ruleset ([#64710](https://github.com/WordPress/gutenberg/pull/64710).

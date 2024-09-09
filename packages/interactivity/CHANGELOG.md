@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent calling `proxifyContext` over an already-proxified context inside `wp-context` ([#65090](https://github.com/WordPress/gutenberg/pull/65090)).
+
+## 6.7.0 (2024-09-05)
+
 ### Enhancements
 
 -   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
