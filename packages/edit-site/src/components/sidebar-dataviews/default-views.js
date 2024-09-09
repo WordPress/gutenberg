@@ -30,6 +30,7 @@ export const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
 		layout: {
 			primaryField: 'title',
+			mediaField: 'featured_media',
 			styles: {
 				title: {
 					maxWidth: 300,

@@ -110,7 +110,7 @@ function FeaturedImage( { item, viewType } ) {
 		canvas: 'edit',
 	} );
 
-	if ( viewType === LAYOUT_GRID && item.status !== 'trash' ) {
+	if ( viewType === LAYOUT_GRID ) {
 		if ( ! url ) {
 			return null;
 		}
