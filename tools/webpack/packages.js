@@ -4,6 +4,7 @@
 const webpack = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
+const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const { join, resolve } = require( 'path' );
 const glob = require( 'fast-glob' );
 
@@ -217,26 +218,46 @@ if ( baseConfig.mode === 'development' ) {
 
 	config.module ||= { rules: [] };
 	config.module.rules ||= [];
-	config.module.rules.push( {
-		test: /\.css$/,
-		use: [
-			resolve( __dirname, '../../packages/css-hmr-loader' ),
-			{
-				loader: 'file-loader',
-				options: {
-					name( resourcePath ) {
-						const [ , packageName, fileName ] = resourcePath.match(
-							/\/([^/]+)\/build-style\/(.+\.css)/
-						);
-						return `${ packageName }/${ fileName }?[contenthash]`;
+	config.module.rules.push(
+		{
+			test: /\.css$/,
+			use: [
+				resolve( __dirname, '../../packages/css-hmr-loader' ),
+				{
+					loader: 'file-loader',
+					options: {
+						name( resourcePath ) {
+							const [ , packageName, fileName ] =
+								resourcePath.match(
+									/\/([^/]+)\/build-style\/(.+\.css)/
+								);
+							return `${ packageName }/${ fileName }?[contenthash]`;
+						},
+						publicPath: `/build/`,
 					},
-					publicPath: `/build/`,
 				},
-			},
-		],
-	} );
+			],
+		},
+		{
+			test: /\.(j|t)sx?$/,
+			exclude: /node_modules/,
+			use: [
+				{
+					loader: 'babel-loader',
+					options: {
+						babelrc: false,
+						configFile: false,
+						plugins: [ require.resolve( 'react-refresh/babel' ) ],
+					},
+				},
+			],
+		}
+	);
 
-	config.plugins.push( new webpack.HotModuleReplacementPlugin() );
+	config.plugins.push(
+		new webpack.HotModuleReplacementPlugin(),
+		new ReactRefreshWebpackPlugin()
+	);
 } else {
 	config.plugins.push(
 		new CopyWebpackPlugin( {

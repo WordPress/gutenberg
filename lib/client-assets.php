@@ -231,7 +231,7 @@ function gutenberg_register_packages_scripts( $scripts ) {
 		$dependencies[] = 'wp-runtime';
 
 		// Register HMR dependencies for each entry point in development mode.
-		if ( gutenberg_is_hmr_enabled() ) {
+		if ( gutenberg_is_hmr_enabled() && 'wp-react-refresh-runtime' !== $handle ) {
 			$dependencies[] = '🔥hot';
 		}
 
