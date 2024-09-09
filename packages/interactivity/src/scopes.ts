@@ -97,3 +97,24 @@ export const getElement = () => {
 		attributes: deepImmutable( attributes ),
 	} );
 };
+
+/**
+ * TODO: write tsdoc comment.
+ *
+ * @param namespace Store namespace. By default, the namespace where the calling
+ *                  function exists is used.
+ * @return The context content.
+ */
+export const getServerContext = < T extends object >(
+	namespace?: string
+): T => {
+	const scope = getScope();
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if ( ! scope ) {
+			throw Error(
+				'Cannot call `getServerContext()` when there is no scope. If you are using an async function, please consider using a generator instead. If you are using some sort of async callbacks, like `setTimeout`, please wrap the callback with `withScope(callback)`.'
+			);
+		}
+	}
+	return scope.serverContext[ namespace || getNamespace() ];
+};
