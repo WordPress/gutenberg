@@ -43,6 +43,16 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
+		'empty_field',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'single'       => true,
+			'default'      => '',
+		)
+	);
+	register_meta(
+		'post',
 		'_protected_field',
 		array(
 			'type'    => 'string',

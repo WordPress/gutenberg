@@ -35,6 +35,7 @@
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/keycodes" },
 		{ "path": "packages/lazy-import" },
+		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
 		{ "path": "packages/plugins" },
 		{ "path": "packages/prettier-config" },

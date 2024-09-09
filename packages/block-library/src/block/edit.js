@@ -29,6 +29,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -193,19 +194,15 @@ function ReusableBlockEdit( {
 		hasPatternOverridesSource,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlocks,
-				getSettings,
-				getBlockEditingMode: _getBlockEditingMode,
-			} = select( blockEditorStore );
+			const { getBlocks, getSettings, getBlockEditingMode } =
+				select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: getBlocks( patternClientId ),
-				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
-				editingMode: _getBlockEditingMode( patternClientId ),
+				editingMode: getBlockEditingMode( patternClientId ),
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
 				),
@@ -247,14 +244,15 @@ function ReusableBlockEdit( {
 		),
 	} );
 
-	// Use `blocks` variable until `innerBlocks` is populated, which has the proper clientIds.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'all',
 		layout,
-		value: innerBlocks.length > 0 ? innerBlocks : blocks,
+		value: blocks,
 		onInput: NOOP,
 		onChange: NOOP,
-		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const handleEditOriginal = () => {
@@ -292,7 +290,7 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ hasResolved && (
+			{ hasResolved && ! isMissing && (
 				<ReusableBlockControl
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }

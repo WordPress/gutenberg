@@ -3,16 +3,18 @@
  */
 import type * as Ariakit from '@ariakit/react';
 
-export type CompositeContextProps =
-	| {
-			/**
-			 * Object returned by the `useCompositeStore` hook.
-			 */
-			store: Ariakit.CompositeStore;
-	  }
-	| undefined;
+export type CompositeContextProps = {
+	/**
+	 * The component store, used for advanced usage of the component.
+	 *
+	 * _Note: Using the store directly is not recommended. Instead, use the props
+	 * exposed by the `Composite` component._
+	 *
+	 */
+	store?: unknown;
+};
 
-export type CompositeStoreProps = {
+type CompositeStoreProps = {
 	/**
 	 * The current active item `id`. The active item is the element within the
 	 * composite widget that has either DOM or virtual focus (in case
@@ -117,22 +119,18 @@ export type CompositeStoreProps = {
 	 */
 	orientation?: Ariakit.CompositeStoreProps[ 'orientation' ];
 	/**
-	 * Determines how the `store`'s `next` and `previous` functions will behave.
+	 * Controls how the previous and next items are determined.
 	 * If `rtl` is set to `true`, they will be inverted.
 	 *
 	 * This only affects the composite widget behavior. You still need to set
 	 * `dir="rtl"` on HTML/CSS.
 	 *
-	 * @default false
+	 * @default `isRtl()`
 	 */
 	rtl?: Ariakit.CompositeStoreProps[ 'rtl' ];
 };
 
-export type CompositeProps = {
-	/**
-	 * Object returned by the `useCompositeStore` hook.
-	 */
-	store: Ariakit.CompositeStore;
+export type CompositeProps = CompositeStoreProps & {
 	/**
 	 * Allows the component to be rendered as a different HTML element or React
 	 * component. The value can be a React element or a function that takes in the
