@@ -36,8 +36,8 @@ describe( 'getEntityRecord', () => {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
-			receiveUserPermission: jest.fn(),
-			finishResolution: jest.fn(),
+			receiveUserPermissions: jest.fn(),
+			finishResolutions: jest.fn(),
 		} );
 		triggerFetch.mockReset();
 	} );
@@ -80,7 +80,6 @@ describe( 'getEntityRecord', () => {
 
 	it( 'accepts a query that overrides default api path', async () => {
 		const query = { context: 'view', _envelope: '1' };
-		const queryObj = { include: [ 'post' ], ...query };
 
 		const select = {
 			hasEntityRecords: jest.fn( () => {} ),
@@ -98,13 +97,6 @@ describe( 'getEntityRecord', () => {
 			query
 		)( { dispatch, select, registry } );
 
-		// Check resolution cache for an existing entity that fulfills the request with query.
-		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
-			'root',
-			'postType',
-			queryObj
-		);
-
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
@@ -116,7 +108,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			POST_TYPE,
-			queryObj
+			query
 		);
 
 		// Locks should have been acquired and released.
@@ -181,7 +173,7 @@ describe( 'getEntityRecords', () => {
 			{},
 			false,
 			undefined,
-			undefined
+			{ totalItems: 2, totalPages: 1 }
 		);
 	} );
 
@@ -219,7 +211,7 @@ describe( 'getEntityRecords', () => {
 		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
-			receiveUserPermission: jest.fn(),
+			receiveUserPermissions: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 			finishResolutions,

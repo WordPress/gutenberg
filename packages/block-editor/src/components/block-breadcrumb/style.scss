@@ -22,40 +22,11 @@
 	}
 }
 
-.block-editor-block-breadcrumb__button.components-button {
-	height: $button-size-small;
-	line-height: $button-size-small;
-	padding: 0;
-	position: relative;
-
-	&:hover:not(:disabled) {
-		text-decoration: underline;
-		box-shadow: none;
-	}
-
-	&:focus {
-		box-shadow: none;
-	}
-
-	&:focus::before {
-		content: "";
-		display: block;
-		position: absolute;
-		border-radius: $radius-block-ui;
-		top: $border-width;
-		right: $border-width;
-		bottom: $border-width;
-		left: $border-width;
-
-		@include button-style__focus();
-	}
-}
-
 .block-editor-block-breadcrumb__current {
 	cursor: default;
 }
 
-.block-editor-block-breadcrumb__button.components-button,
+.block-editor-block-breadcrumb__button.block-editor-block-breadcrumb__button,
 .block-editor-block-breadcrumb__current {
 	color: $gray-900;
 	padding: 0 $grid-unit-10;

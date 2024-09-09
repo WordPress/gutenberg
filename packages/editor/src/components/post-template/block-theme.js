@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -43,6 +44,8 @@ export default function BlockThemeControl( { id } ) {
 		};
 	}, [] );
 
+	const { get: getPreference } = useSelect( preferencesStore );
+
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
@@ -75,6 +78,17 @@ export default function BlockThemeControl( { id } ) {
 				},
 		  ]
 		: undefined;
+
+	const mayShowTemplateEditNotice = () => {
+		if ( ! getPreference( 'core/edit-site', 'welcomeGuideTemplate' ) ) {
+			createSuccessNotice(
+				__(
+					'Editing template. Changes made here affect all posts and pages that use the template.'
+				),
+				{ type: 'snackbar', actions: notificationAction }
+			);
+		}
+	};
 	return (
 		<DropdownMenu
 			popoverProps={ POPOVER_PROPS }
@@ -99,15 +113,7 @@ export default function BlockThemeControl( { id } ) {
 										postType: 'wp_template',
 									} );
 									onClose();
-									createSuccessNotice(
-										__(
-											'Editing template. Changes made here affect all posts and pages that use the template.'
-										),
-										{
-											type: 'snackbar',
-											actions: notificationAction,
-										}
-									);
+									mayShowTemplateEditNotice();
 								} }
 							>
 								{ __( 'Edit template' ) }

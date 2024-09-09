@@ -8,7 +8,6 @@ import { createContext, useContext } from '@wordpress/element';
  */
 import type { CompositeContextProps } from './types';
 
-export const CompositeContext =
-	createContext< CompositeContextProps >( undefined );
+export const CompositeContext = createContext< CompositeContextProps >( {} );
 
 export const useCompositeContext = () => useContext( CompositeContext );
