@@ -5,7 +5,6 @@ import type { FieldType, SortDirection, ValidationContext } from '../types';
 import { default as integer } from './integer';
 import { default as text } from './text';
 import { default as datetime } from './datetime';
-import { default as image } from './image';
 
 /**
  *
@@ -24,10 +23,6 @@ export default function getFieldTypeDefinition( type?: FieldType ) {
 
 	if ( 'datetime' === type ) {
 		return datetime;
-	}
-
-	if ( 'image' === type ) {
-		return image;
 	}
 
 	return {
