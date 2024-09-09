@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -16,9 +16,7 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-import { settings as settingsIcon } from '@wordpress/icons';
-import { store as interfaceStore } from '@wordpress/interface';
+import { ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -127,16 +125,6 @@ export function PrivateBlockToolbar( {
 			hasParentPattern: _hasParentPattern,
 		};
 	}, [] );
-
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
-
-	const isSelected = useSelect(
-		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
-			'edit-post/block',
-		[]
-	);
 
 	const toolbarWrapperRef = useRef( null );
 
@@ -247,26 +235,6 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				<ToolbarGroup>
-					<ToolbarButton
-						icon={ settingsIcon }
-						label={ __( 'Toggle block settings' ) }
-						isPressed={ isSelected }
-						onClick={ () => {
-							if ( isSelected ) {
-								disableComplementaryArea(
-									'core',
-									'edit-post/block'
-								);
-							} else {
-								enableComplementaryArea(
-									'core',
-									'edit-post/block'
-								);
-							}
-						} }
-					/>
-				</ToolbarGroup>
 				{ isDefaultEditingMode && (
 					<BlockSettingsMenu clientIds={ blockClientIds } />
 				) }
