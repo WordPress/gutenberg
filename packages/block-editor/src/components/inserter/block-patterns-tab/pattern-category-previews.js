@@ -17,6 +17,7 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
 
 const noop = () => {};
 
@@ -42,6 +44,11 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
+	const isZoomOutMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		[]
+	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -163,23 +170,39 @@ export function PatternCategoryPreviews( {
 					</Text>
 				) }
 			</VStack>
-
-			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternsList
-					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
-					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHover }
-					label={ category.label }
-					orientation="vertical"
-					category={ category.name }
-					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternSourceFilter }
-					pagingProps={ pagingProps }
-				/>
-			) }
+			<VStack spacing={ 4 }>
+				{ currentCategoryPatterns.length > 0 && (
+					<>
+						{ isZoomOutMode && (
+							<Text
+								size="12"
+								as="p"
+								className="block-editor-inserter__help-text"
+							>
+								{ __(
+									'Drag and drop patterns into the canvas.'
+								) }
+							</Text>
+						) }
+						<BlockPatternsList
+							ref={ scrollContainerRef }
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							onHover={ onHover }
+							label={ category.label }
+							orientation="vertical"
+							category={ category.name }
+							isDraggable
+							showTitlesAsTooltip={ showTitlesAsTooltip }
+							patternFilter={ patternSourceFilter }
+							pagingProps={ pagingProps }
+						/>
+					</>
+				) }
+			</VStack>
 		</>
 	);
 }
