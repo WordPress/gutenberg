@@ -14,7 +14,6 @@ import {
 	useState,
 	useCallback,
 	useRef,
-	useEffect,
 } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
@@ -92,65 +91,16 @@ const getFormattedDate = ( dateToDisplay ) =>
 		getDate( dateToDisplay )
 	);
 
-function PostStatusField( { item } ) {
-	const status = STATUSES.find( ( { value } ) => value === item.status );
-	const label = status?.label || item.status;
-	const icon = status?.icon;
-	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ icon && (
-				<div className="edit-site-post-list__status-icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span>{ label }</span>
-		</HStack>
-	);
-}
-
-function PostAuthorField( { item } ) {
-	const { text, imageUrl } = useSelect(
-		( select ) => {
-			const { getUser } = select( coreStore );
-			const user = getUser( item.author );
-			return {
-				imageUrl: user?.avatar_urls?.[ 48 ],
-				text: user?.name,
-			};
-		},
-		[ item ]
-	);
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ !! imageUrl && (
-				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt={ __( 'Author avatar' ) }
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className="page-templates-author-field__icon">
-					<Icon icon={ authorIcon } />
-				</div>
-			) }
-			<span className="page-templates-author-field__name">{ text }</span>
-		</HStack>
-	);
-}
-
-function FeaturedImage( { item, viewType, getFeaturedMediaUrl } ) {
+function FeaturedImage( { item, viewType } ) {
 	const mediaId = item.featured_media;
 
-	const media = getFeaturedMediaUrl( mediaId );
-
+	const media = useSelect(
+		( select ) => {
+			const { getEntityRecord } = select( coreStore );
+			return getEntityRecord( 'root', 'media', mediaId );
+		},
+		[ mediaId ]
+	);
 	const url = media?.source_url;
 	const title = media?.title?.rendered;
 
@@ -213,23 +163,72 @@ function FeaturedImage( { item, viewType, getFeaturedMediaUrl } ) {
 	);
 }
 
+function PostStatusField( { item } ) {
+	const status = STATUSES.find( ( { value } ) => value === item.status );
+	const label = status?.label || item.status;
+	const icon = status?.icon;
+	return (
+		<HStack alignment="left" spacing={ 0 }>
+			{ icon && (
+				<div className="edit-site-post-list__status-icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>{ label }</span>
+		</HStack>
+	);
+}
+
+function PostAuthorField( { item } ) {
+	const { text, imageUrl } = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			const user = getUser( item.author );
+			return {
+				imageUrl: user?.avatar_urls?.[ 48 ],
+				text: user?.name,
+			};
+		},
+		[ item ]
+	);
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	return (
+		<HStack alignment="left" spacing={ 0 }>
+			{ !! imageUrl && (
+				<div
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt={ __( 'Author avatar' ) }
+						src={ imageUrl }
+					/>
+				</div>
+			) }
+			{ ! imageUrl && (
+				<div className="page-templates-author-field__icon">
+					<Icon icon={ authorIcon } />
+				</div>
+			) }
+			<span className="page-templates-author-field__name">{ text }</span>
+		</HStack>
+	);
+}
+
 function usePostFields( viewType ) {
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
-	const { frontPageId, postsPageId, getFeaturedMediaUrl } = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
-			return {
-				frontPageId: siteSettings?.page_on_front,
-				postsPageId: siteSettings?.page_for_posts,
-				getFeaturedMediaUrl: ( id ) =>
-					getEntityRecord( 'root', 'media', id ),
-			};
-		},
-		[]
-	);
+	const { frontPageId, postsPageId } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		return {
+			frontPageId: siteSettings?.page_on_front,
+			postsPageId: siteSettings?.page_for_posts,
+		};
+	}, [] );
 
 	const fields = useMemo(
 		() => [
@@ -238,16 +237,20 @@ function usePostFields( viewType ) {
 				label: __( 'Featured Image' ),
 				type: 'image',
 				render: ( { item } ) => (
-					<FeaturedImage
-						item={ item }
-						viewType={ viewType }
-						getFeaturedMediaUrl={ getFeaturedMediaUrl }
-					/>
+					<FeaturedImage item={ item } viewType={ viewType } />
 				),
 				Edit: ( { field, onChange, data } ) => {
 					const { id } = field;
 
-					const value = field.getValue( { item: data } ) ?? '';
+					const value = field.getValue( { item: data } );
+
+					const media = useSelect(
+						( select ) => {
+							const { getEntityRecord } = select( coreStore );
+							return getEntityRecord( 'root', 'media', value );
+						},
+						[ value ]
+					);
 
 					const onChangeControl = useCallback(
 						( newValue ) =>
@@ -257,21 +260,12 @@ function usePostFields( viewType ) {
 						[ id, onChange ]
 					);
 
-					const media = getFeaturedMediaUrl( value );
-
 					const url = media?.source_url;
 					const title = media?.title?.rendered;
 					const filename =
 						media?.media_details?.file?.match( '([^/]+$)' )[ 0 ];
 
 					const ref = useRef( null );
-
-					// Focus to the media upload button when the component mounts.
-					useEffect( () => {
-						if ( ref.current ) {
-							ref.current.focus();
-						}
-					}, [] );
 
 					return (
 						<fieldset className="edit-site-dataviews-controls__featured-image">
@@ -565,7 +559,7 @@ function usePostFields( viewType ) {
 				],
 			},
 		],
-		[ authors, getFeaturedMediaUrl, viewType, frontPageId, postsPageId ]
+		[ authors, viewType, frontPageId, postsPageId ]
 	);
 
 	return {
