@@ -221,3 +221,7 @@
 	fill: currentColor;
 }
 
+.edit-site-global-styles-screen-root__active-style-tile,
+.edit-site-global-styles-screen-root__active-style-tile-preview {
+	border-radius: $radius-small !important; // Todo: revisit use of Card component and/or remove override
+}
