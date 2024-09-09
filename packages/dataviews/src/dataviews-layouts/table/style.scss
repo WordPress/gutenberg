@@ -171,10 +171,6 @@
 	}
 }
 
-.dataviews-view-table__cell-content-wrapper:empty {
-	display: none;
-}
-
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.dataviews-view-table tr td:first-child,

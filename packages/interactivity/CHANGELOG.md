@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Prevent calling `proxifyContext` over an already-proxified context inside `wp-context` ([#65090](https://github.com/WordPress/gutenberg/pull/65090)).
+
+## 6.7.0 (2024-09-05)
+
 ### Enhancements
 
 -   Improve TypeScript support for generators, including converting types to and from promises, and a `typed` function to be able to use promise types when yielding ([#64577](https://github.com/WordPress/gutenberg/pull/64577)
