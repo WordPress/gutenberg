@@ -13,9 +13,6 @@
 		// Disable any duotone filter applied in the selected state.
 		filter: none !important;
 
-		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
-		border-radius: $radius-block-ui;
-
 		> svg {
 			opacity: 0;
 		}

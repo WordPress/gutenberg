@@ -27,6 +27,7 @@ import {
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
 	getParsedPattern,
+	getGrammar,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -36,6 +37,7 @@ import {
 	getContentLockingParent,
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
+	getSectionRootClientId,
 } from './private-selectors';
 
 /**
@@ -2057,9 +2059,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							if ( ! item.rootClientId ) {
 								let sectionRootClientId;
 								try {
-									sectionRootClientId = unlock(
-										getSettings( state )
-									).sectionRootClientId;
+									sectionRootClientId =
+										getSectionRootClientId( state );
 								} catch ( e ) {}
 								if (
 									sectionRootClientId &&
@@ -2376,17 +2377,27 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( getParsedPattern );
+				.map( ( pattern ) => {
+					return {
+						...pattern,
+						get blocks() {
+							return getParsedPattern( pattern ).blocks;
+						},
+					};
+				} );
+
 			const availableParsedPatterns = parsedPatterns.filter(
-				( { blocks } ) =>
-					checkAllowListRecursive( blocks, allowedBlockTypes )
+				( pattern ) =>
+					checkAllowListRecursive(
+						getGrammar( pattern ),
+						allowedBlockTypes
+					)
 			);
 			const patternsAllowed = availableParsedPatterns.filter(
-				( { blocks } ) =>
-					blocks.every( ( { name } ) =>
+				( pattern ) =>
+					getGrammar( pattern ).every( ( { blockName: name } ) =>
 						canInsertBlockType( state, name, rootClientId )
 					)
 			);
@@ -2827,7 +2838,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
 	if ( editorMode === 'zoom-out' ) {
-		const { sectionRootClientId } = unlock( getSettings( state ) );
+		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
 				state,
@@ -2920,7 +2931,8 @@ export const getBlockEditingMode = createRegistrySelector(
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings( state ) );
+				const sectionRootClientId = getSectionRootClientId( state );
+
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 					return sectionRootClientId ? 'disabled' : 'contentOnly';
 				}

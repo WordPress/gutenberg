@@ -11,7 +11,7 @@ import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { imageFillStyles } from './media-container';
+import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
@@ -42,11 +42,16 @@ export default function save( { attributes } ) {
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
 
+	const positionStyles = imageFill
+		? imageFillStyles( mediaUrl, focalPoint )
+		: {};
+
 	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
+			style={ positionStyles }
 		/>
 	) : null;
 
@@ -71,11 +76,8 @@ export default function save( { attributes } ) {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
-	const backgroundStyles = imageFill
-		? imageFillStyles( mediaUrl, focalPoint )
-		: {};
 
 	let gridTemplateColumns;
 	if ( mediaWidth !== DEFAULT_MEDIA_WIDTH ) {
@@ -96,10 +98,7 @@ export default function save( { attributes } ) {
 						className: 'wp-block-media-text__content',
 					} ) }
 				/>
-				<figure
-					className="wp-block-media-text__media"
-					style={ backgroundStyles }
-				>
+				<figure className="wp-block-media-text__media">
 					{ ( mediaTypeRenders[ mediaType ] || noop )() }
 				</figure>
 			</div>
@@ -107,10 +106,7 @@ export default function save( { attributes } ) {
 	}
 	return (
 		<div { ...useBlockProps.save( { className, style } ) }>
-			<figure
-				className="wp-block-media-text__media"
-				style={ backgroundStyles }
-			>
+			<figure className="wp-block-media-text__media">
 				{ ( mediaTypeRenders[ mediaType ] || noop )() }
 			</figure>
 			<div

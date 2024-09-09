@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { external } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
 
 /**
@@ -12,7 +12,7 @@ import type { BasePost } from '../types';
 
 const viewPost: Action< BasePost > = {
 	id: 'view-post',
-	label: __( 'View' ),
+	label: _x( 'View', 'verb' ),
 	isPrimary: true,
 	icon: external,
 	isEligible( post ) {

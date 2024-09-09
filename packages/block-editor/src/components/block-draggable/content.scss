@@ -3,7 +3,7 @@
 .block-editor-block-list__layout .is-dragging {
 	background-color: currentColor !important;
 	opacity: 0.05 !important;
-	border-radius: $radius-block-ui !important;
+	border-radius: $radius-small !important;
 
 	// Disabling pointer events during the drag event is necessary,
 	// lest the block might affect your drag operation.

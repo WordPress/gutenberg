@@ -7,7 +7,7 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { createInterpolateElement, memo, useContext } from '@wordpress/element';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 
 /**
@@ -103,7 +103,7 @@ function DataViewsPagination() {
 						disabled={ currentPage === 1 }
 						accessibleWhenDisabled
 						label={ __( 'Previous page' ) }
-						icon={ previous }
+						icon={ isRTL() ? next : previous }
 						showTooltip
 						size="compact"
 						tooltipPosition="top"
@@ -115,7 +115,7 @@ function DataViewsPagination() {
 						disabled={ currentPage >= totalPages }
 						accessibleWhenDisabled
 						label={ __( 'Next page' ) }
-						icon={ next }
+						icon={ isRTL() ? previous : next }
 						showTooltip
 						size="compact"
 						tooltipPosition="top"
