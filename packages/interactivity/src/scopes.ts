@@ -12,6 +12,7 @@ import type { Evaluate } from './hooks';
 export interface Scope {
 	evaluate: Evaluate;
 	context: object;
+	serverContext: object;
 	ref: RefObject< HTMLElement >;
 	attributes: createElement.JSX.HTMLAttributes;
 }
