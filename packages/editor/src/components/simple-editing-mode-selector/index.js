@@ -3,21 +3,23 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Dropdown,
 	Button,
-	MenuItemsChoice,
-	NavigableMenu,
 	SVG,
 	Path,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
+import { edit } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
+
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 const selectIcon = (
 	<SVG
@@ -46,61 +48,49 @@ function SimpleEditingModeSelector( props, ref ) {
 	}
 
 	return (
-		<Dropdown
-			renderToggle={ ( { isOpen, onToggle } ) => (
+		<DropdownMenuV2
+			align="start"
+			trigger={
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
 					{ ...props }
 					ref={ ref }
-					icon={ selectIcon }
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					/* translators: button label text should, if possible, be under 16 characters. */
+					icon={
+						renderingMode === 'template-locked' ? selectIcon : edit
+					}
 					label={ __( 'Editing mode' ) }
+					size="small"
 				/>
-			) }
-			popoverProps={ { placement: 'bottom-start' } }
-			renderContent={ () => (
-				<NavigableMenu
-					className="editor-simple-editing-mode-selector__menu"
-					role="menu"
-					aria-label={ __( 'Editing mode' ) }
+			}
+		>
+			<DropdownMenuV2.Group>
+				<DropdownMenuV2.RadioItem
+					name="editing-mode"
+					value="simple"
+					checked={ renderingMode === 'template-locked' }
+					onChange={ () => setRenderingMode( 'template-locked' ) }
 				>
-					<MenuItemsChoice
-						value={
-							renderingMode === 'template-locked'
-								? 'simple'
-								: 'advanced'
-						}
-						onSelect={ ( mode ) =>
-							setRenderingMode(
-								mode === 'simple'
-									? 'template-locked'
-									: 'post-only'
-							)
-						}
-						choices={ [
-							{
-								value: 'advanced',
-								label: __( 'Design' ),
-								info: __(
-									'Full control over layout and styling'
-								),
-							},
-							{
-								value: 'simple',
-								label: __( 'Edit' ),
-								info: __(
-									'Focus on page structure and content'
-								),
-							},
-						] }
-					/>
-				</NavigableMenu>
-			) }
-		/>
+					<DropdownMenuV2.ItemLabel>
+						{ __( 'Edit' ) }
+					</DropdownMenuV2.ItemLabel>
+					<DropdownMenuV2.ItemHelpText>
+						{ __( 'Focus on content.' ) }
+					</DropdownMenuV2.ItemHelpText>
+				</DropdownMenuV2.RadioItem>
+				<DropdownMenuV2.RadioItem
+					name="editing-mode"
+					value="advanced"
+					checked={ renderingMode !== 'template-locked' }
+					onChange={ () => setRenderingMode( 'post-only' ) }
+				>
+					<DropdownMenuV2.ItemLabel>
+						{ __( 'Design' ) }
+					</DropdownMenuV2.ItemLabel>
+					<DropdownMenuV2.ItemHelpText>
+						{ __( 'Full control over layout and styling.' ) }
+					</DropdownMenuV2.ItemHelpText>
+				</DropdownMenuV2.RadioItem>
+			</DropdownMenuV2.Group>
+		</DropdownMenuV2>
 	);
 }
 
