@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	IconType,
 	Button,
 	__experimentalText as Text,
 	__unstableMotion as motion,
@@ -28,7 +29,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const MotionButton = motion( Button );
 
@@ -41,11 +41,11 @@ const MotionButton = motion( Button );
  * ```jsx
  * <DocumentBar />
  * ```
- * @param {Object}                                   props       The component props.
- * @param {string}                                   props.title A title for the document, defaulting to the document or
- *                                                               template title currently being edited.
- * @param {import("@wordpress/components").IconType} props.icon  An icon for the document, defaulting to an icon for document
- *                                                               or template currently being edited.
+ * @param {Object}   props       The component props.
+ * @param {string}   props.title A title for the document, defaulting to the document or
+ *                               template title currently being edited.
+ * @param {IconType} props.icon  An icon for the document, no default.
+ *                               (A default icon indicating the document post type is no longer used.)
  *
  * @return {JSX.Element} The rendered DocumentBar component.
  */
@@ -56,7 +56,6 @@ export default function DocumentBar( props ) {
 		documentTitle,
 		isNotFound,
 		isUnsyncedPattern,
-		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
@@ -94,12 +93,6 @@ export default function DocumentBar( props ) {
 					_postId
 				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
-			templateIcon: unlock( select( editorStore ) ).getPostIcon(
-				_postType,
-				{
-					area: _document?.area,
-				}
-			),
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -114,7 +107,7 @@ export default function DocumentBar( props ) {
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
 	const title = props.title || entityTitle;
-	const icon = props.icon || templateIcon;
+	const icon = props.icon;
 
 	const mountedRef = useRef( false );
 	useEffect( () => {
@@ -183,13 +176,13 @@ export default function DocumentBar( props ) {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ icon } />
+						{ icon && <BlockIcon icon={ icon } /> }
 						<Text size="body" as="h1">
 							{ title
 								? decodeEntities( title )
 								: __( 'No title' ) }
 
-							{ postTypeLabel && (
+							{ postTypeLabel && ! props.title && (
 								<span className="editor-document-bar__post-type-label">
 									{ ' · ' + decodeEntities( postTypeLabel ) }
 								</span>
