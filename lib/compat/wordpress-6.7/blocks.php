@@ -45,7 +45,9 @@ function gutenberg_filter_block_type_metadata_settings_allow_variations_php_file
 add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_allow_variations_php_file', 10, 2 );
 
 /**
- * Filter the query vars (tax_query) for the Query Loop block to support post formats.
+ * Adds post format query vars to the query loop block's WP_Query when the block's attributes call for them.
+ *
+ * @see query_loop_block_query_vars
  *
  * @param array    $query The query vars.
  * @param WP_Block $block Block instance.
