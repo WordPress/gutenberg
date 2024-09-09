@@ -10,8 +10,7 @@
 
 ### Enhancements
 
--   Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
--   Add automatic support for handling `variations` field from `block.json` in the `build` and `start` scripts ([#63311](https://github.com/WordPress/gutenberg/pull/63311)).
+- Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
 
 ### Bug Fixes
 
