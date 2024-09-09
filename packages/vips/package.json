@@ -26,11 +26,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"types": "build-types",
-	"exports": {
-		".": {
-			"default": "./src/index.ts"
-		}
-	},
 	"dependencies": {
 		"wasm-vips": "^0.0.10"
 	},
