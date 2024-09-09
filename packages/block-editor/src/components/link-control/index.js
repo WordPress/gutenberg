@@ -404,20 +404,24 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
+							// Passing the Button component as a suffix prop
+							suffix={
+								showActions ? null : (
+									<Button
+										// TODO: Switch to true (40px size) if possible
+										__next40pxDefaultSize={ false }
+										onClick={
+											isDisabled ? noop : handleSubmit
+										}
+										label={ __( 'Submit' ) }
+										icon={ keyboardReturn }
+										className="block-editor-link-control__search-submit"
+										aria-disabled={ isDisabled }
+									/>
+								)
+							}
+							props
 						/>
-						{ ! showActions && (
-							<div className="block-editor-link-control__search-enter">
-								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
-									onClick={ isDisabled ? noop : handleSubmit }
-									label={ __( 'Submit' ) }
-									icon={ keyboardReturn }
-									className="block-editor-link-control__search-submit"
-									aria-disabled={ isDisabled }
-								/>
-							</div>
-						) }
 					</div>
 					{ errorMessage && (
 						<Notice

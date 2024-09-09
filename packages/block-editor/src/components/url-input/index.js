@@ -12,6 +12,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
@@ -24,7 +25,6 @@ import {
 } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
-
 /**
  * Internal dependencies
  */
@@ -235,7 +235,8 @@ class URLInput extends Component {
 	}
 
 	onChange( event ) {
-		this.props.onChange( event.target.value );
+		this.props.onChange( event );
+		// this.props.onChange( event.target.value );
 	}
 
 	onFocus() {
@@ -424,7 +425,7 @@ class URLInput extends Component {
 			value = '',
 			hideLabelFromVision = false,
 		} = this.props;
-
+		// console.log( 'Hello', this.props );
 		const {
 			loading,
 			showSuggestions,
@@ -443,7 +444,6 @@ class URLInput extends Component {
 			} ),
 			hideLabelFromVision,
 		};
-
 		const inputProps = {
 			id: inputId,
 			value,
@@ -464,15 +464,15 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			suffix: this.props.suffix,
 		};
-
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
-
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<input { ...inputProps } />
+				<InputControl { ...inputProps } __next40pxDefaultSize />
+				{ /* <input { ...inputProps } /> */ }
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
