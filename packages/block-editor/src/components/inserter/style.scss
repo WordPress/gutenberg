@@ -711,9 +711,8 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__help-text {
-	padding: 0 $grid-unit-30;
-
-	p:first-of-type {
-		margin-top: 0;
-	}
+	margin: 0 $grid-unit-30 1em $grid-unit-30;
+	color: $gray-900;
+	font-size: $helptext-font-size;
+	font-style: normal;
 }

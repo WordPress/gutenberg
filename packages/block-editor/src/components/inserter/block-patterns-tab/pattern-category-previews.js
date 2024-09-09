@@ -16,10 +16,8 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	FlexBlock,
-	Icon,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -176,17 +174,11 @@ export function PatternCategoryPreviews( {
 			{ currentCategoryPatterns.length > 0 && (
 				<>
 					{ isZoomOutMode && (
-						<HStack
-							align="top"
-							className="block-editor-inserter__help-text"
-						>
-							<Icon icon={ info } />
-							<p>
-								{ __(
-									'Drag and drop any pattern into the canvas.'
-								) }
-							</p>
-						</HStack>
+						<p className="block-editor-inserter__help-text">
+							{ __(
+								'Drag and drop any pattern into the canvas.'
+							) }
+						</p>
 					) }
 					<BlockPatternsList
 						ref={ scrollContainerRef }
