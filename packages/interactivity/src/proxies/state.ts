@@ -276,8 +276,11 @@ const deepMergeRecursive = (
 	override: boolean = true
 ) => {
 	if ( isPlainObject( target ) && isPlainObject( source ) ) {
+		let hasNewKeys = false;
 		for ( const key in source ) {
 			const isNew = ! ( key in target );
+			hasNewKeys = hasNewKeys || isNew;
+
 			const desc = Object.getOwnPropertyDescriptor( source, key );
 			if (
 				typeof desc?.get === 'function' ||
@@ -311,10 +314,10 @@ const deepMergeRecursive = (
 					propSignal.setValue( desc.value );
 				}
 			}
+		}
 
-			if ( isNew && objToIterable.has( target ) ) {
-				objToIterable.get( target )!.value++;
-			}
+		if ( hasNewKeys && objToIterable.has( target ) ) {
+			objToIterable.get( target )!.value++;
 		}
 	}
 };
