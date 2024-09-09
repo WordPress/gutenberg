@@ -1420,8 +1420,6 @@ Returns an action object used to open/close the inserter.
 _Parameters_
 
 -   _value_ `boolean|Object`: Whether the inserter should be opened (true) or closed (false). To specify an insertion point, use an object.
--   _value.rootClientId_ `string`: The root client ID to insert at.
--   _value.insertionIndex_ `number`: The index to insert at.
 -   _value.filterValue_ `string`: A query to filter the inserter results.
 -   _value.onSelect_ `Function`: A callback when an item is selected.
 -   _value.tab_ `string`: The tab to open in the inserter.
