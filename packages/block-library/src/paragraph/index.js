@@ -39,11 +39,7 @@ export const settings = {
 				return customName;
 			}
 
-			const { content, metadata: currentMetadata } = attributes;
-
-			if ( currentMetadata?.bindings?.content ) {
-				return __( 'Paragraph with dynamic content' );
-			}
+			const { content } = attributes;
 			return ! content || content.length === 0 ? __( 'Empty' ) : content;
 		}
 	},
