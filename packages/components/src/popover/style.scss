@@ -22,7 +22,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__content {
 	background: $white;
-	box-shadow: $shadow-popover-border-default, $elevation-x-small;
+	box-shadow: $shadow-popover-border-default, $elevation-medium;
 	border-radius: $radius-medium;
 	box-sizing: border-box;
 	width: min-content;

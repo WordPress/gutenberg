@@ -37,7 +37,7 @@ const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
 const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
 const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
 const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
+const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationMedium }`;
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
