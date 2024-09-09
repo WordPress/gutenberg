@@ -720,16 +720,14 @@ export function removeEditorPanel( panelName ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
- * @param {string}         value.filterValue    A query to filter the inserter results.
- * @param {Function}       value.onSelect       A callback when an item is selected.
- * @param {string}         value.tab            The tab to open in the inserter.
- * @param {string}         value.category       The category to initialize in the inserter.
+ * @param {boolean|Object} value             Whether the inserter should be
+ *                                           opened (true) or closed (false).
+ *                                           To specify an insertion point,
+ *                                           use an object.
+ * @param {string}         value.filterValue A query to filter the inserter results.
+ * @param {Function}       value.onSelect    A callback when an item is selected.
+ * @param {string}         value.tab         The tab to open in the inserter.
+ * @param {string}         value.category    The category to initialize in the inserter.
  *
  * @return {Object} Action object.
  */
