@@ -24,50 +24,29 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							blob: blobURL,
-							fileName: file.name,
-						} )
-					);
-				} );
-
-				return blocks;
-			},
-		},
-		{
-			type: 'files',
-			isMatch( files ) {
-				return (
-					files.length > 0 &&
-					files.every(
-						( file ) =>
-							file.type.startsWith( 'video' ) ||
-							file.type.startsWith( 'image/' ) ||
-							file.type.startsWith( 'audio/' )
-					)
-				);
-			},
-			transform( files ) {
-				const blocks = [];
-
-				files.forEach( ( file ) => {
 					if ( file.type.startsWith( 'video/' ) ) {
 						blocks.push(
 							createBlock( 'core/video', {
-								src: createBlobURL( file ),
+								blob: createBlobURL( file ),
 							} )
 						);
 					} else if ( file.type.startsWith( 'image/' ) ) {
 						blocks.push(
 							createBlock( 'core/image', {
-								url: createBlobURL( file ),
+								blob: createBlobURL( file ),
 							} )
 						);
 					} else if ( file.type.startsWith( 'audio/' ) ) {
 						blocks.push(
 							createBlock( 'core/audio', {
-								src: createBlobURL( file ),
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else {
+						blocks.push(
+							createBlock( 'core/file', {
+								blob: blobURL,
+								fileName: file.name,
 							} )
 						);
 					}
