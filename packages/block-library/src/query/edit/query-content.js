@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InspectorControls,
@@ -76,11 +76,6 @@ export default function QueryContent( {
 	// resetting again, so we need to mark these changes as not persistent
 	// with `__unstableMarkNextChangeAsNotPersistent`.
 
-	const updateQuery = useCallback(
-		( newQuery ) => setAttributes( { query: { ...query, ...newQuery } } ),
-		[ query, setAttributes ]
-	);
-
 	// Changes in query property (which is an object) need to be in the same callback,
 	// because updates are batched after the render and changes in different query properties
 	// would cause to override previous wanted changes.
@@ -97,13 +92,7 @@ export default function QueryContent( {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-	}, [
-		query,
-		postsPerPage,
-		inherit,
-		__unstableMarkNextChangeAsNotPersistent,
-		updateQuery,
-	] );
+	}, [ query.perPage, postsPerPage, inherit ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -111,12 +100,9 @@ export default function QueryContent( {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { queryId: instanceId } );
 		}
-	}, [
-		queryId,
-		instanceId,
-		__unstableMarkNextChangeAsNotPersistent,
-		setAttributes,
-	] );
+	}, [ queryId, instanceId ] );
+	const updateQuery = ( newQuery ) =>
+		setAttributes( { query: { ...query, ...newQuery } } );
 	const updateDisplayLayout = ( newDisplayLayout ) =>
 		setAttributes( {
 			displayLayout: { ...displayLayout, ...newDisplayLayout },
