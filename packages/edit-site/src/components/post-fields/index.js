@@ -13,6 +13,8 @@ import {
 	useMemo,
 	useState,
 	useCallback,
+	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
@@ -262,13 +264,25 @@ function usePostFields( viewType ) {
 					const filename =
 						media?.media_details?.file?.match( '([^/]+$)' )[ 0 ];
 
+					const ref = useRef( null );
+
+					useEffect( () => {
+						if ( ref.current ) {
+							ref.current.focus();
+						}
+					}, [] );
+
 					return (
 						<fieldset className="edit-site-dataviews-controls__featured-image">
-							<div className="edit-side-dataviews-controls__featured-image-container">
+							<div
+								ref={ ref }
+								tabIndex={ -1 }
+								className="edit-side-dataviews-controls__featured-image-container"
+							>
 								<MediaUpload
-									onSelect={ ( selectedMedia ) =>
-										onChangeControl( selectedMedia.id )
-									}
+									onSelect={ ( selectedMedia ) => {
+										onChangeControl( selectedMedia.id );
+									} }
 									allowedTypes={ [ 'image' ] }
 									render={ ( { open } ) => {
 										return (
