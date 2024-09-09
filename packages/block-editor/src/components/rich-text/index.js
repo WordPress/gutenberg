@@ -334,7 +334,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
-		placeholder: bindingsPlaceholder || placeholder,
+		placeholder: placeholder || bindingsPlaceholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
@@ -406,7 +406,7 @@ export function RichTextWrapper(
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				aria-label={
-					bindingsPlaceholder || props[ 'aria-label' ] || placeholder
+					props[ 'aria-label' ] || placeholder || bindingsPlaceholder
 				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
