@@ -207,7 +207,7 @@ export default function MaybeUploadMediaPanel() {
 		);
 
 		// Wait for all blocks to be updated with library media.
-		Promise.all(
+		Promise.allSettled(
 			blocksWithExternalMedia.map( ( block ) => {
 				const { url } = getMediaInfo( block );
 
