@@ -1,7 +1,3 @@
-/* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * Internal dependencies
  */
@@ -15,6 +11,7 @@ describe( 'Interactivity API', () => {
 
 		describe( 'types', () => {
 			describe( 'the whole store can be inferred', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					const myStore = store( 'test', {
 						state: {
@@ -35,19 +32,22 @@ describe( 'Interactivity API', () => {
 						},
 					} );
 
-					const n1: number = myStore.state.clientValue;
-					const n2: number = myStore.state.derived;
+					myStore.state.clientValue satisfies number;
+					myStore.state.derived satisfies number;
+
 					// @ts-expect-error
-					const n3: number = myStore.state.nonExistent;
-					const n4: number = myStore.actions.sync( 1 );
-					const n5: Promise< number > = myStore.actions.async( 1 );
-					const n6: number = await myStore.actions.async( 1 );
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
+
 					// @ts-expect-error
-					myStore.actions.nonExistent();
+					myStore.actions.nonExistent() satisfies {};
 				};
 			} );
 
 			describe( 'the whole store can be manually typed', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					interface Store {
 						state: {
@@ -81,20 +81,21 @@ describe( 'Interactivity API', () => {
 						},
 					} );
 
-					const n1: number = myStore.state.clientValue;
-					const n2: number = myStore.state.serverValue;
-					const n3: number = myStore.state.derived;
+					myStore.state.clientValue satisfies number;
+					myStore.state.serverValue satisfies number;
+					myStore.state.derived satisfies number;
 					// @ts-expect-error
-					const n4: number = myStore.state.nonExistent;
-					const n5: number = myStore.actions.sync( 1 );
-					const n6: Promise< number > = myStore.actions.async( 1 );
-					const n7: number = await myStore.actions.async( 1 );
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
 					// @ts-expect-error
 					myStore.actions.nonExistent();
 				};
 			} );
 
 			describe( 'the server state can be typed and the rest inferred', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					type ServerStore = {
 						state: {
@@ -127,20 +128,21 @@ describe( 'Interactivity API', () => {
 
 					const myStore = store< Store >( 'test', clientStore );
 
-					const n1: number = myStore.state.clientValue;
-					const n2: number = myStore.state.serverValue;
-					const n3: number = myStore.state.derived;
+					myStore.state.clientValue satisfies number;
+					myStore.state.serverValue satisfies number;
+					myStore.state.derived satisfies number;
 					// @ts-expect-error
-					const n4: number = myStore.state.nonExistent;
-					const n5: number = myStore.actions.sync( 1 );
-					const n6: Promise< number > = myStore.actions.async( 1 );
-					const n7: number = await myStore.actions.async( 1 );
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
 					// @ts-expect-error
 					myStore.actions.nonExistent();
 				};
 			} );
 
 			describe( 'the state can be casted and the rest inferred', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					type State = {
 						clientValue: number;
@@ -169,20 +171,21 @@ describe( 'Interactivity API', () => {
 						},
 					} );
 
-					const n1: number = myStore.state.clientValue;
-					const n2: number = myStore.state.serverValue;
-					const n3: number = myStore.state.derived;
+					myStore.state.clientValue satisfies number;
+					myStore.state.serverValue satisfies number;
+					myStore.state.derived satisfies number;
 					// @ts-expect-error
-					const n4: number = myStore.state.nonExistent;
-					const n5: number = myStore.actions.sync( 1 );
-					const n6: Promise< number > = myStore.actions.async( 1 );
-					const n7: number = await myStore.actions.async( 1 );
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
 					// @ts-expect-error
-					myStore.actions.nonExistent();
+					myStore.actions.nonExistent() satisfies {};
 				};
 			} );
 
 			describe( 'the whole store can be manually typed even if doesnt contain state', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					interface Store {
 						actions: {
@@ -213,19 +216,20 @@ describe( 'Interactivity API', () => {
 					} );
 
 					// @ts-expect-error
-					const n1: number = myStore.state.nonExistent;
-					const n2: number = myStore.actions.sync( 1 );
-					const n3: Promise< number > = myStore.actions.async( 1 );
-					const n4: number = await myStore.actions.async( 1 );
-					const n5: number = myStore.callbacks.existent;
+					myStore.state.nonExistent satisfies number;
+					myStore.actions.sync( 1 ) satisfies number;
+					myStore.actions.async( 1 ) satisfies Promise< number >;
+					( await myStore.actions.async( 1 ) ) satisfies number;
+					myStore.callbacks.existent satisfies number;
 					// @ts-expect-error
-					const n6: number = myStore.callbacks.nonExistent;
+					myStore.callbacks.nonExistent satisfies number;
 					// @ts-expect-error
-					myStore.actions.nonExistent();
+					myStore.actions.nonExistent() satisfies {};
 				};
 			} );
 
 			describe( 'the store can be divided into multiple parts', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					type ServerState = {
 						state: {
@@ -267,17 +271,19 @@ describe( 'Interactivity API', () => {
 					const myStore = store< Store >( 'test', firstStorePart );
 					store( 'test', secondStorePart );
 
-					const n1: number = myStore.state.clientValue1;
-					const s1: string = myStore.state.clientValue2;
+					myStore.state.clientValue1 satisfies number;
+					myStore.state.clientValue2 satisfies string;
 					myStore.actions.incrementValue1( 1 );
-					const n2: Promise< number > = myStore.actions.asyncAction();
-					const n3: number = await myStore.actions.asyncAction();
+					myStore.actions.asyncAction() satisfies Promise< number >;
+					( await myStore.actions.asyncAction() ) satisfies number;
+
 					// @ts-expect-error
-					myStore.state.nonExistent;
+					myStore.state.nonExistent satisfies {};
 				};
 			} );
 
 			describe( 'generators can use the `type` function to type promises.', () => {
+				// eslint-disable-next-line no-unused-expressions
 				async () => {
 					const myPromise = async ( n: number ) => {
 						return n;
@@ -286,7 +292,7 @@ describe( 'Interactivity API', () => {
 					const myStore = store( 'test', {
 						actions: {
 							*asyncAction( n: number ) {
-								const n1 = yield* typed( myPromise( 1 ) );
+								const n1 = yield* typed( myPromise( n ) );
 								const n2: number = n1;
 								return n2;
 							},
@@ -294,16 +300,17 @@ describe( 'Interactivity API', () => {
 								const n1 = yield* typed(
 									myStore.actions.asyncAction( 1 )
 								);
-								const n2: number = n1;
+								n1 satisfies number;
 								// @ts-expect-error
-								const s1: string = n1;
+								n1 satisfies string;
 							},
 						},
 					} );
 
-					const n1: Promise< number > =
-						myStore.actions.asyncAction( 1 );
-					const n2: number = await myStore.actions.asyncAction( 1 );
+					myStore.actions.asyncAction(
+						1
+					) satisfies Promise< number >;
+					( await myStore.actions.asyncAction( 1 ) ) satisfies number;
 				};
 			} );
 		} );
