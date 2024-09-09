@@ -163,8 +163,9 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 
 			$tax_query = array( 'relation' => 'OR' );
 
-			// The default post format, 'standard', is not saved in the database.
-			// If 'standard' is part of the request, the query needs to exclude the formats.
+			// The default post format, 'standard', is not stored in the database.
+			// If 'standard' is part of the request, the query needs to exclude all post items that
+			// have a format assigned.
 			if ( in_array( 'standard', $formats, true ) ) {
 				$tax_query[] = array(
 					'taxonomy' => 'post_format',
@@ -172,8 +173,8 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 					'terms'    => array(),
 					'operator' => 'NOT EXISTS',
 				);
-				// Remove the standard format:
-				$formats = array_diff( $formats, array( 'standard' ) );
+				// Remove the standard format, since it cannot be queried.
+				unset( $formats[ array_search( 'standard', $formats, true ) ] );
 			}
 
 			// Add any remaining formats to the tax query.
@@ -492,7 +493,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 
 		if ( post_type_supports( $this->post_type, 'post-formats' ) ) {
 			$query_params['format'] = array(
-				'description' => __( 'Limit result set to items assigned one or more formats.' ),
+				'description' => __( 'Limit result set to items assigned one or more given formats.' ),
 				'type'        => 'array',
 				'items'       => array(
 					'enum' => array_values( get_post_format_slugs() ),

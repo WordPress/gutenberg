@@ -62,7 +62,7 @@ function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $bloc
 
 	// The default post format, 'standard', is not stored in the database.
 	// If 'standard' is part of the request, the query needs to exclude all post items that
-	// has a format assigned.
+	// have a format assigned.
 	if ( in_array( 'standard', $formats, true ) ) {
 		$tax_query[] = array(
 			'taxonomy' => 'post_format',
@@ -71,7 +71,7 @@ function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $bloc
 			'operator' => 'NOT EXISTS',
 		);
 		// Remove the standard format, since it cannot be queried.
-		$formats = array_diff( $formats, array( 'standard' ) );
+		unset( $formats[ array_search( 'standard', $formats, true ) ] );
 	}
 
 	// Add any remaining formats to the tax query.

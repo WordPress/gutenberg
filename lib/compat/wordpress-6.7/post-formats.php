@@ -1,6 +1,7 @@
 <?php
 /**
- * Temporary compatibility shims for changes to post formats in Gutenberg.
+ * Shims for changes to post formats until they are merged in all
+ * versions of WordPress which Gutenberg supports.
  *
  * @package gutenberg
  */
