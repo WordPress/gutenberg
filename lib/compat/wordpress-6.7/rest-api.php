@@ -141,7 +141,7 @@ add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 
  * @param string $post_type Post type key.
  */
 function gutenberg_register_post_type_args_for_wp_global_styles( $args, $post_type ) {
-	if ( $post_type === 'wp_global_styles' ) {
+	if ( 'wp_global_styles' === $post_type ) {
 		$args['capabilities']['read'] = 'edit_posts';
 	}
 
