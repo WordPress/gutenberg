@@ -170,32 +170,40 @@ export function PatternCategoryPreviews( {
 					</Text>
 				) }
 			</VStack>
-
-			{ currentCategoryPatterns.length > 0 && (
-				<>
-					{ isZoomOutMode && (
-						<p className="block-editor-inserter__help-text">
-							{ __(
-								'Drag and drop any pattern into the canvas.'
-							) }
-						</p>
-					) }
-					<BlockPatternsList
-						ref={ scrollContainerRef }
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
-						blockPatterns={ pagingProps.categoryPatterns }
-						onClickPattern={ onClickPattern }
-						onHover={ onHover }
-						label={ category.label }
-						orientation="vertical"
-						category={ category.name }
-						isDraggable
-						showTitlesAsTooltip={ showTitlesAsTooltip }
-						patternFilter={ patternSourceFilter }
-						pagingProps={ pagingProps }
-					/>
-				</>
-			) }
+			<VStack spacing={ 4 }>
+				{ currentCategoryPatterns.length > 0 && (
+					<>
+						{ isZoomOutMode && (
+							<Text
+								size="12"
+								as="p"
+								variant="muted"
+								className="block-editor-inserter__help-text"
+							>
+								{ __(
+									'Drag and drop patterns into the canvas.'
+								) }
+							</Text>
+						) }
+						<BlockPatternsList
+							ref={ scrollContainerRef }
+							shownPatterns={
+								pagingProps.categoryPatternsAsyncList
+							}
+							blockPatterns={ pagingProps.categoryPatterns }
+							onClickPattern={ onClickPattern }
+							onHover={ onHover }
+							label={ category.label }
+							orientation="vertical"
+							category={ category.name }
+							isDraggable
+							showTitlesAsTooltip={ showTitlesAsTooltip }
+							patternFilter={ patternSourceFilter }
+							pagingProps={ pagingProps }
+						/>
+					</>
+				) }
+			</VStack>
 		</>
 	);
 }
