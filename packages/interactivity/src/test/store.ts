@@ -32,7 +32,7 @@ describe( 'Interactivity API', () => {
 						},
 					} );
 
-					myStore.state.clientValue satisfies string;
+					myStore.state.clientValue satisfies number;
 					myStore.state.derived satisfies number;
 
 					// @ts-expect-error
