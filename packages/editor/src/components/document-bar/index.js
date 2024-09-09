@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -30,17 +30,6 @@ import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const TYPE_LABELS = {
-	// translators: 1: Pattern title.
-	wp_pattern: __( 'Editing pattern: %s' ),
-	// translators: 1: Navigation menu title.
-	wp_navigation: __( 'Editing navigation menu: %s' ),
-	// translators: 1: Template title.
-	wp_template: __( 'Editing template: %s' ),
-	// translators: 1: Template part title.
-	wp_template_part: __( 'Editing template part: %s' ),
-};
-
 const MotionButton = motion( Button );
 
 /**
@@ -63,6 +52,7 @@ const MotionButton = motion( Button );
 export default function DocumentBar( props ) {
 	const {
 		postType,
+		postTypeLabel,
 		documentTitle,
 		isNotFound,
 		isUnsyncedPattern,
@@ -76,8 +66,11 @@ export default function DocumentBar( props ) {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
-			select( coreStore );
+		const {
+			getEditedEntityRecord,
+			getPostType,
+			isResolving: isResolvingSelector,
+		} = select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
@@ -86,8 +79,11 @@ export default function DocumentBar( props ) {
 			_postId
 		);
 		const _templateInfo = getTemplateInfo( _document );
+		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
+
 		return {
 			postType: _postType,
+			postTypeLabel: _postTypeLabel,
 			documentTitle: _document.title,
 			isNotFound:
 				! _document &&
@@ -188,19 +184,16 @@ export default function DocumentBar( props ) {
 						}
 					>
 						<BlockIcon icon={ icon } />
-						<Text
-							size="body"
-							as="h1"
-							aria-label={
-								! props.title && TYPE_LABELS[ postType ]
-									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( TYPE_LABELS[ postType ], title )
-									: undefined
-							}
-						>
+						<Text size="body" as="h1">
 							{ title
 								? decodeEntities( title )
 								: __( 'No title' ) }
+
+							{ postTypeLabel && (
+								<span className="editor-document-bar__post-type-label">
+									{ ' · ' + decodeEntities( postTypeLabel ) }
+								</span>
+							) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
