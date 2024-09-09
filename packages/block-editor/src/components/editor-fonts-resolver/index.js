@@ -16,12 +16,13 @@ function EditorFontsResolver() {
 	const { currentTheme } = useSelect( ( select ) => {
 		return {
 			currentTheme:
-				// Using 'core' as string to avoid circular dependency importing from @wordpress/core-data
-				select( 'core' ).getCurrentTheme(), // eslint-disable-line @wordpress/data-no-store-string-literals
+				// Disable Reason: Using 'core' as string to avoid circular dependency importing from @wordpress/core-data.
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				select( 'core' ).getCurrentTheme(),
 		};
 	}, [] );
 
-	//Get the fonts from merged theme.json settings.fontFamilies
+	// Get the fonts from merged theme.json settings.fontFamilies.
 	const [ fontFamilies = [] ] = useGlobalSetting( 'typography.fontFamilies' );
 
 	const fontFaces = useMemo( () => {

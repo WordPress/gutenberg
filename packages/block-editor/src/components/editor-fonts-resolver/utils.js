@@ -21,11 +21,11 @@ function formatFontFaceName( input ) {
 	if ( output.includes( ',' ) ) {
 		output = output
 			.split( ',' )
-			// finds the first item that is not an empty string.
+			// Finds the first item that is not an empty string.
 			.find( ( item ) => item.trim() !== '' )
 			.trim();
 	}
-	// removes leading and trailing quotes.
+	// Removes leading and trailing quotes.
 	output = output.replace( /^["']|["']$/g, '' );
 
 	// Firefox needs the font name to be wrapped in double quotes meanwhile other browsers don't.
