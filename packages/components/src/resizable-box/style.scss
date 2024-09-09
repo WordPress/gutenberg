@@ -35,7 +35,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
 	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
 
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, $elevation-x-small;
 	// Only visible in Windows High Contrast mode.
 	outline: 2px solid transparent;
 }
