@@ -28,10 +28,12 @@
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@shopify/web-worker": "^6.3.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/vips": "file:../vips"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -4,6 +4,7 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const MomentTimezoneDataPlugin = require( 'moment-timezone-data-webpack-plugin' );
 const { join } = require( 'path' );
+const { WebWorkerPlugin } = require( '@shopify/web-worker/webpack' );
 
 /**
  * WordPress dependencies
@@ -139,6 +140,8 @@ module.exports = {
 			}
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
+		// This is the default, but required for @shopify/web-worker.
+		globalObject: 'self',
 	},
 	module: {
 		rules: [
@@ -181,5 +184,6 @@ module.exports = {
 			startYear: 2000,
 			endYear: 2040,
 		} ),
+		new WebWorkerPlugin(),
 	].filter( Boolean ),
 };
