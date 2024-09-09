@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -11,7 +11,7 @@ import { useGlobalSetting } from '../global-styles/hooks';
 import { getDisplaySrcFromFontFace, loadFontFaceInBrowser } from './utils';
 
 function EditorFontsResolver() {
-	const [ loadedFontUrls ] = useState( new Set() );
+	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
 	const { currentTheme } = useSelect( ( select ) => {
 		return {
@@ -33,30 +33,30 @@ function EditorFontsResolver() {
 			.flat();
 	}, [ fontFamilies ] );
 
-	const loadFontFaceAsset = async ( fontFace ) => {
-		// If the font doesn't have a src, don't load it.
-		if ( ! fontFace.src ) {
-			return;
-		}
-		// Get the src of the font.
-		const src = getDisplaySrcFromFontFace(
-			fontFace.src,
-			currentTheme?.stylesheet_uri
-		);
-		// If the font is already loaded, don't load it again.
-		if ( ! src || loadedFontUrls.has( src ) ) {
-			return;
-		}
-		// Load the font in the browser.
-		loadFontFaceInBrowser( fontFace, src );
-		// Add the font to the loaded fonts list.
-		loadedFontUrls.add( src );
-	};
+	const loadFontFaceAsset = useCallback(
+		async ( fontFace ) => {
+			if ( ! fontFace.src ) {
+				return;
+			}
+
+			const src = getDisplaySrcFromFontFace(
+				fontFace.src,
+				currentTheme?.stylesheet_uri
+			);
+
+			if ( ! src || loadedFontUrls.has( src ) ) {
+				return;
+			}
+
+			loadFontFaceInBrowser( fontFace, src );
+			setLoadedFontUrls( ( prevUrls ) => new Set( prevUrls ).add( src ) );
+		},
+		[ currentTheme, loadedFontUrls ]
+	);
 
 	useEffect( () => {
 		fontFaces.forEach( loadFontFaceAsset );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ fontFaces ] );
+	}, [ fontFaces, loadFontFaceAsset ] );
 
 	return null;
 }
