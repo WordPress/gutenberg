@@ -235,6 +235,7 @@ export { default as shield } from './library/shield';
 export { default as shortcode } from './library/shortcode';
 export { default as shuffle } from './library/shuffle';
 export { default as siteLogo } from './library/site-logo';
+export { default as speechBubble } from './library/speech-bubble';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';
