@@ -187,6 +187,24 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
 }
 
 /**
+ * Filters the list of rewrite rules formatted for output to an .htaccess file.
+ *
+ * Adds support for serving wasm-vips locally.
+ *
+ * @param string $rules mod_rewrite Rewrite rules formatted for .htaccess.
+ * @return string Filtered rewrite rules.
+ */
+function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
+	$rules .= "\n# BEGIN Gutenberg client-side media processing experiment\n" .
+	          "AddType application/wasm wasm\n" .
+	          "# END Gutenberg client-side media processing experiment\n";
+
+	return $rules;
+}
+
+add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
+
+/**
  * Enables cross-origin isolation in the block editor.
  *
  * Required for enabling SharedArrayBuffer for WebAssembly-based
