@@ -266,6 +266,7 @@ function usePostFields( viewType ) {
 
 					const ref = useRef( null );
 
+					// Focus to the media upload button when the component mounts.
 					useEffect( () => {
 						if ( ref.current ) {
 							ref.current.focus();
@@ -274,11 +275,7 @@ function usePostFields( viewType ) {
 
 					return (
 						<fieldset className="edit-site-dataviews-controls__featured-image">
-							<div
-								ref={ ref }
-								tabIndex={ -1 }
-								className="edit-side-dataviews-controls__featured-image-container"
-							>
+							<div className="edit-side-dataviews-controls__featured-image-container">
 								<MediaUpload
 									onSelect={ ( selectedMedia ) => {
 										onChangeControl( selectedMedia.id );
@@ -287,8 +284,9 @@ function usePostFields( viewType ) {
 									render={ ( { open } ) => {
 										return (
 											<div
+												ref={ ref }
 												role="button"
-												tabIndex={ 0 }
+												tabIndex={ -1 }
 												onClick={ () => {
 													open();
 												} }
