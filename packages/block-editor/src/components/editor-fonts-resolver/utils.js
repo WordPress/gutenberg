@@ -40,15 +40,10 @@ function formatFontFaceName( input ) {
  * It also adds it to the iframe document.
  */
 export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
-	let dataSource;
-
-	if ( typeof source === 'string' ) {
-		dataSource = `url(${ source })`;
-		// eslint-disable-next-line no-undef
-	} else {
+	if ( typeof source !== 'string' ) {
 		return;
 	}
-
+	const dataSource = `url(${ source })`;
 	const newFont = new window.FontFace(
 		formatFontFaceName( fontFace.fontFamily ),
 		dataSource,
