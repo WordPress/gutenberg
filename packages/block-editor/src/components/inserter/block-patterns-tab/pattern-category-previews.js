@@ -177,7 +177,6 @@ export function PatternCategoryPreviews( {
 							<Text
 								size="12"
 								as="p"
-								variant="muted"
 								className="block-editor-inserter__help-text"
 							>
 								{ __(
