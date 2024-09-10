@@ -16,14 +16,6 @@ describe( 'getPostEditURL', () => {
 	} );
 } );
 
-describe( 'getPostTrashedURL', () => {
-	it( 'should generate relative path with post and action arguments', () => {
-		const url = getPostTrashedURL( 1, 'page' );
-
-		expect( url ).toBe( 'edit.php?trashed=1&post_type=page&ids=1' );
-	} );
-} );
-
 describe( 'BrowserURL', () => {
 	let replaceStateSpy;
 
