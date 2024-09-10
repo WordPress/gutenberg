@@ -22,7 +22,7 @@
 	}
 
 	.components-drop-zone__content {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-small;
 	}
 
 	// Align text and icons horizontally to avoid clipping when the featured image is not set.
@@ -65,7 +65,6 @@
 }
 
 .editor-post-featured-image__toggle {
-	border-radius: $radius-block-ui;
 	height: 100%;
 	line-height: 20px;
 	padding: $grid-unit-10 0;

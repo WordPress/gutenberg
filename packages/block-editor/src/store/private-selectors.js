@@ -20,7 +20,7 @@ import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
-	getParsedPattern,
+	getGrammar,
 } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
@@ -28,6 +28,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	sectionRootClientIdKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -300,10 +301,10 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 				if ( ! inserter ) {
 					return false;
 				}
-				const { blocks } = getParsedPattern( pattern );
+				const grammar = getGrammar( pattern );
 				return (
-					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
-					blocks.every( ( { name: blockName } ) =>
+					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
+					grammar.every( ( { name: blockName } ) =>
 						canInsertBlockType( state, blockName, rootClientId )
 					)
 				);
@@ -421,9 +422,11 @@ const EMPTY_ARRAY = [];
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state ) => {
 		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		return reusableBlocksSelect
-			? reusableBlocksSelect( select )
-			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+		return (
+			( reusableBlocksSelect
+				? reusableBlocksSelect( select )
+				: state.settings.__experimentalReusableBlocks ) ?? EMPTY_ARRAY
+		);
 	}
 );
 
@@ -542,4 +545,8 @@ export const getBlockStyles = createSelector(
  */
 export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
+}
+
+export function getSectionRootClientId( state ) {
+	return state.settings?.[ sectionRootClientIdKey ];
 }

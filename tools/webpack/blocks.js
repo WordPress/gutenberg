@@ -4,11 +4,13 @@
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { join, sep } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const { PhpFilePathsPlugin } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies
@@ -90,6 +92,10 @@ module.exports = [
 		plugins: [
 			...plugins,
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+			new PhpFilePathsPlugin( {
+				context: './packages/block-library/src/',
+				props: [ 'render', 'variations' ],
+			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
 					[
@@ -127,17 +133,32 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/index.php`,
+							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname ] = absoluteFilename.match(
-									new RegExp(
-										`([\\w-]+)${ escapeRegExp(
-											sep
-										) }index\\.php$`
+								const [ , dirname, basename ] =
+									absoluteFilename.match(
+										new RegExp(
+											`([\\w-]+)${ escapeRegExp(
+												sep
+											) }([\\w-]+)\\.php$`
+										)
+									);
+
+								if ( basename === 'index' ) {
+									return join( to, `${ dirname }.php` );
+								}
+								return join( to, dirname, `${ basename }.php` );
+							},
+							filter: ( filepath ) => {
+								return (
+									filepath.endsWith( sep + 'index.php' ) ||
+									PhpFilePathsPlugin.paths.includes(
+										realpathSync( filepath ).replace(
+											/\\/g,
+											'/'
+										)
 									)
 								);
-
-								return join( to, `${ dirname }.php` );
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
