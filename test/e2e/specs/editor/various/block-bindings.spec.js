@@ -1183,7 +1183,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Title input is enabled and with the original value.
 				await page
