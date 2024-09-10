@@ -2086,14 +2086,14 @@ export function hoveredBlockClientId( state = false, action ) {
 }
 
 /**
- * Reducer setting the insertion point
+ * Reducer setting the inserter insertion point
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {Object} Updated state.
  */
-export function inserterInsertionPoint( state = false, action ) {
+export function inserterInsertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_INSERTER_INSERTION_POINT':
 			return action.value;

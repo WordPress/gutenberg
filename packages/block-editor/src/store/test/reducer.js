@@ -29,6 +29,7 @@ import {
 	preferences,
 	blocksMode,
 	insertionPoint,
+	inserterInsertionPoint,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
@@ -3482,6 +3483,41 @@ describe( 'state', () => {
 					clientId: 'a-different-block',
 				}
 			);
+			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'inserterInsertionPoint', () => {
+		it( 'should default to null', () => {
+			const state = inserterInsertionPoint( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'should set inserter insertion point', () => {
+			const state = inserterInsertionPoint( null, {
+				type: 'SET_INSERTER_INSERTION_POINT',
+				value: {
+					rootClientId: 'clientId1',
+					insertionIndex: 4,
+				},
+			} );
+
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				insertionIndex: 4,
+			} );
+		} );
+
+		it( 'should clear the inserter insertion point on block selection', () => {
+			const original = deepFreeze( {
+				rootClientId: 'clientId1',
+				insertionIndex: 4,
+			} );
+			const state = inserterInsertionPoint( original, {
+				type: 'SELECT_BLOCK',
+			} );
+
 			expect( state ).toBe( null );
 		} );
 	} );
