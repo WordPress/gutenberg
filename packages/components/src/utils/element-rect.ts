@@ -3,81 +3,11 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import { useEvent } from './hooks/use-event';
-
-/**
- * `useTrackElementRectUpdates` options.
- */
-export type UseTrackElementRectUpdatesOptions = {
-	/**
-	 * Whether to trigger the callback when an element's ResizeObserver is
-	 * first set up, including when the target element changes.
-	 *
-	 * @default true
-	 */
-	fireOnElementInit?: boolean;
-};
-
-/**
- * Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API)
- * for an HTML or SVG element.
- *
- * Pass the returned setter as a callback ref to the React element you want
- * to observe, or use it in layout effects for advanced use cases.
- *
- * @example
- *
- * ```tsx
- * const setElement = useResizeObserver(
- * 	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
- * 	{ box: 'border-box' }
- * );
- * <div ref={ setElement } />;
- *
- * // The setter can be used in other ways, for example:
- * useLayoutEffect( () => {
- * 	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
- * }, [ elementId ] );
- * ```
- */
-export function useResizeObserver< T extends Element >(
-	/**
-	 * The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
-	 */
-	callback: ResizeObserverCallback,
-	/**
-	 * Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
-	 */
-	resizeObserverOptions: ResizeObserverOptions = {}
-): ( element?: T | null ) => void {
-	const callbackEvent = useEvent( callback );
-
-	const observedElementRef = useRef< T | null >();
-	const resizeObserverRef = useRef< ResizeObserver >();
-	return useEvent( ( element?: T | null ) => {
-		if ( element === observedElementRef.current ) {
-			return;
-		}
-		observedElementRef.current = element;
-
-		// Set up `ResizeObserver`.
-		resizeObserverRef.current ??= new ResizeObserver( callbackEvent );
-		const { current: resizeObserver } = resizeObserverRef;
-
-		// Unobserve previous element.
-		if ( observedElementRef.current ) {
-			resizeObserver.unobserve( observedElementRef.current );
-		}
-
-		// Observe new element.
-		if ( element ) {
-			resizeObserver.observe( element, resizeObserverOptions );
-		}
-	} );
-}
 
 /**
  * The position and dimensions of an element, relative to its offset parent.
