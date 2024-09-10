@@ -45,7 +45,7 @@ module.exports = {
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
-		mainFields: [ 'wp-module' ],
+		mainFields: [ 'wp-script-module' ],
 	},
 	module: {
 		rules: [
