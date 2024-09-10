@@ -333,10 +333,6 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel-body {
-	overflow-y: hidden;
-}
-
 .block-editor-inserter__patterns-category-no-results {
 	margin-top: $grid-unit-30;
 }
@@ -715,5 +711,5 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
-	padding: 0 $grid-unit-30;
+	padding: 0 $grid-unit-30 $grid-unit-20;
 }
