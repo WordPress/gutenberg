@@ -116,9 +116,8 @@ export function ImageEdit( {
 	// This won't work for them because the container width changes with the image.
 	// TODO: Find a way to observe the container width for flex and grid layouts.
 	const isMaxWidthContainerWidth =
-		!! parentLayout &&
-		parentLayout.type !== 'flex' &&
-		parentLayout.type !== 'grid';
+		! parentLayout ||
+		( parentLayout.type !== 'flex' && parentLayout.type !== 'grid' );
 	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
 
 	const altRef = useRef();
