@@ -26,9 +26,11 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"wp-script-module": "build-module/module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wp-script-module-exports": {
+		".": "./build-module/module/index.js"
+	},
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/dom-ready": "file:../dom-ready",
