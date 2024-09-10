@@ -393,7 +393,7 @@ export function ImageEdit( {
 				instructions={
 					! lockUrlControls &&
 					__(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					)
 				}
 				style={ {
