@@ -45,22 +45,13 @@ ul.dataviews-view-list {
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				background: #f8f8f8;
 				padding-left: $grid-unit-10;
 				margin-right: $grid-unit-30;
-				box-shadow: -12px 0 8px 0 #f8f8f8;
 
 				.components-button {
 					opacity: 1;
 					position: static;
 				}
-			}
-		}
-
-		&.is-selected {
-			.dataviews-view-list__item-actions {
-				background-color: rgb(247 248 255);
-				box-shadow: -12px 0 8px 0 rgb(247 248 255);
 			}
 		}
 
