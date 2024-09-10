@@ -495,24 +495,23 @@ export const getContentLockingParent = createSelector(
 	]
 );
 
-export const isContentLockingParent = createSelector(
-	( state, clientId ) => {
-		const sectionRootClientId = getSectionRootClientId( state );
-		const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-		return (
-			getBlockName( state, clientId ) === 'core/block' ||
-			getTemplateLock( state, clientId ) === 'contentOnly' ||
-			( isNavigationMode( state ) &&
-				sectionClientIds.includes( clientId ) )
-		);
-	},
-	( state ) => [
-		state.blocks.parents,
-		state.blockListSettings,
-		state.editorMode,
-		getSectionRootClientId( state ),
-	]
-);
+/**
+ * Retrieves the client ID is a content locking parent
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is a content locking parent.
+ */
+export function isContentLockingParent( state, clientId ) {
+	const sectionRootClientId = getSectionRootClientId( state );
+	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
+	return (
+		getBlockName( state, clientId ) === 'core/block' ||
+		getTemplateLock( state, clientId ) === 'contentOnly' ||
+		( isNavigationMode( state ) && sectionClientIds.includes( clientId ) )
+	);
+}
 
 /**
  * Retrieves the client ID of the block that is content locked but is
