@@ -78,7 +78,6 @@ export default function BlockActions( {
 		insertBeforeBlock,
 		flashBlock,
 		setBlockMovingClientId,
-		setNavigationMode,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
 
@@ -104,7 +103,6 @@ export default function BlockActions( {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onMoveTo() {
-			setNavigationMode( true );
 			selectBlock( clientIds[ 0 ] );
 			setBlockMovingClientId( clientIds[ 0 ] );
 		},

@@ -140,7 +140,7 @@ const useActionsCommands = () => {
 	const { getBlockRootClientId, canMoveBlocks, getBlockCount } =
 		useSelect( blockEditorStore );
 
-	const { setBlockMovingClientId, setNavigationMode, selectBlock } =
+	const { setBlockMovingClientId, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	if ( ! clientIds || clientIds.length < 1 ) {
@@ -159,7 +159,6 @@ const useActionsCommands = () => {
 			name: 'move-to',
 			label: __( 'Move to' ),
 			callback: () => {
-				setNavigationMode( true );
 				selectBlock( clientIds[ 0 ] );
 				setBlockMovingClientId( clientIds[ 0 ] );
 			},

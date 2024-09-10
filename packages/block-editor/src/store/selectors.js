@@ -2862,11 +2862,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		'__experimentalDisableBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+	const shouldEnableIfUnselected = blockSupportDisable
+		? false
+		: areInnerBlocksControlled( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&
