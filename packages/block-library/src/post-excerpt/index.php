@@ -20,17 +20,17 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	/*
-	* The purpose of the excerpt length setting is to limit the length of both
-	* automatically generated and user-created excerpts.
-	* Because the excerpt_length filter only applies to auto generated excerpts,
-	* wp_trim_words is used instead.
-	*/
-	$excerpt_length = $attributes['excerptLength'];
-	$excerpt        = get_the_excerpt( $block->context['postId'] );
-	if ( isset( $excerpt_length ) ) {
-		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
-	}
+	// Hook into the excerpt_length filter to apply the `excerptLength` attribute.
+	$excerpt_length        = $attributes['excerptLength'];
+	$filter_excerpt_length = static function () use ( $excerpt_length ) {
+		return $excerpt_length;
+	};
+	add_filter(
+		'excerpt_length',
+		$filter_excerpt_length
+	);
+	$excerpt = get_the_excerpt( $block->context['postId'] );
+	remove_filter( 'excerpt_length', $filter_excerpt_length );
 
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
