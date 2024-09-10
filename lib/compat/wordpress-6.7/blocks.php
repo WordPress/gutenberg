@@ -53,7 +53,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @param WP_Block $block Block instance.
  * @return array   The filtered query vars.
  */
-function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $block ) {
+function gutenberg_add_format_query_vars_to_query_loop_block( $query, $block ) {
 	// Return early if there is no format.
 	if ( empty( $block->context['query']['format'] ) ) {
 		return $query;
@@ -102,4 +102,4 @@ function gutenberg_filter_query_loop_block_query_vars_post_format( $query, $bloc
 
 	return $query;
 }
-add_filter( 'query_loop_block_query_vars', 'gutenberg_filter_query_loop_block_query_vars_post_format', 10, 2 );
+add_filter( 'query_loop_block_query_vars', 'gutenberg_add_format_query_vars_to_query_loop_block', 10, 2 );
