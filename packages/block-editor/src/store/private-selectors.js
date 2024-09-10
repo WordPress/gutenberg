@@ -114,6 +114,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
+		state.editorMode,
 	]
 );
 
