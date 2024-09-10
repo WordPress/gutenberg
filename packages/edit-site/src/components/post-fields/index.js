@@ -12,6 +12,9 @@ import {
 	createInterpolateElement,
 	useMemo,
 	useState,
+	useCallback,
+	useRef,
+	useEffect,
 } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
@@ -22,10 +25,22 @@ import {
 	pending,
 	notAllowed,
 	commentAuthorAvatar as authorIcon,
+	copySmall,
 } from '@wordpress/icons';
-import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import {
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	ExternalLink,
+	Icon,
+	Button,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useCopyToClipboard } from '@wordpress/compose';
+import { safeDecodeURIComponent } from '@wordpress/url';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -173,6 +188,21 @@ function PostAuthorField( { item } ) {
 			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
+}
+
+function LinkField( { item } ) {
+	const slug = item.slug;
+	const originalSlug = useRef( slug );
+
+	useEffect( () => {
+		if ( slug && originalSlug.current === undefined ) {
+			originalSlug.current = slug;
+		}
+	}, [ slug ] );
+
+	const slugToDisplay = slug || originalSlug.current;
+
+	return `/${ slugToDisplay ?? '' }`;
 }
 
 function usePostFields( viewType ) {
@@ -367,6 +397,137 @@ function usePostFields( viewType ) {
 
 					// Unknow status.
 					return <time>{ getFormattedDate( item.date ) }</time>;
+				},
+			},
+			{
+				label: __( 'Link' ),
+				id: 'slug',
+				getValue: ( { item } ) => item.slug,
+				render: LinkField,
+				Edit: ( { field, onChange, data } ) => {
+					const { id } = field;
+
+					const slug = field.getValue( { item: data } ) ?? '';
+					const permalinkTemplate = data.permalink_template || '';
+					const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
+					const [ prefix, suffix ] = permalinkTemplate.split(
+						PERMALINK_POSTNAME_REGEX
+					);
+					const permalinkPrefix = prefix;
+					const permalinkSuffix = suffix;
+					const isEditable =
+						PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
+					const originalSlug = useRef( slug );
+					const slugToDisplay = slug || originalSlug.current;
+					const permalink = isEditable
+						? `${ permalinkPrefix }${ slugToDisplay }${ permalinkSuffix }`
+						: safeDecodeURIComponent( data.link || '' );
+
+					useEffect( () => {
+						if ( slug && originalSlug.current === undefined ) {
+							originalSlug.current = slug;
+						}
+					}, [ slug ] );
+
+					const onChangeControl = useCallback(
+						( newValue ) =>
+							onChange( {
+								[ id ]: newValue,
+							} ),
+						[ id, onChange ]
+					);
+
+					const { createNotice } = useDispatch( noticesStore );
+
+					const copyButtonRef = useCopyToClipboard( permalink, () => {
+						createNotice(
+							'info',
+							__( 'Copied URL to clipboard.' ),
+							{
+								isDismissible: true,
+								type: 'snackbar',
+							}
+						);
+					} );
+
+					return (
+						<fieldset className="edit-site-dataviews-controls__slug">
+							{ isEditable && (
+								<VStack>
+									<VStack spacing="0px">
+										<span>
+											{ __(
+												'Customize the last part of the URL.'
+											) }
+										</span>
+										<ExternalLink
+											href="https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink"
+											target="_blank"
+										>
+											{ __( 'Learn more' ) }
+										</ExternalLink>
+									</VStack>
+									<InputControl
+										__next40pxDefaultSize
+										prefix={
+											<InputControlPrefixWrapper>
+												/
+											</InputControlPrefixWrapper>
+										}
+										suffix={
+											<Button
+												__next40pxDefaultSize
+												icon={ copySmall }
+												ref={ copyButtonRef }
+												label={ __( 'Copy' ) }
+											/>
+										}
+										label={ __( 'Link' ) }
+										hideLabelFromVision
+										value={ slug }
+										autoComplete="off"
+										spellCheck="false"
+										type="text"
+										className="edit-site-dataviews-controls__slug-input"
+										onChange={ ( newValue ) => {
+											onChangeControl( newValue );
+										} }
+										onBlur={ () => {
+											if ( slug === '' ) {
+												onChangeControl(
+													originalSlug.current
+												);
+											}
+										} }
+										help={
+											<ExternalLink
+												className="edit-site-dataviews-controls__slug-help"
+												href={ permalink }
+												target="_blank"
+											>
+												<span>{ permalinkPrefix }</span>
+												<span className="edit-site-dataviews-controls__slug-help-slug">
+													{ slugToDisplay }
+												</span>
+												<span className="edit-site-dataviews-controls__slug-help-suffix">
+													{ permalinkSuffix }
+												</span>
+											</ExternalLink>
+										}
+									/>
+								</VStack>
+							) }
+							{ ! isEditable && (
+								<ExternalLink
+									className="edit-site-dataviews-controls__slug-help"
+									href={ permalink }
+									target="_blank"
+								>
+									{ permalink }
+								</ExternalLink>
+							) }
+						</fieldset>
+					);
 				},
 			},
 			{

@@ -60,7 +60,14 @@ function PostEditForm( { postType, postId } ) {
 	);
 	const form = {
 		type: 'panel',
-		fields: [ 'title', 'status', 'date', 'author', 'comment_status' ],
+		fields: [
+			'title',
+			'status',
+			'date',
+			'author',
+			'slug',
+			'comment_status',
+		],
 	};
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {

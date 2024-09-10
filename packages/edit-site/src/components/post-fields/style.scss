@@ -1,0 +1,19 @@
+.edit-site-dataviews-controls__slug {
+	.edit-site-dataviews-controls__slug-external-icon {
+		margin-left: 5ch;
+	}
+
+	.edit-site-dataviews-controls__slug-input
+	input.components-input-control__input {
+		padding-inline-start: 0 !important;
+	}
+
+	.edit-site-dataviews-controls__slug-help {
+		color: $gray-700;
+
+		.edit-site-dataviews-controls__slug-help-slug,
+		.edit-site-dataviews-controls__slug-help-suffix {
+			font-weight: 600;
+		}
+	}
+}
