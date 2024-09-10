@@ -80,19 +80,7 @@ for ( const [ packageName, versionSpecifier ] of iterableDeps ) {
 module.exports = {
 	...baseConfig,
 	name: 'script-modules',
-	entry: {
-		'interactivity/index': './packages/interactivity',
-		'interactivity/debug': './packages/interactivity/debug',
-
-		'interactivity-router': './packages/interactivity-router',
-
-		'block-library/file/view': './packages/block-library/file/view',
-		'block-library/image/view': './packages/block-library/image/view',
-		'block-library/navigation/view':
-			'./packages/block-library/navigation/view',
-		'block-library/query/view': './packages/block-library/query/view',
-		'block-library/search/view': './packages/block-library/search/view',
-	},
+	entry: gutenbergScriptModules,
 	experiments: {
 		outputModule: true,
 	},
