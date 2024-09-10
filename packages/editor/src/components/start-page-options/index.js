@@ -54,7 +54,10 @@ export default function StartPageOptions() {
 	);
 
 	const showInserterOnNewPage =
-		shouldEnableStartPage && ! isClosed && hasStarterPatterns;
+		shouldEnableStartPage &&
+		! isClosed &&
+		hasStarterPatterns &&
+		window.__experimentalEnableZoomOutExperiment;
 	useEffect( () => {
 		if ( showInserterOnNewPage ) {
 			setIsInserterOpened( {
