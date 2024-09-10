@@ -31,7 +31,18 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 */
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
-		return empty( $more_text ) ? $more : '';
+		// If the block has user input more text, return nothing as this is appended later.
+		$has_block_more_text = ! empty( $more_text );
+		if ( $has_block_more_text ) {
+			return '';
+		}
+		// If the default core more text is in use, replace it with the new block editor-y more text.
+		$default_more = ' ' . '[&hellip;]';
+		if ( $more === $default_more ) {
+			return '&hellip;';
+		}
+		// Otherwise, return the custom filtered more text.
+		return $more;
 	};
 
 	// Hook into the excerpt_length filter to apply the `excerptLength` attribute.
