@@ -74,7 +74,8 @@ export default {
 		// In the experiment we want to also show column control in Auto mode, and
 		// the minimum width control in Manual mode.
 		const showColumnsControl =
-			window.__experimentalEnableGridInteractivity || layout?.columnCount;
+			window.__experimentalEnableGridInteractivity ||
+			!! layout?.columnCount;
 		const showMinWidthControl =
 			window.__experimentalEnableGridInteractivity ||
 			! layout?.columnCount;
@@ -337,7 +338,7 @@ function GridLayoutColumnsAndRowsControl( {
 								}
 							} }
 							value={ columnCount }
-							min={ 0 }
+							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={
 								! window.__experimentalEnableGridInteractivity ||
@@ -364,7 +365,7 @@ function GridLayoutColumnsAndRowsControl( {
 									} );
 								} }
 								value={ rowCount }
-								min={ 0 }
+								min={ 1 }
 								label={ __( 'Rows' ) }
 							/>
 						) : (
@@ -378,7 +379,7 @@ function GridLayoutColumnsAndRowsControl( {
 										columnCount: value,
 									} )
 								}
-								min={ 0 }
+								min={ 1 }
 								max={ 16 }
 								withInputField={ false }
 								label={ __( 'Columns' ) }
