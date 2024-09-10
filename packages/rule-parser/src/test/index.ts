@@ -123,9 +123,7 @@ describe( 'Parser', () => {
 		const rules: Rules< RawRule > = [
 			'ALL',
 			[
-				// @ts-expect-error - Testing new evaluator
 				[ 'cart.cartTotal', 'does not exist', 100 ],
-				// @ts-expect-error - Testing new evaluator
 				[ 'cart.cartTotal', 'does not exist', 50 ],
 			],
 		];
@@ -142,7 +140,6 @@ describe( 'Parser', () => {
 	it( 'should parse with newly introduced evaluator', () => {
 		const rules: Rules< RawRule > = [
 			'ALL',
-			// @ts-expect-error - Testing new evaluator
 			[ [ 'cart.cartTotal', 'between', [ 50, 100 ] ] ],
 		];
 
