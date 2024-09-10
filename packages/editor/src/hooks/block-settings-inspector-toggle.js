@@ -19,7 +19,7 @@ import { drawerLeft, drawerRight } from '@wordpress/icons';
  *
  * @return {Component} Wrapped component.
  */
-const withBlockToolbar = createHigherOrderComponent(
+const withBlockSettingsInspectorToggle = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		return (
 			<>
@@ -28,7 +28,7 @@ const withBlockToolbar = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withBlockToolbar'
+	'withBlockSettingsInspectorToggle'
 );
 
 const BlockInspectorToggle = () => {
@@ -59,5 +59,5 @@ const BlockInspectorToggle = () => {
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/with-block-settings-inspector-toggle',
-	withBlockToolbar
+	withBlockSettingsInspectorToggle
 );
