@@ -41,7 +41,7 @@ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 
 // Animation duration (ms) extracted to JS in order to be used on a setTimeout.
-const FRAME_ANIMATION_DURATION = 260;
+const FRAME_ANIMATION_DURATION = 200;
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<

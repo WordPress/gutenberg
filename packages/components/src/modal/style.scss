@@ -15,7 +15,7 @@
 		// Note: it's important that the fade-out animation doesn't end after the
 		// modal frame's disappear animation, because the component will be removed
 		// from the DOM when that animation ends.
-		@include animation__fade-out($delay: 0.05s);
+		@include animation__fade-out($delay: 80ms);
 	}
 }
 
@@ -32,12 +32,15 @@
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation var(--modal-frame-animation-duration) cubic-bezier(0.29, 0, 0, 1);
+	animation-name: components-modal__appear-animation;
+	animation-duration: var(--modal-frame-animation-duration);
 	animation-fill-mode: forwards;
+	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
 	@include reduce-motion("animation");
 
 	.components-modal__screen-overlay.is-animating-out & {
 		animation-name: components-modal__disappear-animation;
+		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
 	}
 
 	// Show a centered modal on bigger screens.
@@ -108,7 +111,7 @@
 	}
 	to {
 		opacity: 0;
-		transform: scale(0.95);
+		transform: scale(0.9);
 	}
 }
 
