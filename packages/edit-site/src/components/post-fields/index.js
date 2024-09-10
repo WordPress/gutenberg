@@ -262,9 +262,6 @@ function usePostFields( viewType ) {
 
 					const url = media?.source_url;
 					const title = media?.title?.rendered;
-					const filename =
-						media?.media_details?.file?.match( '([^/]+$)' )[ 0 ];
-
 					const ref = useRef( null );
 
 					return (
@@ -290,7 +287,6 @@ function usePostFields( viewType ) {
 													rowGap={ 0 }
 													columnGap={ 8 }
 													templateColumns="24px 1fr 0.5fr"
-													rows={ url ? 2 : 0 }
 												>
 													{ url && (
 														<>
@@ -337,18 +333,6 @@ function usePostFields( viewType ) {
 																	);
 																} }
 															/>
-															<Text
-																className="edit-site-dataviews-controls__featured-image-filename"
-																as="span"
-																ellipsizeMode="middle"
-																limit={ 35 }
-																truncate
-																numberOfLines={
-																	0
-																}
-															>
-																{ filename }
-															</Text>
 														</>
 													) }
 												</Grid>
