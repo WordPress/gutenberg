@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, SearchControl } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -83,7 +83,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { showInsertionPoint, setInserterInsertionPoint } = unlock(
+	const { setInserterInsertionPoint } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -95,7 +95,6 @@ export default function QuickInserter( {
 			onSelect,
 		} );
 		setInserterInsertionPoint( { rootClientId, insertionIndex } );
-		showInsertionPoint( rootClientId, insertionIndex );
 	};
 
 	let maxBlockPatterns = 0;

@@ -82,7 +82,6 @@ function useInsertionPoint( {
 				getInserterInsertionPoint,
 			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
-
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
 			const insertionPoint = getInserterInsertionPoint();
@@ -90,15 +89,14 @@ function useInsertionPoint( {
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
+			} else if ( insertionPoint?.insertionIndex ) {
+				_destinationRootClientId = insertionPoint?.rootClientId
+					? insertionPoint.rootClientId
+					: rootClientId;
+				_destinationIndex = insertionPoint.insertionIndex;
 			} else if ( clientId ) {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
-			} else if (
-				insertionPoint?.insertionIndex &&
-				insertionPoint?.rootClientId
-			) {
-				_destinationRootClientId = insertionPoint.rootClientId;
-				_destinationIndex = insertionPoint.insertionIndex;
 			} else if ( ! isAppender && selectedBlockClientId ) {
 				_destinationRootClientId = getBlockRootClientId(
 					selectedBlockClientId
