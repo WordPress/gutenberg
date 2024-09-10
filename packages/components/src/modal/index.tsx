@@ -40,6 +40,9 @@ import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 
+// Animation duration (ms) extracted to JS in order to be used on a setTimeout.
+const FRAME_ANIMATION_DURATION = 260;
+
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
 	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
@@ -216,6 +219,10 @@ function UnforwardedModal(
 			frameEl.addEventListener( 'animationend', onAnimationEnd, {
 				once: true,
 			} );
+			const animationTimeout = window.setTimeout( () => {
+				setIsAnimatingOut( false );
+				onRequestCloseRef.current?.( event );
+			}, FRAME_ANIMATION_DURATION );
 
 			return () => {
 				frameEl.removeEventListener( 'animationend', onAnimationEnd );
@@ -311,7 +318,10 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ style }
+					style={ {
+						'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }ms`,
+						...style,
+					} }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,
