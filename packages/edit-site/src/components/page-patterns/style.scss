@@ -76,12 +76,14 @@
 }
 
 .edit-site-patterns__pattern-title {
-	display: block;
 	width: 100%;
-	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	color: inherit;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	white-space: normal;
 
 	.is-link {
 		text-decoration: none;
@@ -110,6 +112,10 @@
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
 		}
+	}
+
+	.edit-site-patterns__pattern-title {
+		display: -webkit-box;
 	}
 }
 
