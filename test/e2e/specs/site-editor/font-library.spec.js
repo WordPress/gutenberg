@@ -184,7 +184,7 @@ test.describe( 'Font Library', () => {
 			// Check CSS preset was created.
 			await page.getByRole( 'button', { name: 'Close' } ).click();
 			await page
-				.getByRole( 'button', { name: 'Typography Headings styles' } )
+				.getByRole( 'button', { name: 'Headings', exact: true } )
 				.click();
 			await page.getByLabel( 'Font' ).selectOption( 'Exo 2' );
 			await expect(

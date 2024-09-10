@@ -41,9 +41,7 @@ test.describe( 'Styles', () => {
 		// Navigate to Styles -> Blocks -> Heading -> Typography
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Blocks' } ).click();
-		await page
-			.getByRole( 'button', { name: 'Social Icons block styles' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Social Icons' } ).click();
 
 		// Find the second padding control and change the padding value
 		await page

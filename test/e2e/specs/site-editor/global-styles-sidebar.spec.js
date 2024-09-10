@@ -38,11 +38,11 @@ test.describe( 'Global styles sidebar', () => {
 		// Matches both Heading and Table of Contents blocks.
 		// The latter contains "heading" in its description.
 		await expect(
-			page.getByRole( 'button', { name: 'Heading block styles' } )
+			page.getByRole( 'button', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', {
-				name: 'Table of Contents block styles',
+				name: 'Table of Contents',
 			} )
 		).toBeVisible();
 	} );

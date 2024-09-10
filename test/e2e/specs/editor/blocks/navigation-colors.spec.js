@@ -96,7 +96,9 @@ test.describe( 'Navigation colors', () => {
 			.getByRole( 'option', { name: 'Color: White' } )
 			.click( { force: true } );
 
-		await page.getByRole( 'button', { name: 'Background' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Background', exact: true } )
+			.click();
 		await page
 			.getByRole( 'option', { name: 'Color: Black' } )
 			.click( { force: true } );
