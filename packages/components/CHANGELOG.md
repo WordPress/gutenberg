@@ -13,6 +13,7 @@
 ### Enhancements
 
 -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+-   `CheckboxControl`: Add background transition ([#65212](https://github.com/WordPress/gutenberg/pull/65212)).
 
 ### Internal
 
