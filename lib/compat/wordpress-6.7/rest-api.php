@@ -166,10 +166,12 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_exper
  * @return array An associative array of comment type options.
  *               The keys are the comment type slugs and the values are the translated names of the comment types.
  */
-function update_comment_type_filter_dropdown() {
-	return array(
-		'comment' => __( 'Comments' ),
-		'block_comment' => __( 'Block Comments' ),
-	);
+if ( ! function_exists( 'update_comment_type_filter_dropdown' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
+	function update_comment_type_filter_dropdown() {
+		return array(
+			'comment' => __( 'Comments' ),
+			'block_comment' => __( 'Block Comments' ),
+		);
+	}
+	add_filter( 'admin_comment_types_dropdown', 'update_comment_type_filter_dropdown' );
 }
-add_filter( 'admin_comment_types_dropdown', 'update_comment_type_filter_dropdown' );
