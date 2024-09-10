@@ -20,22 +20,6 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	// Hook into the excerpt_length filter to apply the `excerptLength` attribute.
-	$excerpt_length        = $attributes['excerptLength'];
-	$filter_excerpt_length = static function () use ( $excerpt_length ) {
-		return $excerpt_length;
-	};
-	add_filter(
-		'excerpt_length',
-		$filter_excerpt_length
-	);
-	$excerpt = get_the_excerpt( $block->context['postId'] );
-	remove_filter( 'excerpt_length', $filter_excerpt_length );
-
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
-	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
-		return empty( $more_text ) ? $more : '';
-	};
 	/**
 	 * Some themes might use `excerpt_more` filter to handle the
 	 * `more` link displayed after a trimmed excerpt. Since the
@@ -45,7 +29,28 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 * `excerpt_more` filter and return nothing. This will
 	 * result in showing only one `read more` link at a time.
 	 */
+	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
+	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
+		return empty( $more_text ) ? $more : '';
+	};
+
+	// Hook into the excerpt_length filter to apply the `excerptLength` attribute.
+	$excerpt_length        = $attributes['excerptLength'];
+	$filter_excerpt_length = static function () use ( $excerpt_length ) {
+		return $excerpt_length;
+	};
+
 	add_filter( 'excerpt_more', $filter_excerpt_more );
+	add_filter(
+		'excerpt_length',
+		$filter_excerpt_length
+	);
+
+	$excerpt = get_the_excerpt( $block->context['postId'] );
+
+	remove_filter( 'excerpt_more', $filter_excerpt_more );
+	remove_filter( 'excerpt_length', $filter_excerpt_length );
+
 	$classes = array();
 	if ( isset( $attributes['textAlign'] ) ) {
 		$classes[] = 'has-text-align-' . $attributes['textAlign'];
@@ -62,7 +67,6 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	} else {
 		$content .= " $more_text</p>";
 	}
-	remove_filter( 'excerpt_more', $filter_excerpt_more );
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
 }
 
