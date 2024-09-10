@@ -137,6 +137,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
 					'--wp-admin-theme-color--rgb':
 						'var(--wp-block-synced-color--rgb)',
+					backgroundColor:
+						'color-mix( in srgb, var(--wp-block-synced-color) 20%, transparent 0% )',
 			  }
 			: {};
 
