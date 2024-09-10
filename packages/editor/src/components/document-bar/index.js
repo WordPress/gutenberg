@@ -179,13 +179,14 @@ export default function DocumentBar( props ) {
 					>
 						{ icon && <BlockIcon icon={ icon } /> }
 						<Text size="body" as="h1">
-							{ title
-								? decodeEntities( title )
-								: __( 'No title' ) }
-
+							<span className="editor-document-bar__post-title">
+								{ title
+									? decodeEntities( title )
+									: __( 'No title' ) }
+							</span>
 							{ postTypeLabel && ! props.title && (
 								<span className="editor-document-bar__post-type-label">
-									{ ' · ' + decodeEntities( postTypeLabel ) }
+									{ '· ' + decodeEntities( postTypeLabel ) }
 								</span>
 							) }
 						</Text>

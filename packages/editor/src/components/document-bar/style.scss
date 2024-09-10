@@ -34,36 +34,39 @@
 }
 
 .editor-document-bar__title {
-	flex: 1;
 	overflow: hidden;
 	color: $gray-900;
-	gap: $grid-unit-05;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	margin: 0 auto;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-medium() {
 		padding-left: $grid-unit-30;
 	}
 
+	h1 {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+}
+
+.editor-document-bar__post-title {
+	color: currentColor;
+	font-weight: 400;
+	max-width: 64%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
 	.editor-document-bar.is-global & {
 		color: var(--wp-block-synced-color);
 	}
+}
 
-	.block-editor-block-icon {
-		min-width: $grid-unit-30;
-		flex-shrink: 0;
-	}
-
-	h1 {
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		max-width: 70%;
-		color: currentColor;
-		font-weight: 400;
-	}
+.editor-document-bar__post-type-label {
+	color: $gray-800;
+	padding-left: $grid-unit-05;
 }
 
 .editor-document-bar__shortcut {
@@ -88,8 +91,4 @@
 		color: $gray-900;
 		background-color: transparent;
 	}
-}
-
-.editor-document-bar__post-type-label {
-	color: $gray-800;
 }
