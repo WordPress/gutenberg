@@ -26,7 +26,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
-	"wp-script-module-exports": {
+	"wpScriptModuleExports": {
 		".": "./build-module/index.js",
 		"./debug": "./build-module/debug.js"
 	},

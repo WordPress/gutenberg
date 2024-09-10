@@ -26,9 +26,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
-	"wp-script-module-exports": {
-		".": "./build-module/index.js"
-	},
+	"wpScriptModuleExports": "./build-module/index.js",
 	"dependencies": {
 		"@wordpress/interactivity": "file:../interactivity"
 	},
