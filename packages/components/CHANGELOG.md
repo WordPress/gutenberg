@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `BorderBoxControl`: Fix border styling direction for RTL environments ([#64513](https://github.com/WordPress/gutenberg/pull/64513)).
+
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
