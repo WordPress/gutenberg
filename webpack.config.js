@@ -9,8 +9,8 @@ const vendorsConfig = require( './tools/webpack/vendors' );
 
 module.exports = [
 	...blocksConfig,
+	scriptModules,
 	packagesConfig,
-	scriptModules, // Script modules build depends on the package build.
 	...developmentConfigs,
 	...vendorsConfig,
 ];
