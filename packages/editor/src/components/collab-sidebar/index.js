@@ -84,9 +84,13 @@ export default function CollabSidebar() {
 		const savedRecord = await saveEntityRecord( 'root', 'comment', args );
 
 		if ( savedRecord ) {
-			updateBlockAttributes( clientId, {
-				blockCommentId: savedRecord?.id,
-			} );
+			// If it's a main comment, update the block attributes with the comment id.
+			if ( ! parentCommentId ) {
+				updateBlockAttributes( clientId, {
+					blockCommentId: savedRecord?.id,
+				} );
+			}
+
 			createNotice(
 				'snackbar',
 				parentCommentId
