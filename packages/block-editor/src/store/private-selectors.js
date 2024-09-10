@@ -15,6 +15,7 @@ import {
 	getBlockName,
 	getTemplateLock,
 	getClientIdsWithDescendants,
+	isNavigationMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -480,16 +481,37 @@ export const getContentLockingParent = createSelector(
 		let current = clientId;
 		let result;
 		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if (
-				getBlockName( state, current ) === 'core/block' ||
-				getTemplateLock( state, current ) === 'contentOnly'
-			) {
+			if ( isContentLockingParent( state, current ) ) {
 				result = current;
 			}
 		}
 		return result;
 	},
-	( state ) => [ state.blocks.parents, state.blockListSettings ]
+	( state ) => [
+		state.blocks.parents,
+		state.blockListSettings,
+		state.editorMode,
+		getSectionRootClientId( state ),
+	]
+);
+
+export const isContentLockingParent = createSelector(
+	( state, clientId ) => {
+		const sectionRootClientId = getSectionRootClientId( state );
+		const sectionClientIds = getBlockOrder( state, sectionRootClientId );
+		return (
+			getBlockName( state, clientId ) === 'core/block' ||
+			getTemplateLock( state, clientId ) === 'contentOnly' ||
+			( isNavigationMode( state ) &&
+				sectionClientIds.includes( clientId ) )
+		);
+	},
+	( state ) => [
+		state.blocks.parents,
+		state.blockListSettings,
+		state.editorMode,
+		getSectionRootClientId( state ),
+	]
 );
 
 /**

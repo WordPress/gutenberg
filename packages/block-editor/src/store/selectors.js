@@ -2957,7 +2957,16 @@ export const getBlockEditingMode = createRegistrySelector(
 			}
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
-			if ( templateLock === 'contentOnly' ) {
+			const sectionRootClientId = getSectionRootClientId( state );
+			const sectionsClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
+			if (
+				templateLock === 'contentOnly' ||
+				( editorMode === 'navigation' &&
+					! sectionsClientIds.includes( clientId ) )
+			) {
 				const name = getBlockName( state, clientId );
 				const isContent =
 					select( blocksStore ).__experimentalHasContentRoleAttribute(

@@ -471,7 +471,7 @@ test.describe( 'Widgets Customizer', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.locator(
-				'css=.block-editor-block-list__layout.is-navigate-mode'
+				'css=.block-editor-block-list__block-selection-button'
 			)
 		).toBeVisible();
 		await expect( paragraphBlock ).toBeVisible();

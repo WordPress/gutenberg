@@ -80,7 +80,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
-	&.is-navigate-mode .block-editor-block-list__block.is-selected,
 	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
@@ -132,14 +131,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	[class^="components-"] {
 		user-select: text;
 	}
-}
-
-.is-block-moving-mode.block-editor-block-list__block-selection-button {
-	// Should be invisible but not unfocusable.
-	opacity: 0;
-	font-size: 1px;
-	height: 1px;
-	padding: 0;
 }
 
 .block-editor-block-list__layout .block-editor-block-list__block {
@@ -221,19 +212,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	// Avoid conflict with the multi-selection highlight color.
 	&.has-warning.is-multi-selected::after {
 		background-color: transparent;
-	}
-
-	// Reusable blocks clickthrough overlays.
-	&.is-reusable > .block-editor-inner-blocks > .block-editor-block-list__layout.has-overlay {
-		// Remove only the top click overlay.
-		&::after {
-			display: none;
-		}
-
-		// Restore it for subsequent.
-		.block-editor-block-list__layout.has-overlay::after {
-			display: block;
-		}
 	}
 
 	// Reusable blocks parent border.

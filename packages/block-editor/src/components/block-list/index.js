@@ -47,26 +47,17 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isOutlineMode,
-		isFocusMode,
-		editorMode,
-		temporarilyEditingAsBlocks,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			__unstableGetEditorMode,
-			getTemporarilyEditingAsBlocks,
-			isTyping,
-		} = unlock( select( blockEditorStore ) );
-		const { outlineMode, focusMode } = getSettings();
-		return {
-			isOutlineMode: outlineMode && ! isTyping(),
-			isFocusMode: focusMode,
-			editorMode: __unstableGetEditorMode(),
-			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
-		};
-	}, [] );
+	const { isOutlineMode, isFocusMode, temporarilyEditingAsBlocks } =
+		useSelect( ( select ) => {
+			const { getSettings, getTemporarilyEditingAsBlocks, isTyping } =
+				unlock( select( blockEditorStore ) );
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode && ! isTyping(),
+				isFocusMode: focusMode,
+				temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+			};
+		}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -115,7 +106,6 @@ function Root( { className, ...settings } ) {
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
-				'is-navigate-mode': editorMode === 'navigation',
 			} ),
 		},
 		settings
