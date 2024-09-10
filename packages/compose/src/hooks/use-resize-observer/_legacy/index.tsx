@@ -6,14 +6,13 @@ import type { ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useRef, useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import useResizeObserver from '../index';
 
-type ObservedSize = {
+export type ObservedSize = {
 	width: number | null;
 	height: number | null;
 };
@@ -84,28 +83,10 @@ type ResizeElementProps = {
 };
 
 function ResizeElement( { onResize }: ResizeElementProps ) {
-	const resizeElementRef = useRef< HTMLDivElement >( null );
-	const resizeCallbackRef = useRef( onResize );
-
-	useLayoutEffect( () => {
-		resizeCallbackRef.current = onResize;
-	}, [ onResize ] );
-
-	useLayoutEffect( () => {
-		const resizeElement = resizeElementRef.current as HTMLDivElement;
-		const resizeObserver = new ResizeObserver( ( entries ) => {
-			for ( const entry of entries ) {
-				const newSize = extractSize( entry );
-				resizeCallbackRef.current( newSize );
-			}
-		} );
-
-		resizeObserver.observe( resizeElement );
-
-		return () => {
-			resizeObserver.unobserve( resizeElement );
-		};
-	}, [] );
+	const resizeElementRef = useResizeObserver( ( entries ) => {
+		const newSize = extractSize( entries.at( -1 )! ); // Entries are never empty.
+		onResize( newSize );
+	} );
 
 	return (
 		<div
@@ -141,7 +122,10 @@ const NULL_SIZE: ObservedSize = { width: null, height: null };
  * };
  * ```
  */
-export default function useResizeObserver(): [ ReactElement, ObservedSize ] {
+export default function useLegacyResizeObserver(): [
+	ReactElement,
+	ObservedSize,
+] {
 	const [ size, setSize ] = useState( NULL_SIZE );
 
 	// Using a ref to track the previous width / height to avoid unnecessary renders.
