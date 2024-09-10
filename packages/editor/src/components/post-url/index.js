@@ -87,18 +87,21 @@ export default function PostURL( { onClose } ) {
 			<VStack spacing={ 3 }>
 				{ isEditable && (
 					<p className="editor-post-url__intro">
-						<span id={ postUrlSlugDescriptionId }>
-							{ __(
-								'Customize the last part of the Permalink.'
-							) }
-						</span>
-						<ExternalLink
-							href={ __(
-								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-							) }
-						>
-							{ __( 'Learn more.' ) }
-						</ExternalLink>
+						{ createInterpolateElement(
+							__(
+								'<span>Customize the last part of the URL.</span> <a>Learn more.</a>'
+							),
+							{
+								span: <span id={ postUrlSlugDescriptionId } />,
+								a: (
+									<ExternalLink
+										href={ __(
+											'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+										) }
+									/>
+								),
+							}
+						) }
 					</p>
 				) }
 				<div>
