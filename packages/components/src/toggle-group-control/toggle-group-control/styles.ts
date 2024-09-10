@@ -26,6 +26,33 @@ export const toggleGroupControl = ( {
 
 	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
+
+
+	@media not ( prefers-reduced-motion ) {
+		&.is-animation-enabled::before {
+			transition-property: left, width;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
+		}
+	}
+
+	&::before {
+		content: '';
+		position: absolute;
+		pointer-events: none;
+		background: ${ COLORS.gray[ 900 ] };
+		border-radius: ${ CONFIG.radiusXSmall };
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+		outline-offset: -3px;
+
+		left: calc(
+			var( --indicator-left ) * 1px - 1px
+		); // Correcting for border.
+		width: calc( var( --indicator-width ) * 1px );
+		height: calc( var( --indicator-height ) * 1px );
+	}
 `;
 
 const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {

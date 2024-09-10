@@ -2,13 +2,13 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { LayoutGroup } from 'framer-motion';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +22,8 @@ import { VisualLabelWrapper } from './styles';
 import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+import { useTrackElementOffsetRect } from '../../utils/element-rect';
+import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
 
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
@@ -44,9 +46,24 @@ function UnconnectedToggleGroupControl(
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
 
-	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
 	const normalizedSize =
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+
+	const ref = useRef< HTMLDivElement >();
+	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
+	useLayoutEffect( () => {
+		setActiveElement(
+			ref.current?.querySelector( `button[value="${ value }"]` )
+				?.parentElement ?? undefined
+		);
+	}, [ value ] );
+	const indicatorPosition = useTrackElementOffsetRect( activeElement );
+
+	const [ animationEnabled, setAnimationEnabled ] = useState( false );
+	useOnValueUpdate(
+		value,
+		( { previousValue } ) => previousValue && setAnimationEnabled( true )
+	);
 
 	const cx = useCx();
 
@@ -81,15 +98,29 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				className={ classes }
+				className={ clsx(
+					animationEnabled && 'is-animation-enabled',
+					classes
+				) }
+				style={ {
+					'--indicator-left': indicatorPosition.left,
+					'--indicator-width': indicatorPosition.width,
+					'--indicator-height': indicatorPosition.height,
+					...otherProps.style,
+				} }
+				onTransitionEnd={ ( event ) => {
+					if ( event.pseudoElement === '::before' ) {
+						setAnimationEnabled( false );
+					}
+				} }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ forwardedRef }
+				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 				size={ normalizedSize }
 				value={ value }
 			>
-				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+				{ children }
 			</MainControl>
 		</BaseControl>
 	);
