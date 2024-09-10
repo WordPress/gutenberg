@@ -112,12 +112,13 @@ export function ImageEdit( {
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
 	const containerRef = useRef();
-	// Only observe the max width from the parent container when the parent layout is default or constrained.
-	// This won't work for flex or grid layouts because the container width changes with image.
+	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
+	// This won't work for them because the container width changes with the image.
 	// TODO: Find a way to observe the container width for flex and grid layouts.
 	const isMaxWidthContainerWidth =
-		parentLayout?.type === 'default' ||
-		parentLayout?.type === 'constrained';
+		!! parentLayout &&
+		parentLayout.type !== 'flex' &&
+		parentLayout.type !== 'grid';
 	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
 
 	const altRef = useRef();
