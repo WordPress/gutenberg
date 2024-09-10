@@ -293,7 +293,7 @@ describe( 'transformStyles', () => {
 
 		it( 'should ignore keyframes', () => {
 			const input = `
-			@keyframes edit-post__fade-in-animation {
+			@keyframes __wp-base-styles-fade-in {
 				from {
 					opacity: 0;
 				}

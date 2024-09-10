@@ -4,8 +4,8 @@
 	}
 }
 
-@mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
-	@include keyframes(edit-post__fade-in-animation) {
+@mixin animation__fade-in($speed: 0.08s, $delay: 0s) {
+	@include keyframes(__wp-base-styles-fade-in) {
 		from {
 			opacity: 0;
 		}
@@ -15,7 +15,7 @@
 	}
 
 
-	animation: edit-post__fade-in-animation $speed linear $delay;
+	animation: __wp-base-styles-fade-in $speed linear $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 }
@@ -23,4 +23,10 @@
 @mixin editor-canvas-resize-animation() {
 	transition: all 0.5s cubic-bezier(0.65, 0, 0.45, 1);
 	@include reduce-motion("transition");
+}
+
+// Deprecated
+@mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
+	@warn "The `edit-post__fade-in-animation` mixin is deprecated. Use `animation__fade-in` instead.";
+	@include animation__fade-in($speed, $delay);
 }

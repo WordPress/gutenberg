@@ -8,8 +8,8 @@
 	background-color: rgba($black, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
-	// This animates the appearance of the white background.
-	@include edit-post__fade-in-animation();
+	// This animates the appearance of the backdrop.
+	@include animation__fade-in();
 }
 
 // The modal window element.
