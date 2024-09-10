@@ -32,7 +32,7 @@ if ( ! function_exists( 'wp_unregister_block_template' ) ) {
 	 * Unregister a template.
 	 *
 	 * @param string $template_name Template name in the form of `plugin_uri//template_name`.
-	 * @return WP_Block_Template|WP_Error The registered template object on success, WP_Error object on failure or if
+	 * @return WP_Block_Template|WP_Error The unregistered template object on success, WP_Error object on failure or if
 	 *                                    the template doesn't exist.
 	 */
 	function wp_unregister_block_template( $template_name ) {
