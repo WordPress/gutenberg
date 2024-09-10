@@ -219,7 +219,7 @@ function gutenberg_register_script_modules() {
 
 	wp_register_script_module(
 		'@wordpress/a11y',
-		gutenberg_url( 'build-module/a11y.min.js' ),
+		gutenberg_url( 'build-module/a11y/index.min.js' ),
 		array(),
 		$default_version
 	);
