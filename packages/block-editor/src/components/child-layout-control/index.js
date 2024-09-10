@@ -174,6 +174,8 @@ function FlexControls( {
 						} );
 					} }
 					value={ flexSize }
+					label={ flexResetLabel }
+					hideLabelFromVision
 				/>
 			) }
 		</VStack>

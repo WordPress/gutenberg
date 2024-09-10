@@ -4,6 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { create } from '@wordpress/rich-text';
+import { isSelectionForward } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -53,6 +54,14 @@ function extractSelectionEndNode( selection ) {
 		return focusNode;
 	}
 
+	// When the selection is forward (the selection ends with the focus node),
+	// the selection may extend into the next element with an offset of 0. This
+	// may trigger multi selection even though the selection does not visually
+	// end in the next block.
+	if ( focusOffset === 0 && isSelectionForward( selection ) ) {
+		return focusNode.previousSibling ?? focusNode.parentElement;
+	}
+
 	return focusNode.childNodes[ focusOffset ];
 }
 
@@ -98,8 +107,12 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -182,10 +195,17 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				setContentEditableWrapper(
+					node,
+					!! ( startClientId && endClientId )
+				);
+
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
-						selectBlock( startClientId );
+						if ( getSelectedBlockClientId() !== startClientId ) {
+							selectBlock( startClientId );
+						}
 					} else {
 						multiSelect( startClientId, startClientId );
 					}

@@ -26,6 +26,7 @@ import {
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
+import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
@@ -49,13 +50,13 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
  *
  * export default function Edit() {
  *
- *   const blockProps = useBlockProps(
+ *   const blockProps = useBlockProps( {
  *     className: 'my-custom-class',
  *     style: {
  *       color: '#222222',
  *       backgroundColor: '#eeeeee'
  *     }
- *   )
+ *   } )
  *
  *   return (
  *	    <div { ...blockProps }>
@@ -85,6 +86,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		name,
 		blockApiVersion,
 		blockTitle,
+		editorMode,
 		isSelected,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -115,6 +117,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
+		useZoomOutModeExit( { editorMode } ),
 		useIsHovered( { clientId } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),

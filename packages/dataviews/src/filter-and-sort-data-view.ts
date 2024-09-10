@@ -140,21 +140,7 @@ export function filterSortAndPaginate< Item >(
 		} );
 		if ( fieldToSort ) {
 			filteredData.sort( ( a, b ) => {
-				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-
-				if (
-					typeof valueA === 'number' &&
-					typeof valueB === 'number'
-				) {
-					return view.sort?.direction === 'asc'
-						? valueA - valueB
-						: valueB - valueA;
-				}
-
-				return view.sort?.direction === 'asc'
-					? valueA.localeCompare( valueB )
-					: valueB.localeCompare( valueA );
+				return fieldToSort.sort( a, b, view.sort?.direction ?? 'desc' );
 			} );
 		}
 	}

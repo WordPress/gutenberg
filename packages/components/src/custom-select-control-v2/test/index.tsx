@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
-import { click, press, sleep, type } from '@ariakit/test';
+import { screen } from '@testing-library/react';
+import { click, press, type } from '@ariakit/test';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -66,7 +67,7 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
-		render( <Component { ...defaultProps } /> );
+		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -94,13 +95,12 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-		render( <Component { ...defaultProps } /> );
+		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		await press.Enter();
 		expect(
@@ -121,13 +121,12 @@ describe.each( [
 
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Should be able to change selection using keyboard', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 
@@ -145,13 +144,12 @@ describe.each( [
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			await press.Enter();
 			expect(
@@ -166,13 +164,12 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
 			} );
 
-			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
@@ -194,7 +191,7 @@ describe.each( [
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
-			render( <Component { ...defaultProps } /> );
+			await render( <Component { ...defaultProps } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -244,7 +241,7 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component
 					defaultValue={ defaultValues }
 					onChange={ onChangeMock }
@@ -326,7 +323,7 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component defaultValue={ defaultValues } label="Multi-select">
 					{ defaultValues.map( ( item ) => (
 						<UncontrolledCustomSelectControlV2.Item
@@ -382,7 +379,7 @@ describe.each( [
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 
-		render(
+		await render(
 			<Component label="Rendered" renderSelectedValue={ renderValue }>
 				<UncontrolledCustomSelectControlV2.Item value="april-29">
 					{ renderValue( 'april-29' ) }
@@ -418,13 +415,12 @@ describe.each( [
 	} );
 
 	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
-		render( <Component { ...defaultProps } /> );
+		await render( <Component { ...defaultProps } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
 		} );
 
-		await sleep();
 		await press.Tab();
 		expect( currentSelectedItem ).toHaveFocus();
 		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
@@ -437,8 +433,8 @@ describe.each( [
 		).toBeVisible();
 	} );
 
-	it( 'Should label the component correctly even when the label is not visible', () => {
-		render( <Component { ...defaultProps } hideLabelFromVision /> );
+	it( 'Should label the component correctly even when the label is not visible', async () => {
+		await render( <Component { ...defaultProps } hideLabelFromVision /> );
 
 		expect(
 			screen.getByRole( 'combobox', {

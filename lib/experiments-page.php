@@ -45,7 +45,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-sync-collaboration',
-		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		__( 'Live Collaboration and offline persistence', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -80,8 +80,20 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-block-experiments',
+		__( 'Experimental blocks', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable experimental blocks.<p class="description">(Warning: these blocks may have significant changes during development that cause validation errors and display issues.)</p>', 'gutenberg' ),
+			'id'    => 'gutenberg-block-experiments',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-form-blocks',
-		__( 'Form and input blocks ', 'gutenberg' ),
+		__( 'Form and input blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -93,7 +105,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-grid-interactivity',
-		__( 'Grid interactivity ', 'gutenberg' ),
+		__( 'Grid interactivity', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -128,18 +140,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-patterns-tab',
-		__( 'Enable zoomed out view when patterns are browsed in the inserter', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable zoomed out view when selecting a pattern category in the main inserter.', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-patterns-tab',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-new-posts-dashboard',
 		__( 'Redesigned posts dashboard', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -163,6 +163,29 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-media-processing',
+		__( 'Client-side media processing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable client-side media processing.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-processing',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-zoom-out-experiment',
+		__( 'Zoom out experiments', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable zoom out experiments; shows zoom out in the device preview and other zoom out experiments.', 'gutenberg' ),
+			'id'    => 'gutenberg-zoom-out-experiment',
+		)
+	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

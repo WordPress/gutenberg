@@ -2,12 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type {
-	ForwardedRef,
-	KeyboardEvent,
-	MutableRefObject,
-	UIEvent,
-} from 'react';
+import type { ForwardedRef, KeyboardEvent, RefObject, UIEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -42,11 +37,13 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { Spacer } from '../spacer';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
-const ModalContext = createContext<
-	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
->( [] );
+type Dismissers = Set<
+	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+>;
+const ModalContext = createContext< Dismissers >( new Set() );
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();
@@ -138,32 +135,37 @@ function UnforwardedModal(
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.
-	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+	const onRequestCloseRef = useRef< ModalProps[ 'onRequestClose' ] >();
 	useEffect( () => {
-		refOnRequestClose.current = onRequestClose;
+		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
 
 	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
 	// one should remain open at a time and the list enables closing prior ones.
 	const dismissers = useContext( ModalContext );
 	// Used for the tracking and dismissing any nested modals.
-	const nestedDismissers = useRef< typeof dismissers >( [] );
+	const [ nestedDismissers ] = useState< Dismissers >( () => new Set() );
 
 	// Updates the stack tracking open modals at this level and calls
 	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
-		dismissers.push( refOnRequestClose );
-		const [ first, second ] = dismissers;
-		if ( second ) {
-			first?.current?.();
+		// add this modal instance to the dismissers set
+		dismissers.add( onRequestCloseRef );
+		// request that all the other modals close themselves
+		for ( const dismisser of dismissers ) {
+			if ( dismisser !== onRequestCloseRef ) {
+				dismisser.current?.();
+			}
 		}
-
-		const nested = nestedDismissers.current;
 		return () => {
-			nested[ 0 ]?.current?.();
-			dismissers.shift();
+			// request that all the nested modals close themselves
+			for ( const dismisser of nestedDismissers ) {
+				dismisser.current?.();
+			}
+			// remove this modal instance from the dismissers set
+			dismissers.delete( onRequestCloseRef );
 		};
-	}, [ dismissers ] );
+	}, [ dismissers, nestedDismissers ] );
 
 	// Adds/removes the value of bodyOpenClassName to body element.
 	useEffect( () => {
@@ -322,13 +324,21 @@ function UnforwardedModal(
 								</div>
 								{ headerActions }
 								{ isDismissible && (
-									<Button
-										onClick={ onRequestClose }
-										icon={ close }
-										label={
-											closeButtonLabel || __( 'Close' )
-										}
-									/>
+									<>
+										<Spacer
+											marginBottom={ 0 }
+											marginLeft={ 3 }
+										/>
+										<Button
+											size="small"
+											onClick={ onRequestClose }
+											icon={ close }
+											label={
+												closeButtonLabel ||
+												__( 'Close' )
+											}
+										/>
+									</>
 								) }
 							</div>
 						) }
@@ -350,7 +360,7 @@ function UnforwardedModal(
 	);
 
 	return createPortal(
-		<ModalContext.Provider value={ nestedDismissers.current }>
+		<ModalContext.Provider value={ nestedDismissers }>
 			{ modal }
 		</ModalContext.Provider>,
 		document.body

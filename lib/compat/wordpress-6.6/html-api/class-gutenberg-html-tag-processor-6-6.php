@@ -1227,7 +1227,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 			return false;
 		}
 
-		$this->bookmarks[ $name ] = new Gutenberg_HTML_Span_6_5( $this->token_starts_at, $this->token_length );
+		$this->bookmarks[ $name ] = new WP_HTML_Span( $this->token_starts_at, $this->token_length );
 
 		return true;
 	}
@@ -2035,7 +2035,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 		 * an array when encountering duplicates avoids needless allocations in the
 		 * normative case of parsing tags with no duplicate attributes.
 		 */
-		$duplicate_span = new Gutenberg_HTML_Span_6_5( $attribute_start, $attribute_end - $attribute_start );
+		$duplicate_span = new WP_HTML_Span( $attribute_start, $attribute_end - $attribute_start );
 		if ( null === $this->duplicate_attributes ) {
 			$this->duplicate_attributes = array( $comparable_name => array( $duplicate_span ) );
 		} elseif ( ! array_key_exists( $comparable_name, $this->duplicate_attributes ) ) {
@@ -3007,7 +3007,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 			 *     Result: <div id="new"/>
 			 */
 			$existing_attribute                        = $this->attributes[ $comparable_name ];
-			$this->lexical_updates[ $comparable_name ] = new Gutenberg_HTML_Text_Replacement_6_5(
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$existing_attribute->start,
 				$existing_attribute->length,
 				$updated_attribute
@@ -3025,7 +3025,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 			 *
 			 *     Result: <div id="new"/>
 			 */
-			$this->lexical_updates[ $comparable_name ] = new Gutenberg_HTML_Text_Replacement_6_5(
+			$this->lexical_updates[ $comparable_name ] = new WP_HTML_Text_Replacement(
 				$this->tag_name_starts_at + $this->tag_name_length,
 				0,
 				' ' . $updated_attribute
@@ -3103,7 +3103,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 		 *
 		 *    Result: <div />
 		 */
-		$this->lexical_updates[ $name ] = new Gutenberg_HTML_Text_Replacement_6_5(
+		$this->lexical_updates[ $name ] = new WP_HTML_Text_Replacement(
 			$this->attributes[ $name ]->start,
 			$this->attributes[ $name ]->length,
 			''
@@ -3112,7 +3112,7 @@ class Gutenberg_HTML_Tag_Processor_6_6 {
 		// Removes any duplicated attributes if they were also present.
 		if ( null !== $this->duplicate_attributes && array_key_exists( $name, $this->duplicate_attributes ) ) {
 			foreach ( $this->duplicate_attributes[ $name ] as $attribute_token ) {
-				$this->lexical_updates[] = new Gutenberg_HTML_Text_Replacement_6_5(
+				$this->lexical_updates[] = new WP_HTML_Text_Replacement(
 					$attribute_token->start,
 					$attribute_token->length,
 					''

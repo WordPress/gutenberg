@@ -21,7 +21,11 @@ function DeletedNavigationNotice( { onCreateNew } ) {
 					),
 					{
 						button: (
-							<Button onClick={ onCreateNew } variant="link" />
+							<Button
+								__next40pxDefaultSize
+								onClick={ onCreateNew }
+								variant="link"
+							/>
 						),
 					}
 				) }

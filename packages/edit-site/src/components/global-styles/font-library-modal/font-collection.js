@@ -15,7 +15,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
@@ -28,7 +28,7 @@ import {
 	CheckboxControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
@@ -63,20 +63,15 @@ function FontCollection( { slug } ) {
 	};
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ notice, setNotice ] = useState( false );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const {
-		collections,
-		getFontCollection,
-		installFonts,
-		isInstalling,
-		notice,
-		setNotice,
-	} = useContext( FontLibraryContext );
+	const { collections, getFontCollection, installFonts, isInstalling } =
+		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.slug === slug
 	);
@@ -116,8 +111,7 @@ function FontCollection( { slug } ) {
 
 	useEffect( () => {
 		setSelectedFont( null );
-		setNotice( null );
-	}, [ slug, setNotice ] );
+	}, [ slug ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
@@ -321,6 +315,8 @@ function FontCollection( { slug } ) {
 								</FlexItem>
 								<FlexItem>
 									<SelectControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
 										label={ __( 'Category' ) }
 										value={ filters.category }
 										onChange={ handleCategoryFilter }
@@ -380,14 +376,16 @@ function FontCollection( { slug } ) {
 										</li>
 									) ) }
 								</ul>
-								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }{ ' ' }
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</div>
 						</NavigatorScreen>
 
 						<NavigatorScreen path="/fontFamily">
 							<Flex justify="flex-start">
-								<NavigatorToParentButton
-									icon={ chevronLeft }
+								<NavigatorBackButton
+									icon={
+										isRTL() ? chevronRight : chevronLeft
+									}
 									size="small"
 									onClick={ () => {
 										setSelectedFont( null );
@@ -429,26 +427,40 @@ function FontCollection( { slug } ) {
 								__nextHasNoMarginBottom
 							/>
 							<VStack spacing={ 0 }>
-								<Spacer margin={ 8 } />
-								{ getSortedFontFaces( selectedFont ).map(
-									( face, i ) => (
-										<CollectionFontVariant
-											font={ selectedFont }
-											face={ face }
-											key={ `face${ i }` }
-											handleToggleVariant={
-												handleToggleVariant
-											}
-											selected={ isFontFontFaceInOutline(
-												selectedFont.slug,
-												selectedFont.fontFace
-													? face
-													: null, // If the font has no fontFace, we want to check if the font is in the outline
-												fontToInstallOutline
-											) }
-										/>
-									)
-								) }
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="font-library-modal__fonts-list"
+								>
+									{ getSortedFontFaces( selectedFont ).map(
+										( face, i ) => (
+											<li
+												key={ `face${ i }` }
+												className="font-library-modal__fonts-list-item"
+											>
+												<CollectionFontVariant
+													font={ selectedFont }
+													face={ face }
+													handleToggleVariant={
+														handleToggleVariant
+													}
+													selected={ isFontFontFaceInOutline(
+														selectedFont.slug,
+														selectedFont.fontFace
+															? face
+															: null, // If the font has no fontFace, we want to check if the font is in the outline
+														fontToInstallOutline
+													) }
+												/>
+											</li>
+										)
+									) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
 							<Spacer margin={ 16 } />
 						</NavigatorScreen>
@@ -460,6 +472,8 @@ function FontCollection( { slug } ) {
 							className="font-library-modal__footer"
 						>
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								variant="primary"
 								onClick={ handleInstall }
 								isBusy={ isInstalling }
@@ -486,7 +500,7 @@ function FontCollection( { slug } ) {
 								disabled={ page === 1 }
 								showTooltip
 								accessibleWhenDisabled
-								icon={ chevronLeft }
+								icon={ isRTL() ? chevronRight : chevronLeft }
 								tooltipPosition="top"
 							/>
 							<HStack
@@ -537,7 +551,7 @@ function FontCollection( { slug } ) {
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
 								accessibleWhenDisabled
-								icon={ chevronRight }
+								icon={ isRTL() ? chevronLeft : chevronRight }
 								tooltipPosition="top"
 							/>
 						</HStack>

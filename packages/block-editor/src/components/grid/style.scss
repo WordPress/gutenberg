@@ -105,7 +105,6 @@
 	.block-editor-grid-item-mover-button {
 		width: $block-toolbar-height * 0.5;
 		min-width: 0 !important; // overrides default button width.
-		overflow: hidden;
 		padding-left: 0;
 		padding-right: 0;
 
@@ -118,7 +117,7 @@
 			content: "";
 			position: absolute;
 			display: block;
-			border-radius: $radius-block-ui;
+			border-radius: $radius-small;
 			height: $grid-unit-40;
 
 			// Position the focus rectangle.
@@ -155,7 +154,7 @@
 		justify-content: space-around;
 
 		> .block-editor-grid-item-mover-button.block-editor-grid-item-mover-button {
-			height: $block-toolbar-height * 0.5 - $grid-unit-05;
+			height: $block-toolbar-height * 0.5 - $grid-unit-05 !important; // overrides toolbar button height.
 			width: 100%;
 			min-width: 0 !important; // overrides default button width.
 
@@ -173,18 +172,53 @@
 	}
 }
 
+.editor-collapsible-block-toolbar {
+	.block-editor-grid-item-mover__move-vertical-button-container {
+		// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+		@include break-small() {
+			height: $grid-unit-50;
+			position: relative;
+			top: -5px; // Should be -4px, but that causes scrolling when focus lands on the movers, in a 60px header.
+		}
+	}
+}
+
 .show-icon-labels {
 
-	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-left-button {
-		border-right: 1px solid $gray-700;
-		padding-right: 12px;
-	}
+	.block-editor-grid-item-mover__move-horizontal-button-container {
+		position: relative;
 
-	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-right-button {
-		border-left: 1px solid $gray-700;
-		padding-left: 12px;
-	}
+		&::before {
+			@include break-small() {
+				content: "";
+				height: 100%;
+				width: $border-width;
+				background: $gray-200;
+				position: absolute;
+				top: 0;
+			}
 
+			@include break-medium() {
+				background: $gray-900;
+			}
+		}
+
+		&.is-left {
+			padding-right: 6px;
+
+			&::before {
+				right: 0;
+			}
+		}
+
+		&.is-right {
+			padding-left: 6px;
+
+			&::before {
+				left: 0;
+			}
+		}
+	}
 
 	.block-editor-grid-item-mover__move-vertical-button-container {
 		&::before {
@@ -208,5 +242,21 @@
 		}
 	}
 
+	.block-editor-grid-item-mover-button {
+		white-space: nowrap;
+	}
+
+	.editor-collapsible-block-toolbar {
+		.block-editor-grid-item-mover__move-horizontal-button-container::before {
+			height: $grid-unit-30;
+			background: $gray-300;
+			top: $grid-unit-05;
+		}
+
+		.block-editor-grid-item-mover__move-vertical-button-container::before {
+			background: $gray-300;
+			width: calc(100% - #{$grid-unit-30});
+		}
+	}
 }
 

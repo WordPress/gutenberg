@@ -31,18 +31,18 @@ export function useMediaResults( category, query = {} ) {
 	// In the future we could use AbortController to cancel previous
 	// requests, but we don't for now as it involves adding support
 	// for this to `core-data` package.
-	const lastRequest = useRef();
+	const lastRequestRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
 				category: category.name,
 				...query,
 			} );
-			lastRequest.current = key;
+			lastRequestRef.current = key;
 			setIsLoading( true );
 			setMediaList( [] ); // Empty the previous results.
 			const _media = await category.fetch?.( query );
-			if ( key === lastRequest.current ) {
+			if ( key === lastRequestRef.current ) {
 				setMediaList( _media );
 				setIsLoading( false );
 			}

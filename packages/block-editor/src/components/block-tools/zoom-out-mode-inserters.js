@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
@@ -16,8 +16,9 @@ function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
 		hasSelection,
+		blockInsertionPoint,
 		blockOrder,
-		insertionPoint,
+		blockInsertionPointVisible,
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
@@ -25,23 +26,22 @@ function ZoomOutModeInserters() {
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
+			getBlockInsertionPoint,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
 			getHoveredBlockClientId,
-		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
-		// To do: move ZoomOutModeInserters to core/editor.
-		// Or we perhaps we should move the insertion point state to the
-		// block-editor store. I'm not sure what it was ever moved to the editor
-		// store, because all the inserter components all live in the
-		// block-editor package.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const editor = select( 'core/editor' );
+			isBlockInsertionPointVisible,
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
+		const root = getSectionRootClientId();
+
 		return {
 			hasSelection: !! getSelectionStart().clientId,
+			blockInsertionPoint: getBlockInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
-			insertionPoint: unlock( editor ).getInsertionPoint(),
+			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
@@ -49,6 +49,8 @@ function ZoomOutModeInserters() {
 			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
+
+	const { showInsertionPoint } = useDispatch( blockEditorStore );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -65,14 +67,8 @@ function ZoomOutModeInserters() {
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		const shouldRenderInserter = insertionPoint.insertionIndex !== index;
-
 		const shouldRenderInsertionPoint =
-			insertionPoint.insertionIndex === index;
-
-		if ( ! shouldRenderInserter && ! shouldRenderInsertionPoint ) {
-			return null;
-		}
+			blockInsertionPointVisible && blockInsertionPoint.index === index;
 
 		const previousClientId = clientId;
 		const nextClientId = blockOrder[ index ];
@@ -92,19 +88,7 @@ function ZoomOutModeInserters() {
 				previousClientId={ previousClientId }
 				nextClientId={ nextClientId }
 			>
-				{ shouldRenderInsertionPoint && (
-					<div
-						style={ {
-							borderRadius: '0',
-							height: '12px',
-							opacity: 1,
-							transform: 'translateY(-50%)',
-							width: '100%',
-						} }
-						className="block-editor-block-list__insertion-point-indicator"
-					/>
-				) }
-				{ shouldRenderInserter && (
+				{ ! shouldRenderInsertionPoint && (
 					<ZoomOutModeInserterButton
 						isVisible={ isSelected || isHovered }
 						onClick={ () => {
@@ -113,6 +97,9 @@ function ZoomOutModeInserters() {
 								insertionIndex: index,
 								tab: 'patterns',
 								category: 'all',
+							} );
+							showInsertionPoint( sectionRootClientId, index, {
+								operation: 'insert',
 							} );
 						} }
 					/>

@@ -74,6 +74,7 @@ export default function InitPatternModal() {
 								__next40pxDefaultSize
 							/>
 							<ToggleControl
+								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
@@ -87,6 +88,8 @@ export default function InitPatternModal() {
 							/>
 							<HStack justify="right">
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									variant="primary"
 									type="submit"
 									disabled={ ! title }

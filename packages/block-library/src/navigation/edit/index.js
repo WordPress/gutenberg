@@ -591,6 +591,7 @@ function Navigation( {
 						{ isResponsive && (
 							<>
 								<Button
+									__next40pxDefaultSize
 									className={ overlayMenuPreviewClasses }
 									onClick={ () => {
 										setOverlayMenuPreview(
@@ -626,10 +627,11 @@ function Navigation( {
 								</div>
 							</>
 						) }
-						<h3>{ __( 'Overlay Menu' ) }</h3>
 						<ToggleGroupControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							label={ __( 'Configure overlay menu' ) }
+							label={ __( 'Overlay Menu' ) }
+							aria-label={ __( 'Configure overlay menu' ) }
 							value={ overlayMenu }
 							help={ __(
 								'Collapses the navigation options in a menu icon opening an overlay.'
@@ -638,7 +640,6 @@ function Navigation( {
 								setAttributes( { overlayMenu: value } )
 							}
 							isBlock
-							hideLabelFromVision
 						>
 							<ToggleGroupControlOption
 								value="never"
@@ -721,7 +722,7 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-
+	const isHiddenByDefault = 'always' === overlayMenu;
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 
@@ -760,7 +761,7 @@ function Navigation( {
 					hasIcon={ hasIcon }
 					icon={ icon }
 					isResponsive={ isResponsive }
-					isHiddenByDefault={ 'always' === overlayMenu }
+					isHiddenByDefault={ isHiddenByDefault }
 					overlayBackgroundColor={ overlayBackgroundColor }
 					overlayTextColor={ overlayTextColor }
 				>
@@ -899,13 +900,13 @@ function Navigation( {
 							: undefined
 					}
 				>
-					{ isLoading && (
+					{ isLoading && ! isHiddenByDefault && (
 						<div className="wp-block-navigation__loading-indicator-container">
 							<Spinner className="wp-block-navigation__loading-indicator" />
 						</div>
 					) }
 
-					{ ! isLoading && (
+					{ ( ! isLoading || isHiddenByDefault ) && (
 						<>
 							<AccessibleMenuDescription
 								id={ accessibleDescriptionId }
@@ -917,7 +918,7 @@ function Navigation( {
 								icon={ icon }
 								isOpen={ isResponsiveMenuOpen }
 								isResponsive={ isResponsive }
-								isHiddenByDefault={ 'always' === overlayMenu }
+								isHiddenByDefault={ isHiddenByDefault }
 								overlayBackgroundColor={
 									overlayBackgroundColor
 								}

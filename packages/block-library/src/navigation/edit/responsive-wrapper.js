@@ -79,6 +79,7 @@ export default function ResponsiveWrapper( {
 		<>
 			{ ! isOpen && (
 				<Button
+					__next40pxDefaultSize
 					aria-haspopup="true"
 					aria-label={ hasIcon && __( 'Open menu' ) }
 					className={ openButtonClasses }
@@ -100,6 +101,7 @@ export default function ResponsiveWrapper( {
 				>
 					<div { ...dialogProps }>
 						<Button
+							__next40pxDefaultSize
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ hasIcon && __( 'Close menu' ) }
 							onClick={ () => onToggle( false ) }

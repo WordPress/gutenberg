@@ -6,8 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
-import { store as blocksStore } from '@wordpress/blocks';
+import { isBlobURL, createBlobURL } from '@wordpress/blob';
+import { store as blocksStore, createBlock } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { unlock } from '../lock-unlock';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
+import { isValidFileType } from './utils';
 
 /**
  * Module constants
@@ -108,6 +110,10 @@ export function ImageEdit( {
 		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const figureRef = useRef();
+
+	const [ contentResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -119,7 +125,7 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -134,7 +140,12 @@ export function ImageEdit( {
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
-	const { getSettings } = useSelect( blockEditorStore );
+	const {
+		getSettings,
+		getBlockRootClientId,
+		getBlockName,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -148,7 +159,52 @@ export function ImageEdit( {
 		} );
 	}
 
+	function onSelectImagesList( images ) {
+		const win = figureRef.current?.ownerDocument.defaultView;
+
+		if ( images.every( ( file ) => file instanceof win.File ) ) {
+			/** @type {File[]} */
+			const files = images;
+			const rootClientId = getBlockRootClientId( clientId );
+
+			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
+				// Copied from the same notice in the gallery block.
+				createErrorNotice(
+					__(
+						'If uploading to a gallery all files need to be image formats'
+					),
+					{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+				);
+			}
+
+			const imageBlocks = files
+				.filter( ( file ) => isValidFileType( file ) )
+				.map( ( file ) =>
+					createBlock( 'core/image', {
+						blob: createBlobURL( file ),
+					} )
+				);
+
+			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
+				replaceBlock( clientId, imageBlocks );
+			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{},
+					imageBlocks
+				);
+
+				replaceBlock( clientId, galleryBlock );
+			}
+		}
+	}
+
 	function onSelectImage( media ) {
+		if ( Array.isArray( media ) ) {
+			onSelectImagesList( media );
+			return;
+		}
+
 		if ( ! media || ! media.url ) {
 			setAttributes( {
 				url: undefined,
@@ -292,7 +348,7 @@ export function ImageEdit( {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const blockProps = useBlockProps( { className: classes } );
+	const blockProps = useBlockProps( { ref: figureRef, className: classes } );
 
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
@@ -322,7 +378,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected, metadata?.bindings?.url ]
+		[ context, isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
@@ -337,7 +393,7 @@ export function ImageEdit( {
 				instructions={
 					! lockUrlControls &&
 					__(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					)
 				}
 				style={ {
@@ -364,35 +420,44 @@ export function ImageEdit( {
 	};
 
 	return (
-		<figure { ...blockProps }>
-			<Image
-				temporaryURL={ temporaryURL }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSingleSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				onReplace={ onReplace }
-				onSelectImage={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onUploadError={ onUploadError }
-				context={ context }
-				clientId={ clientId }
-				blockEditingMode={ blockEditingMode }
-				parentLayoutType={ parentLayout?.type }
-			/>
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
-		</figure>
+		<>
+			<figure { ...blockProps }>
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ parentLayout?.type }
+					containerWidth={ containerWidth }
+				/>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					handleUpload={ ( files ) => files.length === 1 }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				contentResizeListener
+			}
+		</>
 	);
 }
 

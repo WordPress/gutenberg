@@ -7,7 +7,7 @@
 
 	// Block UI appearance.
 	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background-color: $white;
 
 	.block-editor-warning__message {
@@ -30,21 +30,14 @@
 		flex-wrap: wrap;
 		align-items: baseline;
 		width: 100%;
+		gap: $grid-unit-15;
 	}
 
 	.block-editor-warning__actions {
 		align-items: center;
 		display: flex;
-		margin-top: 1em;
+		gap: $grid-unit-10;
 	}
-
-	.block-editor-warning__action {
-		margin: 0 $grid-unit-10 0 0;
-	}
-}
-
-.block-editor-warning__secondary {
-	margin: auto 0 auto $grid-unit-10;
 }
 
 .components-popover.block-editor-warning__dropdown {

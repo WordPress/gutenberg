@@ -7,9 +7,12 @@
 	container: dataviews-wrapper / inline-size;
 	display: flex;
 	flex-direction: column;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
 }
 
-.dataviews__view-actions {
+.dataviews__view-actions,
+.dataviews-filters__container {
 	box-sizing: border-box;
 	padding: $grid-unit-20 $grid-unit-60;
 	flex-shrink: 0;
@@ -17,12 +20,6 @@
 	left: 0;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
-
-	.components-search-control {
-		.components-base-control__field {
-			max-width: 240px;
-		}
-	}
 }
 
 .dataviews-view-list__primary-field,
@@ -78,14 +75,9 @@
 
 /* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
-	.dataviews__view-actions {
+	.dataviews__view-actions,
+	.dataviews-filters__container {
 		padding: $grid-unit-15 $grid-unit-30;
-
-		.components-search-control {
-			.components-base-control__field {
-				max-width: 112px;
-			}
-		}
 	}
 
 	.dataviews-view-grid,
@@ -95,3 +87,4 @@
 		padding-right: $grid-unit-30;
 	}
 }
+

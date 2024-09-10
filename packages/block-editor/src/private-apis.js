@@ -6,7 +6,6 @@ import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
-import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
 	extractWords,
@@ -16,7 +15,7 @@ import {
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
+import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
@@ -38,6 +37,7 @@ import {
 	reusableBlocksSelectKey,
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
+	sectionRootClientIdKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -47,6 +47,7 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
+import { useBlockBindingsUtils } from './utils/block-bindings';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -58,7 +59,6 @@ lock( privateApis, {
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
-	PrivateInserter,
 	PrivateQuickInserter,
 	extractWords,
 	getNormalizedSearchTerms,
@@ -68,7 +68,6 @@ lock( privateApis, {
 	BlockInfo,
 	useHasBlockToolbar,
 	cleanEmptyObject,
-	useStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockRemovalWarningModal,
@@ -93,4 +92,6 @@ lock( privateApis, {
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
+	useBlockBindingsUtils,
+	sectionRootClientIdKey,
 } );

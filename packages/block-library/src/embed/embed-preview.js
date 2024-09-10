@@ -13,19 +13,15 @@ import clsx from 'clsx';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
-import {
-	RichText,
-	BlockIcon,
-	__experimentalGetElementClassName,
-} from '@wordpress/block-editor';
+import { BlockIcon } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { getAuthority } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import WpEmbedPreview from './wp-embed-preview';
+import { Caption } from '../utils/caption';
 
 class EmbedPreview extends Component {
 	constructor() {
@@ -62,13 +58,13 @@ class EmbedPreview extends Component {
 			previewable,
 			url,
 			type,
-			caption,
-			onCaptionChange,
-			isSelected,
 			className,
 			icon,
 			label,
 			insertBlocksAfter,
+			attributes,
+			setAttributes,
+			isSelected,
 		} = this.props;
 		const { scripts } = preview;
 		const { interactive } = this.state;
@@ -139,24 +135,14 @@ class EmbedPreview extends Component {
 						</p>
 					</Placeholder>
 				) }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						identifier="caption"
-						tagName="figcaption"
-						className={ __experimentalGetElementClassName(
-							'caption'
-						) }
-						placeholder={ __( 'Add caption' ) }
-						value={ caption }
-						onChange={ onCaptionChange }
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-					/>
-				) }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Embed caption text' ) }
+					showToolbarButton={ isSelected }
+				/>
 			</figure>
 		);
 	}

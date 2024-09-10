@@ -87,9 +87,6 @@
 		$stop2: 64%;
 
 		--wp-underline-color: var(--wp-admin-theme-color);
-		.is-dark-theme & {
-			--wp-underline-color: #{ $dark-theme-focus };
-		}
 
 		background-image:
 			linear-gradient(45deg, transparent ($stop1 - $blur), var(--wp-underline-color) $stop1, var(--wp-underline-color) ($stop1 + $width), transparent ($stop1 + $width + $blur)),

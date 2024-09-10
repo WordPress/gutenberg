@@ -131,7 +131,6 @@ $z-layers: (
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
 	".edit-site-list__rename-modal": 1000001,
-	".dataviews-bulk-actions__modal": 1000001,
 	".dataviews-action-modal": 1000001,
 	".editor-action-modal": 1000001,
 	".editor-post-template__swap-template-modal": 1000001,
@@ -194,7 +193,6 @@ $z-layers: (
 	// Site editor layout
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
 	".edit-site-layout__sidebar": 1,
@@ -208,8 +206,11 @@ $z-layers: (
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
-	// Ensure quick actions toolbar appear above pagination
-	".dataviews-bulk-actions-toolbar": 2,
+	// Ensure selection checkbox stays above the preview field.
+	".dataviews-view-grid__card .dataviews-selection-checkbox": 1,
+
+	// Ensure footer stays above the preview field.
+	".dataviews-footer": 2,
 );
 
 @function z-index( $key ) {

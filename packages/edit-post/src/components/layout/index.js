@@ -74,7 +74,6 @@ function useEditorStyles() {
 		hasThemeStyleSupport,
 		editorSettings,
 		isZoomedOutView,
-		hasMetaBoxes,
 		renderingMode,
 		postType,
 	} = useSelect( ( select ) => {
@@ -86,7 +85,6 @@ function useEditorStyles() {
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
 			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
-			hasMetaBoxes: select( editPostStore ).hasMetaBoxes(),
 			renderingMode: getRenderingMode(),
 			postType: _postType,
 		};
@@ -128,20 +126,17 @@ function useEditorStyles() {
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a constant padding for the typewriter effect. When typing at the
-		// bottom, there needs to be room to scroll up.
+		// Add a space for the typewriter effect. When typing in the last block,
+		// there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
-			! hasMetaBoxes &&
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {
 			return [
 				...baseStyles,
 				{
-					// Should override global styles padding, so ensure 0-1-0
-					// specificity.
-					css: ':root :where(body){padding-bottom: 40vh}',
+					css: ':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}',
 				},
 			];
 		}

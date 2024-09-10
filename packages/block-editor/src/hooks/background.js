@@ -16,16 +16,14 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 } from '../components/global-styles/background-panel';
-import {
-	globalStylesDataKey,
-	globalStylesLinksDataKey,
-} from '../store/private-keys';
+import { globalStylesDataKey } from '../store/private-keys';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
-// Initial control values where no block style is set.
-const BACKGROUND_DEFAULT_VALUES = {
+// Initial control values.
+export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
 
 /**
@@ -55,31 +53,28 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 }
 
 export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if ( ! backgroundStyle ) {
+	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.url ) {
 		return;
 	}
 
-	const backgroundImage = backgroundStyle?.backgroundImage;
 	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if ( !! backgroundImage?.url ) {
-		if ( ! backgroundStyle?.backgroundSize ) {
-			backgroundStylesWithDefaults = {
-				backgroundSize: 'cover',
-			};
-		}
-
-		if (
-			'contain' === backgroundStyle?.backgroundSize &&
-			! backgroundStyle?.backgroundPosition
-		) {
-			backgroundStylesWithDefaults = {
-				backgroundPosition: 'center',
-			};
-		}
+	if ( ! backgroundStyle?.backgroundSize ) {
+		backgroundStylesWithDefaults = {
+			backgroundSize: BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundSize,
+		};
 	}
 
+	if (
+		'contain' === backgroundStyle?.backgroundSize &&
+		! backgroundStyle?.backgroundPosition
+	) {
+		backgroundStylesWithDefaults = {
+			backgroundPosition:
+				BACKGROUND_BLOCK_DEFAULT_VALUES.backgroundPosition,
+		};
+	}
 	return backgroundStylesWithDefaults;
 }
 
@@ -138,15 +133,15 @@ export function BackgroundImagePanel( {
 	setAttributes,
 	settings,
 } ) {
-	const { style, inheritedValue, _links } = useSelect(
+	const { style, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
 			return {
 				style: getBlockAttributes( clientId )?.style,
-				_links: _settings[ globalStylesLinksDataKey ],
 				/*
+				 * To ensure we pass down the right inherited values:
 				 * @TODO 1. Pass inherited value down to all block style controls,
 				 *   See: packages/block-editor/src/hooks/style.js
 				 * @TODO 2. Add support for block style variations,
@@ -187,11 +182,10 @@ export function BackgroundImagePanel( {
 			inheritedValue={ inheritedValue }
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
-			defaultValues={ BACKGROUND_DEFAULT_VALUES }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }
-			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);
 }

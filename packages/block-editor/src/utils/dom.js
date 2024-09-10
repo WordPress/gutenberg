@@ -57,3 +57,120 @@ export function getBlockClientId( node ) {
 
 	return blockNode.id.slice( 'block-'.length );
 }
+
+/**
+ * Calculates the union of two rectangles.
+ *
+ * @param {DOMRect} rect1 First rectangle.
+ * @param {DOMRect} rect2 Second rectangle.
+ * @return {DOMRect} Union of the two rectangles.
+ */
+export function rectUnion( rect1, rect2 ) {
+	const left = Math.min( rect1.left, rect2.left );
+	const right = Math.max( rect1.right, rect2.right );
+	const bottom = Math.max( rect1.bottom, rect2.bottom );
+	const top = Math.min( rect1.top, rect2.top );
+
+	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
+}
+
+/**
+ * Returns whether an element is visible.
+ *
+ * @param {Element} element Element.
+ * @return {boolean} Whether the element is visible.
+ */
+function isElementVisible( element ) {
+	const viewport = element.ownerDocument.defaultView;
+	if ( ! viewport ) {
+		return false;
+	}
+
+	// Check for <VisuallyHidden> component.
+	if ( element.classList.contains( 'components-visually-hidden' ) ) {
+		return false;
+	}
+
+	const bounds = element.getBoundingClientRect();
+	if ( bounds.width === 0 || bounds.height === 0 ) {
+		return false;
+	}
+
+	// Older browsers, e.g. Safari < 17.4 may not support the `checkVisibility` method.
+	if ( element.checkVisibility ) {
+		return element.checkVisibility?.( {
+			opacityProperty: true,
+			contentVisibilityAuto: true,
+			visibilityProperty: true,
+		} );
+	}
+
+	const style = viewport.getComputedStyle( element );
+
+	if (
+		style.display === 'none' ||
+		style.visibility === 'hidden' ||
+		style.opacity === '0'
+	) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Returns the rect of the element including all visible nested elements.
+ *
+ * Visible nested elements, including elements that overflow the parent, are
+ * taken into account.
+ *
+ * This function is useful for calculating the visible area of a block that
+ * contains nested elements that overflow the block, e.g. the Navigation block,
+ * which can contain overflowing Submenu blocks.
+ *
+ * The returned rect represents the full extent of the element and its visible
+ * children, which may extend beyond the viewport.
+ *
+ * @param {Element} element Element.
+ * @return {DOMRect} Bounding client rect of the element and its visible children.
+ */
+export function getVisibleElementBounds( element ) {
+	const viewport = element.ownerDocument.defaultView;
+	if ( ! viewport ) {
+		return new window.DOMRectReadOnly();
+	}
+
+	let bounds = element.getBoundingClientRect();
+
+	const stack = [ element ];
+	let currentElement;
+
+	while ( ( currentElement = stack.pop() ) ) {
+		for ( const child of currentElement.children ) {
+			if ( isElementVisible( child ) ) {
+				const childBounds = child.getBoundingClientRect();
+				bounds = rectUnion( bounds, childBounds );
+				stack.push( child );
+			}
+		}
+	}
+
+	/*
+	 * Take into account the outer horizontal limits of the container in which
+	 * an element is supposed to be "visible". For example, if an element is
+	 * positioned -10px to the left of the window x value (0), this function
+	 * discounts the negative overhang because it's not visible and therefore
+	 * not to be counted in the visibility calculations. Top and bottom values
+	 * are not accounted for to accommodate vertical scroll.
+	 */
+	const left = Math.max( bounds.left, 0 );
+	const right = Math.min( bounds.right, viewport.innerWidth );
+	bounds = new window.DOMRectReadOnly(
+		left,
+		bounds.top,
+		right - left,
+		bounds.height
+	);
+
+	return bounds;
+}

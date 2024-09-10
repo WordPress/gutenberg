@@ -13,9 +13,6 @@
 		// Disable any duotone filter applied in the selected state.
 		filter: none !important;
 
-		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
-		border-radius: $radius-block-ui;
-
 		> svg {
 			opacity: 0;
 		}
@@ -67,12 +64,24 @@ figure.wp-block-image:not(.wp-block) {
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+		margin: 0;
 	}
 }
 
 // Shown while image is being uploded but cannot be previewed.
 .wp-block-image__placeholder {
 	aspect-ratio: 4 / 3;
+
+	// Make placeholder background white so that you can see the spinner on top of it.
+	&.has-illustration::before {
+		background: $white;
+		opacity: 0.8;
+	}
+
+	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
+	.components-placeholder__illustration {
+		opacity: 0.1;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
