@@ -495,6 +495,7 @@ class Gutenberg_REST_Posts_Controller_6_7 extends WP_REST_Posts_Controller {
 			$query_params['format'] = array(
 				'description' => __( 'Limit result set to items assigned one or more given formats.' ),
 				'type'        => 'array',
+				'uniqueItems' => true,
 				'items'       => array(
 					'enum' => array_values( get_post_format_slugs() ),
 					'type' => 'string',
