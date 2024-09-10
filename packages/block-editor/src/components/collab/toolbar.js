@@ -3,7 +3,7 @@
  */
 import { _x } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
-import { collabComment } from '@wordpress/icons';
+import { comment as commentIcon } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -34,7 +34,7 @@ export default function BlockCommentToolbar() {
 	return (
 		<ToolbarButton
 			accessibleWhenDisabled
-			icon={ collabComment }
+			icon={ commentIcon }
 			label={ _x( 'Comment', 'Open comment button' ) }
 			onClick={ openCollabBoard }
 		/>
