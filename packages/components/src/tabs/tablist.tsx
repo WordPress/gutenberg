@@ -86,7 +86,7 @@ export const TabList = forwardRef<
 				...otherProps.style,
 			} }
 			className={ clsx(
-				animationEnabled ? 'is-animation-enabled' : '',
+				animationEnabled && 'is-animation-enabled',
 				otherProps.className
 			) }
 		>
