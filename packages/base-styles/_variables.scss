@@ -55,16 +55,16 @@ $radius-round: 50%;     // For circles and ovals.
  */
 
 // For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.
-$elevation-x-small: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
+$elevation-x-small: 0 1px 1px rgba($black, 0.05), 0 2px 2px rgba($black, 0.04), 0 5px 3px rgba($black, 0.03), 0 8px 3px rgba($black, 0.01);
 
 // For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.
-$elevation-small: 0 0.7px 1px 0 rgba(0, 0, 0, 0.12), 0 2.2px 3.7px -0.2px rgba(0, 0, 0, 0.12), 0 5.3px 7.3px -0.5px rgba(0, 0, 0, 0.12);
+$elevation-small: 0 1px 2px 0 rgba($black, 0.05), 0 4px 4px rgba($black, 0.04), 0 10px 6px rgba($black, 0.03), 0 10px 7px rgba($black, 0.01);
 
 // For components that offer additional actions. Example: Menus, Command Palette
-$elevation-medium: 0 0.7px 1px 0 rgba(0, 0, 0, 0.14), 0 4.2px 5.7px -0.2px rgba(0, 0, 0, 0.14), 0 7.3px 9.3px -0.5px rgba(0, 0, 0, 0.14);
+$elevation-medium: 0 2px 3px 0 rgba($black, 0.1), 0 6px 6px rgba($black, 0.09), 0 14px 8px rgba($black, 0.05), 0 25px 10px rgba($black, 0.01);
 
 // For components that confirm decisions or handle necessary interruptions. Example: Modals.
-$elevation-large: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
+$elevation-large: 0 7px 15px rgba($black, 0.1), 0 27px 27px rgba($black, 0.09), 0 61px 36px rgba($black, 0.05), 0 108px 43px rgba($black, 0.01);
 
 /**
  * Dimensions.
