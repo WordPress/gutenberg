@@ -2,11 +2,12 @@
 	.edit-site-post-featured-image {
 		width: 16px;
 		height: 16px;
-		border: $radius-small;
+		border-radius: $radius-small;
 	}
 	.edit-site-post-featured-image-placeholder {
 		width: 16px;
 		height: 16px;
+		border-radius: $radius-small;
 	}
 }
 
@@ -23,6 +24,7 @@
 .edit-site-post-featured-image-placeholder {
 	width: 24px;
 	height: 24px;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 	display: inline-block;
 	padding: 0;
@@ -34,12 +36,13 @@
 .edit-site-post-featured-image {
 	width: 24px;
 	height: 24px;
-	border: $radius-small;
+	border-radius: $radius-small;
 }
 
 .edit-site-dataviews-controls__featured-image {
 	.edit-side-dataviews-controls__featured-image-container {
 		border: $border-width solid $gray-300;
+		border-radius: $radius-small;
 		padding: 8px 12px;
 		cursor: pointer;
 		&:hover {
@@ -51,13 +54,6 @@
 		align-self: center;
 		text-align: start;
 		white-space: nowrap;
-	}
-
-	.edit-site-dataviews-controls__featured-image-filename {
-		color: $gray-700;
-		grid-area: 2 / 2 / 2 / 4;
-		line-height: 16px;
-		font-size: 12px;
 	}
 
 	.edit-site-dataviews-controls__featured-image-upload-button {
