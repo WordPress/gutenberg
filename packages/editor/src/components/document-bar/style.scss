@@ -47,6 +47,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		font-weight: 400;
 		white-space: nowrap;
 		overflow: hidden;
 	}
@@ -54,7 +55,6 @@
 
 .editor-document-bar__post-title {
 	color: currentColor;
-	font-weight: 400;
 	max-width: 64%;
 	overflow: hidden;
 	text-overflow: ellipsis;
