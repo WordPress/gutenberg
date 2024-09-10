@@ -3,12 +3,7 @@
  */
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import {
-	Dropdown,
-	Button,
-	ExternalLink,
-	__experimentalTruncate as Truncate,
-} from '@wordpress/components';
+import { Dropdown, Button, ExternalLink } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
@@ -102,7 +97,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			<Truncate numberOfLines={ 1 }>{ decodedSlug }</Truncate>
+			<>{ decodedSlug }</>
 		</Button>
 	);
 }
