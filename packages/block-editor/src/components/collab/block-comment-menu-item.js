@@ -3,7 +3,7 @@
  */
 import { _x } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
-import { collabComment } from '@wordpress/icons';
+import { comment as commentIcon } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -32,7 +32,7 @@ export default function BlockCommentMenuItem( { onClose } ) {
 
 	return (
 		<MenuItem
-			icon={ collabComment }
+			icon={ commentIcon }
 			onClick={ openCollabBoard }
 			aria-haspopup="dialog"
 		>
