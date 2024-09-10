@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { startOfYear, endOfYear, format } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -40,6 +45,7 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
+const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, setDisplayLayout } = props;
@@ -55,6 +61,7 @@ export default function QueryInspectorControls( props ) {
 		sticky,
 		inherit,
 		taxQuery,
+		year,
 		parents,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
@@ -89,6 +96,28 @@ export default function QueryInspectorControls( props ) {
 		// We need to reset `parents` because they are tied to each post type.
 		updateQuery.parents = [];
 		setQuery( updateQuery );
+	};
+	const onYearChange = ( value ) => {
+		const yearRegex = /^\d{4}$/;
+
+		if ( yearRegex.test( value ) ) {
+			const yearStart = format(
+				startOfYear( value ),
+				TIMEZONELESS_FORMAT
+			);
+			const yearEnd = format( endOfYear( value ), TIMEZONELESS_FORMAT );
+			setQuery( {
+				year: value,
+				after: yearStart,
+				before: yearEnd,
+			} );
+		} else {
+			setQuery( {
+				year: value,
+				after: undefined,
+				before: undefined,
+			} );
+		}
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
@@ -313,6 +342,9 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
+							year: '',
+							after: undefined,
+							before: undefined,
 						} );
 						setQuerySearch( '' );
 					} }
@@ -361,6 +393,27 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
+					<ToolsPanelItem
+						hasValue={ () => !! year }
+						label={ __( 'Year' ) }
+						onDeselect={ () =>
+							setQuery( {
+								after: undefined,
+								before: undefined,
+							} )
+						}
+					>
+						<TextControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Year:' ) }
+							type="number"
+							min="1000"
+							max="9999"
+							value={ year }
+							onChange={ onYearChange }
+						/>
+					</ToolsPanelItem>
 					{ showParentControl && (
 						<ToolsPanelItem
 							hasValue={ () => !! parents?.length }
