@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import addContainer from '../shared/add-container';
-import addIntroText from '../shared/add-intro-text';
-import clear from '../shared/clear';
-import filterMessage from '../shared/filter-message';
+import addContainer from './add-container';
+import addIntroText from './add-intro-text';
+import clear from './clear';
+import filterMessage from './filter-message';
 
 /**
  * Create the live regions.
