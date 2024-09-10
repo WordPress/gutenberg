@@ -24,9 +24,12 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"wp-script-module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wp-script-module-exports": {
+		".": "./build-module/index.js",
+		"./debug": "./build-module/debug.js"
+	},
 	"dependencies": {
 		"@preact/signals": "^1.2.2",
 		"preact": "^10.19.3"

@@ -17,16 +17,17 @@ module.exports = {
 	...baseConfig,
 	name: 'script-modules',
 	entry: {
-		interactivity: './packages/interactivity',
-		'interactivity-debug': './packages/interactivity/src/debug',
+		'interactivity/index': './packages/interactivity',
+		'interactivity/debug': './packages/interactivity/debug',
+
 		'interactivity-router': './packages/interactivity-router',
 
-		'block-library/file': './packages/block-library/src/file/view.js',
-		'block-library/image': './packages/block-library/src/image/view.js',
-		'block-library/navigation':
-			'./packages/block-library/src/navigation/view.js',
-		'block-library/query': './packages/block-library/src/query/view.js',
-		'block-library/search': './packages/block-library/src/search/view.js',
+		'block-library/file/view': './packages/block-library/file/view',
+		'block-library/image/view': './packages/block-library/image/view',
+		'block-library/navigation/view':
+			'./packages/block-library/navigation/view',
+		'block-library/query/view': './packages/block-library/query/view',
+		'block-library/search/view': './packages/block-library/search/view',
 	},
 	experiments: {
 		outputModule: true,
@@ -45,7 +46,7 @@ module.exports = {
 	},
 	resolve: {
 		extensions: [ '.js', '.ts', '.tsx' ],
-		mainFields: [ 'wp-script-module' ],
+		exportsFields: [ 'wp-script-module-exports', 'exports' ],
 	},
 	module: {
 		rules: [
