@@ -333,6 +333,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__patterns-category-panel-body {
+	overflow-y: hidden;
+}
+
 .block-editor-inserter__patterns-category-no-results {
 	margin-top: $grid-unit-30;
 }

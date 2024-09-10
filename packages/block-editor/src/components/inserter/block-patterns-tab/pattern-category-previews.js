@@ -170,7 +170,10 @@ export function PatternCategoryPreviews( {
 					</Text>
 				) }
 			</VStack>
-			<VStack spacing={ 4 }>
+			<VStack
+				spacing={ 4 }
+				className="block-editor-inserter__patterns-category-panel-body"
+			>
 				{ currentCategoryPatterns.length > 0 && (
 					<>
 						{ isZoomOutMode && (
