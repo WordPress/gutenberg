@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	IconType,
 	Button,
 	__experimentalText as Text,
 	__unstableMotion as motion,
@@ -29,6 +28,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
+
+/** @typedef {import("@wordpress/components").IconType} IconType */
 
 const MotionButton = motion( Button );
 
