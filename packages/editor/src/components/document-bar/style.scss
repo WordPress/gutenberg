@@ -62,11 +62,12 @@
 		text-overflow: ellipsis;
 		max-width: 70%;
 		color: currentColor;
+		font-weight: 400;
 	}
 }
 
 .editor-document-bar__shortcut {
-	color: $gray-700;
+	color: $gray-800;
 	min-width: $grid-unit-30;
 	display: none;
 
@@ -90,5 +91,5 @@
 }
 
 .editor-document-bar__post-type-label {
-	color: $gray-700;
+	color: $gray-800;
 }
