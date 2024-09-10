@@ -24,6 +24,7 @@ import {
 	useFocusOnMount,
 	useConstrainedTabbing,
 	useMergeRefs,
+	useReducedMotion,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
@@ -184,6 +185,46 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
+	const frameRef = useRef< HTMLDivElement >();
+	const [ isAnimatingOut, setIsAnimatingOut ] = useState( false );
+	const isReducedMotion = useReducedMotion();
+	const animateClose = useCallback< typeof onRequestClose >(
+		( event ) => {
+			function onAnimationEnd( e: AnimationEvent ) {
+				if (
+					e.animationName === 'components-modal__disappear-animation'
+				) {
+					setIsAnimatingOut( false );
+					onRequestCloseRef.current?.( event );
+				}
+			}
+
+			if ( isReducedMotion ) {
+				onRequestCloseRef.current?.( event );
+				return;
+			}
+
+			if ( ! frameRef.current ) {
+				return;
+			}
+
+			// Grab a reference to the frame element, to make sure we're referencing
+			// the same reference in the cleanup function.
+			const frameEl = frameRef.current;
+
+			setIsAnimatingOut( true );
+			frameEl.addEventListener( 'animationend', onAnimationEnd, {
+				once: true,
+			} );
+
+			return () => {
+				frameEl.removeEventListener( 'animationend', onAnimationEnd );
+				window.clearTimeout( animationTimeout );
+			};
+		},
+		[ isReducedMotion ]
+	);
+
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
 		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
@@ -207,9 +248,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			if ( onRequestClose ) {
-				onRequestClose( event );
-			}
+			animateClose( event );
 		}
 	}
 
@@ -248,7 +287,7 @@ function UnforwardedModal(
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
 			if ( button === 0 && isSameTarget ) {
-				onRequestClose();
+				animateClose();
 			}
 		},
 	};
@@ -259,6 +298,7 @@ function UnforwardedModal(
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ clsx(
 				'components-modal__screen-overlay',
+				isAnimatingOut && 'is-animating-out',
 				overlayClassName
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
@@ -273,6 +313,7 @@ function UnforwardedModal(
 					) }
 					style={ style }
 					ref={ useMergeRefs( [
+						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
 						focusOnMount !== 'firstContentElement'
@@ -331,7 +372,7 @@ function UnforwardedModal(
 										/>
 										<Button
 											size="small"
-											onClick={ onRequestClose }
+											onClick={ animateClose }
 											icon={ close }
 											label={
 												closeButtonLabel ||
