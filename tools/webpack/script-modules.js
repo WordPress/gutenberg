@@ -80,7 +80,7 @@ for ( const [ packageName, versionSpecifier ] of iterableDeps ) {
 module.exports = {
 	...baseConfig,
 	name: 'script-modules',
-	entry: gutenbergScriptModules,
+	entry: Object.fromEntries( gutenbergScriptModules.entries() ),
 	experiments: {
 		outputModule: true,
 	},
