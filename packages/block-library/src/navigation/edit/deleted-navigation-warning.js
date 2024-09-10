@@ -1,37 +1,47 @@
 /**
  * WordPress dependencies
  */
+import { Warning } from '@wordpress/block-editor';
 import { Button, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
-function DeletedNavigationNotice( { onCreateNew } ) {
-	const [ noticeVisible, setNoticeVisible ] = useState( true );
-
-	return (
-		noticeVisible && (
-			<Notice
-				status="warning"
-				onRemove={ () => setNoticeVisible( false ) }
-				isDismissible
-			>
-				{ createInterpolateElement(
-					__(
-						'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
+function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
+	return isNotice ? (
+		<Notice status="warning" isDismissible={ false }>
+			{ createInterpolateElement(
+				__(
+					'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
+				),
+				{
+					button: (
+						<Button
+							__next40pxDefaultSize
+							onClick={ onCreateNew }
+							variant="link"
+						/>
 					),
-					{
-						button: (
-							<Button
-								__next40pxDefaultSize
-								onClick={ onCreateNew }
-								variant="link"
-							/>
-						),
-					}
-				) }
-			</Notice>
-		)
+				}
+			) }
+		</Notice>
+	) : (
+		<Warning>
+			{ createInterpolateElement(
+				__(
+					'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
+				),
+				{
+					button: (
+						<Button
+							__next40pxDefaultSize
+							onClick={ onCreateNew }
+							variant="link"
+						/>
+					),
+				}
+			) }
+		</Warning>
 	);
 }
 
-export default DeletedNavigationNotice;
+export default DeletedNavigationWarning;
