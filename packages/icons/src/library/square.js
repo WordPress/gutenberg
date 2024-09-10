@@ -9,8 +9,8 @@ const square = (
 			fill="none"
 			d="M5.75 12.75V18.25H11.25M12.75 5.75H18.25V11.25"
 			stroke="currentColor"
-			stroke-width="1.5"
-			stroke-linecap="square"
+			strokeWidth="1.5"
+			strokeLinecap="square"
 		/>
 	</SVG>
 );
