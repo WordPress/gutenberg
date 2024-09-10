@@ -121,6 +121,8 @@ function ListViewBranch( props ) {
 		blockIndexes,
 		expandedState,
 		draggedClientIds,
+		sectionBlockClientIds,
+		isZoomOutMode,
 	} = useListViewContext();
 
 	if ( ! canParentExpand ) {
@@ -174,8 +176,14 @@ function ListViewBranch( props ) {
 						: `${ position }`;
 				const hasNestedBlocks = !! innerBlocks?.length;
 
+				const isZoomOutSectionBlock =
+					isZoomOutMode &&
+					sectionBlockClientIds?.includes( clientId );
+
 				const shouldExpand =
-					hasNestedBlocks && shouldShowInnerBlocks
+					! isZoomOutSectionBlock &&
+					hasNestedBlocks &&
+					shouldShowInnerBlocks
 						? expandedState[ clientId ] ?? isExpanded
 						: undefined;
 
