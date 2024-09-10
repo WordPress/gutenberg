@@ -96,7 +96,7 @@ export function getBindableAttributes( blockName ) {
 	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
 }
 
-export const editWithBlockBindings = createHigherOrderComponent(
+export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
 		const blockContext = useContext( BlockContext );
@@ -296,17 +296,8 @@ export const editWithBlockBindings = createHigherOrderComponent(
 			</>
 		);
 	},
-	'editWithBlockBindings'
+	'withBlockBindingSupport'
 );
-
-function labelWithBlockBindings( settings ) {
-	return ( attributes, { context } ) => {
-		if ( attributes?.metadata?.bindings && context === 'accessibility' ) {
-			return 'Overriding label';
-		}
-		return settings.__experimentalLabel?.( attributes, { context } );
-	};
-}
 
 /**
  * Filters a registered block's settings to enhance a block's `edit` component
@@ -323,8 +314,7 @@ function shimAttributeSource( settings, name ) {
 
 	return {
 		...settings,
-		edit: editWithBlockBindings( settings.edit ),
-		__experimentalLabel: labelWithBlockBindings( settings ),
+		edit: withBlockBindingSupport( settings.edit ),
 	};
 }
 
