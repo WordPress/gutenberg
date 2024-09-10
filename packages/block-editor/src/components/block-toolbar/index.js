@@ -34,7 +34,6 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import Shuffle from './shuffle';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 
 /**
@@ -59,13 +58,15 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
+		isContentOnlyEditingMode,
 		isDefaultEditingMode,
 		blockType,
 		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		canRemove,
+		hasParentPattern,
+		hasContentOnlyLocking,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -73,20 +74,19 @@ export function PrivateBlockToolbar( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
-			canRemoveBlock,
+			getBlockParentsByBlockName,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( firstParentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const _isDefaultEditingMode =
-			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
@@ -98,13 +98,24 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+
+		const _hasParentPattern = selectedBlockClientIds.every(
+			( clientId ) =>
+				getBlockParentsByBlockName( clientId, 'core/block', true )
+					.length > 0
+		);
+
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
+		const _hasTemplateLock = selectedBlockClientIds.some(
+			( id ) => getTemplateLock( id ) === 'contentOnly'
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
+			isContentOnlyEditingMode: editingMode === 'contentOnly',
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
 			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
 				parentBlockType &&
@@ -117,7 +128,8 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
-			canRemove: canRemoveBlock( selectedBlockClientId ),
+			hasParentPattern: _hasParentPattern,
+			hasContentOnlyLocking: _hasTemplateLock,
 		};
 	}, [] );
 
@@ -171,7 +183,9 @@ export function PrivateBlockToolbar( {
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					( isDefaultEditingMode || isSynced ) && (
+					( isDefaultEditingMode ||
+						( isContentOnlyEditingMode && ! hasParentPattern ) ||
+						isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
@@ -198,12 +212,9 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				{ ! isMultiToolbar && canRemove && (
-					<Shuffle clientId={ blockClientId } />
-				) }
-				{ shouldShowVisualToolbar && isMultiToolbar && (
-					<BlockGroupToolbar />
-				) }
+				{ ! hasContentOnlyLocking &&
+					shouldShowVisualToolbar &&
+					isMultiToolbar && <BlockGroupToolbar /> }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot

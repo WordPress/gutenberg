@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import {
 	chevronRight,
@@ -38,7 +38,7 @@ const CarouselNavigation = ( {
 		<Button
 			// TODO: Switch to `true` (40px size) if possible
 			__next40pxDefaultSize={ false }
-			icon={ chevronLeft }
+			icon={ isRTL() ? chevronRight : chevronLeft }
 			label={ __( 'Previous pattern' ) }
 			onClick={ handlePrevious }
 			disabled={ activeSlide === 0 }
@@ -47,7 +47,7 @@ const CarouselNavigation = ( {
 		<Button
 			// TODO: Switch to `true` (40px size) if possible
 			__next40pxDefaultSize={ false }
-			icon={ chevronRight }
+			icon={ isRTL() ? chevronLeft : chevronRight }
 			label={ __( 'Next pattern' ) }
 			onClick={ handleNext }
 			disabled={ activeSlide === totalSlides - 1 }

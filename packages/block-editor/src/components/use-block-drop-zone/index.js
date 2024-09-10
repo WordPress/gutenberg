@@ -275,6 +275,23 @@ export function isDropTargetValid(
 }
 
 /**
+ * Checks if the given element is an insertion point.
+ *
+ * @param {EventTarget|null} targetToCheck - The element to check.
+ * @param {Document}         ownerDocument - The owner document of the element.
+ * @return {boolean} True if the element is a insertion point, false otherwise.
+ */
+function isInsertionPoint( targetToCheck, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+
+	return !! (
+		defaultView &&
+		targetToCheck instanceof defaultView.HTMLElement &&
+		targetToCheck.dataset.isInsertionPoint
+	);
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -313,8 +330,8 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
-		getSettings,
 		isZoomOutMode,
+		getSectionRootClientId,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -360,7 +377,7 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const { sectionRootClientId } = unlock( getSettings() );
+				const sectionRootClientId = getSectionRootClientId();
 
 				// In Zoom Out mode, if the target is not the section root provided by settings then
 				// do not allow dropping as the drop target is not within the root (that which is
@@ -421,6 +438,10 @@ export default function useBlockDropZone( {
 
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
+
+				if ( isZoomOutMode() && operation !== 'insert' ) {
+					return;
+				}
 
 				if ( operation === 'group' ) {
 					const targetBlock = blocks[ targetIndex ];
@@ -492,6 +513,8 @@ export default function useBlockDropZone( {
 				getBlockNamesByClientId,
 				getDraggedBlockClientIds,
 				getBlockType,
+				getSectionRootClientId,
+				isZoomOutMode,
 				getBlocks,
 				getBlockListSettings,
 				dropZoneElement,
@@ -504,8 +527,6 @@ export default function useBlockDropZone( {
 				isGroupable,
 				getBlockVariations,
 				getGroupingBlockName,
-				getSettings,
-				isZoomOutMode,
 			]
 		),
 		200
@@ -521,7 +542,18 @@ export default function useBlockDropZone( {
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget.ownerDocument );
 		},
-		onDragLeave() {
+		onDragLeave( event ) {
+			const { ownerDocument } = event.currentTarget;
+
+			// If the drag event is leaving the drop zone and entering an insertion point,
+			// do not hide the insertion point as it is conceptually within the dropzone.
+			if (
+				isInsertionPoint( event.relatedTarget, ownerDocument ) ||
+				isInsertionPoint( event.target, ownerDocument )
+			) {
+				return;
+			}
+
 			throttled.cancel();
 			hideInsertionPoint();
 		},

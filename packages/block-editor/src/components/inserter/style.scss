@@ -44,12 +44,12 @@ $block-inserter-tabs-height: 44px;
 
 			&:first-child {
 				border-top: $border-width solid $gray-400;
-				border-radius: $radius-block-ui $radius-block-ui 0 0;
+				border-radius: $radius-medium $radius-medium 0 0;
 			}
 
 			&:last-child {
 				border-bottom: $border-width solid $gray-400;
-				border-radius: 0 0 $radius-block-ui $radius-block-ui;
+				border-radius: 0 0 $radius-medium $radius-medium;
 			}
 
 			&.components-button {
@@ -276,7 +276,7 @@ $block-inserter-tabs-height: 44px;
 				bottom: 0;
 				left: 0;
 				right: 0;
-				border-radius: $radius-block-ui;
+				border-radius: $radius-small;
 				opacity: 0.04;
 				background: var(--wp-admin-theme-color);
 				height: 100%;
@@ -359,7 +359,7 @@ $block-inserter-tabs-height: 44px;
 	min-height: $grid-unit-60 * 3;
 	color: $gray-700;
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 }
 
 .block-editor-inserter__tips {
@@ -577,7 +577,6 @@ $block-inserter-tabs-height: 44px;
 
 		> button {
 			background: $white;
-			border-radius: $radius-block-ui;
 			display: none;
 
 			// These styles are important so as focus isn't lost
@@ -611,7 +610,6 @@ $block-inserter-tabs-height: 44px;
 			max-width: 100%;
 			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
-			border-radius: $radius-block-ui;
 		}
 
 		.block-editor-inserter__media-list__item-preview-spinner {
@@ -710,4 +708,8 @@ $block-inserter-tabs-height: 44px;
 			flex-direction: column;
 		}
 	}
+}
+
+.block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
+	padding: 0 $grid-unit-30;
 }
