@@ -1,4 +1,20 @@
+@mixin keyframes($name) {
+	@keyframes #{$name} {
+		@content;
+	}
+}
+
 @mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
+	@include keyframes(edit-post__fade-in-animation) {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+
 	animation: edit-post__fade-in-animation $speed linear $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
