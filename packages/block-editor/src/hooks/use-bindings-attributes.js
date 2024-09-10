@@ -96,6 +96,78 @@ export function getBindableAttributes( blockName ) {
 	return BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
 }
 
+export function getBindingsValues(
+	blockBindings,
+	name,
+	sources,
+	registry,
+	blockContext,
+	clientId
+) {
+	const attributes = {};
+
+	const blockBindingsBySource = new Map();
+
+	for ( const [ attributeName, binding ] of Object.entries(
+		blockBindings
+	) ) {
+		const { source: sourceName, args: sourceArgs } = binding;
+		const source = sources[ sourceName ];
+		if ( ! source || ! canBindAttribute( name, attributeName ) ) {
+			continue;
+		}
+
+		blockBindingsBySource.set( source, {
+			...blockBindingsBySource.get( source ),
+			[ attributeName ]: {
+				args: sourceArgs,
+			},
+		} );
+	}
+
+	if ( blockBindingsBySource.size ) {
+		for ( const [ source, bindings ] of blockBindingsBySource ) {
+			// Populate context.
+			const context = {};
+
+			if ( source.usesContext?.length ) {
+				for ( const key of source.usesContext ) {
+					context[ key ] = blockContext[ key ];
+				}
+			}
+
+			// Get values in batch if the source supports it.
+			let values = {};
+			if ( ! source.getValues ) {
+				Object.keys( bindings ).forEach( ( attr ) => {
+					// Default to the `key` or the source label when `getValues` doesn't exist
+					values[ attr ] = bindings[ attr ].args?.key || source.label;
+				} );
+			} else {
+				values = source.getValues( {
+					registry,
+					context,
+					clientId,
+					bindings,
+				} );
+			}
+			for ( const [ attributeName, value ] of Object.entries( values ) ) {
+				if (
+					attributeName === 'url' &&
+					( ! value || ! isURLLike( value ) )
+				) {
+					// Return null if value is not a valid URL.
+					attributes[ attributeName ] = null;
+				} else {
+					attributes[ attributeName ] = value;
+				}
+			}
+		}
+	}
+
+	return attributes;
+}
+
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
@@ -122,76 +194,15 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
 		const boundAttributes = useSelect( () => {
-			if ( ! blockBindings ) {
-				return;
-			}
-
-			const attributes = {};
-
-			const blockBindingsBySource = new Map();
-
-			for ( const [ attributeName, binding ] of Object.entries(
-				blockBindings
-			) ) {
-				const { source: sourceName, args: sourceArgs } = binding;
-				const source = sources[ sourceName ];
-				if ( ! source || ! canBindAttribute( name, attributeName ) ) {
-					continue;
-				}
-
-				blockBindingsBySource.set( source, {
-					...blockBindingsBySource.get( source ),
-					[ attributeName ]: {
-						args: sourceArgs,
-					},
-				} );
-			}
-
-			if ( blockBindingsBySource.size ) {
-				for ( const [ source, bindings ] of blockBindingsBySource ) {
-					// Populate context.
-					const context = {};
-
-					if ( source.usesContext?.length ) {
-						for ( const key of source.usesContext ) {
-							context[ key ] = blockContext[ key ];
-						}
-					}
-
-					// Get values in batch if the source supports it.
-					let values = {};
-					if ( ! source.getValues ) {
-						Object.keys( bindings ).forEach( ( attr ) => {
-							// Default to the `key` or the source label when `getValues` doesn't exist
-							values[ attr ] =
-								bindings[ attr ].args?.key || source.label;
-						} );
-					} else {
-						values = source.getValues( {
-							registry,
-							context,
-							clientId,
-							bindings,
-						} );
-					}
-					for ( const [ attributeName, value ] of Object.entries(
-						values
-					) ) {
-						if (
-							attributeName === 'url' &&
-							( ! value || ! isURLLike( value ) )
-						) {
-							// Return null if value is not a valid URL.
-							attributes[ attributeName ] = null;
-						} else {
-							attributes[ attributeName ] = value;
-						}
-					}
-				}
-			}
-
-			return attributes;
-		}, [ blockBindings, name, clientId, blockContext, registry, sources ] );
+			return getBindingsValues(
+				blockBindings,
+				name,
+				sources,
+				registry,
+				blockContext,
+				clientId
+			);
+		}, [ blockBindings, name, sources, registry, blockContext, clientId ] );
 
 		const { setAttributes } = props;
 

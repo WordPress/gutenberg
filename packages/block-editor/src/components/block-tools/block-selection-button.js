@@ -39,9 +39,8 @@ import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { unlock } from '../../lock-unlock';
-import { canBindAttribute } from '../../hooks/use-bindings-attributes';
+import { getBindingsValues } from '../../hooks/use-bindings-attributes';
 import BlockContext from '../block-context';
-import isURLLike from '../link-control/is-url-like';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -57,7 +56,6 @@ import isURLLike from '../link-control/is-url-like';
 function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
-
 	const sources = useSelect( ( select ) =>
 		unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 	);
@@ -83,78 +81,15 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 
-			const boundAttributes = {};
 			const blockBindings = attributes?.metadata?.bindings;
-
-			if ( blockBindings ) {
-				const blockBindingsBySource = new Map();
-
-				for ( const [ attributeName, binding ] of Object.entries(
-					blockBindings
-				) ) {
-					const { source: sourceName, args: sourceArgs } = binding;
-					const source = sources[ sourceName ];
-					if (
-						! source ||
-						! canBindAttribute( name, attributeName )
-					) {
-						continue;
-					}
-
-					blockBindingsBySource.set( source, {
-						...blockBindingsBySource.get( source ),
-						[ attributeName ]: {
-							args: sourceArgs,
-						},
-					} );
-				}
-
-				if ( blockBindingsBySource.size ) {
-					for ( const [
-						source,
-						bindings,
-					] of blockBindingsBySource ) {
-						// Populate context.
-						const context = {};
-
-						if ( source.usesContext?.length ) {
-							for ( const key of source.usesContext ) {
-								context[ key ] = blockContext[ key ];
-							}
-						}
-
-						// Get values in batch if the source supports it.
-						let values = {};
-						if ( ! source.getValues ) {
-							Object.keys( bindings ).forEach( ( attr ) => {
-								// Default to the `key` or the source label when `getValues` doesn't exist
-								values[ attr ] =
-									bindings[ attr ].args?.key || source.label;
-							} );
-						} else {
-							values = source.getValues( {
-								registry,
-								context,
-								clientId,
-								bindings,
-							} );
-						}
-						for ( const [ attributeName, value ] of Object.entries(
-							values
-						) ) {
-							if (
-								attributeName === 'url' &&
-								( ! value || ! isURLLike( value ) )
-							) {
-								// Return null if value is not a valid URL.
-								boundAttributes[ attributeName ] = null;
-							} else {
-								boundAttributes[ attributeName ] = value;
-							}
-						}
-					}
-				}
-			}
+			const boundAttributes = getBindingsValues(
+				blockBindings,
+				name,
+				sources,
+				registry,
+				blockContext,
+				clientId
+			);
 
 			const newAttributes = {
 				...attributes,
@@ -176,7 +111,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getPreviousBlockClientId,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, rootClientId, sources, registry, blockContext ]
 	);
 	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
