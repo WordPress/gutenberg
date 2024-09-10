@@ -318,7 +318,7 @@ function GridLayoutColumnsAndRowsControl( {
 									const defaultNewColumnCount =
 										isManualPlacement ? 1 : undefined;
 									const newColumnCount =
-										value === ''
+										value === '' || value === '0'
 											? defaultNewColumnCount
 											: parseInt( value, 10 );
 									onChange( {
@@ -328,7 +328,7 @@ function GridLayoutColumnsAndRowsControl( {
 								} else {
 									// Don't allow unsetting the column count.
 									const newColumnCount =
-										value === ''
+										value === '' || value === '0'
 											? 1
 											: parseInt( value, 10 );
 									onChange( {
@@ -356,7 +356,7 @@ function GridLayoutColumnsAndRowsControl( {
 								onChange={ ( value ) => {
 									// Don't allow unsetting the row count.
 									const newRowCount =
-										value === ''
+										value === '' || value === '0'
 											? 1
 											: parseInt( value, 10 );
 									onChange( {
@@ -372,11 +372,14 @@ function GridLayoutColumnsAndRowsControl( {
 							<RangeControl
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
-								value={ columnCount ?? 0 }
+								value={ columnCount ?? 1 }
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,
-										columnCount: value,
+										columnCount:
+											value === '' || value === '0'
+												? 1
+												: value,
 									} )
 								}
 								min={ 1 }
