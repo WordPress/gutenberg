@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { getPostEditURL, getPostTrashedURL, BrowserURL } from '../';
+import { getPostEditURL, BrowserURL } from '../';
 
 describe( 'getPostEditURL', () => {
 	it( 'should generate relative path with post and action arguments', () => {
