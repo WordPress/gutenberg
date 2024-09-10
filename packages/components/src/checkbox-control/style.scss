@@ -32,7 +32,7 @@
 	height: var(--checkbox-input-size);
 
 	appearance: none;
-	transition: 0.1s border-color ease-in-out;
+	transition: 0.1s border-color ease-in-out, 0.1s background ease-in-out;
 	@include reduce-motion("transition");
 
 	&:focus {
