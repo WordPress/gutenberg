@@ -164,7 +164,7 @@ if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_exper
  * It returns an array of comment type options for the comment type filter dropdown in the admin area.
  *
  * @return array An associative array of comment type options.
- *               The keys are the comment type slugs and the values are the translated names of the comment types.
+ * The keys are the comment type slugs and the values are the translated names of the comment types.
  */
 if ( ! function_exists( 'update_comment_type_filter_dropdown' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
 	function update_comment_type_filter_dropdown() {
