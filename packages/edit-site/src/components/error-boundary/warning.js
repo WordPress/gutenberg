@@ -9,12 +9,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button
-			// TODO: Switch to `true` (40px size) if possible
-			__next40pxDefaultSize={ false }
-			variant="secondary"
-			ref={ ref }
-		>
+		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
