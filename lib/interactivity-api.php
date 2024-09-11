@@ -17,12 +17,20 @@ function gutenberg_reregister_interactivity_script_modules() {
 	$experiments                  = get_option( 'gutenberg-experiments' );
 	$full_page_navigation_enabled = isset( $experiments['gutenberg-full-page-client-side-navigation'] );
 
+	$index_path    = gutenberg_dir_path() . 'build/interactivity/index.min.asset.php';
+	$index_asset   = file_exists( $index_path ) ? require $index_path : null;
+	$index_version = isset( $index_asset['version'] ) ? $index_asset['version'] : $default_version;
+
 	wp_register_script_module(
 		'@wordpress/interactivity',
 		gutenberg_url( '/build-module/' . ( SCRIPT_DEBUG ? 'interactivity/debug.min.js' : 'interactivity/index.min.js' ) ),
 		array(),
-		$full_page_navigation_enabled ? null : $default_version
+		$full_page_navigation_enabled ? null : $index_version
 	);
+
+	$router_path    = gutenberg_dir_path() . 'build/interactivity/router.min.asset.php';
+	$router_asset   = file_exists( $router_path ) ? require $router_path : null;
+	$router_version = isset( $router_asset['version'] ) ? $router_asset['version'] : $default_version;
 
 	wp_register_script_module(
 		'@wordpress/interactivity-router',
