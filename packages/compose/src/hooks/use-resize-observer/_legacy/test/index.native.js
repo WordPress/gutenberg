@@ -7,7 +7,7 @@ import { View } from 'react-native';
 /**
  * Internal dependencies
  */
-import useResizeObserver from '../';
+import useResizeObserver from '..';
 
 const TestComponent = ( { onLayout } ) => {
 	const [ resizeObserver, sizes ] = useResizeObserver();

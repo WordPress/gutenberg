@@ -374,5 +374,20 @@ describe( 'Interactivity API', () => {
 
 			expect( spy ).toHaveBeenCalledTimes( 3 );
 		} );
+
+		it( 'should update iterable signals when new keys are added', () => {
+			const target = proxifyState< any >( 'test', { a: 1, b: 2 } );
+			const source = { a: 1, b: 2, c: 3 };
+
+			const spy = jest.fn( () => Object.keys( target ) );
+			effect( spy );
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+
+			deepMerge( target, source, false );
+
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
+		} );
 	} );
 } );

@@ -61,8 +61,8 @@ function Header() {
 					) }
 				</div>
 				<div className="edit-widgets-header__actions">
-					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-widgets" />
+					<SaveButton />
 					<MoreMenu />
 				</div>
 			</div>

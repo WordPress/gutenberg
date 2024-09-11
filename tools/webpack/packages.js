@@ -34,6 +34,7 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/fields',
 ];
 
 // PHP files in packages that have to be copied during build.
