@@ -47,20 +47,26 @@ export const TabListWrapper = styled.div`
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
+
+	/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+	--antialiasing-factor: 100;
 	&:not( [aria-orientation='vertical'] ) {
 		&::after {
 			bottom: 0;
 			height: 0;
-			/* Using a large value to avoid antialiasing rounding issues
-			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
-			width: 100px;
+			width: calc( var( --antialiasing-factor ) * 1px );
 			transform: translateX(
 					calc(
 						var( --indicator-start ) * var( --direction-factor ) *
 							1px
 					)
 				)
-				scaleX( calc( var( --indicator-width ) / 100 ) );
+				scaleX(
+					calc(
+						var( --indicator-width ) / var( --antialiasing-factor )
+					)
+				);
 			border-bottom: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
 		}
@@ -70,11 +76,11 @@ export const TabListWrapper = styled.div`
 		top: 0;
 		left: 0;
 		width: 100%;
-		/* Using a large value to avoid antialiasing rounding issues
-			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
-		height: 100px;
+		width: calc( var( --antialiasing-factor ) * 1px );
 		transform: translateY( calc( var( --indicator-top ) * 1px ) )
-			scaleY( calc( var( --indicator-height ) / 100 ) );
+			scaleY(
+				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
+			);
 		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
