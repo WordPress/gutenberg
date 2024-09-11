@@ -108,6 +108,9 @@ const copiedVendors = {
 	'react.min.js': 'react/umd/react.production.min.js',
 	'react-dom.js': 'react-dom/umd/react-dom.development.js',
 	'react-dom.min.js': 'react-dom/umd/react-dom.production.min.js',
+	'vips.wasm': 'wasm-vips/lib/vips.wasm',
+	'vips-heif.wasm': 'wasm-vips/lib/vips-heif.wasm',
+	'vips-jxl.wasm': 'wasm-vips/lib/vips-jxl.wasm',
 };
 
 module.exports = {

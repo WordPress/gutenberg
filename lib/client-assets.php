@@ -224,6 +224,8 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				break;
 		}
 
+		\sirreal\d( $handle );
+
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
 		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
 
@@ -597,6 +599,25 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		gutenberg_url( 'build/vendors/react-jsx-runtime' . $extension ),
 		array( 'react' ),
 		'18'
+	);
+
+	wp_register_script_module(
+		'@wordpress/vips/vips',
+		gutenberg_url( 'build/vendors/vips.wasm' ),
+		array(),
+		'vips-version-not-this-string'
+	);
+	wp_register_script_module(
+		'@wordpress/vips/vips-heif',
+		gutenberg_url( 'build/vendors/vips-heif.wasm' ),
+		array(),
+		'vips-version-not-this-string'
+	);
+	wp_register_script_module(
+		'@wordpress/vips/vips-jxl',
+		gutenberg_url( 'build/vendors/vips-jxl.wasm' ),
+		array(),
+		'vips-version-not-this-string'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );

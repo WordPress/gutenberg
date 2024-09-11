@@ -26,7 +26,7 @@ const createVipsWorker = createWorkerFactory(
 );
 const vipsWorker = createVipsWorker();
 
-void vipsWorker.setLocation( __webpack_public_path__ );
+//void vipsWorker.setLocation( __webpack_public_path__ );
 
 export async function uploadToServer(
 	file: File,
