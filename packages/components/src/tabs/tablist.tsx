@@ -90,10 +90,11 @@ export const TabList = forwardRef<
 			tabIndex={ -1 }
 			{ ...otherProps }
 			style={ {
-				'--indicator-left': `${ indicatorPosition.left }px`,
-				'--indicator-top': `${ indicatorPosition.top }px`,
-				'--indicator-width': `${ indicatorPosition.width }px`,
-				'--indicator-height': `${ indicatorPosition.height }px`,
+				'--indicator-top': indicatorPosition.top,
+				'--indicator-right': indicatorPosition.right,
+				'--indicator-left': indicatorPosition.left,
+				'--indicator-width': indicatorPosition.width,
+				'--indicator-height': indicatorPosition.height,
 				...otherProps.style,
 			} }
 			className={ clsx(
