@@ -147,7 +147,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				: undefined;
 
 			function getSectionRootBlock() {
-				if ( renderingMode === 'template-locked' ) {
+				if ( renderingMode.includes( 'template-lock' ) ) {
 					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
 				}
 

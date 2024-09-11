@@ -26,6 +26,7 @@ import { setPreferences } from './set-preferences';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
+import { setRenderingMode } from './set-rendering-mode';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
 
@@ -84,6 +85,8 @@ export class Editor {
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
+	/** @borrows setRenderingMode as this.setRenderingMode */
+	setRenderingMode: typeof setRenderingMode = setRenderingMode.bind( this );
 	/** @borrows switchToLegacyCanvas as this.switchToLegacyCanvas */
 	switchToLegacyCanvas: typeof switchToLegacyCanvas =
 		switchToLegacyCanvas.bind( this );

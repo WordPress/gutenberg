@@ -4,7 +4,11 @@
 import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
@@ -166,17 +170,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				const {
 					getEditorSettings,
 					getEditorSelection,
-					getRenderingMode,
 					__unstableIsEditorReady,
 				} = select( editorStore );
+
+				const postTypeObject = select( coreStore ).getPostType(
+					post.type
+				);
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
-					mode: getRenderingMode(),
 					selection: getEditorSelection(),
+					mode: postTypeObject?.default_rendering_mode ?? 'post-only',
 				};
 			},
-			[]
+			[ post.type ]
 		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
@@ -249,7 +256,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-		}, [] );
+		}, [
+			createWarningNotice,
+			initialEdits,
+			settings,
+			post,
+			recovery,
+			setupEditor,
+			updatePostLock,
+		] );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
@@ -268,15 +283,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
-		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+			setRenderingMode( mode );
+		}, [ mode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 
 		// Register the editor commands.
 		useCommands();
 
-		if ( ! isReady ) {
+		if ( ! isReady || ! mode ) {
 			return null;
 		}
 

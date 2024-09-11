@@ -77,7 +77,6 @@ function gutenberg_add_class_list_to_public_post_types() {
 }
 add_action( 'rest_api_init', 'gutenberg_add_class_list_to_public_post_types' );
 
-
 /**
  * Registers the Global Styles Revisions REST API routes.
  */

@@ -66,6 +66,19 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Set the rendering mode of the post.
+	 *
+	 * @param renderingMode The rendering mode to set.
+	 */
+	async setRenderingMode( renderingMode: string = 'post-only' ) {
+		await this.page.waitForFunction( () => window?.wp?.data );
+
+		await this.page.evaluate( ( mode ) => {
+			window.wp.data.dispatch( 'core/editor' ).setRenderingMode( mode );
+		}, renderingMode );
+	}
+
+	/**
 	 * Disables the editor autosave function.
 	 */
 	async disableAutosave() {
