@@ -53,7 +53,7 @@
 }
 
 .editor-post-featured-image__preview {
-	height: auto;
+	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
 
 	.editor-post-featured-image__preview-image {
