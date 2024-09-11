@@ -9,6 +9,7 @@ import { useStoreState } from '@ariakit/react';
  */
 import warning from '@wordpress/warning';
 import { forwardRef, useState } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,6 +21,7 @@ import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
+import { useTrackOverflow } from './use-track-overflow';
 
 export const TabList = forwardRef<
 	HTMLDivElement,
@@ -30,6 +32,13 @@ export const TabList = forwardRef<
 	const selectedId = useStoreState( context?.store, 'selectedId' );
 	const selectedElement = context?.store.item( selectedId )?.element;
 	const indicatorPosition = useTrackElementOffsetRect( selectedElement );
+	const items = useStoreState( context?.store, 'items' );
+	const [ parent, setParent ] = useState< HTMLElement | null >();
+	const overflow = useTrackOverflow( parent, {
+		first: items?.at( 0 )?.element,
+		last: items?.at( -1 )?.element,
+	} );
+	const refs = useMergeRefs( [ ref, setParent ] );
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate( selectedId, ( { previousValue } ) => {
@@ -66,7 +75,7 @@ export const TabList = forwardRef<
 
 	return (
 		<Ariakit.TabList
-			ref={ ref }
+			ref={ refs }
 			store={ store }
 			render={
 				<TabListWrapper
@@ -88,7 +97,9 @@ export const TabList = forwardRef<
 				...otherProps.style,
 			} }
 			className={ clsx(
-				animationEnabled ? 'is-animation-enabled' : '',
+				overflow.first && 'is-overflowing-first',
+				overflow.last && 'is-overflowing-last',
+				animationEnabled && 'is-animation-enabled',
 				otherProps.className
 			) }
 		>

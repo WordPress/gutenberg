@@ -27,6 +27,21 @@ export const TabListWrapper = styled.div`
 		width: fit-content;
 	}
 
+	--fade-width: 4rem;
+	--fade-gradient-base: transparent 0%, black var( --fade-width );
+	--fade-gradient-composed: var( --fade-gradient-base ), black 50%,
+		transparent 50%;
+	&.is-overflowing-first {
+		mask-image: linear-gradient( to right, var( --fade-gradient-base ) );
+	}
+	&.is-overflowing-last {
+		mask-image: linear-gradient( to left, var( --fade-gradient-base ) );
+	}
+	&.is-overflowing-first.is-overflowing-last {
+		mask-image: linear-gradient( to right, var( --fade-gradient-composed ) ),
+			linear-gradient( to left, var( --fade-gradient-composed ) );
+	}
+
 	@media not ( prefers-reduced-motion: reduce ) {
 		&.is-animation-enabled::after {
 			transition-property: left, top, width, height;
