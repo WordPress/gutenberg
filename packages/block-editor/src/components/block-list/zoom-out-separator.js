@@ -26,23 +26,32 @@ export function ZoomOutSeparator( {
 	position = 'top',
 } ) {
 	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
-	const { sectionRootClientId, sectionClientIds, inserterInsertionPoint } =
-		useSelect( ( select ) => {
-			const {
-				getInserterInsertionPoint,
-				getBlockOrder,
-				getSectionRootClientId,
-			} = unlock( select( blockEditorStore ) );
+	const {
+		sectionRootClientId,
+		sectionClientIds,
+		inserterInsertionPoint,
+		blockInsertionPointVisible,
+		blockInsertionPoint,
+	} = useSelect( ( select ) => {
+		const {
+			getInserterInsertionPoint,
+			getBlockOrder,
+			getSectionRootClientId,
+			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
+		} = unlock( select( blockEditorStore ) );
 
-			const root = getSectionRootClientId();
-			const sectionRootClientIds = getBlockOrder( root );
-			return {
-				sectionRootClientId: root,
-				sectionClientIds: sectionRootClientIds,
-				blockOrder: getBlockOrder( root ),
-				inserterInsertionPoint: getInserterInsertionPoint(),
-			};
-		}, [] );
+		const root = getSectionRootClientId();
+		const sectionRootClientIds = getBlockOrder( root );
+		return {
+			sectionRootClientId: root,
+			sectionClientIds: sectionRootClientIds,
+			blockOrder: getBlockOrder( root ),
+			inserterInsertionPoint: getInserterInsertionPoint(),
+			blockInsertionPoint: getBlockInsertionPoint(),
+			blockInsertionPointVisible: isBlockInsertionPointVisible(),
+		};
+	}, [] );
 
 	const isReducedMotion = useReducedMotion();
 
@@ -57,21 +66,34 @@ export function ZoomOutSeparator( {
 		sectionClientIds &&
 		sectionClientIds.includes( clientId );
 
-	if ( ! isSectionBlock || ! inserterInsertionPoint ) {
+	if ( ! isSectionBlock ) {
 		return null;
 	}
 
+	const hasTopInserterInsertionPoint =
+		inserterInsertionPoint?.insertionIndex === 0 &&
+		clientId === sectionClientIds[ inserterInsertionPoint.insertionIndex ];
+	const hasBottomInserterInsertionPoint =
+		inserterInsertionPoint?.insertionIndex &&
+		clientId ===
+			sectionClientIds[ inserterInsertionPoint.insertionIndex - 1 ];
+	// We want to show the zoom out separator in either of these conditions:
+	// 1. If the inserter has an insertion index set
+	// 2. We are dragging a pattern over an insertion point
 	if ( position === 'top' ) {
 		isVisible =
-			inserterInsertionPoint.insertionIndex === 0 &&
-			clientId ===
-				sectionClientIds[ inserterInsertionPoint.insertionIndex ];
+			hasTopInserterInsertionPoint ||
+			( blockInsertionPointVisible &&
+				blockInsertionPoint.index === 0 &&
+				clientId === sectionClientIds[ blockInsertionPoint.index ] );
 	}
 
 	if ( position === 'bottom' ) {
 		isVisible =
-			clientId ===
-			sectionClientIds[ inserterInsertionPoint.insertionIndex - 1 ];
+			hasBottomInserterInsertionPoint ||
+			( blockInsertionPointVisible &&
+				clientId ===
+					sectionClientIds[ blockInsertionPoint.index - 1 ] );
 	}
 
 	return (
