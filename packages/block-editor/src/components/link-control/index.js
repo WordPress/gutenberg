@@ -406,7 +406,7 @@ function LinkControl( {
 							hideLabelFromVision={ ! showTextControl }
 							// Passing the Button component as a suffix prop
 							suffix={
-								showActions ? null : (
+								showActions ? undefined : (
 									<Button
 										// TODO: Switch to true (40px size) if possible
 										__next40pxDefaultSize={ false }
