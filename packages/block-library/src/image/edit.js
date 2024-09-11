@@ -117,7 +117,7 @@ export function ImageEdit( {
 	const [ placeholderResizeListener, { width: placeholderWidth } ] =
 		useResizeObserver();
 
-	const isLargeContainer = placeholderWidth > 160;
+	const isSmallContainer = placeholderWidth ? placeholderWidth < 160 : false;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -342,13 +342,14 @@ export function ImageEdit( {
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
 				icon={
-					isLargeContainer && ( lockUrlControls ? pluginsIcon : icon )
+					! isSmallContainer &&
+					( lockUrlControls ? pluginsIcon : icon )
 				}
-				withIllustration={ ! isSingleSelected || ! isLargeContainer }
-				label={ isLargeContainer && __( 'Image' ) }
+				withIllustration={ ! isSingleSelected || isSmallContainer }
+				label={ ! isSmallContainer && __( 'Image' ) }
 				instructions={
 					! lockUrlControls &&
-					isLargeContainer &&
+					! isSmallContainer &&
 					__(
 						'Upload an image file, pick one from your media library, or add one with a URL.'
 					)
@@ -366,10 +367,10 @@ export function ImageEdit( {
 				} }
 			>
 				{ lockUrlControls &&
-					isLargeContainer &&
+					! isSmallContainer &&
 					lockUrlControlsMessage }
 
-				{ ! lockUrlControls && isLargeContainer && content }
+				{ ! lockUrlControls && ! isSmallContainer && content }
 				{ placeholderResizeListener }
 			</Placeholder>
 		);
