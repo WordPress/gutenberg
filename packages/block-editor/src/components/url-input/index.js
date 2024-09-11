@@ -424,7 +424,6 @@ class URLInput extends Component {
 			value = '',
 			hideLabelFromVision = false,
 		} = this.props;
-		// console.log( 'Hello', this.props );
 		const {
 			loading,
 			showSuggestions,
@@ -471,7 +470,6 @@ class URLInput extends Component {
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
 				<InputControl { ...inputProps } __next40pxDefaultSize />
-				{ /* <input { ...inputProps } /> */ }
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
