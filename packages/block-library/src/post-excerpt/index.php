@@ -46,6 +46,8 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	};
 
 	// Hook into the excerpt_length filter to apply the `excerptLength` attribute.
+	// The `excerptLength` attribute has a default value of 55, so will always be set,
+	// so there's no need to fallback to the filtered excerpt_length value.
 	$excerpt_length        = $attributes['excerptLength'];
 	$filter_excerpt_length = static function () use ( $excerpt_length ) {
 		return $excerpt_length;
