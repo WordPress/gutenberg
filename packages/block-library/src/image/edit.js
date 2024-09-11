@@ -12,8 +12,8 @@ import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
-	MediaPlaceholder,
 	useBlockProps,
+	MediaPlaceholder,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
@@ -109,11 +109,17 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
+
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 	const figureRef = useRef();
 
 	const [ contentResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
+
+	const [ placeholderResizeListener, { width: placeholderWidth } ] =
+		useResizeObserver();
+
+	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -387,11 +393,15 @@ export function ImageEdit( {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
-				withIllustration
-				icon={ lockUrlControls ? pluginsIcon : icon }
-				label={ __( 'Image' ) }
+				icon={
+					! isSmallContainer &&
+					( lockUrlControls ? pluginsIcon : icon )
+				}
+				withIllustration={ ! isSingleSelected || isSmallContainer }
+				label={ ! isSmallContainer && __( 'Image' ) }
 				instructions={
 					! lockUrlControls &&
+					! isSmallContainer &&
 					__(
 						'Upload or drag an image file here, or pick one from your library.'
 					)
@@ -408,13 +418,12 @@ export function ImageEdit( {
 					...shadowProps.style,
 				} }
 			>
-				{ lockUrlControls ? (
-					<span className="block-bindings-media-placeholder-message">
-						{ lockUrlControlsMessage }
-					</span>
-				) : (
-					content
-				) }
+				{ lockUrlControls &&
+					! isSmallContainer &&
+					lockUrlControlsMessage }
+
+				{ ! lockUrlControls && ! isSmallContainer && content }
+				{ placeholderResizeListener }
 			</Placeholder>
 		);
 	};
