@@ -48,7 +48,9 @@ import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 } from '@wordpress/components';
 import {
+	useEvent,
 	useMediaQuery,
+	useMergeRefs,
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
@@ -164,6 +166,15 @@ function MetaBoxesMain( { isLegacy } ) {
 	const metaBoxesMainRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
+	const getRenderValues = useEvent( () => [ min, openHeight ] );
+	const effectResizableToggle = useRefEffect( () => {
+		const [ freshMin, freshOpenHeight ] = getRenderValues();
+		applyHeight( isOpen ? freshOpenHeight : freshMin, false, true );
+	}, [ isOpen ] );
+	const setResizableRefs = useMergeRefs( [
+		metaBoxesMainRef,
+		effectResizableToggle,
+	] );
 	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
@@ -224,6 +235,8 @@ function MetaBoxesMain( { isLegacy } ) {
 			} );
 		}
 	};
+
+	const shouldAbortToggleRef = useRef( false );
 
 	if ( ! hasAnyVisible ) {
 		return;
@@ -286,9 +299,9 @@ function MetaBoxesMain( { isLegacy } ) {
 		Pane = ResizableBox;
 		paneProps = /** @type {Parameters<typeof ResizableBox>[0]} */ ( {
 			as: NavigableRegion,
-			ref: metaBoxesMainRef,
+			ref: setResizableRefs,
 			className: clsx( className, 'is-resizable' ),
-			defaultSize: { height: openHeight },
+			defaultSize: { height: isOpen ? openHeight : min },
 			minHeight: min,
 			maxHeight: usedMax,
 			enable: {
@@ -305,6 +318,20 @@ function MetaBoxesMain( { isLegacy } ) {
 			handleComponent: {
 				top: (
 					<>
+						<button
+							aria-expanded={ isOpen }
+							onPointerDown={ () => {
+								shouldAbortToggleRef.current = false;
+							} }
+							onClick={ () => {
+								if ( ! shouldAbortToggleRef.current ) {
+									toggle();
+								}
+							} }
+						>
+							{ paneLabel }
+							<Icon icon={ isOpen ? chevronUp : chevronDown } />
+						</button>
 						<Tooltip text={ __( 'Drag to resize' ) }>
 							<button // eslint-disable-line jsx-a11y/role-supports-aria-props
 								ref={ separatorRef }
@@ -330,6 +357,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				if ( separatorRef.current.parentElement.contains( target ) ) {
 					target.setPointerCapture( pointerId );
 				}
+				shouldAbortToggleRef.current = false;
 			},
 			onResizeStart: ( event, direction, elementRef ) => {
 				if ( isAutoHeight ) {
@@ -341,8 +369,19 @@ function MetaBoxesMain( { isLegacy } ) {
 			},
 			onResize: () =>
 				applyHeight( metaBoxesMainRef.current.state.height ),
-			onResizeStop: () =>
-				applyHeight( metaBoxesMainRef.current.state.height, true ),
+			onResizeStop: ( event, direction, elementRef, delta ) => {
+				if ( delta.height ) {
+					if ( metaBoxesMainRef.current.state.height > min ) {
+						shouldAbortToggleRef.current = true;
+						setPreference(
+							'core/edit-post',
+							'metaBoxesMainIsOpen',
+							true
+						);
+					}
+					applyHeight( metaBoxesMainRef.current.state.height, true );
+				}
+			},
 		} );
 	}
 
