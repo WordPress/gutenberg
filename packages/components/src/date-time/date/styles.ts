@@ -38,7 +38,7 @@ export const Calendar = styled.div`
 `;
 
 export const DayOfWeek = styled.div`
-	color: ${ COLORS.gray[ 700 ] };
+	color: ${ COLORS.theme.gray[ 700 ] };
 	font-size: ${ CONFIG.fontSize };
 	line-height: ${ CONFIG.fontLineHeightBase };
 
@@ -94,7 +94,7 @@ export const DayButton = styled( Button, {
 
 				&,
 				&:hover:not(:disabled, [aria-disabled=true]) {
-					color: ${ COLORS.white };
+					color: ${ COLORS.theme.accentInverted };
 				}
 
 				&:focus:not(:disabled),
@@ -117,7 +117,7 @@ export const DayButton = styled( Button, {
 			! props.isSelected &&
 			props.isToday &&
 			`
-			background: ${ COLORS.gray[ 200 ] };
+			background: ${ COLORS.theme.gray[ 200 ] };
 			` }
 	}
 
@@ -125,7 +125,11 @@ export const DayButton = styled( Button, {
 		props.hasEvents &&
 		`
 		::before {
-			border: 2px solid ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
+			border: 2px solid ${
+				props.isSelected
+					? COLORS.theme.accentInverted
+					: COLORS.theme.accent
+			};
 			border-radius: ${ CONFIG.radiusRound };
 			bottom: 2px;
 			content: " ";
