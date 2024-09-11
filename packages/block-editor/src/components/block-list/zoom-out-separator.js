@@ -26,29 +26,23 @@ export function ZoomOutSeparator( {
 	position = 'top',
 } ) {
 	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
-	const {
-		sectionRootClientId,
-		sectionClientIds,
-		blockInsertionPoint,
-		blockInsertionPointVisible,
-	} = useSelect( ( select ) => {
-		const {
-			getBlockInsertionPoint,
-			getBlockOrder,
-			isBlockInsertionPointVisible,
-			getSectionRootClientId,
-		} = unlock( select( blockEditorStore ) );
+	const { sectionRootClientId, sectionClientIds, inserterInsertionPoint } =
+		useSelect( ( select ) => {
+			const {
+				getInserterInsertionPoint,
+				getBlockOrder,
+				getSectionRootClientId,
+			} = unlock( select( blockEditorStore ) );
 
-		const root = getSectionRootClientId();
-		const sectionRootClientIds = getBlockOrder( root );
-		return {
-			sectionRootClientId: root,
-			sectionClientIds: sectionRootClientIds,
-			blockOrder: getBlockOrder( root ),
-			blockInsertionPoint: getBlockInsertionPoint(),
-			blockInsertionPointVisible: isBlockInsertionPointVisible(),
-		};
-	}, [] );
+			const root = getSectionRootClientId();
+			const sectionRootClientIds = getBlockOrder( root );
+			return {
+				sectionRootClientId: root,
+				sectionClientIds: sectionRootClientIds,
+				blockOrder: getBlockOrder( root ),
+				inserterInsertionPoint: getInserterInsertionPoint(),
+			};
+		}, [] );
 
 	const isReducedMotion = useReducedMotion();
 
@@ -63,21 +57,21 @@ export function ZoomOutSeparator( {
 		sectionClientIds &&
 		sectionClientIds.includes( clientId );
 
-	if ( ! isSectionBlock ) {
+	if ( ! isSectionBlock || ! inserterInsertionPoint ) {
 		return null;
 	}
 
 	if ( position === 'top' ) {
 		isVisible =
-			blockInsertionPointVisible &&
-			blockInsertionPoint.index === 0 &&
-			clientId === sectionClientIds[ blockInsertionPoint.index ];
+			inserterInsertionPoint.insertionIndex === 0 &&
+			clientId ===
+				sectionClientIds[ inserterInsertionPoint.insertionIndex ];
 	}
 
 	if ( position === 'bottom' ) {
 		isVisible =
-			blockInsertionPointVisible &&
-			clientId === sectionClientIds[ blockInsertionPoint.index - 1 ];
+			clientId ===
+			sectionClientIds[ inserterInsertionPoint.insertionIndex - 1 ];
 	}
 
 	return (
