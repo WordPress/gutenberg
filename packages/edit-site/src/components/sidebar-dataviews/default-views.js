@@ -220,6 +220,6 @@ export function useDefaultViews( { postType } ) {
 				},
 				count: counts?.trash,
 			},
-		].filter( ( { count } ) => count > 0 );
+		];
 	}, [ labels, counts ] );
 }
