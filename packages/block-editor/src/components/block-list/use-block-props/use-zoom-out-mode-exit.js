@@ -16,19 +16,13 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
+	const getSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings
+	);
+
 	const { __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
-
-	const { setIsInserterOpened } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-
-		const { __experimentalSetIsInserterOpened } = getSettings();
-
-		return {
-			setIsInserterOpened: __experimentalSetIsInserterOpened,
-		};
-	}, [] );
 
 	return useRefEffect(
 		( node ) => {
@@ -39,9 +33,13 @@ export function useZoomOutModeExit( { editorMode } ) {
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
-					// Setting may be undefined.
-					if ( typeof setIsInserterOpened === 'function' ) {
-						setIsInserterOpened( false );
+
+					const { __experimentalSetIsInserterOpened } = getSettings();
+
+					if (
+						typeof __experimentalSetIsInserterOpened === 'function'
+					) {
+						__experimentalSetIsInserterOpened( false );
 					}
 					__unstableSetEditorMode( 'edit' );
 				}
