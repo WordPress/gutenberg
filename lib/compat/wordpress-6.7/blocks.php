@@ -54,8 +54,8 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
  * @return array   The filtered query vars.
  */
 function gutenberg_add_format_query_vars_to_query_loop_block( $query, $block ) {
-	// Return early if there is no format.
-	if ( empty( $block->context['query']['format'] ) ) {
+	// Return early if there is no format or if the format is not an array.
+	if ( empty( $block->context['query']['format'] ) || ! is_array( $block->context['query']['format'] ) ) {
 		return $query;
 	}
 

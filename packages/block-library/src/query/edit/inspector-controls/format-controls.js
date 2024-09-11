@@ -45,6 +45,20 @@ function formatNamesToValues( names, formats ) {
 }
 
 export default function FormatControls( { onChange, query: { format } } ) {
+	// 'format' is expected to be an array. If it is not an array, for example
+	// if a user has manually entered an invalid value in the block markup,
+	// convert it to an array to prevent JavaScript errors.
+	let formatArray = format;
+	if ( Array.isArray( format ) ) {
+		formatArray = format;
+	} else if ( typeof format === 'string' ) {
+		// If the format is a string, preserve it as an array.
+		formatArray = [ format ];
+	} else {
+		// If the format is not a string or an array, set it to an empty array.
+		formatArray = [];
+	}
+
 	const { supportedFormats } = useSelect( ( select ) => {
 		const themeSupports = select( coreStore ).getThemeSupports();
 		return {
@@ -56,7 +70,7 @@ export default function FormatControls( { onChange, query: { format } } ) {
 		supportedFormats.includes( item.value )
 	);
 
-	const values = format
+	const values = formatArray
 		.map(
 			( name ) => formats.find( ( item ) => item.value === name )?.label
 		)
