@@ -42,7 +42,7 @@ class Tests_blockCommentFilter extends WP_UnitTestCase {
 
 		// Assertions
 		$this->assertContains( 'block_comment', $updated_comment_types );
-    }
+	}
 
 	/**
 	 * Tests that `update_comment_type_filter_dropdown` returns the correct options.
