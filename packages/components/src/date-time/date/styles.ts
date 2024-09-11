@@ -131,11 +131,10 @@ export const DayButton = styled( Button, {
 					: COLORS.theme.accent
 			};
 			border-radius: ${ CONFIG.radiusRound };
-			bottom: 2px;
 			content: " ";
 			left: 50%;
 			position: absolute;
-			transform: translateX(-50%);
+			transform: translate(-50%, 9px);
 		}
 		` }
 `;
