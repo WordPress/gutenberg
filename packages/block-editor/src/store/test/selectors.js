@@ -2748,6 +2748,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2772,6 +2773,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2796,6 +2798,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2822,6 +2825,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					block1: {},
@@ -2848,6 +2852,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2876,6 +2881,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2904,6 +2910,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2932,6 +2939,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					block1: {
@@ -2960,6 +2968,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2976,6 +2985,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -3006,6 +3016,10 @@ describe( 'selectors', () => {
 							block2: 'block1',
 						} )
 					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3046,6 +3060,11 @@ describe( 'selectors', () => {
 							block3: 'block2',
 						} )
 					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+						[ 'block2', [ 'block3' ] ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3086,6 +3105,11 @@ describe( 'selectors', () => {
 							block3: 'block2',
 						} )
 					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+						[ 'block2', [ 'block3' ] ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3126,6 +3150,11 @@ describe( 'selectors', () => {
 							block3: 'block2',
 						} )
 					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+						[ 'block2', [ 'block3' ] ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3159,11 +3188,14 @@ describe( 'selectors', () => {
 							block2: {},
 						} )
 					),
-					parents: new Map(
-						Object.entries( {
-							block2: 'block1',
-						} )
-					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
+					parents: new Map( [
+						[ 'block2', 'block1' ],
+						[ 'block1', '' ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3203,6 +3235,10 @@ describe( 'selectors', () => {
 							block2: 'block1',
 						} )
 					),
+					order: new Map( [
+						[ '', [ 'block1' ] ],
+						[ 'block1', [ 'block2' ] ],
+					] ),
 				},
 				blockListSettings: {
 					block1: {},
@@ -3240,6 +3276,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					1: {
@@ -3273,6 +3310,7 @@ describe( 'selectors', () => {
 						} )
 					),
 					parents: new Map(),
+					order: new Map(),
 				},
 				blockListSettings: {
 					1: {
