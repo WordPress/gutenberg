@@ -42,7 +42,7 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 				/>
 				<div className="block-editor-global-styles__clear-shadow">
 					<Button
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onShadowChange( undefined ) }
 					>
