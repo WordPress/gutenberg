@@ -80,7 +80,7 @@ mv gutenberg.tmp.php gutenberg.php
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
-zip -rD \
+zip --recurse-paths --no-dir-entries \
 	gutenberg.zip \
 	gutenberg.php \
 	lib \
