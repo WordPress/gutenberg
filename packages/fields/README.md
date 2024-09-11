@@ -1,6 +1,6 @@
 # Fields
 
-This package includes a set of field controls for the DataView library, designed for creating and managing data display elements within WordPress.
+This package provides core elements for the DataView library, designed to simplify the creation and management of data display elements in WordPress.
 
 ## Installation
 
