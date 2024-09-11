@@ -234,9 +234,8 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
-		this.props.onChange( event );
-		// this.props.onChange( event.target.value );
+	onChange( newValue ) {
+		this.props.onChange( newValue );
 	}
 
 	onFocus() {
