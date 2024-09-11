@@ -304,11 +304,11 @@ In the example below, we use the `blocks.getBlockAttributes` filter to lock the 
 
 ```js
 // Our filter function
-function lockParagraphs( attributes, props, content ) {
-    if(props['name'] === 'core/paragraph') {
-        attributes['lock'] = {move: true}
+function lockParagraphs( blockAttributes, blockType, innterHTML, attributes  ) {
+    if(blockType['name'] === 'core/paragraph') {
+        blockAttributes['lock'] = {move: true}
     }
-    return attributes;
+    return blockAttributes;
 }
 
 // Call the filter
