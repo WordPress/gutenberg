@@ -190,8 +190,7 @@ export default function FiltersPanel( {
 							return (
 								<ItemGroup isBordered isSeparated>
 									<Button
-										// TODO: Switch to `true` (40px size) if possible
-										__next40pxDefaultSize={ false }
+										__next40pxDefaultSize
 										{ ...toggleProps }
 									>
 										<LabeledColorIndicator

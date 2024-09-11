@@ -239,11 +239,7 @@ function ColorPanelDropdown( {
 					};
 
 					return (
-						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
-							{ ...toggleProps }
-						>
+						<Button __next40pxDefaultSize { ...toggleProps }>
 							<LabeledColorIndicators
 								indicators={ indicators }
 								label={ label }
