@@ -84,9 +84,24 @@ svg.components-checkbox-control__indeterminate {
 	@include break-small() {
 		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
 	}
+
+
+	animation: components-checkbox__appear-animation 0.1s ease-in-out;
 }
 
 .components-checkbox-control__help {
 	display: inline-block;
 	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
+}
+
+
+@keyframes components-checkbox__appear-animation {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
 }
