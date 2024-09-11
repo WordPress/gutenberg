@@ -27,7 +27,7 @@ export function useTrackOverflow(
 	} );
 
 	useEffect( () => {
-		if ( ! parent ) {
+		if ( ! parent || ! window.IntersectionObserver ) {
 			return;
 		}
 		const newObserver = new IntersectionObserver( callback, {
