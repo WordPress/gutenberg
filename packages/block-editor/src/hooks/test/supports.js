@@ -13,7 +13,7 @@ describe( 'hasBlockClassNameSupport', () => {
 		const block = {
 			name: blockName,
 		};
-		expect( hasBlockClassNameSupport( block ) ).toEqual( true );
+		expect( hasBlockClassNameSupport( block ) ).toBe( true );
 	} );
 
 	it( 'should return false if the block does not support className', () => {
