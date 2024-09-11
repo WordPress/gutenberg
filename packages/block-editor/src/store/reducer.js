@@ -1803,26 +1803,6 @@ export function editorMode( state = 'edit', action ) {
 }
 
 /**
- * Reducer returning whether the block moving mode is enabled or not.
- *
- * @param {string|null} state  Current state.
- * @param {Object}      action Dispatched action.
- *
- * @return {string|null} Updated state.
- */
-export function hasBlockMovingClientId( state = null, action ) {
-	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
-		return action.hasBlockMovingClientId;
-	}
-
-	if ( action.type === 'SET_EDITOR_MODE' ) {
-		return null;
-	}
-
-	return state;
-}
-
-/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -2099,7 +2079,6 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	lastFocus,
 	editorMode,
-	hasBlockMovingClientId,
 	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,

@@ -29,7 +29,6 @@ export default function BlockActions( {
 				getBlockRootClientId,
 				getBlocksByClientId,
 				getDirectInsertBlock,
-				canMoveBlocks,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 
@@ -44,7 +43,6 @@ export default function BlockActions( {
 				: null;
 
 			return {
-				canMove: canMoveBlocks( clientIds ),
 				canRemove: canRemoveBlocks( clientIds ),
 				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
 				canCopyStyles: blocks.every( ( block ) => {
@@ -67,8 +65,7 @@ export default function BlockActions( {
 	);
 	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
 
-	const { canMove, canRemove, canInsertBlock, canCopyStyles, canDuplicate } =
-		selected;
+	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
 
 	const {
 		removeBlocks,
@@ -77,8 +74,6 @@ export default function BlockActions( {
 		insertAfterBlock,
 		insertBeforeBlock,
 		flashBlock,
-		setBlockMovingClientId,
-		selectBlock,
 	} = useDispatch( blockEditorStore );
 
 	const notifyCopy = useNotifyCopy();
@@ -88,7 +83,6 @@ export default function BlockActions( {
 		canCopyStyles,
 		canDuplicate,
 		canInsertBlock,
-		canMove,
 		canRemove,
 		onDuplicate() {
 			return duplicateBlocks( clientIds, updateSelection );
@@ -101,10 +95,6 @@ export default function BlockActions( {
 		},
 		onInsertAfter() {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
-		},
-		onMoveTo() {
-			selectBlock( clientIds[ 0 ] );
-			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {
 			if ( ! clientIds.length ) {

@@ -571,8 +571,6 @@ function BlockListBlockProvider( props ) {
 				__unstableSelectionHasUnmergeableBlock,
 				isBlockBeingDragged,
 				isDragging,
-				hasBlockMovingClientId,
-				canInsertBlockType,
 				__unstableHasActiveBlockOverlayActive,
 				__unstableGetEditorMode,
 				getSelectedBlocksInitialCaretPosition,
@@ -632,7 +630,6 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
@@ -692,13 +689,6 @@ function BlockListBlockProvider( props ) {
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
-				isBlockMovingMode: !! movingClientId,
-				canInsertMovingBlock:
-					movingClientId &&
-					canInsertBlockType(
-						getBlockName( movingClientId ),
-						rootClientId
-					),
 				isEditingDisabled: blockEditingMode === 'disabled',
 				hasEditableOutline:
 					blockEditingMode !== 'disabled' &&
@@ -743,8 +733,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		isBlockMovingMode,
-		canInsertMovingBlock,
 		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
@@ -790,8 +778,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		isBlockMovingMode,
-		canInsertMovingBlock,
 		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
