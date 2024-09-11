@@ -156,7 +156,11 @@ function useEditorStyles() {
 	] );
 }
 
-function MetaBoxesMain() {
+/**
+ * @param {Object}  props
+ * @param {boolean} props.isLegacy True when the editor canvas is not in an iframe.
+ */
+function MetaBoxesMain( { isLegacy } ) {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { isMetaBoxLocationVisible } = select( editPostStore );
@@ -174,10 +178,10 @@ function MetaBoxesMain() {
 	const isAutoHeight = openHeight === undefined;
 	// In case a user size is set stops the default max-height from applying.
 	useLayoutEffect( () => {
-		if ( hasAnyVisible && ! isShort && ! isAutoHeight ) {
+		if ( ! isLegacy && hasAnyVisible && ! isShort && ! isAutoHeight ) {
 			resizableBoxRef.current.resizable.classList.add( 'has-user-size' );
 		}
-	}, [ isAutoHeight, isShort, hasAnyVisible ] );
+	}, [ isAutoHeight, isShort, hasAnyVisible, isLegacy ] );
 
 	if ( ! hasAnyVisible ) {
 		return;
@@ -185,12 +189,21 @@ function MetaBoxesMain() {
 
 	const className = 'edit-post-meta-boxes-main';
 	const contents = (
-		// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
-		<div className="edit-post-meta-boxes-main__liner edit-post-layout__metaboxes">
+		<div
+			className={ clsx(
+				// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
+				'edit-post-layout__metaboxes',
+				! isLegacy && 'edit-post-meta-boxes-main__liner'
+			) }
+		>
 			<MetaBoxes location="normal" />
 			<MetaBoxes location="advanced" />
 		</div>
 	);
+
+	if ( isLegacy ) {
+		return contents;
+	}
 
 	if ( isShort ) {
 		return (
@@ -457,7 +470,9 @@ function Layout( {
 					}
 					extraContent={
 						! isDistractionFree &&
-						showMetaBoxes && <MetaBoxesMain />
+						showMetaBoxes && (
+							<MetaBoxesMain isLegacy={ ! shouldIframe } />
+						)
 					}
 				>
 					<PostLockedModal />
