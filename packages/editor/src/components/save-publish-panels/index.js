@@ -73,7 +73,6 @@ export default function SavePublishPanels( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					className="editor-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }
 				>
@@ -87,7 +86,6 @@ export default function SavePublishPanels( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					className="editor-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 					disabled={ ! isDirty }
