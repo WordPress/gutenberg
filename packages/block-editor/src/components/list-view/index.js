@@ -119,20 +119,16 @@ function ListViewComponent(
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
 	const { getBlock } = useSelect( blockEditorStore );
-	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+	const { visibleBlockCount } = useSelect(
 		( select ) => {
-			const {
-				getGlobalBlockCount,
-				getClientIdsOfDescendants,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+			const { getGlobalBlockCount, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
-				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
 			};
 		},
 		[ draggedClientIds ]
@@ -397,7 +393,6 @@ function ListViewComponent(
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
-						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						showAppender={ showAppender }
 					/>
 				</ListViewContext.Provider>
