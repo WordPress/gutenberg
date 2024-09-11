@@ -117,7 +117,7 @@ export function ImageEdit( {
 	const [ placeholderResizeListener, { width: placeholderWidth } ] =
 		useResizeObserver();
 
-	const isSmallContainer = placeholderWidth ? placeholderWidth < 160 : false;
+	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
 	const altRef = useRef();
 	useEffect( () => {
