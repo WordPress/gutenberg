@@ -548,11 +548,13 @@ export function isZoomOutMode( state ) {
 }
 
 /**
- * Retrieves the root client ID for a section from the state.
+ * Retrieves the client ID of the block which contains the blocks
+ * acting as "sections" in the editor. This is typically the "main content"
+ * of the template/post.
  *
  * @param {Object} state Editor state.
  *
- * @return {string|undefined} The root client ID for the section, or undefined if not set.
+ * @return {string|undefined} The section root client ID or undefined if not set.
  */
 export function getSectionRootClientId( state ) {
 	return state.settings?.[ sectionRootClientIdKey ];
