@@ -93,9 +93,7 @@ function useInsertionPoint( {
 				insertionPoint &&
 				insertionPoint.hasOwnProperty( 'insertionIndex' )
 			) {
-				_destinationRootClientId = insertionPoint.hasOwnProperty(
-					'rootClientId'
-				)
+				_destinationRootClientId = insertionPoint?.rootClientId
 					? insertionPoint.rootClientId
 					: rootClientId;
 				_destinationIndex = insertionPoint.insertionIndex;
