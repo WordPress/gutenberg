@@ -41,6 +41,8 @@
 	&.is-connected {
 		.block-editor-block-switcher .components-button .block-editor-block-icon {
 			color: var(--wp-block-synced-color);
+			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
+			border-radius: $radius-small;
 		}
 
 		.components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
