@@ -30,7 +30,7 @@ const rule = [ [ 'user.role', 'is', 'editor' ] ];
 ```js
 const rules = [
 	[ 'user.role', 'is', 'editor' ],
-	[ 'post.categories', 'contain', 'tutorials' ],
+	[ 'post.categories', 'contains', 'tutorials' ],
 ];
 ```
 
@@ -41,7 +41,7 @@ const rules = [
 	'ALL',
 	[
 		[ 'user.role', 'is', 'editor' ],
-		[ 'post.categories', 'contain', 'tutorials' ],
+		[ 'post.categories', 'contains', 'tutorials' ],
 	],
 ];
 ```
@@ -53,12 +53,12 @@ const rules = [
     'ANY',
     [
         [ 'user.role', 'is', 'editor' ],
-        [ 'post.categories', 'contain', 'tutorials' ],
+        [ 'post.categories', 'contains', 'tutorials' ],
         [
             'ALL',
             [
                 [ 'user.id', 'in', [ 1, 2, 3 ] ],
-                [ 'post.blocks', 'not contain', 'core/embed' ]
+                [ 'post.blocks', 'not contains', 'core/embed' ]
             ]
         ]
     ]
@@ -91,12 +91,12 @@ const rules = [
     'ANY',
     [
         [ 'user.role', 'is', 'editor' ],
-        [ 'post.categories', 'contain', 'tutorials' ],
+        [ 'post.categories', 'contains', 'tutorials' ],
         [
             'ALL',
             [
                 [ 'user.id', 'in', [ 1, 2, 3 ] ],
-                [ 'post.blocks', 'not contain', 'core/embed' ]
+                [ 'post.blocks', 'not contains', 'core/embed' ]
             ]
         ]
     ]
