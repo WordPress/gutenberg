@@ -32,6 +32,7 @@ import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 import { isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Module constants
