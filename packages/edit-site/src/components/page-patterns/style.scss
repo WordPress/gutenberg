@@ -76,14 +76,12 @@
 }
 
 .edit-site-patterns__pattern-title {
+	display: block;
 	width: 100%;
+	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	color: inherit;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	white-space: normal;
 
 	.is-link {
 		text-decoration: none;
@@ -106,16 +104,21 @@
 	}
 }
 
+.dataviews-view-grid {
+	.edit-site-patterns__pattern-title {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		white-space: normal;
+	}
+}
+
 .edit-site-page-patterns-dataviews {
 	.dataviews-view-grid__badge-fields {
 		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
 			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 			color: var(--wp-block-synced-color);
 		}
-	}
-
-	.edit-site-patterns__pattern-title {
-		display: -webkit-box;
 	}
 }
 
