@@ -109,7 +109,24 @@ console.log( result ); // true
 
 ### Operators
 
-The package ships with a simple registry that allows you register a new operator or an alias to an operator. This should allow implementor to specify which rules they want to support, and even add additional ones that aren't covered by core.
+The package ships with 10 operators, and provides the ability to alias them as well as providing new operators.
+
+Here's a table of the available operators, their descriptions, examples, and aliases:
+
+| Operator       | Description                                                               | Example                                         | Aliases     |
+| -------------- | ------------------------------------------------------------------------- | ----------------------------------------------- | ----------- |
+| `is`           | Checks if the source is loosly equal to the target                        | `['user.role', 'is', 'admin']`                  | `=`         |
+| `is not`       | Checks if the source is not loosly equal to the target                    | `['user.role', 'is not', 'subscriber']`         | `!=`        |
+| `contains`     | Checks if the source array includes the target value                      | `['post.categories', 'contains', 'tutorials']`  | N/A         |
+| `not contains` | Checks if the source array does not include the target value              | `['post.blocks', 'not contains', 'core/embed']` | `!contains` |
+| `in`           | Checks if the source value is in the target array                         | `['user.id', 'in', [1, 2, 3]]`                  | N/A         |
+| `not in`       | Checks if the source value is not in the target array                     | `['user.id', 'not in', [4, 5, 6]]`              | `!in`       |
+| `greater than` | Checks if the source number is greater than the target number             | `['post.comments', 'greater than', 10]`         | `>`         |
+| `less than`    | Checks if the source number is less than the target number                | `['post.views', 'less than', 100]`              | `<`         |
+| `gte`          | Checks if the source number is greater than or equal to the target number | `['post.comments', 'gte', 10]`                  | `>=`        |
+| `lte`          | Checks if the source number is less than or equal to the target number    | `['post.views', 'lte', 100]`                    | `<=`        |
+
+In addition to the built-in operators, the package includes a registry system for custom operators and aliases. This allows implementors to extend or customize the rule system as needed.
 
 ```js
 import { parser, registry } from '@wordpress/rule-parser';
