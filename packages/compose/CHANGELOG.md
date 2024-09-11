@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   `useEvent`: a new utility that creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
+-   `useResizeObserver`: new and improved version of the utility (legacy API is still supported) ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
+
 ## 7.7.0 (2024-09-05)
 
 ## 7.6.0 (2024-08-21)
@@ -205,8 +210,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 3.25.0 (2021-03-17)
 

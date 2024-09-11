@@ -142,6 +142,9 @@ function Header( {
 					forceIsAutosaveable={ forceIsDirty }
 				/>
 				<PostViewLink />
+				{ ( isWideViewport || ! showIconLabels ) && (
+					<PinnedItems.Slot scope="core" />
+				) }
 				{ ! customSaveButton && (
 					<PostPublishButtonOrToggle
 						forceIsDirty={ forceIsDirty }
@@ -151,9 +154,6 @@ function Header( {
 					/>
 				) }
 				{ customSaveButton }
-				{ ( isWideViewport || ! showIconLabels ) && (
-					<PinnedItems.Slot scope="core" />
-				) }
 				<MoreMenu />
 			</motion.div>
 		</div>
