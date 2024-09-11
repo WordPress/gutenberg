@@ -113,6 +113,11 @@ figure.wp-block-image:not(.wp-block) {
 	text-align: center;
 }
 
+// Relatively position the alignment container to support the content resizer.
+.wp-block[data-align]:has(> .wp-block-image) {
+	position: relative;
+}
+
 .wp-block-image__crop-area {
 	position: relative;
 	max-width: 100%;
