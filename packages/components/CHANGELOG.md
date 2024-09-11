@@ -13,8 +13,6 @@
 ### Enhancements
 
 -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
--   `Panel`: Increase bottom padding as an optical adjustment ([#64526](https://github.com/WordPress/gutenberg/pull/64526)).
--   `ToolsPanel`: Increase bottom padding as an optical adjustment ([#64526](https://github.com/WordPress/gutenberg/pull/64526)).
 
 ### Internal
 
