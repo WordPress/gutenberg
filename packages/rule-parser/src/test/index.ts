@@ -24,8 +24,7 @@ describe( 'Parser', () => {
 			[ 'customer.role', 'not is', 'customer' ],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse rule with ALL', () => {
@@ -39,8 +38,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse rule with ANY', () => {
@@ -52,8 +50,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse nested rules', () => {
@@ -72,8 +69,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse rules with aliases', () => {
@@ -89,8 +85,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse rules that return false', () => {
@@ -102,8 +97,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( false );
+		expect( parser( rules, store ) ).toBe( false );
 	} );
 
 	it( 'should parse rules that return false and ANY', () => {
@@ -115,8 +109,7 @@ describe( 'Parser', () => {
 			],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( false );
+		expect( parser( rules, store ) ).toBe( false );
 	} );
 
 	it( 'should parse rules with greater than or equal to', () => {
@@ -125,8 +118,7 @@ describe( 'Parser', () => {
 			[ [ 'cart.cartTotal', 'gte', 75 ] ],
 		];
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, store ) ).toBe( true );
 	} );
 
 	it( 'should parse rules with floating numbers', () => {
@@ -135,8 +127,7 @@ describe( 'Parser', () => {
 			[ [ 'cart.cartTotal', 'less than', 75.5 ] ],
 		];
 
-		const parsedRules = parser( rules, { 'cart.cartTotal': '75.3' } );
-		expect( parsedRules ).toBe( true );
+		expect( parser( rules, { 'cart.cartTotal': '75.3' } ) ).toBe( true );
 	} );
 
 	it( 'should not parse with nonexistent comparator', () => {
@@ -158,18 +149,37 @@ describe( 'Parser', () => {
 	} );
 
 	it( 'should parse with newly introduced evaluator', () => {
-		const rules: Rules< RawRule > = [
-			'ALL',
-			[ [ 'cart.cartTotal', 'between', [ 50, 100 ] ] ],
-		];
-
 		const betweenEvaluator = ( source: Source, target: Target ) => {
 			return source >= target[ 0 ] && source <= target[ 1 ];
 		};
 
 		registry.register( 'between', betweenEvaluator );
 
-		const parsedRules = parser( rules, store );
-		expect( parsedRules ).toBe( true );
+		const rules: Rules< RawRule > = [
+			'ALL',
+			[ [ 'cart.cartTotal', 'between', [ 50, 100 ] ] ],
+		];
+
+		expect( parser( rules, store ) ).toBe( true );
+
+		const falseRules: Rules< RawRule > = [
+			'ALL',
+			[ [ 'cart.cartTotal', 'between', [ 100, 200 ] ] ],
+		];
+
+		expect( parser( falseRules, store ) ).toBe( false );
+	} );
+
+	it( 'should correctly evaluate contains operator with arrays', () => {
+		const rulesSourceArray: Rules< RawRule > = [
+			'ALL',
+			[ [ 'cart.items', 'contains', [ 'apple', 'orange' ] ] ],
+		];
+
+		const storeSourceArray = {
+			'cart.items': [ 'banana', 'apple', 'orange' ],
+		};
+
+		expect( parser( rulesSourceArray, storeSourceArray ) ).toBe( true );
 	} );
 } );
