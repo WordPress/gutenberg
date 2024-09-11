@@ -199,7 +199,6 @@ function PrivateExcerpt() {
 				renderToggle={ ( { onToggle } ) => (
 					<Button
 						__next40pxDefaultSize
-						className="editor-post-excerpt__dropdown__trigger"
 						onClick={ onToggle }
 						variant="link"
 					>
