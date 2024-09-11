@@ -34,6 +34,7 @@ export default function DataViewsSidebarContent() {
 							slug={ dataview.slug }
 							title={ dataview.title }
 							icon={ dataview.icon }
+							suffix={ <span>{ dataview.count }</span> }
 							type={ dataview.view.type }
 							isActive={
 								! isCustomBoolean &&

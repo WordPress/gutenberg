@@ -13,7 +13,7 @@ import {
 	notAllowed,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -24,6 +24,7 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_GRID,
 	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
 export const defaultLayouts = {
@@ -68,21 +69,58 @@ const DEFAULT_POST_BASE = {
 	layout: defaultLayouts[ LAYOUT_LIST ].layout,
 };
 
+function useDataViewItemCounts( { postType } ) {
+	const { records, totalItems } = useEntityRecords( 'postType', postType, {
+		status: [ 'any', 'trash' ],
+	} );
+	return useMemo( () => {
+		if ( ! records ) {
+			return {};
+		}
+		const counts = {
+			all: totalItems,
+			drafts: records.filter( ( record ) => record.status === 'draft' )
+				.length,
+			future: records.filter( ( record ) => record.status === 'future' )
+				.length,
+			pending: records.filter( ( record ) => record.status === 'pending' )
+				.length,
+			private: records.filter( ( record ) => record.status === 'private' )
+				.length,
+			published: records.filter(
+				( record ) => record.status === 'publish'
+			).length,
+			trash: records.filter( ( record ) => record.status === 'trash' )
+				.length,
+		};
+		return counts;
+	}, [ records, totalItems ] );
+}
+
 export function useDefaultViews( { postType } ) {
 	const labels = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return getPostType( postType )?.labels;
-		},
+		( select ) => select( coreStore ).getPostType( postType )?.labels,
 		[ postType ]
 	);
+	const counts = useDataViewItemCounts( { postType } );
+
 	return useMemo( () => {
 		return [
 			{
 				title: labels?.all_items || __( 'All items' ),
 				slug: 'all',
 				icon: pages,
-				view: DEFAULT_POST_BASE,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_NONE,
+							value: 'trash',
+						},
+					],
+				},
+				count: counts?.all,
 			},
 			{
 				title: __( 'Published' ),
@@ -98,6 +136,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.published,
 			},
 			{
 				title: __( 'Scheduled' ),
@@ -113,6 +152,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.future,
 			},
 			{
 				title: __( 'Drafts' ),
@@ -128,6 +168,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.drafts,
 			},
 			{
 				title: __( 'Pending' ),
@@ -143,6 +184,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.pending,
 			},
 			{
 				title: __( 'Private' ),
@@ -158,6 +200,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.private,
 			},
 			{
 				title: __( 'Trash' ),
@@ -175,7 +218,8 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
+				count: counts?.trash,
 			},
-		];
-	}, [ labels ] );
+		].filter( ( { count } ) => count > 0 );
+	}, [ labels, counts ] );
 }
