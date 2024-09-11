@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -20,6 +20,16 @@ export function useZoomOutModeExit( { editorMode } ) {
 		useDispatch( blockEditorStore )
 	);
 
+	const { setIsInserterOpened } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+
+		const { __experimentalSetIsInserterOpened } = getSettings();
+
+		return {
+			setIsInserterOpened: __experimentalSetIsInserterOpened,
+		};
+	}, [] );
+
 	return useRefEffect(
 		( node ) => {
 			if ( editorMode !== 'zoom-out' ) {
@@ -29,6 +39,10 @@ export function useZoomOutModeExit( { editorMode } ) {
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
+					// Setting may be undefined.
+					if ( typeof setIsInserterOpened === 'function' ) {
+						setIsInserterOpened( false );
+					}
 					__unstableSetEditorMode( 'edit' );
 				}
 			}
