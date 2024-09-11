@@ -290,11 +290,10 @@ export default () => {
 						currentValue.current,
 						deepClone( value ) as object
 					);
-					currentValue.current = proxifyContext(
+					result[ namespace ] = proxifyContext(
 						currentValue.current,
 						inheritedValue[ namespace ]
 					);
-					result[ namespace ] = currentValue.current;
 				}
 				return result;
 			}, [ defaultEntry, inheritedValue ] );

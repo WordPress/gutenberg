@@ -423,7 +423,7 @@ export default function LogoEdit( {
 				context: 'view',
 			} );
 		const _isRequestingMediaItem =
-			_siteLogoId &&
+			!! _siteLogoId &&
 			! select( coreStore ).hasFinishedResolution( 'getMedia', [
 				_siteLogoId,
 				{ context: 'view' },
@@ -627,8 +627,7 @@ export default function LogoEdit( {
 								render={ ( { open } ) => (
 									<div className="block-library-site-logo__inspector-upload-container">
 										<Button
-											// TODO: Switch to `true` (40px size) if possible
-											__next40pxDefaultSize={ false }
+											__next40pxDefaultSize
 											onClick={ open }
 											variant="secondary"
 										>
@@ -674,8 +673,7 @@ export default function LogoEdit( {
 					mediaLibraryButton={ ( { open } ) => {
 						return (
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								icon={ upload }
 								variant="primary"
 								label={ __( 'Choose logo' ) }

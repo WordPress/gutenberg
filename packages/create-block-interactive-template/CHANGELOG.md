@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.7.0 (2024-09-05)
+
 ### Enhancements
 
 -   Set the minimum supported WordPress version to 6.6 to make it work seamlessly with the latest version of `@wordpress/scripts` package ([#64920](https://github.com/WordPress/gutenberg/pull/64920)).

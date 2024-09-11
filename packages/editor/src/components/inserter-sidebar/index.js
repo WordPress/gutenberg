@@ -18,13 +18,10 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-const { PrivateInserterLibrary, sectionRootClientIdKey } = unlock(
-	blockEditorPrivateApis
-);
+const { PrivateInserterLibrary } = unlock( blockEditorPrivateApis );
 
 export default function InserterSidebar() {
 	const {
-		blockInsertionPoint,
 		blockSectionRootClientId,
 		inserterSidebarToggleRef,
 		insertionPoint,
@@ -37,17 +34,16 @@ export default function InserterSidebar() {
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
 		const {
-			getBlockInsertionPoint,
 			getBlockRootClientId,
 			__unstableGetEditorMode,
-			getSettings,
-		} = select( blockEditorStore );
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const { [ sectionRootClientIdKey ]: sectionRootClientId } =
-					getSettings();
+				const sectionRootClientId = getSectionRootClientId();
+
 				if ( sectionRootClientId ) {
 					return sectionRootClientId;
 				}
@@ -55,7 +51,6 @@ export default function InserterSidebar() {
 			return getBlockRootClientId();
 		};
 		return {
-			blockInsertionPoint: getBlockInsertionPoint(),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			insertionPoint: getInsertionPoint(),
 			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
@@ -94,9 +89,9 @@ export default function InserterSidebar() {
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
 				rootClientId={
-					blockSectionRootClientId ?? blockInsertionPoint.rootClientId
+					blockSectionRootClientId ?? insertionPoint.rootClientId
 				}
-				__experimentalInsertionIndex={ blockInsertionPoint.index }
+				__experimentalInsertionIndex={ insertionPoint.insertionIndex }
 				onSelect={ insertionPoint.onSelect }
 				__experimentalInitialTab={ insertionPoint.tab }
 				__experimentalInitialCategory={ insertionPoint.category }

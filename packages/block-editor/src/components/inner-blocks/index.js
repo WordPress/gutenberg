@@ -30,7 +30,6 @@ import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey } from '../../store/private-keys';
 
 const EMPTY_OBJECT = {};
 
@@ -204,7 +203,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockEditingMode,
 				getBlockSettings,
 				isDragging,
-				getSettings,
+				getSectionRootClientId,
 			} = unlock( select( blockEditorStore ) );
 			let _isDropZoneDisabled;
 
@@ -226,8 +225,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				// In zoom out mode, we want to disable the drop zone for the sections.
 				// The inner blocks belonging to the section drop zone is
 				// already disabled by the blocks themselves being disabled.
-				const { [ sectionRootClientIdKey ]: sectionRootClientId } =
-					getSettings();
+				const sectionRootClientId = getSectionRootClientId();
 
 				_isDropZoneDisabled = clientId !== sectionRootClientId;
 			}
