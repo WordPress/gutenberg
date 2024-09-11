@@ -202,15 +202,9 @@ function gutenberg_dequeue_module( $module_identifier ) {
 }
 
 /**
- * Registers vendor JavaScript files to be used as dependencies of the editor
- * and plugins.
+ * Registers Gutenberg Script Modules.
  *
- * This function is called from a script during the plugin build process, so it
- * should not call any WordPress PHP functions.
- *
- * @since 13.0
- *
- * @param WP_Scripts $scripts WP_Scripts instance.
+ * @since 19.3
  */
 function gutenberg_register_script_modules() {
 	// When in production, use the plugin's version as the default asset version;
