@@ -224,8 +224,6 @@ function gutenberg_register_packages_scripts( $scripts ) {
 				break;
 		}
 
-		\sirreal\d( $handle );
-
 		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
 		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
 
