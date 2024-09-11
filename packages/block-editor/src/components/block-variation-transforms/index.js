@@ -35,8 +35,7 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
