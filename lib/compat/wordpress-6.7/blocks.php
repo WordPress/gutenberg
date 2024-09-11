@@ -47,7 +47,7 @@ add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadat
 /**
  * Adds post format query vars to the query loop block's WP_Query when the block's attributes call for them.
  *
- * @see query_loop_block_query_vars
+ * @see 'query_loop_block_query_vars'
  *
  * @param array    $query The query vars.
  * @param WP_Block $block Block instance.
