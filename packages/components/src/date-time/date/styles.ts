@@ -7,13 +7,13 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import Button from '../../button';
-import { COLORS, CONFIG } from '../../utils';
+import { boxSizingReset, COLORS, CONFIG } from '../../utils';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { space } from '../../utils/space';
 
 export const Wrapper = styled.div`
-	box-sizing: border-box;
+	${ boxSizingReset }
 `;
 
 export const Navigator = styled( HStack )`
@@ -127,7 +127,6 @@ export const DayButton = styled( Button, {
 		::before {
 			border: 2px solid ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
 			border-radius: ${ CONFIG.radiusRound };
-			box-sizing: border-box;
 			bottom: 2px;
 			content: " ";
 			left: 50%;
