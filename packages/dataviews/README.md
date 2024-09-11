@@ -242,7 +242,11 @@ function MyCustomPageTable() {
 		};
 	}, [ view ] );
 
-	const { records } = useEntityRecords( 'postType', 'page', queryArgs );
+	const { records, isResolving } = useEntityRecords( 'postType', 'page', queryArgs );
+
+	if ( isResolving ){
+	    return <div>Loading</div>
+        }
 
 	return (
 		<DataViews
