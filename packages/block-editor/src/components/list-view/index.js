@@ -45,8 +45,6 @@ import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dro
 import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
-import { unlock } from '../../lock-unlock';
-
 const expanded = ( state, action ) => {
 	if ( action.type === 'clear' ) {
 		return {};
@@ -121,36 +119,24 @@ function ListViewComponent(
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
 	const { getBlock } = useSelect( blockEditorStore );
-
-	const { sectionBlockClientIds, isZoomOutMode, visibleBlockCount } =
-		useSelect(
-			( select ) => {
-				const {
-					getGlobalBlockCount,
-					getClientIdsOfDescendants,
-					__unstableGetEditorMode,
-					getSectionRootClientId,
-					getBlockOrder,
-				} = unlock( select( blockEditorStore ) );
-				const draggedBlockCount =
-					draggedClientIds?.length > 0
-						? getClientIdsOfDescendants( draggedClientIds ).length +
-						  1
-						: 0;
-
-				const _isZoomOutMode = __unstableGetEditorMode() === 'zoom-out';
-
-				return {
-					visibleBlockCount:
-						getGlobalBlockCount() - draggedBlockCount,
-					sectionBlockClientIds: getBlockOrder(
-						getSectionRootClientId()
-					),
-					isZoomOutMode: _isZoomOutMode,
-				};
-			},
-			[ draggedClientIds ]
-		);
+	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+		( select ) => {
+			const {
+				getGlobalBlockCount,
+				getClientIdsOfDescendants,
+				__unstableGetEditorMode,
+			} = select( blockEditorStore );
+			const draggedBlockCount =
+				draggedClientIds?.length > 0
+					? getClientIdsOfDescendants( draggedClientIds ).length + 1
+					: 0;
+			return {
+				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
+				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
+			};
+		},
+		[ draggedClientIds ]
+	);
 
 	const { updateBlockSelection } = useBlockSelection();
 
@@ -319,8 +305,6 @@ function ListViewComponent(
 			setInsertedBlock,
 			treeGridElementRef: elementRef,
 			rootClientId,
-			sectionBlockClientIds,
-			isZoomOutMode,
 		} ),
 		[
 			blockDropPosition,
@@ -338,8 +322,6 @@ function ListViewComponent(
 			insertedBlock,
 			setInsertedBlock,
 			rootClientId,
-			sectionBlockClientIds,
-			isZoomOutMode,
 		]
 	);
 
@@ -415,6 +397,7 @@ function ListViewComponent(
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
+						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						showAppender={ showAppender }
 					/>
 				</ListViewContext.Provider>
