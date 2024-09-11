@@ -122,9 +122,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 					size="compact"
 				/>
 			) }
-			{ canMove && canRemove && (
-				<Shuffle clientId={ clientId } as={ ToolbarButton } />
-			) }
+			{ canMove && canRemove && <Shuffle clientId={ clientId } /> }
 
 			{ ! isBlockTemplatePart && (
 				<ToolbarButton
