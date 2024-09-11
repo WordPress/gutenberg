@@ -16,8 +16,8 @@ const { baseConfig, plugins } = require( './shared' );
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const { createRequire } = require( 'node:module' );
 
-const rootPath = new URL( '..', `file://${ __dirname }` );
-const fromRootRequire = createRequire( rootPath );
+const rootURL = new URL( '..', `file://${ __dirname }` );
+const fromRootRequire = createRequire( rootURL );
 
 /** @type {Iterable<[string, string]>} */
 const iterableDeps = Object.entries(
@@ -34,9 +34,12 @@ for ( const [ packageName, versionSpecifier ] of iterableDeps ) {
 	) {
 		continue;
 	}
+
 	const packageRequire = createRequire(
-		new URL( `${ versionSpecifier.substring( 5 ) }/`, rootPath )
+		// Remove the leading "file:" specifier to build a package URL.
+		new URL( `${ versionSpecifier.substring( 5 ) }/`, rootURL )
 	);
+
 	const depPackageJson = packageRequire( './package.json' );
 	if ( ! Object.hasOwn( depPackageJson, 'wpScriptModuleExports' ) ) {
 		continue;
