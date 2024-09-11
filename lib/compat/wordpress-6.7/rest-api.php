@@ -150,7 +150,7 @@ if ( ! function_exists( 'update_comment_type_in_rest_api_6_7' ) && gutenberg_is_
 if ( ! function_exists( 'update_get_avatar_comment_type' ) && gutenberg_is_experiment_enabled( 'gutenberg-block-comment' ) ) {
 	function update_get_avatar_comment_type( $comment_type ) {
 		$comment_type[] = 'block_comment';
-		return $comment_type;		
+		return $comment_type;
 	}
 	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type', 10, 1 );
 }
