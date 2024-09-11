@@ -18,6 +18,7 @@ function ZoomOutModeInserters() {
 		hasSelection,
 		inserterInsertionPoint,
 		blockOrder,
+		blockInsertionPointVisible,
 		setInserterIsOpened,
 		sectionRootClientId,
 		selectedBlockClientId,
@@ -31,6 +32,7 @@ function ZoomOutModeInserters() {
 			getSelectedBlockClientId,
 			getHoveredBlockClientId,
 			getSectionRootClientId,
+			isBlockInsertionPointVisible,
 		} = unlock( select( blockEditorStore ) );
 
 		const root = getSectionRootClientId();
@@ -39,6 +41,7 @@ function ZoomOutModeInserters() {
 			hasSelection: !! getSelectionStart().clientId,
 			inserterInsertionPoint: getInserterInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
+			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
@@ -48,7 +51,7 @@ function ZoomOutModeInserters() {
 	}, [] );
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { setInserterInsertionPoint } = unlock(
+	const { showInsertionPoint, setInserterInsertionPoint } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -68,6 +71,7 @@ function ZoomOutModeInserters() {
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		const shouldRenderInsertionPoint =
+			blockInsertionPointVisible &&
 			inserterInsertionPoint?.insertionIndex === index;
 
 		const previousClientId = clientId;
@@ -88,22 +92,24 @@ function ZoomOutModeInserters() {
 				previousClientId={ previousClientId }
 				nextClientId={ nextClientId }
 			>
-				<ZoomOutModeInserterButton
-					isVisible={
-						! shouldRenderInsertionPoint &&
-						( isSelected || isHovered )
-					}
-					onClick={ () => {
-						setInserterIsOpened( {
-							tab: 'patterns',
-							category: 'all',
-						} );
-						setInserterInsertionPoint( {
-							rootClientId: sectionRootClientId,
-							insertionIndex: index,
-						} );
-					} }
-				/>
+				{ ! shouldRenderInsertionPoint && (
+					<ZoomOutModeInserterButton
+						isVisible={ isSelected || isHovered }
+						onClick={ () => {
+							setInserterIsOpened( {
+								tab: 'patterns',
+								category: 'all',
+							} );
+							setInserterInsertionPoint( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
+							} );
+							showInsertionPoint( sectionRootClientId, index, {
+								operation: 'insert',
+							} );
+						} }
+					/>
+				) }
 			</BlockPopoverInbetween>
 		);
 	} );
