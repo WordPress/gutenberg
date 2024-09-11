@@ -55,6 +55,8 @@
 .edit-post-meta-boxes-main__liner {
 	overflow: auto;
 	max-height: 100%;
+	// Keep the contents behind the resize handle or details summary.
+	isolation: isolate;
 }
 
 .has-metaboxes .editor-visual-editor {
