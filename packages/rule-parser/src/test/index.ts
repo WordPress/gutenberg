@@ -119,6 +119,26 @@ describe( 'Parser', () => {
 		expect( parsedRules ).toBe( false );
 	} );
 
+	it( 'should parse rules with greater than or equal to', () => {
+		const rules: Rules< RawRule > = [
+			'ALL',
+			[ [ 'cart.cartTotal', 'gte', 75 ] ],
+		];
+
+		const parsedRules = parser( rules, store );
+		expect( parsedRules ).toBe( true );
+	} );
+
+	it( 'should parse rules with floating numbers', () => {
+		const rules: Rules< RawRule > = [
+			'ALL',
+			[ [ 'cart.cartTotal', 'less than', 75.5 ] ],
+		];
+
+		const parsedRules = parser( rules, { 'cart.cartTotal': '75.3' } );
+		expect( parsedRules ).toBe( true );
+	} );
+
 	it( 'should not parse with nonexistent comparator', () => {
 		const rules: Rules< RawRule > = [
 			'ALL',

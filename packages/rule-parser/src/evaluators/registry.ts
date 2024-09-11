@@ -92,12 +92,12 @@ registry.register(
 );
 registry.alias( '>', 'greater than' );
 registry.register( 'lte', ( source: Source, target: Target, rule: Rule ) =>
-	evaluateNumericCompare( source, target, rule, false )
+	evaluateNumericCompare( source, target, rule, true )
 );
 registry.alias( '<=', 'lte' );
 registry.register( 'gte', ( source: Source, target: Target, rule: Rule ) =>
 	// We need to reverse the source and target for the greater than operator.
-	evaluateNumericCompare( target, source, rule, false )
+	evaluateNumericCompare( target, source, rule, true )
 );
 registry.alias( '>=', 'gte' );
 export { registry };
