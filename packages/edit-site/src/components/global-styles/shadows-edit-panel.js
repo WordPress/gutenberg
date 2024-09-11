@@ -497,14 +497,11 @@ function ShadowInputControl( { label, value, onChange } ) {
 	};
 
 	return (
-		<HStack align="flex-end">
-			<UnitControl
-				label={ label }
-				__next40pxDefaultSize
-				value={ value }
-				onChange={ onValueChange }
-				className="edit-site-global-styles__shadow-editor-control"
-			/>
-		</HStack>
+		<UnitControl
+			label={ label }
+			__next40pxDefaultSize
+			value={ value }
+			onChange={ onValueChange }
+		/>
 	);
 }
