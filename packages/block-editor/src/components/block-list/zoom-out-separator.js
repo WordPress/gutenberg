@@ -74,7 +74,8 @@ export function ZoomOutSeparator( {
 		inserterInsertionPoint?.insertionIndex === 0 &&
 		clientId === sectionClientIds[ inserterInsertionPoint.insertionIndex ];
 	const hasBottomInserterInsertionPoint =
-		inserterInsertionPoint?.insertionIndex &&
+		inserterInsertionPoint &&
+		inserterInsertionPoint.hasOwnProperty( 'insertionIndex' ) &&
 		clientId ===
 			sectionClientIds[ inserterInsertionPoint.insertionIndex - 1 ];
 	// We want to show the zoom out separator in either of these conditions:

@@ -89,8 +89,13 @@ function useInsertionPoint( {
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
-			} else if ( insertionPoint?.insertionIndex ) {
-				_destinationRootClientId = insertionPoint?.rootClientId
+			} else if (
+				insertionPoint &&
+				insertionPoint.hasOwnProperty( 'insertionIndex' )
+			) {
+				_destinationRootClientId = insertionPoint.hasOwnProperty(
+					'rootClientId'
+				)
 					? insertionPoint.rootClientId
 					: rootClientId;
 				_destinationIndex = insertionPoint.insertionIndex;
