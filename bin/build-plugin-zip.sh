@@ -80,7 +80,8 @@ mv gutenberg.tmp.php gutenberg.php
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
-zip -r gutenberg.zip \
+zip -rD \
+	gutenberg.zip \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
