@@ -242,7 +242,7 @@ function MyCustomPageTable() {
 		};
 	}, [ view ] );
 
-	const { records, isResolving } = useEntityRecords( 'postType', 'page', queryArgs );
+	const { records,isResolving,totalItems,totalPages } = useEntityRecords( 'postType', 'page', queryArgs );
 
 	if ( isResolving ){
 	    return <div>Loading</div>
@@ -253,7 +253,10 @@ function MyCustomPageTable() {
 			data={ records }
 			view={ view }
 			onChangeView={ setView }
-			// ...
+			fields={ [ 'author', 'status' ] }
+			paginationInfo={{
+				totalItems,totalPages
+			}}
 		/>
 	);
 }
