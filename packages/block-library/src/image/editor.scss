@@ -94,14 +94,18 @@ figure.wp-block-image:not(.wp-block) {
 }
 
 .wp-block[data-align="left"] > .wp-block-image {
+	/*rtl:ignore*/
 	margin-right: 1em;
+	/*rtl:ignore*/
 	margin-left: 0;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
 
 .wp-block[data-align="right"] > .wp-block-image {
+	/*rtl:ignore*/
 	margin-left: 1em;
+	/*rtl:ignore*/
 	margin-right: 0;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
