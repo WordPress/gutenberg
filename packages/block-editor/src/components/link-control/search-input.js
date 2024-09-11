@@ -42,7 +42,7 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion = true,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
-			suffix = null,
+			suffix,
 		},
 		ref
 	) => {
