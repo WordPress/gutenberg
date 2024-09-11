@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useInstanceId, usePrevious, useRefEffect } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -144,12 +144,15 @@ function ListItem< Item >( {
 	const labelId = `${ idPrefix }-label`;
 	const descriptionId = `${ idPrefix }-description`;
 
+	const [ actionsWidth, setActionsWidth ] = useState( 0 );
+	const measureActionsWidth = useRefEffect< HTMLElement >( ( node ) => {
+		setActionsWidth( node.offsetWidth );
+	}, [] );
+
 	const [ isHovered, setIsHovered ] = useState( false );
-	const handleMouseEnter = () => {
-		setIsHovered( true );
-	};
-	const handleMouseLeave = () => {
-		setIsHovered( false );
+	const handleHover: React.MouseEventHandler = ( { type } ) => {
+		const isHover = type === 'mouseenter';
+		setIsHovered( isHover );
 	};
 
 	useEffect( () => {
@@ -187,6 +190,11 @@ function ListItem< Item >( {
 		<primaryField.render item={ item } />
 	) : null;
 
+	const primaryFieldInlineStyle =
+		isHovered || isSelected
+			? { paddingInlineEnd: actionsWidth }
+			: undefined;
+
 	return (
 		<Composite.Row
 			ref={ itemRef }
@@ -196,8 +204,8 @@ function ListItem< Item >( {
 				'is-selected': isSelected,
 				'is-hovered': isHovered,
 			} ) }
-			onMouseEnter={ handleMouseEnter }
-			onMouseLeave={ handleMouseLeave }
+			onMouseEnter={ handleHover }
+			onMouseLeave={ handleHover }
 		>
 			<HStack
 				className="dataviews-view-list__item-wrapper"
@@ -230,6 +238,7 @@ function ListItem< Item >( {
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
+									style={ primaryFieldInlineStyle }
 								>
 									{ renderedPrimaryField }
 								</span>
@@ -267,6 +276,7 @@ function ListItem< Item >( {
 							flexShrink: '0',
 							width: 'auto',
 						} }
+						ref={ measureActionsWidth }
 					>
 						{ primaryAction && (
 							<PrimaryActionGridCell

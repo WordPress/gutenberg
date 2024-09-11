@@ -23,7 +23,8 @@ ul.dataviews-view-list {
 			position: absolute;
 			top: $grid-unit-20;
 			right: 0;
-
+			// Pads __primary-field’s text truncation on hover (done in JS; see ./index.tsx).
+			padding-inline-start: $grid-unit-10;
 
 			> div {
 				height: $button-size-small;
@@ -45,7 +46,6 @@ ul.dataviews-view-list {
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				padding-left: $grid-unit-10;
 				margin-right: $grid-unit-30;
 
 				.components-button {
