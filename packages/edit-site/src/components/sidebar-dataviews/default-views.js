@@ -71,6 +71,7 @@ const DEFAULT_POST_BASE = {
 
 function useDataViewItemCounts( { postType } ) {
 	const { records, totalItems } = useEntityRecords( 'postType', postType, {
+		per_page: -1,
 		status: [ 'any', 'trash' ],
 	} );
 	return useMemo( () => {
