@@ -26,7 +26,7 @@ The diagram below provides an overview of the build process when using the `wp-s
 
 - **Production Mode (`npm run build`):** In this mode, `wp-scripts` compiles your JavaScript, minifying the output to reduce file size and improve loading times in the browser. This is ideal for deploying your code to a live site.
 
-- **Development Mode (`npm run start`):** This mode is tailored for active development. It skips minification for easier debugging, generates source maps for better error tracking, and watches your source files for changes. When a change is detected, it automatically rebuilds the affected files, allowing you to see updates in real-time.
+- **Development Mode (`npm start`):** This mode is tailored for active development. It skips minification for easier debugging, generates source maps for better error tracking, and watches your source files for changes. When a change is detected, it automatically rebuilds the affected files, allowing you to see updates in real-time.
 
 The `wp-scripts` package also facilitates the use of JavaScript modules, allowing code distribution across multiple files and resulting in a streamlined bundle after the build process. The [block-development-example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) GitHub repository provides some good examples.
 
