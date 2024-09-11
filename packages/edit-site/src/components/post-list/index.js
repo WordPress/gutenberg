@@ -174,7 +174,7 @@ function useView( postType ) {
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
 function getItemId( item ) {
-	return item?.id ? item.id.toString() : undefined;
+	return item?.id.toString();
 }
 
 export default function PostList( { postType } ) {
