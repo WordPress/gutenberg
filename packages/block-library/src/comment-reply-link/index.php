@@ -63,6 +63,17 @@ function render_block_core_comment_reply_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
+	$p = new WP_HTML_Tag_Processor( $comment_reply_link );
+	if ( $p->next_tag(
+		array(
+			'tag_name'   => 'A',
+			'class_name' => 'comment-reply-link',
+		)
+	) ) {
+		$p->set_attribute( 'data-wp-on--click', 'actions.changeReplyTo' );
+	}
+	$comment_reply_link = $p->get_updated_html();
+
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,

@@ -11,7 +11,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [ "postId", "postType" ],
+	"usesContext": [ "postId", "postType", "enhancedSubmission" ],
 	"supports": {
 		"html": false,
 		"color": {
@@ -56,5 +56,6 @@
 		"wp-block-post-comments-form",
 		"wp-block-buttons",
 		"wp-block-button"
-	]
+	],
+	"viewScript": "file:./view.min.js"
 }

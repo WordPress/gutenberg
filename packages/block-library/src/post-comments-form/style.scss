@@ -82,4 +82,25 @@
 			margin-left: 0.5em;
 		}
 	}
+
+	.wp-block-post-comments-form__error {
+		display: none;
+		gap: 12px;
+		align-items: stretch;
+		border: 1px solid #cc1818;
+		border-radius: 4px;
+		color: #2f2f2f;
+		padding: 16px;
+		margin-bottom: 20px;
+		background-color: #fff0f0;
+		& > svg {
+			background-color: #cc1818;
+			transform: rotate(180deg);
+			fill: #fff;
+			border-radius: 50%;
+			padding: 2px;
+			flex-shrink: 0;
+			flex-grow: 0;
+		}
+	}
 }

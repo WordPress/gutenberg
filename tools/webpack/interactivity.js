@@ -25,6 +25,7 @@ module.exports = {
 		image: './packages/block-library/src/image/view.js',
 		file: './packages/block-library/src/file/view.js',
 		search: './packages/block-library/src/search/view.js',
+		comments: './packages/block-library/src/post-comments-form/view.js',
 	},
 	experiments: {
 		outputModule: true,

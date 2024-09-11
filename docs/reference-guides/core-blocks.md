@@ -187,7 +187,7 @@ An advanced block that allows displaying post comments using different visual co
 -	**Name:** core/comments
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** legacy, tagName
+-	**Attributes:** enhancedSubmission, legacy, tagName
 
 ## Comments Pagination
 

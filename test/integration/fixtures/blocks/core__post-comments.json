@@ -4,7 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"tagName": "div",
-			"legacy": true
+			"legacy": true,
+			"enhancedSubmission": false
 		},
 		"innerBlocks": []
 	}

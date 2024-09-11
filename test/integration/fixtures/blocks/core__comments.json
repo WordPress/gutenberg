@@ -5,6 +5,7 @@
 		"attributes": {
 			"tagName": "div",
 			"legacy": false,
+			"enhancedSubmission": false,
 			"className": "comments-post-extra"
 		},
 		"innerBlocks": [
