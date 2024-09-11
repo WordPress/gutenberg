@@ -98,6 +98,7 @@ zip -r gutenberg.zip \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$build_files \
+	build-module \
 	readme.txt \
 	changelog.txt \
 	README.md
