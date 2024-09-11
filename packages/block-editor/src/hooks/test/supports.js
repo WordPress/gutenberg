@@ -23,7 +23,7 @@ describe( 'hasBlockClassNameSupport', () => {
 				className: false,
 			},
 		};
-		expect( hasBlockClassNameSupport( block ) ).toEqual( false );
+		expect( hasBlockClassNameSupport( block ) ).toBe( false );
 	} );
 
 	it( 'should reflect the nested supports property if true', () => {
@@ -35,7 +35,7 @@ describe( 'hasBlockClassNameSupport', () => {
 				},
 			},
 		};
-		expect( hasBlockClassNameSupport( block ) ).toEqual( true );
+		expect( hasBlockClassNameSupport( block ) ).toBe( true );
 	} );
 
 	it( 'should reflect the nested supports property if false', () => {
@@ -47,7 +47,7 @@ describe( 'hasBlockClassNameSupport', () => {
 				},
 			},
 		};
-		expect( hasBlockClassNameSupport( block ) ).toEqual( false );
+		expect( hasBlockClassNameSupport( block ) ).toBe( false );
 	} );
 } );
 
@@ -58,7 +58,7 @@ describe( 'hasVariationClassNameSupport', () => {
 		const block = {
 			name: blockName,
 		};
-		expect( hasVariationClassNameSupport( block ) ).toEqual( false );
+		expect( hasVariationClassNameSupport( block ) ).toBe( false );
 	} );
 
 	it( 'should return false if the block does not explicitly support variation class names', () => {
@@ -68,7 +68,7 @@ describe( 'hasVariationClassNameSupport', () => {
 				className: true,
 			},
 		};
-		expect( hasVariationClassNameSupport( block ) ).toEqual( false );
+		expect( hasVariationClassNameSupport( block ) ).toBe( false );
 	} );
 
 	it( 'should reflect the nested supports property if true', () => {
@@ -80,7 +80,7 @@ describe( 'hasVariationClassNameSupport', () => {
 				},
 			},
 		};
-		expect( hasVariationClassNameSupport( block ) ).toEqual( true );
+		expect( hasVariationClassNameSupport( block ) ).toBe( true );
 	} );
 
 	it( 'should reflect the nested supports property if false', () => {
@@ -92,6 +92,6 @@ describe( 'hasVariationClassNameSupport', () => {
 				},
 			},
 		};
-		expect( hasVariationClassNameSupport( block ) ).toEqual( false );
+		expect( hasVariationClassNameSupport( block ) ).toBe( false );
 	} );
 } );
