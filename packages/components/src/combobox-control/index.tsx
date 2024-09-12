@@ -273,6 +273,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	const handleOnReset = () => {
 		setValue( null );
+		setSelectedSuggestion( null );
 		inputContainer.current?.focus();
 	};
 
