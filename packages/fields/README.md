@@ -20,7 +20,7 @@ Undocumented declaration.
 
 ### store
 
-Store definition for the editor namespace.
+Store definition for the fields namespace.
 
 _Related_
 
@@ -32,7 +32,7 @@ _Type_
 
 ### storeConfig
 
-Post editor data store configuration.
+Fields data store configuration.
 
 _Related_
 

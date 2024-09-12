@@ -13,7 +13,7 @@ import * as actions from './actions';
 import { STORE_NAME } from './constants';
 
 /**
- * Post editor data store configuration.
+ * Fields data store configuration.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
  *
@@ -26,7 +26,7 @@ export const storeConfig = {
 };
 
 /**
- * Store definition for the editor namespace.
+ * Store definition for the fields namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
