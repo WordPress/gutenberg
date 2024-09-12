@@ -76,8 +76,12 @@ export function useDefaultViewsWithItemCounts( { postType } ) {
 	} );
 
 	return useMemo( () => {
-		if ( ! records || ! defaultViews ) {
+		if ( ! defaultViews ) {
 			return [];
+		}
+
+		if ( ! records ) {
+			return defaultViews;
 		}
 
 		const counts = {
@@ -98,14 +102,10 @@ export function useDefaultViewsWithItemCounts( { postType } ) {
 		};
 
 		// Filter out views with > 0 item counts.
-		return defaultViews
-			.map( ( _view ) => {
-				if ( counts?.[ _view.slug ] > 0 ) {
-					_view.count = counts[ _view.slug ];
-				}
-				return _view;
-			} )
-			.filter( ( view ) => !! view.count );
+		return defaultViews.map( ( _view ) => {
+			_view.count = counts[ _view.slug ];
+			return _view;
+		} );
 	}, [ defaultViews, records, totalItems ] );
 }
 
