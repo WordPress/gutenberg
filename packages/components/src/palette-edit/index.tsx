@@ -176,7 +176,7 @@ function Option< T extends Color | Gradient >( {
 	slugPrefix,
 	isGradient,
 }: OptionProps< T > ) {
-	const value = isGradient ? element.gradient : element.color;
+	const value = isGradient ? element.gradient! : element.color!;
 	const [ isEditingColor, setIsEditingColor ] = useState( false );
 
 	// Use internal state instead of a ref to make sure that the component

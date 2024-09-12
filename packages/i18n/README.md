@@ -117,7 +117,7 @@ Returns a formatted string. If an error occurs in applying the format, the origi
 
 _Related_
 
--   <https://www.npmjs.com/package/sprintf-js>
+-   <https://www.npmjs.com/package/@tannin/sprintf>
 
 _Parameters_
 

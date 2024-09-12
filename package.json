@@ -93,7 +93,8 @@
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
-		"@wordpress/wordcount": "file:packages/wordcount"
+		"@wordpress/wordcount": "file:packages/wordcount",
+		"@tannin/sprintf": "1.2.0"
 	},
 	"devDependencies": {
 		"@actions/core": "1.9.1",

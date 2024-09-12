@@ -1,0 +1,12 @@
+diff --git a/node_modules/@tannin/sprintf/index.d.ts b/node_modules/@tannin/sprintf/index.d.ts
+index 1ac529e..41d5e9b 100644
+--- a/node_modules/@tannin/sprintf/index.d.ts
++++ b/node_modules/@tannin/sprintf/index.d.ts
+@@ -19,6 +19,4 @@
+  *
+  * @return {string} Formatted string.
+  */
+-export default function sprintf(string: string, ...args: (string | string[] | {
+-    [x: string]: string;
+-})[]): string;
++export default function sprintf(string: string, ...args: ReadonlyArray<string | number>): string;
