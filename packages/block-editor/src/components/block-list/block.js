@@ -342,12 +342,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				const targetRootClientId = getBlockRootClientId( _clientId );
 				const blockOrder = getBlockOrder( _clientId );
 				const [ firstClientId ] = blockOrder;
-
-				if (
-					blockOrder.length === 1 &&
-					isUnmodifiedBlock( getBlock( firstClientId ) )
-				) {
-					removeBlock( _clientId );
+				if ( isUnmodifiedBlock( getBlock( firstClientId ) ) ) {
+					removeBlock(
+						blockOrder.length === 1 ? _clientId : firstClientId
+					);
 				} else {
 					registry.batch( () => {
 						if (
