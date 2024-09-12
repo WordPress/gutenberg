@@ -27,6 +27,7 @@ export default function DataViewItem( {
 	isActive,
 	isCustom,
 	suffix,
+	navigationItemSuffix,
 } ) {
 	const {
 		params: { postType },
@@ -55,6 +56,7 @@ export default function DataViewItem( {
 			<SidebarNavigationItem
 				icon={ iconToUse }
 				{ ...linkInfo }
+				suffix={ navigationItemSuffix }
 				aria-current={ isActive ? 'true' : undefined }
 			>
 				{ title }

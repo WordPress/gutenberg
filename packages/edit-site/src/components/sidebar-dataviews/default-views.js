@@ -24,7 +24,6 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_GRID,
 	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
 export const defaultLayouts = {
@@ -69,15 +68,18 @@ const DEFAULT_POST_BASE = {
 	layout: defaultLayouts[ LAYOUT_LIST ].layout,
 };
 
-function useDataViewItemCounts( { postType } ) {
+export function useDefaultViewsWithItemCounts( { postType } ) {
+	const defaultViews = useDefaultViews( { postType } );
 	const { records, totalItems } = useEntityRecords( 'postType', postType, {
 		per_page: -1,
 		status: [ 'any', 'trash' ],
 	} );
+
 	return useMemo( () => {
-		if ( ! records ) {
-			return {};
+		if ( ! records || ! defaultViews ) {
+			return [];
 		}
+
 		const counts = {
 			all: totalItems,
 			drafts: records.filter( ( record ) => record.status === 'draft' )
@@ -94,8 +96,17 @@ function useDataViewItemCounts( { postType } ) {
 			trash: records.filter( ( record ) => record.status === 'trash' )
 				.length,
 		};
-		return counts;
-	}, [ records, totalItems ] );
+
+		// Filter out views with > 0 item counts.
+		return defaultViews
+			.map( ( _view ) => {
+				if ( counts?.[ _view.slug ] > 0 ) {
+					_view.count = counts[ _view.slug ];
+				}
+				return _view;
+			} )
+			.filter( ( view ) => !! view.count );
+	}, [ defaultViews, records, totalItems ] );
 }
 
 export function useDefaultViews( { postType } ) {
@@ -103,7 +114,6 @@ export function useDefaultViews( { postType } ) {
 		( select ) => select( coreStore ).getPostType( postType )?.labels,
 		[ postType ]
 	);
-	const counts = useDataViewItemCounts( { postType } );
 
 	return useMemo( () => {
 		return [
@@ -111,17 +121,7 @@ export function useDefaultViews( { postType } ) {
 				title: labels?.all_items || __( 'All items' ),
 				slug: 'all',
 				icon: pages,
-				view: {
-					...DEFAULT_POST_BASE,
-					filters: [
-						{
-							field: 'status',
-							operator: OPERATOR_IS_NONE,
-							value: 'trash',
-						},
-					],
-				},
-				count: counts?.all,
+				view: DEFAULT_POST_BASE,
 			},
 			{
 				title: __( 'Published' ),
@@ -137,7 +137,6 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.published,
 			},
 			{
 				title: __( 'Scheduled' ),
@@ -153,7 +152,6 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.future,
 			},
 			{
 				title: __( 'Drafts' ),
@@ -169,7 +167,6 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.drafts,
 			},
 			{
 				title: __( 'Pending' ),
@@ -185,7 +182,6 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.pending,
 			},
 			{
 				title: __( 'Private' ),
@@ -201,7 +197,6 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.private,
 			},
 			{
 				title: __( 'Trash' ),
@@ -219,8 +214,7 @@ export function useDefaultViews( { postType } ) {
 						},
 					],
 				},
-				count: counts?.trash,
 			},
 		];
-	}, [ labels, counts ] );
+	}, [ labels ] );
 }
