@@ -211,6 +211,7 @@ function gutenberg_register_script_modules() {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
 
+	wp_deregister_script_module( '@wordpress/a11y' );
 	wp_register_script_module(
 		'@wordpress/a11y',
 		gutenberg_url( 'build-module/a11y/index.min.js' ),
