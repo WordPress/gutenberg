@@ -133,11 +133,14 @@ function gutenberg_add_assets_links_to_block_type( $response, $block_type, $requ
 			continue;
 		}
 		$expected_handle = $block_type->$script;
-		if ( wp_script_is( $expected_handle, 'registered' ) ) {
-			$links[ 'https://api.w.org/' . $script ] = array(
-				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'scripts', $expected_handle ) ),
-				'embeddable' => true,
-			);
+		$expected_handles = is_array( $expected_handle ) ? $expected_handle : array( $expected_handle );
+		foreach ( $expected_handles as $handle ) {
+			if ( wp_script_is( $handle, 'registered' ) ) {
+				$links[ 'https://api.w.org/' . $script ] = array(
+					'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'scripts', $handle ) ),
+					'embeddable' => true,
+				);
+			}
 		}
 	}
 
@@ -147,11 +150,14 @@ function gutenberg_add_assets_links_to_block_type( $response, $block_type, $requ
 			continue;
 		}
 		$expected_handle = $block_type->$style;
-		if ( wp_style_is( $expected_handle, 'registered' ) ) {
-			$links[ 'https://api.w.org/' . $style ] = array(
-				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'styles', $expected_handle ) ),
-				'embeddable' => true,
-			);
+		$expected_handles = is_array( $expected_handle ) ? $expected_handle : array( $expected_handle );
+		foreach ( $expected_handles as $handle ) {
+			if ( wp_style_is( $handle, 'registered' ) ) {
+				$links[ 'https://api.w.org/' . $style ] = array(
+					'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'styles', $handle ) ),
+					'embeddable' => true,
+				);
+			}
 		}
 	}
 
