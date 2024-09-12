@@ -142,9 +142,9 @@ export function FilterVisibilityToggle( {
 				isPressed={ isShowingFilter }
 				aria-expanded={ isShowingFilter }
 			/>
-			{ hasVisibleFilters && !! view.filters?.length && (
+			{ hasVisibleFilters && (
 				<span className="dataviews-filters-toggle__count">
-					{ view.filters?.length }
+					{ visibleFilters.length }
 				</span>
 			) }
 		</div>
