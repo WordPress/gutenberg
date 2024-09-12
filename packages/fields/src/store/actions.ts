@@ -8,17 +8,14 @@ import { doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import deletePost from '../actions/delete-post';
-import duplicateTemplatePart from '../actions/duplicate-template-part';
-import resetPost from '../actions/reset-post';
-import trashPost from '../actions/trash-post';
-import renamePost from '../actions/rename-post';
-import restorePost from '../actions/restore-post';
+import duplicatePattern from '../actions/duplicate-pattern';
+import exportPattern from '../actions/export-pattern';
+import reorderPage from '../actions/reorder-page';
 import type { PostType } from '../types';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 import duplicatePost from '../actions/duplicate-post';
-import permanentlyDeletePost from '../actions/permanently-delete-post';
+import viewPostRevisions from '../actions/view-post-revisions';
+import viewPost from '../actions/view-post';
+import { store } from '.';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -57,18 +54,14 @@ export function setIsReady( kind: string, name: string ) {
 export const registerPostTypeActions =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
-		const isReady = unlock( registry.select( editorStore ) ).isEntityReady(
-			'postType',
-			postType
-		);
+		const isReady = registry
+			.select( store )
+			.isEntityReady( 'postType', postType );
 		if ( isReady ) {
 			return;
 		}
 
-		unlock( registry.dispatch( editorStore ) ).setIsReady(
-			'postType',
-			postType
-		);
+		registry.dispatch( store ).setIsReady( 'postType', postType );
 
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
@@ -80,11 +73,15 @@ export const registerPostTypeActions =
 				kind: 'postType',
 				name: postType,
 			} );
-		const currentTheme = await registry
-			.resolveSelect( coreStore )
-			.getCurrentTheme();
+		// const currentTheme = await registry
+		// 	.resolveSelect( coreStore )
+		// 	.getCurrentTheme();
 
 		const actions = [
+			postTypeConfig.viewable ? viewPost : undefined,
+			!! postTypeConfig?.supports?.revisions
+				? viewPostRevisions
+				: undefined,
 			// @ts-ignore
 			globalThis.IS_GUTENBERG_PLUGIN
 				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
@@ -93,17 +90,24 @@ export const registerPostTypeActions =
 				  canCreate &&
 				  duplicatePost
 				: undefined,
-			postTypeConfig.slug === 'wp_template_part' &&
-			canCreate &&
-			currentTheme?.is_block_theme
-				? duplicateTemplatePart
+			// postTypeConfig.slug === 'wp_template_part' &&
+			// canCreate &&
+			// currentTheme?.is_block_theme
+			// 	? duplicateTemplatePart
+			// 	: undefined,
+			canCreate && postTypeConfig.slug === 'wp_block'
+				? duplicatePattern
 				: undefined,
-			postTypeConfig.supports?.title ? renamePost : undefined,
-			resetPost,
-			restorePost,
-			deletePost,
-			trashPost,
-			permanentlyDeletePost,
+			// postTypeConfig.supports?.title ? renamePost : undefined,
+			postTypeConfig?.supports?.[ 'page-attributes' ]
+				? reorderPage
+				: undefined,
+			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
+			// resetPost,
+			// restorePost,
+			// deletePost,
+			// trashPost,
+			// permanentlyDeletePost,
 		];
 
 		registry.batch( () => {
@@ -111,11 +115,9 @@ export const registerPostTypeActions =
 				if ( ! action ) {
 					return;
 				}
-				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
-					'postType',
-					postType,
-					action
-				);
+				registry
+					.dispatch( store )
+					.registerEntityAction( 'postType', postType, action );
 			} );
 		} );
 

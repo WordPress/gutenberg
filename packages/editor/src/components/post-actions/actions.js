@@ -3,6 +3,7 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
+import { store as fieldsStore } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -14,17 +15,33 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	const { defaultActions } = useSelect(
 		( select ) => {
 			const { getEntityActions } = unlock( select( editorStore ) );
+			const { getEntityActions: getEntityActionsFromFieldsPackage } =
+				select( fieldsStore );
+
 			return {
-				defaultActions: getEntityActions( 'postType', postType ),
+				defaultActions: [
+					...getEntityActions( 'postType', postType ),
+					...getEntityActionsFromFieldsPackage(
+						'postType',
+						postType
+					),
+				],
 			};
 		},
 		[ postType ]
 	);
 
 	const { registerPostTypeActions } = unlock( useDispatch( editorStore ) );
+	const { registerPostTypeActions: registerPostTypeActionFromFieldsPackage } =
+		useDispatch( fieldsStore );
 	useEffect( () => {
 		registerPostTypeActions( postType );
-	}, [ registerPostTypeActions, postType ] );
+		registerPostTypeActionFromFieldsPackage( postType );
+	}, [
+		registerPostTypeActions,
+		postType,
+		registerPostTypeActionFromFieldsPackage,
+	] );
 
 	return useMemo( () => {
 		// Filter actions based on provided context. If not provided
