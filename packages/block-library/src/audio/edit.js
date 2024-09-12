@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
 	PanelBody,
@@ -21,18 +21,18 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -46,23 +46,14 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
-	const isTemporaryAudio = ! id && isBlobURL( src );
-	const { getSettings } = useSelect( blockEditorStore );
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
-	useEffect( () => {
-		if ( ! id && isBlobURL( src ) ) {
-			const file = getBlobByURL( src );
-
-			if ( file ) {
-				getSettings().mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ media ] ) => onSelectAudio( media ),
-					onError: ( e ) => onUploadError( e ),
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
-			}
-		}
-	}, [] );
+	useUploadMediaFromBlobURL( {
+		url: temporaryURL,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectAudio,
+		onError: onUploadError,
+	} );
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
@@ -82,7 +73,8 @@ function AudioEdit( {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined } );
+			setAttributes( { src: newSrc, id: undefined, blob: undefined } );
+			setTemporaryURL();
 		}
 	}
 
@@ -105,27 +97,37 @@ function AudioEdit( {
 				src: undefined,
 				id: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
 			return;
 		}
+
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
+		}
+
 		// Sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI.
 		setAttributes( {
+			blob: undefined,
 			src: media.url,
 			id: media.id,
 			caption: media.caption,
 		} );
+		setTemporaryURL();
 	}
 
-	const classes = classnames( className, {
-		'is-transient': isTemporaryAudio,
+	const classes = clsx( className, {
+		'is-transient': !! temporaryURL,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
 
-	if ( ! src ) {
+	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -153,6 +155,7 @@ function AudioEdit( {
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onReset={ () => onSelectAudio( undefined ) }
 					/>
 				</BlockControls>
 			) }
@@ -172,6 +175,7 @@ function AudioEdit( {
 						checked={ loop }
 					/>
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
 						value={ preload || '' }
@@ -195,14 +199,14 @@ function AudioEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag if the block is not selected
-					so the user clicking on it won't play the
-					file or change the position slider when the controls are enabled.
+				Disable the audio tag if the block is not selected
+				so the user clicking on it won't play the
+				file or change the position slider when the controls are enabled.
 				*/ }
 				<Disabled isDisabled={ ! isSingleSelected }>
-					<audio controls="controls" src={ src } />
+					<audio controls="controls" src={ src ?? temporaryURL } />
 				</Disabled>
-				{ isTemporaryAudio && <Spinner /> }
+				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

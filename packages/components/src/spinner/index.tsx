@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -21,7 +21,7 @@ export function UnforwardedSpinner(
 ) {
 	return (
 		<StyledSpinner
-			className={ classNames( 'components-spinner', className ) }
+			className={ clsx( 'components-spinner', className ) }
 			viewBox="0 0 100 100"
 			width="16"
 			height="16"

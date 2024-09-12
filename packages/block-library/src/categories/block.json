@@ -26,8 +26,17 @@
 		"showEmpty": {
 			"type": "boolean",
 			"default": false
+		},
+		"label": {
+			"type": "string",
+			"__experimentalRole": "content"
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
 		}
 	},
+	"usesContext": [ "enhancedPagination" ],
 	"supports": {
 		"align": true,
 		"html": false,
@@ -50,6 +59,21 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
 			}
 		}
 	},

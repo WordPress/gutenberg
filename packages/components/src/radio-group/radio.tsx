@@ -6,8 +6,8 @@ import { forwardRef, useContext } from '@wordpress/element';
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ function UnforwardedRadio(
 ) {
 	const { store, disabled } = useContext( RadioGroupContext );
 
-	const selectedValue = store?.useState( 'value' );
+	const selectedValue = useStoreState( store, 'value' );
 	const isChecked = selectedValue !== undefined && selectedValue === value;
 
 	return (

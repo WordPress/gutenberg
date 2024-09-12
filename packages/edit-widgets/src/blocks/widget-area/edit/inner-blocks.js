@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ export default function WidgetAreaInnerBlocks( { id } ) {
 	return (
 		<div
 			data-widget-area-id={ id }
-			className={ classnames(
+			className={ clsx(
 				'wp-block-widget-area__inner-blocks block-editor-inner-blocks editor-styles-wrapper',
 				{
 					'wp-block-widget-area__highlight-drop-zone':

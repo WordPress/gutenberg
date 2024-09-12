@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'tovdom-islands-view' );
 ?>
 
 <div>
@@ -15,15 +13,23 @@ gutenberg_enqueue_module( 'tovdom-islands-view' );
 		</span>
 	</div>
 
-	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+	<div data-wp-interactive="tovdom-islands">
 		<div data-wp-show-mock="state.falseValue">
-			<span data-testid="inside an island">
+			<span data-testid="inside an island with json object">
 				This should not be shown because it is inside an island.
 			</span>
 		</div>
 	</div>
 
-	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="inside an island with string">
+				This should not be shown because it is inside an island.
+			</span>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
 		<div data-wp-ignore>
 			<div data-wp-show-mock="state.falseValue">
 				<span
@@ -36,8 +42,8 @@ gutenberg_enqueue_module( 'tovdom-islands-view' );
 		</div>
 	</div>
 
-	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
-		<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="tovdom-islands">
 			<div
 				data-wp-show-mock="state.falseValue"
 				data-testid="island inside another island"
@@ -50,10 +56,10 @@ gutenberg_enqueue_module( 'tovdom-islands-view' );
 		</div>
 	</div>
 
-	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
+	<div data-wp-interactive="tovdom-islands">
 		<div>
 			<div
-				data-wp-interactive='{ "namespace": "tovdom-islands" }'
+				data-wp-interactive="tovdom-islands"
 				data-wp-ignore
 			>
 				<div data-wp-show-mock="state.falseValue">
@@ -69,10 +75,8 @@ gutenberg_enqueue_module( 'tovdom-islands-view' );
 		</div>
 	</div>
 
-
-
-	<div data-wp-interactive='{ "namespace": "tovdom-islands" }'>
-		<div data-wp-interactive='{ "namespace": "something-new" }'></div>
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="something-new"></div>
 		<div data-wp-show-mock="state.falseValue">
 			<span data-testid="directive after different namespace">
 				The directive above should keep the `tovdom-island` namespace,

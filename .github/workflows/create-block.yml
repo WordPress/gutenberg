@@ -20,11 +20,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '21']
+                node: ['20', '22']
                 os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 

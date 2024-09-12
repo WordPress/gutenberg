@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalListView as ListView } from '@wordpress/block-editor';
-import { Button, TabPanel } from '@wordpress/components';
+import {
+	__experimentalListView as ListView,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -18,6 +19,8 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+
+const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );
@@ -51,7 +54,7 @@ export default function ListViewSidebar() {
 	// This ref refers to the sidebar as a whole.
 	const sidebarRef = useRef();
 	// This ref refers to the tab panel.
-	const tabPanelRef = useRef();
+	const tabsRef = useRef();
 	// This ref refers to the list view application area.
 	const listViewRef = useRef();
 
@@ -71,7 +74,7 @@ export default function ListViewSidebar() {
 	 */
 	function handleSidebarFocus( currentTab ) {
 		// Tab panel focus.
-		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
+		const tabPanelFocus = focus.tabbable.find( tabsRef.current )[ 0 ];
 		// List view tab is selected.
 		if ( currentTab === 'list-view' ) {
 			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
@@ -108,22 +111,6 @@ export default function ListViewSidebar() {
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
 
-	/**
-	 * Render tab content for a given tab name.
-	 *
-	 * @param {string} tabName The name of the tab to render.
-	 */
-	function renderTabContent( tabName ) {
-		if ( tabName === 'list-view' ) {
-			return (
-				<div className="editor-list-view-sidebar__list-view-panel-content">
-					<ListView dropZoneElement={ dropZoneElement } />
-				</div>
-			);
-		}
-		return <ListViewOutline />;
-	}
-
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -131,39 +118,38 @@ export default function ListViewSidebar() {
 			onKeyDown={ closeOnEscape }
 			ref={ sidebarRef }
 		>
-			<Button
-				className="editor-list-view-sidebar__close-button"
-				icon={ closeSmall }
-				label={ __( 'Close' ) }
-				onClick={ closeListView }
-			/>
-			<TabPanel
-				className="editor-list-view-sidebar__tab-panel"
-				ref={ tabPanelRef }
-				onSelect={ ( tabName ) => setTab( tabName ) }
-				selectOnMove={ false }
+			<TabbedSidebar
 				tabs={ [
 					{
 						name: 'list-view',
 						title: _x( 'List View', 'Post overview' ),
-						className: 'editor-list-view-sidebar__panel-tab',
+						panel: (
+							<div className="editor-list-view-sidebar__list-view-container">
+								<div className="editor-list-view-sidebar__list-view-panel-content">
+									<ListView
+										dropZoneElement={ dropZoneElement }
+									/>
+								</div>
+							</div>
+						),
+						panelRef: listViewContainerRef,
 					},
 					{
 						name: 'outline',
 						title: _x( 'Outline', 'Post overview' ),
-						className: 'editor-list-view-sidebar__panel-tab',
+						panel: (
+							<div className="editor-list-view-sidebar__list-view-container">
+								<ListViewOutline />
+							</div>
+						),
 					},
 				] }
-			>
-				{ ( currentTab ) => (
-					<div
-						className="editor-list-view-sidebar__list-view-container"
-						ref={ listViewContainerRef }
-					>
-						{ renderTabContent( currentTab.name ) }
-					</div>
-				) }
-			</TabPanel>
+				onClose={ closeListView }
+				onSelect={ ( tabName ) => setTab( tabName ) }
+				defaultTabId="list-view"
+				ref={ tabsRef }
+				closeButtonLabel={ __( 'Close' ) }
+			/>
 		</div>
 	);
 }

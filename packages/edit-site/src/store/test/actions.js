@@ -4,15 +4,20 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '..';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 function createRegistryWithStores() {
 	// create a registry
@@ -73,81 +78,6 @@ describe( 'actions', () => {
 			const select = registry.select( editSiteStore );
 			expect( select.getEditedPostId() ).toBe( ID );
 			expect( select.getEditedPostType() ).toBe( 'wp_template_part' );
-		} );
-	} );
-
-	describe( 'openGeneralSidebar', () => {
-		it( 'should turn off distraction free mode when opening a general sidebar', () => {
-			const registry = createRegistryWithStores();
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', true );
-			registry
-				.dispatch( editSiteStore )
-				.openGeneralSidebar( 'edit-site/global-styles' );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( false );
-		} );
-	} );
-
-	describe( 'switchEditorMode', () => {
-		it( 'should turn off distraction free mode when switching to code editor', () => {
-			const registry = createRegistryWithStores();
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', true );
-			registry.dispatch( editSiteStore ).switchEditorMode( 'visual' );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( true );
-			registry.dispatch( editSiteStore ).switchEditorMode( 'text' );
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( false );
-		} );
-	} );
-
-	describe( 'toggleDistractionFree', () => {
-		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
-			const registry = createRegistryWithStores();
-			// Enable everything that shouldn't be enabled in distraction free mode.
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', true );
-			registry.dispatch( editorStore ).setIsListViewOpened( true );
-			registry
-				.dispatch( editSiteStore )
-				.openGeneralSidebar( 'edit-site/global-styles' );
-			// Initial state is falsy.
-			registry.dispatch( editSiteStore ).toggleDistractionFree();
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'fixedToolbar' )
-			).toBe( true );
-			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
-				false
-			);
-			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
-				false
-			);
-			expect(
-				registry
-					.select( interfaceStore )
-					.getActiveComplementaryArea( editSiteStore.name )
-			).toBeNull();
-			expect(
-				registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			).toBe( true );
 		} );
 	} );
 } );

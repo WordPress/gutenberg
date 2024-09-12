@@ -18,6 +18,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
@@ -36,6 +37,7 @@ export default function QueryContent( {
 		queryId,
 		query,
 		displayLayout,
+		enhancedPagination,
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
@@ -48,12 +50,26 @@ export default function QueryContent( {
 	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { getEntityRecord, canUser } = select( coreStore );
-		const settingPerPage = canUser( 'read', 'settings' )
+		const { getEntityRecord, getEntityRecordEdits, canUser } =
+			select( coreStore );
+		const settingPerPage = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? +getEntityRecord( 'root', 'site' )?.posts_per_page
 			: +getSettings().postsPerPage;
+
+		// Gets changes made via the template area posts per page setting. These won't be saved
+		// until the page is saved, but we should reflect this setting within the query loops
+		// that inherit it.
+		const editedSettingPerPage = +getEntityRecordEdits( 'root', 'site' )
+			?.posts_per_page;
+
 		return {
-			postsPerPage: settingPerPage || DEFAULTS_POSTS_PER_PAGE,
+			postsPerPage:
+				editedSettingPerPage ||
+				settingPerPage ||
+				DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
 	// There are some effects running where some initialization logic is
@@ -95,7 +111,7 @@ export default function QueryContent( {
 		} );
 	const htmlElementMessages = {
 		main: __(
-			'The <main> element should be used for the primary content of your document only. '
+			'The <main> element should be used for the primary content of your document only.'
 		),
 		section: __(
 			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
@@ -112,13 +128,15 @@ export default function QueryContent( {
 				setAttributes={ setAttributes }
 				clientId={ clientId }
 			/>
-			<QueryInspectorControls
-				attributes={ attributes }
-				setQuery={ updateQuery }
-				setDisplayLayout={ updateDisplayLayout }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
+			<InspectorControls>
+				<QueryInspectorControls
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setDisplayLayout={ updateDisplayLayout }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</InspectorControls>
 			<BlockControls>
 				<QueryToolbar
 					name={ name }
@@ -144,6 +162,11 @@ export default function QueryContent( {
 						setAttributes( { tagName: value } )
 					}
 					help={ htmlElementMessages[ TagName ] }
+				/>
+				<EnhancedPaginationControl
+					enhancedPagination={ enhancedPagination }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<TagName { ...innerBlocksProps } />

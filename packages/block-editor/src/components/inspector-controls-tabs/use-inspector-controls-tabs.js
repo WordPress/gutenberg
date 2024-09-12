@@ -32,6 +32,7 @@ function getShowTabs( blockName, tabSettings = {} ) {
 export default function useInspectorControlsTabs( blockName ) {
 	const tabs = [];
 	const {
+		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
 		default: defaultGroup,
@@ -40,6 +41,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		position: positionGroup,
 		styles: stylesGroup,
 		typography: typographyGroup,
+		effects: effectsGroup,
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
@@ -55,6 +57,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( effectsGroup.Slot.__unstableName ) || [] ),
 	];
 	const hasStyleFills = styleFills.length;
 
@@ -62,8 +65,10 @@ export default function useInspectorControlsTabs( blockName ) {
 	// (i.e. both list view and styles), check only the default and position
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
-	const advancedFills =
-		useSlotFills( InspectorAdvancedControls.slotName ) || [];
+	const advancedFills = [
+		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+		...( useSlotFills( bindingsGroup.Slot.__unstableName ) || [] ),
+	];
 
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createBlobURL } from '@wordpress/blob';
+import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
@@ -20,7 +20,7 @@ const transforms = {
 				// It's already done as part of the `componentDidMount`
 				// in the video block
 				const block = createBlock( 'core/video', {
-					src: createBlobURL( file ),
+					blob: createBlobURL( file ),
 				} );
 				return block;
 			},
@@ -61,6 +61,42 @@ const transforms = {
 						return preload;
 					},
 				},
+			},
+		},
+		{
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				node.children.length === 1 &&
+				node.firstChild.nodeName === 'VIDEO',
+			transform: ( node ) => {
+				const videoElement = node.firstChild;
+				const attributes = {
+					autoplay: videoElement.hasAttribute( 'autoplay' )
+						? true
+						: undefined,
+					controls: videoElement.hasAttribute( 'controls' )
+						? undefined
+						: false,
+					loop: videoElement.hasAttribute( 'loop' )
+						? true
+						: undefined,
+					muted: videoElement.hasAttribute( 'muted' )
+						? true
+						: undefined,
+					preload:
+						videoElement.getAttribute( 'preload' ) || undefined,
+					playsInline: videoElement.hasAttribute( 'playsinline' )
+						? true
+						: undefined,
+					poster: videoElement.getAttribute( 'poster' ) || undefined,
+					src: videoElement.getAttribute( 'src' ) || undefined,
+				};
+				if ( isBlobURL( attributes.src ) ) {
+					attributes.blob = attributes.src;
+					delete attributes.src;
+				}
+				return createBlock( 'core/video', attributes );
 			},
 		},
 	],

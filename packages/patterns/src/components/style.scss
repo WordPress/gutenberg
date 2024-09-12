@@ -13,8 +13,8 @@
 	.components-form-token-field__suggestions-list:not(:empty) {
 		position: absolute;
 		border: $border-width solid var(--wp-admin-theme-color);
-		border-bottom-left-radius: $radius-block-ui;
-		border-bottom-right-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
 		box-shadow: 0 0 0.5px 0.5px var(--wp-admin-theme-color);
 		box-sizing: border-box;
 		z-index: 1;
@@ -37,4 +37,23 @@
 	@include break-medium() {
 		width: $grid-unit * 40;
 	}
+}
+
+.pattern-overrides-control__allow-overrides-button {
+	width: 100%;
+	justify-content: center;
+}
+
+
+.patterns-pattern-overrides-toolbar-indicator__popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
+}
+
+.patterns-pattern-overrides-toolbar-indicator .patterns-pattern-overrides-toolbar-indicator-icon.has-colors svg {
+	fill: var(--wp-block-synced-color);
+}
+
+.editor-collapsible-block-toolbar .patterns-pattern-overrides-toolbar-indicator {
+	height: 32px;
 }

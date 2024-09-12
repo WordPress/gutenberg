@@ -353,6 +353,18 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorMode
+
+Returns the current editing mode.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Editing mode.
+
 ### getEditorSelection
 
 Returns the current selection.
@@ -473,7 +485,7 @@ _Returns_
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into its three parts: the prefix, the postName, and the suffix.
 
 _Parameters_
 
@@ -1046,6 +1058,18 @@ _Returns_
 
 -   `boolean`: Whether the pre-publish panel should be shown or not.
 
+### isPublishSidebarOpened
+
+Returns true if the publish sidebar is opened.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state
+
+_Returns_
+
+-   `boolean`: Whether the publish sidebar is open.
+
 ### isSavingNonPostEntityChanges
 
 Returns true if non-post entities are currently being saved, or false otherwise.
@@ -1107,6 +1131,14 @@ _Parameters_
 _Related_
 
 -   clearSelectedBlock in core/block-editor store.
+
+### closePublishSidebar
+
+Returns an action object used in signalling that the user closed the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### createUndoLevel
 
@@ -1261,6 +1293,14 @@ _Related_
 
 -   multiSelect in core/block-editor store.
 
+### openPublishSidebar
+
+Returns an action object used in signalling that the user opened the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
+
 ### receiveBlocks
 
 _Related_
@@ -1403,14 +1443,12 @@ _Returns_
 
 Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
 
--   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
--   `template-only`: This mode renders the editor with only the template blocks visible.
 -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
 -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
 
 _Parameters_
 
--   _mode_ `string`: Mode (one of 'template-only', 'post-only', 'template-locked' or 'all').
+-   _mode_ `string`: Mode (one of 'post-only' or 'template-locked').
 
 ### setTemplateValidity
 
@@ -1468,6 +1506,14 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+### switchEditorMode
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
 ### synchronizeTemplate
 
 _Related_
@@ -1479,6 +1525,10 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleEditorPanelEnabled
 
@@ -1499,6 +1549,14 @@ Opens a closed panel and closes an open panel.
 _Parameters_
 
 -   _panelName_ `string`: A string that identifies the panel to open or close.
+
+### togglePublishSidebar
+
+Returns an action object used in signalling that the user toggles the publish sidebar.
+
+_Returns_
+
+-   `Object`: Action object
 
 ### toggleSelection
 

@@ -55,6 +55,7 @@ const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<CheckboxControl
+			__nextHasNoMarginBottom
 			label="Is author"
 			help="Is the user a author or not?"
 			checked={ isChecked }
@@ -69,12 +70,11 @@ const MyCheckboxControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input element.
 
-#### `label`: `string|false`
+#### `label`: `string`
 
 A label for the input field, that appears at the side of the checkbox.
 The prop will be rendered as content a label element.
 If no prop is passed an empty label is rendered.
-If the prop is set to false no label is rendered.
 
 -   Required: No
 
@@ -102,6 +102,13 @@ A function that receives the checked state (boolean) as input.
 If indeterminate is true the state of the checkbox will be indeterminate.
 
 -   Required: No
+
+#### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

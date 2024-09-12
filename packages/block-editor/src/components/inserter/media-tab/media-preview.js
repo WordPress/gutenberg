@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import {
 	Flex,
 	FlexItem,
 	Button,
-	privateApis as componentsPrivateApis,
+	Composite,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -33,7 +33,6 @@ import { isBlobURL } from '@wordpress/blob';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const MAXIMUM_TITLE_LENGTH = 25;
@@ -42,8 +41,6 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 function MediaPreviewOptions( { category, media } ) {
 	if ( ! category.getReportUrl ) {
@@ -102,12 +99,22 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="tertiary"
+						onClick={ onClose }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button variant="primary" onClick={ onSubmit }>
+					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
+						variant="primary"
+						onClick={ onSubmit }
+					>
 						{ __( 'Insert' ) }
 					</Button>
 				</FlexItem>
@@ -127,23 +134,31 @@ export function MediaPreview( { media, onClick, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings } = useSelect( blockEditorStore );
+
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
 			if ( isInserting ) {
 				return;
 			}
+
+			const settings = getSettings();
 			const clonedBlock = cloneBlock( previewBlock );
 			const { id, url, caption } = clonedBlock.attributes;
+
+			// User has no permission to upload media.
+			if ( ! id && ! settings.mediaUpload ) {
+				setShowExternalUploadModal( true );
+				return;
+			}
+
 			// Media item already exists in library, so just insert it.
 			if ( !! id ) {
 				onClick( clonedBlock );
 				return;
 			}
+
 			setIsInserting( true );
 			// Media item does not exist in library, so try to upload it.
 			// Fist fetch the image data. This may fail if the image host
@@ -154,7 +169,7 @@ export function MediaPreview( { media, onClick, category } ) {
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
-					mediaUpload( {
+					settings.mediaUpload( {
 						filesList: [ blob ],
 						additionalData: { caption },
 						onFileChange( [ img ] ) {
@@ -189,13 +204,18 @@ export function MediaPreview( { media, onClick, category } ) {
 		},
 		[
 			isInserting,
+			getSettings,
 			onClick,
-			mediaUpload,
-			createErrorNotice,
 			createSuccessNotice,
+			createErrorNotice,
 		]
 	);
-	const title = media.title?.rendered || media.title;
+
+	const title =
+		typeof media.title === 'string'
+			? media.title
+			: media.title?.rendered || __( 'no title' );
+
 	let truncatedTitle;
 	if ( title.length > MAXIMUM_TITLE_LENGTH ) {
 		const omission = '...';
@@ -206,10 +226,10 @@ export function MediaPreview( { media, onClick, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
-						className={ classnames(
+						className={ clsx(
 							'block-editor-inserter__media-list__list-item',
 							{
 								'is-hovered': isHovered,
@@ -226,7 +246,7 @@ export function MediaPreview( { media, onClick, category } ) {
 							onMouseLeave={ onMouseLeave }
 						>
 							<Tooltip text={ truncatedTitle || title }>
-								<CompositeItem
+								<Composite.Item
 									render={
 										<div
 											aria-label={ title }
@@ -244,7 +264,7 @@ export function MediaPreview( { media, onClick, category } ) {
 											</div>
 										) }
 									</div>
-								</CompositeItem>
+								</Composite.Item>
 							</Tooltip>
 							{ ! isInserting && (
 								<MediaPreviewOptions

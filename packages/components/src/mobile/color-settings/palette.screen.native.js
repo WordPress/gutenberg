@@ -9,12 +9,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useState, useContext } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import {
-	ColorControl,
-	PanelBody,
-	BottomSheetContext,
-	useMobileGlobalStylesColors,
-} from '@wordpress/components';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 /**
@@ -25,6 +19,9 @@ import ColorIndicator from '../../color-indicator';
 import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
+import PanelBody from '../../panel/body';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
+import ColorControl from '../../color-control';
 
 import styles from './style.scss';
 
@@ -55,7 +52,7 @@ const PaletteScreen = () => {
 	const currentSegmentColors = ! isGradientSegment
 		? defaultSettings.colors
 		: defaultSettings.gradients;
-	const allAvailableColors = useMobileGlobalStylesColors();
+	const allAvailableColors = defaultSettings?.allAvailableColors || [];
 	const allAvailableGradients = currentSegmentColors
 		.flatMap( ( { gradients } ) => gradients )
 		.filter( Boolean );
@@ -112,7 +109,11 @@ const PaletteScreen = () => {
 
 	function getClearButton() {
 		return (
-			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ HIT_SLOP }>
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( 'Clear selected color' ) }
+				onPress={ onClear }
+				hitSlop={ HIT_SLOP }
+			>
 				<View style={ styles.clearButtonContainer }>
 					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
 				</View>

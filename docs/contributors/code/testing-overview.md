@@ -327,10 +327,7 @@ However, if the change was intentional, follow these steps to update the snapsho
 npm run test:unit -- --updateSnapshot --testPathPattern path/to/tests
 
 # Update snapshot for e2e tests
-npm run test:e2e -- --updateSnapshot --testPathPattern path/to/e2e-tests
-
-# Update snapshot for Playwright
-npm run test:e2e:playwright -- --update-snapshots path/to/spec
+npm run test:e2e -- --update-snapshots path/to/spec
 ```
 
 1. Review the diff and ensure the changes are expected and intentional.
@@ -622,7 +619,7 @@ To run unit tests only, without the linter, use `npm run test:unit:php` instead.
 
 ## Performance testing
 
-To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics:
+To ensure that the editor stays performant as we add features, we monitor the impact pull requests and releases can have on some key metrics including:
 
 -   The time it takes to load the editor.
 -   The time it takes for the browser to respond when typing.

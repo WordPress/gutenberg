@@ -5,7 +5,7 @@ import type { ForwardedRef } from 'react';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -320,7 +320,7 @@ function UnforwardedColorPalette(
 								does not shift
 								*/ }
 								<Truncate
-									className={ classnames(
+									className={ clsx(
 										'components-color-palette__custom-color-value',
 										{
 											'components-color-palette__custom-color-value--is-hex':
@@ -335,26 +335,28 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			<CircularOptionPicker
-				{ ...metaProps }
-				actions={ actions }
-				options={
-					hasMultipleColorOrigins ? (
-						<MultiplePalettes
-							{ ...paletteCommonProps }
-							headingLevel={ headingLevel }
-							colors={ colors as PaletteObject[] }
-							value={ value }
-						/>
-					) : (
-						<SinglePalette
-							{ ...paletteCommonProps }
-							colors={ colors as ColorObject[] }
-							value={ value }
-						/>
-					)
-				}
-			/>
+			{ ( colors.length > 0 || actions ) && (
+				<CircularOptionPicker
+					{ ...metaProps }
+					actions={ actions }
+					options={
+						hasMultipleColorOrigins ? (
+							<MultiplePalettes
+								{ ...paletteCommonProps }
+								headingLevel={ headingLevel }
+								colors={ colors as PaletteObject[] }
+								value={ value }
+							/>
+						) : (
+							<SinglePalette
+								{ ...paletteCommonProps }
+								colors={ colors as ColorObject[] }
+								value={ value }
+							/>
+						)
+					}
+				/>
+			) }
 		</VStack>
 	);
 }

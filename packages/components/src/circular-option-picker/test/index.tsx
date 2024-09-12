@@ -2,24 +2,18 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { press } from '@ariakit/test';
 
 /**
  * Internal dependencies
  */
 import CircularOptionPicker from '..';
 
-const SINGLE_OPTION = [ <CircularOptionPicker.Option key={ 'option' } /> ];
+const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
 
 const MULTIPLE_OPTIONS = [
-	<CircularOptionPicker.Option
-		key={ 'option-1' }
-		aria-label={ 'Option One' }
-	/>,
-	<CircularOptionPicker.Option
-		key={ 'option-2' }
-		aria-label={ 'Option Two' }
-	/>,
+	<CircularOptionPicker.Option key="option-1" aria-label="Option One" />,
+	<CircularOptionPicker.Option key="option-2" aria-label="Option Two" />,
 ];
 
 const DEFAULT_PROPS = {
@@ -59,9 +53,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is true', () => {
 		it( 'should render as buttons', async () => {
-			render(
-				<CircularOptionPicker { ...DEFAULT_PROPS } asButtons={ true } />
-			);
+			render( <CircularOptionPicker { ...DEFAULT_PROPS } asButtons /> );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
@@ -71,8 +63,6 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `loop` is not set', () => {
 		it( 'should loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
@@ -80,40 +70,36 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
 
 	describe( 'when `loop` is true', () => {
 		it( 'should loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
-					loop={ true }
+					loop
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 		} );
 	} );
 
 	describe( 'when `loop` is false', () => {
 		it( 'should not loop', async () => {
-			const user = userEvent.setup();
-
 			render(
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
@@ -122,11 +108,11 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
-			await user.tab();
+			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
-			await user.keyboard( '[ArrowRight]' );
+			await press.ArrowRight();
 			expect( getOption( 'Option Two' ) ).toHaveFocus();
 		} );
 	} );

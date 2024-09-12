@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 6.7.0 (2024-09-05)
+
+## 6.6.0 (2024-08-21)
+
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
+## 6.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 5.41.0 (2024-05-16)
+
+## 5.40.0 (2024-05-02)
+
+## 5.39.0 (2024-04-19)
+
+## 5.38.0 (2024-04-03)
+
+## 5.37.0 (2024-03-21)
+
+## 5.36.0 (2024-03-06)
+
+## 5.35.0 (2024-02-21)
+
+## 5.34.0 (2024-02-09)
+
+## 5.33.0 (2024-01-24)
+
+## 5.32.0 (2024-01-10)
+
 ## 5.31.0 (2023-12-13)
 
 ## 5.30.0 (2023-11-29)
@@ -66,7 +106,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -84,6 +124,6 @@
 
 ## 2.0.0 (2019-03-06)
 
-### Breaking change
+### Breaking Changes
 
 -   Stop using Babel transpilation internally and set node 8 as a minimal version required ([#13540](https://github.com/WordPress/gutenberg/pull/13540)).

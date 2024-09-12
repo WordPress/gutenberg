@@ -7,16 +7,17 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, rtl } from '../../utils';
+import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
+import InputBase from '../../input-control/input-base';
 
 interface SelectProps
 	extends Pick<
 		SelectControlProps,
-		'__next40pxDefaultSize' | 'disabled' | 'multiple'
+		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
 	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
@@ -24,12 +25,33 @@ interface SelectProps
 }
 
 const disabledStyles = ( { disabled }: SelectProps ) => {
-	if ( ! disabled ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+		cursor: default;
+	`;
 };
+
+const inputBaseVariantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'minimal' ) {
+		return css`
+			display: inline-flex;
+		`;
+	}
+
+	return '';
+};
+
+export const StyledInputBase = styled( InputBase )`
+	color: ${ COLORS.theme.foreground };
+	cursor: pointer;
+
+	${ disabledStyles }
+	${ inputBaseVariantStyles }
+`;
 
 const sizeStyles = ( {
 	__next40pxDefaultSize,
@@ -86,10 +108,10 @@ const sizePaddings = ( {
 	selectSize = 'default',
 }: SelectProps ) => {
 	const padding = {
-		default: 16,
-		small: 8,
-		compact: 8,
-		'__unstable-large': 16,
+		default: CONFIG.controlPaddingX,
+		small: CONFIG.controlPaddingXSmall,
+		compact: CONFIG.controlPaddingXSmall,
+		'__unstable-large': CONFIG.controlPaddingX,
 	};
 
 	if ( ! __next40pxDefaultSize ) {
@@ -116,6 +138,16 @@ const overflowStyles = ( { multiple }: SelectProps ) => {
 	};
 };
 
+const variantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'minimal' ) {
+		return css( {
+			fieldSizing: 'content',
+		} );
+	}
+
+	return '';
+};
+
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -126,27 +158,31 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: currentColor; // Overrides hover/focus styles in forms.css
+		cursor: inherit;
 		display: block;
 		font-family: inherit;
 		margin: 0;
 		width: 100%;
 		max-width: none;
-		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 
-		${ disabledStyles };
 		${ fontSizeStyles };
 		${ sizeStyles };
 		${ sizePaddings };
 		${ overflowStyles }
+		${ variantStyles }
 	}
 `;
 
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
+
+	path {
+		fill: currentColor;
+	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(

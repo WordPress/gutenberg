@@ -12,7 +12,11 @@ export {
 } from '@wordpress/primitives';
 
 // Components.
-export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+export {
+	/** @deprecated Import `AlignmentMatrixControl` instead. */
+	default as __experimentalAlignmentMatrixControl,
+	default as AlignmentMatrixControl,
+} from './alignment-matrix-control';
 export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
@@ -61,9 +65,10 @@ export {
 	CompositeGroup as __unstableCompositeGroup,
 	CompositeItem as __unstableCompositeItem,
 	useCompositeState as __unstableUseCompositeState,
-} from './composite';
+} from './composite/legacy';
+export { Composite } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
-export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
+export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
@@ -132,6 +137,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as ProgressBar } from './progress-bar';
 export { default as QueryControls } from './query-controls';
 export { default as __experimentalRadio } from './radio-group/radio';
 export { default as __experimentalRadioGroup } from './radio-group';

@@ -36,16 +36,25 @@ export default function useTabNav() {
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
-	const noCapture = useRef();
+	const noCaptureRef = useRef();
 
 	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
-		if ( noCapture.current ) {
-			noCapture.current = null;
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			getLastFocus()?.current.focus();
+			if ( getLastFocus()?.current ) {
+				getLastFocus().current.focus();
+			} else {
+				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
+				container.current
+					.querySelector(
+						`[data-block="${ getSelectedBlockClientId() }"]`
+					)
+					.focus();
+			}
 		} else {
 			setNavigationMode( true );
 
@@ -118,7 +127,9 @@ export default function useTabNav() {
 				// do it again here because after clearing block selection,
 				// focus land on the writing flow container and pressing Tab
 				// will no longer send focus through the focus capture element.
-				if ( event.target === node ) setNavigationMode( true );
+				if ( event.target === node ) {
+					setNavigationMode( true );
+				}
 				return;
 			}
 
@@ -154,7 +165,7 @@ export default function useTabNav() {
 			// Disable focus capturing on the focus capture element, so it
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
-			noCapture.current = true;
+			noCaptureRef.current = true;
 
 			// Focusing the focus capture element, which is located above and
 			// below the editor, should not scroll the page all the way up or

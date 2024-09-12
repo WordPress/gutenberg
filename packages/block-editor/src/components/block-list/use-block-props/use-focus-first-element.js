@@ -28,11 +28,16 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
+		useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
-		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
+		if (
+			! isBlockSelected( clientId ) ||
+			isMultiSelecting() ||
+			__unstableGetEditorMode() === 'zoom-out'
+		) {
 			return;
 		}
 
@@ -63,6 +68,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
+			ownerDocument.defaultView.getSelection().removeAllRanges();
 			ref.current.focus();
 			return;
 		}
@@ -80,7 +86,6 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
-
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 

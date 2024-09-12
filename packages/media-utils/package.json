@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "4.39.1-next.79a6196f.0",
+	"version": "5.7.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -14,16 +14,18 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/url"
+		"directory": "packages/media-utils"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",

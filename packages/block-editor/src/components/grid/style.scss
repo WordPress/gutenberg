@@ -1,0 +1,262 @@
+.block-editor-grid-visualizer {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		&.is-dropping-allowed {
+			.block-editor-grid-visualizer__drop-zone {
+				pointer-events: all;
+			}
+		}
+		.block-editor-inserter * {
+			pointer-events: auto;
+		}
+	}
+}
+
+.block-editor-grid-visualizer__grid {
+	display: grid;
+}
+
+.block-editor-grid-visualizer__cell {
+	display: grid;
+	position: relative;
+
+	.block-editor-inserter {
+		color: inherit;
+		z-index: 32;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		overflow: hidden;
+
+		.block-editor-grid-visualizer__appender {
+			box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor  20%, #0000);
+			color: inherit;
+			overflow: hidden;
+			height: 100%;
+			width: 100%;
+			padding: 0 !important;
+			opacity: 0;
+		}
+
+	}
+
+	&.is-highlighted {
+		.block-editor-inserter,
+		.block-editor-grid-visualizer__drop-zone {
+			background: var(--wp-admin-theme-color);
+		}
+	}
+
+	&:hover .block-editor-grid-visualizer__appender,
+	.block-editor-grid-visualizer__appender:focus {
+		opacity: 1;
+		background-color: color-mix(in srgb, currentColor  20%, #0000);
+	}
+}
+
+.block-editor-grid-visualizer__drop-zone {
+	background: rgba($gray-400, 0.1);
+	width: 100%;
+	height: 100%;
+	grid-column: 1;
+	grid-row: 1;
+
+	// Make drop zone 8x8 at minimum so that it's easier to drag into. This will overflow the parent.
+	min-width: $grid-unit-10;
+	min-height: $grid-unit-10;
+}
+
+.block-editor-grid-item-resizer {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
+}
+
+.block-editor-grid-item-resizer__box {
+	border: $border-width solid var(--wp-admin-theme-color);
+
+	.components-resizable-box__handle {
+		// Specificity to override the pointer-events set by .components-popover.
+		&.components-resizable-box__handle.components-resizable-box__handle {
+			pointer-events: all;
+		}
+	}
+}
+
+.block-editor-grid-item-mover__move-button-container {
+	display: flex;
+	padding: 0;
+	border: none;
+	justify-content: center;
+
+	.block-editor-grid-item-mover-button {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		padding-left: 0;
+		padding-right: 0;
+
+		svg {
+			min-width: $grid-unit-30;
+		}
+
+		// Focus and toggle pseudo elements.
+		&::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-small;
+			height: $grid-unit-40;
+
+			// Position the focus rectangle.
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+			z-index: -1;
+
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
+
+		// Don't show the focus inherited by the Button component.
+		&:focus,
+		&:focus:enabled,
+		&:focus::before {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible::before {
+			@include block-toolbar-button-style__focus();
+		}
+	}
+}
+
+
+.block-editor-grid-item-mover__move-vertical-button-container {
+	display: flex;
+	position: relative;
+	@include break-small() {
+		flex-direction: column;
+		justify-content: space-around;
+
+		> .block-editor-grid-item-mover-button.block-editor-grid-item-mover-button {
+			height: $block-toolbar-height * 0.5 - $grid-unit-05 !important; // overrides toolbar button height.
+			width: 100%;
+			min-width: 0 !important; // overrides default button width.
+
+			// Focus style.
+			&::before {
+				height: calc(100% - 4px);
+			}
+		}
+
+		.block-editor-grid-item-mover-button.is-up-button svg,
+		.block-editor-grid-item-mover-button.is-down-button svg {
+			flex-shrink: 0;
+			height: $block-toolbar-height * 0.5 - $grid-unit-05;
+		}
+	}
+}
+
+.editor-collapsible-block-toolbar {
+	.block-editor-grid-item-mover__move-vertical-button-container {
+		// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+		@include break-small() {
+			height: $grid-unit-50;
+			position: relative;
+			top: -5px; // Should be -4px, but that causes scrolling when focus lands on the movers, in a 60px header.
+		}
+	}
+}
+
+.show-icon-labels {
+
+	.block-editor-grid-item-mover__move-horizontal-button-container {
+		position: relative;
+
+		&::before {
+			@include break-small() {
+				content: "";
+				height: 100%;
+				width: $border-width;
+				background: $gray-200;
+				position: absolute;
+				top: 0;
+			}
+
+			@include break-medium() {
+				background: $gray-900;
+			}
+		}
+
+		&.is-left {
+			padding-right: 6px;
+
+			&::before {
+				right: 0;
+			}
+		}
+
+		&.is-right {
+			padding-left: 6px;
+
+			&::before {
+				left: 0;
+			}
+		}
+	}
+
+	.block-editor-grid-item-mover__move-vertical-button-container {
+		&::before {
+			@include break-small() {
+				content: "";
+				height: $border-width;
+				width: 100%;
+				background: $gray-200;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
+			}
+		}
+	}
+
+	.block-editor-grid-item-mover-button {
+		white-space: nowrap;
+	}
+
+	.editor-collapsible-block-toolbar {
+		.block-editor-grid-item-mover__move-horizontal-button-container::before {
+			height: $grid-unit-30;
+			background: $gray-300;
+			top: $grid-unit-05;
+		}
+
+		.block-editor-grid-item-mover__move-vertical-button-container::before {
+			background: $gray-300;
+			width: calc(100% - #{$grid-unit-30});
+		}
+	}
+}
+

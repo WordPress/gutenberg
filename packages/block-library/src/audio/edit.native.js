@@ -13,9 +13,9 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	AudioPlayer,
 } from '@wordpress/components';
 import {
+	AudioPlayer,
 	BlockCaption,
 	BlockControls,
 	BlockIcon,
@@ -212,13 +212,13 @@ function AudioEdit( {
 									label: _x( 'None', '"Preload" value' ),
 								},
 							] }
-							hideCancelButton={ true }
+							hideCancelButton
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<MediaUpload
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					isReplacingMedia={ true }
+					isReplacingMedia
 					onSelect={ onSelectAudio }
 					onSelectURL={ onSelectURL }
 					render={ ( { open, getMediaOptions } ) => {
@@ -226,7 +226,7 @@ function AudioEdit( {
 					} }
 				/>
 				<BlockCaption
-					accessible={ true }
+					accessible
 					accessibilityLabelCreator={ ( caption ) =>
 						RichText.isEmpty( caption )
 							? /* translators: accessibility text. Empty Audio caption. */

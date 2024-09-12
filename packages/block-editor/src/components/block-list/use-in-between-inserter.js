@@ -25,10 +25,12 @@ export function useInBetweenInserter() {
 		getBlockIndex,
 		isMultiSelecting,
 		getSelectedBlockClientIds,
+		getSettings,
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
 		getBlockEditingMode,
 		getBlockName,
+		getBlockAttributes,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
@@ -40,7 +42,9 @@ export function useInBetweenInserter() {
 			}
 
 			function onMouseMove( event ) {
-				if ( openRef.current ) {
+				// openRef is the reference to the insertion point between blocks.
+				// If the reference is not set or the insertion point is already open, return.
+				if ( openRef === undefined || openRef.current ) {
 					return;
 				}
 
@@ -77,15 +81,19 @@ export function useInBetweenInserter() {
 				if (
 					getTemplateLock( rootClientId ) ||
 					getBlockEditingMode( rootClientId ) === 'disabled' ||
-					( getBlockName( rootClientId ) === 'core/block' &&
-						window.__experimentalPatternPartialSyncing )
+					getBlockName( rootClientId ) === 'core/block' ||
+					( rootClientId &&
+						getBlockAttributes( rootClientId ).layout
+							?.isManualPlacement )
 				) {
 					return;
 				}
 
+				const blockListSettings = getBlockListSettings( rootClientId );
 				const orientation =
-					getBlockListSettings( rootClientId )?.orientation ||
-					'vertical';
+					blockListSettings?.orientation || 'vertical';
+				const captureToolbars =
+					!! blockListSettings?.__experimentalCaptureToolbars;
 				const offsetTop = event.clientY;
 				const offsetLeft = event.clientX;
 
@@ -130,9 +138,18 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				// Don't show the inserter when hovering above (conflicts with
-				// block toolbar) or inside selected block(s).
-				if ( getSelectedBlockClientIds().includes( clientId ) ) {
+				// Don't show the inserter if the following conditions are met,
+				// as it conflicts with the block toolbar:
+				// 1. when hovering above or inside selected block(s)
+				// 2. when the orientation is vertical
+				// 3. when the __experimentalCaptureToolbars is not enabled
+				// 4. when the Top Toolbar is not disabled
+				if (
+					getSelectedBlockClientIds().includes( clientId ) &&
+					orientation === 'vertical' &&
+					! captureToolbars &&
+					! getSettings().hasFixedToolbar
+				) {
 					return;
 				}
 				const elementRect = element.getBoundingClientRect();

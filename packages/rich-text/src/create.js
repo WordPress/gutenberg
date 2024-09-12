@@ -98,15 +98,12 @@ function toFormat( { tagName, attributes } ) {
 	};
 }
 
-// Ideally we use a private property.
-const RichTextInternalData = Symbol( 'RichTextInternalData' );
-
 /**
  * The RichTextData class is used to instantiate a wrapper around rich text
  * values, with methods that can be used to transform or manipulate the data.
  *
- * - Create an emtpy instance: `new RichTextData()`.
- * - Create one from an html string: `RichTextData.fromHTMLString(
+ * - Create an empty instance: `new RichTextData()`.
+ * - Create one from an HTML string: `RichTextData.fromHTMLString(
  *   '<em>hello</em>' )`.
  * - Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
  *   document.querySelector( 'p' ) )`.
@@ -117,6 +114,8 @@ const RichTextInternalData = Symbol( 'RichTextInternalData' );
  * @todo Add methods to manipulate the data, such as applyFormat, slice etc.
  */
 export class RichTextData {
+	#value;
+
 	static empty() {
 		return new RichTextData();
 	}
@@ -138,21 +137,17 @@ export class RichTextData {
 		return richTextData;
 	}
 	constructor( init = createEmptyValue() ) {
-		// Setting text, formats, and replacements as enumerable properties
-		// unfortunately visualises these in the e2e tests. As long as the class
-		// instance doesn't have any enumerable properties, it will be
-		// visualised as a string.
-		Object.defineProperty( this, RichTextInternalData, { value: init } );
+		this.#value = init;
 	}
 	toPlainText() {
-		return getTextContent( this[ RichTextInternalData ] );
+		return getTextContent( this.#value );
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
-	toHTMLString() {
+	toHTMLString( { preserveWhiteSpace } = {} ) {
 		return (
 			this.originalHTML ||
-			toHTMLString( { value: this[ RichTextInternalData ] } )
+			toHTMLString( { value: this.#value, preserveWhiteSpace } )
 		);
 	}
 	valueOf() {
@@ -168,13 +163,13 @@ export class RichTextData {
 		return this.text.length;
 	}
 	get formats() {
-		return this[ RichTextInternalData ].formats;
+		return this.#value.formats;
 	}
 	get replacements() {
-		return this[ RichTextInternalData ].replacements;
+		return this.#value.replacements;
 	}
 	get text() {
-		return this[ RichTextInternalData ].text;
+		return this.#value.text;
 	}
 }
 
@@ -409,14 +404,26 @@ function collapseWhiteSpace( element, isRoot = true ) {
 }
 
 /**
- * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
+ * We need to normalise line breaks to `\n` so they are consistent across
+ * platforms and serialised properly. Not removing \r would cause it to
+ * linger and result in double line breaks when whitespace is preserved.
+ */
+const CARRIAGE_RETURN = '\r';
+
+/**
+ * Removes reserved characters used by rich-text (zero width non breaking spaces
+ * added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
 export function removeReservedCharacters( string ) {
-	// with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	// with the global flag, note that we should create a new regex each time OR
+	// reset lastIndex state.
 	return string.replace(
-		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		new RegExp(
+			`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }${ CARRIAGE_RETURN }]`,
+			'gu'
+		),
 		''
 	);
 }
@@ -468,11 +475,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if (
 			isEditableTree &&
-			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
-				// Ignore any line breaks that are not inserted by us.
-				( tagName === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+			// Ignore any line breaks that are not inserted by us.
+			tagName === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -527,7 +532,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
-		if ( format ) delete format.formatType;
+		if ( format ) {
+			delete format.formatType;
+		}
 
 		const value = createFromElement( {
 			element: node,
@@ -537,7 +544,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		accumulateSelection( accumulator, node, range, value );
 
-		if ( ! format ) {
+		// Ignore any placeholders, but keep their content since the browser
+		// might insert text inside them when the editable element is flex.
+		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {

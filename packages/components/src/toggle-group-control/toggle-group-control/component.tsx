@@ -2,14 +2,12 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
 import { LayoutGroup } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -74,6 +72,7 @@ function UnconnectedToggleGroupControl(
 		<BaseControl
 			help={ help }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="ToggleGroupControl"
 		>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
@@ -117,7 +116,12 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __nextHasNoMarginBottom
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>

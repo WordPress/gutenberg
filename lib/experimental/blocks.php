@@ -78,95 +78,42 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	}
 }
 
+/**
+ * Registers a new block style for one or more block types.
+ *
+ * WP_Block_Styles_Registry was marked as `final` in core so it cannot be
+ * updated via Gutenberg to allow registration of a style across multiple
+ * block types as well as with an optional style object. This function will
+ * support the desired functionality until the styles registry can be updated
+ * in core.
+ *
+ * @param string|array $block_name       Block type name including namespace or array of namespaced block type names.
+ * @param array        $style_properties Array containing the properties of the style name, label,
+ *                                       style_handle (name of the stylesheet to be enqueued),
+ *                                       inline_style (string containing the CSS to be added),
+ *                                       style_data (theme.json-like object to generate CSS from).
+ *
+ * @return bool True if all block styles were registered with success and false otherwise.
+ */
+function gutenberg_register_block_style( $block_name, $style_properties ) {
+	if ( ! is_string( $block_name ) && ! is_array( $block_name ) ) {
+		_doing_it_wrong(
+			__METHOD__,
+			__( 'Block name must be a string or array.', 'gutenberg' ),
+			'6.6.0'
+		);
 
+		return false;
+	}
 
+	$block_names = is_string( $block_name ) ? array( $block_name ) : $block_name;
+	$result      = true;
 
-$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-if ( $gutenberg_experiments && (
-	array_key_exists( 'gutenberg-block-bindings', $gutenberg_experiments ) ||
-	array_key_exists( 'gutenberg-pattern-partial-syncing', $gutenberg_experiments )
-) ) {
-
-	require_once __DIR__ . '/block-bindings/index.php';
-		// Allowed blocks that support block bindings.
-	// TODO: Look for a mechanism to opt-in for this. Maybe adding a property to block attributes?
-	global $block_bindings_allowed_blocks;
-	$block_bindings_allowed_blocks = array(
-		'core/paragraph' => array( 'content' ),
-		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text' ),
-	);
-	if ( ! function_exists( 'process_block_bindings' ) ) {
-		/**
-		 * Process the block bindings attribute.
-		 *
-		 * @param string   $block_content Block Content.
-		 * @param array    $block Block attributes.
-		 * @param WP_Block $block_instance The block instance.
-		 */
-		function process_block_bindings( $block_content, $block, $block_instance ) {
-			// If the block doesn't have the bindings property, return.
-			if ( ! isset( $block['attrs']['metadata']['bindings'] ) ) {
-				return $block_content;
-			}
-
-			// Assuming the following format for the bindings property of the "metadata" attribute:
-			//
-			// "bindings": {
-			//   "title": {
-			//     "source": {
-			//       "name": "post_meta",
-			//       "attributes": { "value": "text_custom_field" }
-			//     }
-			//   },
-			//   "url": {
-			//     "source": {
-			//       "name": "post_meta",
-			//       "attributes": { "value": "text_custom_field" }
-			//     }
-			//   }
-			// }
-			//
-			global $block_bindings_allowed_blocks;
-			global $block_bindings_sources;
-			$modified_block_content = $block_content;
-			foreach ( $block['attrs']['metadata']['bindings'] as $binding_attribute => $binding_source ) {
-				// If the block is not in the list, stop processing.
-				if ( ! isset( $block_bindings_allowed_blocks[ $block['blockName'] ] ) ) {
-					return $block_content;
-				}
-				// If the attribute is not in the list, process next attribute.
-				if ( ! in_array( $binding_attribute, $block_bindings_allowed_blocks[ $block['blockName'] ], true ) ) {
-					continue;
-				}
-				// If no source is provided, or that source is not registered, process next attribute.
-				if ( ! isset( $binding_source['source'] ) || ! isset( $binding_source['source']['name'] ) || ! isset( $block_bindings_sources[ $binding_source['source']['name'] ] ) ) {
-					continue;
-				}
-
-				$source_callback = $block_bindings_sources[ $binding_source['source']['name'] ]['apply'];
-				// Get the value based on the source.
-				if ( ! isset( $binding_source['source']['attributes'] ) ) {
-					$source_args = array();
-				} else {
-					$source_args = $binding_source['source']['attributes'];
-				}
-				$source_value = $source_callback( $source_args, $block_instance, $binding_attribute );
-				// If the value is null, process next attribute.
-				if ( is_null( $source_value ) ) {
-					continue;
-				}
-
-				// Process the HTML based on the block and the attribute.
-				$modified_block_content = block_bindings_replace_html( $modified_block_content, $block['blockName'], $binding_attribute, $source_value );
-			}
-			return $modified_block_content;
-		}
-
-		// Add filter only to the blocks in the list.
-		foreach ( $block_bindings_allowed_blocks as $block_name => $attributes ) {
-			add_filter( 'render_block_' . $block_name, 'process_block_bindings', 20, 3 );
+	foreach ( $block_names as $name ) {
+		if ( ! WP_Block_Styles_Registry::get_instance()->register( $name, $style_properties ) ) {
+			$result = false;
 		}
 	}
+
+	return $result;
 }

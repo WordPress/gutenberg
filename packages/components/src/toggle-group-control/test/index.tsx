@@ -15,7 +15,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
  */
 import Button from '../../button';
 import {
-	ToggleGroupControl,
+	ToggleGroupControl as _ToggleGroupControl,
 	ToggleGroupControlOption,
 	ToggleGroupControlOptionIcon,
 } from '../index';
@@ -25,6 +25,10 @@ import type { ToggleGroupControlProps } from '../types';
 const hoverOutside = async () => {
 	await hover( document.body );
 	await hover( document.body, { clientX: 10, clientY: 10 } );
+};
+
+const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
 };
 
 const ControlledToggleGroupControl = ( {
@@ -71,13 +75,20 @@ const optionsWithTooltip = (
 			value="gnocchi"
 			label="Delicious Gnocchi"
 			aria-label="Click for Delicious Gnocchi"
-			showTooltip={ true }
+			showTooltip
 		/>
 		<ToggleGroupControlOption
 			value="caponata"
 			label="Sumptuous Caponata"
 			aria-label="Click for Sumptuous Caponata"
 		/>
+	</>
+);
+const optionsWithDisabledOption = (
+	<>
+		<ToggleGroupControlOption value="pizza" label="Pizza" />
+		<ToggleGroupControlOption value="rice" label="Rice" disabled />
+		<ToggleGroupControlOption value="pasta" label="Pasta" />
 	</>
 );
 
@@ -116,6 +127,22 @@ describe.each( [
 
 			expect( container ).toMatchSnapshot();
 		} );
+	} );
+	it( 'should render with the correct option initially selected when `value` is defined', () => {
+		render(
+			<Component value="jack" label="Test Toggle Group Control">
+				{ options }
+			</Component>
+		);
+		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+	} );
+	it( 'should render without a selected option when `value` is `undefined`', () => {
+		render(
+			<Component label="Test Toggle Group Control">{ options }</Component>
+		);
+		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'J' } ) ).not.toBeChecked();
 	} );
 	it( 'should call onChange with proper value', async () => {
 		const mockOnChange = jest.fn();
@@ -193,7 +220,7 @@ describe.each( [
 	} );
 
 	if ( mode === 'controlled' ) {
-		it( 'should reset values correctly', async () => {
+		it( 'should reset values correctly when default value is undefined', async () => {
 			render(
 				<Component label="Test Toggle Group Control">
 					{ options }
@@ -208,10 +235,28 @@ describe.each( [
 			expect( jackOption ).not.toBeChecked();
 			expect( rigasOption ).toBeChecked();
 
-			await press.ArrowRight();
+			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
 			expect( rigasOption ).not.toBeChecked();
-			expect( jackOption ).toBeChecked();
+			expect( jackOption ).not.toBeChecked();
+		} );
+
+		it( 'should reset values correctly when default value is defined', async () => {
+			render(
+				<Component label="Test Toggle Group Control" value="rigas">
+					{ options }
+				</Component>
+			);
+
+			const rigasOption = screen.getByRole( 'radio', {
+				name: 'R',
+			} );
+			const jackOption = screen.getByRole( 'radio', {
+				name: 'J',
+			} );
+
+			expect( rigasOption ).toBeChecked();
+			expect( jackOption ).not.toBeChecked();
 
 			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
 
@@ -219,45 +264,48 @@ describe.each( [
 			expect( jackOption ).not.toBeChecked();
 		} );
 
-		it( 'should update correctly when triggered by external updates', async () => {
-			render(
-				<Component
-					value="rigas"
-					label="Test Toggle Group Control"
-					extraButtonOptions={ [
-						{ name: 'Rigas', value: 'rigas' },
-						{ name: 'Jack', value: 'jack' },
-					] }
-				>
-					{ options }
-				</Component>
-			);
+		describe.each( [
+			[ 'undefined', undefined ],
+			[ 'defined', 'rigas' ],
+		] )(
+			'should update correctly when triggered by external updates',
+			( defaultValueType, defaultValue ) => {
+				it( `when default value is ${ defaultValueType }`, async () => {
+					render(
+						<Component
+							value={ defaultValue }
+							label="Test Toggle Group Control"
+							extraButtonOptions={ [
+								{ name: 'Rigas', value: 'rigas' },
+								{ name: 'Jack', value: 'jack' },
+							] }
+						>
+							{ options }
+						</Component>
+					);
 
-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
+					await click(
+						screen.getByRole( 'button', { name: 'Jack' } )
+					);
+					expect(
+						screen.getByRole( 'radio', { name: 'J' } )
+					).toBeChecked();
+					expect(
+						screen.getByRole( 'radio', { name: 'R' } )
+					).not.toBeChecked();
 
-			await click( screen.getByRole( 'button', { name: 'Jack' } ) );
-			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'R' } )
-			).not.toBeChecked();
-
-			await click( screen.getByRole( 'button', { name: 'Rigas' } ) );
-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
-
-			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
-			expect(
-				screen.getByRole( 'radio', { name: 'R' } )
-			).not.toBeChecked();
-			expect(
-				screen.getByRole( 'radio', { name: 'J' } )
-			).not.toBeChecked();
-		} );
+					await click(
+						screen.getByRole( 'button', { name: 'Rigas' } )
+					);
+					expect(
+						screen.getByRole( 'radio', { name: 'R' } )
+					).toBeChecked();
+					expect(
+						screen.getByRole( 'radio', { name: 'J' } )
+					).not.toBeChecked();
+				} );
+			}
+		);
 	}
 
 	describe( 'isDeselectable', () => {
@@ -311,6 +359,52 @@ describe.each( [
 						: screen.getByRole( 'button', { name: 'Reset' } );
 
 				expect( expectedFocusTarget ).toHaveFocus();
+			} );
+
+			it( 'should ignore disabled radio options', async () => {
+				const mockOnChange = jest.fn();
+
+				render(
+					<Component
+						value="pizza"
+						onChange={ mockOnChange }
+						label="Test Toggle Group Control"
+					>
+						{ optionsWithDisabledOption }
+					</Component>
+				);
+
+				await press.Tab();
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Rice' } )
+				).toBeDisabled();
+
+				// Arrow navigation skips the disabled option
+				await press.ArrowRight();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pasta' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
+
+				// Arrow navigation skips the disabled option
+				await press.ArrowLeft();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
+
+				// Clicks don't cause the option to be selected
+				await click( screen.getByRole( 'radio', { name: 'Rice' } ) );
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
 			} );
 		} );
 
@@ -379,6 +473,65 @@ describe.each( [
 						pressed: false,
 					} )
 				).toHaveFocus();
+			} );
+
+			it( 'should ignore disabled options', async () => {
+				const mockOnChange = jest.fn();
+
+				render(
+					<Component
+						value="pizza"
+						isDeselectable
+						onChange={ mockOnChange }
+						label="Test Toggle Group Control"
+					>
+						{ optionsWithDisabledOption }
+					</Component>
+				);
+
+				await press.Tab();
+
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pizza',
+						pressed: true,
+					} )
+				).toBeVisible();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Rice',
+						pressed: false,
+					} )
+				).toBeDisabled();
+
+				// Tab key navigation skips the disabled option
+				await press.Tab();
+				await press.Space();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pasta',
+						pressed: true,
+					} )
+				).toHaveFocus();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
+
+				// Tab key navigation skips the disabled option
+				await press.ShiftTab();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pizza',
+						pressed: false,
+					} )
+				).toHaveFocus();
+
+				// Clicks don't cause the option to be selected.
+				await click(
+					screen.getByRole( 'button', {
+						name: 'Rice',
+					} )
+				);
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
 	} );

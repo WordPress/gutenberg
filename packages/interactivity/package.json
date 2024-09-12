@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/interactivity",
-	"version": "3.1.2-next.79a6196f.0",
+	"version": "6.7.0",
 	"description": "Package that provides a standard and simple way to handle the frontend interactivity of Gutenberg blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,16 +19,20 @@
 		"url": "https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js",
+		"./debug": "./build-module/debug.js"
+	},
 	"dependencies": {
-		"@preact/signals": "^1.1.3",
-		"deepsignal": "^1.3.6",
-		"preact": "^10.13.2"
+		"@preact/signals": "^1.2.2",
+		"preact": "^10.19.3"
 	},
 	"publishConfig": {
 		"access": "public"

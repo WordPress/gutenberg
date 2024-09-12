@@ -17,6 +17,7 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +33,7 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
 
 const noop = () => {};
 
@@ -42,9 +44,15 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
+	const isZoomOutMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		[]
+	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
-		rootClientId
+		rootClientId,
+		category?.name
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -128,14 +136,19 @@ export function PatternCategoryPreviews( {
 	);
 
 	return (
-		<div className="block-editor-inserter__patterns-category-panel">
+		<>
 			<VStack
 				spacing={ 2 }
 				className="block-editor-inserter__patterns-category-panel-header"
 			>
 				<HStack>
 					<FlexBlock>
-						<Heading level={ 4 } as="div">
+						<Heading
+							className="block-editor-inserter__patterns-category-panel-title"
+							size={ 13 }
+							level={ 4 }
+							as="div"
+						>
 							{ category.label }
 						</Heading>
 					</FlexBlock>
@@ -157,23 +170,33 @@ export function PatternCategoryPreviews( {
 					</Text>
 				) }
 			</VStack>
-
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternsList
-					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
-					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHover }
-					label={ category.label }
-					orientation="vertical"
-					category={ category.name }
-					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternSourceFilter }
-					pagingProps={ pagingProps }
-				/>
+				<>
+					{ isZoomOutMode && (
+						<Text
+							size="12"
+							as="p"
+							className="block-editor-inserter__help-text"
+						>
+							{ __( 'Drag and drop patterns into the canvas.' ) }
+						</Text>
+					) }
+					<BlockPatternsList
+						ref={ scrollContainerRef }
+						shownPatterns={ pagingProps.categoryPatternsAsyncList }
+						blockPatterns={ pagingProps.categoryPatterns }
+						onClickPattern={ onClickPattern }
+						onHover={ onHover }
+						label={ category.label }
+						orientation="vertical"
+						category={ category.name }
+						isDraggable
+						showTitlesAsTooltip={ showTitlesAsTooltip }
+						patternFilter={ patternSourceFilter }
+						pagingProps={ pagingProps }
+					/>
+				</>
 			) }
-		</div>
+		</>
 	);
 }

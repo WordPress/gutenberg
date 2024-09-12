@@ -49,7 +49,7 @@ export default function MyBlockEdit( { attributes, setAttributes } ) {
 <MyBlockEdit />;
 ```
 
-See [this custom block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) for more information and block controls examples.
+See [this custom block tutorial page](/docs/getting-started/fundamentals/block-in-the-editor.md) for more information and block controls examples.
 
 Furthermore, the READMEs of various components inside the block editor package and the components package include examples that also utilize `BlockControls` and can be a good reference.
 
@@ -69,7 +69,7 @@ Group of the block controls. Allows you to create and render multiple groups of 
 
 Allows overriding the default `controls` if the `default` group is used. 
 
-See [this custom block tutorial page](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) for more details and examples with block controls.
+See [this custom block tutorial page](/docs/getting-started/fundamentals/block-in-the-editor.md) for more details and examples with block controls.
 
 - Type: `array`
 

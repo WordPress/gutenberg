@@ -33,8 +33,10 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			return availableTemplates[ templateSlug ];
 		}
 		const template =
-			select( coreStore ).canUser( 'create', 'templates' ) &&
-			select( editorStore ).getCurrentTemplateId();
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) && select( editorStore ).getCurrentTemplateId();
 		return (
 			template?.title ||
 			template?.slug ||
@@ -44,7 +46,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 
 	return (
 		<Button
-			className="edit-post-post-template__toggle"
+			__next40pxDefaultSize
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={ __( 'Template options' ) }
@@ -55,6 +57,14 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 	);
 }
 
+/**
+ * Renders the dropdown content for selecting a post template.
+ *
+ * @param {Object}   props         The component props.
+ * @param {Function} props.onClose The function to close the dropdown.
+ *
+ * @return {JSX.Element} The rendered dropdown content.
+ */
 function PostTemplateDropdownContent( { onClose } ) {
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const {
@@ -63,12 +73,19 @@ function PostTemplateDropdownContent( { onClose } ) {
 		selectedTemplateSlug,
 		canCreate,
 		canEdit,
+		currentTemplateId,
+		onNavigateToEntityRecord,
+		getEditorSettings,
 	} = useSelect(
 		( select ) => {
 			const { canUser, getEntityRecords } = select( coreStore );
 			const editorSettings = select( editorStore ).getEditorSettings();
-			const canCreateTemplates = canUser( 'create', 'templates' );
-
+			const canCreateTemplates = canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
+			const _currentTemplateId =
+				select( editorStore ).getCurrentTemplateId();
 			return {
 				availableTemplates: editorSettings.availableTemplates,
 				fetchedTemplates: canCreateTemplates
@@ -88,7 +105,11 @@ function PostTemplateDropdownContent( { onClose } ) {
 					allowSwitchingTemplate &&
 					canCreateTemplates &&
 					editorSettings.supportsTemplateMode &&
-					!! select( editorStore ).getCurrentTemplateId(),
+					!! _currentTemplateId,
+				currentTemplateId: _currentTemplateId,
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
+				getEditorSettings: select( editorStore ).getEditorSettings,
 			};
 		},
 		[ allowSwitchingTemplate ]
@@ -113,9 +134,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		options.find( ( option ) => ! option.value ); // The default option has '' value.
 
 	const { editPost } = useDispatch( editorStore );
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const { setRenderingMode } = useDispatch( editorStore );
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );
 
 	return (
@@ -155,12 +174,17 @@ function PostTemplateDropdownContent( { onClose } ) {
 					}
 				/>
 			) }
-			{ canEdit && (
+			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="link"
 						onClick={ () => {
-							setRenderingMode( 'template-only' );
+							onNavigateToEntityRecord( {
+								postId: currentTemplateId,
+								postType: 'wp_template',
+							} );
 							onClose();
 							createSuccessNotice(
 								__(
@@ -172,10 +196,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 										{
 											label: __( 'Go back' ),
 											onClick: () =>
-												setRenderingMode(
-													getEditorSettings()
-														.defaultRenderingMode
-												),
+												getEditorSettings().onNavigateToPreviousEntityRecord(),
 										},
 									],
 								}
@@ -210,4 +231,11 @@ function ClassicThemeControl() {
 	);
 }
 
+/**
+ * Provides a dropdown menu for selecting and managing post templates.
+ *
+ * The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+ *
+ * @return {JSX.Element} The rendered ClassicThemeControl component.
+ */
 export default ClassicThemeControl;

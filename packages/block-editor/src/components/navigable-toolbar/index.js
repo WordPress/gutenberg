@@ -28,9 +28,7 @@ function hasOnlyToolbarItem( elements ) {
 
 function getAllFocusableToolbarItemsIn( container ) {
 	return Array.from(
-		container.querySelectorAll(
-			'[data-toolbar-item]:not([disabled]):not([aria-disabled="true"])'
-		)
+		container.querySelectorAll( '[data-toolbar-item]:not([disabled])' )
 	);
 }
 
@@ -144,7 +142,13 @@ function useToolbarFocus( {
 		// We have to wait for the next browser paint because block controls aren't
 		// rendered right away when the toolbar gets mounted.
 		let raf = 0;
-		if ( ! initialFocusOnMount ) {
+
+		// If the toolbar already had focus before the render, we don't want to move it.
+		// https://github.com/WordPress/gutenberg/issues/58511
+		if (
+			! initialFocusOnMount &&
+			! hasFocusWithin( navigableToolbarRef )
+		) {
 			raf = window.requestAnimationFrame( () => {
 				const items =
 					getAllFocusableToolbarItemsIn( navigableToolbarRef );
@@ -161,7 +165,9 @@ function useToolbarFocus( {
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! navigableToolbarRef ) return;
+			if ( ! onIndexChange || ! navigableToolbarRef ) {
+				return;
+			}
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllFocusableToolbarItemsIn( navigableToolbarRef );
@@ -204,6 +210,7 @@ export default function NavigableToolbar( {
 	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
+	orientation = 'horizontal',
 	...props
 } ) {
 	const toolbarRef = useRef();
@@ -224,6 +231,7 @@ export default function NavigableToolbar( {
 			<Toolbar
 				label={ props[ 'aria-label' ] }
 				ref={ toolbarRef }
+				orientation={ orientation }
 				{ ...props }
 			>
 				{ children }
@@ -233,7 +241,7 @@ export default function NavigableToolbar( {
 
 	return (
 		<NavigableMenu
-			orientation="horizontal"
+			orientation={ orientation }
 			role="toolbar"
 			ref={ toolbarRef }
 			{ ...props }

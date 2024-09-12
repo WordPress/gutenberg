@@ -13,7 +13,6 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
-import { __, _n } from '@wordpress/i18n';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,
@@ -30,6 +29,7 @@ import { isAppleOS } from '@wordpress/keycodes';
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
 	AutocompleteProps,
 	AutocompleterUIProps,
@@ -183,15 +183,7 @@ export function useAutocomplete( {
 			return;
 		}
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 
@@ -260,7 +252,9 @@ export function useAutocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
@@ -284,7 +278,9 @@ export function useAutocomplete( {
 		);
 
 		if ( ! completer ) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
@@ -300,7 +296,9 @@ export function useAutocomplete( {
 		// significantly. This could happen, for example, if `matchingWhileBackspacing`
 		// is true and one of the "words" end up being too long. If that's the case,
 		// it will be caught by this guard.
-		if ( tooDistantFromTrigger ) return;
+		if ( tooDistantFromTrigger ) {
+			return;
+		}
 
 		const mismatch = filteredOptions.length === 0;
 		const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
@@ -325,7 +323,9 @@ export function useAutocomplete( {
 			backspacing.current && wordsFromTrigger.length <= 3;
 
 		if ( mismatch && ! ( matchingWhileBackspacing || hasOneTriggerWord ) ) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
@@ -340,7 +340,9 @@ export function useAutocomplete( {
 				textAfterSelection
 			)
 		) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
@@ -348,12 +350,16 @@ export function useAutocomplete( {
 			/^\s/.test( textWithoutTrigger ) ||
 			/\s\s+$/.test( textWithoutTrigger )
 		) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
 		if ( ! /[\u0000-\uFFFF]*$/.test( textWithoutTrigger ) ) {
-			if ( autocompleter ) reset();
+			if ( autocompleter ) {
+				reset();
+			}
 			return;
 		}
 
@@ -390,7 +396,7 @@ export function useAutocomplete( {
 	return {
 		listBoxId,
 		activeId,
-		onKeyDown: handleKeyDown,
+		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: hasSelection && AutocompleterUI && (
 			<AutocompleterUI
 				className={ className }

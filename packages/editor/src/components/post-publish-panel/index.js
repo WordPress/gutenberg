@@ -78,6 +78,8 @@ export class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							onClick={ onClose }
 							icon={ closeSmall }
 							label={ __( 'Close panel' ) }
@@ -93,9 +95,11 @@ export class PostPublishPanel extends Component {
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
+									accessibleWhenDisabled
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
+									size="compact"
 								>
 									{ __( 'Cancel' ) }
 								</Button>
@@ -110,7 +114,7 @@ export class PostPublishPanel extends Component {
 						</PostPublishPanelPrepublish>
 					) }
 					{ isPostPublish && (
-						<PostPublishPanelPostpublish focusOnMount={ true }>
+						<PostPublishPanelPostpublish focusOnMount>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
@@ -129,6 +133,9 @@ export class PostPublishPanel extends Component {
 	}
 }
 
+/**
+ * Renders a panel for publishing a post.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const { getPostType } = select( coreStore );

@@ -155,6 +155,34 @@ describe( 'Cover block', () => {
 				'is-position-top-left'
 			);
 		} );
+
+		test( 'clears media when clear media button clicked', async () => {
+			await setup( {
+				url: 'http://localhost/my-image.jpg',
+			} );
+
+			await selectBlock( 'Block: Cover' );
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'img'
+				)
+			).toBeInTheDocument();
+
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Replace' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'menuitem', {
+					name: 'Reset',
+				} )
+			);
+
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
+					'img'
+				)
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'Inspector controls', () => {
@@ -163,7 +191,7 @@ describe( 'Cover block', () => {
 				await setup();
 				expect(
 					screen.queryByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
 			} );
@@ -175,7 +203,7 @@ describe( 'Cover block', () => {
 				await selectBlock( 'Block: Cover' );
 				expect(
 					screen.getByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).toBeInTheDocument();
 			} );
@@ -240,30 +268,6 @@ describe( 'Cover block', () => {
 				'Me'
 			);
 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
-		} );
-
-		test( 'clears media  when clear media button clicked', async () => {
-			await setup( {
-				url: 'http://localhost/my-image.jpg',
-			} );
-
-			await selectBlock( 'Block: Cover' );
-			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
-				)
-			).toBeInTheDocument();
-
-			await userEvent.click(
-				screen.getByRole( 'button', {
-					name: 'Clear Media',
-				} )
-			);
-			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
-					'img'
-				)
-			).not.toBeInTheDocument();
 		} );
 
 		describe( 'Color panel', () => {
@@ -372,10 +376,10 @@ describe( 'Cover block', () => {
 					} )
 				);
 				await userEvent.clear(
-					screen.getByLabelText( 'Minimum height of cover' )
+					screen.getByLabelText( 'Minimum height' )
 				);
 				await userEvent.type(
-					screen.getByLabelText( 'Minimum height of cover' ),
+					screen.getByLabelText( 'Minimum height' ),
 					'300'
 				);
 

@@ -39,4 +39,14 @@ describe( 'props', () => {
 		);
 		expect( container ).toMatchSnapshot();
 	} );
+
+	test( 'should not pass through invalid props to the `as` component', () => {
+		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
+			return <div { ...props } />;
+		};
+
+		render( <VStack as={ AsComponent }>foobar</VStack> );
+
+		expect( console ).not.toHaveErrored();
+	} );
 } );

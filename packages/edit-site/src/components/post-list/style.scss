@@ -1,0 +1,85 @@
+.edit-site-post-list__featured-image {
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.edit-site-post-list__featured-image-wrapper {
+	height: 100%;
+	width: 100%;
+	border-radius: $grid-unit-05;
+
+	&.is-layout-table:not(:has(.edit-site-post-list__featured-image-button)),
+	&.is-layout-table .edit-site-post-list__featured-image-button {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		display: block;
+		border-radius: $grid-unit-05;
+		position: relative;
+		overflow: hidden;
+		background-color: $gray-100;
+		flex-grow: 0 !important;
+
+		&::after {
+			border-radius: 4px;
+			box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+			content: "";
+			height: 100%;
+			left: 0;
+			position: absolute;
+			top: 0;
+			width: 100%;
+		}
+	}
+}
+
+.edit-site-post-list__featured-image-button {
+	box-shadow: none;
+	border: none;
+	padding: 0;
+	background-color: unset;
+	box-sizing: border-box;
+	cursor: pointer;
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+	border-radius: $grid-unit-05;
+
+	&:focus-visible {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+}
+
+.dataviews-view-grid__card.is-selected {
+	.edit-site-post-list__featured-image-button::after {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	}
+}
+
+.edit-site-post-list__title span {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.edit-site-post-list__title-badge {
+	background: $gray-100;
+	color: $gray-700;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-small;
+	font-size: 12px;
+	font-weight: 400;
+	flex-shrink: 0;
+	line-height: $grid-unit-05 * 5;
+}
+
+.edit-site-post-list__status-icon {
+	height: $grid-unit-30;
+	width: $grid-unit-30;
+	svg {
+		fill: currentColor;
+		margin-left: -$grid-unit-05;
+	}
+}

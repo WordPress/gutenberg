@@ -10,6 +10,15 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { ContextSystemProvider } from '../context';
+
+const CONTEXT_VALUE = {
+	BaseControl: {
+		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
+		// via the context system to override the value set by SelectControl.
+		_overrides: { __associatedWPComponentName: 'TreeSelect' },
+	},
+};
 
 function getSelectOptions(
 	tree: Tree[],
@@ -37,6 +46,7 @@ function getSelectOptions(
  *
  * 	return (
  * 		<TreeSelect
+ * 			__nextHasNoMarginBottom
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -72,7 +82,6 @@ function getSelectOptions(
  * }
  * ```
  */
-
 export function TreeSelect( props: TreeSelectProps ) {
 	const {
 		label,
@@ -81,11 +90,7 @@ export function TreeSelect( props: TreeSelectProps ) {
 		selectedId,
 		tree = [],
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.TreeSelect',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const options = useMemo( () => {
 		return [
@@ -95,11 +100,13 @@ export function TreeSelect( props: TreeSelectProps ) {
 	}, [ noOptionLabel, tree ] );
 
 	return (
-		<SelectControl
-			{ ...{ label, options, onChange } }
-			value={ selectedId }
-			{ ...restProps }
-		/>
+		<ContextSystemProvider value={ CONTEXT_VALUE }>
+			<SelectControl
+				{ ...{ label, options, onChange } }
+				value={ selectedId }
+				{ ...restProps }
+			/>
+		</ContextSystemProvider>
 	);
 }
 

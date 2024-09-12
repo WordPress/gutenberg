@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
+import { useHasBlockToolbar } from './use-has-block-toolbar';
 
 /**
  * Renders the block toolbar.
@@ -58,10 +58,15 @@ export function PrivateBlockToolbar( {
 	const {
 		blockClientId,
 		blockClientIds,
+		isContentOnlyEditingMode,
 		isDefaultEditingMode,
 		blockType,
+		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
+		isUsingBindings,
+		hasParentPattern,
+		hasContentOnlyLocking,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -69,34 +74,49 @@ export function PrivateBlockToolbar( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			getBlockRootClientId,
 			getBlockEditingMode,
+			getBlockAttributes,
+			getBlockParentsByBlockName,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
 		const firstParentClientId = parents[ parents.length - 1 ];
 		const parentBlockName = getBlockName( firstParentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const _isDefaultEditingMode =
-			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const _isDefaultEditingMode = editingMode === 'default';
+		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
 		);
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
+		const _isUsingBindings = selectedBlockClientIds.every(
+			( clientId ) =>
+				!! getBlockAttributes( clientId )?.metadata?.bindings
+		);
+
+		const _hasParentPattern = selectedBlockClientIds.every(
+			( clientId ) =>
+				getBlockParentsByBlockName( clientId, 'core/block', true )
+					.length > 0
+		);
+
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
+		const _hasTemplateLock = selectedBlockClientIds.some(
+			( id ) => getTemplateLock( id ) === 'contentOnly'
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
+			isContentOnlyEditingMode: editingMode === 'contentOnly',
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockType:
-				selectedBlockClientId &&
-				getBlockType( getBlockName( selectedBlockClientId ) ),
-
+			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
+			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
 				parentBlockType &&
 				getBlockEditingMode( firstParentClientId ) === 'default' &&
@@ -107,6 +127,9 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
+			isUsingBindings: _isUsingBindings,
+			hasParentPattern: _hasParentPattern,
+			hasContentOnlyLocking: _hasTemplateLock,
 		};
 	}, [] );
 
@@ -121,15 +144,8 @@ export function PrivateBlockToolbar( {
 
 	const isLargeViewport = ! useViewportMatch( 'medium', '<' );
 
-	const isToolbarEnabled =
-		blockType &&
-		hasBlockSupport( blockType, '__experimentalToolbar', true );
-	const hasAnyBlockControls = useHasAnyBlockControls();
-
-	if (
-		! isToolbarEnabled ||
-		( ! isDefaultEditingMode && ! hasAnyBlockControls )
-	) {
+	const hasBlockToolbar = useHasBlockToolbar();
+	if ( ! hasBlockToolbar ) {
 		return null;
 	}
 
@@ -138,12 +154,13 @@ export function PrivateBlockToolbar( {
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
-	const classes = classnames( 'block-editor-block-contextual-toolbar', {
+	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
 	} );
 
-	const innerClasses = classnames( 'block-editor-block-toolbar', {
+	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
+		'is-connected': isUsingBindings,
 	} );
 
 	return (
@@ -159,35 +176,45 @@ export function PrivateBlockToolbar( {
 			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-			key={ blockClientId }
+			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					isDefaultEditingMode && (
+					( isDefaultEditingMode ||
+						( isContentOnlyEditingMode && ! hasParentPattern ) ||
+						isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
-								<BlockMover
+								<BlockSwitcher
 									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
+									disabled={ ! isDefaultEditingMode }
+									isUsingBindings={ isUsingBindings }
 								/>
+								{ isDefaultEditingMode && (
+									<>
+										{ ! isMultiToolbar && (
+											<BlockLockToolbar
+												clientId={ blockClientId }
+											/>
+										) }
+										<BlockMover
+											clientIds={ blockClientIds }
+											hideDragHandle={ hideDragHandle }
+										/>
+									</>
+								) }
 							</ToolbarGroup>
 						</div>
 					) }
-				{ shouldShowVisualToolbar && isMultiToolbar && (
-					<BlockGroupToolbar />
-				) }
+				{ ! hasContentOnlyLocking &&
+					shouldShowVisualToolbar &&
+					isMultiToolbar && <BlockGroupToolbar /> }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot

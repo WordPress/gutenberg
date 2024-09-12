@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "21.31.1-next.79a6196f.0",
+	"version": "22.7.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"CHANGELOG.md",
@@ -31,11 +32,12 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^6.0.0",
-		"stylelint-config-recommended-scss": "^5.0.2"
+		"@stylistic/stylelint-plugin": "^3.0.1",
+		"stylelint-config-recommended": "^14.0.1",
+		"stylelint-config-recommended-scss": "^14.1.0"
 	},
 	"peerDependencies": {
-		"stylelint": "^14.2"
+		"stylelint": "^16.8.2"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

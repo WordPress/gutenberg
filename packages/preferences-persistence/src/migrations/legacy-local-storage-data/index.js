@@ -63,17 +63,17 @@ export function convertLegacyData( data ) {
 	data = moveIndividualPreference(
 		data,
 		{ from: 'core/edit-post', to: 'core/edit-post' },
-		'preferredStyleVariations'
-	);
-	data = moveIndividualPreference(
-		data,
-		{ from: 'core/edit-post', to: 'core/edit-post' },
 		'panels',
 		convertEditPostPanels
 	);
 	data = moveIndividualPreference(
 		data,
-		{ from: 'core/editor', to: 'core/edit-post' },
+		{ from: 'core/editor', to: 'core' },
+		'isPublishSidebarEnabled'
+	);
+	data = moveIndividualPreference(
+		data,
+		{ from: 'core/edit-post', to: 'core' },
 		'isPublishSidebarEnabled'
 	);
 	data = moveIndividualPreference(

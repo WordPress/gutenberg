@@ -5,6 +5,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -24,6 +26,10 @@ export default function InspectorControlsTabs( {
 	hasBlockStyles,
 	tabs,
 } ) {
+	const showIconLabels = useSelect( ( select ) => {
+		return select( preferencesStore ).get( 'core', 'showIconLabels' );
+	}, [] );
+
 	// The tabs panel will mount before fills are rendered to the list view
 	// slot. This means the list view tab isn't initially included in the
 	// available tabs so the panel defaults selection to the settings tab
@@ -35,7 +41,7 @@ export default function InspectorControlsTabs( {
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
-			<Tabs initialTabId={ initialTabName } key={ clientId }>
+			<Tabs defaultTabId={ initialTabName } key={ clientId }>
 				<Tabs.TabList>
 					{ tabs.map( ( tab ) => (
 						<Tabs.Tab
@@ -43,10 +49,18 @@ export default function InspectorControlsTabs( {
 							tabId={ tab.name }
 							render={
 								<Button
-									icon={ tab.icon }
-									label={ tab.title }
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
+									icon={
+										! showIconLabels ? tab.icon : undefined
+									}
+									label={
+										! showIconLabels ? tab.title : undefined
+									}
 									className={ tab.className }
-								/>
+								>
+									{ showIconLabels && tab.title }
+								</Button>
 							}
 						/>
 					) ) }

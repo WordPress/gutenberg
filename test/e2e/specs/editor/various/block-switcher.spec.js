@@ -34,7 +34,14 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Quote', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Quote',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
 	test( 'Should show the expected block transforms on the list block when the quote block is removed', async ( {
@@ -74,10 +81,40 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
-	test( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async ( {
+	test( 'Should not show the block switcher if the block has no styles and cannot be removed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert a list block.
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( '1' );
+		await pageUtils.pressKeys( 'alt+F10' );
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Paragraph' } );
+		await expect( button ).toBeEnabled();
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+		await page.click( 'role=checkbox[name="Prevent removal"]' );
+		await page.click( 'role=button[name="Apply"]' );
+
+		// Verify the block switcher isn't enabled.
+		await expect( button ).toBeDisabled();
+	} );
+
+	test( 'Should show a message if there are no transforms or styles available', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -87,40 +124,19 @@ test.describe( 'Block Switcher', () => {
 			.getByRole( 'button', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
-
-		// Remove blocks.
-		await page.waitForFunction( () => {
-			try {
-				window.wp.data
-					.dispatch( 'core/blocks' )
-					.removeBlockTypes( [
-						'core/quote',
-						'core/pullquote',
-						'core/paragraph',
-						'core/group',
-						'core/heading',
-						'core/columns',
-					] );
-				return true;
-			} catch {
-				return false;
-			}
-		} );
-
-		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'alt+F10' );
 
-		// Verify the block switcher isn't enabled.
-		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'List' } )
-		).toBeDisabled();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'List item' } )
+			.click();
+		await expect( page.getByText( 'No transforms.' ) ).toBeVisible();
 	} );
 
 	test( 'Should show Columns block only if selected blocks are between limits (1-6)', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
@@ -129,9 +145,7 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## I am a header' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.up( 'Shift' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )

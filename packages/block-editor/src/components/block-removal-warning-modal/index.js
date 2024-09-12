@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,9 +17,8 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
@@ -37,7 +36,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! blockNamesForPrompt ) {
+	if ( ! message ) {
 		return;
 	}
 
@@ -50,19 +49,22 @@ export function BlockRemovalWarningModal( { rules } ) {
 		<Modal
 			title={ __( 'Be careful!' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
+			size="medium"
 		>
-			<p>
-				{ _n(
-					'Post or page content will not be displayed if you delete this block.',
-					'Post or page content will not be displayed if you delete these blocks.',
-					blockNamesForPrompt.length
-				) }
-			</p>
+			<p>{ message }</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
+				<Button
+					variant="tertiary"
+					onClick={ clearBlockRemovalPrompt }
+					__next40pxDefaultSize
+				>
 					{ __( 'Cancel' ) }
 				</Button>
-				<Button variant="primary" onClick={ onConfirmRemoval }>
+				<Button
+					variant="primary"
+					onClick={ onConfirmRemoval }
+					__next40pxDefaultSize
+				>
 					{ __( 'Delete' ) }
 				</Button>
 			</HStack>

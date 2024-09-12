@@ -52,11 +52,14 @@
 			left: 0;
 			pointer-events: none;
 			border: $border-width dashed currentColor;
-			@include placeholder-style();
 		}
 
 		.block-editor-inserter {
-			visibility: hidden;
+			opacity: 0;
+
+			&:focus-within {
+				opacity: 1;
+			}
 		}
 
 		&.is-drag-over {

@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
+import { useStoreState } from '@ariakit/react';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -122,7 +122,9 @@ const UnforwardedTabPanel = (
 		defaultSelectedId: prependInstanceId( initialTabName ),
 	} );
 
-	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
+	const selectedTabName = extractTabName(
+		useStoreState( tabStore, 'selectedId' )
+	);
 
 	const setTabStoreSelectedId = useCallback(
 		( tabName: string ) => {
@@ -202,7 +204,7 @@ const UnforwardedTabPanel = (
 						<Ariakit.Tab
 							key={ tab.name }
 							id={ prependInstanceId( tab.name ) }
-							className={ classnames(
+							className={ clsx(
 								'components-tab-panel__tabs-item',
 								tab.className,
 								{
@@ -232,7 +234,7 @@ const UnforwardedTabPanel = (
 					id={ `${ prependInstanceId( selectedTab.name ) }-view` }
 					store={ tabStore }
 					tabId={ prependInstanceId( selectedTab.name ) }
-					className={ 'components-tab-panel__tab-content' }
+					className="components-tab-panel__tab-content"
 				>
 					{ children( selectedTab ) }
 				</Ariakit.TabPanel>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,22 +16,23 @@ import {
 	InspectorControls,
 	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
-	__experimentalImageSizeControl as ImageSizeControl,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -44,6 +45,10 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	TEMPLATE,
 } from './constants';
+import { unlock } from '../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>
@@ -127,7 +132,12 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
+function MediaTextEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	context: { postId, postType },
+} ) {
 	const {
 		focalPoint,
 		href,
@@ -145,8 +155,47 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		rel,
 		verticalAlignment,
 		allowedBlocks,
+		useFeaturedImage,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const featuredImageMedia = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+
+	const featuredImageURL = useFeaturedImage
+		? featuredImageMedia?.source_url
+		: '';
+	const featuredImageAlt = useFeaturedImage
+		? featuredImageMedia?.alt_text
+		: '';
+
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			imageFill: false,
+			mediaType: 'image',
+			mediaId: undefined,
+			mediaUrl: undefined,
+			mediaAlt: undefined,
+			mediaLink: undefined,
+			linkDestination: undefined,
+			linkTarget: undefined,
+			linkClass: undefined,
+			rel: undefined,
+			href: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+		} );
+	};
 
 	const { imageSizes, image } = useSelect(
 		( select ) => {
@@ -164,11 +213,11 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		[ isSelected, mediaId ]
 	);
 
-	const refMediaContainer = useRef();
+	const refMedia = useRef();
 	const imperativeFocalPointPreview = ( value ) => {
-		const { style } = refMediaContainer.current.resizable;
+		const { style } = refMedia.current;
 		const { x, y } = value;
-		style.backgroundPosition = `${ x * 100 }% ${ y * 100 }%`;
+		style.objectPosition = `${ x * 100 }% ${ y * 100 }%`;
 	};
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
@@ -189,12 +238,12 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		setTemporaryMediaWidth( null );
 	};
 
-	const classNames = classnames( {
+	const classNames = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		'is-image-fill': imageFill,
+		'is-image-fill-element': imageFill,
 	} );
 	const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 	const gridTemplateColumns =
@@ -227,83 +276,146 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			mediaSizeSlug: newMediaSizeSlug,
 		} );
 	};
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const mediaTextGeneralSettings = (
-		<PanelBody title={ __( 'Settings' ) }>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Stack on mobile' ) }
-				checked={ isStackedOnMobile }
-				onChange={ () =>
-					setAttributes( {
-						isStackedOnMobile: ! isStackedOnMobile,
-					} )
-				}
-			/>
-			{ mediaType === 'image' && (
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Crop image to fill entire column' ) }
-					checked={ !! imageFill }
-					onChange={ () =>
-						setAttributes( {
-							imageFill: ! imageFill,
-						} )
-					}
-				/>
-			) }
-			{ imageFill && mediaUrl && mediaType === 'image' && (
-				<FocalPointPicker
-					__nextHasNoMarginBottom
-					label={ __( 'Focal point picker' ) }
-					url={ mediaUrl }
-					value={ focalPoint }
-					onChange={ ( value ) =>
-						setAttributes( { focalPoint: value } )
-					}
-					onDragStart={ imperativeFocalPointPreview }
-					onDrag={ imperativeFocalPointPreview }
-				/>
-			) }
-			{ mediaType === 'image' && (
-				<TextareaControl
-					__nextHasNoMarginBottom
-					label={ __( 'Alternative text' ) }
-					value={ mediaAlt }
-					onChange={ onMediaAltChange }
-					help={
-						<>
-							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image.' ) }
-							</ExternalLink>
-							<br />
-							{ __( 'Leave empty if decorative.' ) }
-						</>
-					}
-				/>
-			) }
-			{ mediaType === 'image' && (
-				<ImageSizeControl
-					onChangeImage={ updateImage }
-					slug={ mediaSizeSlug }
-					imageSizeOptions={ imageSizeOptions }
-					isResizable={ false }
-					imageSizeHelp={ __(
-						'Select the size of the source image.'
-					) }
-				/>
-			) }
-			{ mediaUrl && (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				setAttributes( {
+					isStackedOnMobile: true,
+					imageFill: false,
+					mediaAlt: '',
+					focalPoint: undefined,
+					mediaWidth: 50,
+					mediaSizeSlug: undefined,
+				} );
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				label={ __( 'Media width' ) }
+				isShownByDefault
+				hasValue={ () => mediaWidth !== 50 }
+				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+			>
 				<RangeControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Media width' ) }
 					value={ temporaryMediaWidth || mediaWidth }
 					onChange={ commitWidthChange }
 					min={ WIDTH_CONSTRAINT_PERCENTAGE }
 					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
 				/>
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				label={ __( 'Stack on mobile' ) }
+				isShownByDefault
+				hasValue={ () => ! isStackedOnMobile }
+				onDeselect={ () =>
+					setAttributes( { isStackedOnMobile: true } )
+				}
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
+					onChange={ () =>
+						setAttributes( {
+							isStackedOnMobile: ! isStackedOnMobile,
+						} )
+					}
+				/>
+			</ToolsPanelItem>
+			{ mediaType === 'image' && (
+				<ToolsPanelItem
+					label={ __( 'Crop image to fill' ) }
+					isShownByDefault
+					hasValue={ () => !! imageFill }
+					onDeselect={ () => setAttributes( { imageFill: false } ) }
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop image to fill' ) }
+						checked={ !! imageFill }
+						onChange={ () =>
+							setAttributes( {
+								imageFill: ! imageFill,
+							} )
+						}
+					/>
+				</ToolsPanelItem>
 			) }
-		</PanelBody>
+			{ imageFill &&
+				( mediaUrl || featuredImageURL ) &&
+				mediaType === 'image' && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( { focalPoint: undefined } )
+						}
+					>
+						<FocalPointPicker
+							__nextHasNoMarginBottom
+							label={ __( 'Focal point' ) }
+							url={
+								useFeaturedImage && featuredImageURL
+									? featuredImageURL
+									: mediaUrl
+							}
+							value={ focalPoint }
+							onChange={ ( value ) =>
+								setAttributes( { focalPoint: value } )
+							}
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+						/>
+					</ToolsPanelItem>
+				) }
+			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
+				<ToolsPanelItem
+					label={ __( 'Alternative text' ) }
+					isShownByDefault
+					hasValue={ () => !! mediaAlt }
+					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
+				>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ __( 'Alternative text' ) }
+						value={ mediaAlt }
+						onChange={ onMediaAltChange }
+						help={
+							<>
+								<ExternalLink
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
+					/>
+				</ToolsPanelItem>
+			) }
+			{ mediaType === 'image' && ! useFeaturedImage && (
+				<ResolutionTool
+					value={ mediaSizeSlug }
+					options={ imageSizeOptions }
+					onChange={ updateImage }
+				/>
+			) }
+		</ToolsPanel>
 	);
 
 	const blockProps = useBlockProps( {
@@ -347,7 +459,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					</>
 				) }
 
-				{ mediaType === 'image' && (
+				{ mediaType === 'image' && ! useFeaturedImage && (
 					<ImageURLInputUI
 						url={ href || '' }
 						onChangeUrl={ onSetHref }
@@ -368,8 +480,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onSelectMedia={ onSelectMedia }
 					onWidthChange={ onWidthChange }
 					commitWidthChange={ commitWidthChange }
-					ref={ refMediaContainer }
+					refMedia={ refMedia }
 					enableResize={ blockEditingMode === 'default' }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					{ ...{
 						focalPoint,
 						imageFill,
@@ -381,6 +494,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						useFeaturedImage,
+						featuredImageURL,
+						featuredImageAlt,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

@@ -8,6 +8,8 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { unlock } from '../../lock-unlock';
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
  * 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
@@ -69,6 +71,5 @@ export function getFontSizeClass( fontSizeSlug ) {
 		return;
 	}
 
-	const { kebabCase } = unlock( componentsPrivateApis );
 	return `has-${ kebabCase( fontSizeSlug ) }-font-size`;
 }

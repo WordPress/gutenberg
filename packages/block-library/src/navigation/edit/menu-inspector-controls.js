@@ -49,7 +49,9 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 
 	const setInsertedBlockAttributes =
 		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _insertedBlockClientId ) return;
+			if ( ! _insertedBlockClientId ) {
+				return;
+			}
 			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 
@@ -92,7 +94,9 @@ const MainContent = ( {
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
+		return (
+			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
+		);
 	}
 
 	if ( isLoading ) {
@@ -102,7 +106,7 @@ const MainContent = ( {
 	const description = navigationMenu
 		? sprintf(
 				/* translators: %s: The name of a menu. */
-				__( 'Structure for navigation menu: %s' ),
+				__( 'Structure for Navigation Menu: %s' ),
 				navigationMenu?.title || __( 'Untitled menu' )
 		  )
 		: __(
@@ -113,7 +117,7 @@ const MainContent = ( {
 		<div className="wp-block-navigation__menu-inspector-controls">
 			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
-					{ __( 'This navigation menu is empty.' ) }
+					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView

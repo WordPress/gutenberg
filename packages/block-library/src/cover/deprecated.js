@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -305,7 +305,7 @@ const v13 = {
 
 		const backgroundPosition = mediaPosition( focalPoint );
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -316,7 +316,7 @@ const v13 = {
 			getPositionClassName( contentPosition )
 		);
 
-		const imgClasses = classnames(
+		const imgClasses = clsx(
 			'wp-block-cover__image-background',
 			id ? `wp-image-${ id }` : null,
 			{
@@ -331,7 +331,7 @@ const v13 = {
 			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -370,7 +370,7 @@ const v13 = {
 					) ) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -400,8 +400,9 @@ const v12 = {
 	supports: v12BlockSupports,
 	isEligible( attributes ) {
 		return (
-			attributes.customOverlayColor !== undefined ||
-			attributes.overlayColor !== undefined
+			( attributes.customOverlayColor !== undefined ||
+				attributes.overlayColor !== undefined ) &&
+			attributes.isUserOverlayColor === undefined
 		);
 	},
 	migrate( attributes ) {
@@ -467,7 +468,7 @@ const v12 = {
 
 		const backgroundPosition = mediaPosition( focalPoint );
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -478,7 +479,7 @@ const v12 = {
 			getPositionClassName( contentPosition )
 		);
 
-		const imgClasses = classnames(
+		const imgClasses = clsx(
 			'wp-block-cover__image-background',
 			id ? `wp-image-${ id }` : null,
 			{
@@ -493,7 +494,7 @@ const v12 = {
 			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -532,7 +533,7 @@ const v12 = {
 					) ) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -616,7 +617,7 @@ const v11 = {
 
 		const backgroundPosition = mediaPosition( focalPoint );
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -627,7 +628,7 @@ const v11 = {
 			getPositionClassName( contentPosition )
 		);
 
-		const imgClasses = classnames(
+		const imgClasses = clsx(
 			'wp-block-cover__image-background',
 			id ? `wp-image-${ id }` : null,
 			{
@@ -642,7 +643,7 @@ const v11 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -681,7 +682,7 @@ const v11 = {
 					) ) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -765,7 +766,7 @@ const v10 = {
 				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
 				 : undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -782,7 +783,7 @@ const v10 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -805,7 +806,7 @@ const v10 = {
 					isImgElement &&
 					url && (
 						<img
-							className={ classnames(
+							className={ clsx(
 								'wp-block-cover__image-background',
 								id ? `wp-image-${ id }` : null
 							) }
@@ -818,7 +819,7 @@ const v10 = {
 					) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -900,7 +901,7 @@ const v9 = {
 				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
 				 : undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -917,7 +918,7 @@ const v9 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -937,7 +938,7 @@ const v9 = {
 
 				{ isImageBackground && isImgElement && url && (
 					<img
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__image-background',
 							id ? `wp-image-${ id }` : null
 						) }
@@ -950,7 +951,7 @@ const v9 = {
 				) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -1032,7 +1033,7 @@ const v8 = {
 				 ? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
 				 : undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			{
 				'is-light': ! isDark,
 				'has-parallax': hasParallax,
@@ -1047,7 +1048,7 @@ const v8 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
-					className={ classnames(
+					className={ clsx(
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
 						'wp-block-cover__gradient-background',
@@ -1064,7 +1065,7 @@ const v8 = {
 
 				{ isImageBackground && isImgElement && url && (
 					<img
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__image-background',
 							id ? `wp-image-${ id }` : null
 						) }
@@ -1077,7 +1078,7 @@ const v8 = {
 				) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -1182,7 +1183,7 @@ const v7 = {
 					? `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round( focalPoint.y * 100 ) }%`
 					: undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
 			{
@@ -1202,7 +1203,7 @@ const v7 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
@@ -1215,7 +1216,7 @@ const v7 = {
 				) }
 				{ isImageBackground && isImgElement && url && (
 					<img
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__image-background',
 							id ? `wp-image-${ id }` : null
 						) }
@@ -1228,7 +1229,7 @@ const v7 = {
 				) }
 				{ isVideoBackground && url && (
 					<video
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__video-background',
 							'intrinsic-ignore'
 						) }
@@ -1333,7 +1334,7 @@ const v6 = {
 			}
 		}
 
-		const classes = classnames(
+		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
 			{
@@ -1353,7 +1354,7 @@ const v6 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
@@ -1436,7 +1437,7 @@ const v5 = {
 		}
 		style.minHeight = minHeight || undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
 			{
@@ -1452,7 +1453,7 @@ const v5 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
@@ -1533,7 +1534,7 @@ const v4 = {
 		}
 		style.minHeight = minHeight || undefined;
 
-		const classes = classnames(
+		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
 			{
@@ -1549,7 +1550,7 @@ const v4 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
@@ -1623,7 +1624,7 @@ const v3 = {
 			}%`;
 		}
 
-		const classes = classnames(
+		const classes = clsx(
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
 			{
@@ -1716,7 +1717,7 @@ const v2 = {
 			style.backgroundColor = customOverlayColor;
 		}
 
-		const classes = classnames(
+		const classes = clsx(
 			'wp-block-cover-image',
 			dimRatioToClassV1( dimRatio ),
 			overlayColorClass,
@@ -1785,7 +1786,7 @@ const v1 = {
 	save( { attributes } ) {
 		const { url, title, hasParallax, dimRatio, align } = attributes;
 		const style = backgroundImageStyles( url );
-		const classes = classnames(
+		const classes = clsx(
 			'wp-block-cover-image',
 			dimRatioToClassV1( dimRatio ),
 			{

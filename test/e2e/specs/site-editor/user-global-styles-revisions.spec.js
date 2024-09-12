@@ -14,7 +14,7 @@ test.use( {
 	},
 } );
 
-test.describe( 'Global styles revisions', () => {
+test.describe( 'Style Revisions', () => {
 	let stylesPostId;
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
@@ -56,8 +56,11 @@ test.describe( 'Global styles revisions', () => {
 
 		// Shows changes made in the revision.
 		await expect(
-			page.getByTestId( 'global-styles-revision-changes' )
-		).toHaveText( 'Colors' );
+			page
+				.getByTestId( 'global-styles-revision-changes' )
+				.getByRole( 'listitem' )
+				.first()
+		).toHaveText( 'Colors styles.' );
 
 		// There should be 2 revisions not including the reset to theme defaults button.
 		await expect( revisionButtons ).toHaveCount(
@@ -98,7 +101,7 @@ test.describe( 'Global styles revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Any unsaved changes will be lost when you apply this revision./
+			/^Are you sure you want to apply this revision\? Any unsaved changes will be lost./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
@@ -152,11 +155,14 @@ test.describe( 'Global styles revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
+		// Search for exact names to avoid selecting the command bar button in the header.
 		const revisionsButton = page.getByRole( 'button', {
 			name: 'Revisions',
+			exact: true,
 		} );
 		const styleBookButton = page.getByRole( 'button', {
 			name: 'Style Book',
+			exact: true,
 		} );
 		await revisionsButton.click();
 		// We can see the Revisions list.
@@ -187,6 +193,64 @@ test.describe( 'Global styles revisions', () => {
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeHidden();
+	} );
+
+	test( 'should close revisions panel and leave style book open if activated', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		await styleBookButton.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		await page.click( 'role=button[name="Back"]' );
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+
+		// The site editor canvas has been restored.
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
+	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page
+			.getByRole( 'button', {
+				name: 'Revisions',
+				exact: true,
+			} )
+			.click();
+
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Revisions',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
+		).toBeVisible();
 	} );
 
 	test( 'should paginate', async ( {

@@ -17,6 +17,10 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
+	 * Custom class name for the tooltip.
+	 */
+	className?: string;
+	/**
 	 * Option to hide the tooltip when the anchor is clicked.
 	 *
 	 * @default true
@@ -61,5 +65,5 @@ export type TooltipProps = {
 };
 
 export type TooltipInternalContext = {
-	isNestedInTooltip?: boolean;
+	isNestedInTooltip: boolean;
 };

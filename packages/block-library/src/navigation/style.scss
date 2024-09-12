@@ -76,15 +76,10 @@ $navigation-icon-size: 24px;
 		}
 	}
 
-	&:where(:not([class*="has-text-decoration"])) {
-		a {
-			text-decoration: none;
-
-			&:focus,
-			&:active {
-				text-decoration: none;
-			}
-		}
+	& :where(a),
+	& :where(a:focus),
+	& :where(a:active) {
+		text-decoration: none;
 	}
 
 	// Submenu indicator.
@@ -300,6 +295,7 @@ button.wp-block-navigation-item__content {
 	color: currentColor;
 	font-size: inherit;
 	font-family: inherit;
+	letter-spacing: inherit;
 	line-height: inherit;
 	font-style: inherit;
 	font-weight: inherit;
@@ -611,19 +607,18 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
-	// When the menu is collapsed, the menu button is visible.
-	// We are using the > selector combined with the :not(is-collapsed) selector
-	// as a way to target the class being added to the parent nav element.
-	:not(.is-collapsed) > & {
-		&:not(.is-menu-open) {
-			display: block;
-			width: 100%;
-			position: relative;
-			z-index: auto;
-			background-color: inherit;
+	@include break-small() {
+		&:not(.hidden-by-default) {
+			&:not(.is-menu-open) {
+				display: block;
+				width: 100%;
+				position: relative;
+				z-index: auto;
+				background-color: inherit;
 
-			.wp-block-navigation__responsive-container-close {
-				display: none;
+				.wp-block-navigation__responsive-container-close {
+					display: none;
+				}
 			}
 		}
 
@@ -687,11 +682,10 @@ button.wp-block-navigation-item__content {
 		font-size: inherit;
 	}
 
-	// When the menu is collapsed, the menu button is visible.
-	// We are using the > selector combined with the :not(is-collapsed) selector
-	// as a way to target the class being added to the parent nav element.
-	:not(.is-collapsed) > & {
-		display: none;
+	&:not(.always-shown) {
+		@include break-small {
+			display: none;
+		}
 	}
 }
 

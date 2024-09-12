@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 
 export type TabsContextProps =
@@ -43,7 +42,7 @@ export type TabsProps = {
 	 * Note: this prop will be overridden by the `selectedTabId` prop if it is
 	 * provided. (Controlled Mode)
 	 */
-	initialTabId?: string;
+	defaultTabId?: string;
 	/**
 	 * The function called when a tab has been selected.
 	 * It is passed the id of the newly selected tab as an argument.

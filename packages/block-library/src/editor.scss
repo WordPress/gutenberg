@@ -1,7 +1,6 @@
 @import "./archives/editor.scss";
 @import "./audio/editor.scss";
 @import "./avatar/editor.scss";
-@import "./block/editor.scss";
 @import "./button/editor.scss";
 @import "./buttons/editor.scss";
 @import "./categories/editor.scss";
@@ -32,6 +31,7 @@
 @import "./nextpage/editor.scss";
 @import "./page-list/editor.scss";
 @import "./paragraph/editor.scss";
+@import "./post-author/editor.scss";
 @import "./post-excerpt/editor.scss";
 @import "./pullquote/editor.scss";
 @import "./rss/editor.scss";
@@ -45,6 +45,7 @@
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
 @import "./table/editor.scss";
+@import "./tag-cloud/editor.scss";
 @import "./template-part/editor.scss";
 @import "./text-columns/editor.scss";
 @import "./video/editor.scss";
@@ -54,20 +55,13 @@
 @import "./query-pagination-numbers/editor.scss";
 @import "./post-featured-image/editor.scss";
 @import "./post-comments-form/editor.scss";
-
+@import "./post-content/editor.scss";
 @import "./editor-elements.scss";
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
 	@include gradient-colors-deprecated();
-}
-
-// This CSS Custom Properties aren't used anymore as defaults,
-// but we still need to keep them for backward compatibility.
-:where(.editor-styles-wrapper) {
-	--wp--preset--font-size--normal: 16px;
-	--wp--preset--font-size--huge: 42px;
 }
 
 // Font sizes (not used now, kept because of backward compatibility).
@@ -80,14 +74,6 @@
 
 :where(.editor-styles-wrapper) .has-larger-font-size {
 	font-size: 42px;
-}
-
-:where(.editor-styles-wrapper) .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal);
-}
-
-:where(.editor-styles-wrapper) .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**

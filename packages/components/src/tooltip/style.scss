@@ -1,6 +1,7 @@
 .components-tooltip {
-	background: $black; // TODO: Discuss with designers.
-	border-radius: $radius-block-ui;
+	background: $black;
+	font-family: $default-font;
+	border-radius: $radius-small;
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;

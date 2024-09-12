@@ -1,6 +1,6 @@
 # Compose
 
-The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
+The `compose` package is a collection of handy [Hooks](https://react.dev/reference/react/hooks) and [Higher Order Components](https://legacy.reactjs.org/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
@@ -11,7 +11,7 @@ const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -69,7 +69,7 @@ This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow-right/>
+-   <https://lodash.com/docs/4#flow-right>
 
 ### createHigherOrderComponent
 
@@ -129,6 +129,14 @@ _Returns_
 
 -   Higher-order component.
 
+### observableMap
+
+A constructor (factory) for `ObservableMap`, a map-like key/value data structure where the individual entries are observable: using the `subscribe` method, you can subscribe to updates for a particular keys. Each subscriber always observes one specific key and is not notified about any unrelated changes (for different keys) in the `ObservableMap`.
+
+_Returns_
+
+-   `ObservableMap< K, V >`: A new instance of the `ObservableMap` type.
+
 ### pipe
 
 Composes multiple higher-order components into a single higher-order component. Performs left-to-right function composition, where each successive invocation is supplied the return value of the previous.
@@ -137,9 +145,11 @@ This is inspired by `lodash`'s `flow` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow/>
+-   <https://lodash.com/docs/4#flow>
 
 ### pure
+
+> **Deprecated** Use `memo` or `PureComponent` instead.
 
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
@@ -237,7 +247,7 @@ Debounces a function similar to Lodash's `debounce`. A new debounced function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/debounce/>
+-   <https://lodash.com/docs/4#debounce>
 
 _Parameters_
 
@@ -255,11 +265,11 @@ Helper hook for input fields that need to debounce the value before using it.
 
 _Parameters_
 
--   _defaultValue_ `any`: The default value to use.
+-   _defaultValue_ The default value to use.
 
 _Returns_
 
--   `[string, Function, string]`: The input value, the setter and the debounced input value.
+-   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -294,6 +304,29 @@ _Parameters_
 _Returns_
 
 -   `import('react').RefCallback<HTMLElement>`: Element Ref.
+
+### useEvent
+
+Creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks. Throws when used in the render phase.
+
+_Usage_
+
+```tsx
+function Component( props ) {
+	const onClick = useEvent( props.onClick );
+	useEffect( () => {
+		onClick();
+		// Won't trigger the effect again when props.onClick is updated.
+	}, [ onClick ] );
+	// Won't re-render Button when props.onClick is updated (if `Button` is
+	// wrapped in `React.memo`).
+	return <Button onClick={ onClick } />;
+}
+```
+
+_Parameters_
+
+-   _callback_ `T`: The callback function to wrap.
 
 ### useFocusableIframe
 
@@ -440,6 +473,19 @@ _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
+### useObservableValue
+
+React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.
+
+_Parameters_
+
+-   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+-   _name_ `K`: The map key to observe.
+
+_Returns_
+
+-   `V | undefined`: The value corresponding to the map key requested.
+
 ### usePrevious
 
 Use something's value from the previous render. Based on <https://usehooks.com/usePrevious/>.
@@ -477,22 +523,29 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen the resize event of any target element when it changes sizes. \_Note: `useResizeObserver` will report `null` until after first render.
+Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API) for an HTML or SVG element.
+
+Pass the returned setter as a callback ref to the React element you want to observe, or use it in layout effects for advanced use cases.
 
 _Usage_
 
-```js
-const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+```tsx
+const setElement = useResizeObserver(
+	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
+	{ box: 'border-box' }
+);
+<div ref={ setElement } />;
 
-	return (
-		<div>
-			{ resizeListener }
-			Your content here
-		</div>
-	);
-};
+// The setter can be used in other ways, for example:
+useLayoutEffect( () => {
+	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
+}, [ elementId ] );
 ```
+
+_Parameters_
+
+-   _callback_ `ResizeObserverCallback`: The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
+-   _options_ `ResizeObserverOptions`: Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 
 ### useStateWithHistory
 
@@ -512,7 +565,7 @@ Throttles a function similar to Lodash's `throttle`. A new throttled function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/throttle/>
+-   <https://lodash.com/docs/4#throttle>
 
 _Parameters_
 
@@ -579,7 +632,7 @@ _Returns_
 
 ### withInstanceId
 
-A Higher Order Component used to be provide a unique instance ID by component.
+A Higher Order Component used to provide a unique instance ID by component.
 
 ### withSafeTimeout
 

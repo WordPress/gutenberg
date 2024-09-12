@@ -4,6 +4,7 @@
 	 * we need to right-align the toggle.
 	 */
 	.components-toggle-control .components-h-stack {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
 		flex-direction: row-reverse;
 	}
 
@@ -12,5 +13,11 @@
 	 */
 	.components-toggle-control .components-h-stack .components-h-stack {
 		flex-direction: row;
+	}
+
+	.block-editor-hooks__block-hooks-helptext {
+		color: $gray-700;
+		font-size: $helptext-font-size;
+		margin-bottom: $grid-unit-20;
 	}
 }

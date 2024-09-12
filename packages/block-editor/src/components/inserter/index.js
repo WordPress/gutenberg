@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { forwardRef, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -76,7 +76,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class PrivateInserter extends Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -207,10 +207,9 @@ class PrivateInserter extends Component {
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName={ classnames(
-					'block-editor-inserter__popover',
-					{ 'is-quick': isQuick }
-				) }
+				contentClassName={ clsx( 'block-editor-inserter__popover', {
+					'is-quick': isQuick,
+				} ) }
 				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile
@@ -223,7 +222,7 @@ class PrivateInserter extends Component {
 	}
 }
 
-export const ComposedPrivateInserter = compose( [
+export default compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
@@ -419,10 +418,4 @@ export const ComposedPrivateInserter = compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( PrivateInserter );
-
-const Inserter = forwardRef( ( props, ref ) => {
-	return <ComposedPrivateInserter ref={ ref } { ...props } />;
-} );
-
-export default Inserter;
+] )( Inserter );

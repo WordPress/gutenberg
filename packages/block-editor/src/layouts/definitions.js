@@ -34,13 +34,13 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child:first-child',
+				selector: ' > :first-child',
 				rules: {
 					'margin-block-start': '0',
 				},
 			},
 			{
-				selector: ' > :last-child:last-child',
+				selector: ' > :last-child',
 				rules: {
 					'margin-block-end': '0',
 				},
@@ -100,13 +100,13 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child:first-child',
+				selector: ' > :first-child',
 				rules: {
 					'margin-block-start': '0',
 				},
 			},
 			{
-				selector: ' > :last-child:last-child',
+				selector: ' > :last-child',
 				rules: {
 					'margin-block-end': '0',
 				},
@@ -134,7 +134,7 @@ export const LAYOUT_DEFINITIONS = {
 				},
 			},
 			{
-				selector: ' > *',
+				selector: ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 				rules: {
 					margin: '0',
 				},
@@ -156,7 +156,7 @@ export const LAYOUT_DEFINITIONS = {
 		displayMode: 'grid',
 		baseStyles: [
 			{
-				selector: ' > *',
+				selector: ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 				rules: {
 					margin: '0',
 				},

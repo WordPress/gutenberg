@@ -23,12 +23,12 @@ jobs:
 
         steps:
             - name: checkout
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Use desired version of Java
-              uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+              uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
               with:
                   distribution: 'corretto'
                   java-version: '17'
@@ -37,7 +37,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Restore tests setup cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
               with:
                   path: |
                       ~/.appium
@@ -47,10 +47,10 @@ jobs:
               run: npm run native test:e2e:setup
 
             - name: Gradle cache
-              uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2.11.1
+              uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
             - name: AVD cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
               id: avd-cache
               with:
                   path: |
@@ -60,7 +60,7 @@ jobs:
 
             - name: Create AVD and generate snapshot for caching
               if: steps.avd-cache.outputs.cache-hit != 'true'
-              uses: reactivecircus/android-emulator-runner@99a4aac18b4df9b3af66c4a1f04c1f23fa10c270 # v2.29.0
+              uses: reactivecircus/android-emulator-runner@f0d1ed2dcad93c7479e8b2f2226c83af54494915 # v2.32.0
               with:
                   api-level: ${{ matrix.api-level }}
                   force-avd-creation: false
@@ -71,7 +71,7 @@ jobs:
                   script: echo "Generated AVD snapshot for caching."
 
             - name: Run tests
-              uses: reactivecircus/android-emulator-runner@99a4aac18b4df9b3af66c4a1f04c1f23fa10c270 # v2.29.0
+              uses: reactivecircus/android-emulator-runner@f0d1ed2dcad93c7479e8b2f2226c83af54494915 # v2.32.0
               with:
                   api-level: ${{ matrix.api-level }}
                   force-avd-creation: false
@@ -81,13 +81,13 @@ jobs:
                   profile: Nexus 6
                   script: npm run native test:e2e:android:local ${{ matrix.native-test-name }}
 
-            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: always()
               with:
                   name: android-screen-recordings
                   path: packages/react-native-editor/android-screen-recordings
 
-            - uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: always()
               with:
                   name: appium-logs

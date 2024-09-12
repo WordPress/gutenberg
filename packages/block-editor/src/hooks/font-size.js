@@ -4,7 +4,6 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
-import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,11 +21,7 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
-import { store as blockEditorStore } from '../store';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -133,7 +128,6 @@ export function FontSizeEdit( props ) {
 			withReset={ false }
 			withSlider
 			size="__unstable-large"
-			__nextHasNoMarginBottom
 		/>
 	);
 }
@@ -154,23 +148,44 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 }
 
 function useBlockProps( { name, fontSize, style } ) {
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
+		'typography.fontSizes',
+		'typography.fluid',
+		'layout'
+	);
 
-	// Only add inline styles if the block supports font sizes,
-	// doesn't skip serialization of font sizes,
-	// doesn't already have an inline font size,
-	// and does have a class to extract the font size from.
+	/*
+	 * Only add inline styles if the block supports font sizes,
+	 * doesn't skip serialization of font sizes,
+	 * and has either a custom font size or a preset font size.
+	 */
 	if (
 		! hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY ) ||
 		shouldSkipSerialization( name, TYPOGRAPHY_SUPPORT_KEY, 'fontSize' ) ||
-		! fontSize
+		( ! fontSize && ! style?.typography?.fontSize )
 	) {
 		return;
 	}
 
-	let props = {};
+	let props;
 
-	if ( ! style?.typography?.fontSize ) {
+	if ( style?.typography?.fontSize ) {
+		props = {
+			style: {
+				fontSize: getTypographyFontSizeValue(
+					{ size: style.typography.fontSize },
+					{
+						typography: {
+							fluid: fluidTypographySettings,
+						},
+						layout: layoutSettings,
+					}
+				),
+			},
+		};
+	}
+
+	if ( fontSize ) {
 		props = {
 			style: {
 				fontSize: getFontSize(
@@ -182,28 +197,8 @@ function useBlockProps( { name, fontSize, style } ) {
 		};
 	}
 
-	// TODO: This sucks! We should be using useSetting( 'typography.fluid' )
-	// or even useSelect( blockEditorStore ). We can't do either here
-	// because getEditWrapperProps is a plain JavaScript function called by
-	// BlockListBlock and not a React component rendered within
-	// BlockListContext.Provider. If we set fontSize using editor.
-	// BlockListBlock instead of using getEditWrapperProps then the value is
-	// clobbered when the core/style/addEditProps filter runs.
-
-	// TODO: We can do the thing above now.
-	const fluidTypographySettings = getFluidTypographyOptionsFromSettings(
-		select( blockEditorStore ).getSettings().__experimentalFeatures
-	);
-
-	if ( fontSize ) {
-		props = {
-			style: {
-				fontSize: getTypographyFontSizeValue(
-					{ size: fontSize },
-					fluidTypographySettings
-				),
-			},
-		};
+	if ( ! props ) {
+		return;
 	}
 
 	return addSaveProps( props, name, { fontSize } );

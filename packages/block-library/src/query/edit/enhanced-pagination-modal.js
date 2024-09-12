@@ -27,7 +27,11 @@ export default function EnhancedPaginationModal( {
 		useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		if ( enhancedPagination && hasUnsupportedBlocks ) {
+		if (
+			enhancedPagination &&
+			hasUnsupportedBlocks &&
+			! window.__experimentalFullPageClientSideNavigation
+		) {
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
 		}
@@ -38,12 +42,12 @@ export default function EnhancedPaginationModal( {
 	};
 
 	let notice = __(
-		'If you still want to prevent full page reloads, remove that block, then disable "Force page reload" again in the Query Block settings.'
+		'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
 	);
 	if ( hasBlocksFromPlugins ) {
 		notice =
 			__(
-				'Currently, avoiding full page reloads is not possible when blocks from plugins are present inside the Query block.'
+				'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
 			) +
 			' ' +
 			notice;
@@ -59,7 +63,7 @@ export default function EnhancedPaginationModal( {
 	return (
 		isOpen && (
 			<Modal
-				title={ __( 'Query block: Force page reload enabled' ) }
+				title={ __( 'Query block: Reload full page enabled' ) }
 				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
@@ -71,7 +75,11 @@ export default function EnhancedPaginationModal( {
 			>
 				<VStack alignment="right" spacing={ 5 }>
 					<span id={ modalDescriptionId }>{ notice }</span>
-					<Button variant="primary" onClick={ closeModal }>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ closeModal }
+					>
 						{ __( 'OK' ) }
 					</Button>
 				</VStack>

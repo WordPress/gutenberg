@@ -102,7 +102,6 @@
 		&.is-error {
 			.components-form-token-field__token-text {
 				color: $alert-red;
-				border-radius: 4px 0 0 4px;
 				padding: 0 4px 0 6px;
 			}
 		}
@@ -133,7 +132,7 @@
 }
 
 .components-form-token-field__token-text {
-	border-radius: 2px 0 0 2px;
+	border-radius: $radius-x-small 0 0 $radius-x-small;
 	padding: 0 0 0 8px;
 	white-space: nowrap;
 	overflow: hidden;
@@ -142,7 +141,7 @@
 
 .components-form-token-field__remove-token.components-button {
 	cursor: pointer;
-	border-radius: 0 2px 2px 0;
+	border-radius: 0 $radius-x-small $radius-x-small 0;
 	padding: 0 2px;
 	color: $gray-900;
 	line-height: 10px;
@@ -180,5 +179,14 @@
 	&.is-selected {
 		background: $components-color-accent;
 		color: $white;
+	}
+
+	&[aria-disabled="true"] {
+		pointer-events: none;
+		color: $gray-600;
+
+		&.is-selected {
+			background-color: $components-color-accent-transparent-40;
+		}
 	}
 }

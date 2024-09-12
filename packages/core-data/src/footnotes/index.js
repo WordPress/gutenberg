@@ -12,17 +12,23 @@ let oldFootnotes = {};
 
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
-	if ( ! meta ) return output;
+	if ( ! meta ) {
+		return output;
+	}
 
 	// If meta.footnotes is empty, it means the meta is not registered.
-	if ( meta.footnotes === undefined ) return output;
+	if ( meta.footnotes === undefined ) {
+		return output;
+	}
 
 	const newOrder = getFootnotesOrder( blocks );
 
 	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
 
-	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return output;
+	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
+		return output;
+	}
 
 	const newFootnotes = newOrder.map(
 		( fnId ) =>
@@ -64,7 +70,9 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			const richTextValue =
 				typeof value === 'string'
 					? RichTextData.fromHTMLString( value )
-					: value;
+					: new RichTextData( value );
+
+			let hasFootnotes = false;
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
@@ -86,13 +94,16 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 					replacement.innerHTML = toHTMLString( {
 						value: countValue,
 					} );
+					hasFootnotes = true;
 				}
 			} );
 
-			attributes[ key ] =
-				typeof value === 'string'
-					? richTextValue.toHTMLString()
-					: richTextValue;
+			if ( hasFootnotes ) {
+				attributes[ key ] =
+					typeof value === 'string'
+						? richTextValue.toHTMLString()
+						: richTextValue;
+			}
 		}
 
 		return attributes;

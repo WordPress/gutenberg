@@ -66,19 +66,6 @@ function bootstrappedBlockTypes( state = {}, action ) {
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// The `selectors` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.3.
-				if (
-					serverDefinition.selectors === undefined &&
-					blockType.selectors
-				) {
-					newDefinition = {
-						...serverDefinition,
-						selectors: blockType.selectors,
-					};
-				}
-
 				// The `blockHooks` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.4.
@@ -90,6 +77,20 @@ function bootstrappedBlockTypes( state = {}, action ) {
 						...serverDefinition,
 						...newDefinition,
 						blockHooks: blockType.blockHooks,
+					};
+				}
+
+				// The `allowedBlocks` prop is not yet included in the server provided
+				// definitions and needs to be polyfilled. This can be removed when the
+				// minimum supported WordPress is >= 6.5.
+				if (
+					serverDefinition.allowedBlocks === undefined &&
+					blockType.allowedBlocks
+				) {
+					newDefinition = {
+						...serverDefinition,
+						...newDefinition,
+						allowedBlocks: blockType.allowedBlocks,
 					};
 				}
 			} else {
@@ -200,13 +201,14 @@ export function blockStyles( state = {}, action ) {
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
-			return {
-				...state,
-				[ action.blockName ]: getUniqueItemsByName( [
-					...( state[ action.blockName ] ?? [] ),
+			const updatedStyles = {};
+			action.blockNames.forEach( ( blockName ) => {
+				updatedStyles[ blockName ] = getUniqueItemsByName( [
+					...( state[ blockName ] ?? [] ),
 					...action.styles,
-				] ),
-			};
+				] );
+			} );
+			return { ...state, ...updatedStyles };
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
@@ -326,7 +328,12 @@ export const groupingBlockName = createBlockNameSetterReducer(
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
 		case 'SET_CATEGORIES':
-			return action.categories || [];
+			// Ensure, that categories are unique by slug.
+			const uniqueCategories = new Map();
+			( action.categories || [] ).forEach( ( category ) => {
+				uniqueCategories.set( category.slug, category );
+			} );
+			return [ ...uniqueCategories.values() ];
 		case 'UPDATE_CATEGORY': {
 			if (
 				! action.category ||
@@ -369,6 +376,60 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Merges usesContext with existing values, potentially defined in the server registration.
+ *
+ * @param {string[]} existingUsesContext Existing `usesContext`.
+ * @param {string[]} newUsesContext      Newly added `usesContext`.
+ * @return {string[]|undefined} Merged `usesContext`.
+ */
+function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
+	const mergedArrays = Array.from(
+		new Set( existingUsesContext.concat( newUsesContext ) )
+	);
+	return mergedArrays.length > 0 ? mergedArrays : undefined;
+}
+
+export function blockBindingsSources( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+					getValues: action.getValues,
+					setValues: action.setValues,
+					canUserEditValue: action.canUserEditValue,
+					getFieldsList: action.getFieldsList,
+				},
+			};
+		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					/*
+					 * Keep the exisitng properties in case the source has been registered
+					 * in the client before bootstrapping.
+					 */
+					...state[ action.name ],
+					label: action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
+	}
+	return state;
+}
+
 export default combineReducers( {
 	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
@@ -381,4 +442,5 @@ export default combineReducers( {
 	groupingBlockName,
 	categories,
 	collections,
+	blockBindingsSources,
 } );

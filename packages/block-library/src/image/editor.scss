@@ -1,43 +1,10 @@
 // Provide special styling for the placeholder.
-// @todo: this particular minimal style of placeholder could be componentized further.
+// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
-	// Show Placeholder style on-select.
-	&.is-selected .components-placeholder {
-		// Block UI appearance.
-		color: $gray-900;
-		background-color: $white;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
-		border: none;
-
-		// Disable any duotone filter applied in the selected state.
-		filter: none !important;
-
-		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
-		border-radius: $radius-block-ui;
-
-		> svg {
-			opacity: 0;
-		}
-
-		.components-placeholder__illustration {
-			display: none;
-		}
-
-		&::before {
-			opacity: 0;
-		}
-	}
-
-	// Remove the transition while we still have a legacy placeholder style.
-	// Otherwise the content jumps between the 1px placeholder border, and any inherited custom
-	// parent border that may get applied when you deselect.
-	.components-placeholder__label,
-	.components-placeholder__instructions,
-	.components-button {
-		transition: none;
+	.block-editor-media-placeholder.is-small {
+		min-height: 60px;
 	}
 }
-
 
 figure.wp-block-image:not(.wp-block) {
 	margin: 0;
@@ -61,6 +28,23 @@ figure.wp-block-image:not(.wp-block) {
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
+		margin: 0;
+	}
+}
+
+// Shown while image is being uploded but cannot be previewed.
+.wp-block-image__placeholder {
+	aspect-ratio: 4 / 3;
+
+	// Make placeholder background white so that you can see the spinner on top of it.
+	&.has-illustration::before {
+		background: $white;
+		opacity: 0.8;
+	}
+
+	// Reduce opacity of diagonal stroke so that it doesn't obscure the spinner.
+	.components-placeholder__illustration {
+		opacity: 0.1;
 	}
 }
 
@@ -129,19 +113,30 @@ figure.wp-block-image:not(.wp-block) {
 	text-align: center;
 }
 
+// Relatively position the alignment container to support the content resizer.
+.wp-block[data-align]:has(> .wp-block-image) {
+	position: relative;
+}
+
 .wp-block-image__crop-area {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
 	overflow: hidden;
 
-	// This removes the border from the img within the image cropper so it
-	// can be applied to the cropper itself. This then allows the image to be
-	// cropped within the visual border providing more accurate editing and
-	// smoother UX.
-	.reactEasyCrop_Container .reactEasyCrop_Image {
-		border: none;
-		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
 	}
 }
 
@@ -164,15 +159,7 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.wp-block-image__aspect-ratio {
-	height: $grid-unit-60 - $border-width - $border-width;
-	margin-bottom: -$grid-unit-10;
-	display: flex;
-	align-items: center;
-
-	.components-button {
-		width: $button-size;
-		padding-left: 0;
-		padding-right: 0;
-	}
+.wp-block-image__toolbar_content_textarea {
+	// Corresponds to the size of the textarea in the block inspector.
+	width: 250px;
 }

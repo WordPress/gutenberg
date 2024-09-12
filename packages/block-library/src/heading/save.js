@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ export default function save( { attributes } ) {
 	const { textAlign, content, level } = attributes;
 	const TagName = 'h' + level;
 
-	const className = classnames( {
+	const className = clsx( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 

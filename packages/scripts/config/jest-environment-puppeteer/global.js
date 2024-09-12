@@ -45,7 +45,9 @@ async function setup( jestConfig = {} ) {
 
 	// If we are in watch mode, - only setupServer() once.
 	if ( jestConfig.watch || jestConfig.watchAll ) {
-		if ( didAlreadyRunInWatchMode ) return;
+		if ( didAlreadyRunInWatchMode ) {
+			return;
+		}
 		didAlreadyRunInWatchMode = true;
 	}
 

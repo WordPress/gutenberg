@@ -2,13 +2,15 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { join, sep } = require( 'path' );
+const { join, sep, basename } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
+const { realpathSync } = require( 'fs' );
 
 /**
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
+const { PhpFilePathsPlugin } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies
@@ -34,6 +36,8 @@ const prefixFunctions = [
 	'wp_style_engine_get_styles',
 	'wp_get_global_settings',
 ];
+
+const classesToSuffix = [ 'WP_Navigation_Block_Renderer' ];
 
 /**
  * Escapes the RegExp special characters.
@@ -88,6 +92,10 @@ module.exports = [
 		plugins: [
 			...plugins,
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
+			new PhpFilePathsPlugin( {
+				context: './packages/block-library/src/',
+				props: [ 'render', 'variations' ],
+			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
 					[
@@ -125,23 +133,42 @@ module.exports = [
 							'build/widgets/blocks/',
 					} ).flatMap( ( [ from, to ] ) => [
 						{
-							from: `${ from }/**/index.php`,
+							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname ] = absoluteFilename.match(
-									new RegExp(
-										`([\\w-]+)${ escapeRegExp(
-											sep
-										) }index\\.php$`
+								const [ , dirname, fileBasename ] =
+									absoluteFilename.match(
+										new RegExp(
+											`([\\w-]+)${ escapeRegExp(
+												sep
+											) }([\\w-]+)\\.php$`
+										)
+									);
+								if ( fileBasename === 'index' ) {
+									return join( to, `${ dirname }.php` );
+								}
+								return join(
+									to,
+									dirname,
+									`${ fileBasename }.php`
+								);
+							},
+							filter: ( filepath ) => {
+								return (
+									basename( filepath ) === 'index.php' ||
+									PhpFilePathsPlugin.paths.includes(
+										realpathSync( filepath ).replace(
+											/\\/g,
+											'/'
+										)
 									)
 								);
-
-								return join( to, `${ dirname }.php` );
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
+								const classSuffix = 'Gutenberg';
 								content = content.toString();
 
-								// Within content, search and prefix any function calls from
+								// Within content, search and prefix any function calls from the
 								// `prefixFunctions` list. This is needed because some functions
 								// are called inside block files, but have been declared elsewhere.
 								// So with the rename we can call Gutenberg override functions, but the
@@ -158,6 +185,19 @@ module.exports = [
 										) }`
 								);
 
+								// Within content, search and prefix any classes calls from the
+								// `classesToSuffix` list. This is needed because some classes
+								// are called inside block files, but also exist in core.
+								// With the rename we can use the Gutenberg class in the plugin,
+								// without having to worry about duplicate class names with core.
+								content = content.replace(
+									new RegExp(
+										classesToSuffix.join( '|' ),
+										'g'
+									),
+									( match ) => `${ match }_${ classSuffix }`
+								);
+
 								// Within content, search for any function definitions. For
 								// each, replace every other reference to it in the file.
 								return (
@@ -172,7 +212,8 @@ module.exports = [
 												// other core prefix (e.g. "wp_").
 												return result.replace(
 													new RegExp(
-														functionName,
+														functionName +
+															'(?![a-zA-Z0-9_])',
 														'g'
 													),
 													( match ) =>

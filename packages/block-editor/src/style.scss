@@ -16,7 +16,6 @@
 @import "./components/block-popover/style.scss";
 @import "./components/block-preview/style.scss";
 @import "./components/block-rename/style.scss";
-@import "./components/block-settings-menu/style.scss";
 @import "./components/block-styles/style.scss";
 @import "./components/block-switcher/style.scss";
 @import "./components/block-types-list/style.scss";
@@ -24,11 +23,11 @@
 @import "./components/block-variation-transforms/style.scss";
 @import "./components/border-radius-control/style.scss";
 @import "./components/colors-gradients/style.scss";
-@import "./components/contrast-checker/style.scss";
 @import "./components/date-format-picker/style.scss";
 @import "./components/duotone-control/style.scss";
 @import "./components/font-appearance-control/style.scss";
 @import "./components/global-styles/style.scss";
+@import "./components/grid/style.scss";
 @import "./components/height-control/style.scss";
 @import "./components/image-size-control/style.scss";
 @import "./components/inserter-list-item/style.scss";
@@ -42,20 +41,17 @@
 @import "./components/responsive-block-control/style.scss";
 @import "./components/rich-text/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
-@import "./components/text-decoration-control/style.scss";
-@import "./components/text-transform-control/style.scss";
+@import "./components/tabbed-sidebar/style.scss";
 @import "./components/tool-selector/style.scss";
 @import "./components/url-input/style.scss";
 @import "./components/url-popover/style.scss";
-@import "./hooks/anchor.scss";
 @import "./hooks/block-hooks.scss";
-@import "./hooks/background.scss";
+@import "./hooks/block-bindings.scss";
 @import "./hooks/border.scss";
 @import "./hooks/color.scss";
 @import "./hooks/dimensions.scss";
 @import "./hooks/layout.scss";
-@import "./hooks/padding.scss";
-@import "./hooks/position.scss";
+@import "./hooks/spacing.scss";
 @import "./hooks/typography.scss";
 
 @import "./components/block-toolbar/style.scss";

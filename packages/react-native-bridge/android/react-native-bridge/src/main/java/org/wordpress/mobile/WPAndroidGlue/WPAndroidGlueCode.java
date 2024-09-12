@@ -18,7 +18,9 @@ import androidx.core.util.Consumer;
 import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 
+import com.BV.LinearGradient.LinearGradientPackage;
 import com.brentvatne.react.ReactVideoPackage;
+import com.dylanvann.fastimage.FastImageViewPackage;
 import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -40,23 +42,22 @@ import com.facebook.react.shell.MainPackageConfig;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.horcrux.svg.SvgPackage;
-import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.clipboard.ClipboardPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
-import org.linusu.RNGetRandomValuesPackage;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.swmansion.gesturehandler.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
-import org.reactnative.maskedview.RNCMaskedViewPackage;
-import com.dylanvann.fastimage.FastImageViewPackage;
 
+import org.linusu.RNGetRandomValuesPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.android.util.AppLog.T;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.BuildConfig;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.LogExceptionCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
@@ -92,7 +93,6 @@ public class WPAndroidGlueCode {
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
-    private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
     private OnSetFeaturedImageListener mOnSetFeaturedImageListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
@@ -102,7 +102,6 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidRequestEmbedFullscreenPreviewListener mOnGutenbergDidRequestEmbedFullscreenPreviewListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
-    private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private OnFocalPointPickerTooltipShownEventListener mOnFocalPointPickerTooltipShownListener;
     private OnGutenbergDidRequestPreviewListener mOnGutenbergDidRequestPreviewListener;
     private OnBlockTypeImpressionsEventListener mOnBlockTypeImpressionsEventListener;
@@ -114,6 +113,8 @@ public class WPAndroidGlueCode {
     private OnToggleRedoButtonListener mOnToggleRedoButtonListener;
     private OnConnectionStatusEventListener mOnConnectionStatusEventListener;
     private OnBackHandlerEventListener mOnBackHandlerEventListener;
+
+    private OnLogExceptionListener mOnLogExceptionListener;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -177,24 +178,12 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
-    public interface OnMediaFilesCollectionBasedBlockEditorListener {
-        void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
-        void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
-        void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
-        void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
-        void onMediaFilesBlockReplaceSync(ArrayList<Object> mediaFiles, String blockId);
-    }
-
     public interface OnImageFullscreenPreviewListener {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
     public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
-    }
-
-    public interface OnReattachMediaSavingQueryListener {
-        void onQueryCurrentProgressForSavingMedia();
     }
 
     public interface OnSetFeaturedImageListener {
@@ -272,6 +261,10 @@ public class WPAndroidGlueCode {
 
     public interface OnBackHandlerEventListener {
         void onBackHandler();
+    }
+
+    public interface OnLogExceptionListener {
+        void onLogException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback);
     }
 
     public void mediaSelectionCancelled() {
@@ -361,12 +354,6 @@ public class WPAndroidGlueCode {
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
                 mOnReattachMediaUploadQueryListener.onQueryCurrentProgressForUploadingMedia();
-            }
-
-            @Override
-            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
-                mMediaSelectedCallback = mediaSelectedCallback;
-                mOnReattachMediaSavingQueryListener.onQueryCurrentProgressForSavingMedia();
             }
 
             @Override
@@ -513,40 +500,6 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
-                mOnMediaFilesCollectionBasedBlockEditorListener
-                        .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
-            }
-
-            @Override
-            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
-                mOnMediaFilesCollectionBasedBlockEditorListener.onRetryUploadForMediaCollection(
-                        mediaFiles.toArrayList()
-                );
-            }
-
-            @Override
-            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
-                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelUploadForMediaCollection(
-                        mediaFiles.toArrayList()
-                );
-            }
-
-            @Override
-            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
-                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
-                        mediaFiles.toArrayList()
-                );
-            }
-
-            @Override
-            public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
-                mOnMediaFilesCollectionBasedBlockEditorListener.onMediaFilesBlockReplaceSync(
-                    mediaFiles.toArrayList(), blockId
-                );
-            }
-
-            @Override
             public void setFocalPointPickerTooltipShown(boolean showTooltip) {
                 mOnFocalPointPickerTooltipShownListener.onSetFocalPointPickerTooltipShown(showTooltip);
             }
@@ -615,6 +568,11 @@ public class WPAndroidGlueCode {
                 boolean isConnected = mOnConnectionStatusEventListener.onRequestConnectionStatus();
                 connectionStatusCallback.onRequestConnectionStatus(isConnected);
             }
+
+            @Override
+            public void logException(GutenbergJsException exception, LogExceptionCallback logExceptionCallback) {
+                mOnLogExceptionListener.onLogException(exception, logExceptionCallback);
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -666,6 +624,10 @@ public class WPAndroidGlueCode {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
+        // Workaround to prevent saving large RN view hierarchies that lead to a `TransactionTooLargeException`
+        // Ref: https://github.com/wordpress-mobile/WordPress-Android/issues/9685#issuecomment-1908452392
+        mReactRootView.setSaveFromParentEnabled(false);
+
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
                                     .setApplication(application)
@@ -689,7 +651,6 @@ public class WPAndroidGlueCode {
     public void attachToContainer(ViewGroup viewGroup,
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
-                                  OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
                                   OnSetFeaturedImageListener onSetFeaturedImageListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
@@ -701,7 +662,6 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidRequestEmbedFullscreenPreviewListener onGutenbergDidRequestEmbedFullscreenPreviewListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
-                                  OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   OnGutenbergDidRequestPreviewListener onGutenbergDidRequestPreviewListener,
                                   OnBlockTypeImpressionsEventListener onBlockTypeImpressionsEventListener,
@@ -711,13 +671,13 @@ public class WPAndroidGlueCode {
                                   OnToggleRedoButtonListener onToggleRedoButtonListener,
                                   OnConnectionStatusEventListener onConnectionStatusEventListener,
                                   OnBackHandlerEventListener onBackHandlerEventListener,
+                                  OnLogExceptionListener onLogExceptionListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
-        mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
         mOnSetFeaturedImageListener = onSetFeaturedImageListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
@@ -728,7 +688,6 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidRequestEmbedFullscreenPreviewListener = onGutenbergDidRequestEmbedFullscreenPreviewListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mShowSuggestionsUtil = showSuggestionsUtil;
-        mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
         mOnFocalPointPickerTooltipShownListener = onFocalPointPickerTooltipListener;
         mOnGutenbergDidRequestPreviewListener = onGutenbergDidRequestPreviewListener;
         mOnBlockTypeImpressionsEventListener = onBlockTypeImpressionsEventListener;
@@ -738,6 +697,7 @@ public class WPAndroidGlueCode {
         mOnToggleRedoButtonListener = onToggleRedoButtonListener;
         mOnConnectionStatusEventListener = onConnectionStatusEventListener;
         mOnBackHandlerEventListener = onBackHandlerEventListener;
+        mOnLogExceptionListener = onLogExceptionListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -884,6 +844,10 @@ public class WPAndroidGlueCode {
 
     public void onRedoPressed() {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onRedoPressed();
+    }
+
+    public void onContentUpdate(String content) {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onContentUpdate(content);
     }
 
     public void setTitle(String title) {

@@ -9,6 +9,7 @@ import { isValidElementType } from 'react-is';
  */
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -17,9 +18,6 @@ import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
-
-const error = ( ...args ) => window?.console?.error?.( ...args );
-const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to
@@ -34,6 +32,37 @@ const LEGACY_CATEGORY_MAPPING = {
 };
 
 /**
+ * Merge block variations bootstrapped from the server and client.
+ *
+ * When a variation is registered in both places, its properties are merged.
+ *
+ * @param {Array} bootstrappedVariations - A block type variations from the server.
+ * @param {Array} clientVariations       - A block type variations from the client.
+ * @return {Array} The merged array of block variations.
+ */
+function mergeBlockVariations(
+	bootstrappedVariations = [],
+	clientVariations = []
+) {
+	const result = [ ...bootstrappedVariations ];
+
+	clientVariations.forEach( ( clientVariation ) => {
+		const index = result.findIndex(
+			( bootstrappedVariation ) =>
+				bootstrappedVariation.name === clientVariation.name
+		);
+
+		if ( index !== -1 ) {
+			result[ index ] = { ...result[ index ], ...clientVariation };
+		} else {
+			result.push( clientVariation );
+		}
+	} );
+
+	return result;
+}
+
+/**
  * Takes the unprocessed block type settings, merges them with block type metadata
  * and applies all the existing filters for the registered block type.
  * Next, it validates all the settings and performs additional processing to the block type definition.
@@ -46,6 +75,8 @@ const LEGACY_CATEGORY_MAPPING = {
 export const processBlockType =
 	( name, blockSettings ) =>
 	( { select } ) => {
+		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
+
 		const blockType = {
 			name,
 			icon: BLOCK_ICON_DEFAULT,
@@ -56,11 +87,19 @@ export const processBlockType =
 			selectors: {},
 			supports: {},
 			styles: [],
-			variations: [],
 			blockHooks: {},
 			save: () => null,
-			...select.getBootstrappedBlockType( name ),
+			...bootstrappedBlockType,
 			...blockSettings,
+			// blockType.variations can be defined as a filePath.
+			variations: mergeBlockVariations(
+				Array.isArray( bootstrappedBlockType?.variations )
+					? bootstrappedBlockType.variations
+					: [],
+				Array.isArray( blockSettings?.variations )
+					? blockSettings.variations
+					: []
+			),
 		};
 
 		const settings = applyFilters(
@@ -106,16 +145,16 @@ export const processBlockType =
 		}
 
 		if ( ! isPlainObject( settings ) ) {
-			error( 'Block settings must be a valid object.' );
+			warning( 'Block settings must be a valid object.' );
 			return;
 		}
 
 		if ( typeof settings.save !== 'function' ) {
-			error( 'The "save" property must be a valid function.' );
+			warning( 'The "save" property must be a valid function.' );
 			return;
 		}
 		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
-			error( 'The "edit" property must be a valid component.' );
+			warning( 'The "edit" property must be a valid component.' );
 			return;
 		}
 
@@ -130,7 +169,7 @@ export const processBlockType =
 				.getCategories()
 				.some( ( { slug } ) => slug === settings.category )
 		) {
-			warn(
+			warning(
 				'The block "' +
 					name +
 					'" is registered with an invalid category "' +
@@ -141,17 +180,17 @@ export const processBlockType =
 		}
 
 		if ( ! ( 'title' in settings ) || settings.title === '' ) {
-			error( 'The block "' + name + '" must have a title.' );
+			warning( 'The block "' + name + '" must have a title.' );
 			return;
 		}
 		if ( typeof settings.title !== 'string' ) {
-			error( 'Block titles must be strings.' );
+			warning( 'Block titles must be strings.' );
 			return;
 		}
 
 		settings.icon = normalizeIconObject( settings.icon );
 		if ( ! isValidIcon( settings.icon.src ) ) {
-			error(
+			warning(
 				'The icon passed is invalid. ' +
 					'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
 			);

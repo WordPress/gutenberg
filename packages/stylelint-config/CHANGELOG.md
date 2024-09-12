@@ -2,6 +2,60 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Updated `stylelint` peer dependency requirement to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended` to `^14.0.1` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Updated `stylelint-config-recommended-scss` to `^14.1.0` and disabled new rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Added `@stylistic/stylelint-plugin` dependency at `^3.0.1` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+-   Migrated stylelint's deprecated rules from v15 to use `@stylistic/stylelint-plugin` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). For more information, see the [stylelint migration guide](https://stylelint.io/migration-guide/to-15). To migrate your rule overrides, you just need to add `@stylistic/` in front of the rule names.
+-   Created new `stylistic` and `scss-stylistic` configs ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). If you want to continue using the exact same rule set as before, you should use these, however if you currently use something like `stylelint-config-prettier` to disable formatting rules, you will want to use the non-stylistic configs (using the same names as before).
+-   `scss/at-import-partial-extension` has been renamed ([#64828](https://github.com/WordPress/gutenberg/pull/64828)). You must convert this rule to `scss/load-partial-extension` instead (name only change).
+
+### Bug Fixes
+
+-   Fixes `declaration-block-no-duplicate-properties` in the `scss` config to use the same value as the base config ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+
+## 22.7.0 (2024-09-05)
+
+## 22.6.0 (2024-08-21)
+
+## 22.5.0 (2024-08-07)
+
+## 22.4.0 (2024-07-24)
+
+## 22.3.0 (2024-07-10)
+
+## 22.2.0 (2024-06-26)
+
+## 22.1.0 (2024-06-15)
+
+## 22.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 21.41.0 (2024-05-16)
+
+## 21.40.0 (2024-05-02)
+
+## 21.39.0 (2024-04-19)
+
+## 21.38.0 (2024-04-03)
+
+## 21.37.0 (2024-03-21)
+
+## 21.36.0 (2024-03-06)
+
+## 21.35.0 (2024-02-21)
+
+## 21.34.0 (2024-02-09)
+
+## 21.33.0 (2024-01-24)
+
+## 21.32.0 (2024-01-10)
+
 ## 21.31.0 (2023-12-13)
 
 ## 21.30.0 (2023-11-29)
@@ -66,19 +120,19 @@
 
 ## 21.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 20.0.0 (2022-01-27)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increased minimum peer dependency of `stylelint` to `14.2.0` ([#38091](https://github.com/WordPress/gutenberg/pull/38091)). See [official migration guide to v14](https://github.com/stylelint/stylelint/blob/14.0.0/docs/migration-guide/to-14.md) for details.
 
 ## 19.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 -   Increased minimum peer dependency of `stylelint` to `13.7.0`.
@@ -89,7 +143,7 @@
 
 ## 18.0.0 (2021-01-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 

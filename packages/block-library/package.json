@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "8.25.1-next.79a6196f.0",
+	"version": "9.7.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -29,6 +30,13 @@
 		"src/**/*.scss",
 		"{src,build,build-module}/*/init.js"
 	],
+	"wpScriptModuleExports": {
+		"./file/view": "./build-module/file/view.js",
+		"./image/view": "./build-module/image/view.js",
+		"./navigation/view": "./build-module/navigation/view.js",
+		"./query/view": "./build-module/query/view.js",
+		"./search/view": "./build-module/search/view.js"
+	},
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/a11y": "file:../a11y",
@@ -51,8 +59,11 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interactivity": "file:../interactivity",
+		"@wordpress/interactivity-router": "file:../interactivity-router",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
@@ -62,7 +73,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
-		"classnames": "^2.3.1",
+		"clsx": "^2.1.1",
 		"colord": "^2.7.0",
 		"escape-html": "^1.0.3",
 		"fast-average-color": "^9.1.1",

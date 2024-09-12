@@ -29,6 +29,9 @@ import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
 
+const DEFAULT_BLOCK = {
+	name: 'core/list-item',
+};
 const TEMPLATE = [ [ 'core/list-item' ] ];
 const NATIVE_MARGIN_SPACING = 8;
 
@@ -107,7 +110,7 @@ function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
-				describedBy={ __( 'Outdent list item' ) }
+				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ outdentList }
 			/>
@@ -125,7 +128,8 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/list-item' ],
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		template: TEMPLATE,
 		templateLock: false,
 		templateInsertUpdatesSelection: true,
@@ -143,7 +147,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
 				title={ __( 'Unordered' ) }
-				describedBy={ __( 'Convert to unordered list' ) }
+				description={ __( 'Convert to unordered list' ) }
 				isActive={ ordered === false }
 				onClick={ () => {
 					setAttributes( { ordered: false } );
@@ -152,7 +156,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatListNumberedRTL : formatListNumbered }
 				title={ __( 'Ordered' ) }
-				describedBy={ __( 'Convert to ordered list' ) }
+				description={ __( 'Convert to ordered list' ) }
 				isActive={ ordered === true }
 				onClick={ () => {
 					setAttributes( { ordered: true } );

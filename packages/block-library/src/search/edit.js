@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ import {
 	ToolbarButton,
 	ResizableBox,
 	PanelBody,
-	BaseControl,
+	__experimentalVStack as VStack,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
@@ -112,13 +112,19 @@ export default function SearchEdit( {
 	] );
 
 	const borderRadius = style?.border?.radius;
-	const borderProps = useBorderProps( attributes );
+	let borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
 	// per-corner styles.
 	if ( typeof borderRadius === 'number' ) {
-		borderProps.style.borderRadius = `${ borderRadius }px`;
+		borderProps = {
+			...borderProps,
+			style: {
+				...borderProps.style,
+				borderRadius: `${ borderRadius }px`,
+			},
+		};
 	}
 
 	const colorProps = useColorProps( attributes );
@@ -168,7 +174,7 @@ export default function SearchEdit( {
 	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
-		return classnames(
+		return clsx(
 			className,
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
@@ -267,7 +273,7 @@ export default function SearchEdit( {
 
 	const renderTextField = () => {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
-		const textFieldClasses = classnames(
+		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
@@ -303,7 +309,7 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
-		const buttonClasses = classnames(
+		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
 			typographyProps.className,
@@ -347,6 +353,7 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<RichText
+						identifier="buttonText"
 						className={ buttonClasses }
 						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
@@ -400,13 +407,15 @@ export default function SearchEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
-					<BaseControl
-						label={ __( 'Width' ) }
-						id={ unitControlInputId }
+				<PanelBody title={ __( 'Settings' ) }>
+					<VStack
+						className="wp-block-search__inspector-controls"
+						spacing={ 4 }
 					>
 						<UnitControl
-							id={ unitControlInputId }
+							__next40pxDefaultSize
+							label={ __( 'Width' ) }
+							id={ unitControlInputId } // unused, kept for backwards compatibility
 							min={
 								isPercentageUnit( widthUnit ) ? 0 : MIN_WIDTH
 							}
@@ -420,7 +429,6 @@ export default function SearchEdit( {
 									parseInt( newWidth, 10 ) > 100
 										? 100
 										: newWidth;
-
 								setAttributes( {
 									width: parseInt( filteredWidth, 10 ),
 								} );
@@ -434,13 +442,12 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							__unstableInputWidth={ '80px' }
+							__unstableInputWidth="80px"
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
-
 						<ButtonGroup
-							className="wp-block-search__components-button-group"
+							className="wp-block-search__components-button-group" // unused, kept for backwards compatibility
 							aria-label={ __( 'Percentage Width' ) }
 						>
 							{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
@@ -466,7 +473,7 @@ export default function SearchEdit( {
 								);
 							} ) }
 						</ButtonGroup>
-					</BaseControl>
+					</VStack>
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -535,7 +542,7 @@ export default function SearchEdit( {
 		},
 	} );
 
-	const labelClassnames = classnames(
+	const labelClassnames = clsx(
 		'wp-block-search__label',
 		typographyProps.className
 	);
@@ -546,6 +553,7 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
+					identifier="label"
 					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
@@ -560,7 +568,7 @@ export default function SearchEdit( {
 				size={ {
 					width: `${ width }${ widthUnit }`,
 				} }
-				className={ classnames(
+				className={ clsx(
 					'wp-block-search__inside-wrapper',
 					isButtonPositionInside ? borderProps.className : undefined
 				) }

@@ -25,6 +25,8 @@ function EditorHistoryRedo( props, ref ) {
 	const { redo } = useDispatch( editorStore );
 	return (
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			{ ...props }
 			ref={ ref }
 			icon={ ! isRTL() ? redoIcon : undoIcon }
@@ -41,4 +43,14 @@ function EditorHistoryRedo( props, ref ) {
 	);
 }
 
+/** @typedef {import('react').Ref<HTMLElement>} Ref */
+
+/**
+ * Renders the redo button for the editor history.
+ *
+ * @param {Object} props - Props.
+ * @param {Ref}    ref   - Forwarded ref.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default forwardRef( EditorHistoryRedo );

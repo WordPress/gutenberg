@@ -1,62 +1,29 @@
-# Interactivity API
+# `@wordpress/interactivity`
 
-> **Warning**
-> **This package is only available in Gutenberg** at the moment and not in WordPress Core as it is still very experimental, and very likely to change. 
+The package `@wordpress/interactivity` contains the logic that enables the Interactivity API which was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
+<div class="callout callout-info">
+    Check the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/">Interactivity API Reference docs in the Block Editor handbook</a> to learn more about the Interactivity API.
+</div>
 
-> **Note**
-> This package enables the API shared at [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) we encourage participation in helping shape this API and the [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) is the best place to engage.
-
-This package can be tested, but it's still very experimental.
-The Interactivity API is [being used in some core blocks](https://github.com/search?q=repo%3AWordPress%2Fgutenberg%20%40wordpress%2Finteractivity&type=code) but its use is still very limited. 
-
-
-## Frequently Asked Questions 
-
-At this point, some of the questions you have about the Interactivity API may be:
-
-### What is this?
-
-This is the base of a new standard to create interactive blocks. Read [the proposal](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/) to learn more about this.
-
-### Can I use it?
-
-You can test it, but it's still very experimental.
-
-### How do I get started?
-
-The best place to start with the Interactivity API is this [**Getting started guide**](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md). There you'll will find a very quick start guide and the current requirements of the Interactivity API.
-
-### Where can I ask questions?
-
-The [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions is the best place to ask questions about the Interactivity API.
-
-### Where can I share my feedback about the API?
-
-The [“Interactivity API” category](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) in Gutenberg repo discussions is also the best place to share your feedback about the Interactivity API.
 
 ## Installation
 
-Install the module:
+Install the Interactivity API using the command:
 
 ```bash
 npm install @wordpress/interactivity --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+This step is only required if you use the Interactivity API outside WordPress.
 
-## Docs & Examples
+Within WordPress, the package is already bundled in Core. To ensure it's loaded, add `@wordpress/interactivity` to the dependency array of the script module. This process is often done automatically with tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/).
 
-**[Interactivity API Documentation](https://github.com/WordPress/gutenberg/tree/trunk/packages/interactivity/docs)** is the best place to learn about this proposal. Although it's still in progress, some key pages are already available:
+Furthermore, this package assumes your code will run in an **ES2015+** environment. If you're using an environment with limited or no support for such language features and APIs, you should include the polyfill shipped in [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code.
 
-- **[Getting Started Guide](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/1-getting-started.md)**: Follow this Getting Started guide to learn how to scaffold a new project and create your first interactive blocks.
-- **[API Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/interactivity/docs/2-api-reference.md)**: Check this page for technical  detailed explanations and examples of the directives and the store.
 
-Here you have some more resources to learn/read more about the Interactivity API:
+## License
 
-- **[Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882)**
-- [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/)
-- Developer Hours sessions ([Americas](https://www.youtube.com/watch?v=RXNoyP2ZiS8&t=664s) & [APAC/EMEA](https://www.youtube.com/watch?v=6ghbrhyAcvA))
-- [wpmovies.dev](http://wpmovies.dev/) demo and its [wp-movies-demo](https://github.com/WordPress/wp-movies-demo) repo
+Interactivity API proposal, as part of Gutenberg and the WordPress project is free software, and is released under the terms of the GNU General Public License version 2 or (at your option) any later version. See [LICENSE.md](https://github.com/WordPress/gutenberg/blob/trunk/LICENSE.md) for complete license.
 
-<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

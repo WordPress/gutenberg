@@ -1,28 +1,36 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import { useStoreState } from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Children, cloneElement } from '@wordpress/element';
+import {
+	Children,
+	useContext,
+	createContext,
+	forwardRef,
+	cloneElement,
+} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import type { TooltipProps, TooltipInternalContext } from './types';
+import type {
+	TooltipProps,
+	TooltipInternalContext as TooltipInternalContextType,
+} from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
-import {
-	contextConnect,
-	useContextSystem,
-	ContextSystemProvider,
-} from '../context';
-import type { WordPressComponentProps } from '../context';
+
+const TooltipInternalContext = createContext< TooltipInternalContextType >( {
+	isNestedInTooltip: false,
+} );
 
 /**
  * Time over anchor to wait before showing tooltip
@@ -30,17 +38,16 @@ import type { WordPressComponentProps } from '../context';
 export const TOOLTIP_DELAY = 700;
 
 const CONTEXT_VALUE = {
-	Tooltip: {
-		isNestedInTooltip: true,
-	},
+	isNestedInTooltip: true,
 };
 
-function UnconnectedTooltip(
-	props: WordPressComponentProps< TooltipProps, 'div', false >,
+function UnforwardedTooltip(
+	props: TooltipProps,
 	ref: React.ForwardedRef< any >
 ) {
 	const {
 		children,
+		className,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
 		placement,
@@ -48,14 +55,10 @@ function UnconnectedTooltip(
 		shortcut,
 		text,
 
-		// From Internal Context system
-		isNestedInTooltip,
-
 		...restProps
-	} = useContextSystem< typeof props & TooltipInternalContext >(
-		props,
-		'Tooltip'
-	);
+	} = props;
+
+	const { isNestedInTooltip } = useContext( TooltipInternalContext );
 
 	const baseId = useInstanceId( Tooltip, 'tooltip' );
 	const describedById = text || shortcut ? baseId : undefined;
@@ -87,29 +90,38 @@ function UnconnectedTooltip(
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	// Removing the `Ariakit` namespace from the hook name allows ESLint to
-	// properly identify the hook, and apply the correct linting rules.
-	const useAriakitTooltipStore = Ariakit.useTooltipStore;
-	const tooltipStore = useAriakitTooltipStore( {
+	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
+	const mounted = useStoreState( tooltipStore, 'mounted' );
 
 	if ( isNestedInTooltip ) {
-		return isOnlyChild
-			? cloneElement( children, {
-					...restProps,
-					ref,
-			  } )
-			: children;
+		return isOnlyChild ? (
+			<Ariakit.Role { ...restProps } render={ children } />
+		) : (
+			children
+		);
+	}
+
+	// TODO: this is a temporary workaround to minimize the effects of the
+	// Ariakit upgrade. Ariakit doesn't pass the `aria-describedby` prop to
+	// the tooltip anchor anymore since 0.4.0, so we need to add it manually.
+	// See: https://github.com/WordPress/gutenberg/pull/64066
+	function addDescribedById( element: React.ReactElement ) {
+		return describedById && mounted
+			? cloneElement( element, { 'aria-describedby': describedById } )
+			: element;
 	}
 
 	return (
-		<ContextSystemProvider value={ CONTEXT_VALUE }>
+		<TooltipInternalContext.Provider value={ CONTEXT_VALUE }>
 			<Ariakit.TooltipAnchor
 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
 				store={ tooltipStore }
-				render={ isOnlyChild ? children : undefined }
+				render={
+					isOnlyChild ? addDescribedById( children ) : undefined
+				}
 				ref={ ref }
 			>
 				{ isOnlyChild ? undefined : children }
@@ -117,6 +129,7 @@ function UnconnectedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
+					className={ clsx( 'components-tooltip', className ) }
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }
@@ -134,10 +147,9 @@ function UnconnectedTooltip(
 					) }
 				</Ariakit.Tooltip>
 			) }
-		</ContextSystemProvider>
+		</TooltipInternalContext.Provider>
 	);
 }
-
-export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
+export const Tooltip = forwardRef( UnforwardedTooltip );
 
 export default Tooltip;

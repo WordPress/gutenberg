@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,8 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 
+const inputLabel = __( 'Search commands and settings' );
+
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
@@ -44,34 +46,29 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			<Command.List>
-				{ commands.map( ( command ) => (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
+			{ commands.map( ( command ) => (
+				<Command.Item
+					key={ command.name }
+					value={ command.searchLabel ?? command.label }
+					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
+				>
+					<HStack
+						alignment="left"
+						className={ clsx( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<HStack
-							alignment="left"
-							className={ classnames(
-								'commands-command-menu__item',
-								{
-									'has-icon': command.icon,
-								}
-							) }
-						>
-							{ command.icon && <Icon icon={ command.icon } /> }
-							<span>
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-						</HStack>
-					</Command.Item>
-				) ) }
-			</Command.List>
+						{ command.icon && <Icon icon={ command.icon } /> }
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
+				</Command.Item>
+			) ) }
 		</>
 	);
 }
@@ -82,11 +79,11 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	// the CommandMenuLoaderWrapper component need to be
 	// remounted on each hook prop change
 	// We use the key state to make sure we do that properly.
-	const currentLoader = useRef( hook );
+	const currentLoaderRef = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		if ( currentLoader.current !== hook ) {
-			currentLoader.current = hook;
+		if ( currentLoaderRef.current !== hook ) {
+			currentLoaderRef.current = hook;
 			setKey( ( prevKey ) => prevKey + 1 );
 		}
 	}, [ hook ] );
@@ -94,7 +91,7 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	return (
 		<CommandMenuLoader
 			key={ key }
-			hook={ currentLoader.current }
+			hook={ currentLoaderRef.current }
 			search={ search }
 			setLoader={ setLoader }
 			close={ close }
@@ -129,7 +126,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -176,7 +173,7 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Search for commands' ) }
+			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
 			icon={ search }
 		/>
@@ -213,7 +210,9 @@ export function CommandMenu() {
 		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {
@@ -265,21 +264,19 @@ export function CommandMenu() {
 			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
+			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command
-					label={ __( 'Command palette' ) }
-					onKeyDown={ onKeyDown }
-				>
+				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
-						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
+						<Icon icon={ inputIcon } />
 					</div>
-					<Command.List>
+					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }

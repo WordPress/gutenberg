@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 import type { Placement } from '@floating-ui/react-dom';
 
@@ -82,6 +81,13 @@ export interface DropdownMenuProps {
 }
 
 export interface DropdownMenuGroupProps {
+	/**
+	 * The contents of the dropdown menu group.
+	 */
+	children: React.ReactNode;
+}
+
+export interface DropdownMenuGroupLabelProps {
 	/**
 	 * The contents of the dropdown menu group.
 	 */

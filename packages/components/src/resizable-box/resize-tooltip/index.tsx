@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { Ref, ForwardedRef } from 'react';
 
 /**
@@ -55,9 +55,11 @@ function ResizeTooltip(
 		position,
 	} );
 
-	if ( ! isVisible ) return null;
+	if ( ! isVisible ) {
+		return null;
+	}
 
-	const classes = classnames( 'components-resize-tooltip', className );
+	const classes = clsx( 'components-resize-tooltip', className );
 
 	return (
 		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>

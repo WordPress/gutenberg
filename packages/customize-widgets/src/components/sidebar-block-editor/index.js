@@ -14,6 +14,7 @@ import {
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -30,6 +31,8 @@ import { unlock } from '../../lock-unlock';
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -48,7 +51,10 @@ export default function SidebarBlockEditor( {
 		const { get } = select( preferencesStore );
 		return {
 			hasUploadPermissions:
-				select( coreStore ).canUser( 'create', 'media' ) ?? true,
+				select( coreStore ).canUser( 'create', {
+					kind: 'root',
+					name: 'media',
+				} ) ?? true,
 			isFixedToolbarActive: !! get(
 				'core/customize-widgets',
 				'fixedToolbar'
@@ -99,6 +105,7 @@ export default function SidebarBlockEditor( {
 	return (
 		<>
 			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
 				<KeyboardShortcuts

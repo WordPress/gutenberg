@@ -7,6 +7,7 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { getLevelFromHeadingNodeName } from './shared';
+import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 
 const transforms = {
 	from: [
@@ -15,12 +16,20 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, anchor, align: textAlign } ) =>
-					createBlock( 'core/heading', {
-						content,
-						anchor,
-						textAlign,
-					} )
+				attributes.map(
+					( { content, anchor, align: textAlign, metadata } ) =>
+						createBlock( 'core/heading', {
+							content,
+							anchor,
+							textAlign,
+							metadata: getTransformedMetadata(
+								metadata,
+								'core/heading',
+								( { content: contentBinding } ) => ( {
+									content: contentBinding,
+								} )
+							),
+						} )
 				),
 		},
 		{
@@ -82,8 +91,18 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				attributes.map( ( { content, textAlign: align } ) =>
-					createBlock( 'core/paragraph', { content, align } )
+				attributes.map( ( { content, textAlign: align, metadata } ) =>
+					createBlock( 'core/paragraph', {
+						content,
+						align,
+						metadata: getTransformedMetadata(
+							metadata,
+							'core/paragraph',
+							( { content: contentBinding } ) => ( {
+								content: contentBinding,
+							} )
+						),
+					} )
 				),
 		},
 	],

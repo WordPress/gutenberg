@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -36,40 +36,41 @@ export default function BlockToolbarPopover( {
 	}, [ clientId ] );
 
 	const { stopTyping } = useDispatch( blockEditorStore );
-	const isToolbarForced = useRef( false );
+	const isToolbarForcedRef = useRef( false );
 
 	useShortcut( 'core/block-editor/focus-toolbar', () => {
-		isToolbarForced.current = true;
+		isToolbarForcedRef.current = true;
 		stopTyping( true );
 	} );
 
 	useEffect( () => {
-		isToolbarForced.current = false;
+		isToolbarForcedRef.current = false;
 	} );
+
+	// If the block has a parent with __experimentalCaptureToolbars enabled,
+	// the toolbar should be positioned over the topmost capturing parent.
+	const clientIdToPositionOver = capturingClientId || clientId;
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
-		clientId,
+		clientId: clientIdToPositionOver,
 	} );
 
 	return (
 		! isTyping && (
 			<BlockPopover
-				clientId={ capturingClientId || clientId }
+				clientId={ clientIdToPositionOver }
 				bottomClientId={ lastClientId }
-				className={ classnames(
-					'block-editor-block-list__block-popover',
-					{
-						'is-insertion-point-visible': isInsertionPointVisible,
-					}
-				) }
+				className={ clsx( 'block-editor-block-list__block-popover', {
+					'is-insertion-point-visible': isInsertionPointVisible,
+				} ) }
 				resize={ false }
 				{ ...popoverProps }
 			>
 				<PrivateBlockToolbar
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced.current }
+					focusOnMount={ isToolbarForcedRef.current }
 					__experimentalInitialIndex={
 						initialToolbarItemIndexRef.current
 					}

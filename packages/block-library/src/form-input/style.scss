@@ -24,6 +24,7 @@
 	*/
 	&:has(input[type="checkbox"]) {
 		width: fit-content;
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
 		flex-direction: row-reverse;
 	}
 }

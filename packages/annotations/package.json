@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "2.48.1-next.79a6196f.0",
+	"version": "3.7.0",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -30,7 +31,6 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/rich-text": "file:../rich-text",
-		"rememo": "^4.0.2",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {

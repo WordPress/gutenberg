@@ -58,6 +58,7 @@ function TrackList( { tracks, onEditPress } ) {
 				>
 					<span>{ track.label } </span>
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onEditPress( index ) }
 						aria-label={ sprintf(
@@ -99,6 +100,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</span>
 				<Grid columns={ 2 } gap={ 4 }>
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						/* eslint-disable jsx-a11y/no-autofocus */
 						autoFocus
@@ -114,6 +116,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 						help={ __( 'Title of track' ) }
 					/>
 					<TextControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						onChange={ ( newSrcLang ) =>
 							onChange( {
@@ -128,6 +131,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 				</Grid>
 				<VStack spacing="8">
 					<SelectControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						className="block-library-video-tracks-editor__single-track-editor-kind-select"
 						options={ KIND_OPTIONS }
@@ -142,6 +146,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					/>
 					<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 						<Button
+							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ () => {
 								const changes = {};
@@ -170,6 +175,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 							{ __( 'Close' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							isDestructive
 							variant="link"
 							onClick={ onRemove }

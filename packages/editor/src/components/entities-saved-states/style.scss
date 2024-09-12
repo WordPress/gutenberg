@@ -15,3 +15,18 @@
 		margin-bottom: $grid-unit-15;
 	}
 }
+
+.entities-saved-states__description-heading {
+	font-size: $default-font-size;
+}
+
+.entities-saved-states__changes {
+	color: $gray-700;
+	font-size: $helptext-font-size;
+	margin: $grid-unit-10 $grid-unit-20 0 $grid-unit-20;
+	list-style: disc;
+
+	li {
+		margin-bottom: $grid-unit-05;
+	}
+}

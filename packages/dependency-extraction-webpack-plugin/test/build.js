@@ -72,6 +72,16 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 					} )
 				);
 
+				/* eslint-disable jest/no-conditional-expect */
+				if ( configCase.includes( 'error' ) ) {
+					expect( stats.hasErrors() ).toBe( true );
+					expect(
+						stats.toString( { errors: true, all: false } )
+					).toMatchSnapshot();
+					return;
+				}
+				/* eslint-enable jest/no-conditional-expect */
+
 				if ( stats.hasErrors() ) {
 					throw new Error(
 						stats.toString( { errors: true, all: false } )
@@ -98,8 +108,12 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 				const compareByModuleIdentifier = ( m1, m2 ) => {
 					const i1 = m1.identifier();
 					const i2 = m2.identifier();
-					if ( i1 < i2 ) return -1;
-					if ( i1 > i2 ) return 1;
+					if ( i1 < i2 ) {
+						return -1;
+					}
+					if ( i1 > i2 ) {
+						return 1;
+					}
 					return 0;
 				};
 

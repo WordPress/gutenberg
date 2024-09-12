@@ -96,11 +96,7 @@ function Interface( { blockEditorSettings } ) {
 			} }
 			header={ <Header /> }
 			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
-			sidebar={
-				hasSidebarEnabled && (
-					<ComplementaryArea.Slot scope="core/edit-widgets" />
-				)
-			}
+			sidebar={ <ComplementaryArea.Slot scope="core/edit-widgets" /> }
 			content={
 				<>
 					<WidgetAreasBlockEditorContent

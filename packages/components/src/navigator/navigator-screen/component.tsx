@@ -17,6 +17,7 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -33,6 +34,12 @@ function UnconnectedNavigatorScreen(
 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	if ( ! /^\//.test( props.path ) ) {
+		warning(
+			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
+	}
+
 	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
@@ -106,7 +113,7 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location?.focusTargetSelector ) {
+		if ( location.isBack && location.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
 				location.focusTargetSelector
 			);
@@ -115,9 +122,7 @@ function UnconnectedNavigatorScreen(
 		// If the previous query didn't run or find any element to focus, fallback
 		// to the first tabbable element in the screen (or the screen itself).
 		if ( ! elementToFocus ) {
-			const firstTabbable = (
-				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
-			 )[ 0 ];
+			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 

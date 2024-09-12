@@ -17,6 +17,8 @@ import { unlock } from '../../lock-unlock';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
  * and the values of the defined color or custom color returns a color object describing the color.
@@ -74,8 +76,6 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	if ( ! colorContextName || ! colorSlug ) {
 		return undefined;
 	}
-
-	const { kebabCase } = unlock( componentsPrivateApis );
 
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
 }

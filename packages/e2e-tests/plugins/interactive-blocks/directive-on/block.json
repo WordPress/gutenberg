@@ -10,6 +10,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "directive-on-view",
+	"viewScriptModule": "file:./view.js",
 	"render": "file:./render.php"
 }

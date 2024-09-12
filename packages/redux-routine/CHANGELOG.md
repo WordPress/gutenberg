@@ -2,6 +2,46 @@
 
 ## Unreleased
 
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 4.58.0 (2024-05-16)
+
+## 4.57.0 (2024-05-02)
+
+## 4.56.0 (2024-04-19)
+
+## 4.55.0 (2024-04-03)
+
+## 4.54.0 (2024-03-21)
+
+## 4.53.0 (2024-03-06)
+
+## 4.52.0 (2024-02-21)
+
+## 4.51.0 (2024-02-09)
+
+## 4.50.0 (2024-01-24)
+
+## 4.49.0 (2024-01-10)
+
 ## 4.48.0 (2023-12-13)
 
 ## 4.47.0 (2023-11-29)
@@ -72,7 +112,7 @@
 
 ## 4.16.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -121,7 +161,7 @@
 
 ## 3.7.0 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Change the `isGenerator` check for better compatibility with generator helper libraries ([#19666](https://github.com/WordPress/gutenberg/pull/19666)).
 
@@ -138,23 +178,23 @@
 
 ## 3.0.2 (2018-10-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
 
 ## 3.0.0 (2018-09-30)
 
-### Breaking change
+### Breaking Changes
 
 -   The middleware returns a promise resolving once the runtime finishes iterating over the generator.
 -   It's not possible to kill the execution of the runtime anymore by returning `undefined`
 
-## Bug Fixes
+### Bug Fixes
 
 -   Fix running routines in Firefox.
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

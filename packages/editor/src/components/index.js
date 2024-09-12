@@ -26,6 +26,15 @@ export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesPanel } from './page-attributes/panel';
 export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template/classic-theme';
+export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
+export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
+export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
+export { default as PluginPostStatusInfo } from './plugin-post-status-info';
+export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
+export { default as PluginPreviewMenuItem } from './plugin-preview-menu-item';
+export { default as PluginSidebar } from './plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './plugin-sidebar-more-menu-item';
 export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
@@ -64,10 +73,7 @@ export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
-export {
-	default as PostSyncStatus,
-	PostSyncStatusModal,
-} from './post-sync-status';
+export { default as PostSyncStatus } from './post-sync-status';
 export { default as PostTaxonomies } from './post-taxonomies';
 export { FlatTermSelector as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
 export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';
@@ -100,5 +106,21 @@ export { default as CharacterCount } from './character-count';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+
+/**
+ * Handles the keyboard shortcuts for the editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
+ */
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+/**
+ * Handles the keyboard shortcuts for the editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
+ */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;

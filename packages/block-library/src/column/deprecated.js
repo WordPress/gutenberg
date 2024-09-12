@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ const deprecated = [
 		save( { attributes } ) {
 			const { verticalAlignment, width } = attributes;
 
-			const wrapperClasses = classnames( {
+			const wrapperClasses = clsx( {
 				[ `is-vertically-aligned-${ verticalAlignment }` ]:
 					verticalAlignment,
 			} );

@@ -7,8 +7,10 @@ export default function convertEditorSettings( data ) {
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'distractionFree',
+		'editorMode',
 		'fixedToolbar',
 		'focusMode',
+		'hiddenBlockTypes',
 		'inactivePanels',
 		'keepCaretInsideBlock',
 		'mostUsedBlocks',
@@ -16,6 +18,9 @@ export default function convertEditorSettings( data ) {
 		'showBlockBreadcrumbs',
 		'showIconLabels',
 		'showListViewByDefault',
+		'isPublishSidebarEnabled',
+		'isComplementaryAreaVisible',
+		'pinnedItems',
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {

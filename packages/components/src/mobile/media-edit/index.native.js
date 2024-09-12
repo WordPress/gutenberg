@@ -3,11 +3,15 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Picker } from '@wordpress/components';
 import {
 	requestMediaEditor,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
+
+/**
+ * Internal dependencies
+ */
+import Picker from '../picker';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 
@@ -103,7 +107,7 @@ export class MediaEdit extends Component {
 				hideCancelButton
 				ref={ ( instance ) => ( this.picker = instance ) }
 				options={ this.getMediaOptionsItems() }
-				leftAlign={ true }
+				leftAlign
 				onChange={ this.onPickerSelect }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ __( 'Media options' ) }

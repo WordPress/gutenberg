@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/a11y",
-	"version": "3.48.1-next.79a6196f.0",
+	"version": "4.7.0",
 	"description": "Accessibility (a11y) utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,12 +21,14 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wpScriptModuleExports": "./build-module/module/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/dom-ready": "file:../dom-ready",

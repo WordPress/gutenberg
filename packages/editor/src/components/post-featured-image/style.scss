@@ -1,20 +1,12 @@
 .editor-post-featured-image {
 	padding: 0;
 
-
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		margin-top: -9px;
 		margin-left: -9px;
-	}
-
-	// This keeps images at their intrinsic size (eg. a 50px
-	// image will never be wider than 50px).
-	.components-responsive-wrapper__content {
-		max-width: 100%;
-		width: auto;
 	}
 }
 
@@ -28,6 +20,21 @@
 			opacity: 1;
 		}
 	}
+
+	.components-drop-zone__content {
+		border-radius: $radius-small;
+	}
+
+	// Align text and icons horizontally to avoid clipping when the featured image is not set.
+	&:has(.editor-post-featured-image__toggle) .components-drop-zone .components-drop-zone__content-inner {
+		display: flex;
+		align-items: center;
+		gap: $grid-unit-10;
+
+		.components-drop-zone__content-icon {
+			margin: 0;
+		}
+	}
 }
 
 .editor-post-featured-image__toggle,
@@ -38,34 +45,31 @@
 	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
+	outline-offset: -#{$border-width};
+	min-height: $grid-unit-50;
 
-	// Apply a max-height.
 	display: flex;
 	justify-content: center;
-	max-height: 150px;
 }
 
 .editor-post-featured-image__preview {
 	height: auto;
+	outline: $border-width solid rgba($black, 0.1);
 
-	.components-responsive-wrapper {
+	.editor-post-featured-image__preview-image {
+		object-fit: cover;
 		width: 100%;
-		background: $gray-100;
+		object-position: 50% 50%;
+		aspect-ratio: 2/1;
 	}
 }
 
 .editor-post-featured-image__toggle {
-	border-radius: $radius-block-ui;
-	background-color: $gray-100;
-	min-height: 90px;
+	height: 100%;
 	line-height: 20px;
 	padding: $grid-unit-10 0;
 	text-align: center;
-
-	&:hover {
-		background: $gray-300;
-		color: $gray-900;
-	}
+	box-shadow: inset 0 0 0 $border-width $gray-400;
 }
 
 .editor-post-featured-image__actions {

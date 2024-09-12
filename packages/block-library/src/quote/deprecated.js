@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { createBlock, parseWithAttributeSchema } from '@wordpress/blocks';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 
 export const migrateToQuoteV2 = ( attributes ) => {
 	const { value, ...restAttributes } = attributes;
@@ -32,6 +32,102 @@ export const migrateToQuoteV2 = ( attributes ) => {
 			  )
 			: createBlock( 'core/paragraph' ),
 	];
+};
+
+const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
+
+// Migrate existing text alignment settings to the renamed attribute.
+const migrateTextAlign = ( attributes, innerBlocks ) => {
+	const { align, ...rest } = attributes;
+	// Check if there are valid alignments stored in the old attribute
+	// and assign them to the new attribute name.
+	const migratedAttributes = TEXT_ALIGN_OPTIONS.includes( align )
+		? { ...rest, textAlign: align }
+		: attributes;
+
+	return [ migratedAttributes, innerBlocks ];
+};
+
+// Migrate the v2 blocks with style === `2`;
+const migrateLargeStyle = ( attributes, innerBlocks ) => {
+	return [
+		{
+			...attributes,
+			className: attributes.className
+				? attributes.className + ' is-style-large'
+				: 'is-style-large',
+		},
+		innerBlocks,
+	];
+};
+
+// Version before the 'align' attribute was replaced with 'textAlign'.
+const v4 = {
+	attributes: {
+		value: {
+			type: 'string',
+			source: 'html',
+			selector: 'blockquote',
+			multiline: 'p',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		citation: {
+			type: 'string',
+			source: 'html',
+			selector: 'cite',
+			default: '',
+			__experimentalRole: 'content',
+		},
+		align: {
+			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		html: false,
+		__experimentalOnEnter: true,
+		__experimentalOnMerge: true,
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+		color: {
+			gradients: true,
+			heading: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+	},
+	isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
+	save( { attributes } ) {
+		const { align, citation } = attributes;
+		const className = clsx( {
+			[ `has-text-align-${ align }` ]: align,
+		} );
+		return (
+			<blockquote { ...useBlockProps.save( { className } ) }>
+				<InnerBlocks.Content />
+				{ ! RichText.isEmpty( citation ) && (
+					<RichText.Content tagName="cite" value={ citation } />
+				) }
+			</blockquote>
+		);
+	},
+	migrate: migrateTextAlign,
 };
 
 const v3 = {
@@ -74,7 +170,7 @@ const v3 = {
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
 
-		const className = classnames( {
+		const className = clsx( {
 			[ `has-text-align-${ align }` ]: align,
 		} );
 
@@ -87,7 +183,9 @@ const v3 = {
 			</blockquote>
 		);
 	},
-	migrate: migrateToQuoteV2,
+	migrate( attributes ) {
+		return migrateTextAlign( ...migrateToQuoteV2( attributes ) );
+	},
 };
 
 const v2 = {
@@ -109,7 +207,9 @@ const v2 = {
 			type: 'string',
 		},
 	},
-	migrate: migrateToQuoteV2,
+	migrate( attributes ) {
+		return migrateTextAlign( ...migrateToQuoteV2( attributes ) );
+	},
 	save( { attributes } ) {
 		const { align, value, citation } = attributes;
 
@@ -151,15 +251,12 @@ const v1 = {
 	migrate( attributes ) {
 		if ( attributes.style === 2 ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateToQuoteV2( {
-				...restAttributes,
-				className: attributes.className
-					? attributes.className + ' is-style-large'
-					: 'is-style-large',
-			} );
+			return migrateTextAlign(
+				...migrateLargeStyle( ...migrateToQuoteV2( restAttributes ) )
+			);
 		}
 
-		return migrateToQuoteV2( attributes );
+		return migrateTextAlign( ...migrateToQuoteV2( attributes ) );
 	},
 
 	save( { attributes } ) {
@@ -206,12 +303,10 @@ const v0 = {
 	migrate( attributes ) {
 		if ( ! isNaN( parseInt( attributes.style ) ) ) {
 			const { style, ...restAttributes } = attributes;
-			return migrateToQuoteV2( {
-				...restAttributes,
-			} );
+			return migrateTextAlign( ...migrateToQuoteV2( restAttributes ) );
 		}
 
-		return migrateToQuoteV2( attributes );
+		return migrateTextAlign( ...migrateToQuoteV2( attributes ) );
 	},
 
 	save( { attributes } ) {
@@ -239,4 +334,4 @@ const v0 = {
  *
  * See block-deprecation.md
  */
-export default [ v3, v2, v1, v0 ];
+export default [ v4, v3, v2, v1, v0 ];

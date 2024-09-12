@@ -25,8 +25,8 @@ import {
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
-	raw: ' "\'><=invalid_path',
-	escaped: " &quot;'&gt;<=invalid_path",
+	raw: '/ "\'><=invalid_path',
+	escaped: "/ &quot;'&gt;<=invalid_path",
 };
 
 const PATHS = {
@@ -162,6 +162,27 @@ function CustomNavigatorToParentButton( {
 			} }
 			{ ...props }
 		/>
+	);
+}
+
+function CustomNavigatorToParentButtonAlternative( {
+	onClick,
+	children,
+}: {
+	children: React.ReactNode;
+	onClick?: CustomTestOnClickHandler;
+} ) {
+	const { goToParent } = useNavigator();
+	return (
+		<button
+			onClick={ () => {
+				goToParent();
+				// Used to spy on the values passed to `navigator.goBack`.
+				onClick?.( { type: 'goToParent' } );
+			} }
+		>
+			{ children }
+		</button>
 	);
 }
 
@@ -344,20 +365,20 @@ const MyHierarchicalNavigation = ( {
 					>
 						{ BUTTON_TEXT.toNestedScreen }
 					</CustomNavigatorButton>
-					<CustomNavigatorToParentButton
+					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton>
+					</CustomNavigatorBackButton>
 				</NavigatorScreen>
 
 				<NavigatorScreen path={ PATHS.NESTED }>
 					<p>{ SCREEN_TEXT.nested }</p>
-					<CustomNavigatorToParentButton
+					<CustomNavigatorBackButton
 						onClick={ onNavigatorButtonClick }
 					>
 						{ BUTTON_TEXT.back }
-					</CustomNavigatorToParentButton>
+					</CustomNavigatorBackButton>
 					<CustomNavigatorGoToBackButton
 						path={ PATHS.CHILD }
 						onClick={ onNavigatorButtonClick }
@@ -371,6 +392,66 @@ const MyHierarchicalNavigation = ( {
 				>
 					{ BUTTON_TEXT.goToWithSkipFocus }
 				</CustomNavigatorGoToSkipFocusButton>
+			</NavigatorProvider>
+		</>
+	);
+};
+
+const MyDeprecatedNavigation = ( {
+	initialPath = PATHS.HOME,
+	onNavigatorButtonClick,
+}: {
+	initialPath?: string;
+	onNavigatorButtonClick?: CustomTestOnClickHandler;
+} ) => {
+	return (
+		<>
+			<NavigatorProvider initialPath={ initialPath }>
+				<NavigatorScreen path={ PATHS.HOME }>
+					<p>{ SCREEN_TEXT.home }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable home screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.CHILD }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toChildScreen }
+					</CustomNavigatorButton>
+				</NavigatorScreen>
+
+				<NavigatorScreen path={ PATHS.CHILD }>
+					<p>{ SCREEN_TEXT.child }</p>
+					{ /*
+					 * A button useful to test focus restoration. This button is the first
+					 * tabbable item in the screen, but should not receive focus when
+					 * navigating to screen as a result of a backwards navigation.
+					 */ }
+					<button>First tabbable child screen button</button>
+					<CustomNavigatorButton
+						path={ PATHS.NESTED }
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.toNestedScreen }
+					</CustomNavigatorButton>
+					<CustomNavigatorToParentButton
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButton>
+				</NavigatorScreen>
+
+				<NavigatorScreen path={ PATHS.NESTED }>
+					<p>{ SCREEN_TEXT.nested }</p>
+					<CustomNavigatorToParentButtonAlternative
+						onClick={ onNavigatorButtonClick }
+					>
+						{ BUTTON_TEXT.back }
+					</CustomNavigatorToParentButtonAlternative>
+				</NavigatorScreen>
 			</NavigatorProvider>
 		</>
 	);
@@ -559,6 +640,14 @@ describe( 'Navigator', () => {
 		expect(
 			getNavigationButton( 'toInvalidHtmlPathScreen' )
 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
+	} );
+
+	it( 'should warn if the `path` prop does not follow the required format', () => {
+		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
 	} );
 
 	it( 'should match correctly paths with named arguments', async () => {
@@ -767,6 +856,55 @@ describe( 'Navigator', () => {
 					name: 'First tabbable child screen button',
 				} )
 			).toHaveFocus();
+		} );
+	} );
+
+	describe( 'deprecated APIs', () => {
+		it( 'should log a deprecation notice when using the NavigatorToParentButton component', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.CHILD } /> );
+
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+
+			// Navigate back to home screen.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'home' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable home screen button',
+				} )
+			).toHaveFocus();
+
+			// Rendering `NavigatorToParentButton` logs a deprecation notice
+			expect( console ).toHaveWarnedWith(
+				'wp.components.NavigatorToParentButton is deprecated since version 6.7. Please use wp.components.NavigatorBackButton instead.'
+			);
+		} );
+
+		it( 'should log a deprecation notice when using the useNavigator().goToParent() function', async () => {
+			const user = userEvent.setup();
+
+			render( <MyDeprecatedNavigation initialPath={ PATHS.NESTED } /> );
+
+			expect( getScreen( 'nested' ) ).toBeInTheDocument();
+
+			// Navigate back to child screen using the back button.
+			// The first tabbable element receives focus, since focus restoration
+			// it not possible (there was no forward navigation).
+			await user.click( getNavigationButton( 'back' ) );
+			expect( getScreen( 'child' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'First tabbable child screen button',
+				} )
+			).toHaveFocus();
+
+			expect( console ).toHaveWarnedWith(
+				'wp.components.useNavigator().goToParent is deprecated since version 6.7. Please use wp.components.useNavigator().goBack instead.'
+			);
 		} );
 	} );
 } );

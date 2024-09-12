@@ -183,12 +183,15 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Switch to draft' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Save',
+				exact: true,
+			} )
 			.click();
-		// FIXME: The confirmation dialog is not named yet.
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
 		// Wait for the status change.
 		// @see https://github.com/WordPress/gutenberg/pull/43933

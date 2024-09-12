@@ -236,8 +236,9 @@ test.describe( 'Paragraph', () => {
 
 				{
 					// Dragging on the top half of the heading block.
+					// Make sure to target the top dropzone by dragging > 30px inside the block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + 1
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();
@@ -252,8 +253,9 @@ test.describe( 'Paragraph', () => {
 
 				{
 					// Dragging on the bottom half of the heading block.
+					// Make sure to target the bottom dropzone by dragging > 30px inside the block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + headingBox.height - 1
 					);
 					await expect( draggingUtils.dropZone ).toBeHidden();
@@ -267,6 +269,26 @@ test.describe( 'Paragraph', () => {
 								.then( ( { y, height } ) => y + height )
 						)
 						.toBeGreaterThan( headingBox.y + headingBox.height );
+				}
+
+				{
+					// Dragging on the right edge of the heading block.
+					// Targets the right hand dropzone.
+					await draggingUtils.dragOver(
+						headingBox.x + headingBox.width - 1,
+						headingBox.y + headingBox.height - 1
+					);
+					await expect( draggingUtils.dropZone ).toBeHidden();
+					await expect(
+						draggingUtils.insertionIndicator
+					).toBeVisible();
+					await expect
+						.poll( () =>
+							draggingUtils.insertionIndicator
+								.boundingBox()
+								.then( ( { x, width } ) => x + width )
+						)
+						.toBe( headingBox.x + headingBox.width );
 				}
 			} );
 
@@ -299,7 +321,7 @@ test.describe( 'Paragraph', () => {
 				{
 					// Dragging on the top half of the heading block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + 1
 					);
 					await expect( draggingUtils.dropZone ).toBeHidden();
@@ -318,7 +340,7 @@ test.describe( 'Paragraph', () => {
 				{
 					// Dragging on the bottom half of the heading block.
 					await draggingUtils.dragOver(
-						headingBox.x,
+						headingBox.x + 32,
 						headingBox.y + headingBox.height - 1
 					);
 					await expect( draggingUtils.dropZone ).toBeVisible();

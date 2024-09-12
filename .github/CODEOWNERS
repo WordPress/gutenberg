@@ -1,9 +1,9 @@
 # Documentation
-/docs                                           @ajitbohra @ryanwelcher @juanmaguitar @fabiankaegy @ndiego
+/docs                                           @ajitbohra @juanmaguitar @fabiankaegy @ndiego
 /packages/interactivity/docs                    @juanmaguitar
 
 # Schemas
-/schemas/json                                   @ajlende
+/schemas/json
 
 # Data
 /packages/api-fetch                             @nerrad @mmtr
@@ -15,25 +15,23 @@
 # Blocks
 /packages/block-library                         @ajitbohra
 /packages/block-library/src/gallery             @geriux
-/packages/block-library/src/navigation          @tellthemachines
-/packages/block-library/src/navigation-link     @tellthemachines
-/packages/block-library/src/navigation-submenu  @tellthemachines
-/packages/block-library/src/page-list           @tellthemachines
 /packages/block-library/src/comment-template    @michalczaplinski
 /packages/block-library/src/comments            @michalczaplinski
 /packages/block-library/src/table-of-contents   @ZebulanStanphill
-/packages/block-library/src/image								@artemiomorales @michalczaplinski
+/packages/block-library/src/image               @artemiomorales
 
 # Duotone
-/lib/block-supports/duotone.php                       @ajlende
-/packages/block-editor/src/components/duotone-control @ajlende
-/packages/block-editor/src/hooks/duotone.js           @ajlende
-/packages/components/src/duotone-picker               @ajlende
+/lib/block-supports/duotone.php
+/packages/block-editor/src/components/duotone-control
+/packages/block-editor/src/hooks/duotone.js
+/packages/components/src/duotone-picker
 
 # Editor
 /packages/annotations                           @atimmer
 /packages/autop
 /packages/block-editor                          @ellatrix
+/packages/block-editor/src/hooks                @tellthemachines
+/packages/block-editor/src/layouts              @tellthemachines
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
 /packages/blocks
@@ -49,9 +47,9 @@
 /packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
-/packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
-/packages/customize-widgets                     @noisysocks
-/packages/widgets                               @noisysocks
+/packages/edit-widgets                          @draganescu @adamziel @kevin940726
+/packages/customize-widgets
+/packages/widgets
 
 # Full Site Editing
 /packages/edit-site
@@ -83,8 +81,7 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726 @Mamaduka
-/test/php/gutenberg-coding-standards			@anton-vlasenko
+/test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
 /packages/components                            @ajitbohra
@@ -122,20 +119,22 @@
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
-/packages/format-library                        @ellatrix @fluiddot @dcalhoun
-/packages/rich-text                             @ellatrix @fluiddot @dcalhoun
-/packages/block-editor/src/components/rich-text @ellatrix @fluiddot @dcalhoun
+/packages/format-library                        @ellatrix
+/packages/rich-text                             @ellatrix
+/packages/block-editor/src/components/rich-text @ellatrix
 
 # Project Management
-/.github
+/.github                                        @desrosj
 /packages/project-management-automation
 /packages/report-flaky-tests                    @kevin940726
 
 # wp-env
-/packages/env                                   @noahtallen @ObliviousHarmony @t-hamano
+/packages/env                                   @ObliviousHarmony @t-hamano
 
 # PHP
 /lib                                            @spacedmonkey
+/lib/block-supports/layout.php                  @tellthemachines
+/lib/class-wp-theme-json-gutenberg.php          @tellthemachines
 /lib/compat/*/html-api                          @dmsnell
 /lib/experimental/rest-api.php                  @timothybjacobs
 /lib/experimental/class-wp-rest-*               @timothybjacobs

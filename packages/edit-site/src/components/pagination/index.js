@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,8 @@ import {
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf, isRTL } from '@wordpress/i18n';
+import { previous, chevronLeft, chevronRight, next } from '@wordpress/icons';
 
 export default function Pagination( {
 	currentPage,
@@ -30,7 +31,7 @@ export default function Pagination( {
 			aria-label={ label }
 			spacing={ 3 }
 			justify="flex-start"
-			className={ classnames( 'edit-site-pagination', className ) }
+			className={ clsx( 'edit-site-pagination', className ) }
 		>
 			<Text variant="muted" className="edit-site-pagination__total">
 				{
@@ -46,19 +47,21 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
-					aria-label={ __( 'First page' ) }
-				>
-					«
-				</Button>
+					label={ __( 'First page' ) }
+					icon={ isRTL() ? next : previous }
+					size="compact"
+				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
-					aria-label={ __( 'Previous page' ) }
-				>
-					‹
-				</Button>
+					label={ __( 'Previous page' ) }
+					icon={ isRTL() ? chevronRight : chevronLeft }
+					size="compact"
+				/>
 			</HStack>
 			<Text variant="muted">
 				{ sprintf(
@@ -72,19 +75,21 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
-					aria-label={ __( 'Next page' ) }
-				>
-					›
-				</Button>
+					label={ __( 'Next page' ) }
+					icon={ isRTL() ? chevronLeft : chevronRight }
+					size="compact"
+				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
-					aria-label={ __( 'Last page' ) }
-				>
-					»
-				</Button>
+					label={ __( 'Last page' ) }
+					icon={ isRTL() ? previous : next }
+					size="compact"
+				/>
 			</HStack>
 		</HStack>
 	);

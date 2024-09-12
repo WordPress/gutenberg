@@ -28,9 +28,11 @@ const changedPackages = [
 	fs.existsSync( path.join( packageRoot, 'tsconfig.json' ) )
 );
 
-try {
-	execa.sync( tscPath, [ '--build', ...changedPackages ] );
-} catch ( err ) {
-	console.error( err.stdout );
-	process.exitCode = 1;
+if ( changedPackages.length > 0 ) {
+	try {
+		execa.sync( tscPath, [ '--build', ...changedPackages ] );
+	} catch ( err ) {
+		console.error( err.stdout );
+		process.exitCode = 1;
+	}
 }

@@ -64,7 +64,7 @@
  */
 
 @mixin block-toolbar-button-style__focus() {
-	box-shadow: inset 0 0 0 $border-width var(--wp-components-color-background, $white), 0 0 0 var(--wp-admin-border-width-focus) var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	box-shadow: inset 0 0 0 $border-width $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
@@ -74,7 +74,7 @@
 @mixin input-style__neutral() {
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	border: $border-width solid $gray-600;
 	@include reduce-motion("transition");
 }
@@ -162,22 +162,6 @@
 	}
 }
 
-@mixin placeholder-style() {
-	border-radius: $radius-block-ui;
-
-	&::before {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		pointer-events: none;
-		background: currentColor;
-		opacity: 0.1;
-	}
-}
-
 /**
  * Allows users to opt-out of animations via OS-level preferences.
  */
@@ -243,7 +227,7 @@
 	border: $border-width solid $gray-900;
 	margin-right: $grid-unit-15;
 	transition: none;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
 	&:focus {
 		box-shadow: 0 0 0 ($border-width * 2) $white, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) var(--wp-admin-theme-color);
@@ -284,9 +268,8 @@
 			display: inline-block;
 			vertical-align: middle;
 			width: 16px;
-			/* stylelint-disable */
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
 			font: normal 30px/1 dashicons;
-			/* stylelint-enable */
 			speak: none;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -296,6 +279,16 @@
 				font-size: 21px;
 			}
 		}
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: $gray-100;
+		border-color: $gray-300;
+		cursor: default;
+
+		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
+		opacity: 1;
 	}
 }
 
@@ -307,17 +300,25 @@
 	border-radius: $radius-round;
 	width: $radio-input-size-sm;
 	height: $radio-input-size-sm;
+	min-width: $radio-input-size-sm;
+	max-width: $radio-input-size-sm;
+	position: relative;
 
 	@include break-small() {
 		height: $radio-input-size;
 		width: $radio-input-size;
+		min-width: $radio-input-size;
+		max-width: $radio-input-size;
 	}
 
 	&:checked::before {
 		box-sizing: inherit;
-		width: 8px;
-		height: 8px;
-		transform: translate(7px, 7px);
+		width: math.div($radio-input-size-sm, 2);
+		height: math.div($radio-input-size-sm, 2);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		margin: 0;
 		background-color: $white;
 
@@ -325,7 +326,8 @@
 		border: 4px solid $white;
 
 		@include break-small() {
-			transform: translate(5px, 5px);
+			width: math.div($radio-input-size, 2);
+			height: math.div($radio-input-size, 2);
 		}
 	}
 
@@ -338,7 +340,7 @@
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
+		border: none;
 	}
 }
 
@@ -357,6 +359,14 @@
 	}
 }
 
+@mixin link-reset {
+	&:focus {
+		color: var(--wp-admin-theme-color--rgb);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		border-radius: $radius-small;
+	}
+}
+
 // The editor input reset with increased specificity to avoid theme styles bleeding in.
 @mixin editor-input-reset() {
 	font-family: $editor-html-font !important;
@@ -365,7 +375,7 @@
 	padding: $grid-unit-15 !important;
 	border: $border-width solid $gray-900 !important;
 	box-shadow: none !important;
-	border-radius: $radius-block-ui !important;
+	border-radius: $radius-small !important;
 
 	// Fonts smaller than 16px causes mobile safari to zoom.
 	font-size: $mobile-text-min-font-size !important;
@@ -500,12 +510,9 @@
 
 // Deprecated from UI, kept for back-compat.
 @mixin gradient-colors-deprecated() {
-	/*
-	 * Our classes uses the same values we set for gradient value attributes,
-	 * and we can not use spacing because of WP multi site kses rule.
-	 */
+	// Our classes uses the same values we set for gradient value attributes.
 
-	/* stylelint-disable function-comma-space-after */
+	/* stylelint-disable @stylistic/function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
 	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
 		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}
@@ -533,7 +540,7 @@
 	.has-midnight-gradient-background {
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
-	/* stylelint-enable function-comma-space-after */
+	/* stylelint-enable @stylistic/function-comma-space-after */
 }
 
 @mixin custom-scrollbars-on-hover($handle-color, $handle-color-hover) {
@@ -578,4 +585,22 @@
 			scrollbar-color: $handle-color-hover transparent;
 		}
 	}
+}
+
+@mixin selected-block-outline($widthRatio: 1) {
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+}
+
+@mixin selected-block-focus($widthRatio: 1) {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	@include selected-block-outline($widthRatio);
 }

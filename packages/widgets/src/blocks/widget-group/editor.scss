@@ -1,7 +1,7 @@
 .wp-block-widget-group {
 	&.has-child-selected::after {
-		border-radius: $radius-block-ui;
-		border: 1px solid var(--wp-admin-theme-color);
+		border-radius: $radius-small;
+		border: $border-width solid var(--wp-admin-theme-color);
 		bottom: 0;
 		content: "";
 		left: 0;

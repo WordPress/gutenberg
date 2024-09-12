@@ -1,0 +1,282 @@
+.editor-header {
+	height: $header-height;
+	background: $white;
+	display: grid;
+	grid-auto-flow: row;
+	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
+	&:has(> .editor-header__center) {
+		grid-template: auto / $header-height min-content 1fr min-content $header-height;
+		@include break-medium {
+			grid-template: auto / $header-height minmax(min-content, 1fr) 2fr minmax(min-content, 1fr) $header-height;
+		}
+	}
+	@include break-mobile {
+		gap: $grid-unit-20;
+	}
+	align-items: center;
+	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
+	justify-content: space-between;
+
+	// Make toolbar sticky on larger breakpoints
+	@include break-zoomed-in {
+		flex-wrap: nowrap;
+	}
+}
+
+.editor-header__toolbar {
+	grid-column: 1 / 3;
+	// When there is no back button or the viewport is <= mobile the margin keeps the content off
+	// the starting edge.
+	> :first-child {
+		margin-inline: $grid-unit-20 0;
+	}
+
+	// This is the typical case, the back button takes up the first column.
+	.editor-header__back-button + & {
+		grid-column: 2 / 3;
+
+		@include break-mobile {
+			// Clears the margin; at this breakpoint the parent’s `gap` takes its place.
+			> :first-child {
+				margin-inline: 0;
+			}
+		}
+	}
+	display: flex;
+	// Make narrowing to less than content width possible. Block toolbar will hide overflow and allow scrolling on fixed toolbar.
+	min-width: 0;
+	align-items: center;
+	// Clip the box while leaving room for focus rings.
+	clip-path: inset(-2px);
+	@include break-mobile {
+		clip-path: none;
+	}
+
+	.table-of-contents {
+		display: none;
+
+		@include break-small() {
+			display: block;
+		}
+	}
+
+	// Add a gap before the block toolbar or its toggle button when collapsed.
+	.editor-collapsible-block-toolbar {
+		margin-inline: $grid-unit 0;
+
+		&.is-collapsed ~ .editor-collapsible-block-toolbar__toggle {
+			margin-inline: $grid-unit 0;
+		}
+	}
+}
+
+.editor-header__center {
+	grid-column: 3 / 4;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	// To enable shrinking and truncating of child text, apply an explicit min-width.
+	min-width: 0;
+	// Clip the box while leaving room for focus rings.
+	clip-path: inset(-2px);
+	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
+	// gap around the center’s contents.
+	@media (max-width: #{$break-mobile - 1}) {
+		> :first-child {
+			margin-inline-start: $grid-unit;
+		}
+		> :last-child {
+			margin-inline-end: $grid-unit;
+		}
+	}
+}
+
+/**
+ * Buttons on the right side
+ */
+
+.editor-header__settings {
+	grid-column: 3 / -1;
+	.editor-header:has(> .editor-header__center) & {
+		grid-column: 4 / -1;
+	}
+	justify-self: end;
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: nowrap;
+	padding-right: $grid-unit-05;
+
+	@include break-small () {
+		padding-right: $grid-unit-10;
+	}
+
+	gap: $grid-unit-10;
+}
+
+/**
+ * Show icon labels.
+ */
+
+.show-icon-labels.interface-pinned-items,
+.show-icon-labels .editor-header {
+	.components-button.has-icon {
+		width: auto;
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+		}
+		&[aria-disabled="true"] {
+			background-color: transparent;
+		}
+	}
+	.is-tertiary {
+		&:active {
+			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
+			background-color: transparent;
+		}
+	}
+	// Exception for drodpdown toggle buttons.
+	.components-button.has-icon.button-toggle {
+		svg {
+			display: block;
+		}
+		&::after {
+			content: none;
+		}
+	}
+
+	// Don't hide MenuItemsChoice check icons
+	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
+		display: block;
+	}
+	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
+	.interface-pinned-items .components-button {
+		padding-left: $grid-unit;
+		padding-right: $grid-unit;
+
+		@include break-small {
+			padding-left: $grid-unit-15;
+			padding-right: $grid-unit-15;
+		}
+	}
+
+	.editor-post-save-draft.editor-post-save-draft,
+	.editor-post-saved-state.editor-post-saved-state {
+		&::after {
+			content: none;
+		}
+	}
+}
+
+.show-icon-labels {
+	.editor-header__toolbar .block-editor-block-mover {
+		// Modified group borders.
+		border-left: none;
+
+		&::before {
+			content: "";
+			width: $border-width;
+			height: $grid-unit-30;
+			background-color: $gray-300;
+			margin-top: $grid-unit-05;
+			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
+		}
+	}
+}
+
+.show-icon-labels.interface-pinned-items {
+	padding: 6px $grid-unit-15 $grid-unit-15;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: -$grid-unit-15;
+	margin-right: -$grid-unit-15;
+	border-bottom: 1px solid $gray-400;
+	display: block;
+
+	> .components-button.has-icon {
+		margin: 0;
+		padding: 6px 6px 6px $grid-unit;
+		width: 14.625rem;
+		justify-content: flex-start;
+
+		&[aria-expanded="true"] svg {
+			display: block;
+			max-width: $grid-unit-30;
+		}
+		&[aria-expanded="false"] {
+			padding-left: $grid-unit-50;
+		}
+		svg {
+			margin-right: 8px;
+		}
+	}
+}
+
+.editor-header__post-preview-button {
+	@include break-mobile {
+		display: none;
+	}
+}
+
+.editor-editor-interface.is-distraction-free {
+	.interface-interface-skeleton__header {
+		border-bottom: none;
+	}
+
+	.editor-header {
+		background-color: $white;
+		width: 100%;
+
+		@include break-medium {
+			box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+			position: absolute;
+		}
+
+
+		// hide some parts
+		& > .edit-post-header__settings > .edit-post-header__post-preview-button {
+			visibility: hidden;
+		}
+
+		& > .editor-header__toolbar .editor-document-tools__document-overview-toggle,
+		& > .editor-header__settings > .editor-preview-dropdown,
+		& > .editor-header__settings > .interface-pinned-items {
+			display: none;
+		}
+
+	}
+
+	// We need ! important because we override inline styles
+	// set by the motion component.
+	.interface-interface-skeleton__header:focus-within {
+		opacity: 1 !important;
+		div {
+			transform: translateX(0) translateZ(0) !important;
+		}
+
+	}
+
+	.components-editor-notices__dismissible {
+		position: absolute;
+		z-index: 35;
+	}
+}
+
+.components-popover.more-menu-dropdown__content {
+	z-index: z-index(".components-popover.more-menu__content");
+}

@@ -1,6 +1,6 @@
 # Attributes
 
-Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background colour, or a button title.
+Block attributes provide information about the data stored by a block. For example, rich content, a list of image URLs, a background color, or a button title.
 
 A block can contain any number of attributes, and these are specified by the `attributes` field - an object where each key is the name of the attribute, and the value is the attribute definition.
 
@@ -66,7 +66,7 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 <!-- /block:your-block -->
 ```
 
-If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
+If an attribute changes over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
 ## Type validation
 
@@ -374,9 +374,6 @@ Attribute definition:
 ```
 
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
-
-
-{% JSX %}
 
 ```js
 edit( { attributes, setAttributes } ) {

@@ -130,28 +130,39 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
 				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
-			'background image style with contain, position, and repeat is applied' => array(
+			'background image style is applied when backgroundImage is a string' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
 				'background_settings' => array(
 					'backgroundImage' => true,
 				),
 				'background_style'    => array(
-					'backgroundImage'  => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
-					),
-					'backgroundRepeat' => 'no-repeat',
-					'backgroundSize'   => 'contain',
+					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-position:center;background-repeat:no-repeat;background-size:contain;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background image style with contain, position, attachment, and repeat is applied' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-rules-are-output',
+				'background_settings' => array(
+					'backgroundImage' => true,
+				),
+				'background_style'    => array(
+					'backgroundImage'      => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'backgroundRepeat'     => 'no-repeat',
+					'backgroundSize'       => 'contain',
+					'backgroundAttachment' => 'fixed',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-position:50% 50%;background-repeat:no-repeat;background-size:contain;background-attachment:fixed;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background image style is appended if a style attribute already exists' => array(
@@ -162,8 +173,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
@@ -177,8 +187,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
 				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
@@ -192,8 +201,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
 				'expected_wrapper'    => '<div>Content</div>',

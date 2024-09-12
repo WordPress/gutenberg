@@ -12,12 +12,11 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Button from '../../button';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
 
 const props = {
-	children: <Button>Tooltip anchor</Button>,
+	children: <button>Tooltip anchor</button>,
 	text: 'tooltip text',
 };
 
@@ -43,21 +42,13 @@ const hoverOutside = async () => {
 };
 
 describe( 'Tooltip', () => {
-	// Wait enough time to make sure that tooltips don't show immediately, ignoring
-	// the showTimeout delay. For more context, see:
-	// - https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435167187
-	// - https://ariakit.org/reference/tooltip-provider#skiptimeout
-	afterEach( async () => {
-		await sleep( 300 );
-	} );
-
 	describe( 'basic behavior', () => {
 		it( 'should not render the tooltip if multiple children are passed', async () => {
 			render(
 				// @ts-expect-error Tooltip cannot have more than one child element
 				<Tooltip { ...props }>
-					<Button>First button</Button>
-					<Button>Second button</Button>
+					<button>First button</button>
+					<button>Second button</button>
 				</Tooltip>
 			);
 
@@ -102,6 +93,35 @@ describe( 'Tooltip', () => {
 				screen.queryByRole( 'button', { description: 'tooltip text' } )
 			).not.toBeInTheDocument();
 		} );
+
+		it( 'should not leak Tooltip props to the tooltip anchor', () => {
+			render(
+				<Tooltip data-foo>
+					<button>Anchor</button>
+				</Tooltip>
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Anchor' } )
+			).not.toHaveAttribute( 'data-foo' );
+		} );
+
+		it( 'should add default and custom class names to the tooltip', async () => {
+			render( <Tooltip { ...props } className="foo" /> );
+
+			// Hover over the anchor, tooltip should show
+			await hover(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			);
+
+			// Check default and custom classnames
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text',
+					} )
+				).toHaveClass( 'components-tooltip', 'foo' )
+			);
+		} );
 	} );
 
 	describe( 'keyboard focus', () => {
@@ -142,9 +162,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -196,9 +214,7 @@ describe( 'Tooltip', () => {
 			render(
 				<>
 					<Tooltip { ...props }>
-						<Button disabled __experimentalIsFocusable>
-							Tooltip anchor
-						</Button>
+						<button aria-disabled="true">Tooltip anchor</button>
 					</Tooltip>
 					<button>Focus me</button>
 				</>
@@ -301,6 +317,11 @@ describe( 'Tooltip', () => {
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
 			await waitExpectTooltipToHide();
+
+			// Prevent this test from interfering with the next one.
+			// "Tooltips appear instantly if another tooltip has just been hidden."
+			// See: https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435495655
+			await sleep( 3000 );
 		} );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
@@ -310,12 +331,12 @@ describe( 'Tooltip', () => {
 
 			render(
 				<Tooltip { ...props }>
-					<Button
+					<button
 						onMouseEnter={ onMouseEnterMock }
 						onMouseLeave={ onMouseLeaveMock }
 					>
 						Tooltip anchor
-					</Button>
+					</button>
 				</Tooltip>
 			);
 
@@ -443,7 +464,7 @@ describe( 'Tooltip', () => {
 				<Tooltip text="Outer tooltip">
 					<Tooltip text="Middle tooltip">
 						<Tooltip text="Inner tooltip">
-							<Button>Tooltip anchor</Button>
+							<button>Tooltip anchor</button>
 						</Tooltip>
 					</Tooltip>
 				</Tooltip>
@@ -480,6 +501,19 @@ describe( 'Tooltip', () => {
 					screen.queryByRole( 'tooltip', { name: 'Outer tooltip' } )
 				).not.toBeInTheDocument()
 			);
+		} );
+
+		it( 'should not leak Tooltip component classname to the anchor element', () => {
+			render(
+				<Tooltip>
+					<Tooltip>
+						<button>Anchor</button>
+					</Tooltip>
+				</Tooltip>
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Anchor' } )
+			).not.toHaveClass( 'components-tooltip' );
 		} );
 	} );
 } );

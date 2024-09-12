@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -56,11 +56,7 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = useDeprecated36pxDefaultSizeProp(
-		unitControlProps,
-		'wp.components.UnitControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -112,7 +108,7 @@ function UnforwardedUnitControl(
 		}
 	}, [ parsedUnit, setUnit ] );
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-unit-control',
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
@@ -171,11 +167,16 @@ function UnforwardedUnitControl(
 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 			props.onKeyDown?.( event );
-			// Unless the meta key was pressed (to avoid interfering with
-			// shortcuts, e.g. pastes), moves focus to the unit select if a key
+			// Unless the meta or ctrl key was pressed (to avoid interfering with
+			// shortcuts, e.g. pastes), move focus to the unit select if a key
 			// matches the first character of a unit.
-			if ( ! event.metaKey && reFirstCharacterOfUnits.test( event.key ) )
+			if (
+				! event.metaKey &&
+				! event.ctrlKey &&
+				reFirstCharacterOfUnits.test( event.key )
+			) {
 				refInputSuffix.current?.focus();
+			}
 		};
 	}
 
