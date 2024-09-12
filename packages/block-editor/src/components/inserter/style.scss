@@ -155,15 +155,6 @@ $block-inserter-tabs-height: 44px;
 	text-align: right;
 }
 
-.block-editor-inserter__manage-reusable-blocks-container {
-	margin: auto $grid-unit-20 $grid-unit-20;
-}
-
-.block-editor-inserter__manage-reusable-blocks {
-	justify-content: center;
-	width: 100%;
-}
-
 .block-editor-inserter__no-results,
 .block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
@@ -711,5 +702,5 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-tabbed-sidebar__tabpanel .block-editor-inserter__help-text {
-	padding: 0 $grid-unit-30;
+	padding: 0 $grid-unit-30 $grid-unit-20;
 }

@@ -395,6 +395,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 				data.length - 1,
 				Math.max( 0, targetIndex )
 			);
+			if ( ! data[ clampedIndex ] ) {
+				return;
+			}
 			const itemIdPrefix = generateCompositeItemIdPrefix(
 				data[ clampedIndex ]
 			);

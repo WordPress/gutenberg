@@ -25,6 +25,7 @@
 		{ "path": "packages/element" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
+		{ "path": "packages/fields" },
 		{ "path": "packages/hooks" },
 		{ "path": "packages/html-entities" },
 		{ "path": "packages/html-entities" },
