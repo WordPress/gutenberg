@@ -3,4 +3,7 @@ div.block-editor-bindings__panel {
 	button:hover .block-editor-bindings__item span {
 		color: inherit;
 	}
+	.block-editor-bindings__item {
+		gap: 0;
+	}
 }
