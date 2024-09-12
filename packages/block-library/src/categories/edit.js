@@ -41,13 +41,12 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
-	const { records: taxonomies, isResolvingTaxonomies } = useEntityRecords(
+	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
 		'root',
-		'taxonomy',
-		{
-			type: 'post',
-		}
+		'taxonomy'
 	);
+
+	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
 
 	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
 
