@@ -31,6 +31,30 @@ extend( [ namesPlugin, a11yPlugin ] );
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
 
 /**
+ * Determines whether the block's attribute is equal to the default attribute
+ * which means the attribute is unmodified.
+ * @param {Object} attributeDefinition The attribute's definition of the block type.
+ * @param {*}      value               The attribute's value.
+ * @return {boolean} Whether the attribute is unmodified.
+ */
+export function isAttributeUnmodified( attributeDefinition, value ) {
+	// Every attribute that has a default must match the default.
+	if ( attributeDefinition.hasOwnProperty( 'default' ) ) {
+		return value === attributeDefinition.default;
+	}
+
+	// The rich text type is a bit different from the rest because it
+	// has an implicit default value of an empty RichTextData instance,
+	// so check the length of the value.
+	if ( attributeDefinition.type === 'rich-text' ) {
+		return ! value?.length;
+	}
+
+	// Every attribute that doesn't have a default should be undefined.
+	return value === undefined;
+}
+
+/**
  * Determines whether the block's attributes are equal to the default attributes
  * which means the block is unmodified.
  *
@@ -43,20 +67,7 @@ export function isUnmodifiedBlock( block ) {
 		( [ key, definition ] ) => {
 			const value = block.attributes[ key ];
 
-			// Every attribute that has a default must match the default.
-			if ( definition.hasOwnProperty( 'default' ) ) {
-				return value === definition.default;
-			}
-
-			// The rich text type is a bit different from the rest because it
-			// has an implicit default value of an empty RichTextData instance,
-			// so check the length of the value.
-			if ( definition.type === 'rich-text' ) {
-				return ! value?.length;
-			}
-
-			// Every attribute that doesn't have a default should be undefined.
-			return value === undefined;
+			return isAttributeUnmodified( definition, value );
 		}
 	);
 }
