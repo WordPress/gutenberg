@@ -38,27 +38,6 @@ export const TabListWrapper = styled.div`
 		--indicator-start: var( --indicator-right );
 	}
 
-	--fade-width: 4rem;
-	--fade-gradient-base: transparent 0%, black var( --fade-width );
-	--fade-gradient-composed: var( --fade-gradient-base ), black 50%,
-		transparent 50%;
-	&.is-overflowing-first {
-		mask-image: linear-gradient(
-			to var( --direction-end ),
-			var( --fade-gradient-base )
-		);
-	}
-	&.is-overflowing-last {
-		mask-image: linear-gradient(
-			to var( --direction-start ),
-			var( --fade-gradient-base )
-		);
-	}
-	&.is-overflowing-first.is-overflowing-last {
-		mask-image: linear-gradient( to right, var( --fade-gradient-composed ) ),
-			linear-gradient( to left, var( --fade-gradient-composed ) );
-	}
-
 	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::after {
 			transition-property: transform;
@@ -81,6 +60,30 @@ export const TabListWrapper = styled.div`
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&:not( [aria-orientation='vertical'] ) {
+		--fade-width: 4rem;
+		--fade-gradient-base: transparent 0%, black var( --fade-width );
+		--fade-gradient-composed: var( --fade-gradient-base ), black 50%,
+			transparent 50%;
+		&.is-overflowing-first {
+			mask-image: linear-gradient(
+				to var( --direction-end ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-last {
+			mask-image: linear-gradient(
+				to var( --direction-start ),
+				var( --fade-gradient-base )
+			);
+		}
+		&.is-overflowing-first.is-overflowing-last {
+			mask-image: linear-gradient(
+					to right,
+					var( --fade-gradient-composed )
+				),
+				linear-gradient( to left, var( --fade-gradient-composed ) );
+		}
+
 		&::after {
 			bottom: 0;
 			height: 0;
