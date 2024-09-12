@@ -221,7 +221,11 @@
 	fill: currentColor;
 }
 
-.edit-site-global-styles-screen-root__active-style-tile,
-.edit-site-global-styles-screen-root__active-style-tile-preview {
-	border-radius: $radius-small !important; // Todo: revisit use of Card component and/or remove override
+.edit-site-global-styles-screen-root__active-style-tile {
+	// Todo: revisit use of Card component and/or remove override
+	// The &#{&} is a workaround for the specificity of the Card component.
+	&#{&},
+	&#{&} .edit-site-global-styles-screen-root__active-style-tile-preview {
+		border-radius: $radius-small;
+	}
 }
