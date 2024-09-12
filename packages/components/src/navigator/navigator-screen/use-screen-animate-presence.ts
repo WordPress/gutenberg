@@ -50,7 +50,6 @@ export function useScreenAnimatePresence( {
 	skipAnimation,
 	isBack,
 	onAnimationEnd,
-	screenEl,
 }: {
 	isMatch: boolean;
 	skipAnimation: boolean;
@@ -79,7 +78,7 @@ export function useScreenAnimatePresence( {
 				skipAnimation || prefersReducedMotion ? 'OUT' : 'ANIMATING_OUT'
 			);
 		}
-	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion, screenEl ] );
+	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion ] );
 
 	// Styles
 	const animationDirection =

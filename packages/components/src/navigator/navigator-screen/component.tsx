@@ -13,7 +13,6 @@ import {
 	useMemo,
 	useRef,
 	useId,
-	useState,
 } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { escapeAttribute } from '@wordpress/escape-html';
@@ -44,13 +43,8 @@ function UnconnectedNavigatorScreen(
 	// Generate a unique ID for the screen.
 	const screenId = useId();
 
-	const [ wrapperEl, setWrapperEl ] = useState< HTMLElement | null >( null );
-	const wrapperRefCallback: React.RefCallback< HTMLElement > = ( el ) =>
-		setWrapperEl( el );
-	const mergedWrapperRef = useMergeRefs( [
-		forwardedRef,
-		wrapperRefCallback,
-	] );
+	const wrapperRef = useRef< HTMLDivElement >( null );
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	const {
 		children,
@@ -84,7 +78,6 @@ function UnconnectedNavigatorScreen(
 			isBack,
 			onAnimationEnd: onAnimationEndProp,
 			skipAnimation: skipAnimationAndFocusRestoration,
-			screenEl: wrapperEl,
 		} );
 
 	const cx = useCx();
@@ -99,6 +92,7 @@ function UnconnectedNavigatorScreen(
 		locationRef.current = location;
 	}, [ location ] );
 	useEffect( () => {
+		const wrapperEl = wrapperRef.current;
 		// Only attempt to restore focus:
 		// - if the current location is not the initial one (to avoid moving focus on page load)
 		// - when the screen becomes visible
@@ -146,7 +140,6 @@ function UnconnectedNavigatorScreen(
 		isBack,
 		focusTargetSelector,
 		skipFocus,
-		wrapperEl,
 	] );
 
 	return shouldRenderScreen ? (
