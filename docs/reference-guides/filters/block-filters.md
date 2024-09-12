@@ -311,7 +311,7 @@ function lockParagraphs( blockAttributes, blockType, innterHTML, attributes  ) {
     return blockAttributes;
 }
 
-// Call the filter
+// Add the filter
 wp.hooks.addFilter(
     'blocks.getBlockAttributes',
     'my-plugin/lock-paragraphs',
