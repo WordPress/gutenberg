@@ -1516,35 +1516,44 @@ export function getInsertionCue( state ) {
  *
  * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
-export const getInsertionPoint = createSelector(
-	( state ) => {
-		let rootClientId, index;
+export const getInsertionPoint = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			let rootClientId = '',
+				index;
 
-		const {
-			insertionPoint,
-			selection: { selectionEnd },
-		} = state;
-		if ( insertionPoint !== null ) {
-			return insertionPoint;
-		}
+			const {
+				insertionPoint,
+				selection: { selectionEnd },
+			} = state;
+			if ( insertionPoint !== null ) {
+				return insertionPoint;
+			}
 
-		const { clientId } = selectionEnd;
+			const { clientId } = selectionEnd;
+			const sectionRootClientId = unlock(
+				select( STORE_NAME )
+			).getSectionRootClientId( state, clientId );
 
-		if ( clientId ) {
-			rootClientId = getBlockRootClientId( state, clientId ) || undefined;
-			index = getBlockIndex( state, selectionEnd.clientId ) + 1;
-		} else {
-			index = getBlockOrder( state ).length;
-		}
+			if ( clientId ) {
+				rootClientId =
+					getBlockRootClientId( state, clientId ) || undefined;
+				index = getBlockIndex( state, selectionEnd.clientId ) + 1;
+			} else if ( sectionRootClientId ) {
+				index = getBlockOrder( state, sectionRootClientId ).length;
+			} else {
+				index = getBlockOrder( state ).length;
+			}
 
-		return { rootClientId, index };
-	},
-	( state ) => [
-		state.insertionPoint,
-		state.selection.selectionEnd.clientId,
-		state.blocks.parents,
-		state.blocks.order,
-	]
+			return { rootClientId, index };
+		},
+		( state ) => [
+			state.insertionPoint,
+			state.selection.selectionEnd.clientId,
+			state.blocks.parents,
+			state.blocks.order,
+		]
+	)
 );
 
 /**

@@ -1624,6 +1624,7 @@ export function insertionCue( state = null, action ) {
 			return fastDeepEqual( state, nextState ) ? state : nextState;
 		}
 
+		case 'CLEAR_SELECTED_BLOCK':
 		case 'HIDE_INSERTION_POINT':
 		case 'HIDE_INSERTION_CUE':
 			return null;

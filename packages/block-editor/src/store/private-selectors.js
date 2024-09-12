@@ -550,13 +550,3 @@ export function isZoomOutMode( state ) {
 export function getSectionRootClientId( state ) {
 	return state.settings?.[ sectionRootClientIdKey ];
 }
-
-/**
- * Where the inserter should insert into.
- *
- * @param {Object} state
- * @return {Object} Of where the insertion point in the block editor is or null if none is set.
- */
-export function getInsertionPoint( state ) {
-	return state.insertionPoint;
-}
