@@ -179,8 +179,7 @@ export function isValuesMixed(
  */
 export function isValuesDefined( values?: BoxControlValue ) {
 	return (
-		values !== undefined &&
-		values !== null &&
+		values &&
 		Object.values( values ).filter(
 			// Switching units when input is empty causes values only
 			// containing units. This gives false positive on mixed values
