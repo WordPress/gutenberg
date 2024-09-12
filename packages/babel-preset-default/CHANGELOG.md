@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added `addPolyfillImport` option. When used, it will automatically add `@wordpress/polyfill` imports where needed.
+
 ## 8.7.0 (2024-09-05)
 
 ## 8.6.0 (2024-08-21)

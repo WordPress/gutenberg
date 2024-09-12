@@ -11,6 +11,8 @@ module.exports = ( environment = '', file ) => {
 			name: `WP_BUILD_${ environment.toUpperCase() }`,
 		},
 	};
+	// Add `@wordpress/polyfill` import where needed.
+	callerOpts.caller.addPolyfillImport = true;
 	switch ( environment ) {
 		case 'main':
 			// To be merged as a presetEnv option.
