@@ -111,7 +111,16 @@ const baseConfig = {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
+		extensions: [
+			'.jsx',
+			'.ts',
+			'.tsx',
+			'.mjs',
+			'.mts',
+			'.cjs',
+			'.cts',
+			'...',
+		],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -154,7 +163,7 @@ const baseConfig = {
 	module: {
 		rules: [
 			{
-				test: /\.m?(j|t)sx?$/,
+				test: /\.(m|c)?(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -209,7 +218,7 @@ const baseConfig = {
 			},
 			{
 				test: /\.svg$/,
-				issuer: /\.(j|t)sx?$/,
+				issuer: /\.(m|c)?(j|t)sx?$/,
 				use: [ '@svgr/webpack', 'url-loader' ],
 				type: 'javascript/auto',
 			},

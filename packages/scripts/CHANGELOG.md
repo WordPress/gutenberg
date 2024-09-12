@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add support for mjs, cjs, mts, and cts file extensions ([#65101](https://github.com/WordPress/gutenberg/pull/65101)).
+
 ## 29.0.0 (2024-09-05)
 
 ### Breaking Changes
@@ -10,7 +14,7 @@
 
 ### Enhancements
 
-- Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
+-   Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
 
 ### Bug Fixes
 
