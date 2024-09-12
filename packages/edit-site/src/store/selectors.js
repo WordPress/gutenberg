@@ -213,7 +213,7 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
 				version: '6.7',
 			}
 		);
-		return unlock( select( editorStore ) ).getInsertionPoint();
+		return unlock( select( editorStore ) ).getInserterPanel();
 	}
 );
 

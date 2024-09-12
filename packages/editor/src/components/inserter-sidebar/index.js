@@ -30,7 +30,7 @@ export default function InserterSidebar() {
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
-			getInsertionPoint,
+			getInserterPanel,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
 		const {
@@ -52,7 +52,7 @@ export default function InserterSidebar() {
 		};
 		return {
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
-			insertionPoint: getInsertionPoint(),
+			insertionPoint: getInserterPanel(),
 			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 			blockSectionRootClientId: getBlockSectionRootClientId(),
 			sidebarIsOpened: !! (

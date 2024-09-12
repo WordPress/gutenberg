@@ -43,7 +43,7 @@ const EMPTY_INSERTION_POINT = {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export const getInsertionPoint = createRegistrySelector( ( select ) =>
+export const getInserterPanel = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state ) => {
 			if ( typeof state.blockInserterPanel === 'object' ) {
