@@ -13,7 +13,6 @@ import {
 	ToggleControl,
 	PanelBody,
 	Placeholder,
-	Button,
 	Spinner,
 	TextControl,
 } from '@wordpress/components';
@@ -29,7 +28,6 @@ import {
 } from '@wordpress/block-editor';
 import { useMemo, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -281,7 +279,6 @@ export default function PostFeaturedImageEdit( {
 		);
 	}
 
-	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
@@ -295,7 +292,7 @@ export default function PostFeaturedImageEdit( {
 	 * - It has a postId (for example in a single post)
 	 * - It is not inside a query loop
 	 * - It has no image assigned yet
-	 * Then display the placeholder with the image upload option.
+	 * Then display the media placeholder.
 	 */
 	if ( ! featuredImage && ! temporaryURL ) {
 		image = (
@@ -305,21 +302,6 @@ export default function PostFeaturedImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onError={ onUploadError }
 				placeholder={ placeholder }
-				mediaLibraryButton={ ( { open } ) => {
-					return (
-						<Button
-							__next40pxDefaultSize
-							icon={ upload }
-							variant="primary"
-							label={ label }
-							showTooltip
-							tooltipPosition="top center"
-							onClick={ () => {
-								open();
-							} }
-						/>
-					);
-				} }
 			/>
 		);
 	} else {
@@ -350,18 +332,22 @@ export default function PostFeaturedImageEdit( {
 
 	/**
 	 * When the post featured image block:
-	 * - Has an image assigned
 	 * - Is not inside a query loop
 	 * Then display the image and the image replacement option.
 	 */
 	return (
 		<>
 			{ ! temporaryURL && controls }
-			{ !! media && ! isDescendentOfQueryLoop && (
+			{ ! isDescendentOfQueryLoop && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ featuredImage }
 						mediaURL={ mediaUrl }
+						name={
+							! featuredImage
+								? __( 'Add featured image' )
+								: __( 'Replace' )
+						}
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="image/*"
 						onSelect={ onSelectImage }

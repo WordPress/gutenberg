@@ -1,47 +1,15 @@
-// Provide special styling for the placeholder.
-// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-post-featured-image {
 	.block-editor-media-placeholder {
-		z-index: 1; // Need to put it above the overlay so the upload button works.
-		backdrop-filter: none; // Removes background blur so the overlay's actual color is visible.
-	}
-
-	// Style the placeholder.
-	.wp-block-post-featured-image__placeholder,
-	.components-placeholder {
-		justify-content: center;
-		align-items: center;
-		padding: 0;
-		display: flex;
-
-		// Hide the upload button, as it's also available in the media library.
-		.components-form-file-upload {
-			display: none;
-		}
-
-		// Style the upload button.
-		.components-button {
-			margin: auto;
-			padding: 0;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			width: $grid-unit-60;
-			height: $grid-unit-60;
-			border-radius: 50%;
-			position: relative;
-			background: var(--wp-admin-theme-color);
-			border-color: var(--wp-admin-theme-color);
-			border-style: solid;
-			color: $white;
-
-			> svg {
-				color: inherit;
-			}
-		}
-
 		// Show default placeholder height when not resized.
 		min-height: 200px;
+
+		&.is-small {
+			min-height: 60px;
+		}
+
+		.components-button.components-button {
+			opacity: 0;
+		}
 	}
 
 	// The following override the default placeholder styles that remove
@@ -49,7 +17,7 @@
 	// a visual border. They also override the `img { border: none; }` applied
 	// by core.
 	.wp-block-post-featured-image__placeholder,
-	.components-placeholder,
+	.block-editor-media-placeholder,
 	img {
 		// The following is required to overcome WP Core applying styles that clear
 		// img borders with a higher specificity than those added by the border
@@ -91,7 +59,7 @@
 	// Provide a minimum size for the placeholder when resized.
 	// Note, this should be as small as we can afford it, and exists only
 	// to ensure there's room for the upload button.
-	&[style*="height"] .components-placeholder {
+	&[style*="height"] .block-editor-media-placeholder {
 		min-height: $grid-unit-60;
 		min-width: $grid-unit-60;
 		height: 100%;
@@ -103,18 +71,6 @@
 	// Restore cursor style so it doesn't appear 'clickable'.
 	> a {
 		cursor: default;
-	}
-
-	// When the Post Featured Image block is linked,
-	// and wrapped with a disabled <a /> tag
-	// ensure that the placeholder items are visible when selected.
-	&.is-selected .components-placeholder.has-illustration {
-		.components-button,
-		.components-placeholder__instructions,
-		.components-placeholder__label {
-			opacity: 1;
-			pointer-events: auto;
-		}
 	}
 
 	// When image being uploaded.
