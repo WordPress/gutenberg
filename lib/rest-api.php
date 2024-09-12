@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function gutenberg_override_global_styles_endpoint( array $args, string $post_type ): array {
 	if ( 'wp_global_styles' === $post_type ) {
-		$args['rest_controller_class'] = WP_REST_Global_Styles_Controller_Gutenberg::class;
+		$args['rest_controller_class'] = 'WP_REST_Global_Styles_Controller_Gutenberg';
 	}
 
 	return $args;
