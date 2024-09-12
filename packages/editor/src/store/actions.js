@@ -720,23 +720,50 @@ export function removeEditorPanel( panelName ) {
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value             Whether the inserter should be
- *                                           opened (true) or closed (false).
- *                                           To specify an insertion point,
- *                                           use an object.
- * @param {string}         value.filterValue A query to filter the inserter results.
- * @param {Function}       value.onSelect    A callback when an item is selected.
- * @param {string}         value.tab         The tab to open in the inserter.
- * @param {string}         value.category    The category to initialize in the inserter.
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   Deprecated. The root client ID to insert at.
+ * @param {number}         value.insertionIndex Deprecated. The index to insert at.
+ * @param {string}         value.filterValue    A query to filter the inserter results.
+ * @param {Function}       value.onSelect       A callback when an item is selected.
+ * @param {string}         value.tab            The tab to open in the inserter.
+ * @param {string}         value.category       The category to initialize in the inserter.
  *
  * @return {Object} Action object.
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { dispatch, registry } ) => {
+		if (
+			typeof value === 'object' &&
+			value.hasOwnProperty( 'rootClientId' ) &&
+			value.hasOwnProperty( 'insertionIndex' )
+		) {
+			deprecated(
+				'rootClientId and insertionIndex are deprecated from the editor store state.',
+				{
+					since: '6.7',
+					version: '6.9',
+					alternative:
+						'wp.data.dispatch( "core/block-editor" ).setInserterInsertionPoint',
+				}
+			);
+
+			return registry
+				.dispatch( blockEditorStore )
+				.setInserterInsertionPoint( {
+					rootClientId: value.rootClientId,
+					insertionIndex: value.insertionIndex,
+				} );
+		}
+
+		dispatch( {
+			type: 'SET_IS_INSERTER_OPENED',
+			value,
+		} );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
