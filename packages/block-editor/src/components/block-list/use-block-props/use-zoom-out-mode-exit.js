@@ -16,29 +16,30 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
-	const { getSettings } = useSelect( blockEditorStore );
-	const { __unstableSetEditorMode } = unlock(
+	const { getEditorMode } = useSelect( ( select ) => {
+		const { __unstableGetEditorMode } = select( blockEditorStore );
+		return {
+			getEditorMode: __unstableGetEditorMode,
+		};
+	}, [] );
+
+	const { __unstableSetEditorMode, setZoomOut } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	return useRefEffect(
 		( node ) => {
-			if ( editorMode !== 'zoom-out' ) {
+			if ( editorMode !== 'compose' ) {
 				return;
 			}
 
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
-
-					const { __experimentalSetIsInserterOpened } = getSettings();
-
-					if (
-						typeof __experimentalSetIsInserterOpened === 'function'
-					) {
-						__experimentalSetIsInserterOpened( false );
+					if ( getEditorMode() === 'compose' ) {
+						__unstableSetEditorMode( 'edit' );
+						setZoomOut( false );
 					}
-					__unstableSetEditorMode( 'edit' );
 				}
 			}
 
@@ -48,6 +49,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ editorMode, getSettings, __unstableSetEditorMode ]
+		[ editorMode, __unstableSetEditorMode ]
 	);
 }

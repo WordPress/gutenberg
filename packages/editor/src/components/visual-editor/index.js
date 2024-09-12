@@ -174,17 +174,22 @@ function VisualEditor( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
-		isZoomOutMode,
+		isComposeMode,
+		isZoomOut,
 	} = useSelect( ( select ) => {
-		const { getSettings, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const {
+			getSettings,
+			__unstableGetEditorMode,
+			isZoomOut: _isZoomOut,
+		} = select( blockEditorStore );
 		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isComposeMode: __unstableGetEditorMode() === 'compose',
+			isZoomOut: _isZoomOut(),
 		};
 	}, [] );
 
@@ -336,7 +341,7 @@ function VisualEditor( {
 	] );
 
 	const zoomOutProps =
-		isZoomOutMode && ! isTabletViewport
+		isZoomOut && ! isTabletViewport
 			? {
 					scale: 'default',
 					frameSize: '48px',
@@ -355,7 +360,7 @@ function VisualEditor( {
 		// Disable resizing in mobile viewport.
 		! isMobileViewport &&
 		// Dsiable resizing in zoomed-out mode.
-		! isZoomOutMode;
+		! isComposeMode;
 	const shouldIframe =
 		! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType );
 

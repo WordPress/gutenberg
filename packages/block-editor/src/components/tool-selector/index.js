@@ -12,7 +12,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { Icon, edit as editIcon } from '@wordpress/icons';
+import {
+	Icon,
+	edit as editIcon,
+	blockTable as composeIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -30,12 +34,20 @@ const selectIcon = (
 	</SVG>
 );
 
+// write an icon map of mode => icon
+const ICON_MAPPING = {
+	edit: editIcon,
+	navigation: selectIcon,
+	compose: composeIcon,
+};
+
 function ToolSelector( props, ref ) {
 	const mode = useSelect(
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode, setZoomOut } =
+		useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -45,7 +57,7 @@ function ToolSelector( props, ref ) {
 					__next40pxDefaultSize={ false }
 					{ ...props }
 					ref={ ref }
-					icon={ mode === 'navigation' ? selectIcon : editIcon }
+					icon={ ICON_MAPPING[ mode ] }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
@@ -58,10 +70,13 @@ function ToolSelector( props, ref ) {
 				<>
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
-							value={
-								mode === 'navigation' ? 'navigation' : 'edit'
-							}
-							onSelect={ __unstableSetEditorMode }
+							value={ mode }
+							onSelect={ ( newVal ) => {
+								if ( newVal === 'compose' ) {
+									setZoomOut( true );
+								}
+								__unstableSetEditorMode( newVal );
+							} }
 							choices={ [
 								{
 									value: 'edit',
@@ -78,6 +93,15 @@ function ToolSelector( props, ref ) {
 										<>
 											{ selectIcon }
 											{ __( 'Select' ) }
+										</>
+									),
+								},
+								{
+									value: 'compose',
+									label: (
+										<>
+											<Icon icon={ composeIcon } />
+											{ __( 'Compose' ) }
 										</>
 									),
 								},

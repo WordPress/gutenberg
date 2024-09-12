@@ -683,7 +683,7 @@ function BlockListBlockProvider( props ) {
 					! isDragging(),
 				initialPosition:
 					_isSelected &&
-					( editorMode === 'edit' || editorMode === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
+					( editorMode === 'edit' || editorMode === 'compose' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),

@@ -2837,7 +2837,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	const editorMode = __unstableGetEditorMode( state );
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'zoom-out' ) {
+	if ( editorMode === 'compose' ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
@@ -2930,7 +2930,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'zoom-out' ) {
+			if ( editorMode === 'compose' ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
@@ -3093,4 +3093,14 @@ export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
 		}
 	);
 	return getTemporarilyEditingFocusModeToRevert( state );
+}
+
+/**
+ * Returns the zoom out state.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} The zoom out state.
+ */
+export function isZoomOut( state ) {
+	return state.zoomOut;
 }

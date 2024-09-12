@@ -205,7 +205,7 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				isRichEditingEnabled &&
-				blockEditorMode !== 'zoom-out' &&
+				blockEditorMode !== 'compose' &&
 				mode === 'visual' && (
 					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)

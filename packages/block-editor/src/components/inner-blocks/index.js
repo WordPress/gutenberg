@@ -221,7 +221,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 			_isDropZoneDisabled = blockEditingMode === 'disabled';
 
-			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+			if ( __unstableGetEditorMode() === 'compose' ) {
 				// In zoom out mode, we want to disable the drop zone for the sections.
 				// The inner blocks belonging to the section drop zone is
 				// already disabled by the blocks themselves being disabled.

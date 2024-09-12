@@ -36,7 +36,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		if (
 			! isBlockSelected( clientId ) ||
 			isMultiSelecting() ||
-			__unstableGetEditorMode() === 'zoom-out'
+			__unstableGetEditorMode() === 'compose'
 		) {
 			return;
 		}

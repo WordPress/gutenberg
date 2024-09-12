@@ -41,7 +41,7 @@ export default function InserterSidebar() {
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
-			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+			if ( __unstableGetEditorMode() === 'compose' ) {
 				const sectionRootClientId = getSectionRootClientId();
 
 				if ( sectionRootClientId ) {

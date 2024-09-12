@@ -47,9 +47,9 @@ export function useShowBlockTools() {
 			! hasMultiSelection() &&
 			editorMode === 'navigation';
 
-		const isZoomOut = editorMode === 'zoom-out';
+		const isComposeMode = editorMode === 'compose';
 		const _showZoomOutToolbar =
-			isZoomOut &&
+			isComposeMode &&
 			block?.attributes?.align === 'full' &&
 			! _showEmptyBlockSideInserter &&
 			! maybeShowBreadcrumb;

@@ -64,7 +64,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			isComposeMode: __unstableGetEditorMode() === 'compose',
 		};
 	}, [] );
 

@@ -44,9 +44,9 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const isZoomOutMode = useSelect(
+	const isComposeMode = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+			select( blockEditorStore ).__unstableGetEditorMode() === 'compose',
 		[]
 	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
@@ -172,7 +172,7 @@ export function PatternCategoryPreviews( {
 			</VStack>
 			{ currentCategoryPatterns.length > 0 && (
 				<>
-					{ isZoomOutMode && (
+					{ isComposeMode && (
 						<Text
 							size="12"
 							as="p"

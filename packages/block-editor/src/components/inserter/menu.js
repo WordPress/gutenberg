@@ -52,9 +52,9 @@ function InserterMenu(
 	},
 	ref
 ) {
-	const isZoomOutMode = useSelect(
+	const isComposeMode = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+			select( blockEditorStore ).__unstableGetEditorMode() === 'compose',
 		[]
 	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
@@ -71,7 +71,7 @@ function InserterMenu(
 			return __experimentalInitialTab;
 		}
 
-		if ( isZoomOutMode ) {
+		if ( isComposeMode ) {
 			return 'patterns';
 		}
 	}
@@ -307,7 +307,7 @@ function InserterMenu(
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
-				'is-zoom-out': isZoomOutMode,
+				'is-zoom-out': isComposeMode,
 			} ) }
 			ref={ ref }
 		>

@@ -78,7 +78,7 @@ function useEditorStyles() {
 	const {
 		hasThemeStyleSupport,
 		editorSettings,
-		isZoomedOutView,
+		isComposeMode,
 		renderingMode,
 		postType,
 	} = useSelect( ( select ) => {
@@ -89,7 +89,7 @@ function useEditorStyles() {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			isComposeMode: __unstableGetEditorMode() === 'compose',
 			renderingMode: getRenderingMode(),
 			postType: _postType,
 		};
@@ -134,7 +134,7 @@ function useEditorStyles() {
 		// Add a space for the typewriter effect. When typing in the last block,
 		// there needs to be room to scroll up.
 		if (
-			! isZoomedOutView &&
+			! isComposeMode &&
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {

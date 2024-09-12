@@ -84,7 +84,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock, __unstableSetEditorMode } =
+	const { removeBlock, __unstableSetEditorMode, setZoomOut } =
 		useDispatch( blockEditorStore );
 
 	const classNames = clsx( 'zoom-out-toolbar', {
@@ -144,6 +144,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 							setIsInserterOpened( false );
 						}
 						__unstableSetEditorMode( 'edit' );
+						setZoomOut( false );
 						__unstableContentRef.current?.focus();
 					} }
 				/>

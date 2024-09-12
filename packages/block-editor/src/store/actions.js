@@ -2189,3 +2189,17 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * Sets the zoom out state.
+ *
+ * @param {boolean} zoomOut The new zoom out state.
+ *
+ * @return {Object} Action object.
+ */
+export function setZoomOut( zoomOut ) {
+	return {
+		type: 'SET_ZOOM_OUT',
+		zoomOut,
+	};
+}

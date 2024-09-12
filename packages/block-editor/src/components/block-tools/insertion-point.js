@@ -38,7 +38,7 @@ function InbetweenInsertionPointPopover( {
 		isInserterShown,
 		isDistractionFree,
 		isNavigationMode,
-		isZoomOutMode,
+		isComposeMode,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -81,7 +81,7 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isComposeMode: __unstableGetEditorMode() === 'compose',
 		};
 	}, [] );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );
@@ -152,7 +152,7 @@ function InbetweenInsertionPointPopover( {
 	// Other operations such as "group" are when the editor tries to create a row
 	// block by grouping the block being dragged with the block it's being dropped
 	// onto.
-	if ( isZoomOutMode && operation !== 'insert' ) {
+	if ( isComposeMode && operation !== 'insert' ) {
 		return null;
 	}
 

@@ -1279,7 +1279,7 @@ export function getRenderingMode( state ) {
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
 		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
-		if ( editorMode === 'zoom-out' ) {
+		if ( editorMode === 'compose' ) {
 			return 'Desktop';
 		}
 		return state.deviceType;

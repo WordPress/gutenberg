@@ -28,7 +28,7 @@ export const Appender = forwardRef(
 
 				return (
 					!! getTemplateLock( clientId ) ||
-					__unstableGetEditorMode() === 'zoom-out'
+					__unstableGetEditorMode() === 'compose'
 				);
 			},
 			[ clientId ]

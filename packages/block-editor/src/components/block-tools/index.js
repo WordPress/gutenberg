@@ -46,7 +46,7 @@ function selector( select ) {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: editorMode === 'zoom-out',
+		isComposeMode: editorMode === 'compose',
 	};
 }
 
@@ -64,7 +64,7 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
+	const { clientId, hasFixedToolbar, isTyping, isComposeMode } = useSelect(
 		selector,
 		[]
 	);
@@ -202,7 +202,7 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && ! isZoomOutMode && (
+				{ ! isTyping && ! isComposeMode && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
@@ -239,7 +239,7 @@ export default function BlockTools( {
 				) }
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode && ! hasFixedToolbar && (
+				{ ! isComposeMode && ! hasFixedToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }
@@ -251,7 +251,7 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
+				{ isComposeMode && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }
 					/>

@@ -177,7 +177,7 @@ function Items( {
 	const hasCustomAppender = !! CustomAppender;
 	const {
 		order,
-		isZoomOut,
+		isComposeMode,
 		selectedBlocks,
 		visibleBlocks,
 		shouldRenderAppender,
@@ -209,10 +209,10 @@ function Items( {
 				order: _order,
 				selectedBlocks: getSelectedBlockClientIds(),
 				visibleBlocks: __unstableGetVisibleBlocks(),
-				isZoomOut: __unstableGetEditorMode() === 'zoom-out',
+				isComposeMode: __unstableGetEditorMode() === 'compose',
 				shouldRenderAppender:
 					hasAppender &&
-					__unstableGetEditorMode() !== 'zoom-out' &&
+					__unstableGetEditorMode() !== 'compose' &&
 					( hasCustomAppender
 						? ! getTemplateLock( rootClientId ) &&
 						  getBlockEditingMode( rootClientId ) !== 'disabled'
@@ -237,7 +237,7 @@ function Items( {
 						! selectedBlocks.includes( clientId )
 					}
 				>
-					{ isZoomOut && (
+					{ isComposeMode && (
 						<ZoomOutSeparator
 							clientId={ clientId }
 							rootClientId={ rootClientId }
@@ -248,7 +248,7 @@ function Items( {
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 					/>
-					{ isZoomOut && (
+					{ isComposeMode && (
 						<ZoomOutSeparator
 							clientId={ clientId }
 							rootClientId={ rootClientId }
