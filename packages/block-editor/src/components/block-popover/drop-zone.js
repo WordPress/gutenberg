@@ -22,9 +22,8 @@ function BlockDropZonePopover( {
 	__unstableContentRef,
 } ) {
 	const { clientId } = useSelect( ( select ) => {
-		const { getBlockOrder, getBlockInsertionPoint } =
-			select( blockEditorStore );
-		const insertionPoint = getBlockInsertionPoint();
+		const { getBlockOrder, getInsertionCue } = select( blockEditorStore );
+		const insertionPoint = getInsertionCue();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
 		if ( ! order.length ) {
