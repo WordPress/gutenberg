@@ -11,13 +11,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the Global Styles REST API routes.
+ * Overrides the REST controller for the `wp_global_styles` post type.
+ *
+ * @param array  $args      Array of arguments for registering a post type.
+ *                          See the register_post_type() function for accepted arguments.
+ * @param string $post_type Post type key.
+ *
+ * @return array Array of arguments for registering a post type.
  */
-function gutenberg_register_global_styles_endpoints() {
-	$global_styles_controller = new WP_REST_Global_Styles_Controller_Gutenberg();
-	$global_styles_controller->register_routes();
+function gutenberg_override_global_styles_endpoint( array $args, string $post_type ): array {
+	if ( 'wp_global_styles' === $post_type ) {
+		$args['rest_controller_class'] = WP_REST_Global_Styles_Controller_Gutenberg::class;
+	}
+
+	return $args;
 }
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
+add_filter( 'register_post_type_args', 'gutenberg_override_global_styles_endpoint', 10, 2 );
 
 
 /**
