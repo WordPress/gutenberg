@@ -32,7 +32,7 @@ export function useInBetweenInserter() {
 		getBlockName,
 		getBlockAttributes,
 	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } =
+	const { showInsertionCue, hideInsertionCue } =
 		useDispatch( blockEditorStore );
 
 	return useRefEffect(
@@ -62,7 +62,7 @@ export function useInBetweenInserter() {
 						'block-editor-block-list__layout'
 					)
 				) {
-					hideInsertionPoint();
+					hideInsertionCue();
 					return;
 				}
 
@@ -113,7 +113,7 @@ export function useInBetweenInserter() {
 				} );
 
 				if ( ! element ) {
-					hideInsertionPoint();
+					hideInsertionCue();
 					return;
 				}
 
@@ -123,7 +123,7 @@ export function useInBetweenInserter() {
 					element = element.firstElementChild;
 
 					if ( ! element ) {
-						hideInsertionPoint();
+						hideInsertionCue();
 						return;
 					}
 				}
@@ -162,7 +162,7 @@ export function useInBetweenInserter() {
 						( event.clientX > elementRect.right ||
 							event.clientX < elementRect.left ) )
 				) {
-					hideInsertionPoint();
+					hideInsertionCue();
 					return;
 				}
 
@@ -171,11 +171,11 @@ export function useInBetweenInserter() {
 				// Don't show the in-between inserter before the first block in
 				// the list (preserves the original behaviour).
 				if ( index === 0 ) {
-					hideInsertionPoint();
+					hideInsertionCue();
 					return;
 				}
 
-				showInsertionPoint( rootClientId, index, {
+				showInsertionCue( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
 			}
@@ -191,8 +191,8 @@ export function useInBetweenInserter() {
 			getBlockListSettings,
 			getBlockIndex,
 			isMultiSelecting,
-			showInsertionPoint,
-			hideInsertionPoint,
+			showInsertionCue,
+			hideInsertionCue,
 			getSelectedBlockClientIds,
 			isInBetweenInserterDisabled,
 		]

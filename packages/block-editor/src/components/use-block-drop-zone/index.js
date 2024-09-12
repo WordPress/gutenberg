@@ -333,12 +333,8 @@ export default function useBlockDropZone( {
 		isZoomOutMode,
 		getSectionRootClientId,
 	} = unlock( useSelect( blockEditorStore ) );
-	const {
-		showInsertionPoint,
-		hideInsertionPoint,
-		startDragging,
-		stopDragging,
-	} = unlock( useDispatch( blockEditorStore ) );
+	const { showInsertionCue, hideInsertionCue, startDragging, stopDragging } =
+		unlock( useDispatch( blockEditorStore ) );
 
 	const onBlockDrop = useOnBlockDrop(
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
@@ -398,7 +394,7 @@ export default function useBlockDropZone( {
 							index: 0,
 							operation: 'insert',
 						} );
-						showInsertionPoint( targetRootClientId, 0, {
+						showInsertionCue( targetRootClientId, 0, {
 							operation: 'insert',
 						} );
 					} );
@@ -500,7 +496,7 @@ export default function useBlockDropZone( {
 						? parentBlockClientId
 						: targetRootClientId;
 
-					showInsertionPoint( insertionPointClientId, targetIndex, {
+					showInsertionCue( insertionPointClientId, targetIndex, {
 						operation,
 						nearestSide,
 					} );
@@ -522,7 +518,7 @@ export default function useBlockDropZone( {
 				getBlockIndex,
 				registry,
 				startDragging,
-				showInsertionPoint,
+				showInsertionCue,
 				canInsertBlockType,
 				isGroupable,
 				getBlockVariations,
@@ -555,12 +551,12 @@ export default function useBlockDropZone( {
 			}
 
 			throttled.cancel();
-			hideInsertionPoint();
+			hideInsertionCue();
 		},
 		onDragEnd() {
 			throttled.cancel();
 			stopDragging();
-			hideInsertionPoint();
+			hideInsertionCue();
 		},
 	} );
 }

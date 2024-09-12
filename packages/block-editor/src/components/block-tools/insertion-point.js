@@ -27,7 +27,7 @@ function InbetweenInsertionPointPopover( {
 	operation = 'insert',
 	nearestSide = 'right',
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
+	const { selectBlock, hideInsertionCue } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
 	const {
@@ -102,7 +102,7 @@ function InbetweenInsertionPointPopover( {
 		// Only hide the inserter if it's triggered on the wrapper,
 		// and the inserter is not open.
 		if ( event.target === ref.current && ! openRef.current ) {
-			hideInsertionPoint();
+			hideInsertionCue();
 		}
 	}
 

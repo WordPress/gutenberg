@@ -123,8 +123,8 @@ function useInsertionPoint( {
 	const {
 		replaceBlocks,
 		insertBlocks,
-		showInsertionPoint,
-		hideInsertionPoint,
+		showInsertionCue,
+		hideInsertionCue,
 		setLastFocus,
 	} = unlock( useDispatch( blockEditorStore ) );
 
@@ -203,7 +203,7 @@ function useInsertionPoint( {
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
 			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
-				showInsertionPoint(
+				showInsertionCue(
 					item.rootClientId,
 					getIndex( {
 						destinationRootClientId,
@@ -213,12 +213,12 @@ function useInsertionPoint( {
 					} )
 				);
 			} else {
-				hideInsertionPoint();
+				hideInsertionCue();
 			}
 		},
 		[
-			showInsertionPoint,
-			hideInsertionPoint,
+			showInsertionCue,
+			hideInsertionCue,
 			destinationRootClientId,
 			destinationIndex,
 		]
