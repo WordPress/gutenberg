@@ -61,8 +61,7 @@ function BlockPatternsTab( {
 						{ children }
 					</CategoryTabs>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						className="block-editor-inserter__patterns-explore-button"
 						onClick={ () => setShowPatternsExplorer( true ) }
 						variant="secondary"
