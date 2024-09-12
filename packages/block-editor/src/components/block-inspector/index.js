@@ -72,7 +72,6 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
-			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
 			{ hasBlockStyles && (
 				<BlockStylesPanel clientId={ topLevelLockedBlock } />
@@ -322,6 +321,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot group="styles" />
 					<PositionControls />
+					<InspectorControls.Slot group="bindings" />
 					<div>
 						<AdvancedControls />
 					</div>

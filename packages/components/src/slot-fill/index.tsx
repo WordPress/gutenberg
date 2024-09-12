@@ -71,6 +71,7 @@ export function Provider( {
 		</SlotFillProvider>
 	);
 }
+Provider.displayName = 'SlotFillProvider';
 
 export function createSlotFill( key: SlotKey ) {
 	const baseName = typeof key === 'symbol' ? key.description : key;

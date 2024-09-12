@@ -101,18 +101,17 @@ export default function BlockInvalidWarning( { clientId } ) {
 			<Warning
 				actions={ [
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						key="recover"
 						onClick={ convert.toRecoveredBlock }
 						variant="primary"
 					>
-						{ __( 'Attempt Block Recovery' ) }
+						{ __( 'Attempt recovery' ) }
 					</Button>,
 				] }
 				secondaryActions={ secondaryActions }
 			>
-				{ __( 'This block contains unexpected or invalid content.' ) }
+				{ __( 'Block contains unexpected or invalid content.' ) }
 			</Warning>
 			{ compare && (
 				<Modal

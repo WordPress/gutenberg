@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 29.0.0 (2024-09-05)
+
+### Breaking Changes
+
+-   Fixed the issue with having 5 high severity vulnerabilities by upgrading the `puppeteer-core` package to the latest major version `^23.1.0` ([#64597](https://github.com/WordPress/gutenberg/pull/64597)).
+
+### Enhancements
+
+- Inlines CSS files imported from other CSS files before optimization in the `build` command ([#61121](https://github.com/WordPress/gutenberg/pull/61121)).
+
+### Bug Fixes
+
+-   Added chunk filename in webpack config to avoid reading stale files ([#58176](https://github.com/WordPress/gutenberg/pull/58176)).
+
 ## 28.6.0 (2024-08-21)
 
 ## 28.5.0 (2024-08-07)
