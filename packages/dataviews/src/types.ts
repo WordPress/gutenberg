@@ -209,9 +209,9 @@ export interface Filter {
 	value: any;
 
 	/**
-	 * Whether the filter can be reset.
+	 * Whether the filter can be edited or removed.
 	 */
-	canBeReset?: boolean;
+	isLocked?: boolean;
 }
 
 export interface NormalizedFilter {

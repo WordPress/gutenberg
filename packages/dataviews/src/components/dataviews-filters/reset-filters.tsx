@@ -44,7 +44,7 @@ export default function ResetFilter( {
 					search: '',
 					filters:
 						view.filters?.filter(
-							( filter ) => filter.canBeReset === false
+							( filter ) => filter.isLocked === true
 						) || [],
 				} );
 			} }

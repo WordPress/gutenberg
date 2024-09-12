@@ -33,7 +33,7 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 
 			if (
 				view.filters?.some(
-					( f ) => f.field === field.id && f.canBeReset === false
+					( f ) => f.field === field.id && f.isLocked === true
 				)
 			) {
 				return;
