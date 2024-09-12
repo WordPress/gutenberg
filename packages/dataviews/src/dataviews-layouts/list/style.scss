@@ -13,6 +13,7 @@ ul.dataviews-view-list {
 		.dataviews-view-list__item-wrapper {
 			position: relative;
 			border-radius: $grid-unit-05;
+			padding: $grid-unit-20 $grid-unit-30;
 
 			> * {
 				width: 100%;
@@ -20,38 +21,27 @@ ul.dataviews-view-list {
 		}
 
 		.dataviews-view-list__item-actions {
-			position: absolute;
-			top: $grid-unit-20;
-			right: 0;
-			// Pads __primary-field’s text truncation on hover (done in JS; see ./index.tsx).
-			padding-inline-start: $grid-unit-10;
-
+			flex: 0;
+			overflow: hidden;
 
 			> div {
 				height: $button-size-small;
 			}
 
 			.components-button {
+				position: relative;
+				z-index: 1;
 				opacity: 0;
 			}
 		}
 
-		&:has(.dataviews-view-list__fields:empty) {
+		&:where(.is-selected, .is-hovered, :focus-within) {
 			.dataviews-view-list__item-actions {
-				top: 50%;
-				transform: translateY(-50%);
-			}
-		}
-
-		&.is-selected,
-		&.is-hovered,
-		&:focus-within {
-			.dataviews-view-list__item-actions {
-				margin-right: $grid-unit-30;
+				flex-basis: min-content;
+				overflow: unset;
 
 				.components-button {
 					opacity: 1;
-					position: static;
 				}
 			}
 		}
@@ -97,28 +87,33 @@ ul.dataviews-view-list {
 	}
 
 	.dataviews-view-list__item {
-		box-sizing: border-box;
-		padding: $grid-unit-20 $grid-unit-30;
-		width: 100%;
+		position: absolute;
+		inset: 0;
 		scroll-margin: $grid-unit-10 0;
+		appearance: none;
+		border: none;
+		background: none;
+		padding: 0;
 
 		&:focus-visible {
+			outline: none;
+
 			&::before {
 				position: absolute;
 				content: "";
-				top: var(--wp-admin-border-width-focus);
-				right: var(--wp-admin-border-width-focus);
-				bottom: var(--wp-admin-border-width-focus);
-				left: var(--wp-admin-border-width-focus);
+				inset: var(--wp-admin-border-width-focus);
 				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 				border-radius: $radius-small;
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
 			}
 		}
-		.dataviews-view-list__primary-field {
-			min-height: $grid-unit-30;
-			line-height: $grid-unit-30;
-			overflow: hidden;
-		}
+	}
+	.dataviews-view-list__primary-field {
+		flex: 1;
+		min-height: $grid-unit-30;
+		line-height: $grid-unit-30;
+		overflow: hidden;
 	}
 
 	.dataviews-view-list__media-wrapper {
@@ -156,6 +151,7 @@ ul.dataviews-view-list {
 
 	.dataviews-view-list__field-wrapper {
 		min-height: $grid-unit-05 * 13; // Ensures title is centrally aligned when all fields are hidden
+		flex-grow: 1;
 	}
 
 	.dataviews-view-list__fields {
