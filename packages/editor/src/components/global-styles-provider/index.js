@@ -56,7 +56,7 @@ function useGlobalStylesUserConfig() {
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 
 			let record;
-			const userCanEditGlobalStyles = canUser( 'edit', {
+			const userCanEditGlobalStyles = canUser( 'update', {
 				kind: 'root',
 				name: 'globalStyles',
 				id: _globalStylesId,
