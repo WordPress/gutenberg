@@ -16,7 +16,6 @@ import { useMemo, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { store as editorStore } from '../../store';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
@@ -169,20 +168,11 @@ function useGlobalStylesUserConfig() {
 }
 
 function useGlobalStylesBaseConfig() {
-	const baseConfig = useSelect( ( select ) => {
-		const {
-			__experimentalGetCurrentThemeBaseGlobalStyles,
-			getCurrentTheme,
-			canUser,
-		} = select( coreStore );
-		const currentTheme = getCurrentTheme();
-
-		return currentTheme &&
-			canUser( 'read', 'global-styles/themes', currentTheme.stylesheet )
-			? __experimentalGetCurrentThemeBaseGlobalStyles()
-			: undefined;
-	}, [] );
-
+	const baseConfig = useSelect(
+		( select ) =>
+			select( coreStore ).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		[]
+	);
 	return [ !! baseConfig, baseConfig ];
 }
 
