@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "19.2.0-rc.1",
+	"version": "19.2.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -59,6 +59,7 @@
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/icons": "file:packages/icons",
 		"@wordpress/interactivity": "file:packages/interactivity",
+		"@wordpress/interactivity-router": "file:packages/interactivity-router",
 		"@wordpress/interface": "file:packages/interface",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
