@@ -207,6 +207,11 @@ export interface Filter {
 	 * The value to filter by.
 	 */
 	value: any;
+
+	/**
+	 * Whether the filter can be reset.
+	 */
+	canBeReset?: boolean;
 }
 
 export interface NormalizedFilter {
