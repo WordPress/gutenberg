@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.7.1-next.0 (2024-09-12)
+
 ### Bug Fixes
 
 -   Prevent calling `proxifyContext` over an already-proxified context inside `wp-context` ([#65090](https://github.com/WordPress/gutenberg/pull/65090)).

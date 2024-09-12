@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 30.0.0-next.0 (2024-09-12)
+
 
 ### Breaking Changes
 

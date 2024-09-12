@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.8.0-next.0 (2024-09-12)
+
 ### New Features
 
 -   Rewrite in TypeScript, exporting all the individual utility functions.

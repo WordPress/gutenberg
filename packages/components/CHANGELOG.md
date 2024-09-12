@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.8.0-next.0 (2024-09-12)
+
 ### Bug Fixes
 
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
