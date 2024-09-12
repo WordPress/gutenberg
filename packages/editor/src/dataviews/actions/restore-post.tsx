@@ -92,7 +92,7 @@ const restorePost: Action< PostWithPermissions > = {
 				}
 				// If we were trying to move multiple posts to the trash
 			} else {
-				const errorMessages = new Set();
+				const errorMessages = new Set< string >();
 				const failedPromises = promiseResult.filter(
 					( { status } ) => status === 'rejected'
 				);

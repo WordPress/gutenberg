@@ -139,7 +139,7 @@ const trashPost: Action< PostWithPermissions > = {
 									}
 									// If we were trying to delete multiple items.
 								} else {
-									const errorMessages = new Set();
+									const errorMessages = new Set< string >();
 									const failedPromises = promiseResult.filter(
 										( { status } ) => status === 'rejected'
 									);
