@@ -216,6 +216,15 @@ function proceed( conversionMap ) {
 			return true;
 
 		case 'closer':
+			// If there was no opener, proceed without converting.
+			if ( 0 === stackDepth ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					`Unmatched closing tag '${ name }' cannot be converted.`
+				);
+				return false;
+			}
+
 			// If we're not nesting then this is easy - close the block.
 			if ( 1 === stackDepth ) {
 				closeOuterElement( startOffset );
