@@ -139,6 +139,8 @@ add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 
  * @param array  $args      Array of arguments for registering a post type.
  *                          See the register_post_type() function for accepted arguments.
  * @param string $post_type Post type key.
+ *
+ * @return array|string Array or string of arguments for registering a post type.
  */
 function gutenberg_register_post_type_args_for_wp_global_styles( $args, $post_type ) {
 	if ( 'wp_global_styles' === $post_type ) {

@@ -553,7 +553,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		return new WP_Error(
-			'rest_cannot_manage_global_styles',
+			'rest_cannot_read_global_styles',
 			__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
 			array(
 				'status' => rest_authorization_required_code(),
