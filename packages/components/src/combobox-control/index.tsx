@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useRef,
 	useEffect,
+	useLayoutEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -137,7 +138,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	} );
 
 	const currentOption = options.find( ( option ) => option.value === value );
-	const currentLabel = currentOption?.label ?? '';
 	// Use a custom prefix when generating the `instanceId` to avoid having
 	// duplicate input IDs when rendering this component and `FormTokenField`
 	// in the same page (see https://github.com/WordPress/gutenberg/issues/42112).
@@ -148,6 +148,13 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputHasFocus, setInputHasFocus ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
+
+	const currentLabel = currentOption?.label;
+
+	useLayoutEffect( () => {
+		setInputValue( currentLabel ?? '' );
+	}, [ currentLabel ] );
+
 	const inputContainer = useRef< HTMLInputElement >( null );
 
 	const matchingSuggestions = useMemo( () => {
@@ -234,6 +241,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	const onBlur = () => {
 		setInputHasFocus( false );
+		setInputValue( currentLabel ?? '' );
 	};
 
 	const onFocus = () => {
@@ -340,7 +348,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								className="components-combobox-control__input"
 								instanceId={ instanceId }
 								ref={ inputContainer }
-								value={ isExpanded ? inputValue : currentLabel }
+								value={ inputValue }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								onClick={ onClick }
