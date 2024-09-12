@@ -49,7 +49,7 @@ export default function BlockListAppender( {
 		( select ) => {
 			const {
 				getBlockInsertionPoint,
-				isBlockInsertionPointVisible,
+				isInsertionCueVisible,
 				getBlockCount,
 			} = select( blockEditorStore );
 			const insertionPoint = getBlockInsertionPoint();
@@ -57,7 +57,7 @@ export default function BlockListAppender( {
 			// requires a lot more setup. We can revisit this once we refactor
 			// the DnD utility hooks.
 			return (
-				isBlockInsertionPointVisible() &&
+				isInsertionCueVisible() &&
 				rootClientId === insertionPoint?.rootClientId &&
 				getBlockCount( rootClientId ) === 0
 			);

@@ -31,7 +31,7 @@ const BlockDraggable = ( {
 		srcRootClientId,
 		isDraggable,
 		icon,
-		visibleInserter,
+		visibleInsertionCue,
 		getBlockType,
 	} = useSelect(
 		( select ) => {
@@ -40,7 +40,7 @@ const BlockDraggable = ( {
 				getBlockRootClientId,
 				getBlockName,
 				getBlockAttributes,
-				isBlockInsertionPointVisible,
+				isInsertionCueVisible,
 			} = select( blockEditorStore );
 			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
@@ -55,7 +55,7 @@ const BlockDraggable = ( {
 				srcRootClientId: rootClientId,
 				isDraggable: canMoveBlocks( clientIds ),
 				icon: variation?.icon || _getBlockType( blockName )?.icon,
-				visibleInserter: isBlockInsertionPointVisible(),
+				visibleInsertionCue: isInsertionCueVisible(),
 				getBlockType: _getBlockType,
 			};
 		},
@@ -143,7 +143,7 @@ const BlockDraggable = ( {
 			 * This has to be done on the document body because the draggable
 			 * chip is rendered outside of the editor iframe.
 			 */
-			if ( ! dropTargetValid && ! visibleInserter ) {
+			if ( ! dropTargetValid && ! visibleInsertionCue ) {
 				window?.document?.body?.classList?.add(
 					'block-draggable-invalid-drag-token'
 				);
@@ -169,7 +169,7 @@ const BlockDraggable = ( {
 		getBlockNamesByClientId,
 		getBlockRootClientId,
 		getBlockType,
-		visibleInserter,
+		visibleInsertionCue,
 	] );
 
 	if ( ! isDraggable ) {

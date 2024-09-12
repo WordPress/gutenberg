@@ -85,7 +85,7 @@ export default function BlockList( {
 				getBlockHierarchyRootClientId,
 				getBlockOrder,
 				getSelectedBlockClientId,
-				isBlockInsertionPointVisible,
+				isInsertionCueVisible,
 				getSettings,
 			} = select( blockEditorStore );
 
@@ -110,7 +110,7 @@ export default function BlockList( {
 				blockClientIds: blockOrder,
 				blockCount: getBlockCount(),
 				blockInsertionPointIsVisible:
-					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
+					Platform.OS === 'ios' && isInsertionCueVisible(),
 				isReadOnly: readOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible:
@@ -394,16 +394,13 @@ function EmptyList( {
 	rootClientId,
 } ) {
 	const { shouldShowInsertionPoint } = useSelect( ( select ) => {
-		const {
-			getBlockOrder,
-			getBlockInsertionPoint,
-			isBlockInsertionPointVisible,
-		} = select( blockEditorStore );
+		const { getBlockOrder, getBlockInsertionPoint, isInsertionCueVisible } =
+			select( blockEditorStore );
 
 		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );
 		const insertionPoint = getBlockInsertionPoint();
-		const blockInsertionPointIsVisible = isBlockInsertionPointVisible();
+		const blockInsertionPointIsVisible = isInsertionCueVisible();
 
 		return {
 			shouldShowInsertionPoint:

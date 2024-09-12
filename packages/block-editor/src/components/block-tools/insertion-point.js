@@ -227,13 +227,13 @@ export default function InsertionPoint( props ) {
 		( select ) => {
 			const {
 				getBlockInsertionPoint,
-				isBlockInsertionPointVisible,
+				isInsertionCueVisible,
 				getBlockCount,
 			} = select( blockEditorStore );
 			const blockInsertionPoint = getBlockInsertionPoint();
 			return {
 				insertionPoint: blockInsertionPoint,
-				isVisible: isBlockInsertionPointVisible(),
+				isVisible: isInsertionCueVisible(),
 				isBlockListEmpty:
 					getBlockCount( blockInsertionPoint?.rootClientId ) === 0,
 			};

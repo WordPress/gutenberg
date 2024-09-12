@@ -30,14 +30,14 @@ export function ZoomOutSeparator( {
 		sectionRootClientId,
 		sectionClientIds,
 		insertionPoint,
-		blockInsertionPointVisible,
+		insertionCueIsVisible,
 		blockInsertionPoint,
 	} = useSelect( ( select ) => {
 		const {
 			getInsertionPoint,
 			getBlockOrder,
 			getSectionRootClientId,
-			isBlockInsertionPointVisible,
+			isInsertionCueVisible,
 			getBlockInsertionPoint,
 		} = unlock( select( blockEditorStore ) );
 
@@ -49,7 +49,7 @@ export function ZoomOutSeparator( {
 			blockOrder: getBlockOrder( root ),
 			insertionPoint: getInsertionPoint(),
 			blockInsertionPoint: getBlockInsertionPoint(),
-			blockInsertionPointVisible: isBlockInsertionPointVisible(),
+			insertionCueIsVisible: isInsertionCueVisible(),
 		};
 	}, [] );
 
@@ -83,7 +83,7 @@ export function ZoomOutSeparator( {
 	if ( position === 'top' ) {
 		isVisible =
 			hasTopinsertionPoint ||
-			( blockInsertionPointVisible &&
+			( insertionCueIsVisible &&
 				blockInsertionPoint.index === 0 &&
 				clientId === sectionClientIds[ blockInsertionPoint.index ] );
 	}
@@ -91,7 +91,7 @@ export function ZoomOutSeparator( {
 	if ( position === 'bottom' ) {
 		isVisible =
 			hasBottominsertionPoint ||
-			( blockInsertionPointVisible &&
+			( insertionCueIsVisible &&
 				clientId ===
 					sectionClientIds[ blockInsertionPoint.index - 1 ] );
 	}
