@@ -39,13 +39,13 @@ export const TabListWrapper = styled.div`
 	}
 
 	@media not ( prefers-reduced-motion ) {
-		&.is-animation-enabled::after {
+		&.is-animation-enabled::before {
 			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
 	}
-	&::after {
+	&::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
@@ -84,7 +84,7 @@ export const TabListWrapper = styled.div`
 				linear-gradient( to left, var( --fade-gradient-composed ) );
 		}
 
-		&::after {
+		&::before {
 			bottom: 0;
 			height: 0;
 			width: calc( var( --antialiasing-factor ) * 1px );
@@ -103,8 +103,7 @@ export const TabListWrapper = styled.div`
 				${ COLORS.theme.accent };
 		}
 	}
-	&[aria-orientation='vertical']::after {
-		z-index: -1;
+	&[aria-orientation='vertical']::before {
 		top: 0;
 		left: 0;
 		width: 100%;
@@ -158,7 +157,7 @@ export const Tab = styled( Ariakit.Tab )`
 		}
 
 		// Focus.
-		&::before {
+		&::after {
 			content: '';
 			position: absolute;
 			top: ${ space( 3 ) };
@@ -181,7 +180,7 @@ export const Tab = styled( Ariakit.Tab )`
 			}
 		}
 
-		&:focus-visible::before {
+		&:focus-visible::after {
 			opacity: 1;
 		}
 	}
