@@ -39,7 +39,8 @@ const {
 	replaceInnerBlocks,
 	resetBlocks,
 	selectBlock,
-	showInsertionPoint,
+	showInsertionCue,
+	setInsertionPoint,
 	startMultiSelect,
 	startTyping,
 	stopMultiSelect,
@@ -512,10 +513,24 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'showInsertionPoint', () => {
+	describe( 'showInsertionCue', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint() ).toEqual( {
-				type: 'SHOW_INSERTION_POINT',
+			expect( showInsertionCue() ).toEqual( {
+				type: 'SHOW_INSERTION_CUE',
+			} );
+		} );
+	} );
+
+	describe( 'setInsertionPoint', () => {
+		it( 'should return the SET_INSERTION_POINT action', () => {
+			expect(
+				setInsertionPoint( {
+					rootClientId: '',
+					insertionIndex: '123',
+				} )
+			).toEqual( {
+				type: 'SET_INSERTION_POINT',
+				value: { rootClientId: '', insertionIndex: '123' },
 			} );
 		} );
 	} );
