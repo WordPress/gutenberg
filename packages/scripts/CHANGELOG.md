@@ -2,11 +2,14 @@
 
 ## Unreleased
 
-
 ### Breaking Changes
 
 -   Updated `stylelint` dependency to `^16.8.2` ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
 -   Switched default config from `@wordpress/stylelint-config/scss` to use `@wordpress/stylelint-config/scss-stylistic` to keep stylistic rules ([#64828](https://github.com/WordPress/gutenberg/pull/64828)).
+
+### Enhancements
+
+-   Add support for mjs, cjs, mts, and cts file extensions ([#65101](https://github.com/WordPress/gutenberg/pull/65101)).
 
 ## 29.0.0 (2024-09-05)
 
