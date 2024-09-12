@@ -183,7 +183,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
-		setInputValue( '' );
 		setIsExpanded( false );
 	};
 
