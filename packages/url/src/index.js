@@ -1,5 +1,6 @@
 export { isURL } from './is-url';
 export { isEmail } from './is-email';
+export { isPhoneNumber } from './is-phone-number';
 export { getProtocol } from './get-protocol';
 export { isValidProtocol } from './is-valid-protocol';
 export { getAuthority } from './get-authority';

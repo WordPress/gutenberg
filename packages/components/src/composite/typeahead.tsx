@@ -22,7 +22,7 @@ export const CompositeTypeahead = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeTypeahead
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>

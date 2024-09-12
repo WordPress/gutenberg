@@ -38,8 +38,13 @@ import {
 	sortIcons,
 	sortLabels,
 } from '../../constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from '../../dataviews-layouts';
-import type { NormalizedField, SupportedLayouts, View } from '../../types';
+import {
+	VIEW_LAYOUTS,
+	getNotHidableFieldIds,
+	getVisibleFieldIds,
+	getHiddenFieldIds,
+} from '../../dataviews-layouts';
+import type { SupportedLayouts, View, Field } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
@@ -232,50 +237,34 @@ function ItemsPerPageControl() {
 	);
 }
 
+interface FieldItemProps {
+	id: any;
+	label: string;
+	index: number;
+	isVisible: boolean;
+	isHidable: boolean;
+}
+
 function FieldItem( {
+	field: { id, label, index, isVisible, isHidable },
 	fields,
-	fieldId,
-	mandatoryFields,
-	viewFields,
 	view,
 	onChangeView,
 }: {
-	fields: NormalizedField< any >[];
-	fieldId: string;
-	mandatoryFields: string | any[];
-	viewFields: string[];
+	field: FieldItemProps;
+	fields: Field< any >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
 } ) {
-	let fieldLabel;
-	let fieldIsHidable;
-	const fieldObject = fields.find(
-		( f ) => f.id === fieldId
-	) as NormalizedField< any >;
-	if ( fieldObject ) {
-		fieldLabel = fieldObject.label;
-		fieldIsHidable =
-			fieldObject.enableHiding !== false &&
-			! mandatoryFields.includes( fieldId );
-	} else if ( view.type === LAYOUT_TABLE ) {
-		const combinedFieldObject = view.layout?.combinedFields?.find(
-			( f ) => f.id === fieldId
-		);
-		if ( combinedFieldObject ) {
-			fieldLabel = combinedFieldObject.label;
-			fieldIsHidable = ! mandatoryFields.includes( fieldId );
-		}
-	}
+	const visibleFieldIds = getVisibleFieldIds( view, fields );
 
-	const index = view.fields?.indexOf( fieldId ) as number;
-	const isVisible = viewFields.includes( fieldId );
 	return (
-		<Item key={ fieldId }>
+		<Item key={ id }>
 			<HStack
 				expanded
-				className={ `dataviews-field-control__field dataviews-field-control__field-${ fieldId }` }
+				className={ `dataviews-field-control__field dataviews-field-control__field-${ id }` }
 			>
-				<span>{ fieldLabel }</span>
+				<span>{ label }</span>
 				<HStack
 					justify="flex-end"
 					expanded={ false }
@@ -284,23 +273,22 @@ function FieldItem( {
 					{ view.type === LAYOUT_TABLE && isVisible && (
 						<>
 							<Button
-								disabled={ ! isVisible || index < 1 }
+								disabled={ index < 1 }
 								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
-									if ( ! view.fields || index < 1 ) {
-										return;
-									}
 									onChangeView( {
 										...view,
 										fields: [
-											...( view.fields.slice(
+											...( visibleFieldIds.slice(
 												0,
 												index - 1
 											) ?? [] ),
-											fieldId,
-											view.fields[ index - 1 ],
-											...view.fields.slice( index + 1 ),
+											id,
+											visibleFieldIds[ index - 1 ],
+											...visibleFieldIds.slice(
+												index + 1
+											),
 										],
 									} );
 								} }
@@ -308,34 +296,26 @@ function FieldItem( {
 								label={ sprintf(
 									/* translators: %s: field label */
 									__( 'Move %s up' ),
-									fieldLabel
+									label
 								) }
 							/>
 							<Button
-								disabled={
-									! isVisible ||
-									! view.fields ||
-									index >= view.fields.length - 1
-								}
+								disabled={ index >= visibleFieldIds.length - 1 }
 								accessibleWhenDisabled
 								size="compact"
 								onClick={ () => {
-									if (
-										! view.fields ||
-										index >= view.fields.length - 1
-									) {
-										return;
-									}
 									onChangeView( {
 										...view,
 										fields: [
-											...( view.fields.slice(
+											...( visibleFieldIds.slice(
 												0,
 												index
 											) ?? [] ),
-											view.fields[ index + 1 ],
-											fieldId,
-											...view.fields.slice( index + 2 ),
+											visibleFieldIds[ index + 1 ],
+											id,
+											...visibleFieldIds.slice(
+												index + 2
+											),
 										],
 									} );
 								} }
@@ -343,31 +323,31 @@ function FieldItem( {
 								label={ sprintf(
 									/* translators: %s: field label */
 									__( 'Move %s down' ),
-									fieldLabel
+									label
 								) }
 							/>{ ' ' }
 						</>
 					) }
 					<Button
 						className="dataviews-field-control__field-visibility-button"
-						disabled={ ! fieldIsHidable }
+						disabled={ ! isHidable }
 						accessibleWhenDisabled
 						size="compact"
 						onClick={ () => {
 							onChangeView( {
 								...view,
 								fields: isVisible
-									? viewFields.filter(
-											( id ) => id !== fieldId
+									? visibleFieldIds.filter(
+											( fieldId ) => fieldId !== id
 									  )
-									: [ ...viewFields, fieldId ],
+									: [ ...visibleFieldIds, id ],
 							} );
 							// Focus the visibility button to avoid focus loss.
 							// Our code is safe against the component being unmounted, so we don't need to worry about cleaning the timeout.
 							// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 							setTimeout( () => {
 								const element = document.querySelector(
-									`.dataviews-field-control__field-${ fieldId } .dataviews-field-control__field-visibility-button`
+									`.dataviews-field-control__field-${ id } .dataviews-field-control__field-visibility-button`
 								);
 								if ( element instanceof HTMLElement ) {
 									element.focus();
@@ -380,12 +360,12 @@ function FieldItem( {
 								? sprintf(
 										/* translators: %s: field label */
 										__( 'Hide %s' ),
-										fieldLabel
+										label
 								  )
 								: sprintf(
 										/* translators: %s: field label */
 										__( 'Show %s' ),
-										fieldLabel
+										label
 								  )
 						}
 					/>
@@ -395,83 +375,77 @@ function FieldItem( {
 	);
 }
 
-function FieldList( {
-	fields,
-	fieldIds,
-	mandatoryFields,
-	viewFields,
-	view,
-	onChangeView,
-}: Omit< Parameters< typeof FieldItem >[ 0 ], 'fieldId' > & {
-	fieldIds: string[];
-} ) {
-	return fieldIds.map( ( fieldId ) => (
-		<FieldItem
-			key={ fieldId }
-			fields={ fields }
-			fieldId={ fieldId }
-			mandatoryFields={ mandatoryFields }
-			viewFields={ viewFields }
-			view={ view }
-			onChangeView={ onChangeView }
-		/>
-	) );
-}
-
 function FieldControl() {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
-	const mandatoryFields = useMemo(
-		() => getMandatoryFields( view ),
+
+	const visibleFieldIds = useMemo(
+		() => getVisibleFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const hiddenFieldIds = useMemo(
+		() => getHiddenFieldIds( view, fields ),
+		[ view, fields ]
+	);
+	const notHidableFieldIds = useMemo(
+		() => getNotHidableFieldIds( view ),
 		[ view ]
 	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	const visibleFields = view.fields;
-	const hiddenFields = useMemo( () => {
-		const nonViewFieldsList = fields
-			.filter(
-				( field ) =>
-					! viewFields.includes( field.id ) &&
-					! mandatoryFields?.includes( field.id )
-			)
-			.map( ( field ) => field.id );
 
-		if ( view.type !== LAYOUT_TABLE ) {
-			return nonViewFieldsList;
-		}
-		const nonViewFieldsAndNonCombinedList = nonViewFieldsList.filter(
-			( fieldId ) => {
-				return ! view.layout?.combinedFields?.some( ( combinedField ) =>
-					combinedField.children.includes( fieldId )
-				);
-			}
-		);
-		const nonViewFieldsCombinedFieldsList =
-			view.layout?.combinedFields
-				?.filter(
-					( combinedField ) =>
-						! viewFields.includes( combinedField.id )
-				)
-				.map( ( combinedField ) => combinedField.id ) || [];
-		return [
-			...nonViewFieldsAndNonCombinedList,
-			...nonViewFieldsCombinedFieldsList,
-		];
-	}, [ view, mandatoryFields, fields, viewFields ] );
+	const visibleFields = fields
+		.filter( ( { id } ) => visibleFieldIds.includes( id ) )
+		.map( ( { id, label, enableHiding } ) => {
+			return {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id )
+					? false
+					: enableHiding,
+			};
+		} );
+	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		view.layout.combinedFields.forEach( ( { id, label } ) => {
+			visibleFields.push( {
+				id,
+				label,
+				index: visibleFieldIds.indexOf( id ),
+				isVisible: true,
+				isHidable: notHidableFieldIds.includes( id ),
+			} );
+		} );
+	}
+	visibleFields.sort( ( a, b ) => a.index - b.index );
+
+	const hiddenFields = fields
+		.filter( ( { id } ) => hiddenFieldIds.includes( id ) )
+		.map( ( { id, label, enableHiding }, index ) => {
+			return {
+				id,
+				label,
+				index,
+				isVisible: false,
+				isHidable: enableHiding,
+			};
+		} );
+
 	if ( ! visibleFields?.length && ! hiddenFields?.length ) {
 		return null;
 	}
+
 	return (
 		<VStack spacing={ 6 } className="dataviews-field-control">
 			{ !! visibleFields?.length && (
 				<ItemGroup isBordered isSeparated>
-					<FieldList
-						fields={ fields }
-						fieldIds={ visibleFields }
-						mandatoryFields={ mandatoryFields }
-						viewFields={ viewFields }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
+					{ visibleFields.map( ( field ) => (
+						<FieldItem
+							key={ field.id }
+							field={ field }
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					) ) }
 				</ItemGroup>
 			) }
 			{ !! hiddenFields?.length && (
@@ -481,14 +455,15 @@ function FieldControl() {
 							{ __( 'Hidden' ) }
 						</BaseControl.VisualLabel>
 						<ItemGroup isBordered isSeparated>
-							<FieldList
-								fields={ fields }
-								fieldIds={ hiddenFields }
-								mandatoryFields={ mandatoryFields }
-								viewFields={ viewFields }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
+							{ hiddenFields.map( ( field ) => (
+								<FieldItem
+									key={ field.id }
+									field={ field }
+									fields={ fields }
+									view={ view }
+									onChangeView={ onChangeView }
+								/>
+							) ) }
 						</ItemGroup>
 					</VStack>
 				</>

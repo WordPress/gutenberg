@@ -646,6 +646,8 @@ function BlockListBlockProvider( props ) {
 				blocksWithSameName.length &&
 				blocksWithSameName[ 0 ] !== clientId;
 
+			const editorMode = __unstableGetEditorMode();
+
 			return {
 				...previewContext,
 				mode: getBlockMode( clientId ),
@@ -672,6 +674,7 @@ function BlockListBlockProvider( props ) {
 					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
+				editorMode,
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
 					isBlockSubtreeDisabled( clientId ),
@@ -680,8 +683,7 @@ function BlockListBlockProvider( props ) {
 					! isDragging(),
 				initialPosition:
 					_isSelected &&
-					( __unstableGetEditorMode() === 'edit' ||
-						__unstableGetEditorMode() === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
+					( editorMode === 'edit' || editorMode === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
@@ -728,6 +730,7 @@ function BlockListBlockProvider( props ) {
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
+		editorMode,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		index,
@@ -782,6 +785,7 @@ function BlockListBlockProvider( props ) {
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
+		editorMode,
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,

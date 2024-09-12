@@ -16,6 +16,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
+import { isRTL } from '@wordpress/i18n';
 import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
@@ -38,10 +39,9 @@ import type { CompositeProps } from './types';
  *
  * @example
  * ```jsx
- * import { Composite, useCompositeStore } from '@wordpress/components';
+ * import { Composite } from '@wordpress/components';
  *
- * const store = useCompositeStore();
- * <Composite store={store}>
+ * <Composite>
  *   <Composite.Item>Item 1</Composite.Item>
  *   <Composite.Item>Item 2</Composite.Item>
  * </Composite>
@@ -62,21 +62,18 @@ export const Composite = Object.assign(
 			focusShift = false,
 			virtualFocus = false,
 			orientation = 'both',
-			rtl = false,
+			rtl = isRTL(),
 
 			// Composite component props
 			children,
 			disabled = false,
-
-			// To be removed
-			store: storeProp,
 
 			// Rest props
 			...props
 		},
 		ref
 	) {
-		const newStore = Ariakit.useCompositeStore( {
+		const store = Ariakit.useCompositeStore( {
 			activeId,
 			defaultActiveId,
 			setActiveId,
@@ -87,8 +84,6 @@ export const Composite = Object.assign(
 			orientation,
 			rtl,
 		} );
-
-		const store = storeProp || newStore;
 
 		const contextValue = useMemo(
 			() => ( {
@@ -116,10 +111,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Group>
 		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
 		 *     <Composite.Item>Item 1</Composite.Item>
@@ -138,10 +132,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Group>
 		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
 		 *     <Composite.Item>Item 1</Composite.Item>
@@ -158,10 +151,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Item>Item 1</Composite.Item>
 		 *   <Composite.Item>Item 2</Composite.Item>
 		 *   <Composite.Item>Item 3</Composite.Item>
@@ -176,10 +168,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Row>
 		 *     <Composite.Item>Item 1.1</Composite.Item>
 		 *     <Composite.Item>Item 1.2</Composite.Item>
@@ -201,10 +192,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Hover render={ <Composite.Item /> }>
 		 *     Item 1
 		 *   </Composite.Hover>
@@ -224,10 +214,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store} render={ <CompositeTypeahead /> }>
+		 * <Composite render={ <CompositeTypeahead /> }>
 		 *   <Composite.Item>Item 1</Composite.Item>
 		 *   <Composite.Item>Item 2</Composite.Item>
 		 * </Composite>

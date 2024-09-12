@@ -22,7 +22,7 @@ export default {
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				meta?.[ source.args.key ] || source.args.key;
+				meta?.[ source.args.key ] ?? source.args.key;
 		}
 		return newValues;
 	},
@@ -60,6 +60,12 @@ export default {
 		)?.meta?.[ args.key ];
 
 		if ( fieldValue === undefined ) {
+			return false;
+		}
+		// Check that custom fields metabox is not enabled.
+		const areCustomFieldsEnabled =
+			select( editorStore ).getEditorSettings().enableCustomFields;
+		if ( areCustomFieldsEnabled ) {
 			return false;
 		}
 

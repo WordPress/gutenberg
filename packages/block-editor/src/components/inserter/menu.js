@@ -32,7 +32,6 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -102,12 +101,12 @@ function InserterMenu(
 			window.requestAnimationFrame( () => {
 				if (
 					! shouldFocusBlock &&
-					! blockTypesTabRef?.current.contains(
+					! blockTypesTabRef.current?.contains(
 						ref.current.ownerDocument.activeElement
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
-					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+					blockTypesTabRef.current?.querySelector( 'button' ).focus();
 				}
 			} );
 		},
@@ -146,11 +145,6 @@ function InserterMenu(
 		!! selectedPatternCategory;
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
-
-	const showZoomOut =
-		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
-
-	useZoomOut( showZoomOut );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {

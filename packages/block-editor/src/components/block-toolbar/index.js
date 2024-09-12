@@ -65,6 +65,8 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		hasParentPattern,
+		hasContentOnlyLocking,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -74,6 +76,8 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockEditingMode,
 			getBlockAttributes,
+			getBlockParentsByBlockName,
+			getTemplateLock,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -94,6 +98,17 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+
+		const _hasParentPattern = selectedBlockClientIds.every(
+			( clientId ) =>
+				getBlockParentsByBlockName( clientId, 'core/block', true )
+					.length > 0
+		);
+
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
+		const _hasTemplateLock = selectedBlockClientIds.some(
+			( id ) => getTemplateLock( id ) === 'contentOnly'
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -113,6 +128,8 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: _isUsingBindings,
+			hasParentPattern: _hasParentPattern,
+			hasContentOnlyLocking: _hasTemplateLock,
 		};
 	}, [] );
 
@@ -167,7 +184,7 @@ export function PrivateBlockToolbar( {
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode ||
-						isContentOnlyEditingMode ||
+						( isContentOnlyEditingMode && ! hasParentPattern ) ||
 						isSynced ) && (
 						<div
 							ref={ nodeRef }
@@ -195,9 +212,9 @@ export function PrivateBlockToolbar( {
 							</ToolbarGroup>
 						</div>
 					) }
-				{ shouldShowVisualToolbar && isMultiToolbar && (
-					<BlockGroupToolbar />
-				) }
+				{ ! hasContentOnlyLocking &&
+					shouldShowVisualToolbar &&
+					isMultiToolbar && <BlockGroupToolbar /> }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot
