@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -16,6 +16,10 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
+	const getSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings
+	);
+
 	const { __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -29,6 +33,14 @@ export function useZoomOutModeExit( { editorMode } ) {
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
+
+					const { __experimentalSetIsInserterOpened } = getSettings();
+
+					if (
+						typeof __experimentalSetIsInserterOpened === 'function'
+					) {
+						__experimentalSetIsInserterOpened( false );
+					}
 					__unstableSetEditorMode( 'edit' );
 				}
 			}

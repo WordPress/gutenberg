@@ -64,19 +64,17 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		if ( focusOnMountRef.current === 'firstElement' ) {
-			timerIdRef.current = setTimeout( () => {
-				const firstTabbable = focus.tabbable.find( node )[ 0 ];
-
-				if ( firstTabbable ) {
-					setFocus( firstTabbable );
-				}
-			}, 0 );
-
+		if ( focusOnMountRef.current !== 'firstElement' ) {
+			setFocus( node );
 			return;
 		}
 
-		setFocus( node );
+		timerIdRef.current = setTimeout( () => {
+			const firstTabbable = focus.tabbable.find( node )[ 0 ];
+			if ( firstTabbable ) {
+				setFocus( firstTabbable );
+			}
+		}, 0 );
 
 		return () => {
 			if ( timerIdRef.current ) {

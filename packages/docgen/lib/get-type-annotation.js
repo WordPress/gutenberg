@@ -401,6 +401,10 @@ function getTypeAnnotation( typeAnnotation ) {
  *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
+	if ( babelTypes.isTSDeclareFunction( token ) ) {
+		return token;
+	}
+
 	if ( babelTypes.isFunctionDeclaration( token ) ) {
 		return token;
 	}
