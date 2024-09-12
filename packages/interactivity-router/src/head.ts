@@ -1,7 +1,10 @@
 /**
- * Internal dependencies
+ * The cache of prefetched stylesheets and scripts.
  */
-import { headElements } from '.';
+export const headElements = new Map<
+	string,
+	{ tag: HTMLElement; text?: string }
+>();
 
 /**
  * Helper to update only the necessary tags in the head.

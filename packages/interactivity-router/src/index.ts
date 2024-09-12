@@ -6,7 +6,7 @@ import { store, privateApis, getConfig } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { fetchHeadAssets, updateHead } from './head';
+import { fetchHeadAssets, updateHead, headElements } from './head';
 
 const {
 	directivePrefix,
@@ -54,10 +54,6 @@ const navigationMode: 'regionBased' | 'fullPage' =
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map< string, Promise< Page | false > >();
-export const headElements = new Map<
-	string,
-	{ tag: HTMLElement; text?: string }
->();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
