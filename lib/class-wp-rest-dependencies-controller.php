@@ -208,12 +208,26 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	public function get_items_permissions_check( $request ) {
-		$check = $this->check_read_permission( $request['dependency'] );
-		if ( is_wp_error( $check ) ) {
-			return $check;
+		$dependency = $request['dependency'];
+
+		if ( $dependency ) {
+			$check = $this->check_read_permission( $dependency );
+			if ( is_wp_error( $check ) ) {
+				return $check;
+			}
+			if ( true === $check || current_user_can( 'manage_options' ) ) {
+				return true;
+			}
 		}
-		if ( true === $check || current_user_can( 'manage_options' ) ) {
+
+		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
+		}
+
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
 		}
 
 		return new WP_Error( 'rest_handle_cannot_view', __( 'Sorry, you are not allowed to manage dependencies.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
@@ -287,8 +301,6 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return bool|WP_Error
 	 */
 	protected function check_read_permission( $handle ) {
-		// Circumvent the a handle requirement to allow querying all dependencies.
-		return true;
 		if ( ! $handle ) {
 			return new WP_Error( 'rest_handle_empty', __( 'Empty handle.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
