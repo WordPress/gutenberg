@@ -79,12 +79,12 @@ function useInsertionPoint( {
 				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-				getInserterInsertionPoint,
+				getInsertionPoint,
 			} = unlock( select( blockEditorStore ) );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
-			const insertionPoint = getInserterInsertionPoint();
+			const insertionPoint = getInsertionPoint();
 
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.

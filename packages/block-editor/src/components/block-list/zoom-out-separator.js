@@ -29,12 +29,12 @@ export function ZoomOutSeparator( {
 	const {
 		sectionRootClientId,
 		sectionClientIds,
-		inserterInsertionPoint,
+		insertionPoint,
 		blockInsertionPointVisible,
 		blockInsertionPoint,
 	} = useSelect( ( select ) => {
 		const {
-			getInserterInsertionPoint,
+			getInsertionPoint,
 			getBlockOrder,
 			getSectionRootClientId,
 			isBlockInsertionPointVisible,
@@ -47,7 +47,7 @@ export function ZoomOutSeparator( {
 			sectionRootClientId: root,
 			sectionClientIds: sectionRootClientIds,
 			blockOrder: getBlockOrder( root ),
-			inserterInsertionPoint: getInserterInsertionPoint(),
+			insertionPoint: getInsertionPoint(),
 			blockInsertionPoint: getBlockInsertionPoint(),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 		};
@@ -70,20 +70,19 @@ export function ZoomOutSeparator( {
 		return null;
 	}
 
-	const hasTopInserterInsertionPoint =
-		inserterInsertionPoint?.insertionIndex === 0 &&
-		clientId === sectionClientIds[ inserterInsertionPoint.insertionIndex ];
-	const hasBottomInserterInsertionPoint =
-		inserterInsertionPoint &&
-		inserterInsertionPoint.hasOwnProperty( 'insertionIndex' ) &&
-		clientId ===
-			sectionClientIds[ inserterInsertionPoint.insertionIndex - 1 ];
+	const hasTopinsertionPoint =
+		insertionPoint?.insertionIndex === 0 &&
+		clientId === sectionClientIds[ insertionPoint.insertionIndex ];
+	const hasBottominsertionPoint =
+		insertionPoint &&
+		insertionPoint.hasOwnProperty( 'insertionIndex' ) &&
+		clientId === sectionClientIds[ insertionPoint.insertionIndex - 1 ];
 	// We want to show the zoom out separator in either of these conditions:
 	// 1. If the inserter has an insertion index set
 	// 2. We are dragging a pattern over an insertion point
 	if ( position === 'top' ) {
 		isVisible =
-			hasTopInserterInsertionPoint ||
+			hasTopinsertionPoint ||
 			( blockInsertionPointVisible &&
 				blockInsertionPoint.index === 0 &&
 				clientId === sectionClientIds[ blockInsertionPoint.index ] );
@@ -91,7 +90,7 @@ export function ZoomOutSeparator( {
 
 	if ( position === 'bottom' ) {
 		isVisible =
-			hasBottomInserterInsertionPoint ||
+			hasBottominsertionPoint ||
 			( blockInsertionPointVisible &&
 				clientId ===
 					sectionClientIds[ blockInsertionPoint.index - 1 ] );

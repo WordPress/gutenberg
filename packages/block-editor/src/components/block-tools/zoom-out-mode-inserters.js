@@ -16,7 +16,7 @@ function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
 		hasSelection,
-		inserterInsertionPoint,
+		insertionPoint,
 		blockOrder,
 		blockInsertionPointVisible,
 		setInserterIsOpened,
@@ -26,7 +26,7 @@ function ZoomOutModeInserters() {
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
-			getInserterInsertionPoint,
+			getInsertionPoint,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
@@ -39,7 +39,7 @@ function ZoomOutModeInserters() {
 
 		return {
 			hasSelection: !! getSelectionStart().clientId,
-			inserterInsertionPoint: getInserterInsertionPoint(),
+			insertionPoint: getInsertionPoint(),
 			blockOrder: getBlockOrder( root ),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,
@@ -72,7 +72,7 @@ function ZoomOutModeInserters() {
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		const shouldRenderInsertionPoint =
 			blockInsertionPointVisible &&
-			inserterInsertionPoint?.insertionIndex === index;
+			insertionPoint?.insertionIndex === index;
 
 		const previousClientId = clientId;
 		const nextClientId = blockOrder[ index ];
