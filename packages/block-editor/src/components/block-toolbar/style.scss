@@ -39,10 +39,13 @@
 
 	&.is-synced,
 	&.is-connected {
-		.block-editor-block-switcher .components-button .block-editor-block-icon {
-			color: var(--wp-block-synced-color);
+		.block-editor-block-switcher .components-button::before {
 			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
 			border-radius: $radius-small;
+		}
+
+		.block-editor-block-switcher .components-button .block-editor-block-icon {
+			color: var(--wp-block-synced-color);
 		}
 
 		.components-toolbar-button.block-editor-block-switcher__no-switcher-icon {
