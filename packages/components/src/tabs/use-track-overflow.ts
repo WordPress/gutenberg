@@ -32,7 +32,7 @@ export function useTrackOverflow(
 		}
 		const newObserver = new IntersectionObserver( callback, {
 			root: parent,
-			threshold: 1,
+			threshold: 0.9,
 		} );
 		setObserver( newObserver );
 
