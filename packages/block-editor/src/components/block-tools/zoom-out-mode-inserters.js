@@ -71,7 +71,7 @@ function ZoomOutModeInserters() {
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		const shouldRenderInsertionPoint =
-			insertionCueIsVisible && insertionPoint?.insertionIndex === index;
+			insertionCueIsVisible && insertionPoint?.index === index;
 
 		const previousClientId = clientId;
 		const nextClientId = blockOrder[ index ];
