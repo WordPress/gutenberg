@@ -126,9 +126,6 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		min-height: ${ space(
-			12
-		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
 		height: auto;
 		background: transparent;
 		border: none;
@@ -139,7 +136,6 @@ export const Tab = styled( Ariakit.Tab )`
 		margin-left: 0;
 		font-weight: 500;
 		text-align: inherit;
-		hyphens: auto;
 		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
