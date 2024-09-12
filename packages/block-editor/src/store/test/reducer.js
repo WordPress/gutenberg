@@ -28,8 +28,8 @@ import {
 	isMultiSelecting,
 	preferences,
 	blocksMode,
+	insertionCue,
 	insertionPoint,
-	inserterInsertionPoint,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
@@ -2379,15 +2379,15 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'insertionPoint', () => {
+	describe( 'insertionCue', () => {
 		it( 'should default to null', () => {
-			const state = insertionPoint( undefined, {} );
+			const state = insertionCue( undefined, {} );
 
 			expect( state ).toBe( null );
 		} );
 
 		it( 'should set insertion point', () => {
-			const state = insertionPoint( null, {
+			const state = insertionCue( null, {
 				type: 'SHOW_INSERTION_POINT',
 				rootClientId: 'clientId1',
 				index: 0,
@@ -2404,7 +2404,7 @@ describe( 'state', () => {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
-			const state = insertionPoint( original, {
+			const state = insertionCue( original, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
@@ -3487,16 +3487,16 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'inserterInsertionPoint', () => {
+	describe( 'insertionPoint', () => {
 		it( 'should default to null', () => {
-			const state = inserterInsertionPoint( undefined, {} );
+			const state = insertionPoint( undefined, {} );
 
 			expect( state ).toBe( null );
 		} );
 
-		it( 'should set inserter insertion point', () => {
-			const state = inserterInsertionPoint( null, {
-				type: 'SET_INSERTER_INSERTION_POINT',
+		it( 'should set insertion point', () => {
+			const state = insertionPoint( null, {
+				type: 'SET_INSERTION_POINT',
 				value: {
 					rootClientId: 'clientId1',
 					insertionIndex: 4,
@@ -3514,7 +3514,7 @@ describe( 'state', () => {
 				rootClientId: 'clientId1',
 				insertionIndex: 4,
 			} );
-			const state = inserterInsertionPoint( original, {
+			const state = insertionPoint( original, {
 				type: 'SELECT_BLOCK',
 			} );
 

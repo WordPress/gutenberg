@@ -6,7 +6,7 @@ import {
 	showBlockInterface,
 	expandBlock,
 	__experimentalUpdateSettings,
-	setInserterInsertionPoint,
+	setInsertionPoint,
 	setOpenedBlockSettingsMenu,
 	startDragging,
 	stopDragging,
@@ -125,15 +125,15 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'setInserterInsertionPoint', () => {
-		it( 'should return the SET_INSERTER_INSERTION_POINT action', () => {
+	describe( 'setInsertionPoint', () => {
+		it( 'should return the SET_INSERTION_POINT action', () => {
 			expect(
-				setInserterInsertionPoint( {
+				setInsertionPoint( {
 					rootClientId: '',
 					insertionIndex: '123',
 				} )
 			).toEqual( {
-				type: 'SET_INSERTER_INSERTION_POINT',
+				type: 'SET_INSERTION_POINT',
 				value: { rootClientId: '', insertionIndex: '123' },
 			} );
 		} );

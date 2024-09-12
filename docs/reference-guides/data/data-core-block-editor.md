@@ -609,6 +609,30 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+### getInsertionCue
+
+Returns the insertion cue state. Returns null if there is no insertion cue.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Insertion point object with `rootClientId`, `index`.
+
+### getInsertionPoint
+
+Returns the point where a block would be inserted.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Insertion point object with `rootClientId`, `index`.
+
 ### getLastMultiSelectedBlockClientId
 
 Returns the client ID of the last block in the multi-selection set, or null if there is no multi-selection.
@@ -1111,6 +1135,18 @@ _Returns_
 
 -   `boolean`: True if the blocks are groupable.
 
+### isInsertionCueVisible
+
+Returns true if we should show the insertion cue.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `?boolean`: Whether the insertion cue is visible or not.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
@@ -1264,6 +1300,10 @@ Action that "flashes" the block with a given `clientId` by rhythmically highligh
 _Parameters_
 
 -   _clientId_ `string`: Target block client ID.
+
+### hideInsertionCue
+
+Action that hides the insertion cue.
 
 ### hideInsertionPoint
 
@@ -1684,6 +1724,18 @@ _Parameters_
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
 
+### setInsertionPoint
+
+_Parameters_
+
+-   _value_ `Object`:
+-   _value.rootClientId_ `string`: The root client ID to insert at.
+-   _value.insertionIndex_ `number`: The index to insert at.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setNavigationMode
 
 Action that enables or disables the navigation mode.
@@ -1703,6 +1755,25 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### showInsertionCue
+
+Action that shows an insertion point cue.
+
+_Parameters_
+
+-   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
+-   _index_ `?number`: Index at which block should be inserted.
+-   _\_\_unstableOptions_ `?Object`: Additional options.
+
+_Returns_
+
+-   `Object`: Action object.
+
+_Properties_
+
+-   _\_\_unstableWithInserter_ `boolean`: Whether or not to show an inserter button.
+-   _operation_ `WPDropOperation`: The operation to perform when applied, either 'insert' or 'replace' for now.
 
 ### showInsertionPoint
 

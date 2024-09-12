@@ -616,6 +616,11 @@ export function showInsertionPoint(
 	index,
 	__unstableOptions = {}
 ) {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).showInsertionPoint', {
+		since: '6.7',
+		version: '6.9',
+		alternative: 'wp.data.dispatch( "core/block-editor" ).showInsertionCue',
+	} );
 	const { __unstableWithInserter, operation, nearestSide } =
 		__unstableOptions;
 	return {
@@ -627,12 +632,22 @@ export function showInsertionPoint(
 		nearestSide,
 	};
 }
+
 /**
  * Action that hides the insertion point.
  */
 export const hideInsertionPoint =
 	() =>
 	( { select, dispatch } ) => {
+		deprecated(
+			'wp.data.dispatch( "core/block-editor" ).hideInsertionPoint',
+			{
+				since: '6.7',
+				version: '6.9',
+				alternative:
+					'wp.data.dispatch( "core/block-editor" ).hideInsertionCue',
+			}
+		);
 		if ( ! select.isBlockInsertionPointVisible() ) {
 			return;
 		}
@@ -640,6 +655,64 @@ export const hideInsertionPoint =
 			type: 'HIDE_INSERTION_POINT',
 		} );
 	};
+
+/**
+ * Action that shows an insertion point cue.
+ *
+ * @param    {?string}         rootClientId           Optional root client ID of block list on
+ *                                                    which to insert.
+ * @param    {?number}         index                  Index at which block should be inserted.
+ * @param    {?Object}         __unstableOptions      Additional options.
+ * @property {boolean}         __unstableWithInserter Whether or not to show an inserter button.
+ * @property {WPDropOperation} operation              The operation to perform when applied,
+ *                                                    either 'insert' or 'replace' for now.
+ *
+ * @return {Object} Action object.
+ */
+export function showInsertionCue(
+	rootClientId,
+	index,
+	__unstableOptions = {}
+) {
+	const { __unstableWithInserter, operation, nearestSide } =
+		__unstableOptions;
+	return {
+		type: 'SHOW_INSERTION_CUE',
+		rootClientId,
+		index,
+		__unstableWithInserter,
+		operation,
+		nearestSide,
+	};
+}
+
+/**
+ * Action that hides the insertion cue.
+ */
+export const hideInsertionCue =
+	() =>
+	( { select, dispatch } ) => {
+		if ( ! select.isInsertionCueVisible() ) {
+			return;
+		}
+		dispatch( {
+			type: 'HIDE_INSERTION_CUE',
+		} );
+	};
+
+/**
+ * @param {Object} value
+ * @param {string} value.rootClientId   The root client ID to insert at.
+ * @param {number} value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setInsertionPoint( value ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		value,
+	};
+}
 
 /**
  * Action that resets the template validity.

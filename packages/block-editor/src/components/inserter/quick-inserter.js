@@ -19,7 +19,6 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
@@ -83,9 +82,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { setInserterInsertionPoint } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { setInsertionPoint } = useDispatch( blockEditorStore );
 
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
@@ -94,7 +91,7 @@ export default function QuickInserter( {
 			filterValue,
 			onSelect,
 		} );
-		setInserterInsertionPoint( { rootClientId, insertionIndex } );
+		setInsertionPoint( { rootClientId, insertionIndex } );
 	};
 
 	let maxBlockPatterns = 0;
