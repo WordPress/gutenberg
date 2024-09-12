@@ -40,6 +40,7 @@ function InserterSearchResults( {
 	onHover,
 	onHoverPattern,
 	rootClientId,
+	clientId,
 	isAppender,
 	__experimentalInsertionIndex,
 	maxBlockPatterns,
@@ -69,6 +70,7 @@ function InserterSearchResults( {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
+		clientId,
 		isAppender,
 		insertionIndex: __experimentalInsertionIndex,
 		shouldFocusBlock,

@@ -43,7 +43,7 @@ function InbetweenInsertionPointPopover( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getBlockInsertionPoint,
+			getInsertionCue,
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
@@ -51,15 +51,15 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode,
 			__unstableGetEditorMode,
 		} = select( blockEditorStore );
-		const insertionPoint = getBlockInsertionPoint();
-		const order = getBlockOrder( insertionPoint.rootClientId );
+		const insertionCue = getInsertionCue();
+		const order = getBlockOrder( insertionCue.rootClientId );
 
 		if ( ! order.length ) {
 			return {};
 		}
 
-		let _previousClientId = order[ insertionPoint.index - 1 ];
-		let _nextClientId = order[ insertionPoint.index ];
+		let _previousClientId = order[ insertionCue.index - 1 ];
+		let _nextClientId = order[ insertionCue.index ];
 
 		while ( isBlockBeingDragged( _previousClientId ) ) {
 			_previousClientId = getPreviousBlockClientId( _previousClientId );
@@ -75,12 +75,12 @@ function InbetweenInsertionPointPopover( {
 			previousClientId: _previousClientId,
 			nextClientId: _nextClientId,
 			orientation:
-				getBlockListSettings( insertionPoint.rootClientId )
+				getBlockListSettings( insertionCue.rootClientId )
 					?.orientation || 'vertical',
-			rootClientId: insertionPoint.rootClientId,
+			rootClientId: insertionCue.rootClientId,
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
-			isInserterShown: insertionPoint?.__unstableWithInserter,
+			isInserterShown: insertionCue?.__unstableWithInserter,
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
@@ -223,19 +223,16 @@ function InbetweenInsertionPointPopover( {
 }
 
 export default function InsertionPoint( props ) {
-	const { insertionPoint, isVisible, isBlockListEmpty } = useSelect(
+	const { insertionCue, isVisible, isBlockListEmpty } = useSelect(
 		( select ) => {
-			const {
-				getBlockInsertionPoint,
-				isInsertionCueVisible,
-				getBlockCount,
-			} = select( blockEditorStore );
-			const blockInsertionPoint = getBlockInsertionPoint();
+			const { getInsertionCue, isInsertionCueVisible, getBlockCount } =
+				select( blockEditorStore );
+			const blockInsertionCue = getInsertionCue();
 			return {
-				insertionPoint: blockInsertionPoint,
+				insertionCue: blockInsertionCue,
 				isVisible: isInsertionCueVisible(),
 				isBlockListEmpty:
-					getBlockCount( blockInsertionPoint?.rootClientId ) === 0,
+					getBlockCount( blockInsertionCue?.rootClientId ) === 0,
 			};
 		},
 		[]
@@ -254,16 +251,16 @@ export default function InsertionPoint( props ) {
 	 * Render a popover that overlays the block when the desired operation is to replace it.
 	 * Otherwise, render a popover in between blocks for the indication of inserting between them.
 	 */
-	return insertionPoint.operation === 'replace' ? (
+	return insertionCue.operation === 'replace' ? (
 		<BlockDropZonePopover
 			// Force remount to trigger the animation.
-			key={ `${ insertionPoint.rootClientId }-${ insertionPoint.index }` }
+			key={ `${ insertionCue.rootClientId }-${ insertionCue.index }` }
 			{ ...props }
 		/>
 	) : (
 		<InbetweenInsertionPointPopover
-			operation={ insertionPoint.operation }
-			nearestSide={ insertionPoint.nearestSide }
+			operation={ insertionCue.operation }
+			nearestSide={ insertionCue.nearestSide }
 			{ ...props }
 		/>
 	);

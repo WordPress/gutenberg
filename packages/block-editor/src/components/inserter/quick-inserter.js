@@ -38,6 +38,7 @@ export default function QuickInserter( {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
+		clientId,
 		isAppender,
 		selectBlockOnInsert,
 	} );

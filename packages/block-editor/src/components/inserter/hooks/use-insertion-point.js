@@ -64,6 +64,7 @@ function getIndex( {
 function useInsertionPoint( {
 	rootClientId = '',
 	insertionIndex,
+	clientId = false,
 	isAppender,
 	onSelect,
 	shouldFocusBlock = true,
@@ -73,7 +74,8 @@ function useInsertionPoint( {
 	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
-			const { getNextInsertionPoint } = select( blockEditorStore );
+			const { getNextInsertionPoint, getBlockIndex } =
+				select( blockEditorStore );
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
 			const insertionPoint = getNextInsertionPoint();
@@ -81,6 +83,9 @@ function useInsertionPoint( {
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
+			} else if ( clientId ) {
+				// Insert after a specific client ID.
+				_destinationIndex = getBlockIndex( clientId );
 			} else if ( insertionPoint ) {
 				_destinationRootClientId = insertionPoint?.rootClientId
 					? insertionPoint.rootClientId

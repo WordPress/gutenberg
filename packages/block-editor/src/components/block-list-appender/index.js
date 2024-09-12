@@ -47,18 +47,15 @@ export default function BlockListAppender( {
 } ) {
 	const isDragOver = useSelect(
 		( select ) => {
-			const {
-				getBlockInsertionPoint,
-				isInsertionCueVisible,
-				getBlockCount,
-			} = select( blockEditorStore );
-			const insertionPoint = getBlockInsertionPoint();
+			const { getInsertionCue, isInsertionCueVisible, getBlockCount } =
+				select( blockEditorStore );
+			const insertionCue = getInsertionCue();
 			// Ideally we should also check for `isDragging` but currently it
 			// requires a lot more setup. We can revisit this once we refactor
 			// the DnD utility hooks.
 			return (
 				isInsertionCueVisible() &&
-				rootClientId === insertionPoint?.rootClientId &&
+				rootClientId === insertionCue?.rootClientId &&
 				getBlockCount( rootClientId ) === 0
 			);
 		},
