@@ -37,13 +37,15 @@
 		border-right: $border-width solid $gray-300;
 	}
 
-	&.is-synced,
 	&.is-connected {
 		.block-editor-block-switcher .components-button::before {
 			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
 			border-radius: $radius-small;
 		}
+	}
 
+	&.is-synced,
+	&.is-connected {
 		.block-editor-block-switcher .components-button .block-editor-block-icon {
 			color: var(--wp-block-synced-color);
 		}
