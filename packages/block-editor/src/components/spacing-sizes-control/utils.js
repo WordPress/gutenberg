@@ -365,7 +365,7 @@ export function getInitialView( values = {}, sides ) {
 		! sideValues.length && hasBalancedSidesSupport( sides );
 
 	// Only single side supported and no value defined.
-	if ( sides?.length === 1 && ! sideValues.length ) {
+	if ( sides?.length === 1 ) {
 		return sides[ 0 ];
 	}
 
