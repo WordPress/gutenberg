@@ -153,7 +153,7 @@ async function buildJS( file ) {
 		JS_ENVIRONMENTS
 	) ) {
 		const destPath = getBuildPath(
-			file.replace( /\.([mt])?tsx?$/, '.$1js' ),
+			file.replace( /\.tsx?$/, '.js' ),
 			buildDir
 		);
 		const babelOptions = getBabelConfig(
@@ -189,10 +189,6 @@ const BUILD_TASK_BY_EXTENSION = {
 	'.js': buildJS,
 	'.ts': buildJS,
 	'.tsx': buildJS,
-	'.cjs': buildJS,
-	'.cts': buildJS,
-	'.mjs': buildJS,
-	'.mts': buildJS,
 };
 
 module.exports = async ( file, callback ) => {
