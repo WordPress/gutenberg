@@ -22,7 +22,7 @@ import {
 	useDisabled,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -131,21 +131,31 @@ function Iframe( {
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
 		};
 		let iFrameDocument;
+		let documentElement;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
+
+		function zoomIn( event ) {
+			if ( event.target === event.currentTarget ) {
+				__unstableSetEditorMode( 'edit' );
+			}
+		}
 		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
-			const { documentElement } = contentDocument;
+			documentElement = contentDocument.documentElement;
 			iFrameDocument = contentDocument;
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
+			documentElement.addEventListener( 'click', zoomIn, false );
 
 			clearerRef( documentElement );
 
@@ -206,6 +216,7 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
+			documentElement?.removeEventListener( 'click', zoomIn );
 		};
 	}, [] );
 

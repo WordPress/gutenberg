@@ -34,13 +34,14 @@
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
 
-	transform: scale(#{$scale});
-
 	background-color: $gray-300;
 
 	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
 	// layout, so we use border matching the background instead of margins.
 	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
+
+	// Indicate to users that they can zoom back in by clicking on the canvas.
+	cursor: zoom-in;
 
 	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
 	// so we need to adjust the height of the content to match the scale by using negative margins.
@@ -50,6 +51,17 @@
 	margin-bottom: calc(-1 * #{$total-height});
 
 	body {
+		transform: scale(#{$scale});
+		transform-origin: center top;
+
+		// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
+		// so we need to adjust the height of the content to match the scale by using negative margins.
+		$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
+		$total-frame-height: calc(2 * #{$frame-size});
+		$total-height: calc(#{$extra-content-height} + 2px);
+		margin-bottom: calc(-1 * #{$total-height});
+
+		cursor: default;
 		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
 		display: flex;
 		flex-direction: column;
