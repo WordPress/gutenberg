@@ -221,7 +221,7 @@ function gutenberg_register_script_modules() {
 	add_filter(
 		'script_module_data_@wordpress/a11y',
 		function ( $data ) {
-			$data['i18n'] = array( 'Notifications' => __( 'Notifications' ) );
+			$data['i18n'] = array( 'Notifications' => __( 'Notifications', 'default' ) );
 			return $data;
 		}
 	);
