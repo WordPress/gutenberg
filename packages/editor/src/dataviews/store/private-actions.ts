@@ -8,7 +8,6 @@ import { doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
