@@ -305,7 +305,7 @@ In the example below, we use the `blocks.getBlockAttributes` filter to lock the 
 ```js
 // Our filter function
 function lockParagraphs( blockAttributes, blockType, innerHTML, attributes  ) {
-    if(blockType['name'] === 'core/paragraph') {
+    if('core/paragraph' === blockType.name) {
         blockAttributes['lock'] = {move: true}
     }
     return blockAttributes;
