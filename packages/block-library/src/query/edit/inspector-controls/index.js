@@ -61,8 +61,9 @@ export default function QueryInspectorControls( props ) {
 		sticky,
 		inherit,
 		taxQuery,
-		year,
 		parents,
+		after,
+		before,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -100,24 +101,18 @@ export default function QueryInspectorControls( props ) {
 	const onYearChange = ( value ) => {
 		const yearRegex = /^\d{4}$/;
 
-		if ( yearRegex.test( value ) ) {
-			const yearStart = format(
-				startOfYear( value ),
-				TIMEZONELESS_FORMAT
-			);
-			const yearEnd = format( endOfYear( value ), TIMEZONELESS_FORMAT );
+		if ( ! yearRegex.test( value ) ) {
 			setQuery( {
-				year: value,
-				after: yearStart,
-				before: yearEnd,
-			} );
-		} else {
-			setQuery( {
-				year: value,
 				after: undefined,
 				before: undefined,
 			} );
+			return;
 		}
+
+		setQuery( {
+			after: format( startOfYear( value ), TIMEZONELESS_FORMAT ),
+			before: format( endOfYear( value ), TIMEZONELESS_FORMAT ),
+		} );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
 	const onChangeDebounced = useCallback(
@@ -155,6 +150,9 @@ export default function QueryInspectorControls( props ) {
 	const showTaxControl =
 		!! taxonomies?.length &&
 		isControlAllowed( allowedControls, 'taxQuery' );
+	const showYearControl =
+		isControlAllowed( allowedControls, 'after' ) ||
+		isControlAllowed( allowedControls, 'before' );
 	const showAuthorControl = isControlAllowed( allowedControls, 'author' );
 	const showSearchControl = isControlAllowed( allowedControls, 'search' );
 	const showParentControl =
@@ -342,7 +340,6 @@ export default function QueryInspectorControls( props ) {
 							parents: [],
 							search: '',
 							taxQuery: null,
-							year: '',
 							after: undefined,
 							before: undefined,
 						} );
@@ -393,27 +390,29 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					<ToolsPanelItem
-						hasValue={ () => !! year }
-						label={ __( 'Year' ) }
-						onDeselect={ () =>
-							setQuery( {
-								after: undefined,
-								before: undefined,
-							} )
-						}
-					>
-						<TextControl
-							__next40pxDefaultSize
-							__nextHasNoMarginBottom
-							label={ __( 'Year:' ) }
-							type="number"
-							min="1000"
-							max="9999"
-							value={ year }
-							onChange={ onYearChange }
-						/>
-					</ToolsPanelItem>
+					{ showYearControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! after || !! before }
+							label={ __( 'Year' ) }
+							onDeselect={ () =>
+								setQuery( {
+									after: undefined,
+									before: undefined,
+								} )
+							}
+						>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Year:' ) }
+								type="number"
+								min="1000"
+								max="9999"
+								value={ new Date( after ).getFullYear() }
+								onChange={ onYearChange }
+							/>
+						</ToolsPanelItem>
+					) }
 					{ showParentControl && (
 						<ToolsPanelItem
 							hasValue={ () => !! parents?.length }
