@@ -38,7 +38,6 @@ export default function QuickInserter( {
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
-		clientId,
 		isAppender,
 		selectBlockOnInsert,
 	} );
@@ -91,7 +90,7 @@ export default function QuickInserter( {
 			filterValue,
 			onSelect,
 		} );
-		setInsertionPoint( { rootClientId, insertionIndex } );
+		setInsertionPoint( { rootClientId, index: insertionIndex } );
 	};
 
 	let maxBlockPatterns = 0;

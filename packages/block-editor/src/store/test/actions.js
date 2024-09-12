@@ -526,11 +526,11 @@ describe( 'actions', () => {
 			expect(
 				setInsertionPoint( {
 					rootClientId: '',
-					insertionIndex: '123',
+					index: '123',
 				} )
 			).toEqual( {
 				type: 'SET_INSERTION_POINT',
-				value: { rootClientId: '', insertionIndex: '123' },
+				value: { rootClientId: '', index: '123' },
 			} );
 		} );
 	} );

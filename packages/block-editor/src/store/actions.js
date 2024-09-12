@@ -702,8 +702,8 @@ export const hideInsertionCue =
 
 /**
  * @param {Object} value
- * @param {string} value.rootClientId   The root client ID to insert at.
- * @param {number} value.insertionIndex The index to insert at.
+ * @param {string} value.rootClientId The root client ID to insert at.
+ * @param {number} value.index        The index to insert at.
  *
  * @return {Object} Action object.
  */

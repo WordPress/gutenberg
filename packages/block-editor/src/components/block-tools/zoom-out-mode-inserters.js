@@ -102,7 +102,7 @@ function ZoomOutModeInserters() {
 							} );
 							setInsertionPoint( {
 								rootClientId: sectionRootClientId,
-								insertionIndex: index,
+								index,
 							} );
 							showInsertionCue( sectionRootClientId, index, {
 								operation: 'insert',

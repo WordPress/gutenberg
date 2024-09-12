@@ -1730,7 +1730,7 @@ _Parameters_
 
 -   _value_ `Object`:
 -   _value.rootClientId_ `string`: The root client ID to insert at.
--   _value.insertionIndex_ `number`: The index to insert at.
+-   _value.index_ `number`: The index to insert at.
 
 _Returns_
 

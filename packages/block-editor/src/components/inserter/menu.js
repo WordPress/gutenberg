@@ -80,7 +80,6 @@ function InserterMenu(
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
 			rootClientId,
-			clientId,
 			isAppender,
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
