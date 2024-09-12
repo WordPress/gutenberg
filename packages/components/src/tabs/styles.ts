@@ -112,7 +112,8 @@ export const TabListWrapper = styled.div`
 			scaleY(
 				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
 			);
-		background-color: ${ COLORS.theme.gray[ 100 ] };
+		background-color: ${ COLORS.theme.accent };
+		opacity: 0.04;
 	}
 `;
 
