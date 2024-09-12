@@ -73,10 +73,10 @@ function useInsertionPoint( {
 	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
-			const { getInsertionPoint } = select( blockEditorStore );
+			const { getNextInsertionPoint } = select( blockEditorStore );
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
-			const insertionPoint = getInsertionPoint();
+			const insertionPoint = getNextInsertionPoint();
 
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.

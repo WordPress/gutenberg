@@ -1516,7 +1516,7 @@ export function getInsertionCue( state ) {
  *
  * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
-export const getInsertionPoint = createRegistrySelector( ( select ) =>
+export const getNextInsertionPoint = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state ) => {
 			let rootClientId = '',
@@ -1555,6 +1555,10 @@ export const getInsertionPoint = createRegistrySelector( ( select ) =>
 		]
 	)
 );
+
+export function getInsertionPoint( state ) {
+	return state.insertionPoint;
+}
 
 /**
  * Returns true if we should show the block insertion point.

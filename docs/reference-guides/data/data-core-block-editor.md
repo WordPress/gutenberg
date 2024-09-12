@@ -623,15 +623,7 @@ _Returns_
 
 ### getInsertionPoint
 
-Returns the point where a block would be inserted.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `Object`: Insertion point object with `rootClientId`, `index`.
+Undocumented declaration.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -730,6 +722,18 @@ _Parameters_
 _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
+
+### getNextInsertionPoint
+
+Returns the point where a block would be inserted.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+
+_Returns_
+
+-   `Object`: Insertion point object with `rootClientId`, `index`.
 
 ### getPatternsByBlockTypes
 
