@@ -57,7 +57,7 @@ export const slideToRight = keyframes( {
 
 type NavigatorScreenAnimationProps = {
 	skipAnimation: boolean;
-	animationDirection: 'forwards' | 'backwards';
+	animationDirection: 'end' | 'start';
 	animationType: 'in' | 'out' | undefined;
 };
 
@@ -80,18 +80,18 @@ export const TOTAL_ANIMATION_DURATION = {
 };
 
 export const ANIMATION_END_NAMES = {
-	forwards: {
+	end: {
 		in: slideFromRight.name,
 		out: slideToLeft.name,
 	},
-	backwards: {
+	start: {
 		in: slideFromLeft.name,
 		out: slideToRight.name,
 	},
 };
 
 const ANIMATION = {
-	forwards: {
+	end: {
 		in: css`
 			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
 				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromRight }
@@ -101,7 +101,7 @@ const ANIMATION = {
 				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
 		`,
 	},
-	backwards: {
+	start: {
 		in: css`
 			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
 				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromLeft }

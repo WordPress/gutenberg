@@ -30,7 +30,7 @@ type AnimationStatus =
 	| 'OUT';
 
 const isEnterAnimation = (
-	animationDirection: 'forwards' | 'backwards',
+	animationDirection: 'end' | 'start',
 	animationStatus: AnimationStatus,
 	animationName: string
 ) =>
@@ -38,7 +38,7 @@ const isEnterAnimation = (
 	animationName === styles.ANIMATION_END_NAMES[ animationDirection ].in;
 
 const isExitAnimation = (
-	animationDirection: 'forwards' | 'backwards',
+	animationDirection: 'end' | 'start',
 	animationStatus: AnimationStatus,
 	animationName: string
 ) =>
@@ -82,9 +82,7 @@ export function useScreenAnimatePresence( {
 
 	// Styles
 	const animationDirection =
-		( isRTL && isBack ) || ( ! isRTL && ! isBack )
-			? 'forwards'
-			: 'backwards';
+		( isRTL && isBack ) || ( ! isRTL && ! isBack ) ? 'end' : 'start';
 	const isAnimatingIn = animationStatus === 'ANIMATING_IN';
 	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
 	let animationType: 'in' | 'out' | undefined;
