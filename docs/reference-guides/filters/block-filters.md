@@ -298,7 +298,7 @@ The callback function for this filter accepts 4 parameters:
 - `blockAttributes` (`Object`): The attributes of the block node given its type.
 - `blockType` (`Object`): A block-type definition object.
 - `innerHTML` (`string`): Inner HTML content of the block.
-- `attributea` (`object`): Known attributes of the block.
+- `attributes` (`object`): Known attributes of the block.
 
 In the example below, we use the `blocks.getBlockAttributes` filter to lock the position of all paragraph blocks on a page.
 
