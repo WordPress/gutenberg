@@ -150,6 +150,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef< HTMLInputElement >( null );
 
+	useEffect( () => {
+		if ( ! inputHasFocus ) {
+			setInputValue( '' );
+		}
+	}, [ inputHasFocus ] );
+
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch: ComboboxControlOption[] = [];
 		const containsMatch: ComboboxControlOption[] = [];
@@ -238,8 +244,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		if ( ! currentOption ) {
 			onFilterValueChange( '' );
 		}
-
-		setInputValue( '' );
 	};
 
 	const onFocus = () => {
