@@ -112,6 +112,7 @@ add_action( 'rest_api_init', 'gutenberg_register_script_style' );
  *
  * @param \WP_REST_Response $response   API response.
  * @param \WP_Block_Type    $block_type Block type.
+ * @param \WP_REST_Request  $request    The current request.
  *
  * @return \WP_REST_Response Modified API response.
  */
