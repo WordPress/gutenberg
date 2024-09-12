@@ -10,7 +10,7 @@ import type { Action } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import type { Pattern } from '../types';
+import type { Pattern } from '../../types';
 
 // Patterns.
 const { CreatePatternModalContents, useDuplicatePatternProps } =
