@@ -82,4 +82,8 @@ export type ComboboxControlProps = Pick<
 	 * The current value of the control.
 	 */
 	value?: string | null;
+	/**
+	 * The placeholder for the Combobox.
+	 */
+	placeholder?: string;
 };
