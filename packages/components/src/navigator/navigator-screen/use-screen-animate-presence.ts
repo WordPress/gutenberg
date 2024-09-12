@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import {
-	useEffect,
 	useState,
 	useLayoutEffect,
 	useCallback,
 	useMemo,
 } from '@wordpress/element';
-import { usePrevious, useReducedMotion } from '@wordpress/compose';
+import { useReducedMotion } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 
 /**
@@ -63,32 +62,41 @@ export function useScreenAnimatePresence( {
 	const [ animationStatus, setAnimationStatus ] =
 		useState< AnimationStatus >( 'INITIAL' );
 
-	const wasMatch = usePrevious( isMatch );
-
 	// Start enter and exit animations when the screen is selected or deselected.
 	// The animation status is set to `*_END` immediately if the animation should
 	// be skipped.
+	const becameSelected =
+		animationStatus !== 'ANIMATING_IN' &&
+		animationStatus !== 'IN' &&
+		isMatch;
+	const becameUnselected =
+		animationStatus !== 'ANIMATING_OUT' &&
+		animationStatus !== 'OUT' &&
+		! isMatch;
 	useLayoutEffect( () => {
-		if ( ! wasMatch && isMatch ) {
+		if ( becameSelected ) {
 			setAnimationStatus(
 				skipAnimation || prefersReducedMotion ? 'IN' : 'ANIMATING_IN'
 			);
-		} else if ( wasMatch && ! isMatch ) {
+		} else if ( becameUnselected ) {
 			setAnimationStatus(
 				skipAnimation || prefersReducedMotion ? 'OUT' : 'ANIMATING_OUT'
 			);
 		}
-	}, [ isMatch, wasMatch, skipAnimation, prefersReducedMotion ] );
+	}, [
+		becameSelected,
+		becameUnselected,
+		skipAnimation,
+		prefersReducedMotion,
+	] );
 
 	// Styles
 	const animationDirection =
 		( isRTL && isBack ) || ( ! isRTL && ! isBack ) ? 'end' : 'start';
-	const isAnimatingIn = animationStatus === 'ANIMATING_IN';
-	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
 	let animationType: 'in' | 'out' | undefined;
-	if ( isAnimatingIn ) {
+	if ( animationStatus === 'ANIMATING_IN' ) {
 		animationType = 'in';
-	} else if ( isAnimatingOut ) {
+	} else if ( animationStatus === 'ANIMATING_OUT' ) {
 		animationType = 'out';
 	}
 	const animationStyles = useMemo(
@@ -129,31 +137,6 @@ export function useScreenAnimatePresence( {
 		},
 		[ onAnimationEnd, animationStatus, animationDirection ]
 	);
-
-	// Fallback timeout to ensure that the logic is applied even if the
-	// `animationend` event is not triggered.
-	useEffect( () => {
-		let animationTimeout: number | undefined;
-
-		if ( isAnimatingOut ) {
-			animationTimeout = window.setTimeout( () => {
-				setAnimationStatus( 'OUT' );
-				animationTimeout = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION.OUT );
-		} else if ( isAnimatingIn ) {
-			animationTimeout = window.setTimeout( () => {
-				setAnimationStatus( 'IN' );
-				animationTimeout = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION.IN );
-		}
-
-		return () => {
-			if ( animationTimeout ) {
-				window.clearTimeout( animationTimeout );
-				animationTimeout = undefined;
-			}
-		};
-	}, [ isAnimatingOut, isAnimatingIn ] );
 
 	return {
 		animationStyles,
