@@ -8,21 +8,20 @@ import { __, sprintf } from '@wordpress/i18n';
 export default function LinkedButton( { isLinked, ...props } ) {
 	const label = isLinked
 		? sprintf(
-				// translators: 1. Type of spacing being modified (Padding, margin, etc).
+				// translators: 1. Type of spacing being modified (padding, margin, etc).
 				__( 'Unlink %1$s' ),
-				props.label
+				props.label.toLowerCase()
 		  ).trim()
 		: sprintf(
-				// translators: 1. Type of spacing being modified (Padding, margin, etc).
+				// translators: 1. Type of spacing being modified (padding, margin, etc).
 				__( 'Link %1$s' ),
-				props.label
+				props.label.toLowerCase()
 		  ).trim();
 
 	return (
 		<Tooltip text={ label }>
 			<Button
 				{ ...props }
-				className="spacing-sizes-control__linked-button"
 				size="small"
 				icon={ isLinked ? link : linkOff }
 				iconSize={ 24 }
