@@ -25,6 +25,7 @@ import {
 } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
+
 /**
  * Internal dependencies
  */
@@ -424,6 +425,7 @@ class URLInput extends Component {
 			value = '',
 			hideLabelFromVision = false,
 		} = this.props;
+
 		const {
 			loading,
 			showSuggestions,
@@ -442,6 +444,7 @@ class URLInput extends Component {
 			} ),
 			hideLabelFromVision,
 		};
+
 		const inputProps = {
 			id: inputId,
 			value,
@@ -464,9 +467,11 @@ class URLInput extends Component {
 			ref: this.inputRef,
 			suffix: this.props.suffix,
 		};
+
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
+
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
 				<InputControl { ...inputProps } __next40pxDefaultSize />

@@ -12,6 +12,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
 // which will cause an unintended http request.
@@ -114,6 +115,7 @@ const LinkControlSearchInput = forwardRef(
 				);
 			}
 		};
+
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
