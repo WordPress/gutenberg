@@ -114,7 +114,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page: Page ) => {
 	batch( async () => {
-		populateInitialData( page.initialData );
+		populateServerData( page.initialData );
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			if ( navigationMode === 'fullPage' ) {
 				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
