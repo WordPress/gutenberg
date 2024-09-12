@@ -3,7 +3,6 @@
  */
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -56,8 +55,6 @@ function GridItemResizerInner( {
 		left: false,
 		right: false,
 	} );
-
-	const rtl = isRTL();
 
 	useEffect( () => {
 		const observer = new window.ResizeObserver( () => {
@@ -132,22 +129,12 @@ function GridItemResizerInner( {
 					target.setPointerCapture( pointerId );
 				} }
 				onResizeStart={ ( event, direction ) => {
-					if ( rtl ) {
-						if ( 'left' === direction ) {
-							setResizeDirection( 'right' );
-						} else if ( 'right' === direction ) {
-							setResizeDirection( 'left' );
-						} else {
-							setResizeDirection( direction );
-						}
-					} else {
-						/*
-						 * The container justification and alignment need to be set
-						 * according to the direction the resizer is being dragged in,
-						 * so that it resizes in the right direction.
-						 */
-						setResizeDirection( direction );
-					}
+					/*
+					 * The container justification and alignment need to be set
+					 * according to the direction the resizer is being dragged in,
+					 * so that it resizes in the right direction.
+					 */
+					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
 					const columnGap = parseFloat(
