@@ -12,6 +12,7 @@ import {
 	withFilters,
 	Flex,
 	FlexItem,
+	SearchControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -406,9 +407,8 @@ export function HierarchicalTermSelector( { slug } ) {
 	return (
 		<Flex direction="column" gap="4">
 			{ showFilter && (
-				<TextControl
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+				<SearchControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ filterLabel }
 					value={ filterValue }
@@ -428,6 +428,8 @@ export function HierarchicalTermSelector( { slug } ) {
 			{ ! loading && hasCreateAction && (
 				<FlexItem>
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						onClick={ onToggleForm }
 						className="editor-post-taxonomies__hierarchical-terms-add"
 						aria-expanded={ showForm }

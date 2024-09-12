@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 
 export const TabListWrapper = styled.div`
@@ -22,36 +22,65 @@ export const TabListWrapper = styled.div`
 		text-align: start;
 	}
 
-	@media not ( prefers-reduced-motion: reduce ) {
+	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::after {
-			transition-property: left, top, width, height;
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
+	}
+	--direction-factor: 1;
+	--direction-origin-x: left;
+	--indicator-start: var( --indicator-left );
+	&:dir( rtl ) {
+		--direction-factor: -1;
+		--direction-origin-x: right;
+		--indicator-start: var( --indicator-right );
 	}
 	&::after {
 		content: '';
 		position: absolute;
 		pointer-events: none;
+		transform-origin: var( --direction-origin-x ) top;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
-	&:not( [aria-orientation='vertical'] )::after {
-		bottom: 0;
-		left: var( --indicator-left );
-		width: var( --indicator-width );
-		height: 0;
-		border-bottom: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
+
+	/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+	--antialiasing-factor: 100;
+	&:not( [aria-orientation='vertical'] ) {
+		&::after {
+			bottom: 0;
+			height: 0;
+			width: calc( var( --antialiasing-factor ) * 1px );
+			transform: translateX(
+					calc(
+						var( --indicator-start ) * var( --direction-factor ) *
+							1px
+					)
+				)
+				scaleX(
+					calc(
+						var( --indicator-width ) / var( --antialiasing-factor )
+					)
+				);
+			border-bottom: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+		}
 	}
 	&[aria-orientation='vertical']::after {
 		z-index: -1;
+		top: 0;
 		left: 0;
 		width: 100%;
-		top: var( --indicator-top );
-		height: var( --indicator-height );
+		width: calc( var( --antialiasing-factor ) * 1px );
+		transform: translateY( calc( var( --indicator-top ) * 1px ) )
+			scaleY(
+				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
+			);
 		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
@@ -107,7 +136,7 @@ export const Tab = styled( Ariakit.Tab )`
 			// Outline works for Windows high contrast mode as well.
 			outline: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
-			border-radius: 2px;
+			border-radius: ${ CONFIG.radiusSmall };
 
 			// Animation
 			opacity: 0;
@@ -136,7 +165,6 @@ export const TabPanel = styled( Ariakit.TabPanel )`
 	}
 
 	&:focus-visible {
-		border-radius: 2px;
 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
 			${ COLORS.theme.accent };
 		// Windows high contrast mode.

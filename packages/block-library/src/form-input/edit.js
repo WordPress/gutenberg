@@ -31,6 +31,9 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		ref.current.focus();
 	}
 
+	// Note: radio inputs aren't implemented yet.
+	const isCheckboxOrRadio = type === 'checkbox' || type === 'radio';
+
 	const controls = (
 		<>
 			{ 'hidden' !== type && (
@@ -63,8 +66,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 			) }
 			<InspectorControls group="advanced">
 				<TextControl
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					autoComplete="off"
 					label={ __( 'Name' ) }
@@ -80,6 +82,18 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 				/>
 			</InspectorControls>
 		</>
+	);
+
+	const content = (
+		<RichText
+			tagName="span"
+			className="wp-block-form-input__label-content"
+			value={ label }
+			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+			aria-label={ label ? __( 'Label' ) : __( 'Empty label' ) }
+			data-empty={ ! label }
+			placeholder={ __( 'Type the label for this input' ) }
+		/>
 	);
 
 	if ( 'hidden' === type ) {
@@ -112,17 +126,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					'is-label-inline': inlineLabel || 'checkbox' === type,
 				} ) }
 			>
-				<RichText
-					tagName="span"
-					className="wp-block-form-input__label-content"
-					value={ label }
-					onChange={ ( newLabel ) =>
-						setAttributes( { label: newLabel } )
-					}
-					aria-label={ label ? __( 'Label' ) : __( 'Empty label' ) }
-					data-empty={ label ? false : true }
-					placeholder={ __( 'Type the label for this input' ) }
-				/>
+				{ ! isCheckboxOrRadio && content }
 				<TagName
 					type={ 'textarea' === type ? undefined : type }
 					className={ clsx(
@@ -148,6 +152,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						...colorProps.style,
 					} }
 				/>
+				{ isCheckboxOrRadio && content }
 			</span>
 		</div>
 	);

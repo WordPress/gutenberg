@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useLilius } from 'use-lilius';
 import {
 	format,
 	isSameDay,
@@ -29,6 +28,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useLilius } from './use-lilius';
 import type { DatePickerProps } from '../types';
 import {
 	Wrapper,

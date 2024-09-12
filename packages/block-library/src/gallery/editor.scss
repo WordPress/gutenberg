@@ -139,12 +139,12 @@
 	z-index: z-index(".block-library-gallery-item__inline-menu");
 	transition: box-shadow 0.2s ease-out;
 	@include reduce-motion("transition");
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	background: $white;
 	border: $border-width solid $gray-900;
 
 	&:hover {
-		box-shadow: $shadow-popover;
+		box-shadow: $elevation-x-small;
 	}
 
 	@include break-small() {

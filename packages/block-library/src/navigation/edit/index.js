@@ -591,6 +591,7 @@ function Navigation( {
 						{ isResponsive && (
 							<>
 								<Button
+									__next40pxDefaultSize
 									className={ overlayMenuPreviewClasses }
 									onClick={ () => {
 										setOverlayMenuPreview(

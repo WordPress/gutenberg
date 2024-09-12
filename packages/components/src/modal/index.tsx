@@ -37,6 +37,7 @@ import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+import { Spacer } from '../spacer';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
@@ -134,9 +135,9 @@ function UnforwardedModal(
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.
-	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+	const onRequestCloseRef = useRef< ModalProps[ 'onRequestClose' ] >();
 	useEffect( () => {
-		refOnRequestClose.current = onRequestClose;
+		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
 
 	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
@@ -149,10 +150,10 @@ function UnforwardedModal(
 	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
 		// add this modal instance to the dismissers set
-		dismissers.add( refOnRequestClose );
+		dismissers.add( onRequestCloseRef );
 		// request that all the other modals close themselves
 		for ( const dismisser of dismissers ) {
-			if ( dismisser !== refOnRequestClose ) {
+			if ( dismisser !== onRequestCloseRef ) {
 				dismisser.current?.();
 			}
 		}
@@ -162,7 +163,7 @@ function UnforwardedModal(
 				dismisser.current?.();
 			}
 			// remove this modal instance from the dismissers set
-			dismissers.delete( refOnRequestClose );
+			dismissers.delete( onRequestCloseRef );
 		};
 	}, [ dismissers, nestedDismissers ] );
 
@@ -323,13 +324,21 @@ function UnforwardedModal(
 								</div>
 								{ headerActions }
 								{ isDismissible && (
-									<Button
-										onClick={ onRequestClose }
-										icon={ close }
-										label={
-											closeButtonLabel || __( 'Close' )
-										}
-									/>
+									<>
+										<Spacer
+											marginBottom={ 0 }
+											marginLeft={ 3 }
+										/>
+										<Button
+											size="small"
+											onClick={ onRequestClose }
+											icon={ close }
+											label={
+												closeButtonLabel ||
+												__( 'Close' )
+											}
+										/>
+									</>
 								) }
 							</div>
 						) }

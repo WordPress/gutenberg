@@ -233,7 +233,6 @@ function LayoutPanelPure( {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
@@ -320,6 +319,8 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						key={ name }
 						isPressed={ type === name }
 						onClick={ () => onChange( name ) }

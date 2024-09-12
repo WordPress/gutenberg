@@ -160,6 +160,12 @@ test.describe( 'Block template registration', () => {
 		await expect(
 			page.getByText( 'Custom Template (overridden by the theme)' )
 		).toBeHidden();
+		// Verify the template description fall backs to the plugin registered description.
+		await expect(
+			page.getByText(
+				'A custom template registered by a plugin and overridden by a theme.'
+			)
+		).toBeVisible();
 		// Verify the theme template shows the theme name as the author.
 		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );
@@ -243,8 +249,13 @@ test.describe( 'Block template registration', () => {
 
 	test( 'WP default templates can be overridden by plugins', async ( {
 		page,
+		requestUtils,
 	} ) => {
-		await page.goto( '?page_id=2' );
+		const { id } = await requestUtils.createPage( {
+			title: 'Plugin override page',
+			status: 'publish',
+		} );
+		await page.goto( `?page_id=${ id }` );
 		await expect(
 			page.getByText( 'This is a plugin-registered page template.' )
 		).toBeVisible();

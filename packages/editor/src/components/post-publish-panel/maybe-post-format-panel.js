@@ -25,6 +25,7 @@ const PostFormatSuggestion = ( {
 	onUpdatePostFormat,
 } ) => (
 	<Button
+		__next40pxDefaultSize
 		variant="link"
 		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
 	>

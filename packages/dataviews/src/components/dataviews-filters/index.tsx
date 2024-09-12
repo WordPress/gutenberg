@@ -95,6 +95,9 @@ export function FilterVisibilityToggle( {
 	const visibleFilters = filters.filter( ( filter ) => filter.isVisible );
 
 	const hasVisibleFilters = !! visibleFilters.length;
+	if ( filters.length === 0 ) {
+		return null;
+	}
 	if ( ! hasVisibleFilters ) {
 		return (
 			<AddFilterDropdownMenu
