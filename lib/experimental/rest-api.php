@@ -115,7 +115,17 @@ add_action( 'rest_api_init', 'gutenberg_register_script_style' );
  *
  * @return \WP_REST_Response Modified API response.
  */
-function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
+function gutenberg_add_assets_links_to_block_type( $response, $block_type, $request ) {
+	$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+
+	if ('edit' == $context) {
+		// Eqneueu editor assets to include conditionally registered assets.
+		add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+		do_action( 'enqueue_block_assets' );
+		do_action( 'enqueue_block_editor_assets' );
+		remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+	}
+
 	$links   = array();
 	$scripts = array( 'editor_script', 'script' );
 	foreach ( $scripts as $script ) {
@@ -151,4 +161,4 @@ function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
 
 	return $response;
 }
-add_filter( 'rest_prepare_block_type', 'gutenberg_add_assets_links_to_block_type', 10, 2 );
+add_filter( 'rest_prepare_block_type', 'gutenberg_add_assets_links_to_block_type', 10, 3 );

@@ -97,15 +97,19 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return array|WP_Error|WP_REST_Response
 	 */
 	public function get_items( $request ) {
-		// Force editor assets enqueue.
-		add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
-		do_action( 'enqueue_block_assets' );
-		do_action( 'enqueue_block_editor_assets' );
-		remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
-
 		$data   = array();
 		$handle = $request['dependency'];
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$filter = array();
+
+		if ( 'edit' === $context ) {
+			// Eqneueu editor assets to include conditionally registered assets.
+			add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+			do_action( 'enqueue_block_assets' );
+			do_action( 'enqueue_block_editor_assets' );
+			remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+		}
+
 		if ( $handle ) {
 			$this->object->all_deps( $handle );
 			$filter = $this->object->to_do;
@@ -141,6 +145,16 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 * @return array|mixed|WP_Error|WP_REST_Response
 	 */
 	public function get_item( $request ) {
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+
+		if ( 'edit' === $context ) {
+			// Eqneueu editor assets to include conditionally registered assets.
+			add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+			do_action( 'enqueue_block_assets' );
+			do_action( 'enqueue_block_editor_assets' );
+			remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
+		}
+
 		if ( ! isset( $this->object->registered[ $request['handle'] ] ) ) {
 			return array();
 		}
