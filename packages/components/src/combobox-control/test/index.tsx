@@ -188,7 +188,7 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
-	it( 'calls onFilterValueChange whenever the textbox changes', async () => {
+	it( 'does not call onFilterValueChange on focus', async () => {
 		const user = userEvent.setup();
 		const onChangeSpy = jest.fn();
 		render(
@@ -202,10 +202,49 @@ describe.each( [
 
 		await user.click( input );
 		expect( onChangeSpy ).not.toHaveBeenCalled();
+	} );
+
+	it( 'calls onFilterValueChange whenever the textbox changes', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onFilterValueChange={ onChangeSpy }
+			/>
+		);
+
+		const input = getInput( defaultLabelText );
 
 		await user.type( input, 'a' );
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( 'a' );
+	} );
+
+	it( 'clears the textbox value if there is no selected value on blur', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onFilterValueChange={ onChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.type( input, 'a' );
+		expect( input ).toHaveValue( 'a' );
+
+		onChangeSpy.mockReset();
+
+		// Clicking document.body to trigger a blur event on the input.
+		await user.click( document.body );
+
+		expect( input ).toHaveValue( '' );
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( '' );
 	} );
 
 	it( 'should select the correct option from a search', async () => {
