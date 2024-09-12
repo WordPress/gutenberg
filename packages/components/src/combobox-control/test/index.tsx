@@ -188,6 +188,26 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
+	it( 'calls onFilterValueChange whenever the textbox changes', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onFilterValueChange={ onChangeSpy }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		expect( onChangeSpy ).not.toHaveBeenCalled();
+
+		await user.type( input, 'a' );
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( 'a' );
+	} );
+
 	it( 'should select the correct option from a search', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
