@@ -394,16 +394,8 @@ function a11yAnnounce(
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		import( '@wordpress/a11y' ).then(
 			( { speak } ) => speak( message, ariaLive ),
-			// Use the fallback Interactivity API implementation if the a11y
-			// Script Module cannot be loaded.
-			() => {
-				state.navigation.message =
-					// Announce that the page has been loaded. If the message is the
-					// same, we use a no-break space similar to the @wordpress/a11y
-					// package: https://github.com/WordPress/gutenberg/blob/c395242b8e6ee20f8b06c199e4fc2920d7018af1/packages/a11y/src/filter-message.js#L20-L26
-					message +
-					( state.navigation.message === message ? '\u00A0' : '' );
-			}
+			// Ignore failures to load the a11y module.
+			() => {}
 		);
 	} else {
 		state.navigation.message =
