@@ -57,7 +57,7 @@ export function getBlockDefaultClassName( blockName ) {
  * Returns a block variation specific classname.
  *
  * If the given block matches a variation, the classname will be the block's default classname
- * with the variation name appended (separated by a hyphen).
+ * with the variation name appended (separated by a double underscore, i.e. `__`).
  *
  * Note that the block's default classname  is affected by the `blocks.getBlockDefaultClassName` filter.
  *
@@ -72,7 +72,7 @@ export function getBlockVariationClassName( blockName, attributes ) {
 		return null;
 	}
 
-	return getBlockDefaultClassName( blockName ) + '-' + activeVariation.name;
+	return getBlockDefaultClassName( blockName ) + '__' + activeVariation.name;
 }
 
 /**

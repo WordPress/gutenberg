@@ -541,7 +541,7 @@ describe( 'block serializer', () => {
 				getBlockVariationClassName( 'core/fruit', {
 					fruit: 'banana',
 				} )
-			).toBe( 'wp-block-fruit-banana' );
+			).toBe( 'wp-block-fruit__banana' );
 		} );
 	} );
 } );

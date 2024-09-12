@@ -206,7 +206,7 @@ supports: {
 
 ### className.variation
 
-In the same vein, it is possible to have a variation-specific class added to a block (if the latter supports variations). E.g. if a block named `your/block-name` has a variation called `your-variation`, the following will add the class `.wp-block-your-block-name-your-variation`:
+In the same vein, it is possible to have a variation-specific class added to a block (if the latter supports variations). E.g. if a block named `your/block-name` has a variation called `your-variation`, the following will add the class `.wp-block-your-block-name__your-variation`:
 
 ```js
 supports: {

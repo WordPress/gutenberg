@@ -266,7 +266,7 @@
 									"type": "boolean"
 								},
 								"variation": {
-									"description": "Add the .wp-block-your-block-name-your-block-variation class to the block's wrapper element",
+									"description": "Add the .wp-block-your-block-name__your-block-variation class to the block's wrapper element",
 									"type": "boolean"
 								}
 							}

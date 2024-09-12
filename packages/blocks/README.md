@@ -204,7 +204,7 @@ _Returns_
 
 Returns a block variation specific classname.
 
-If the given block matches a variation, the classname will be the block's default classname with the variation name appended (separated by a hyphen).
+If the given block matches a variation, the classname will be the block's default classname with the variation name appended (separated by a double underscore, i.e. `__`).
 
 Note that the block's default classname is affected by the `blocks.getBlockDefaultClassName` filter.
 

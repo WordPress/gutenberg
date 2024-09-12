@@ -150,7 +150,7 @@ describe( 'generated className', () => {
 			);
 
 			expect( extraProps.className ).toBe(
-				'wp-block-produce-fruit wp-block-produce-fruit-banana foo'
+				'wp-block-produce-fruit wp-block-produce-fruit__banana foo'
 			);
 		} );
 
@@ -172,7 +172,7 @@ describe( 'generated className', () => {
 			);
 
 			expect( extraProps.className ).toBe(
-				'wp-block-produce-fruit-banana foo'
+				'wp-block-produce-fruit__banana foo'
 			);
 		} );
 	} );
