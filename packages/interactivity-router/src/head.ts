@@ -38,8 +38,7 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 		[ ...headElements.entries() ]
 			.filter( ( [ , { tag } ] ) => tag.nodeName === 'SCRIPT' )
 			.map( async ( [ url ] ) => {
-				// await import( url );
-				return url;
+				await import( url );
 			} )
 	);
 
