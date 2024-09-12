@@ -150,9 +150,12 @@ function splitStyleValue( value ) {
 function splitGapValue( value ) {
 	// Check for shorthand value (a string value).
 	if ( value && typeof value === 'string' ) {
-		// If the value is a string, treat it as a single side (top) for the spacing controls.
+		// Convert to value for individual sides for BoxControl.
 		return {
 			top: value,
+			right: value,
+			bottom: value,
+			left: value,
 		};
 	}
 
@@ -646,7 +649,9 @@ export default function DimensionsPanel( {
 							onChange={ setGapValues }
 							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
-							values={ gapValues }
+							values={
+								isAxialGap ? gapValues : { top: gapValues?.top }
+							}
 							allowReset={ false }
 						/>
 					) }
