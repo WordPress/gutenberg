@@ -42,6 +42,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### renamePost
+
+Undocumented declaration.
+
 ### reorderPage
 
 Undocumented declaration.
@@ -50,7 +54,15 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### restorePost
+
+Undocumented declaration.
+
 ### titleField
+
+Undocumented declaration.
+
+### trashPost
 
 Undocumented declaration.
 

@@ -10,8 +10,8 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
-import type { CoreDataError, PostWithPermissions } from '../types';
+import { getItemTitle, isTemplateOrTemplatePart } from '../utils';
+import type { CoreDataError, PostWithPermissions } from '../../types';
 
 const restorePost: Action< PostWithPermissions > = {
 	id: 'restore',
