@@ -41,8 +41,8 @@ function gutenberg_register_interactivity_script_module_data_hooks() {
 					if ( ! isset( $data['i18n'] ) ) {
 						$data['i18n'] = array();
 					}
-					$data['i18n']['loading'] = __( 'Loading page, please wait.', 'gutenberg' );
-					$data['i18n']['loaded']  = __( 'Page Loaded.', 'gutenberg' );
+					$data['i18n']['loading'] = __( 'Loading page, please wait.', 'default' );
+					$data['i18n']['loaded']  = __( 'Page Loaded.', 'default' );
 					return $data;
 				}
 			);
