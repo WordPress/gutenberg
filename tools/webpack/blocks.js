@@ -135,7 +135,7 @@ module.exports = [
 						{
 							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname, _basename ] =
+								const [ , dirname, fileBasename ] =
 									absoluteFilename.match(
 										new RegExp(
 											`([\\w-]+)${ escapeRegExp(
@@ -143,13 +143,13 @@ module.exports = [
 											) }([\\w-]+)\\.php$`
 										)
 									);
-								if ( _basename === 'index' ) {
+								if ( fileBasename === 'index' ) {
 									return join( to, `${ dirname }.php` );
 								}
 								return join(
 									to,
 									dirname,
-									`${ _basename }.php`
+									`${ fileBasename }.php`
 								);
 							},
 							filter: ( filepath ) => {
