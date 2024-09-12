@@ -3,15 +3,12 @@
  */
 import {
 	__experimentalItemGroup as ItemGroup,
-	Flex,
 	__experimentalHStack as HStack,
-	__experimentalZStack as ZStack,
 	__experimentalVStack as VStack,
-	ColorIndicator,
-	Button,
+	FlexItem,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
-import { Icon, shuffle, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -20,8 +17,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
-import { useColorRandomizer } from './hooks';
-import ColorIndicatorWrapper from './color-indicator-wrapper';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -37,8 +32,6 @@ function Palette( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
-	const [ randomizeThemeColors ] = useColorRandomizer();
 
 	const colors = useMemo(
 		() => [
@@ -66,37 +59,11 @@ function Palette( { name } ) {
 			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path={ screenPath }>
 					<HStack direction="row">
-						<Flex direction="column" gap={ hasColors ? 2 : 0 }>
-							<div>{ paletteButtonText }</div>
-							<ZStack isLayered={ false } offset={ -8 }>
-								{ colors
-									.slice( 0, 5 )
-									.map( ( { color }, index ) => (
-										<ColorIndicatorWrapper
-											key={ `${ color }-${ index }` }
-										>
-											<ColorIndicator
-												colorValue={ color }
-											/>
-										</ColorIndicatorWrapper>
-									) ) }
-							</ZStack>
-						</Flex>
+						<FlexItem>{ paletteButtonText }</FlexItem>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
-			{ window.__experimentalEnableColorRandomizer &&
-				themeColors?.length > 0 && (
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						icon={ shuffle }
-						onClick={ randomizeThemeColors }
-					>
-						{ __( 'Randomize colors' ) }
-					</Button>
-				) }
 		</VStack>
 	);
 }
