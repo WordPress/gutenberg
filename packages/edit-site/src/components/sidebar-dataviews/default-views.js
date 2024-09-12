@@ -111,10 +111,12 @@ export function useDefaultViewsWithItemCounts( { postType } ) {
 
 export function useDefaultViews( { postType } ) {
 	const labels = useSelect(
-		( select ) => select( coreStore ).getPostType( postType )?.labels,
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType )?.labels;
+		},
 		[ postType ]
 	);
-
 	return useMemo( () => {
 		return [
 			{
