@@ -31,6 +31,14 @@ export function useFilters( fields: NormalizedField< any >[], view: View ) {
 				return;
 			}
 
+			if (
+				view.filters?.some(
+					( f ) => f.field === field.id && f.canBeReset === false
+				)
+			) {
+				return;
+			}
+
 			const operators = sanitizeOperators( field );
 			if ( operators.length === 0 ) {
 				return;
