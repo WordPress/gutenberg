@@ -257,6 +257,10 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		.rich-text {
 			cursor: auto;
 		}
+
+		.is-zoomed-out & {
+			cursor: move;
+		}
 	}
 
 	&.is-hovered:not(.is-selected),
