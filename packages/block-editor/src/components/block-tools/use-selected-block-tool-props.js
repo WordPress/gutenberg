@@ -20,7 +20,7 @@ export default function useSelectedBlockToolProps( clientId ) {
 				getBlockRootClientId,
 				getBlockParents,
 				__experimentalGetBlockListSettingsForBlocks,
-				isBlockInsertionPointVisible,
+				isInsertionCueVisible,
 				getInsertionCue,
 				getBlockOrder,
 				hasMultiSelection,
@@ -42,17 +42,17 @@ export default function useSelectedBlockToolProps( clientId ) {
 						?.__experimentalCaptureToolbars
 			);
 
-			let isInsertionCueVisible = false;
-			if ( isBlockInsertionPointVisible() ) {
+			let isInsertionPointVisible = false;
+			if ( isInsertionCueVisible() ) {
 				const insertionCue = getInsertionCue();
 				const order = getBlockOrder( insertionCue.rootClientId );
-				isInsertionCueVisible =
+				isInsertionPointVisible =
 					order[ insertionCue.index ] === clientId;
 			}
 
 			return {
 				capturingClientId,
-				isInsertionCueVisible,
+				isInsertionPointVisible,
 				lastClientId: hasMultiSelection()
 					? getLastMultiSelectedBlockClientId()
 					: null,

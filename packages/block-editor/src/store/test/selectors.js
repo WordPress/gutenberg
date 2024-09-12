@@ -52,8 +52,8 @@ const {
 	getDraggedBlockClientIds,
 	isBlockBeingDragged,
 	isAncestorBeingDragged,
-	getBlockInsertionPoint,
-	isBlockInsertionPointVisible,
+	getNextInsertionPoint,
+	isInsertionCueVisible,
 	isSelectionEnabled,
 	canInsertBlockType,
 	canInsertBlocks,
@@ -2389,7 +2389,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getBlockInsertionPoint', () => {
+	describe( 'getNextInsertionPoint', () => {
 		it( 'should return the explicitly assigned insertion point', () => {
 			const state = {
 				selection: {
@@ -2429,7 +2429,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
+			expect( getNextInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 0,
 			} );
@@ -2467,7 +2467,7 @@ describe( 'selectors', () => {
 				insertionPoint: null,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
+			expect( getNextInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 1,
 			} );
@@ -2505,8 +2505,8 @@ describe( 'selectors', () => {
 				insertionPoint: null,
 			};
 
-			const insertionPoint1 = getBlockInsertionPoint( state );
-			const insertionPoint2 = getBlockInsertionPoint( state );
+			const insertionPoint1 = getNextInsertionPoint( state );
+			const insertionPoint2 = getNextInsertionPoint( state );
 
 			expect( insertionPoint1 ).toBe( insertionPoint2 );
 		} );
@@ -2547,7 +2547,7 @@ describe( 'selectors', () => {
 				insertionPoint: null,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
+			expect( getNextInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 1,
 			} );
@@ -2589,7 +2589,7 @@ describe( 'selectors', () => {
 				insertionPoint: null,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
+			expect( getNextInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
 			} );
@@ -2631,31 +2631,31 @@ describe( 'selectors', () => {
 				insertionPoint: null,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
+			expect( getNextInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
 			} );
 		} );
 	} );
 
-	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+	describe( 'isInsertionCueVisible', () => {
+		it( 'should return false if no assigned insertion cue', () => {
 			const state = {
-				insertionPoint: null,
+				insertionCue: null,
 			};
 
-			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
+			expect( isInsertionCueVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if assigned insertion cue', () => {
 			const state = {
-				insertionPoint: {
+				insertionCue: {
 					rootClientId: undefined,
 					index: 5,
 				},
 			};
 
-			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
+			expect( isInsertionCueVisible( state ) ).toBe( true );
 		} );
 	} );
 

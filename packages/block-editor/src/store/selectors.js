@@ -1519,8 +1519,7 @@ export function getInsertionCue( state ) {
 export const getNextInsertionPoint = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state ) => {
-			let rootClientId = '',
-				index;
+			let rootClientId, index;
 
 			const {
 				insertionPoint,
@@ -1569,7 +1568,7 @@ export function getInsertionPoint( state ) {
  */
 export function isBlockInsertionPointVisible( state ) {
 	deprecated(
-		'wp.data.select( "core/block-editor" ).isInsertionPointVisible',
+		'wp.data.select( "core/block-editor" ).isBlockInsertionPointVisible',
 		{
 			since: '6.7',
 			version: '6.9',
