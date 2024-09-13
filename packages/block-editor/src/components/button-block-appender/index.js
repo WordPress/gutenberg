@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { forwardRef, useRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -43,22 +43,22 @@ function ButtonBlockAppender(
 				blockTitle,
 				hasSingleBlockType,
 			} ) => {
-				let label;
-				if ( hasSingleBlockType ) {
-					label = sprintf(
-						// translators: %s: the name of the block when there is only one
-						_x( 'Add %s', 'directly add the only allowed block' ),
-						blockTitle
-					);
-				} else {
-					label = _x(
-						'Add block',
-						'Generic label for block inserter button'
-					);
-				}
 				const isToggleButton = ! hasSingleBlockType;
+				const label = hasSingleBlockType
+					? sprintf(
+							// translators: %s: the name of the block when there is only one
+							_x(
+								'Add %s',
+								'directly add the only allowed block'
+							),
+							blockTitle
+					  )
+					: _x(
+							'Add block',
+							'Generic label for block inserter button'
+					  );
 
-				let inserterButton = (
+				return (
 					<Button
 						// TODO: Switch to `true` (40px size) if possible
 						__next40pxDefaultSize={ false }
@@ -76,20 +76,11 @@ function ButtonBlockAppender(
 						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
+						showTooltip
 					>
-						{ ! hasSingleBlockType && (
-							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-						) }
 						<Icon icon={ plus } />
 					</Button>
 				);
-
-				if ( isToggleButton || hasSingleBlockType ) {
-					inserterButton = (
-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
-					);
-				}
-				return inserterButton;
 			} }
 			isAppender
 		/>

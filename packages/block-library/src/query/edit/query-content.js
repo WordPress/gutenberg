@@ -18,6 +18,7 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
+import EnhancedPaginationControl from './inspector-controls/enhanced-pagination-control';
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './inspector-controls';
 import EnhancedPaginationModal from './enhanced-pagination-modal';
@@ -36,6 +37,7 @@ export default function QueryContent( {
 		queryId,
 		query,
 		displayLayout,
+		enhancedPagination,
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
@@ -160,6 +162,11 @@ export default function QueryContent( {
 						setAttributes( { tagName: value } )
 					}
 					help={ htmlElementMessages[ TagName ] }
+				/>
+				<EnhancedPaginationControl
+					enhancedPagination={ enhancedPagination }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
 				/>
 			</InspectorControls>
 			<TagName { ...innerBlocksProps } />
