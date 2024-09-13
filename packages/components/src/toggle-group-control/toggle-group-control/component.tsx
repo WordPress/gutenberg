@@ -55,11 +55,12 @@ function UnconnectedToggleGroupControl(
 	const indicatorPosition = useTrackElementOffsetRect( activeElement );
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
-	useOnValueUpdate(
-		value,
-		( { previousValue } ) =>
-			value && previousValue && setAnimationEnabled( true )
-	);
+	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
+		// Only enable the animation when moving from one element to another.
+		if ( indicatorPosition.element && previousValue ) {
+			setAnimationEnabled( true );
+		}
+	} );
 
 	const cx = useCx();
 
