@@ -51,7 +51,7 @@ function ZoomOutModeInserters() {
 	}, [] );
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { showInsertionPoint, setInserterInsertionPoint } = unlock(
+	const { showInsertionPoint, setInsertionPoint } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -100,9 +100,9 @@ function ZoomOutModeInserters() {
 								tab: 'patterns',
 								category: 'all',
 							} );
-							setInserterInsertionPoint( {
+							setInsertionPoint( {
 								rootClientId: sectionRootClientId,
-								insertionIndex: index,
+								index,
 							} );
 							showInsertionPoint( sectionRootClientId, index, {
 								operation: 'insert',

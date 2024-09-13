@@ -1601,7 +1601,7 @@ export function blocksMode( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function insertionPoint( state = null, action ) {
+export function insertionCue( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
 			const {
@@ -2066,7 +2066,7 @@ export function hoveredBlockClientId( state = false, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {number} Updated state.
  */
 export function zoomLevel( state = 100, action ) {
 	switch ( action.type ) {
@@ -2085,11 +2085,11 @@ export function zoomLevel( state = 100, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {Object} Updated state.
  */
-export function inserterInsertionPoint( state = false, action ) {
+export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTER_INSERTION_POINT':
+		case 'SET_INSERTION_POINT':
 			return action.value;
 		case 'SELECT_BLOCK':
 			return null;
@@ -2110,8 +2110,8 @@ const combinedReducers = combineReducers( {
 	initialPosition,
 	blocksMode,
 	blockListSettings,
-	inserterInsertionPoint,
 	insertionPoint,
+	insertionCue,
 	template,
 	settings,
 	preferences,

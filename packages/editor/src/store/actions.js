@@ -741,22 +741,10 @@ export const setIsInserterOpened =
 			value.hasOwnProperty( 'rootClientId' ) &&
 			value.hasOwnProperty( 'insertionIndex' )
 		) {
-			deprecated(
-				'rootClientId and insertionIndex are deprecated from the editor store state.',
-				{
-					since: '6.7',
-					version: '6.9',
-					alternative:
-						'wp.data.dispatch( "core/block-editor" ).setInserterInsertionPoint',
-				}
-			);
-
-			return registry
-				.dispatch( blockEditorStore )
-				.setInserterInsertionPoint( {
-					rootClientId: value.rootClientId,
-					insertionIndex: value.insertionIndex,
-				} );
+			return registry.dispatch( blockEditorStore ).setInsertionPoint( {
+				rootClientId: value.rootClientId,
+				index: value.insertionIndex,
+			} );
 		}
 
 		dispatch( {

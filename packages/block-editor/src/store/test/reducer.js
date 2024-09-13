@@ -3496,7 +3496,7 @@ describe( 'state', () => {
 
 		it( 'should set inserter insertion point', () => {
 			const state = inserterInsertionPoint( null, {
-				type: 'SET_INSERTER_INSERTION_POINT',
+				type: 'SET_INSERTION_POINT',
 				value: {
 					rootClientId: 'clientId1',
 					insertionIndex: 4,

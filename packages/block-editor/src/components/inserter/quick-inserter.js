@@ -84,9 +84,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { setInserterInsertionPoint } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { setInsertionPoint } = unlock( useDispatch( blockEditorStore ) );
 
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
@@ -95,7 +93,7 @@ export default function QuickInserter( {
 			filterValue,
 			onSelect,
 		} );
-		setInserterInsertionPoint( { rootClientId, insertionIndex } );
+		setInsertionPoint( { rootClientId, index: insertionIndex } );
 	};
 
 	let maxBlockPatterns = 0;
