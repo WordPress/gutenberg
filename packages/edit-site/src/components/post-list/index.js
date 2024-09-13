@@ -205,7 +205,7 @@ export default function PostList( { postType } ) {
 
 	const getActiveViewFilters = ( views, match ) => {
 		const found = views.find( ( { slug } ) => slug === match );
-		return found?.filterDataBy ?? [];
+		return found?.filters ?? [];
 	};
 
 	const { isLoading: isLoadingFields, fields: _fields } = usePostFields(

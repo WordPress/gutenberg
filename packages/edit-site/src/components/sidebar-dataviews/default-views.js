@@ -89,7 +89,7 @@ export function useDefaultViews( { postType } ) {
 				slug: 'published',
 				icon: published,
 				view: DEFAULT_POST_BASE,
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
@@ -102,7 +102,7 @@ export function useDefaultViews( { postType } ) {
 				slug: 'future',
 				icon: scheduled,
 				view: DEFAULT_POST_BASE,
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
@@ -115,7 +115,7 @@ export function useDefaultViews( { postType } ) {
 				slug: 'drafts',
 				icon: drafts,
 				view: DEFAULT_POST_BASE,
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
@@ -128,7 +128,7 @@ export function useDefaultViews( { postType } ) {
 				slug: 'pending',
 				icon: pending,
 				view: DEFAULT_POST_BASE,
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
@@ -141,7 +141,7 @@ export function useDefaultViews( { postType } ) {
 				slug: 'private',
 				icon: notAllowed,
 				view: DEFAULT_POST_BASE,
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
@@ -158,7 +158,7 @@ export function useDefaultViews( { postType } ) {
 					type: LAYOUT_TABLE,
 					layout: defaultLayouts[ LAYOUT_TABLE ].layout,
 				},
-				filterDataBy: [
+				filters: [
 					{
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
