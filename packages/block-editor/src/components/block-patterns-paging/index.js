@@ -38,8 +38,7 @@ export default function Pagination( {
 						className="block-editor-patterns__grid-pagination-previous"
 					>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => changePage( 1 ) }
 							disabled={ currentPage === 1 }
@@ -49,8 +48,7 @@ export default function Pagination( {
 							<span>«</span>
 						</Button>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => changePage( currentPage - 1 ) }
 							disabled={ currentPage === 1 }
@@ -74,8 +72,7 @@ export default function Pagination( {
 						className="block-editor-patterns__grid-pagination-next"
 					>
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => changePage( currentPage + 1 ) }
 							disabled={ currentPage === numPages }
@@ -85,6 +82,7 @@ export default function Pagination( {
 							<span>›</span>
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							variant="tertiary"
 							onClick={ () => changePage( numPages ) }
 							disabled={ currentPage === numPages }
