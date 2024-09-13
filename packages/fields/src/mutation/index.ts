@@ -10,6 +10,34 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { CoreDataError, Post } from '../types';
 import { dispatch } from '@wordpress/data';
 
+const getErrorMessagesFromPromises = < T >(
+	allSettledResults: PromiseSettledResult< T >[]
+) => {
+	const errorMessages = new Set< string >();
+	// If there was at lease one failure.
+	if ( allSettledResults.length === 1 ) {
+		const typedError = allSettledResults[ 0 ] as {
+			reason?: CoreDataError;
+		};
+		if ( typedError.reason?.message ) {
+			errorMessages.add( typedError.reason.message );
+		}
+	} else {
+		const failedPromises = allSettledResults.filter(
+			( { status } ) => status === 'rejected'
+		);
+		for ( const failedPromise of failedPromises ) {
+			const typedError = failedPromise as {
+				reason?: CoreDataError;
+			};
+			if ( typedError.reason?.message ) {
+				errorMessages.add( typedError.reason.message );
+			}
+		}
+	}
+	return errorMessages;
+};
+
 export type NoticeSettings< T extends Post > = {
 	success: {
 		id?: string;
@@ -39,7 +67,7 @@ export const deletePostWithNotices = async < T extends Post >(
 ) => {
 	const { createSuccessNotice, createErrorNotice } = dispatch( noticesStore );
 	const { deleteEntityRecord } = dispatch( coreStore );
-	const promiseResult = await Promise.allSettled(
+	const allSettledResults = await Promise.allSettled(
 		posts.map( ( post ) => {
 			return deleteEntityRecord(
 				'postType',
@@ -51,9 +79,9 @@ export const deletePostWithNotices = async < T extends Post >(
 		} )
 	);
 	// If all the promises were fulfilled with success.
-	if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+	if ( allSettledResults.every( ( { status } ) => status === 'fulfilled' ) ) {
 		let successMessage;
-		if ( promiseResult.length === 1 ) {
+		if ( allSettledResults.length === 1 ) {
 			successMessage = notice.success.messages.getMessage( posts[ 0 ] );
 		} else {
 			successMessage = notice.success.messages.getBatchMessage( posts );
@@ -64,38 +92,15 @@ export const deletePostWithNotices = async < T extends Post >(
 		} );
 		callbacks.onActionPerformed?.( posts );
 	} else {
-		const errorMessages = new Set< string >();
-		// If there was at lease one failure.
-		let errorMessage;
-		// If we were trying to permanently delete a single post.
-		if ( promiseResult.length === 1 ) {
-			const typedError = promiseResult[ 0 ] as {
-				reason?: CoreDataError;
-			};
-			if ( typedError.reason?.message ) {
-				errorMessage = typedError.reason.message;
-				errorMessages.add( typedError.reason.message );
-			} else {
-				errorMessage =
-					notice.error.messages.getMessage( errorMessages );
-			}
-			// If we were trying to permanently delete multiple posts
+		const errorMessages = getErrorMessagesFromPromises( allSettledResults );
+		let errorMessage = '';
+		if ( allSettledResults.length === 1 ) {
+			errorMessage = notice.error.messages.getMessage( errorMessages );
 		} else {
-			const failedPromises = promiseResult.filter(
-				( { status } ) => status === 'rejected'
-			);
-			for ( const failedPromise of failedPromises ) {
-				const typedError = failedPromise as {
-					reason?: CoreDataError;
-				};
-				if ( typedError.reason?.message ) {
-					errorMessages.add( typedError.reason.message );
-				}
-			}
-
 			errorMessage =
 				notice.error.messages.getBatchMessage( errorMessages );
 		}
+
 		createErrorNotice( errorMessage, {
 			type: notice.error.type ?? 'snackbar',
 			id: notice.error.id,
@@ -129,7 +134,7 @@ export const editPostWithNotices = async < T extends Post >(
 			);
 		} )
 	);
-	const promiseResult = await Promise.allSettled(
+	const allSettledResults = await Promise.allSettled(
 		postsWithUpdates.map( ( post ) => {
 			return saveEditedEntityRecord(
 				'postType',
@@ -142,9 +147,9 @@ export const editPostWithNotices = async < T extends Post >(
 		} )
 	);
 	// If all the promises were fulfilled with success.
-	if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+	if ( allSettledResults.every( ( { status } ) => status === 'fulfilled' ) ) {
 		let successMessage;
-		if ( promiseResult.length === 1 ) {
+		if ( allSettledResults.length === 1 ) {
 			successMessage = notice.success.messages.getMessage(
 				postsWithUpdates[ 0 ].originalPost
 			);
@@ -161,38 +166,15 @@ export const editPostWithNotices = async < T extends Post >(
 			postsWithUpdates.map( ( post ) => post.originalPost )
 		);
 	} else {
-		const errorMessages = new Set< string >();
-		// If there was at lease one failure.
-		let errorMessage;
-		// If we were trying to permanently delete a single post.
-		if ( promiseResult.length === 1 ) {
-			const typedError = promiseResult[ 0 ] as {
-				reason?: CoreDataError;
-			};
-			if ( typedError.reason?.message ) {
-				errorMessage = typedError.reason.message;
-				errorMessages.add( typedError.reason.message );
-			} else {
-				errorMessage =
-					notice.error.messages.getMessage( errorMessages );
-			}
-			// If we were trying to permanently delete multiple posts
+		const errorMessages = getErrorMessagesFromPromises( allSettledResults );
+		let errorMessage = '';
+		if ( allSettledResults.length === 1 ) {
+			errorMessage = notice.error.messages.getMessage( errorMessages );
 		} else {
-			const failedPromises = promiseResult.filter(
-				( { status } ) => status === 'rejected'
-			);
-			for ( const failedPromise of failedPromises ) {
-				const typedError = failedPromise as {
-					reason?: CoreDataError;
-				};
-				if ( typedError.reason?.message ) {
-					errorMessages.add( typedError.reason.message );
-				}
-			}
-
 			errorMessage =
 				notice.error.messages.getBatchMessage( errorMessages );
 		}
+
 		createErrorNotice( errorMessage, {
 			type: notice.error.type ?? 'snackbar',
 			id: notice.error.id,
