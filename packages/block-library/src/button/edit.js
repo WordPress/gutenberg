@@ -17,12 +17,12 @@ import { unlock } from '../lock-unlock';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
-	Button,
-	ButtonGroup,
 	PanelBody,
 	TextControl,
 	ToolbarButton,
 	Popover,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -115,34 +115,29 @@ function useEnter( props ) {
 }
 
 function WidthPanel( { selectedWidth, setAttributes } ) {
-	function handleChange( newWidth ) {
-		// Check if we are toggling the width off
-		const width = selectedWidth === newWidth ? undefined : newWidth;
-
-		// Update attributes.
-		setAttributes( { width } );
-	}
-
 	return (
 		<PanelBody title={ __( 'Settings' ) }>
-			<ButtonGroup aria-label={ __( 'Button width' ) }>
+			<ToggleGroupControl
+				label={ __( 'Button width' ) }
+				value={ selectedWidth }
+				hideLabelFromVision
+				onChange={ ( newWidth ) =>
+					setAttributes( { width: newWidth } )
+				}
+				isDeselectable
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			>
 				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 					return (
-						<Button
+						<ToggleGroupControlOption
 							key={ widthValue }
-							size="small"
-							variant={
-								widthValue === selectedWidth
-									? 'primary'
-									: undefined
-							}
-							onClick={ () => handleChange( widthValue ) }
-						>
-							{ widthValue }%
-						</Button>
+							value={ widthValue }
+							label={ `${ widthValue }%` }
+						/>
 					);
 				} ) }
-			</ButtonGroup>
+			</ToggleGroupControl>
 		</PanelBody>
 	);
 }
