@@ -2,7 +2,7 @@
  * External dependencies
  */
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const { join, sep } = require( 'path' );
+const { join, sep, basename } = require( 'path' );
 const fastGlob = require( 'fast-glob' );
 const { realpathSync } = require( 'fs' );
 
@@ -135,7 +135,7 @@ module.exports = [
 						{
 							from: `${ from }/**/*.php`,
 							to( { absoluteFilename } ) {
-								const [ , dirname, basename ] =
+								const [ , dirname, fileBasename ] =
 									absoluteFilename.match(
 										new RegExp(
 											`([\\w-]+)${ escapeRegExp(
@@ -143,15 +143,18 @@ module.exports = [
 											) }([\\w-]+)\\.php$`
 										)
 									);
-
-								if ( basename === 'index' ) {
+								if ( fileBasename === 'index' ) {
 									return join( to, `${ dirname }.php` );
 								}
-								return join( to, dirname, `${ basename }.php` );
+								return join(
+									to,
+									dirname,
+									`${ fileBasename }.php`
+								);
 							},
 							filter: ( filepath ) => {
 								return (
-									filepath.endsWith( sep + 'index.php' ) ||
+									basename( filepath ) === 'index.php' ||
 									PhpFilePathsPlugin.paths.includes(
 										realpathSync( filepath ).replace(
 											/\\/g,
