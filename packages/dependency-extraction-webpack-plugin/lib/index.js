@@ -279,7 +279,7 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			// Go through the assets and hash the sources. We can't just use
+			// Prepare to hash the sources. We can't just use
 			// `chunk.contentHash` because that's not updated when
 			// assets are minified. In practice the hash is updated by
 			// `RealContentHashPlugin` after minification, but it only modifies
@@ -288,12 +288,36 @@ class DependencyExtractionWebpackPlugin {
 			const { hashFunction, hashDigest, hashDigestLength } =
 				compilation.outputOptions;
 
-			const contentHash = chunkFiles
-				.sort()
-				.reduce( ( hash, filename ) => {
-					const asset = compilation.getAsset( filename );
-					return hash.update( asset.source.buffer() );
-				}, createHash( hashFunction ) )
+			const hashBuilder = createHash( hashFunction );
+
+			const processContentsForHash = ( content ) => {
+				hashBuilder.update( content );
+			};
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const processContentsForMagicComments = ( content ) => {
+				if (
+					content
+						.toString()
+						.includes( '/* wordpress: needs wp-polyfill */' )
+				) {
+					chunkStaticDeps.add( 'wp-polyfill' );
+				}
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to generate hashes, as well as look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				processContentsForHash( content );
+				processContentsForMagicComments( content );
+			} );
+
+			// Finalise hash.
+			const contentHash = hashBuilder
 				.digest( hashDigest )
 				.slice( 0, hashDigestLength );
 

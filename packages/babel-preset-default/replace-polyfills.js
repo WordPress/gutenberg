@@ -6,6 +6,17 @@ function replacePolyfills() {
 			this.hasAddedPolyfills = false;
 		},
 		visitor: {
+			Program: {
+				exit( path ) {
+					if ( this.hasAddedPolyfills ) {
+						// Add magic comment to top of file.
+						path.addComment(
+							'leading',
+							' wordpress: needs wp-polyfill '
+						);
+					}
+				},
+			},
 			// Handle `import` syntax.
 			ImportDeclaration( path ) {
 				const source = path?.node?.source;
@@ -13,14 +24,9 @@ function replacePolyfills() {
 
 				// Look for imports from `core-js`.
 				if ( name.startsWith( 'core-js/' ) ) {
-					if ( this.hasAddedPolyfills ) {
-						// Remove duplicate import.
-						path.remove();
-					} else {
-						// Replace with `@wordpress/polyfill`.
-						source.value = '@wordpress/polyfill';
-						this.hasAddedPolyfills = true;
-					}
+					// Remove import.
+					path.remove();
+					this.hasAddedPolyfills = true;
 				}
 			},
 
@@ -43,14 +49,9 @@ function replacePolyfills() {
 					arg.type === 'StringLiteral' &&
 					arg.value.startsWith( 'core-js/' )
 				) {
-					if ( this.hasAddedPolyfills ) {
-						// Remove duplicate import.
-						path.remove();
-					} else {
-						// Replace with `@wordpress/polyfill`.
-						arg.value = '@wordpress/polyfill';
-						this.hasAddedPolyfills = true;
-					}
+					// Remove import.
+					path.remove();
+					this.hasAddedPolyfills = true;
 				}
 			},
 		},

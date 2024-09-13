@@ -93,7 +93,6 @@ function defaultRequestToExternalModule( request ) {
 	switch ( request ) {
 		case '@wordpress/interactivity-router':
 		case '@wordpress/a11y':
-		case '@wordpress/polyfill':
 			return `import ${ request }`;
 	}
 
