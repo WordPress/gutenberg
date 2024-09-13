@@ -20,7 +20,7 @@ import { getItemTitle } from '../utils';
 import type { Pattern } from '../../types';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
-import type { Notice } from '../../mutation';
+import type { NoticeSettings } from '../../mutation';
 import { deleteWithNotices } from '../../mutation';
 
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
@@ -71,10 +71,10 @@ const deletePatternAction: Action< Pattern > = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							const notices: Notice< Pattern > = {
-								onSuccess: {
+							const notices: NoticeSettings< Pattern > = {
+								success: {
 									messages: {
-										getOneItemMessage: ( item ) => {
+										getMessage: ( item ) => {
 											let title = '';
 											if (
 												typeof item.title === 'string'
@@ -98,13 +98,13 @@ const deletePatternAction: Action< Pattern > = {
 												decodeEntities( title )
 											);
 										},
-										getMultipleItemMessage: () =>
+										getBatchMessage: () =>
 											__( 'Items deleted.' ),
 									},
 								},
-								onError: {
+								error: {
 									messages: {
-										getOneItemMessage: ( error ) => {
+										getMessage: ( error ) => {
 											if ( error.size === 1 ) {
 												return sprintf(
 													/* translators: The template/part's name. */
@@ -118,7 +118,7 @@ const deletePatternAction: Action< Pattern > = {
 												'An error occurred while deleting the item.'
 											);
 										},
-										getMultipleItemMessage: ( errors ) => {
+										getBatchMessage: ( errors ) => {
 											if ( errors.size === 0 ) {
 												return __(
 													'An error occurred while deleting the items.'

@@ -10,28 +10,28 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { CoreDataError, Post } from '../types';
 import { dispatch } from '@wordpress/data';
 
-export type Notice< T extends Post > = {
-	onSuccess: {
+export type NoticeSettings< T extends Post > = {
+	success: {
 		id?: string;
 		type?: string;
 		messages: {
-			getOneItemMessage: ( posts: T ) => string;
-			getMultipleItemMessage: ( posts: T[] ) => string;
+			getMessage: ( posts: T ) => string;
+			getBatchMessage: ( posts: T[] ) => string;
 		};
 	};
-	onError: {
+	error: {
 		id?: string;
 		type?: string;
 		messages: {
-			getOneItemMessage: ( errors: Set< string > ) => string;
-			getMultipleItemMessage: ( errors: Set< string > ) => string;
+			getMessage: ( errors: Set< string > ) => string;
+			getBatchMessage: ( errors: Set< string > ) => string;
 		};
 	};
 };
 
 export const deleteWithNotices = async < T extends Post >(
 	posts: T[],
-	notice: Notice< T >,
+	notice: NoticeSettings< T >,
 	callbacks: {
 		onActionPerformed?: ( posts: T[] ) => void;
 		onActionError?: () => void;
@@ -54,16 +54,13 @@ export const deleteWithNotices = async < T extends Post >(
 	if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 		let successMessage;
 		if ( promiseResult.length === 1 ) {
-			successMessage = notice.onSuccess.messages.getOneItemMessage(
-				posts[ 0 ]
-			);
+			successMessage = notice.success.messages.getMessage( posts[ 0 ] );
 		} else {
-			successMessage =
-				notice.onSuccess.messages.getMultipleItemMessage( posts );
+			successMessage = notice.success.messages.getBatchMessage( posts );
 		}
 		createSuccessNotice( successMessage, {
-			type: notice.onSuccess.type ?? 'snackbar',
-			id: notice.onSuccess.id,
+			type: notice.success.type ?? 'snackbar',
+			id: notice.success.id,
 		} );
 		callbacks.onActionPerformed?.( posts );
 	} else {
@@ -80,7 +77,7 @@ export const deleteWithNotices = async < T extends Post >(
 				errorMessages.add( typedError.reason.message );
 			} else {
 				errorMessage =
-					notice.onError.messages.getOneItemMessage( errorMessages );
+					notice.error.messages.getMessage( errorMessages );
 			}
 			// If we were trying to permanently delete multiple posts
 		} else {
@@ -97,11 +94,11 @@ export const deleteWithNotices = async < T extends Post >(
 			}
 
 			errorMessage =
-				notice.onError.messages.getMultipleItemMessage( errorMessages );
+				notice.error.messages.getBatchMessage( errorMessages );
 		}
 		createErrorNotice( errorMessage, {
-			type: notice.onError.type ?? 'snackbar',
-			id: notice.onError.id,
+			type: notice.error.type ?? 'snackbar',
+			id: notice.error.id,
 		} );
 		callbacks.onActionError?.();
 	}
@@ -112,7 +109,7 @@ export const editWithNotices = async < T extends Post >(
 		originalPost: T;
 		changes: Partial< T >;
 	}[],
-	notice: Notice< T >,
+	notice: NoticeSettings< T >,
 	callbacks: {
 		onActionPerformed?: ( posts: T[] ) => void;
 		onActionError?: () => void;
@@ -148,17 +145,17 @@ export const editWithNotices = async < T extends Post >(
 	if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 		let successMessage;
 		if ( promiseResult.length === 1 ) {
-			successMessage = notice.onSuccess.messages.getOneItemMessage(
+			successMessage = notice.success.messages.getMessage(
 				postsWithUpdates[ 0 ].originalPost
 			);
 		} else {
-			successMessage = notice.onSuccess.messages.getMultipleItemMessage(
+			successMessage = notice.success.messages.getBatchMessage(
 				postsWithUpdates.map( ( post ) => post.originalPost )
 			);
 		}
 		createSuccessNotice( successMessage, {
-			type: notice.onSuccess.type ?? 'snackbar',
-			id: notice.onSuccess.id,
+			type: notice.success.type ?? 'snackbar',
+			id: notice.success.id,
 		} );
 		callbacks.onActionPerformed?.(
 			postsWithUpdates.map( ( post ) => post.originalPost )
@@ -177,7 +174,7 @@ export const editWithNotices = async < T extends Post >(
 				errorMessages.add( typedError.reason.message );
 			} else {
 				errorMessage =
-					notice.onError.messages.getOneItemMessage( errorMessages );
+					notice.error.messages.getMessage( errorMessages );
 			}
 			// If we were trying to permanently delete multiple posts
 		} else {
@@ -194,11 +191,11 @@ export const editWithNotices = async < T extends Post >(
 			}
 
 			errorMessage =
-				notice.onError.messages.getMultipleItemMessage( errorMessages );
+				notice.error.messages.getBatchMessage( errorMessages );
 		}
 		createErrorNotice( errorMessage, {
-			type: notice.onError.type ?? 'snackbar',
-			id: notice.onError.id,
+			type: notice.error.type ?? 'snackbar',
+			id: notice.error.id,
 		} );
 		callbacks.onActionError?.();
 	}

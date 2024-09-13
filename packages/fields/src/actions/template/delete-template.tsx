@@ -18,7 +18,7 @@ import type { Action } from '@wordpress/dataviews';
 import { isTemplateRemovable, getItemTitle } from '../utils';
 import type { Template, TemplatePart } from '../../types';
 import { decodeEntities } from '@wordpress/html-entities';
-import type { Notice } from '../../mutation';
+import type { NoticeSettings } from '../../mutation';
 import { deleteWithNotices } from '../../mutation';
 
 const deleteTemplateAction: Action< Template | TemplatePart > = {
@@ -67,10 +67,12 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							const notice: Notice< Template | TemplatePart > = {
-								onSuccess: {
+							const notice: NoticeSettings<
+								Template | TemplatePart
+							> = {
+								success: {
 									messages: {
-										getOneItemMessage: ( item ) => {
+										getMessage: ( item ) => {
 											return isResetting
 												? sprintf(
 														/* translators: The template/part's name. */
@@ -87,16 +89,16 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 														)
 												  );
 										},
-										getMultipleItemMessage: () => {
+										getBatchMessage: () => {
 											return isResetting
 												? __( 'Items reset.' )
 												: __( 'Items deleted.' );
 										},
 									},
 								},
-								onError: {
+								error: {
 									messages: {
-										getOneItemMessage: ( error ) => {
+										getMessage: ( error ) => {
 											if ( error.size === 1 ) {
 												return [ ...error ][ 0 ];
 											}
@@ -108,7 +110,7 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 														'An error occurred while deleting the item.'
 												  );
 										},
-										getMultipleItemMessage: ( errors ) => {
+										getBatchMessage: ( errors ) => {
 											if ( errors.size === 0 ) {
 												return isResetting
 													? __(
