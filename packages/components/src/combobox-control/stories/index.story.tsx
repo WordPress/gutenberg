@@ -80,7 +80,6 @@ Default.args = {
 	allowReset: false,
 	label: 'Select a country',
 	options: countryOptions,
-	placeholder: 'Optional placeholder',
 };
 
 /**
