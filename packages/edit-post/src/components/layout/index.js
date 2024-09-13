@@ -290,7 +290,13 @@ function MetaBoxesMain( { isLegacy } ) {
 				max,
 				Math.max( min, delta + fromHeight )
 			);
-			resizableBoxRef.current.updateSize( { height: nextHeight } );
+			resizableBoxRef.current.updateSize( {
+				height: nextHeight,
+				// Oddly, if left unspecified a subsequent drag gesture applies a fixed
+				// width and the pane fails to shrink/grow with parent width changes from
+				// sidebars opening/closing or window resizes.
+				width: 'auto',
+			} );
 			setPreference(
 				'core/edit-post',
 				'metaBoxesMainOpenHeight',
