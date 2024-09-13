@@ -2,31 +2,18 @@
  * WordPress dependencies
  */
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import BlockSettingsDropdown from './block-settings-dropdown';
-import BlockCommentToolbar from '../collab/toolbar';
-import { store as blockEditorStore } from '../../store';
+import __unstableCommentIconToolbarFill from '../collab/block-comment-icon-toolbar-slot';
 
 export function BlockSettingsMenu( { clientIds, ...props } ) {
-	const selectedBlockClientId = clientIds[ 0 ];
-	const commentID = useSelect( ( select ) => {
-		return (
-			select( blockEditorStore ).getBlock( selectedBlockClientId )
-				?.attributes?.blockCommentId || null
-		);
-	} );
-
 	return (
 		<ToolbarGroup>
-			{ commentID && (
-				<BlockCommentToolbar
-					clientId={ selectedBlockClientId }
-					blockClassName={ commentID }
-				/>
-			) }
+
+			<__unstableCommentIconToolbarFill.Slot />
 
 			<ToolbarItem>
 				{ ( toggleProps ) => (
