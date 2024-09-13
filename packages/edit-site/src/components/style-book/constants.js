@@ -3,28 +3,47 @@
  */
 import { __ } from '@wordpress/i18n';
 
-const STYLE_BOOK_CATEGORIES = [
+/*
+  category: slug/identifier for the category
+  label: display name for the category
+  blocks: block to display in the category in addition to any registered blocks in that category.
+  onClick: function to call when the category's blocks are clicked. Overrides the default behavior.
+ */
+export const STYLE_BOOK_CATEGORIES = [
 	{
-		name: 'layout',
-		label: __( 'Layout' ),
-		blocks: [],
+		// Clicking examples on the landing tab
+		// will take you to the corresponding
+		// tab in the style book. E.g., image > media
+		// So the click events have to be handled separately.
+		category: 'overview',
+		label: __( 'Overview' ),
+		blocks: [
+			// colors
+			'core/heading',
+			'core/paragraph',
+			'core/image',
+			'core/separator',
+			'core/buttons',
+			'core/pull-quote',
+			'core/search',
+		],
 	},
 	{
-		name: 'text',
+		category: 'text',
 		label: __( 'Text' ),
 		blocks: [ 'core/post-content', 'core/home-link' ],
 	},
 	{
-		name: 'colors',
+		category: 'colors',
 		label: __( 'Colors' ),
 		blocks: [],
 	},
 	{
-		name: 'theme',
+		category: 'theme',
 		label: __( 'Theme' ),
 		categories: [
 			{
-				name: 'site-identity',
+				category: 'site-identity',
 				label: __( 'Site Identity' ),
 				blocks: [
 					'core/site-logo',
@@ -33,7 +52,7 @@ const STYLE_BOOK_CATEGORIES = [
 				],
 			},
 			{
-				name: 'design',
+				category: 'design',
 				label: __( 'Design' ),
 				blocks: [
 					'core/navigation',
@@ -47,7 +66,7 @@ const STYLE_BOOK_CATEGORIES = [
 				],
 			},
 			{
-				name: 'posts',
+				category: 'posts',
 				label: __( 'Posts' ),
 				blocks: [
 					'core/post-title',
@@ -65,7 +84,7 @@ const STYLE_BOOK_CATEGORIES = [
 				],
 			},
 			{
-				name: 'comments',
+				category: 'comments',
 				label: __( 'Comments' ),
 				blocks: [
 					'core/comments-title',
@@ -85,18 +104,18 @@ const STYLE_BOOK_CATEGORIES = [
 		],
 	},
 	{
-		name: 'media',
+		category: 'media',
 		label: __( 'Media' ),
 		blocks: [ 'core/post-featured-image' ],
 	},
 	{
-		name: 'widgets',
+		category: 'widgets',
 		label: __( 'Widgets' ),
 		blocks: [],
 	},
 
 	{
-		name: 'embeds',
+		category: 'embeds',
 		label: __( 'Embeds' ),
 		blocks: [],
 	},
