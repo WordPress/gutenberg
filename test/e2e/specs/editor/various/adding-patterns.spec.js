@@ -17,7 +17,7 @@ test.describe( 'adding patterns', () => {
 			'Standard'
 		);
 
-		await page.click( 'role=option[name="Standard"i]' );
+		await page.getByRole( 'option', { name: 'Standard' } ).click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/query',
