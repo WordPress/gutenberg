@@ -155,7 +155,7 @@ export const getEntityRecord =
 					}
 				);
 
-				if ( query !== undefined ) {
+				if ( query !== undefined && query._fields ) {
 					query = { ...query, include: [ key ] };
 
 					// The resolution cache won't consider query as reusable based on the
@@ -177,24 +177,32 @@ export const getEntityRecord =
 					response.headers?.get( 'allow' )
 				);
 
+				const canUserResolutionsArgs = [];
+				const receiveUserPermissionArgs = {};
+				for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
+					receiveUserPermissionArgs[
+						getUserPermissionCacheKey( action, {
+							kind,
+							name,
+							id: key,
+						} )
+					] = permissions[ action ];
+
+					canUserResolutionsArgs.push( [
+						action,
+						{ kind, name, id: key },
+					] );
+				}
+
 				registry.batch( () => {
 					dispatch.receiveEntityRecords( kind, name, record, query );
-
-					for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
-						const permissionKey = getUserPermissionCacheKey(
-							action,
-							{ kind, name, id: key }
-						);
-
-						dispatch.receiveUserPermission(
-							permissionKey,
-							permissions[ action ]
-						);
-						dispatch.finishResolution( 'canUser', [
-							action,
-							{ kind, name, id: key },
-						] );
-					}
+					dispatch.receiveUserPermissions(
+						receiveUserPermissionArgs
+					);
+					dispatch.finishResolutions(
+						'canUser',
+						canUserResolutionsArgs
+					);
 				} );
 			}
 		} finally {
@@ -747,7 +755,7 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select } ) => {
+	async ( { dispatch, select, registry } ) => {
 		const fallback = await apiFetch( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
@@ -756,9 +764,13 @@ export const getNavigationFallbackId =
 
 		const record = fallback?._embedded?.self;
 
-		dispatch.receiveNavigationFallbackId( fallback?.id );
+		registry.batch( () => {
+			dispatch.receiveNavigationFallbackId( fallback?.id );
 
-		if ( record ) {
+			if ( ! record ) {
+				return;
+			}
+
 			// If the fallback is already in the store, don't invalidate navigation queries.
 			// Otherwise, invalidate the cache for the scenario where there were no Navigation
 			// posts in the state and the fallback created one.
@@ -782,7 +794,7 @@ export const getNavigationFallbackId =
 				'wp_navigation',
 				fallback.id,
 			] );
-		}
+		} );
 	};
 
 export const getDefaultTemplateId =
@@ -809,7 +821,7 @@ export const getDefaultTemplateId =
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch } ) => {
+	async ( { dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -876,32 +888,36 @@ export const getRevisions =
 				} );
 			}
 
-			dispatch.receiveRevisions(
-				kind,
-				name,
-				recordKey,
-				records,
-				query,
-				false,
-				meta
-			);
+			registry.batch( () => {
+				dispatch.receiveRevisions(
+					kind,
+					name,
+					recordKey,
+					records,
+					query,
+					false,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getRevision` selector in addition to `getRevisions`.
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [
-						kind,
-						name,
-						recordKey,
-						record[ key ],
-					] );
+				// When requesting all fields, the list of results can be used to
+				// resolve the `getRevision` selector in addition to `getRevisions`.
+				if ( ! query?._fields && ! query.context ) {
+					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [
+							kind,
+							name,
+							recordKey,
+							record[ key ],
+						] );
 
-				dispatch.startResolutions( 'getRevision', resolutionsArgs );
-				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
-			}
+					dispatch.finishResolutions(
+						'getRevision',
+						resolutionsArgs
+					);
+				}
+			} );
 		}
 	};
 

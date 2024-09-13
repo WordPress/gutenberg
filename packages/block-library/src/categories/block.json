@@ -36,6 +36,7 @@
 			"default": true
 		}
 	},
+	"usesContext": [ "enhancedPagination" ],
 	"supports": {
 		"align": true,
 		"html": false,

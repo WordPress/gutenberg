@@ -16,20 +16,24 @@ import type { WordPressComponentProps } from '../context';
 import { DropdownMenuContext } from './context';
 import type { DropdownMenuCheckboxItemProps } from './types';
 import * as Styled from './styles';
+import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
 
 export const DropdownMenuCheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
 >( function DropdownMenuCheckboxItem(
-	{ suffix, children, hideOnClick = false, ...props },
+	{ suffix, children, onBlur, hideOnClick = false, ...props },
 	ref
 ) {
+	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 
 	return (
 		<Styled.DropdownMenuCheckboxItem
 			ref={ ref }
 			{ ...props }
+			{ ...focusVisibleFixProps }
 			accessibleWhenDisabled
 			hideOnClick={ hideOnClick }
 			store={ dropdownMenuContext?.store }

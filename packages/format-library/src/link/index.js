@@ -12,7 +12,7 @@ import {
 	insert,
 	create,
 } from '@wordpress/rich-text';
-import { isURL, isEmail } from '@wordpress/url';
+import { isURL, isEmail, isPhoneNumber } from '@wordpress/url';
 import {
 	RichTextToolbarButton,
 	RichTextShortcut,
@@ -102,6 +102,13 @@ function Edit( {
 				applyFormat( value, {
 					type: name,
 					attributes: { url: `mailto:${ text }` },
+				} )
+			);
+		} else if ( ! isActive && text && isPhoneNumber( text ) ) {
+			onChange(
+				applyFormat( value, {
+					type: name,
+					attributes: { url: `tel:${ text.replace( /\D/g, '' ) }` },
 				} )
 			);
 		} else {
