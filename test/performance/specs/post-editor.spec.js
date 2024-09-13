@@ -595,13 +595,13 @@ test.describe( 'Post Editor Performance', () => {
 					source: 'core',
 				},
 				{
-					name: 'core/standard',
-					title: 'Standard',
+					name: 'core/social-links-shared-background-color',
+					title: 'Social links with a shared background color',
 					content:
-						'<!-- wp:query {"queryId":8,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"metadata":{"categories":["posts"],"patternName":"core/query-standard-posts","name":"Standard"}} --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-title {"isLink":true} /--><!-- wp:post-featured-image {"isLink":true,"align":"wide"} /--><!-- wp:post-excerpt /--><!-- wp:separator {"opacity":"css"} --><hr class="wp-block-separator has-css-opacity"/><!-- /wp:separator --><!-- wp:post-date /--><!-- /wp:post-template --></div><!-- /wp:query -->',
+						'<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->\n\t\t\t\t\t\t<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"chain"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>\n\t\t\t\t\t\t<!-- /wp:social-links -->',
 					viewportWidth: 500,
 					categories: [ 'test' ],
-					blockTypes: [ 'core/query' ],
+					blockTypes: [ 'core/social-links' ],
 					source: 'core',
 				},
 				{
@@ -623,13 +623,13 @@ test.describe( 'Post Editor Performance', () => {
 					source: 'core',
 				},
 				{
-					name: 'core/standard-2',
-					title: 'Standard 2',
+					name: 'core/social-links-shared-background-color-2',
+					title: 'Social links with a shared background color 2',
 					content:
-						'<!-- wp:query {"queryId":8,"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":false},"metadata":{"categories":["posts"],"patternName":"core/query-standard-posts","name":"Standard"}} --><div class="wp-block-query"><!-- wp:post-template --><!-- wp:post-title {"isLink":true} /--><!-- wp:post-featured-image {"isLink":true,"align":"wide"} /--><!-- wp:post-excerpt /--><!-- wp:separator {"opacity":"css"} --><hr class="wp-block-separator has-css-opacity"/><!-- /wp:separator --><!-- wp:post-date /--><!-- /wp:post-template --></div><!-- /wp:query -->',
+						'<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->\n\t\t\t\t\t\t<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"chain"} /-->\n\t\t\t\t\t\t<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>\n\t\t\t\t\t\t<!-- /wp:social-links -->',
 					viewportWidth: 500,
 					categories: [ 'test' ],
-					blockTypes: [ 'core/query' ],
+					blockTypes: [ 'core/social-links' ],
 					source: 'core',
 				},
 			];
