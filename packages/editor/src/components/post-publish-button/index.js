@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, createRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -17,7 +17,6 @@ const noop = () => {};
 export class PostPublishButton extends Component {
 	constructor( props ) {
 		super( props );
-		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
 		this.closeEntitiesSavedStates =
@@ -26,21 +25,6 @@ export class PostPublishButton extends Component {
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
-	}
-
-	componentDidMount() {
-		if ( this.props.focusOnMount ) {
-			// This timeout is necessary to make sure the `useEffect` hook of
-			// `useFocusReturn` gets the correct element (the button that opens the
-			// PostPublishPanel) otherwise it will get this button.
-			this.timeoutID = setTimeout( () => {
-				this.buttonNode.current.focus();
-			}, 0 );
-		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.timeoutID );
 	}
 
 	createOnClick( callback ) {
@@ -182,7 +166,6 @@ export class PostPublishButton extends Component {
 		return (
 			<>
 				<Button
-					ref={ this.buttonNode }
 					{ ...componentProps }
 					className={ `${ componentProps.className } editor-post-publish-button__button` }
 					size="compact"
