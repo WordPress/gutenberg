@@ -14,6 +14,7 @@
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+-   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
 
 ### Enhancements
 
