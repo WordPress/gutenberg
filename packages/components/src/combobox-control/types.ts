@@ -83,7 +83,7 @@ export type ComboboxControlProps = Pick<
 	 */
 	value?: string | null;
 	/**
-	 * The placeholder for the Combobox.
+	 * If passed, the combobox input will show a placeholder string if no values are present.
 	 */
 	placeholder?: string;
 };
