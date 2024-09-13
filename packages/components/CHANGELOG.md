@@ -2,11 +2,10 @@
 
 ## Unreleased
 
-## 28.8.0-next.0 (2024-09-12)
-
 ### Bug Fixes
 
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
+-   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
 
 ### Deprecations
 
@@ -30,6 +29,7 @@
 -   `Tabs`: improved performance of the indicator animation ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
+-   `BoxControl`: Fix critical error when null value is passed ([#65287](https://github.com/WordPress/gutenberg/pull/65287)).
 
 ## 28.7.0 (2024-09-05)
 

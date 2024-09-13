@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "23.0.1-next.5368f64a9.0",
+	"version": "22.7.0",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
@@ -28,7 +28,9 @@
 		"LICENSE",
 		"README.md",
 		"index.js",
-		"scss.js"
+		"scss.js",
+		"scss-stylistic.js",
+		"stylistic.js"
 	],
 	"main": "index.js",
 	"dependencies": {
