@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added `addPolyfillImport` option. When used, it will automatically add `@wordpress/polyfill` imports where needed.
+- Added `addPolyfillComments` option. When used, it will automatically add magic comments to mark files that need `wp-polyfill`.
 
 ## 8.7.0 (2024-09-05)
 

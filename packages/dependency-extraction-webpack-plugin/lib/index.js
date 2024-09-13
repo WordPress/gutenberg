@@ -287,11 +287,7 @@ class DependencyExtractionWebpackPlugin {
 			// Prepare to look for magic comments, in order to decide whether
 			// `wp-polyfill` is needed.
 			const processContentsForMagicComments = ( content ) => {
-				if (
-					content
-						.toString()
-						.includes( '/* wordpress: needs wp-polyfill */' )
-				) {
+				if ( content.toString().includes( '/* wp:polyfill */' ) ) {
 					chunkStaticDeps.add( 'wp-polyfill' );
 				}
 			};

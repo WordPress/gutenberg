@@ -33,7 +33,7 @@ module.exports = ( api ) => {
 				'proposal-nullish-coalescing-operator',
 				'proposal-logical-assignment-operators',
 			],
-			...( wpBuildOpts.addPolyfillImport
+			...( wpBuildOpts.addPolyfillComments
 				? {
 						useBuiltIns: 'usage',
 						exclude: exclusions,
@@ -95,7 +95,7 @@ module.exports = ( api ) => {
 				},
 			],
 			maybeGetPluginTransformRuntime(),
-			wpBuildOpts.addPolyfillImport && replacePolyfills,
+			wpBuildOpts.addPolyfillComments && replacePolyfills,
 		].filter( Boolean ),
 	};
 };

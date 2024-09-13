@@ -1,5 +1,6 @@
 // Babel plugin that looks for `core-js` imports (or requires)
-// and replaces them with `@wordpress/polyfill`.
+// and replaces them magic comments to mark the file as depending
+// on wp-polyfill.
 function replacePolyfills() {
 	return {
 		pre() {
@@ -10,10 +11,7 @@ function replacePolyfills() {
 				exit( path ) {
 					if ( this.hasAddedPolyfills ) {
 						// Add magic comment to top of file.
-						path.addComment(
-							'leading',
-							' wordpress: needs wp-polyfill '
-						);
+						path.addComment( 'leading', ' wp:polyfill ' );
 					}
 				},
 			},

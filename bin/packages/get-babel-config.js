@@ -12,7 +12,7 @@ module.exports = ( environment = '', file ) => {
 		},
 	};
 	// Add `@wordpress/polyfill` import where needed.
-	callerOpts.caller.addPolyfillImport = true;
+	callerOpts.caller.addPolyfillComments = true;
 	switch ( environment ) {
 		case 'main':
 			// To be merged as a presetEnv option.
