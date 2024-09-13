@@ -39,7 +39,10 @@ import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { unlock } from '../../lock-unlock';
-import { getBindingsValues } from '../../hooks/use-bindings-attributes';
+import {
+	getBindingsValues,
+	replacePatternOverrideDefaultBindings,
+} from '../../hooks/use-bindings-attributes';
 import BlockContext from '../block-context';
 
 /**
@@ -71,17 +74,33 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canMoveBlock,
+				getBlockParents,
 			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
 			const index = getBlockIndex( clientId );
-			const { name, attributes } = getBlock( clientId );
+			const block = getBlock( clientId );
+			const { name, attributes } = block;
 			const blockType = getBlockType( name );
 			const orientation =
 				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 
-			const blockBindings = attributes?.metadata?.bindings;
+			const blockBindings = replacePatternOverrideDefaultBindings(
+				name,
+				attributes?.metadata?.bindings
+			);
+
+			if ( blockBindings?.content?.source === 'core/pattern-overrides' ) {
+				const parents = getBlockParents( clientId );
+				const parentBlock =
+					parents && parents.length > 0
+						? getBlock( parents[ 0 ] )
+						: null;
+				blockContext[ 'pattern/overrides' ] =
+					parentBlock?.attributes?.content;
+			}
+
 			const boundAttributes = getBindingsValues(
 				blockBindings,
 				name,

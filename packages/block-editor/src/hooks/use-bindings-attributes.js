@@ -45,7 +45,7 @@ const DEFAULT_ATTRIBUTE = '__default';
  *
  * @return {Object} The bindings with default replaced for pattern overrides.
  */
-function replacePatternOverrideDefaultBindings( blockName, bindings ) {
+export function replacePatternOverrideDefaultBindings( blockName, bindings ) {
 	// The `__default` binding currently only works for pattern overrides.
 	if (
 		bindings?.[ DEFAULT_ATTRIBUTE ]?.source === 'core/pattern-overrides'
