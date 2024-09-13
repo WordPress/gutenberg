@@ -36,7 +36,8 @@ export const TabList = forwardRef<
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate(
 		selectedId,
-		( { previousValue } ) => previousValue && setAnimationEnabled( true )
+		( { previousValue } ) =>
+			selectedId && previousValue && setAnimationEnabled( true )
 	);
 
 	if ( ! context || ! tabStoreState ) {
