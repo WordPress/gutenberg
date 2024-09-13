@@ -46,13 +46,8 @@ function UnconnectedNavigatorScreen(
 	const wrapperRef = useRef< HTMLDivElement >( null );
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
-	const {
-		children,
-		className,
-		path,
-		onAnimationEnd: onAnimationEndProp,
-		...otherProps
-	} = useContextSystem( props, 'NavigatorScreen' );
+	const { children, className, path, onTransitionEnd, ...otherProps } =
+		useContextSystem( props, 'NavigatorScreen' );
 
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
@@ -72,11 +67,12 @@ function UnconnectedNavigatorScreen(
 	}, [ screenId, path, addScreen, removeScreen ] );
 
 	// Animation.
-	const { animationStyles, shouldRenderScreen, onAnimationEnd } =
+	const { animationStyles, shouldRenderScreen, screenProps } =
 		useScreenAnimatePresence( {
+			ref: wrapperRef,
 			isMatch,
 			isBack,
-			onAnimationEnd: onAnimationEndProp,
+			onTransitionEnd,
 			skipAnimation: skipAnimationAndFocusRestoration,
 		} );
 
@@ -100,6 +96,7 @@ function UnconnectedNavigatorScreen(
 		// - if focus hasn't already been restored for the current location
 		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
 		if (
+			! shouldRenderScreen ||
 			skipAnimationAndFocusRestoration ||
 			! isMatch ||
 			! wrapperEl ||
@@ -135,6 +132,7 @@ function UnconnectedNavigatorScreen(
 		locationRef.current.hasRestoredFocus = true;
 		elementToFocus.focus();
 	}, [
+		shouldRenderScreen,
 		skipAnimationAndFocusRestoration,
 		isMatch,
 		isBack,
@@ -142,16 +140,17 @@ function UnconnectedNavigatorScreen(
 		skipFocus,
 	] );
 
-	return shouldRenderScreen ? (
+	return (
 		<View
+			key={ screenId }
 			ref={ mergedWrapperRef }
 			className={ classes }
-			onAnimationEnd={ onAnimationEnd }
+			{ ...screenProps }
 			{ ...otherProps }
 		>
-			{ children }
+			{ shouldRenderScreen ? children : null }
 		</View>
-	) : null;
+	);
 }
 
 /**

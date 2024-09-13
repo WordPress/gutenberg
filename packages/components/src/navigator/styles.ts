@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css, keyframes } from '@emotion/react';
+import { css } from '@emotion/react';
 
 export const navigatorProviderWrapper = css`
 	position: relative;
@@ -19,48 +19,6 @@ export const navigatorProviderWrapper = css`
 	align-items: start;
 `;
 
-const fadeIn = keyframes( {
-	from: {
-		opacity: 0,
-	},
-} );
-
-const fadeOut = keyframes( {
-	to: {
-		opacity: 0,
-	},
-} );
-
-export const slideFromRight = keyframes( {
-	from: {
-		transform: 'translateX(100px)',
-	},
-} );
-
-export const slideToLeft = keyframes( {
-	to: {
-		transform: 'translateX(-80px)',
-	},
-} );
-
-export const slideFromLeft = keyframes( {
-	from: {
-		transform: 'translateX(-100px)',
-	},
-} );
-
-export const slideToRight = keyframes( {
-	to: {
-		transform: 'translateX(80px)',
-	},
-} );
-
-type NavigatorScreenAnimationProps = {
-	skipAnimation: boolean;
-	animationDirection: 'end' | 'start';
-	animationType: 'in' | 'out' | undefined;
-};
-
 const FADE = {
 	DURATION: 70,
 	EASING: 'linear',
@@ -72,6 +30,10 @@ const FADE = {
 const SLIDE = {
 	DURATION: 300,
 	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
+	AMOUNT: {
+		IN: 100,
+		OUT: 80,
+	},
 };
 
 export const TOTAL_ANIMATION_DURATION = {
@@ -79,51 +41,52 @@ export const TOTAL_ANIMATION_DURATION = {
 	OUT: Math.max( FADE.DURATION + FADE.DELAY.OUT, SLIDE.DURATION ),
 };
 
-export const ANIMATION_END_NAMES = {
-	end: {
-		in: slideFromRight.name,
-		out: slideToLeft.name,
-	},
-	start: {
-		in: slideFromLeft.name,
-		out: slideToRight.name,
-	},
-};
+export const navigatorScreenAnimation = css`
+	@media not ( prefers-reduced-motion ) {
+		/* Initial transition values for the enter animation */
+		opacity: 0;
+		z-index: 0;
+		&[data-animation-direction='to-left'] {
+			transform: translateX( ${ SLIDE.AMOUNT.IN }px );
+		}
+		&[data-animation-direction='to-right'] {
+			transform: translateX( -${ SLIDE.AMOUNT.IN }px );
+		}
 
-const ANIMATION = {
-	end: {
-		in: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromRight }
-		`,
-		out: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
-		`,
-	},
-	start: {
-		in: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromLeft }
-		`,
-		out: css`
-			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
-				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToRight }
-		`,
-	},
-};
-export const navigatorScreenAnimation = ( {
-	animationDirection,
-	skipAnimation,
-	animationType,
-}: NavigatorScreenAnimationProps ) => css`
-	z-index: ${ animationType === 'out' ? 0 : 1 };
-	animation: ${ skipAnimation || ! animationType
-		? 'none'
-		: ANIMATION[ animationDirection ][ animationType ] };
+		/* Visible (ie. end of the enter animation, start of the exit animation) */
+		&[data-animation-in] {
+			z-index: 1;
+			opacity: 1;
+			transform: none;
 
-	@media ( prefers-reduced-motion ) {
-		animation: none;
+			&:not( [data-animation-skip] ) {
+				will-change: opacity, transform;
+				transition:
+					opacity ${ FADE.DURATION }ms ${ FADE.EASING }
+						${ FADE.DELAY.IN }ms,
+					transform ${ SLIDE.DURATION }ms ${ SLIDE.EASING };
+			}
+		}
+
+		/* Out (ie. the end of the exit animation) */
+		&[data-animation-in][data-animation-out] {
+			z-index: 0;
+			opacity: 0;
+
+			&[data-animation-direction='to-left'] {
+				transform: translateX( -${ SLIDE.AMOUNT.OUT }px );
+			}
+			&[data-animation-direction='to-right'] {
+				transform: translateX( ${ SLIDE.AMOUNT.OUT }px );
+			}
+
+			&:not( [data-animation-skip] ) {
+				transition:
+					opacity ${ FADE.DURATION }ms ${ FADE.EASING }
+						${ FADE.DELAY.OUT }ms,
+					transform ${ SLIDE.DURATION }ms ${ SLIDE.EASING };
+			}
+		}
 	}
 `;
 
