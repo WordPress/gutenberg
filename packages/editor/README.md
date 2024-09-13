@@ -862,6 +862,43 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
+### PluginPreviewMenuItem
+
+Renders a menu item in the Preview dropdown, which can be used as a button or link depending on the props provided. The text within the component appears as the menu item label.
+
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { PluginPreviewMenuItem } from '@wordpress/editor';
+import { external } from '@wordpress/icons';
+
+function onPreviewClick() {
+	// Handle preview action
+}
+
+const ExternalPreviewMenuItem = () => (
+	<PreviewDropdownMenuItem icon={ external } onClick={ onPreviewClick }>
+		{ __( 'Preview in new tab' ) }
+	</PreviewDropdownMenuItem>
+);
+registerPlugin( 'external-preview-menu-item', {
+	render: ExternalPreviewMenuItem,
+} );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.href_ `[string]`: When `href` is provided, the menu item is rendered as an anchor instead of a button. It corresponds to the `href` attribute of the anchor.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The icon to be rendered to the left of the menu item label. Can be a Dashicon slug or an SVG WP element.
+-   _props.onClick_ `[Function]`: The callback function to be executed when the user clicks the menu item.
+-   _props.other_ `[...*]`: Any additional props are passed through to the underlying MenuItem component.
+
+_Returns_
+
+-   `Component`: The rendered menu item component.
+
 ### PluginSidebar
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar. It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`. If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
@@ -1433,6 +1470,10 @@ Undocumented declaration.
 ### PostTrash
 
 Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Parameters_
+
+-   _An_ `?{onActionPerformed: Object}`: object containing the onActionPerformed function.
 
 _Returns_
 

@@ -6,14 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { isBlobURL } from '@wordpress/blob';
-import { store as blocksStore } from '@wordpress/blocks';
+import { isBlobURL, createBlobURL } from '@wordpress/blob';
+import { store as blocksStore, createBlock } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
-	MediaPlaceholder,
 	useBlockProps,
+	MediaPlaceholder,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
@@ -31,6 +31,8 @@ import { useResizeObserver } from '@wordpress/compose';
 import { unlock } from '../lock-unlock';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
+import { isValidFileType } from './utils';
+import { useMaxWidthObserver } from './use-max-width-observer';
 
 /**
  * Module constants
@@ -108,10 +110,22 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
+
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
-	const [ contentResizeListener, { width: containerWidth } ] =
+	const containerRef = useRef();
+	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
+	// This won't work for them because the container width changes with the image.
+	// TODO: Find a way to observe the container width for flex and grid layouts.
+	const isMaxWidthContainerWidth =
+		! parentLayout ||
+		( parentLayout.type !== 'flex' && parentLayout.type !== 'grid' );
+	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
+
+	const [ placeholderResizeListener, { width: placeholderWidth } ] =
 		useResizeObserver();
+
+	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -123,7 +137,7 @@ export function ImageEdit( {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -138,7 +152,12 @@ export function ImageEdit( {
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
-	const { getSettings } = useSelect( blockEditorStore );
+	const {
+		getSettings,
+		getBlockRootClientId,
+		getBlockName,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -152,7 +171,52 @@ export function ImageEdit( {
 		} );
 	}
 
+	function onSelectImagesList( images ) {
+		const win = containerRef.current?.ownerDocument.defaultView;
+
+		if ( images.every( ( file ) => file instanceof win.File ) ) {
+			/** @type {File[]} */
+			const files = images;
+			const rootClientId = getBlockRootClientId( clientId );
+
+			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
+				// Copied from the same notice in the gallery block.
+				createErrorNotice(
+					__(
+						'If uploading to a gallery all files need to be image formats'
+					),
+					{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+				);
+			}
+
+			const imageBlocks = files
+				.filter( ( file ) => isValidFileType( file ) )
+				.map( ( file ) =>
+					createBlock( 'core/image', {
+						blob: createBlobURL( file ),
+					} )
+				);
+
+			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
+				replaceBlock( clientId, imageBlocks );
+			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{},
+					imageBlocks
+				);
+
+				replaceBlock( clientId, galleryBlock );
+			}
+		}
+	}
+
 	function onSelectImage( media ) {
+		if ( Array.isArray( media ) ) {
+			onSelectImagesList( media );
+			return;
+		}
+
 		if ( ! media || ! media.url ) {
 			setAttributes( {
 				url: undefined,
@@ -296,7 +360,10 @@ export function ImageEdit( {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const blockProps = useBlockProps( { className: classes } );
+	const blockProps = useBlockProps( {
+		ref: containerRef,
+		className: classes,
+	} );
 
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
@@ -335,13 +402,17 @@ export function ImageEdit( {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
-				withIllustration
-				icon={ lockUrlControls ? pluginsIcon : icon }
-				label={ __( 'Image' ) }
+				icon={
+					! isSmallContainer &&
+					( lockUrlControls ? pluginsIcon : icon )
+				}
+				withIllustration={ ! isSingleSelected || isSmallContainer }
+				label={ ! isSmallContainer && __( 'Image' ) }
 				instructions={
 					! lockUrlControls &&
+					! isSmallContainer &&
 					__(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					)
 				}
 				style={ {
@@ -356,13 +427,12 @@ export function ImageEdit( {
 					...shadowProps.style,
 				} }
 			>
-				{ lockUrlControls ? (
-					<span className="block-bindings-media-placeholder-message">
-						{ lockUrlControlsMessage }
-					</span>
-				) : (
-					content
-				) }
+				{ lockUrlControls &&
+					! isSmallContainer &&
+					lockUrlControlsMessage }
+
+				{ ! lockUrlControls && ! isSmallContainer && content }
+				{ placeholderResizeListener }
 			</Placeholder>
 		);
 	};
@@ -384,7 +454,7 @@ export function ImageEdit( {
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }
 					parentLayoutType={ parentLayout?.type }
-					containerWidth={ containerWidth }
+					maxContentWidth={ maxContentWidth }
 				/>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
@@ -394,6 +464,7 @@ export function ImageEdit( {
 					placeholder={ placeholder }
 					accept="image/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }
 					mediaPreview={ mediaPreview }
 					disableMediaButtons={ temporaryURL || url }
@@ -402,7 +473,7 @@ export function ImageEdit( {
 			{
 				// The listener cannot be placed as the first element as it will break the in-between inserter.
 				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
-				contentResizeListener
+				isSingleSelected && isMaxWidthContainerWidth && maxWidthObserver
 			}
 		</>
 	);

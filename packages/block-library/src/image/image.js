@@ -3,7 +3,6 @@
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
-	MenuItem,
 	ExternalLink,
 	ResizableBox,
 	Spinner,
@@ -109,7 +108,7 @@ export default function Image( {
 	clientId,
 	blockEditingMode,
 	parentLayoutType,
-	containerWidth,
+	maxContentWidth,
 } ) {
 	const {
 		url = '',
@@ -358,7 +357,11 @@ export default function Image( {
 	}, [ isSingleSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
-	const allowCrop = isSingleSelected && canEditImage && ! isEditingImage;
+	const allowCrop =
+		isSingleSelected &&
+		canEditImage &&
+		! isEditingImage &&
+		! isContentOnlyMode;
 
 	function switchToCover() {
 		replaceBlocks(
@@ -553,6 +556,24 @@ export default function Image( {
 
 	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
+	const mediaReplaceFlow = isSingleSelected &&
+		! isEditingImage &&
+		! lockUrlControls && (
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*"
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
+					onReset={ () => onSelectImage( undefined ) }
+				/>
+			</BlockControls>
+		);
+
 	const controls = (
 		<>
 			{ showBlockControls && (
@@ -589,23 +610,6 @@ export default function Image( {
 					) }
 				</BlockControls>
 			) }
-			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*"
-						onSelect={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => onSelectImage( undefined ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
-				</BlockControls>
-			) }
 			{ isSingleSelected && externalBlob && (
 				<BlockControls>
 					<ToolbarGroup>
@@ -637,7 +641,7 @@ export default function Image( {
 								} }
 							>
 								{ _x(
-									'Alt',
+									'Alternative text',
 									'Alternative text for an image. Block toolbar label, a low character count is preferred.'
 								) }
 							</ToolbarButton>
@@ -677,51 +681,56 @@ export default function Image( {
 							/>
 						) }
 					/>
-					<Dropdown
-						popoverProps={ { position: 'bottom right' } }
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<ToolbarButton
-								onClick={ onToggle }
-								aria-haspopup="true"
-								aria-expanded={ isOpen }
-								onKeyDown={ ( event ) => {
-									if ( ! isOpen && event.keyCode === DOWN ) {
-										event.preventDefault();
-										onToggle();
-									}
-								} }
-							>
-								{ __( 'Title' ) }
-							</ToolbarButton>
-						) }
-						renderContent={ () => (
-							<TextControl
-								__next40pxDefaultSize
-								className="wp-block-image__toolbar_content_textarea"
-								__nextHasNoMarginBottom
-								label={ __( 'Title attribute' ) }
-								value={ title || '' }
-								onChange={ onSetTitle }
-								disabled={ lockTitleControls }
-								help={
-									lockTitleControls ? (
-										<>{ lockTitleControlsMessage }</>
-									) : (
-										<>
-											{ __(
-												'Describe the role of this image on the page.'
-											) }
-											<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+					{ title && (
+						<Dropdown
+							popoverProps={ { position: 'bottom right' } }
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<ToolbarButton
+									onClick={ onToggle }
+									aria-haspopup="true"
+									aria-expanded={ isOpen }
+									onKeyDown={ ( event ) => {
+										if (
+											! isOpen &&
+											event.keyCode === DOWN
+										) {
+											event.preventDefault();
+											onToggle();
+										}
+									} }
+								>
+									{ __( 'Title' ) }
+								</ToolbarButton>
+							) }
+							renderContent={ () => (
+								<TextControl
+									__next40pxDefaultSize
+									className="wp-block-image__toolbar_content_textarea"
+									__nextHasNoMarginBottom
+									label={ __( 'Title attribute' ) }
+									value={ title || '' }
+									onChange={ onSetTitle }
+									disabled={ lockTitleControls }
+									help={
+										lockTitleControls ? (
+											<>{ lockTitleControlsMessage }</>
+										) : (
+											<>
 												{ __(
-													'(Note: many devices and browsers do not display this text.)'
+													'Describe the role of this image on the page.'
 												) }
-											</ExternalLink>
-										</>
-									)
-								}
-							/>
-						) }
-					/>
+												<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
+													{ __(
+														'(Note: many devices and browsers do not display this text.)'
+													) }
+												</ExternalLink>
+											</>
+										)
+									}
+								/>
+							) }
+						/>
+					) }
 				</BlockControls>
 			) }
 			<InspectorControls>
@@ -929,7 +938,7 @@ export default function Image( {
 		// @todo It would be good to revisit this once a content-width variable
 		// becomes available.
 		const maxWidthBuffer = maxWidth * 2.5;
-		const maxContentWidth = containerWidth || maxWidthBuffer;
+		const maxResizeWidth = maxContentWidth || maxWidthBuffer;
 
 		let showRightHandle = false;
 		let showLeftHandle = false;
@@ -975,9 +984,9 @@ export default function Image( {
 				} }
 				showHandle={ isSingleSelected }
 				minWidth={ minWidth }
-				maxWidth={ maxContentWidth }
+				maxWidth={ maxResizeWidth }
 				minHeight={ minHeight }
-				maxHeight={ maxContentWidth / ratio }
+				maxHeight={ maxResizeWidth / ratio }
 				lockAspectRatio={ ratio }
 				enable={ {
 					top: false,
@@ -991,6 +1000,7 @@ export default function Image( {
 
 					// Clear hardcoded width if the resized width is close to the max-content width.
 					if (
+						maxContentWidth &&
 						// Only do this if the image is bigger than the container to prevent it from being squished.
 						// TODO: Remove this check if the image support setting 100% width.
 						naturalWidth >= maxContentWidth &&
@@ -1024,12 +1034,18 @@ export default function Image( {
 	}
 
 	if ( ! url && ! temporaryURL ) {
-		// Add all controls if the image attributes are connected.
-		return metadata?.bindings ? controls : sizeControls;
+		return (
+			<>
+				{ mediaReplaceFlow }
+				{ /* Add all controls if the image attributes are connected. */ }
+				{ metadata?.bindings ? controls : sizeControls }
+			</>
+		);
 	}
 
 	return (
 		<>
+			{ mediaReplaceFlow }
 			{ controls }
 			{ img }
 

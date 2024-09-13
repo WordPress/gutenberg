@@ -214,6 +214,7 @@ function VideoEdit( {
 							onSelect={ onSelectVideo }
 							onSelectURL={ onSelectURL }
 							onError={ onUploadError }
+							onReset={ () => onSelectVideo( undefined ) }
 						/>
 					</BlockControls>
 				</>
@@ -237,8 +238,7 @@ function VideoEdit( {
 								}
 								render={ ( { open } ) => (
 									<Button
-										// TODO: Switch to `true` (40px size) if possible
-										__next40pxDefaultSize={ false }
+										__next40pxDefaultSize
 										variant="primary"
 										onClick={ open }
 										ref={ posterImageButton }
@@ -267,8 +267,7 @@ function VideoEdit( {
 							</p>
 							{ !! poster && (
 								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
+									__next40pxDefaultSize
 									onClick={ onRemovePoster }
 									variant="tertiary"
 								>

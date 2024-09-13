@@ -178,6 +178,8 @@ export default function PostLockedModal() {
 			shouldCloseOnClickOutside={ false }
 			shouldCloseOnEsc={ false }
 			isDismissible={ false }
+			// Do not remove this class, as this class is used by third party plugins.
+			className="editor-post-locked-modal"
 			size="medium"
 		>
 			<HStack alignment="top" spacing={ 6 }>
@@ -255,8 +257,7 @@ export default function PostLockedModal() {
 					>
 						{ ! isTakeover && (
 							<Button
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								variant="tertiary"
 								href={ unlockUrl }
 							>
@@ -264,8 +265,7 @@ export default function PostLockedModal() {
 							</Button>
 						) }
 						<Button
-							// TODO: Switch to `true` (40px size) if possible
-							__next40pxDefaultSize={ false }
+							__next40pxDefaultSize
 							variant="primary"
 							href={ allPostsUrl }
 						>

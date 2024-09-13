@@ -18,7 +18,7 @@ test.describe( 'Post visibility', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			await page
-				.getByRole( 'button', { name: 'Change post status:' } )
+				.getByRole( 'button', { name: 'Change status:' } )
 				.click();
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
@@ -57,9 +57,7 @@ test.describe( 'Post visibility', () => {
 				name: 'Close',
 			} )
 			.click();
-		await page
-			.getByRole( 'button', { name: 'Change post status:' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
 		await page.getByRole( 'radio', { name: 'Private' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
