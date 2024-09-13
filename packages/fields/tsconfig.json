@@ -7,6 +7,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../api-fetch" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
@@ -24,6 +25,5 @@
 		{ "path": "../hooks" },
 		{ "path": "../html-entities" }
 	],
-	"include": [ "src" ],
-	"exclude": [ "@wordpress/editor" ]
+	"include": [ "src" ]
 }
