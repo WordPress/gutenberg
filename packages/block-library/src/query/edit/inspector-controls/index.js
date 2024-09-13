@@ -56,6 +56,7 @@ export default function QueryInspectorControls( props ) {
 		inherit,
 		taxQuery,
 		parents,
+		template,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -103,20 +104,25 @@ export default function QueryInspectorControls( props ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
+	const showDefaultControl = template === 'wp_template';
+	const showInheritControl =
+		showDefaultControl && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
-		! inherit && isControlAllowed( allowedControls, 'postType' );
+		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
+		! showDefaultControl;
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
-		! inherit && isControlAllowed( allowedControls, 'order' );
+		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
+		! showDefaultControl;
 	const showStickyControl =
-		! inherit &&
-		showSticky &&
-		isControlAllowed( allowedControls, 'sticky' );
+		( ! inherit &&
+			showSticky &&
+			isControlAllowed( allowedControls, 'sticky' ) ) ||
+		! showDefaultControl;
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
