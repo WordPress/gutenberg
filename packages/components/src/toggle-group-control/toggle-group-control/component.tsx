@@ -7,7 +7,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,11 +49,9 @@ function UnconnectedToggleGroupControl(
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
-	useLayoutEffect( () => {
-		if ( ! value ) {
-			setActiveElement( undefined );
-		}
-	}, [ value ] );
+	if ( activeElement && ! value ) {
+		setActiveElement( undefined );
+	}
 	const indicatorPosition = useTrackElementOffsetRect( activeElement );
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
