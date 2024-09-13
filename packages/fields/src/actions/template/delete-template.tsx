@@ -10,10 +10,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-// @ts-ignore
-import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
-
 import type { Action } from '@wordpress/dataviews';
 
 /**
@@ -21,133 +17,9 @@ import type { Action } from '@wordpress/dataviews';
  */
 import { isTemplateRemovable, getItemTitle } from '../utils';
 import type { Template, TemplatePart } from '../../types';
-import { dispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-export const removeTemplates = async (
-	items: ( Template | TemplatePart )[]
-) => {
-	const isResetting = items.every( ( item ) => item?.has_theme_file );
-
-	const promiseResult: any[] = await Promise.allSettled(
-		items.map( ( item ) =>
-			dispatch( coreStore ).deleteEntityRecord(
-				'postType',
-				item.type,
-				item.id,
-				{ force: true },
-				{ throwOnError: true }
-			)
-		)
-	);
-
-	// If all the promises were fulfilled with sucess.
-	if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
-		let successMessage;
-
-		if ( items.length === 1 ) {
-			let title = '';
-			if ( typeof items[ 0 ].title === 'string' ) {
-				title = items[ 0 ].title;
-			} else if (
-				'rendered' in items[ 0 ].title &&
-				typeof items[ 0 ].title.rendered === 'string'
-			) {
-				title = items[ 0 ].title?.rendered;
-			} else if (
-				'raw' in items[ 0 ].title &&
-				typeof items[ 0 ].title?.raw === 'string'
-			) {
-				title = items[ 0 ].title?.raw;
-			}
-
-			successMessage = isResetting
-				? sprintf(
-						/* translators: The template/part's name. */
-						__( '"%s" reset.' ),
-						decodeEntities( title )
-				  )
-				: sprintf(
-						/* translators: The template/part's name. */
-						__( '"%s" deleted.' ),
-						decodeEntities( title )
-				  );
-		} else {
-			successMessage = isResetting
-				? __( 'Items reset.' )
-				: __( 'Items deleted.' );
-		}
-
-		dispatch( noticesStore ).createSuccessNotice( successMessage, {
-			type: 'snackbar',
-			id: 'editor-template-deleted-success',
-		} );
-	} else {
-		// If there was at lease one failure.
-		let errorMessage;
-		// If we were trying to delete a single template.
-		if ( promiseResult.length === 1 ) {
-			if ( promiseResult[ 0 ].reason?.message ) {
-				errorMessage = promiseResult[ 0 ].reason.message;
-			} else {
-				errorMessage = isResetting
-					? __( 'An error occurred while reverting the item.' )
-					: __( 'An error occurred while deleting the item.' );
-			}
-			// If we were trying to delete a multiple templates
-		} else {
-			const errorMessages = new Set();
-			const failedPromises = promiseResult.filter(
-				( { status } ) => status === 'rejected'
-			);
-			for ( const failedPromise of failedPromises ) {
-				if ( failedPromise.reason?.message ) {
-					errorMessages.add( failedPromise.reason.message );
-				}
-			}
-			if ( errorMessages.size === 0 ) {
-				errorMessage = __(
-					'An error occurred while deleting the items.'
-				);
-			} else if ( errorMessages.size === 1 ) {
-				errorMessage = isResetting
-					? sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while reverting the items: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-					  )
-					: sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while deleting the items: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-					  );
-			} else {
-				errorMessage = isResetting
-					? sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while reverting the items: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-					  )
-					: sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while deleting the items: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-					  );
-			}
-		}
-		dispatch( noticesStore ).createErrorNotice( errorMessage, {
-			type: 'snackbar',
-		} );
-	}
-};
+import type { Notice } from '../../mutation';
+import { deleteWithNotices } from '../../mutation';
 
 // This action is used for templates, patterns and template parts.
 // Every other post type uses the similar `trashPostAction` which
@@ -164,6 +36,8 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
+
+		const isResetting = items.every( ( item ) => item?.has_theme_file );
 
 		return (
 			<VStack spacing="5">
@@ -198,8 +72,103 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							await removeTemplates( items );
-							onActionPerformed?.( items );
+							const notice: Notice< Template | TemplatePart > = {
+								onSuccess: {
+									messages: {
+										getOneItemMessage: ( item ) => {
+											return isResetting
+												? sprintf(
+														/* translators: The template/part's name. */
+														__( '"%s" reset.' ),
+														decodeEntities(
+															getItemTitle( item )
+														)
+												  )
+												: sprintf(
+														/* translators: The template/part's name. */
+														__( '"%s" deleted.' ),
+														decodeEntities(
+															getItemTitle( item )
+														)
+												  );
+										},
+										getMultipleItemMessage: () => {
+											return isResetting
+												? __( 'Items reset.' )
+												: __( 'Items deleted.' );
+										},
+									},
+								},
+								onError: {
+									messages: {
+										getOneItemMessage: ( error ) => {
+											if ( error.size === 1 ) {
+												return [ ...error ][ 0 ];
+											}
+											return isResetting
+												? __(
+														'An error occurred while reverting the item.'
+												  )
+												: __(
+														'An error occurred while deleting the item.'
+												  );
+										},
+										getMultipleItemMessage: ( errors ) => {
+											if ( errors.size === 0 ) {
+												return isResetting
+													? __(
+															'An error occurred while reverting the items.'
+													  )
+													: __(
+															'An error occurred while deleting the items.'
+													  );
+											}
+
+											if ( errors.size === 1 ) {
+												return isResetting
+													? sprintf(
+															/* translators: %s: an error message */
+															__(
+																'An error occurred while reverting the items: %s'
+															),
+															[ ...errors ][ 0 ]
+													  )
+													: sprintf(
+															/* translators: %s: an error message */
+															__(
+																'An error occurred while deleting the items: %s'
+															),
+															[ ...errors ][ 0 ]
+													  );
+											}
+
+											return isResetting
+												? sprintf(
+														/* translators: %s: a list of comma separated error messages */
+														__(
+															'Some errors occurred while reverting the items: %s'
+														),
+														[ ...errors ].join(
+															','
+														)
+												  )
+												: sprintf(
+														/* translators: %s: a list of comma separated error messages */
+														__(
+															'Some errors occurred while deleting the items: %s'
+														),
+														[ ...errors ].join(
+															','
+														)
+												  );
+										},
+									},
+								},
+							};
+
+							await deleteWithNotices( items, notice, {
+								onActionPerformed,
+							} );
 							setIsBusy( false );
 							closeModal?.();
 						} }
