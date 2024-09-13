@@ -205,7 +205,7 @@ export default function CoverInspectorControls( {
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
 							setAttributes( {
-								hasParallax: undefined,
+								hasParallax: false,
 								focalPoint: undefined,
 								isRepeated: false,
 								alt: '',
@@ -219,10 +219,10 @@ export default function CoverInspectorControls( {
 								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
 									isShownByDefault
-									hasValue={ () => !! hasParallax }
+									hasValue={ () => hasParallax }
 									onDeselect={ () =>
 										setAttributes( {
-											hasParallax: undefined,
+											hasParallax: false,
 											focalPoint: undefined,
 										} )
 									}
@@ -238,7 +238,7 @@ export default function CoverInspectorControls( {
 								<ToolsPanelItem
 									label={ __( 'Repeated background' ) }
 									isShownByDefault
-									hasValue={ () => !! isRepeated }
+									hasValue={ () => isRepeated }
 									onDeselect={ () =>
 										setAttributes( {
 											isRepeated: false,
