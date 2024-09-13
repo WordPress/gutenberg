@@ -194,7 +194,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
@@ -350,7 +350,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
