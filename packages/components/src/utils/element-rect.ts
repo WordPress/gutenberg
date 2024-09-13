@@ -113,6 +113,9 @@ const POLL_RATE = 100;
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
  *
+ * When no element is provided (`null` or `undefined`), the hook will return
+ * a "null" rect, in which all values are `0`.
+ *
  * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
  * documentation for more details). When that happens, this hook will attempt
  * to measure again after a frame, and if that fails, it will poll every 100
@@ -149,10 +152,12 @@ export function useTrackElementOffsetRect(
 		}
 	} );
 
-	useLayoutEffect(
-		() => setElement( targetElement ),
-		[ setElement, targetElement ]
-	);
+	useLayoutEffect( () => {
+		setElement( targetElement );
+		if ( ! targetElement ) {
+			setIndicatorPosition( NULL_ELEMENT_OFFSET_RECT );
+		}
+	}, [ setElement, targetElement ] );
 
 	return indicatorPosition;
 }

@@ -26,6 +26,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		size,
 		value: valueProp,
 		id: idProp,
+		setActiveElement,
 		...otherProps
 	}: WordPressComponentProps<
 		ToggleGroupControlMainControlProps,
@@ -54,16 +55,23 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 	} );
 
 	const groupContextValue = useMemo(
-		() =>
-			( {
-				baseId,
-				value: selectedValue,
-				setValue: setSelectedValue,
-				isBlock: ! isAdaptiveWidth,
-				isDeselectable: true,
-				size,
-			} ) as ToggleGroupControlContextProps,
-		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
+		(): ToggleGroupControlContextProps => ( {
+			baseId,
+			value: selectedValue,
+			setValue: setSelectedValue,
+			isBlock: ! isAdaptiveWidth,
+			isDeselectable: true,
+			size,
+			setActiveElement,
+		} ),
+		[
+			baseId,
+			selectedValue,
+			setSelectedValue,
+			isAdaptiveWidth,
+			size,
+			setActiveElement,
+		]
 	);
 
 	return (

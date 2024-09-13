@@ -7,8 +7,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useMergeRefs } from '@wordpress/compose';
-import { useLayoutEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,20 +48,19 @@ function UnconnectedToggleGroupControl(
 	const normalizedSize =
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
-	const ref = useRef< HTMLDivElement >();
 	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
 	useLayoutEffect( () => {
-		setActiveElement(
-			ref.current?.querySelector( `button[value="${ value }"]` )
-				?.parentElement ?? undefined
-		);
+		if ( ! value ) {
+			setActiveElement( undefined );
+		}
 	}, [ value ] );
 	const indicatorPosition = useTrackElementOffsetRect( activeElement );
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate(
 		value,
-		( { previousValue } ) => previousValue && setAnimationEnabled( true )
+		( { previousValue } ) =>
+			value && previousValue && setAnimationEnabled( true )
 	);
 
 	const cx = useCx();
@@ -98,7 +96,9 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
+				setActiveElement={ setActiveElement }
 				className={ clsx(
+					activeElement && 'has-active-element',
 					animationEnabled && 'is-animation-enabled',
 					classes
 				) }
@@ -116,7 +116,7 @@ function UnconnectedToggleGroupControl(
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
-				ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+				ref={ forwardedRef }
 				size={ normalizedSize }
 				value={ value }
 			>

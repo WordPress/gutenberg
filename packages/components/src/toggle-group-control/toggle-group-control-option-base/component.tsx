@@ -116,7 +116,14 @@ function ToggleGroupControlOptionBase(
 	};
 
 	return (
-		<LabelView className={ labelViewClasses }>
+		<LabelView
+			ref={ ( element ) => {
+				if ( isPressed && element ) {
+					toggleGroupControlContext.setActiveElement( element );
+				}
+			} }
+			className={ labelViewClasses }
+		>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }

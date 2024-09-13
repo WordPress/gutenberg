@@ -27,7 +27,6 @@ export const toggleGroupControl = ( {
 	${ toggleGroupControlSize( size ) }
 	${ ! isDeselectable && enclosingBorders( isBlock ) }
 
-
 	@media not ( prefers-reduced-motion ) {
 		&.is-animation-enabled::before {
 			transition-property: left, width;
@@ -36,7 +35,7 @@ export const toggleGroupControl = ( {
 		}
 	}
 
-	&::before {
+	&.has-active-element::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
