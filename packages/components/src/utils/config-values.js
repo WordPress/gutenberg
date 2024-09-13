@@ -74,7 +74,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
 	elevationXSmall: `0 1px 1px rgba(0,0,0, 0.03), 0 1px 2px rgba(0,0,0, 0.02), 0 3px 3px rgba(0,0,0, 0.02), 0 4px 4px rgba(0,0,0, 0.01)`,
-	elevationSmall: `0 1px 2px rgba(0,0,0, 0.04), 0 2px 3px rgba(0,0,0, 0.03), 0 6px 6px rgba(0,0,0, 0.02), 0 8px 8px rgba(0,0,0, 0.01)`,
+	elevationSmall: `0 1px 2px rgba(0,0,0, 0.05), 0 2px 3px rgba(0,0,0, 0.04), 0 6px 6px rgba(0,0,0, 0.03), 0 8px 8px rgba(0,0,0, 0.02)`,
 	elevationMedium: `0 2px 3px rgba(0,0,0, 0.05), 0 4px 5px rgba(0,0,0, 0.04), 0 12px 12px rgba(0,0,0, 0.03), 0 16px 16px rgba(0,0,0, 0.02)`,
 	elevationLarge: `0 5px 15px rgba(0,0,0, 0.08), 0 15px 27px rgba(0,0,0, 0.07), 0 30px 36px rgba(0,0,0, 0.04), 0 50px 43px rgba(0,0,0, 0.02)`,
 	surfaceBackgroundColor: COLORS.white,
