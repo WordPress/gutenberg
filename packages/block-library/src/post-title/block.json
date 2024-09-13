@@ -80,8 +80,5 @@
 			}
 		}
 	},
-	"style": "wp-block-post-title",
-	"selectors": {
-		"typography": ".wp-block-post-title, .wp-block-post-title > a"
-	}
+	"style": "wp-block-post-title"
 }
