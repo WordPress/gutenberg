@@ -39,7 +39,7 @@ function formatFontFaceName( input ) {
  * Loads the font face from a URL and adds it to the browser.
  * It also adds it to the iframe document.
  */
-export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
+export async function loadFontFaceInBrowser( fontFace, source, documentRef ) {
 	if ( typeof source !== 'string' ) {
 		return;
 	}
@@ -55,15 +55,12 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 
 	const loadedFace = await newFont.load();
 
-	if ( addTo === 'document' || addTo === 'all' ) {
-		document.fonts.add( loadedFace );
-	}
+	// Add the font to the ref document.
+	documentRef.fonts.add( loadedFace );
 
-	if ( addTo === 'iframe' || addTo === 'all' ) {
-		const iframeDocument = document.querySelector(
-			'iframe[name="editor-canvas"]'
-		).contentDocument;
-		iframeDocument.fonts.add( loadedFace );
+	// Add the font to the window document.
+	if ( documentRef !== window.document ) {
+		window.document.fonts.add( loadedFace );
 	}
 }
 

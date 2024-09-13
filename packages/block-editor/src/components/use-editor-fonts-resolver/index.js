@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { getDisplaySrcFromFontFace, loadFontFaceInBrowser } from './utils';
 import { store as editorStore } from '../../store';
 
-function EditorFontsResolver() {
+function useEditorFontsResolver( ref ) {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
 	const { currentTheme, fontFamilies = [] } = useSelect( ( select ) => {
@@ -48,7 +48,7 @@ function EditorFontsResolver() {
 				return;
 			}
 
-			loadFontFaceInBrowser( fontFace, src );
+			loadFontFaceInBrowser( fontFace, src, ref.current.ownerDocument );
 			setLoadedFontUrls( ( prevUrls ) => new Set( prevUrls ).add( src ) );
 		},
 		[ currentTheme, loadedFontUrls ]
@@ -57,8 +57,6 @@ function EditorFontsResolver() {
 	useEffect( () => {
 		fontFaces.forEach( loadFontFaceAsset );
 	}, [ fontFaces, loadFontFaceAsset ] );
-
-	return null;
 }
 
-export default EditorFontsResolver;
+export default useEditorFontsResolver;

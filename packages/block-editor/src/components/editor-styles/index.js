@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo, memo } from '@wordpress/element';
+import { useMemo, memo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -18,53 +18,49 @@ import { useSelect } from '@wordpress/data';
 import transformStyles from '../../utils/transform-styles';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import EditorFontsResolver from '../editor-fonts-resolver';
+import useEditorFontsResolver from '../use-editor-fonts-resolver';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles, scope ) {
-	return useCallback(
-		( node ) => {
-			if ( ! node ) {
-				return;
-			}
-			const { ownerDocument } = node;
-			const { defaultView, body } = ownerDocument;
-			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
+function useDarkThemeBodyClassName( scope, ref ) {
+	if ( ! ref.current ) {
+		return;
+	}
 
-			let backgroundColor;
+	const { ownerDocument } = ref.current;
+	const { defaultView, body } = ownerDocument;
+	const canvas = scope ? ownerDocument.querySelector( scope ) : body;
 
-			if ( ! canvas ) {
-				// The real .editor-styles-wrapper element might not exist in the
-				// DOM, so calculate the background color by creating a fake
-				// wrapper.
-				const tempCanvas = ownerDocument.createElement( 'div' );
-				tempCanvas.classList.add( 'editor-styles-wrapper' );
-				body.appendChild( tempCanvas );
+	let backgroundColor;
 
-				backgroundColor = defaultView
-					?.getComputedStyle( tempCanvas, null )
-					.getPropertyValue( 'background-color' );
+	if ( ! canvas ) {
+		// The real .editor-styles-wrapper element might not exist in the
+		// DOM, so calculate the background color by creating a fake
+		// wrapper.
+		const tempCanvas = ownerDocument.createElement( 'div' );
+		tempCanvas.classList.add( 'editor-styles-wrapper' );
+		body.appendChild( tempCanvas );
 
-				body.removeChild( tempCanvas );
-			} else {
-				backgroundColor = defaultView
-					?.getComputedStyle( canvas, null )
-					.getPropertyValue( 'background-color' );
-			}
-			const colordBackgroundColor = colord( backgroundColor );
-			// If background is transparent, it should be treated as light color.
-			if (
-				colordBackgroundColor.luminance() > 0.5 ||
-				colordBackgroundColor.alpha() === 0
-			) {
-				body.classList.remove( 'is-dark-theme' );
-			} else {
-				body.classList.add( 'is-dark-theme' );
-			}
-		},
-		[ styles, scope ]
-	);
+		backgroundColor = defaultView
+			?.getComputedStyle( tempCanvas, null )
+			.getPropertyValue( 'background-color' );
+
+		body.removeChild( tempCanvas );
+	} else {
+		backgroundColor = defaultView
+			?.getComputedStyle( canvas, null )
+			.getPropertyValue( 'background-color' );
+	}
+	const colordBackgroundColor = colord( backgroundColor );
+	// If background is transparent, it should be treated as light color.
+	if (
+		colordBackgroundColor.luminance() > 0.5 ||
+		colordBackgroundColor.alpha() === 0
+	) {
+		body.classList.remove( 'is-dark-theme' );
+	} else {
+		body.classList.add( 'is-dark-theme' );
+	}
 }
 
 function EditorStyles( { styles, scope, transformOptions } ) {
@@ -98,13 +94,16 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 		];
 	}, [ styles, overrides, scope, transformOptions ] );
 
+	const styleRef = useRef( null );
+	useDarkThemeBodyClassName( scope, styleRef );
+	useEditorFontsResolver( styleRef );
+
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style
-				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
-			/>
+			<style ref={ styleRef } />
+
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>
 			) ) }
@@ -122,7 +121,6 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 				} }
 				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
 			/>
-			<EditorFontsResolver />
 		</>
 	);
 }
