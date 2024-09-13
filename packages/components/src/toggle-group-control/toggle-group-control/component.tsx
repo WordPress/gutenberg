@@ -98,7 +98,6 @@ function UnconnectedToggleGroupControl(
 				{ ...otherProps }
 				setActiveElement={ setActiveElement }
 				className={ clsx(
-					activeElement && 'has-active-element',
 					animationEnabled && 'is-animation-enabled',
 					classes
 				) }

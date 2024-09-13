@@ -35,7 +35,7 @@ export const toggleGroupControl = ( {
 		}
 	}
 
-	&.has-active-element::before {
+	&::before {
 		content: '';
 		position: absolute;
 		pointer-events: none;
