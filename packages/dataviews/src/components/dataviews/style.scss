@@ -7,6 +7,8 @@
 	container: dataviews-wrapper / inline-size;
 	display: flex;
 	flex-direction: column;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
 }
 
 .dataviews__view-actions,
