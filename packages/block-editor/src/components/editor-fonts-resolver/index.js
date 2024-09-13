@@ -7,23 +7,23 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useGlobalSetting } from '../global-styles/hooks';
 import { getDisplaySrcFromFontFace, loadFontFaceInBrowser } from './utils';
+import { store as editorStore } from '../../store';
 
 function EditorFontsResolver() {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
-	const { currentTheme } = useSelect( ( select ) => {
+	const { currentTheme, fontFamilies = [] } = useSelect( ( select ) => {
 		return {
 			currentTheme:
 				// Disable Reason: Using 'core' as string to avoid circular dependency importing from @wordpress/core-data.
 				// eslint-disable-next-line @wordpress/data-no-store-string-literals
 				select( 'core' ).getCurrentTheme(),
+			fontFamilies:
+				select( editorStore ).getSettings()?.__experimentalFeatures
+					?.typography?.fontFamilies,
 		};
 	}, [] );
-
-	// Get the fonts from merged theme.json settings.fontFamilies.
-	const [ fontFamilies = [] ] = useGlobalSetting( 'typography.fontFamilies' );
 
 	const fontFaces = useMemo( () => {
 		return Object.values( fontFamilies )

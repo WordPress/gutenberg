@@ -18,6 +18,7 @@ import { useSelect } from '@wordpress/data';
 import transformStyles from '../../utils/transform-styles';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import EditorFontsResolver from '../editor-fonts-resolver';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -27,7 +28,6 @@ function useDarkThemeBodyClassName( styles, scope ) {
 			if ( ! node ) {
 				return;
 			}
-
 			const { ownerDocument } = node;
 			const { defaultView, body } = ownerDocument;
 			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
@@ -122,6 +122,7 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 				} }
 				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
 			/>
+			<EditorFontsResolver />
 		</>
 	);
 }
