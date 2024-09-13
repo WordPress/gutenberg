@@ -80,12 +80,12 @@ export function useDefaultViewsWithItemCounts( { postType } ) {
 			return [];
 		}
 
+		// If there are no records, return the default views with no counts.
 		if ( ! records ) {
 			return defaultViews;
 		}
 
 		const counts = {
-			all: totalItems,
 			drafts: records.filter( ( record ) => record.status === 'draft' )
 				.length,
 			future: records.filter( ( record ) => record.status === 'future' )
@@ -100,6 +100,9 @@ export function useDefaultViewsWithItemCounts( { postType } ) {
 			trash: records.filter( ( record ) => record.status === 'trash' )
 				.length,
 		};
+
+		// All items excluding trashed items as per the default "all" status query.
+		counts.all = totalItems ? totalItems - counts.trash : 0;
 
 		// Filter out views with > 0 item counts.
 		return defaultViews.map( ( _view ) => {
