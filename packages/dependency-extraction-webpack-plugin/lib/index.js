@@ -97,16 +97,6 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		if ( externalRequest ) {
-			// Special case for modules.
-			// Since `@wordpress/polyfill` is a script and not a module, we need
-			// to exclude it from the list of externalised deps.
-			if (
-				this.useModules &&
-				externalRequest.includes( '@wordpress/polyfill' )
-			) {
-				return callback( null, '' );
-			}
-
 			this.externalizedDeps.add( request );
 
 			return callback( null, externalRequest );
