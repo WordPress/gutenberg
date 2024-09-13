@@ -8,7 +8,7 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../types';
+import type { BasePost } from '../../types';
 
 const viewPost: Action< BasePost > = {
 	id: 'view-post',

@@ -9,6 +9,7 @@
 		"gutenberg",
 		"dataviews"
 	],
+	"private": true,
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields/README.md",
 	"repository": {
 		"type": "git",
@@ -24,13 +25,34 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url",
+		"@wordpress/warning": "file:../warning",
+		"change-case": "4.1.2",
+		"client-zip": "^2.4.5"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"
