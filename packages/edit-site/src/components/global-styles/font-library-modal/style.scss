@@ -129,17 +129,16 @@ $footer-height: 70px;
 	padding-bottom: $grid-unit-20;
 }
 
-.font-library-modal__tabs {
-	[role="tablist"] {
-		position: sticky;
-		top: 0;
-		border-bottom: 1px solid $gray-300;
-		background: $white;
-		margin: 0 #{$grid-unit-40 * -1};
-		padding: 0 $grid-unit-20;
-		z-index: 1;
-	}
+.font-library-modal__tablist {
+	position: sticky;
+	top: 0;
+	border-bottom: 1px solid $gray-300;
+	background: $white;
+	margin: 0 #{$grid-unit-40 * -1};
+	padding: 0 $grid-unit-20;
+	z-index: 1;
 }
+
 
 .font-library-modal__upload-area {
 	align-items: center;
