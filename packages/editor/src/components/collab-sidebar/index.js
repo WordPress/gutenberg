@@ -19,6 +19,8 @@ import { collabSidebarName } from './constants';
 import { Comments } from './comments';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
+import AddCommentButton from './commentButton';
+import AddCommentToolbarButton from './commentButtonToolbar';
 
 const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
@@ -29,10 +31,6 @@ const modifyBlockCommentAttributes = ( settings, name ) => {
 			blockCommentId: {
 				type: 'number',
 				default: 0,
-			},
-			showCommentBoard: {
-				type: 'boolean',
-				default: false,
 			},
 		};
 	}
@@ -55,16 +53,32 @@ export default function CollabSidebar() {
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getEntityRecords } = resolveSelect( coreStore );
 
+	// eslint-disable-next-line @wordpress/data-no-store-string-literals
+	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const [ blockCommentID, setBlockCommentID] = useState( null );
+	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
+
 	const [ threads, setThreads ] = useState( () => [] );
-	const { postId, clientId } = useSelect( ( select ) => {
+	const { postId } = useSelect( ( select ) => {
 		return {
 			postId: select( editorStore ).getCurrentPostId(),
-			clientId: select( blockEditorStore ).getSelectedBlockClientId(),
 		};
+	}, [] );
+
+	const clientId = useSelect( ( select ) => {
+		const { getSelectedBlockClientId } = select( blockEditorStore );
+		setBlockCommentID( select( blockEditorStore ).getBlock( getSelectedBlockClientId() )?.attributes.blockCommentId );
+		return getSelectedBlockClientId();
 	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+
+	const openCollabBoard = () => {
+		setShowCommentBoard( true );
+		openGeneralSidebar( 'edit-post/collab-sidebar' );
+	};
 
 	// Function to save the comment.
 	const addNewComment = async ( comment, parentCommentId ) => {
@@ -171,7 +185,6 @@ export default function CollabSidebar() {
 
 		updateBlockAttributes( clientId, {
 			blockCommentId: undefined,
-			showCommentBoard: undefined,
 		} );
 
 		createNotice(
@@ -258,25 +271,40 @@ export default function CollabSidebar() {
 	}
 
 	return (
-		<PluginSidebar
-			identifier={ collabSidebarName }
-			// translators: Comments sidebar title
-			title={ __( 'Comments' ) }
-			icon={ commentIcon }
-		>
-			<div className="editor-collab-sidebar-panel">
-				<AddComment
-					threads={ resultComments }
-					onSubmit={ addNewComment }
+		<>
+			{ ! blockCommentID && (
+				<AddCommentButton 
+					onClick={openCollabBoard} 
+				/>				
+			)}
+
+			{ blockCommentID > 0 && (
+				<AddCommentToolbarButton 
+					onClick={openCollabBoard} 
 				/>
-				<Comments
-					threads={ resultComments }
-					onEditComment={ onEditComment }
-					onAddReply={ addNewComment }
-					onCommentDelete={ onCommentDelete }
-					onCommentResolve={ onCommentResolve }
-				/>
-			</div>
-		</PluginSidebar>
+			)}
+			<PluginSidebar
+				identifier={ collabSidebarName }
+				// translators: Comments sidebar title
+				title={ __( 'Comments' ) }
+				icon={ commentIcon }
+			>
+				<div className="editor-collab-sidebar-panel">
+					<AddComment
+						threads={ resultComments }
+						onSubmit={ addNewComment }
+						showCommentBoard={ showCommentBoard }
+						setShowCommentBoard={ setShowCommentBoard }
+					/>
+					<Comments
+						threads={ resultComments }
+						onEditComment={ onEditComment }
+						onAddReply={ addNewComment }
+						onCommentDelete={ onCommentDelete }
+						onCommentResolve={ onCommentResolve }
+					/>
+				</div>
+			</PluginSidebar>
+		</>
 	);
 }

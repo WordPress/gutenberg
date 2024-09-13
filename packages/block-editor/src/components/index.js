@@ -104,6 +104,9 @@ export {
  */
 
 export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as __unstableCommentIconFill } from './collab/block-comment-icon-slot';
+export { default as __unstableCommentIconToolbarFill } from './collab/block-comment-icon-toolbar-slot';
+
 export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block-toolbar-last-item';
 export { default as __unstableBlockNameContext } from './block-toolbar/block-name-context';
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';

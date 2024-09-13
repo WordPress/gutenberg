@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	__experimentalHStack as HStack,
@@ -19,12 +19,15 @@ import { store as coreStore } from '@wordpress/core-data';
 import { sanitizeCommentString } from './utils';
 
 /**
- * Renders the new comment form.
+ * Renders the UI for adding a comment in the Gutenberg editor's collaboration sidebar.
  *
- * @param {Object}   root0          The component props.
- * @param {Function} root0.onSubmit Function to add new comment.
+ * @param {Object}   props                     - The component props.
+ * @param {Function} props.onSubmit            - A callback function to be called when the user submits a comment.
+ * @param {boolean}  props.showCommentBoard    - The function to edit the comment.
+ * @param {Function} props.setShowCommentBoard - The function to delete the comment.
+ * @return {JSX.Element} The rendered comment input UI.
  */
-export function AddComment( { onSubmit } ) {
+export function AddComment( { onSubmit, showCommentBoard, setShowCommentBoard } ) {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 
@@ -43,7 +46,7 @@ export function AddComment( { onSubmit } ) {
 			defaultAvatar: __experimentalDiscussionSettings?.avatarURL,
 			clientId: selectedBlock?.clientId,
 			blockCommentId: selectedBlock?.attributes?.blockCommentId,
-			showAddCommentBoard: selectedBlock?.attributes?.showCommentBoard,
+			showAddCommentBoard: showCommentBoard,
 			currentUser: userData,
 		};
 	} );
@@ -54,13 +57,8 @@ export function AddComment( { onSubmit } ) {
 		setInputComment( '' );
 	}, [ clientId ] );
 
-	// Get the dispatch functions to save the comment and update the block attributes.
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
 	const handleCancel = () => {
-		updateBlockAttributes( clientId, {
-			showCommentBoard: false,
-		} );
+		setShowCommentBoard( false );
 		setInputComment( '' );
 	};
 
