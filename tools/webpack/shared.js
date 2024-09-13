@@ -25,7 +25,7 @@ const baseConfig = {
 				parallel: true,
 				terserOptions: {
 					output: {
-						comments: /(translators|wp):/i,
+						comments: /(translators:|wp:polyfill)/i,
 					},
 					compress: {
 						passes: 2,
