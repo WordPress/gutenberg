@@ -7,8 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -30,14 +28,7 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import {
-	useCallback,
-	Platform,
-	useRef,
-	useState,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -45,10 +36,8 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import {
-	useToolsPanelDropdownMenuProps,
-	getResolvedValue,
-} from '../global-styles/utils';
+import { getResolvedValue } from '../global-styles/utils';
+import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -59,9 +48,7 @@ import {
 } from '../../store/private-keys';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
-const DEFAULT_CONTROLS = {
-	backgroundImage: true,
-};
+
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 36,
@@ -69,49 +56,6 @@ const BACKGROUND_POPOVER_PROPS = {
 	className: 'block-editor-global-styles-background-panel__popover',
 };
 const noop = () => {};
-
-/**
- * Checks site settings to see if the background panel may be used.
- * `settings.background.backgroundSize` exists also,
- * but can only be used if settings?.background?.backgroundImage is `true`.
- *
- * @param {Object} settings Site settings
- * @return {boolean}        Whether site settings has activated background panel.
- */
-export function useHasBackgroundPanel( settings ) {
-	return Platform.OS === 'web' && settings?.background?.backgroundImage;
-}
-
-/**
- * Checks if there is a current value in the background size block support
- * attributes. Background size values include background size as well
- * as background position.
- *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background size value set.
- */
-export function hasBackgroundSizeValue( style ) {
-	return (
-		style?.background?.backgroundPosition !== undefined ||
-		style?.background?.backgroundSize !== undefined
-	);
-}
-
-/**
- * Checks if there is a current value in the background image block support
- * attributes.
- *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background image value set.
- */
-export function hasBackgroundImageValue( style ) {
-	return (
-		!! style?.background?.backgroundImage?.id ||
-		// Supports url() string values in theme.json.
-		'string' === typeof style?.background?.backgroundImage ||
-		!! style?.background?.backgroundImage?.url
-	);
-}
 
 /**
  * Get the help text for the background size control.
@@ -674,42 +618,12 @@ function BackgroundSizeControls( {
 	);
 }
 
-function BackgroundToolsPanel( {
-	resetAllFilter,
-	onChange,
-	value,
-	panelId,
-	children,
-	headerLabel,
-} ) {
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const resetAll = () => {
-		const updatedValue = resetAllFilter( value );
-		onChange( updatedValue );
-	};
-
-	return (
-		<ToolsPanel
-			label={ headerLabel }
-			resetAll={ resetAll }
-			panelId={ panelId }
-			dropdownMenuProps={ dropdownMenuProps }
-		>
-			{ children }
-		</ToolsPanel>
-	);
-}
-
 export default function BackgroundImagePanel( {
-	as: Wrapper = BackgroundToolsPanel,
 	value,
 	onChange,
 	inheritedValue = value,
 	settings,
-	panelId,
-	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
-	headerLabel = __( 'Background image' ),
 } ) {
 	/*
 	 * Resolve any inherited "ref" pointers.
@@ -748,13 +662,6 @@ export default function BackgroundImagePanel( {
 		return resolvedValues;
 	}, [ globalStyles, _links, inheritedValue ] );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			background: {},
-		};
-	}, [] );
-
 	const resetBackground = () =>
 		onChange( setImmutably( value, [ 'background' ], {} ) );
 
@@ -779,75 +686,56 @@ export default function BackgroundImagePanel( {
 	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
 
 	return (
-		<Wrapper
-			resetAllFilter={ resetAllFilter }
-			value={ value }
-			onChange={ onChange }
-			panelId={ panelId }
-			headerLabel={ headerLabel }
+		<div
+			className={ clsx(
+				'block-editor-global-styles-background-panel__inspector-media-replace-container',
+				{
+					'is-open': isDropDownOpen,
+				}
+			) }
 		>
-			<div
-				className={ clsx(
-					'block-editor-global-styles-background-panel__inspector-media-replace-container',
-					{
-						'is-open': isDropDownOpen,
-					}
-				) }
-			>
-				<ToolsPanelItem
-					hasValue={ () => !! value?.background }
-					label={ __( 'Image' ) }
-					onDeselect={ resetBackground }
-					isShownByDefault={ defaultControls.backgroundImage }
-					panelId={ panelId }
+			{ shouldShowBackgroundImageControls ? (
+				<BackgroundControlsPanel
+					label={ title }
+					filename={ title }
+					url={ url }
+					onToggle={ setIsDropDownOpen }
+					hasImageValue={ hasImageValue }
 				>
-					{ shouldShowBackgroundImageControls ? (
-						<BackgroundControlsPanel
-							label={ title }
-							filename={ title }
-							url={ url }
-							onToggle={ setIsDropDownOpen }
-							hasImageValue={ hasImageValue }
-						>
-							<VStack spacing={ 3 } className="single-column">
-								<BackgroundImageControls
-									onChange={ onChange }
-									style={ value }
-									inheritedValue={ resolvedInheritedValue }
-									displayInPanel
-									onResetImage={ () => {
-										setIsDropDownOpen( false );
-										resetBackground();
-									} }
-									onRemoveImage={ () =>
-										setIsDropDownOpen( false )
-									}
-									defaultValues={ defaultValues }
-								/>
-								<BackgroundSizeControls
-									onChange={ onChange }
-									panelId={ panelId }
-									style={ value }
-									defaultValues={ defaultValues }
-									inheritedValue={ resolvedInheritedValue }
-								/>
-							</VStack>
-						</BackgroundControlsPanel>
-					) : (
+					<VStack spacing={ 3 } className="single-column">
 						<BackgroundImageControls
 							onChange={ onChange }
 							style={ value }
 							inheritedValue={ resolvedInheritedValue }
-							defaultValues={ defaultValues }
+							displayInPanel
 							onResetImage={ () => {
 								setIsDropDownOpen( false );
 								resetBackground();
 							} }
 							onRemoveImage={ () => setIsDropDownOpen( false ) }
+							defaultValues={ defaultValues }
 						/>
-					) }
-				</ToolsPanelItem>
-			</div>
-		</Wrapper>
+						<BackgroundSizeControls
+							onChange={ onChange }
+							style={ value }
+							defaultValues={ defaultValues }
+							inheritedValue={ resolvedInheritedValue }
+						/>
+					</VStack>
+				</BackgroundControlsPanel>
+			) : (
+				<BackgroundImageControls
+					onChange={ onChange }
+					style={ value }
+					inheritedValue={ resolvedInheritedValue }
+					defaultValues={ defaultValues }
+					onResetImage={ () => {
+						setIsDropDownOpen( false );
+						resetBackground();
+					} }
+					onRemoveImage={ () => setIsDropDownOpen( false ) }
+				/>
+			) }
+		</div>
 	);
 }

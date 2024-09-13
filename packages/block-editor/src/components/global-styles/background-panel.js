@@ -30,6 +30,37 @@ export function useHasBackgroundPanel( settings ) {
 	return Platform.OS === 'web' && settings?.background?.backgroundImage;
 }
 
+/**
+ * Checks if there is a current value in the background size block support
+ * attributes. Background size values include background size as well
+ * as background position.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background size value set.
+ */
+export function hasBackgroundSizeValue( style ) {
+	return (
+		style?.background?.backgroundPosition !== undefined ||
+		style?.background?.backgroundSize !== undefined
+	);
+}
+
+/**
+ * Checks if there is a current value in the background image block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background image value set.
+ */
+export function hasBackgroundImageValue( style ) {
+	return (
+		!! style?.background?.backgroundImage?.id ||
+		// Supports url() string values in theme.json.
+		'string' === typeof style?.background?.backgroundImage ||
+		!! style?.background?.backgroundImage?.url
+	);
+}
+
 function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -65,6 +96,7 @@ export default function BackgroundImagePanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
+	headerLabel = __( 'Background image' ),
 } ) {
 	const showBackgroundImageControl = useHasBackgroundPanel( settings );
 	const resetBackground = () =>
@@ -82,6 +114,7 @@ export default function BackgroundImagePanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			headerLabel={ headerLabel }
 		>
 			{ showBackgroundImageControl && (
 				<ToolsPanelItem
@@ -96,7 +129,6 @@ export default function BackgroundImagePanel( {
 						onChange={ onChange }
 						settings={ settings }
 						inheritedValue={ inheritedValue }
-						panelId={ panelId }
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
 					/>
