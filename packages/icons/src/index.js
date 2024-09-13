@@ -242,6 +242,7 @@ export { default as store } from './library/store';
 export { default as stretchFullWidth } from './library/stretch-full-width';
 export { default as styles } from './library/styles';
 export { default as shipping } from './library/shipping';
+export { default as square } from './library/square';
 export { default as stretchWide } from './library/stretch-wide';
 export { default as subscript } from './library/subscript';
 export { default as superscript } from './library/superscript';
