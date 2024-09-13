@@ -17,6 +17,8 @@ export { default as atSymbol } from './library/at-symbol';
 export { default as aspectRatio } from './library/aspect-ratio';
 export { default as audio } from './library/audio';
 export { default as backup } from './library/backup';
+export { default as bell } from './library/bell';
+export { default as bellUnread } from './library/bell-unread';
 export { default as blockDefault } from './library/block-default';
 export { default as blockMeta } from './library/block-meta';
 export { default as blockTable } from './library/block-table';
