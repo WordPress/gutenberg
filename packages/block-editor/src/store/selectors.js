@@ -1488,6 +1488,10 @@ export const getBlockInsertionPoint = createSelector(
 	]
 );
 
+export function getInsertionCue( state ) {
+	return state.insertionPoint;
+}
+
 /**
  * Returns true if we should show the block insertion point.
  *

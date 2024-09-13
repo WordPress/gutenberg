@@ -21,7 +21,7 @@ export default function useSelectedBlockToolProps( clientId ) {
 				getBlockParents,
 				__experimentalGetBlockListSettingsForBlocks,
 				isBlockInsertionPointVisible,
-				getBlockInsertionPoint,
+				getInsertionCue,
 				getBlockOrder,
 				hasMultiSelection,
 				getLastMultiSelectedBlockClientId,
@@ -44,7 +44,7 @@ export default function useSelectedBlockToolProps( clientId ) {
 
 			let isInsertionPointVisible = false;
 			if ( isBlockInsertionPointVisible() ) {
-				const insertionPoint = getBlockInsertionPoint();
+				const insertionPoint = getInsertionCue();
 				const order = getBlockOrder( insertionPoint.rootClientId );
 				isInsertionPointVisible =
 					order[ insertionPoint.index ] === clientId;

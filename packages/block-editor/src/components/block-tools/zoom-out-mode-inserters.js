@@ -26,7 +26,7 @@ function ZoomOutModeInserters() {
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
-			getBlockInsertionPoint,
+			getInsertionCue,
 			getBlockOrder,
 			getSelectionStart,
 			getSelectedBlockClientId,
@@ -39,7 +39,7 @@ function ZoomOutModeInserters() {
 
 		return {
 			hasSelection: !! getSelectionStart().clientId,
-			blockInsertionPoint: getBlockInsertionPoint(),
+			blockInsertionPoint: getInsertionCue(),
 			blockOrder: getBlockOrder( root ),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 			sectionRootClientId: root,

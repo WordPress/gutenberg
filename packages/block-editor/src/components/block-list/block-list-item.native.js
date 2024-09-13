@@ -64,13 +64,13 @@ function BlockListItemContent( {
 		( select ) => {
 			const {
 				getBlockAttributes,
-				getBlockInsertionPoint,
+				getInsertionCue,
 				getBlockName,
 				getBlockOrder,
 				isBlockInsertionPointVisible,
 			} = select( blockEditorStore );
 			const blockClientIds = getBlockOrder( rootClientId );
-			const insertionPoint = getBlockInsertionPoint();
+			const insertionPoint = getInsertionCue();
 
 			const insertionPointVisibleInCurrentRoot =
 				! isStackedHorizontally &&

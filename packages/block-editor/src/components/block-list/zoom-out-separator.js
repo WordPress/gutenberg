@@ -33,7 +33,7 @@ export function ZoomOutSeparator( {
 		blockInsertionPointVisible,
 	} = useSelect( ( select ) => {
 		const {
-			getBlockInsertionPoint,
+			getInsertionCue,
 			getBlockOrder,
 			isBlockInsertionPointVisible,
 			getSectionRootClientId,
@@ -45,7 +45,7 @@ export function ZoomOutSeparator( {
 			sectionRootClientId: root,
 			sectionClientIds: sectionRootClientIds,
 			blockOrder: getBlockOrder( root ),
-			blockInsertionPoint: getBlockInsertionPoint(),
+			blockInsertionPoint: getInsertionCue(),
 			blockInsertionPointVisible: isBlockInsertionPointVisible(),
 		};
 	}, [] );

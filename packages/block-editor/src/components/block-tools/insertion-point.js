@@ -43,7 +43,7 @@ function InbetweenInsertionPointPopover( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getBlockInsertionPoint,
+			getInsertionCue,
 			isBlockBeingDragged,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
@@ -51,7 +51,7 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode,
 			__unstableGetEditorMode,
 		} = select( blockEditorStore );
-		const insertionPoint = getBlockInsertionPoint();
+		const insertionPoint = getInsertionCue();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
 		if ( ! order.length ) {
@@ -226,11 +226,11 @@ export default function InsertionPoint( props ) {
 	const { insertionPoint, isVisible, isBlockListEmpty } = useSelect(
 		( select ) => {
 			const {
-				getBlockInsertionPoint,
+				getInsertionCue,
 				isBlockInsertionPointVisible,
 				getBlockCount,
 			} = select( blockEditorStore );
-			const blockInsertionPoint = getBlockInsertionPoint();
+			const blockInsertionPoint = getInsertionCue();
 			return {
 				insertionPoint: blockInsertionPoint,
 				isVisible: isBlockInsertionPointVisible(),
