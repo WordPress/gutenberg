@@ -153,6 +153,11 @@ export type Field< Item > = {
 	 * Defaults to `item[ field.id ]`.
 	 */
 	getValue?: ( args: { item: Item } ) => any;
+
+	/**
+	 * True if the field is supposed to be used as a media field.
+	 */
+	isMediaField?: boolean;
 };
 
 export type NormalizedField< Item > = Field< Item > & {
@@ -165,6 +170,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 	enableHiding: boolean;
 	enableSorting: boolean;
+	isMediaField: boolean;
 };
 
 /**

@@ -81,21 +81,30 @@ export function getVisibleFieldIds(
 ): string[] {
 	const fieldsToExclude = getCombinedFieldIds( view );
 
+	let visibleFields = [];
 	if ( view.fields ) {
-		return view.fields.filter( ( id ) => ! fieldsToExclude.includes( id ) );
-	}
-
-	const visibleFields = [];
-	if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+		visibleFields = view.fields.filter(
+			( id ) => ! fieldsToExclude.includes( id )
+		);
+	} else {
+		if ( view.type === LAYOUT_TABLE && view.layout?.combinedFields ) {
+			visibleFields.push(
+				...view.layout.combinedFields.map( ( { id } ) => id )
+			);
+		}
 		visibleFields.push(
-			...view.layout.combinedFields.map( ( { id } ) => id )
+			...fields
+				.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
+				.map( ( { id } ) => id )
 		);
 	}
-	visibleFields.push(
-		...fields
-			.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
-			.map( ( { id } ) => id )
-	);
+	if (
+		( view.type === LAYOUT_GRID || view.type === LAYOUT_LIST ) &&
+		view.layout?.mediaField &&
+		! visibleFields.includes( view.layout?.mediaField )
+	) {
+		visibleFields.push( view.layout?.mediaField );
+	}
 
 	return visibleFields;
 }

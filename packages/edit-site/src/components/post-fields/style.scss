@@ -1,0 +1,33 @@
+.edit-site-post-list-content-preview {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border-radius: $radius-medium;
+
+	.dataviews-view-table & {
+		width: 96px;
+		flex-grow: 0;
+	}
+
+	.edit-site-post-list-content-preview__button {
+		box-shadow: none;
+		border: none;
+		padding: 0;
+		background-color: unset;
+		box-sizing: border-box;
+		cursor: pointer;
+		overflow: hidden;
+		height: 100%;
+		border-radius: $grid-unit-05;
+
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+
+		&[aria-disabled="true"] {
+			cursor: default;
+		}
+	}
+}
