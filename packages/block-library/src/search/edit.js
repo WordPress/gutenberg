@@ -23,14 +23,14 @@ import { useEffect, useRef } from '@wordpress/element';
 import {
 	ToolbarDropdownMenu,
 	ToolbarGroup,
-	Button,
-	ButtonGroup,
 	ToolbarButton,
 	ResizableBox,
 	PanelBody,
 	__experimentalVStack as VStack,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
@@ -58,6 +58,7 @@ import {
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
 const DEFAULT_INNER_PADDING = '4px';
+const PERCENTAGE_WIDTHS = [ 25, 50, 75, 100 ];
 
 export default function SearchEdit( {
 	className,
@@ -445,33 +446,34 @@ export default function SearchEdit( {
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
-						<ButtonGroup
-							className="wp-block-search__components-button-group" // unused, kept for backwards compatibility
-							aria-label={ __( 'Percentage Width' ) }
+						<ToggleGroupControl
+							label={ __( 'Percentage Width' ) }
+							value={
+								PERCENTAGE_WIDTHS.includes( width ) &&
+								widthUnit === '%'
+									? width
+									: undefined
+							}
+							hideLabelFromVision
+							onChange={ ( newWidth ) => {
+								setAttributes( {
+									width: newWidth,
+									widthUnit: '%',
+								} );
+							} }
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 						>
-							{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+							{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
 								return (
-									<Button
+									<ToggleGroupControlOption
 										key={ widthValue }
-										size="small"
-										variant={
-											widthValue === width &&
-											widthUnit === '%'
-												? 'primary'
-												: undefined
-										}
-										onClick={ () =>
-											setAttributes( {
-												width: widthValue,
-												widthUnit: '%',
-											} )
-										}
-									>
-										{ widthValue }%
-									</Button>
+										value={ widthValue }
+										label={ `${ widthValue }%` }
+									/>
 								);
 							} ) }
-						</ButtonGroup>
+						</ToggleGroupControl>
 					</VStack>
 				</PanelBody>
 			</InspectorControls>
