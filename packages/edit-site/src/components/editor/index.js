@@ -159,7 +159,14 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		( actionId, items ) => {
 			switch ( actionId ) {
 				case 'move-to-trash':
-				case 'delete-post':
+				case 'delete-template':
+					{
+						history.push( {
+							postType: items[ 0 ].type,
+						} );
+					}
+					break;
+				case 'delete-pattern':
 					{
 						history.push( {
 							postType: items[ 0 ].type,

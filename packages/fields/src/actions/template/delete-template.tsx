@@ -25,7 +25,7 @@ import { deleteWithNotices } from '../../mutation';
 // Every other post type uses the similar `trashPostAction` which
 // moves the post to trash.
 const deleteTemplateAction: Action< Template | TemplatePart > = {
-	id: 'delete-post',
+	id: 'delete-template',
 	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
@@ -36,9 +36,7 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-
 		const isResetting = items.every( ( item ) => item?.has_theme_file );
-
 		return (
 			<VStack spacing="5">
 				<Text>
