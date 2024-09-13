@@ -150,8 +150,7 @@ export default function SavePanel() {
 				} ) }
 			>
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					variant="secondary"
 					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
