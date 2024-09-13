@@ -7,7 +7,6 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { __unstableCommentIconFill as CommentIconFill } from '@wordpress/block-editor';
 
 const AddCommentButton = ( { onClick } ) => {
-
 	return (
 		<CommentIconFill>
 			<MenuItem

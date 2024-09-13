@@ -55,7 +55,7 @@ export default function CollabSidebar() {
 
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
-	const [ blockCommentID, setBlockCommentID] = useState( null );
+	const [ blockCommentID, setBlockCommentID ] = useState( null );
 	const [ showCommentBoard, setShowCommentBoard ] = useState( false );
 
 	const [ threads, setThreads ] = useState( () => [] );
@@ -67,13 +67,15 @@ export default function CollabSidebar() {
 
 	const clientId = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
-		setBlockCommentID( select( blockEditorStore ).getBlock( getSelectedBlockClientId() )?.attributes.blockCommentId );
+		setBlockCommentID(
+			select( blockEditorStore ).getBlock( getSelectedBlockClientId() )
+				?.attributes.blockCommentId
+		);
 		return getSelectedBlockClientId();
 	}, [] );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
 
 	const openCollabBoard = () => {
 		setShowCommentBoard( true );
@@ -273,16 +275,12 @@ export default function CollabSidebar() {
 	return (
 		<>
 			{ ! blockCommentID && (
-				<AddCommentButton 
-					onClick={openCollabBoard} 
-				/>				
-			)}
+				<AddCommentButton onClick={ openCollabBoard } />
+			) }
 
 			{ blockCommentID > 0 && (
-				<AddCommentToolbarButton 
-					onClick={openCollabBoard} 
-				/>
-			)}
+				<AddCommentToolbarButton onClick={ openCollabBoard } />
+			) }
 			<PluginSidebar
 				identifier={ collabSidebarName }
 				// translators: Comments sidebar title

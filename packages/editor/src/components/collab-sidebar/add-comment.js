@@ -27,7 +27,11 @@ import { sanitizeCommentString } from './utils';
  * @param {Function} props.setShowCommentBoard - The function to delete the comment.
  * @return {JSX.Element} The rendered comment input UI.
  */
-export function AddComment( { onSubmit, showCommentBoard, setShowCommentBoard } ) {
+export function AddComment( {
+	onSubmit,
+	showCommentBoard,
+	setShowCommentBoard,
+} ) {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 
