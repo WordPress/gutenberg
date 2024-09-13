@@ -25,6 +25,14 @@
 			background: $gray-200;
 		}
 	}
+
+	&.has-back-button {
+		@media screen and (min-width: #{ ($break-medium) }) and (max-width: $break-large) {
+			.editor-document-bar__post-type-label {
+				display: none;
+			}
+		}
+	}
 }
 
 .editor-document-bar__command {
@@ -37,6 +45,7 @@
 	overflow: hidden;
 	color: $gray-900;
 	margin: 0 auto;
+	max-width: 70%;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-medium() {
@@ -55,7 +64,7 @@
 
 .editor-document-bar__post-title {
 	color: currentColor;
-	max-width: 64%;
+	flex: 1;
 	overflow: hidden;
 	text-overflow: ellipsis;
 
@@ -65,6 +74,7 @@
 }
 
 .editor-document-bar__post-type-label {
+	flex: 0;
 	color: $gray-800;
 	padding-left: $grid-unit-05;
 }
