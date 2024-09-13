@@ -67,6 +67,9 @@ export default function QueryInspectorControls( props ) {
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
+	const [ queryYear, setQueryYear ] = useState(
+		!! after ? new Date( after ).getFullYear() : ''
+	);
 	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
@@ -99,6 +102,7 @@ export default function QueryInspectorControls( props ) {
 		setQuery( updateQuery );
 	};
 	const onYearChange = ( value ) => {
+		setQueryYear( value );
 		const yearRegex = /^\d{4}$/;
 
 		if ( ! yearRegex.test( value ) ) {
@@ -406,9 +410,7 @@ export default function QueryInspectorControls( props ) {
 								__nextHasNoMarginBottom
 								label={ __( 'Year:' ) }
 								type="number"
-								min="1000"
-								max="9999"
-								value={ new Date( after ).getFullYear() }
+								value={ queryYear }
 								onChange={ onYearChange }
 							/>
 						</ToolsPanelItem>
