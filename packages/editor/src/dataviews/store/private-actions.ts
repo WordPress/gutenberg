@@ -22,10 +22,11 @@ import {
 	restorePost,
 	trashPost,
 	renamePost,
+	deletePatternAction,
+	resetTemplateAction,
+	deleteTemplateAction,
 } from '@wordpress/fields';
 import duplicateTemplatePart from '../actions/duplicate-template-part';
-import deletePost from '../actions/delete-post';
-import resetPost from '../actions/reset-post';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -117,9 +118,11 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			resetPost,
+			deletePatternAction,
+			resetTemplateAction,
 			restorePost,
-			deletePost,
+			resetTemplateAction,
+			deleteTemplateAction,
 			trashPost,
 			permanentlyDeletePost,
 		];

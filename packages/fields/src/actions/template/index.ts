@@ -1,2 +1,2 @@
-export { default as deleteTemplate } from './delete-template';
-export { default as resetTemplate } from './reset-template';
+export { default as deleteTemplateAction } from './delete-template';
+export { default as resetTemplateAction } from './reset-template';
