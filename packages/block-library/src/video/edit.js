@@ -148,7 +148,7 @@ function VideoEdit( {
 				instructions={ __(
 					'Upload a video file, pick one from your media library, or add one with a URL.'
 				) }
-				style={ ! isSingleSelected ? { ...borderProps.style } : {} }
+				style={ ! isSingleSelected ? borderProps.style : {} }
 			>
 				{ content }
 			</Placeholder>
