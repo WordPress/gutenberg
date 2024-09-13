@@ -1454,8 +1454,7 @@ export function isCaretWithinFormattedText() {
 }
 
 /**
- * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last index.
+ * Returns the location of the insertion cue. Defaults to the last index.
  *
  * @param {Object} state Editor state.
  *
@@ -1493,7 +1492,7 @@ export const getBlockInsertionPoint = createSelector(
 );
 
 /**
- * Returns true if we should show the block insertion point.
+ * Returns true if the block insertion point is visible.
  *
  * @param {Object} state Global application state.
  *

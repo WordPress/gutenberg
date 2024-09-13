@@ -700,10 +700,10 @@ export function getClosestAllowedInsertionPointForPattern(
 }
 
 /**
- * Where the inserter should insert into.
+ * Where the point where the next block will be inserted into.
  *
  * @param {Object} state
- * @return {Object} Of where the insertion point in the block editor is or null if none is set.
+ * @return {Object} where the insertion point in the block editor is or null if none is set.
  */
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;

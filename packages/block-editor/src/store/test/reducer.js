@@ -3494,7 +3494,7 @@ describe( 'state', () => {
 			expect( state ).toBe( null );
 		} );
 
-		it( 'should set inserter insertion point', () => {
+		it( 'should set insertion point', () => {
 			const state = insertionPoint( null, {
 				type: 'SET_INSERTION_POINT',
 				value: {
@@ -3509,7 +3509,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should clear the inserter insertion point on block selection', () => {
+		it( 'should clear the insertion point on block selection', () => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 4,
