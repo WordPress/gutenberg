@@ -104,6 +104,10 @@ export function getBindingsValues(
 	blockContext,
 	clientId
 ) {
+	if ( ! blockBindings ) {
+		return {};
+	}
+
 	const attributes = {};
 
 	const blockBindingsBySource = new Map();
