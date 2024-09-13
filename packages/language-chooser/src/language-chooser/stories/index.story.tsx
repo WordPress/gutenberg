@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react';
+import type { ComponentProps, KeyboardEvent } from 'react';
 
 /**
  * Internal dependencies
@@ -9,9 +10,26 @@ import type { Meta, StoryObj } from '@storybook/react';
 import LanguageChooser from '../';
 import type { Language } from '../types';
 
+function Component( props: ComponentProps< typeof LanguageChooser > ) {
+	const onKeyDown = ( evt: KeyboardEvent< HTMLElement > ) => {
+		evt.stopPropagation();
+	};
+
+	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div onKeyDown={ onKeyDown }>
+			<LanguageChooser { ...props } />
+			<p>
+				Note: Typical storybook keyboard shortcuts are disabled for this
+				story because they clash with the ones used by the component.
+			</p>
+		</div>
+	);
+}
+
 const meta: Meta< typeof LanguageChooser > = {
 	title: 'Language Chooser/Language Chooser',
-	component: LanguageChooser,
+	component: Component,
 	parameters: {
 		argTypes: {
 			hasMissingTranslations: {
