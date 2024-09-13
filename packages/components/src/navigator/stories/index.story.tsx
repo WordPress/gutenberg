@@ -167,6 +167,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
 						outline: '1px solid black',
 						outlineOffset: '-1px',
 						marginBlockEnd: '1rem',
+						display: 'contents',
 					} }
 				>
 					<NavigatorScreen path="/">
