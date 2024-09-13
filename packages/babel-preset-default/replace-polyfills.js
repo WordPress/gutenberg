@@ -1,6 +1,6 @@
 // Babel plugin that looks for `core-js` imports (or requires)
-// and replaces them magic comments to mark the file as depending
-// on wp-polyfill.
+// and replaces them with magic comments to mark the file as
+// depending on wp-polyfill.
 function replacePolyfills() {
 	return {
 		pre() {
