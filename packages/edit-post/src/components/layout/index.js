@@ -168,7 +168,8 @@ function MetaBoxesMain( { isLegacy } ) {
 			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
 			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
 			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ),
+				isMetaBoxLocationVisible( 'advanced' ) ||
+				isMetaBoxLocationVisible( 'side' ),
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
