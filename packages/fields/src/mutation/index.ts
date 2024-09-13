@@ -29,7 +29,7 @@ export type NoticeSettings< T extends Post > = {
 	};
 };
 
-export const deleteWithNotices = async < T extends Post >(
+export const deletePostWithNotices = async < T extends Post >(
 	posts: T[],
 	notice: NoticeSettings< T >,
 	callbacks: {
@@ -104,7 +104,7 @@ export const deleteWithNotices = async < T extends Post >(
 	}
 };
 
-export const editWithNotices = async < T extends Post >(
+export const editPostWithNotices = async < T extends Post >(
 	postsWithUpdates: {
 		originalPost: T;
 		changes: Partial< T >;

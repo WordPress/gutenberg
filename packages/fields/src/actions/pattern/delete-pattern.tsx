@@ -21,7 +21,7 @@ import type { Pattern } from '../../types';
 import { decodeEntities } from '@wordpress/html-entities';
 import { unlock } from '../../lock-unlock';
 import type { NoticeSettings } from '../../mutation';
-import { deleteWithNotices } from '../../mutation';
+import { deletePostWithNotices } from '../../mutation';
 
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
@@ -144,7 +144,7 @@ const deletePatternAction: Action< Pattern > = {
 									},
 								},
 							};
-							await deleteWithNotices( items, notices, {
+							await deletePostWithNotices( items, notices, {
 								onActionPerformed,
 								onActionError: () => void 0,
 							} );

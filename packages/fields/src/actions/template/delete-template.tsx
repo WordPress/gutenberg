@@ -19,7 +19,7 @@ import { isTemplateRemovable, getItemTitle } from '../utils';
 import type { Template, TemplatePart } from '../../types';
 import { decodeEntities } from '@wordpress/html-entities';
 import type { NoticeSettings } from '../../mutation';
-import { deleteWithNotices } from '../../mutation';
+import { deletePostWithNotices } from '../../mutation';
 
 const deleteTemplateAction: Action< Template | TemplatePart > = {
 	id: 'delete-template',
@@ -163,7 +163,7 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 								},
 							};
 
-							await deleteWithNotices( items, notice, {
+							await deletePostWithNotices( items, notice, {
 								onActionPerformed,
 							} );
 							setIsBusy( false );
