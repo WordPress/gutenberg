@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -115,15 +115,15 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
+	const labelRef = useRef< HTMLDivElement | null >( null );
+	useLayoutEffect( () => {
+		if ( isPressed && labelRef.current ) {
+			toggleGroupControlContext.setActiveElement( labelRef.current );
+		}
+	}, [ isPressed, toggleGroupControlContext ] );
+
 	return (
-		<LabelView
-			ref={ ( element ) => {
-				if ( isPressed && element ) {
-					toggleGroupControlContext.setActiveElement( element );
-				}
-			} }
-			className={ labelViewClasses }
-		>
+		<LabelView ref={ labelRef } className={ labelViewClasses }>
 			<WithToolTip
 				showTooltip={ showTooltip }
 				text={ otherButtonProps[ 'aria-label' ] }
