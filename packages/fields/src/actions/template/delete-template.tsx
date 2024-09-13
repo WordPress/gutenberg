@@ -21,9 +21,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import type { Notice } from '../../mutation';
 import { deleteWithNotices } from '../../mutation';
 
-// This action is used for templates, patterns and template parts.
-// Every other post type uses the similar `trashPostAction` which
-// moves the post to trash.
 const deleteTemplateAction: Action< Template | TemplatePart > = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
