@@ -51,6 +51,8 @@ const InsertFromURLPopover = ( {
 				value={ src }
 			/>
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="block-editor-media-placeholder__url-input-submit-button"
 				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }
@@ -85,6 +87,8 @@ const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
 	return (
 		<div className="block-editor-media-placeholder__url-input-container">
 			<Button
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
@@ -168,7 +172,10 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
-		if ( ! handleUpload ) {
+		if (
+			! handleUpload ||
+			( typeof handleUpload === 'function' && ! handleUpload( files ) )
+		) {
 			return onSelect( files );
 		}
 		onFilesPreUpload( files );
@@ -316,15 +323,15 @@ export function MediaPlaceholder( {
 
 				if ( isAudio ) {
 					instructions = __(
-						'Upload an audio file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an audio file here, or pick one from your library.'
 					);
 				} else if ( isImage ) {
 					instructions = __(
-						'Upload an image file, pick one from your media library, or add one with a URL.'
+						'Upload or drag an image file here, or pick one from your library.'
 					);
 				} else if ( isVideo ) {
 					instructions = __(
-						'Upload a video file, pick one from your media library, or add one with a URL.'
+						'Upload or drag a video file here, or pick one from your library.'
 					);
 				}
 			}
@@ -382,6 +389,8 @@ export function MediaPlaceholder( {
 		return (
 			onCancel && (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					className="block-editor-media-placeholder__cancel-button"
 					title={ __( 'Cancel' ) }
 					variant="link"
@@ -410,6 +419,8 @@ export function MediaPlaceholder( {
 			onToggleFeaturedImage && (
 				<div className="block-editor-media-placeholder__url-input-container">
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
 						variant="secondary"
@@ -425,6 +436,8 @@ export function MediaPlaceholder( {
 		const defaultButton = ( { open } ) => {
 			return (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					variant="secondary"
 					onClick={ () => {
 						open();
@@ -464,6 +477,8 @@ export function MediaPlaceholder( {
 							const content = (
 								<>
 									<Button
+										// TODO: Switch to `true` (40px size) if possible
+										__next40pxDefaultSize={ false }
 										variant="primary"
 										className={ clsx(
 											'block-editor-media-placeholder__button',
@@ -493,6 +508,8 @@ export function MediaPlaceholder( {
 					<FormFileUpload
 						render={ ( { openFileDialog } ) => (
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								onClick={ openFileDialog }
 								variant="primary"
 								className={ clsx(

@@ -22,10 +22,9 @@ export const CompositeRow = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeRow
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeRow.displayName = 'Composite.Row';

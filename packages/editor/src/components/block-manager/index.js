@@ -67,6 +67,7 @@ function BlockManager( {
 						numberOfHiddenBlocks
 					) }
 					<Button
+						__next40pxDefaultSize
 						variant="link"
 						onClick={ () => enableAllBlockTypes( blockTypes ) }
 					>

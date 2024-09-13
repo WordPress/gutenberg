@@ -22,10 +22,9 @@ export const CompositeHover = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeHover
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeHover.displayName = 'Composite.Hover';

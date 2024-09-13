@@ -67,6 +67,7 @@ const trashPost: Action< PostWithPermissions > = {
 				</Text>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
@@ -75,6 +76,7 @@ const trashPost: Action< PostWithPermissions > = {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );

@@ -145,7 +145,10 @@ function CoverEdit( {
 				averageBackgroundColor
 			);
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { isDark: newIsDark } );
+			setAttributes( {
+				isDark: newIsDark,
+				isUserOverlayColor: isUserOverlayColor || false,
+			} );
 		} )();
 		// Disable reason: Update the block only when the featured image changes.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,6 +222,7 @@ function CoverEdit( {
 			useFeaturedImage: undefined,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
+			isUserOverlayColor: isUserOverlayColor || false,
 		} );
 	};
 

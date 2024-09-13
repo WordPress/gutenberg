@@ -44,14 +44,17 @@ function FontSize() {
 		'typography.fontSizes'
 	);
 
+	const [ globalFluid ] = useGlobalSetting( 'typography.fluid' );
+
 	// Get the font sizes from the origin, default to empty array.
 	const sizes = fontSizes[ origin ] ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
 
-	// Whether fluid is true or an object, set it to true, otherwise false.
-	const isFluid = !! fontSize.fluid ?? false;
+	// Whether the font size is fluid. If not defined, use the global fluid value of the theme.
+	const isFluid =
+		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 
 	// Whether custom fluid values are used.
 	const isCustomFluid = typeof fontSize.fluid === 'object';

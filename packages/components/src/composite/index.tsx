@@ -16,6 +16,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
+import { isRTL } from '@wordpress/i18n';
 import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
@@ -38,10 +39,9 @@ import type { CompositeProps } from './types';
  *
  * @example
  * ```jsx
- * import { Composite, useCompositeStore } from '@wordpress/components';
+ * import { Composite } from '@wordpress/components';
  *
- * const store = useCompositeStore();
- * <Composite store={store}>
+ * <Composite>
  *   <Composite.Item>Item 1</Composite.Item>
  *   <Composite.Item>Item 2</Composite.Item>
  * </Composite>
@@ -52,9 +52,39 @@ export const Composite = Object.assign(
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
 	>( function Composite(
-		{ children, store, disabled = false, ...props },
+		{
+			// Composite store props
+			activeId,
+			defaultActiveId,
+			setActiveId,
+			focusLoop = false,
+			focusWrap = false,
+			focusShift = false,
+			virtualFocus = false,
+			orientation = 'both',
+			rtl = isRTL(),
+
+			// Composite component props
+			children,
+			disabled = false,
+
+			// Rest props
+			...props
+		},
 		ref
 	) {
+		const store = Ariakit.useCompositeStore( {
+			activeId,
+			defaultActiveId,
+			setActiveId,
+			focusLoop,
+			focusWrap,
+			focusShift,
+			virtualFocus,
+			orientation,
+			rtl,
+		} );
+
 		const contextValue = useMemo(
 			() => ( {
 				store,
@@ -81,10 +111,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Group>
 		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
 		 *     <Composite.Item>Item 1</Composite.Item>
@@ -93,7 +122,9 @@ export const Composite = Object.assign(
 		 * </Composite>
 		 * ```
 		 */
-		Group: CompositeGroup,
+		Group: Object.assign( CompositeGroup, {
+			displayName: 'Composite.Group',
+		} ),
 		/**
 		 * Renders a label in a composite group. This component must be wrapped with
 		 * `Composite.Group` so the `aria-labelledby` prop is properly set on the
@@ -101,10 +132,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Group>
 		 *     <Composite.GroupLabel>Label</Composite.GroupLabel>
 		 *     <Composite.Item>Item 1</Composite.Item>
@@ -113,23 +143,24 @@ export const Composite = Object.assign(
 		 * </Composite>
 		 * ```
 		 */
-		GroupLabel: CompositeGroupLabel,
+		GroupLabel: Object.assign( CompositeGroupLabel, {
+			displayName: 'Composite.GroupLabel',
+		} ),
 		/**
 		 * Renders a composite item.
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Item>Item 1</Composite.Item>
 		 *   <Composite.Item>Item 2</Composite.Item>
 		 *   <Composite.Item>Item 3</Composite.Item>
 		 * </Composite>
 		 * ```
 		 */
-		Item: CompositeItem,
+		Item: Object.assign( CompositeItem, { displayName: 'Composite.Item' } ),
 		/**
 		 * Renders a composite row. Wrapping `Composite.Item` elements within
 		 * `Composite.Row` will create a two-dimensional composite widget, such as a
@@ -137,10 +168,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Row>
 		 *     <Composite.Item>Item 1.1</Composite.Item>
 		 *     <Composite.Item>Item 1.2</Composite.Item>
@@ -154,7 +184,7 @@ export const Composite = Object.assign(
 		 * </Composite>
 		 * ```
 		 */
-		Row: CompositeRow,
+		Row: Object.assign( CompositeRow, { displayName: 'Composite.Row' } ),
 		/**
 		 * Renders an element in a composite widget that receives focus on mouse move
 		 * and loses focus to the composite base element on mouse leave. This should
@@ -162,10 +192,9 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store}>
+		 * <Composite>
 		 *   <Composite.Hover render={ <Composite.Item /> }>
 		 *     Item 1
 		 *   </Composite.Hover>
@@ -175,7 +204,9 @@ export const Composite = Object.assign(
 		 * </Composite>
 		 * ```
 		 */
-		Hover: CompositeHover,
+		Hover: Object.assign( CompositeHover, {
+			displayName: 'Composite.Hover',
+		} ),
 		/**
 		 * Renders a component that adds typeahead functionality to composite
 		 * components. Hitting printable character keys will move focus to the next
@@ -183,16 +214,17 @@ export const Composite = Object.assign(
 		 *
 		 * @example
 		 * ```jsx
-		 * import { Composite, useCompositeStore } from '@wordpress/components';
+		 * import { Composite } from '@wordpress/components';
 		 *
-		 * const store = useCompositeStore();
-		 * <Composite store={store} render={ <CompositeTypeahead /> }>
+		 * <Composite render={ <CompositeTypeahead /> }>
 		 *   <Composite.Item>Item 1</Composite.Item>
 		 *   <Composite.Item>Item 2</Composite.Item>
 		 * </Composite>
 		 * ```
 		 */
-		Typeahead: CompositeTypeahead,
+		Typeahead: Object.assign( CompositeTypeahead, {
+			displayName: 'Composite.Typeahead',
+		} ),
 		/**
 		 * The React context used by the composite components. It can be used by
 		 * to access the composite store, and to forward the context when composite
@@ -207,6 +239,8 @@ export const Composite = Object.assign(
 		 * const compositeContext = useContext( Composite.Context );
 		 * ```
 		 */
-		Context: CompositeContext,
+		Context: Object.assign( CompositeContext, {
+			displayName: 'Composite.Context',
+		} ),
 	}
 );

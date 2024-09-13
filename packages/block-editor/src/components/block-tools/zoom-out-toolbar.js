@@ -21,11 +21,7 @@ import BlockMover from '../block-mover';
 import Shuffle from '../block-toolbar/shuffle';
 import NavigableToolbar from '../navigable-toolbar';
 
-export default function ZoomOutToolbar( {
-	clientId,
-	rootClientId,
-	__unstableContentRef,
-} ) {
+export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -35,7 +31,12 @@ export default function ZoomOutToolbar( {
 				getPreviousBlockClientId,
 				canRemoveBlock,
 				canMoveBlock,
+				getSettings,
 			} = select( blockEditorStore );
+
+			const { __experimentalSetIsInserterOpened: setIsInserterOpened } =
+				getSettings();
+
 			const { getBlockType } = select( blocksStore );
 			const { name } = getBlock( clientId );
 			const blockType = getBlockType( name );
@@ -65,11 +66,12 @@ export default function ZoomOutToolbar( {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
+				setIsInserterOpened,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId ]
 	);
 
 	const {
@@ -79,6 +81,7 @@ export default function ZoomOutToolbar( {
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
+		setIsInserterOpened,
 	} = selected;
 
 	const { removeBlock, __unstableSetEditorMode } =
@@ -136,6 +139,10 @@ export default function ZoomOutToolbar( {
 					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ () => {
+						// Setting may be undefined.
+						if ( typeof setIsInserterOpened === 'function' ) {
+							setIsInserterOpened( false );
+						}
 						__unstableSetEditorMode( 'edit' );
 						__unstableContentRef.current?.focus();
 					} }

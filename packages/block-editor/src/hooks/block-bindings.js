@@ -9,11 +9,10 @@ import {
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
@@ -28,6 +27,7 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { useBlockBindingsUtils } from '../utils/block-bindings';
+import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
@@ -55,14 +55,9 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 				<Fragment key={ name }>
 					<DropdownMenuV2.Group>
 						{ Object.keys( fieldsList ).length > 1 && (
-							<Text
-								className="block-editor-bindings__source-label"
-								upperCase
-								variant="muted"
-								aria-hidden
-							>
+							<DropdownMenuV2.GroupLabel>
 								{ registeredSources[ name ].label }
-							</Text>
+							</DropdownMenuV2.GroupLabel>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
 							<DropdownMenuV2.RadioItem
@@ -101,17 +96,19 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
+	const isSourceInvalid = ! sourceProps;
 	return (
-		<VStack>
-			<Truncate>{ attribute }</Truncate>
+		<VStack className="block-editor-bindings__item" spacing={ 0 }>
+			<Text truncate>{ attribute }</Text>
 			{ !! binding && (
 				<Text
-					variant="muted"
-					className="block-editor-bindings__item-explanation"
+					truncate
+					variant={ ! isSourceInvalid && 'muted' }
+					isDestructive={ isSourceInvalid }
 				>
-					<Truncate>
-						{ args?.key || sourceProps?.label || sourceName }
-					</Truncate>
+					{ isSourceInvalid
+						? __( 'Invalid source' )
+						: args?.key || sourceProps?.label || sourceName }
 				</Text>
 			) }
 		</VStack>
@@ -160,7 +157,6 @@ function EditableBlockBindingsPanelItems( {
 								isMobile ? 'bottom-start' : 'left-start'
 							}
 							gutter={ isMobile ? 8 : 36 }
-							className="block-editor-bindings__popover"
 							trigger={
 								<Item>
 									<BlockBindingsAttribute
@@ -201,6 +197,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
+	const { canUpdateBlockBindings } = useSelect( ( select ) => {
+		return {
+			canUpdateBlockBindings:
+				select( blockEditorStore ).getSettings().canUpdateBlockBindings,
+		};
+	}, [] );
+
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
@@ -236,17 +239,16 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 		}
 	} );
 
-	// Lock the UI when the experiment is not enabled or there are no fields to connect to.
+	// Lock the UI when the user can't update bindings or there are no fields to connect to.
 	const readOnly =
-		! window.__experimentalBlockBindingsUI ||
-		! Object.keys( fieldsList ).length;
+		! canUpdateBlockBindings || ! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
 	}
 
 	return (
-		<InspectorControls>
+		<InspectorControls group="bindings">
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
@@ -268,9 +270,13 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 						/>
 					) }
 				</ItemGroup>
-				<Text variant="muted">
-					{ __( 'Attributes connected to various sources.' ) }
-				</Text>
+				<ItemGroup>
+					<Text variant="muted">
+						{ __(
+							'Attributes connected to custom fields or other dynamic data.'
+						) }
+					</Text>
+				</ItemGroup>
 			</ToolsPanel>
 		</InspectorControls>
 	);

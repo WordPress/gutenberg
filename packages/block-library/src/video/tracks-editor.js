@@ -58,6 +58,7 @@ function TrackList( { tracks, onEditPress } ) {
 				>
 					<span>{ track.label } </span>
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => onEditPress( index ) }
 						aria-label={ sprintf(
@@ -145,6 +146,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					/>
 					<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 						<Button
+							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ () => {
 								const changes = {};
@@ -173,6 +175,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 							{ __( 'Close' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							isDestructive
 							variant="link"
 							onClick={ onRemove }

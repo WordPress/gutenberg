@@ -78,26 +78,16 @@ npm run build
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(
-	ls build/*/*.{js,js.map,css,asset.php} \
-	build/block-library/blocks/*.php \
-	build/block-library/blocks/*/block.json \
-	build/block-library/blocks/*/*.{js,js.map,css,asset.php} \
-	build/edit-widgets/blocks/*/block.json \
-	build/widgets/blocks/*.php \
-	build/widgets/blocks/*/block.json \
-	build/style-engine/*.php \
-)
-
-
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
-zip -r gutenberg.zip \
+zip --recurse-paths --no-dir-entries \
+	gutenberg.zip \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
 	post-content.php \
-	$build_files \
+	build \
+	build-module \
 	readme.txt \
 	changelog.txt \
 	README.md

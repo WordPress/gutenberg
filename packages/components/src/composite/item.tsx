@@ -22,10 +22,9 @@ export const CompositeItem = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeItem
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeItem.displayName = 'Composite.Item';

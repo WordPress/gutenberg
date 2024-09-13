@@ -17,6 +17,7 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 import { escapeAttribute } from '@wordpress/escape-html';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -33,6 +34,12 @@ function UnconnectedNavigatorScreen(
 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
+	if ( ! /^\//.test( props.path ) ) {
+		warning(
+			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
+		);
+	}
+
 	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,

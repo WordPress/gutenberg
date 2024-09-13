@@ -21,4 +21,3 @@ export const DropdownMenuItemHelpText = forwardRef<
 		/>
 	);
 } );
-DropdownMenuItemHelpText.displayName = 'DropdownMenuV2.ItemHelpText';

@@ -22,10 +22,9 @@ export const CompositeGroup = forwardRef<
 	const context = useCompositeContext();
 	return (
 		<Ariakit.CompositeGroup
-			store={ context?.store }
+			store={ context.store as Ariakit.CompositeStore }
 			{ ...props }
 			ref={ ref }
 		/>
 	);
 } );
-CompositeGroup.displayName = 'Composite.Group';

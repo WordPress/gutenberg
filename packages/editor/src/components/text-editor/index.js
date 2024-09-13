@@ -40,6 +40,7 @@ export default function TextEditor( { autoFocus = false } ) {
 				<div className="editor-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => switchEditorMode( 'visual' ) }
 						shortcut={ shortcut }

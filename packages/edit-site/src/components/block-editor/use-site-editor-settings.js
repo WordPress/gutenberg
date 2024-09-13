@@ -3,7 +3,6 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { usePrevious } from '@wordpress/compose';
 
@@ -15,7 +14,6 @@ import { unlock } from '../../lock-unlock';
 import useNavigateToEntityRecord from './use-navigate-to-entity-record';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { useBlockEditorSettings } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useNavigateToPreviousEntityRecord() {
@@ -82,20 +80,4 @@ export function useSpecificEditorSettings() {
 	] );
 
 	return defaultEditorSettings;
-}
-
-export default function useSiteEditorSettings() {
-	const defaultEditorSettings = useSpecificEditorSettings();
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = unlock(
-			select( editSiteStore )
-		);
-		const usedPostType = getEditedPostType();
-		const usedPostId = getEditedPostId();
-		return {
-			postType: usedPostType,
-			postId: usedPostId,
-		};
-	}, [] );
-	return useBlockEditorSettings( defaultEditorSettings, postType, postId );
 }

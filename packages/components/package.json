@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "28.6.0",
+	"version": "28.7.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,7 +75,6 @@
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.3.1",
 		"remove-accents": "^0.5.0",
-		"use-lilius": "^2.0.5",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
