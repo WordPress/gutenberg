@@ -197,7 +197,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Standard"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			PATTERN_NAME
 		);
 
