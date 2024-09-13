@@ -223,195 +223,195 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect(
-		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
-			const {
-				getBlockRootClientId,
-				hasInserterItems,
-				getAllowedBlocks,
-				getDirectInsertBlock,
-				getSettings,
-			} = select( blockEditorStore );
+	// withSelect(
+	// 	( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
+	// 		const {
+	// 			getBlockRootClientId,
+	// 			hasInserterItems,
+	// 			getAllowedBlocks,
+	// 			getDirectInsertBlock,
+	// 			getSettings,
+	// 		} = select( blockEditorStore );
 
-			const { getBlockVariations } = select( blocksStore );
+	// 		const { getBlockVariations } = select( blocksStore );
 
-			rootClientId =
-				rootClientId || getBlockRootClientId( clientId ) || undefined;
+	// 		rootClientId =
+	// 			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
-			const allowedBlocks = getAllowedBlocks( rootClientId );
+	// 		const allowedBlocks = getAllowedBlocks( rootClientId );
 
-			const directInsertBlock =
-				shouldDirectInsert && getDirectInsertBlock( rootClientId );
+	// 		const directInsertBlock =
+	// 			shouldDirectInsert && getDirectInsertBlock( rootClientId );
 
-			const settings = getSettings();
+	// 		const settings = getSettings();
 
-			const hasSingleBlockType =
-				allowedBlocks?.length === 1 &&
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-					?.length === 0;
+	// 		const hasSingleBlockType =
+	// 			allowedBlocks?.length === 1 &&
+	// 			getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
+	// 				?.length === 0;
 
-			let allowedBlockType = false;
-			if ( hasSingleBlockType ) {
-				allowedBlockType = allowedBlocks[ 0 ];
-			}
+	// 		let allowedBlockType = false;
+	// 		if ( hasSingleBlockType ) {
+	// 			allowedBlockType = allowedBlocks[ 0 ];
+	// 		}
 
-			return {
-				hasItems: hasInserterItems( rootClientId ),
-				hasSingleBlockType,
-				blockTitle: allowedBlockType ? allowedBlockType.title : '',
-				allowedBlockType,
-				directInsertBlock,
-				rootClientId,
-				prioritizePatterns:
-					settings.__experimentalPreferPatternsOnRoot &&
-					! rootClientId,
-			};
-		}
-	),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		return {
-			insertOnlyAllowedBlock() {
-				const {
-					rootClientId,
-					clientId,
-					isAppender,
-					hasSingleBlockType,
-					allowedBlockType,
-					directInsertBlock,
-					onSelectOrClose,
-					selectBlockOnInsert,
-				} = ownProps;
+	// 		return {
+	// 			hasItems: hasInserterItems( rootClientId ),
+	// 			hasSingleBlockType,
+	// 			blockTitle: allowedBlockType ? allowedBlockType.title : '',
+	// 			allowedBlockType,
+	// 			directInsertBlock,
+	// 			rootClientId,
+	// 			prioritizePatterns:
+	// 				settings.__experimentalPreferPatternsOnRoot &&
+	// 				! rootClientId,
+	// 		};
+	// 	}
+	// ),
+	// withDispatch( ( dispatch, ownProps, { select } ) => {
+	// 	return {
+	// 		insertOnlyAllowedBlock() {
+	// 			const {
+	// 				rootClientId,
+	// 				clientId,
+	// 				isAppender,
+	// 				hasSingleBlockType,
+	// 				allowedBlockType,
+	// 				directInsertBlock,
+	// 				onSelectOrClose,
+	// 				selectBlockOnInsert,
+	// 			} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsertBlock ) {
-					return;
-				}
+	// 			if ( ! hasSingleBlockType && ! directInsertBlock ) {
+	// 				return;
+	// 			}
 
-				function getAdjacentBlockAttributes( attributesToCopy ) {
-					const { getBlock, getPreviousBlockClientId } =
-						select( blockEditorStore );
+	// 			function getAdjacentBlockAttributes( attributesToCopy ) {
+	// 				const { getBlock, getPreviousBlockClientId } =
+	// 					select( blockEditorStore );
 
-					if (
-						! attributesToCopy ||
-						( ! clientId && ! rootClientId )
-					) {
-						return {};
-					}
+	// 				if (
+	// 					! attributesToCopy ||
+	// 					( ! clientId && ! rootClientId )
+	// 				) {
+	// 					return {};
+	// 				}
 
-					const result = {};
-					let adjacentAttributes = {};
+	// 				const result = {};
+	// 				let adjacentAttributes = {};
 
-					// If there is no clientId, then attempt to get attributes
-					// from the last block within innerBlocks of the root block.
-					if ( ! clientId ) {
-						const parentBlock = getBlock( rootClientId );
+	// 				// If there is no clientId, then attempt to get attributes
+	// 				// from the last block within innerBlocks of the root block.
+	// 				if ( ! clientId ) {
+	// 					const parentBlock = getBlock( rootClientId );
 
-						if ( parentBlock?.innerBlocks?.length ) {
-							const lastInnerBlock =
-								parentBlock.innerBlocks[
-									parentBlock.innerBlocks.length - 1
-								];
+	// 					if ( parentBlock?.innerBlocks?.length ) {
+	// 						const lastInnerBlock =
+	// 							parentBlock.innerBlocks[
+	// 								parentBlock.innerBlocks.length - 1
+	// 							];
 
-							if (
-								directInsertBlock &&
-								directInsertBlock?.name === lastInnerBlock.name
-							) {
-								adjacentAttributes = lastInnerBlock.attributes;
-							}
-						}
-					} else {
-						// Otherwise, attempt to get attributes from the
-						// previous block relative to the current clientId.
-						const currentBlock = getBlock( clientId );
-						const previousBlock = getBlock(
-							getPreviousBlockClientId( clientId )
-						);
+	// 						if (
+	// 							directInsertBlock &&
+	// 							directInsertBlock?.name === lastInnerBlock.name
+	// 						) {
+	// 							adjacentAttributes = lastInnerBlock.attributes;
+	// 						}
+	// 					}
+	// 				} else {
+	// 					// Otherwise, attempt to get attributes from the
+	// 					// previous block relative to the current clientId.
+	// 					const currentBlock = getBlock( clientId );
+	// 					const previousBlock = getBlock(
+	// 						getPreviousBlockClientId( clientId )
+	// 					);
 
-						if ( currentBlock?.name === previousBlock?.name ) {
-							adjacentAttributes =
-								previousBlock?.attributes || {};
-						}
-					}
+	// 					if ( currentBlock?.name === previousBlock?.name ) {
+	// 						adjacentAttributes =
+	// 							previousBlock?.attributes || {};
+	// 					}
+	// 				}
 
-					// Copy over only those attributes flagged to be copied.
-					attributesToCopy.forEach( ( attribute ) => {
-						if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
-							result[ attribute ] =
-								adjacentAttributes[ attribute ];
-						}
-					} );
+	// 				// Copy over only those attributes flagged to be copied.
+	// 				attributesToCopy.forEach( ( attribute ) => {
+	// 					if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
+	// 						result[ attribute ] =
+	// 							adjacentAttributes[ attribute ];
+	// 					}
+	// 				} );
 
-					return result;
-				}
+	// 				return result;
+	// 			}
 
-				function getInsertionIndex() {
-					const {
-						getBlockIndex,
-						getBlockSelectionEnd,
-						getBlockOrder,
-						getBlockRootClientId,
-					} = select( blockEditorStore );
+	// 			function getInsertionIndex() {
+	// 				const {
+	// 					getBlockIndex,
+	// 					getBlockSelectionEnd,
+	// 					getBlockOrder,
+	// 					getBlockRootClientId,
+	// 				} = select( blockEditorStore );
 
-					// If the clientId is defined, we insert at the position of the block.
-					if ( clientId ) {
-						return getBlockIndex( clientId );
-					}
+	// 				// If the clientId is defined, we insert at the position of the block.
+	// 				if ( clientId ) {
+	// 					return getBlockIndex( clientId );
+	// 				}
 
-					// If there a selected block, we insert after the selected block.
-					const end = getBlockSelectionEnd();
-					if (
-						! isAppender &&
-						end &&
-						getBlockRootClientId( end ) === rootClientId
-					) {
-						return getBlockIndex( end ) + 1;
-					}
+	// 				// If there a selected block, we insert after the selected block.
+	// 				const end = getBlockSelectionEnd();
+	// 				if (
+	// 					! isAppender &&
+	// 					end &&
+	// 					getBlockRootClientId( end ) === rootClientId
+	// 				) {
+	// 					return getBlockIndex( end ) + 1;
+	// 				}
 
-					// Otherwise, we insert at the end of the current rootClientId.
-					return getBlockOrder( rootClientId ).length;
-				}
+	// 				// Otherwise, we insert at the end of the current rootClientId.
+	// 				return getBlockOrder( rootClientId ).length;
+	// 			}
 
-				const { insertBlock } = dispatch( blockEditorStore );
+	// 			const { insertBlock } = dispatch( blockEditorStore );
 
-				let blockToInsert;
+	// 			let blockToInsert;
 
-				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
-				// This ensures styling from nearby blocks is preserved in the newly inserted block.
-				// See: https://github.com/WordPress/gutenberg/issues/37904
-				if ( directInsertBlock ) {
-					const newAttributes = getAdjacentBlockAttributes(
-						directInsertBlock.attributesToCopy
-					);
+	// 			// Attempt to augment the directInsertBlock with attributes from an adjacent block.
+	// 			// This ensures styling from nearby blocks is preserved in the newly inserted block.
+	// 			// See: https://github.com/WordPress/gutenberg/issues/37904
+	// 			if ( directInsertBlock ) {
+	// 				const newAttributes = getAdjacentBlockAttributes(
+	// 					directInsertBlock.attributesToCopy
+	// 				);
 
-					blockToInsert = createBlock( directInsertBlock.name, {
-						...( directInsertBlock.attributes || {} ),
-						...newAttributes,
-					} );
-				} else {
-					blockToInsert = createBlock( allowedBlockType.name );
-				}
+	// 				blockToInsert = createBlock( directInsertBlock.name, {
+	// 					...( directInsertBlock.attributes || {} ),
+	// 					...newAttributes,
+	// 				} );
+	// 			} else {
+	// 				blockToInsert = createBlock( allowedBlockType.name );
+	// 			}
 
-				insertBlock(
-					blockToInsert,
-					getInsertionIndex(),
-					rootClientId,
-					selectBlockOnInsert
-				);
+	// 			insertBlock(
+	// 				blockToInsert,
+	// 				getInsertionIndex(),
+	// 				rootClientId,
+	// 				selectBlockOnInsert
+	// 			);
 
-				if ( onSelectOrClose ) {
-					onSelectOrClose( {
-						clientId: blockToInsert?.clientId,
-					} );
-				}
+	// 			if ( onSelectOrClose ) {
+	// 				onSelectOrClose( {
+	// 					clientId: blockToInsert?.clientId,
+	// 				} );
+	// 			}
 
-				const message = sprintf(
-					// translators: %s: the name of the block that has been added
-					__( '%s block added' ),
-					allowedBlockType.title
-				);
-				speak( message );
-			},
-		};
-	} ),
+	// 			const message = sprintf(
+	// 				// translators: %s: the name of the block that has been added
+	// 				__( '%s block added' ),
+	// 				allowedBlockType.title
+	// 			);
+	// 			speak( message );
+	// 		},
+	// 	};
+	// } ),
 	// The global inserter should always be visible, we are using ( ! isAppender && ! rootClientId && ! clientId ) as
 	// a way to detect the global Inserter.
 	ifCondition(
