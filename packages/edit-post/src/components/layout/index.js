@@ -190,7 +190,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
 	// aria-valuenow attribute on the seperator.
-	const effectSizeContraints = useRefEffect( ( node ) => {
+	const effectSizeConstraints = useRefEffect( ( node ) => {
 		const container = node.closest(
 			'.interface-interface-skeleton__content'
 		);
@@ -380,7 +380,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				),
 			} }
 		>
-			<meta ref={ effectSizeContraints } />
+			<meta ref={ effectSizeConstraints } />
 			{ contents }
 		</ResizableBox>
 	);
