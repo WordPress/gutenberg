@@ -236,11 +236,7 @@ function ListItem< Item >( {
 			onMouseEnter={ handleHover }
 			onMouseLeave={ handleHover }
 		>
-			<HStack
-				className="dataviews-view-list__item-wrapper"
-				alignment="center"
-				spacing={ 0 }
-			>
+			<HStack className="dataviews-view-list__item-wrapper" spacing={ 0 }>
 				<div role="gridcell">
 					<Composite.Item
 						id={ generateItemWrapperCompositeId( idPrefix ) }
@@ -250,51 +246,47 @@ function ListItem< Item >( {
 						className="dataviews-view-list__item"
 						onClick={ () => onSelect( item ) }
 					/>
-					<HStack
-						spacing={ 3 }
-						justify="start"
-						alignment="flex-start"
-					>
-						<div className="dataviews-view-list__media-wrapper">
-							{ renderedMediaField }
-						</div>
-						<VStack
-							spacing={ 1 }
-							className="dataviews-view-list__field-wrapper"
-						>
-							<HStack spacing={ 0 }>
-								<div
-									className="dataviews-view-list__primary-field"
-									id={ labelId }
-								>
-									{ renderedPrimaryField }
-								</div>
-								{ usedActions }
-							</HStack>
-							<div
-								className="dataviews-view-list__fields"
-								id={ descriptionId }
-							>
-								{ visibleFields.map( ( field ) => (
-									<div
-										key={ field.id }
-										className="dataviews-view-list__field"
-									>
-										<VisuallyHidden
-											as="span"
-											className="dataviews-view-list__field-label"
-										>
-											{ field.label }
-										</VisuallyHidden>
-										<span className="dataviews-view-list__field-value">
-											<field.render item={ item } />
-										</span>
-									</div>
-								) ) }
-							</div>
-						</VStack>
-					</HStack>
 				</div>
+				<HStack spacing={ 3 } justify="start" alignment="flex-start">
+					<div className="dataviews-view-list__media-wrapper">
+						{ renderedMediaField }
+					</div>
+					<VStack
+						spacing={ 1 }
+						className="dataviews-view-list__field-wrapper"
+					>
+						<HStack spacing={ 0 }>
+							<div
+								className="dataviews-view-list__primary-field"
+								id={ labelId }
+							>
+								{ renderedPrimaryField }
+							</div>
+							{ usedActions }
+						</HStack>
+						<div
+							className="dataviews-view-list__fields"
+							id={ descriptionId }
+						>
+							{ visibleFields.map( ( field ) => (
+								<div
+									key={ field.id }
+									className="dataviews-view-list__field"
+								>
+									<VisuallyHidden
+										as="span"
+										className="dataviews-view-list__field-label"
+									>
+										{ field.label }
+									</VisuallyHidden>
+									<span className="dataviews-view-list__field-value">
+										<field.render item={ item } />
+									</span>
+								</div>
+							) ) }
+						</div>
+					</VStack>
+				</HStack>
 			</HStack>
 		</Composite.Row>
 	);
