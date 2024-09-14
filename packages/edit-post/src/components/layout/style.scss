@@ -74,6 +74,7 @@
 			background-color: $gray-300;
 			border-radius: $grid-unit-05;
 			transition: transform 0.3s ease-out;
+			@include reduce-motion("transition");
 		}
 	}
 }
