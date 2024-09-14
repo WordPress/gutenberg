@@ -5,7 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { SearchControl, Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -58,15 +58,13 @@ export default function BlockManager() {
 		showBlockTypes( blockNames );
 	}
 
-	const filteredBlockTypes = useMemo( () => {
-		return blockTypes.filter(
-			( blockType ) =>
-				hasBlockSupport( blockType, 'inserter', true ) &&
-				( ! search || isMatchingSearchTerm( blockType, search ) ) &&
-				( ! blockType.parent ||
-					blockType.parent.includes( 'core/post-content' ) )
-		);
-	}, [ blockTypes, hasBlockSupport, isMatchingSearchTerm, search ] );
+	const filteredBlockTypes = blockTypes.filter(
+		( blockType ) =>
+			hasBlockSupport( blockType, 'inserter', true ) &&
+			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
+			( ! blockType.parent ||
+				blockType.parent.includes( 'core/post-content' ) )
+	);
 
 	// Announce search results on change
 	useEffect( () => {
