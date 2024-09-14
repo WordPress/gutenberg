@@ -251,12 +251,10 @@ function MetaBoxesMain( { isLegacy } ) {
 		usedMax = isAutoHeight && isUntouched ? max / 2 : max;
 	}
 
-	const getAriaValueNow = ( current, total ) =>
-		Math.round( ( ( current - min ) / ( total - min ) ) * 100 );
+	const getAriaValueNow = ( height ) =>
+		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
-		max === undefined || isAutoHeight
-			? 50
-			: getAriaValueNow( openHeight, max );
+		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
 
 	if ( isShort ) {
 		return (
@@ -340,11 +338,10 @@ function MetaBoxesMain( { isLegacy } ) {
 					setIsUntouched( false );
 				}
 			} }
-			onResize={ ( event, direction, elementRef, delta ) => {
-				const fromHeight = resizableBoxRef.current.state.height;
-				const nextHeight = fromHeight + delta.height;
+			onResize={ () => {
+				const { height } = resizableBoxRef.current.state;
 				const separator = separatorRef.current;
-				separator.ariaValueNow = getAriaValueNow( nextHeight, max );
+				separator.ariaValueNow = getAriaValueNow( height );
 			} }
 			onResizeStop={ () => {
 				const nextHeight = resizableBoxRef.current.state.height;
