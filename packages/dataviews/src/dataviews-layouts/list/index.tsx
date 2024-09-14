@@ -262,7 +262,7 @@ function ListItem< Item >( {
 							spacing={ 1 }
 							className="dataviews-view-list__field-wrapper"
 						>
-							<HStack>
+							<HStack spacing={ 0 }>
 								<div
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
