@@ -36,46 +36,26 @@
 	height: 23px;
 	box-shadow: 0 $border-width $gray-300;
 
-	&:hover > button::before,
-	&:hover > button::after {
-		background-color: var(--wp-admin-theme-color);
-	}
-	&:hover > button::before {
-		transform: translateX(-$grid-unit-20);
-	}
-	&:hover > button::after {
-		transform: translateX($grid-unit-20);
-	}
-
 	& > button {
 		appearance: none;
 		cursor: inherit;
 		margin: auto;
 		padding: 0;
 		border: none;
-		background: none;
 		outline: none;
-		display: grid;
-		grid-template: auto / auto;
+		background-color: $gray-300;
+		// The visible width is the first unit, the rest is clipped when not hovered/focused.
+		width: $grid-unit-80 + $grid-unit-10 * 2;
+		height: $grid-unit-05;
+		clip-path: inset(0 $grid-unit-10 round $grid-unit-05);
+		transition: clip-path 0.3s ease-out;
+		@include reduce-motion("transition");
+	}
 
-		&:is(:focus, :active)::before,
-		&:is(:focus, :active)::after {
-			background-color: var(--wp-admin-theme-color);
-		}
-
-		&::before,
-		&::after {
-			content: "";
-			grid-area: 1 / 1;
-			display: block;
-			// Other resize handles are 68px when not hovered and this grid unit is close.
-			width: $grid-unit-80;
-			height: $grid-unit-05;
-			background-color: $gray-300;
-			border-radius: $grid-unit-05;
-			transition: transform 0.3s ease-out;
-			@include reduce-motion("transition");
-		}
+	&:hover > button,
+	> button:focus {
+		background-color: var(--wp-admin-theme-color);
+		clip-path: inset(0 0 round $grid-unit-05);
 	}
 }
 
