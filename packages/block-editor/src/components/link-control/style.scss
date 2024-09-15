@@ -72,8 +72,7 @@ $block-editor-link-control-number-of-actions: 1;
 		color: $gray-900;
 	}
 
-	input[type="text"]
-	{
+	input[type="text"] {
 		@include input-control;
 		display: block;
 		border: $border-width solid $gray-600;
@@ -88,9 +87,8 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 	}
 	//Specificity override of URL input defaults
-	.components-input-control input[type="text"].components-input-control__input
-	{
-		border:none;
+	.components-input-control input[type="text"].components-input-control__input {
+		border: none;
 		width: 100%;
 	}
 }
