@@ -10,4 +10,4 @@ jobs:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-            - uses: gradle/wrapper-validation-action@v3
+            - uses: gradle/actions/wrapper-validation@v4
