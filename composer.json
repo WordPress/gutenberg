@@ -30,7 +30,7 @@
 		"wp-coding-standards/wpcs": "^3.0",
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"spatie/phpunit-watcher": "^1.23",
-		"yoast/phpunit-polyfills": "^1.0",
+		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev"
 	},
 	"repositories": [
