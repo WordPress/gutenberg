@@ -5,10 +5,10 @@ name: Unit Tests
 on:
     pull_request:
     push:
-        branches:
-            - trunk
-            - 'release/**'
-            - 'wp/**'
+    #        branches:
+    #            - trunk
+    #            - 'release/**'
+    #            - 'wp/**'
     # Allow manually triggering the workflow.
     workflow_dispatch:
 
@@ -23,7 +23,8 @@ jobs:
     unit-js:
         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        #        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
@@ -62,7 +63,8 @@ jobs:
     unit-js-date:
         name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        #        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
@@ -142,9 +144,9 @@ jobs:
         needs: [compute-previous-wordpress-version, build-assets]
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        #        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 php:
                     - '7.2'
@@ -274,7 +276,8 @@ jobs:
         name: PHP coding standards
         runs-on: ubuntu-latest
         timeout-minutes: 20
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        #        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
@@ -344,7 +347,8 @@ jobs:
     mobile-unit-js:
         name: Mobile
         runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        #        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' }}
 
         steps:
             - name: Checkout repository
