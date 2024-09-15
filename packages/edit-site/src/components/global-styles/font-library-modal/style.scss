@@ -94,7 +94,11 @@ $footer-height: 70px;
 .font-library-modal__font-card {
 	border: $border-width solid $gray-200;
 	width: 100%;
-	height: auto;
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756147260
+	height: auto !important;
+
 	padding: $grid-unit-20;
 	margin-top: -1px; /* To collapse the margin with the previous element */
 
