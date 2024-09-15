@@ -2,69 +2,49 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { SearchControl, Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { store as editorStore } from '../../store';
 import BlockManagerCategory from './category';
 
-export default function BlockManager() {
+/**
+ * Provides a list of blocks with checkboxes.
+ *
+ * @param {Object}   props                    Props.
+ * @param {Array}    props.blockTypes         An array of blocks.
+ * @param {Array}    props.selectedBlockTypes An array of selected blocks.
+ * @param {Function} props.onChange           Function to be called when the selected blocks change.
+ */
+export default function BlockManager( {
+	blockTypes,
+	selectedBlockTypes,
+	onChange,
+} ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
-	const { showBlockTypes } = unlock( useDispatch( editorStore ) );
-
-	const {
-		blockTypes,
-		categories,
-		hasBlockSupport,
-		isMatchingSearchTerm,
-		numberOfHiddenBlocks,
-	} = useSelect( ( select ) => {
-		// Some hidden blocks become unregistered
-		// by removing for instance the plugin that registered them, yet
-		// they're still remain as hidden by the user's action.
-		// We consider "hidden", blocks which were hidden and
-		// are still registered.
-		const _blockTypes = select( blocksStore ).getBlockTypes();
-		const hiddenBlockTypes = (
-			select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ?? []
-		).filter( ( hiddenBlock ) => {
-			return _blockTypes.some(
-				( registeredBlock ) => registeredBlock.name === hiddenBlock
-			);
-		} );
-
+	const { categories, isMatchingSearchTerm } = useSelect( ( select ) => {
 		return {
-			blockTypes: _blockTypes,
 			categories: select( blocksStore ).getCategories(),
-			hasBlockSupport: select( blocksStore ).hasBlockSupport,
 			isMatchingSearchTerm: select( blocksStore ).isMatchingSearchTerm,
-			numberOfHiddenBlocks:
-				Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length,
 		};
 	}, [] );
 
-	function enableAllBlockTypes( newBlockTypes ) {
-		const blockNames = newBlockTypes.map( ( { name } ) => name );
-		showBlockTypes( blockNames );
+	function enableAllBlockTypes() {
+		onChange( blockTypes );
 	}
 
-	const filteredBlockTypes = blockTypes.filter(
-		( blockType ) =>
-			hasBlockSupport( blockType, 'inserter', true ) &&
-			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
-			( ! blockType.parent ||
-				blockType.parent.includes( 'core/post-content' ) )
-	);
+	const filteredBlockTypes = blockTypes.filter( ( blockType ) => {
+		return ! search || isMatchingSearchTerm( blockType, search );
+	} );
+
+	const numberOfHiddenBlocks = blockTypes.length - selectedBlockTypes.length;
 
 	// Announce search results on change
 	useEffect( () => {
@@ -96,9 +76,7 @@ export default function BlockManager() {
 					<Button
 						__next40pxDefaultSize
 						variant="link"
-						onClick={ () =>
-							enableAllBlockTypes( filteredBlockTypes )
-						}
+						onClick={ enableAllBlockTypes }
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -131,6 +109,8 @@ export default function BlockManager() {
 							( blockType ) =>
 								blockType.category === category.slug
 						) }
+						selectedBlockTypes={ selectedBlockTypes }
+						onChange={ onChange }
 					/>
 				) ) }
 				<BlockManagerCategory
@@ -138,6 +118,8 @@ export default function BlockManager() {
 					blockTypes={ filteredBlockTypes.filter(
 						( { category } ) => ! category
 					) }
+					selectedBlockTypes={ selectedBlockTypes }
+					onChange={ onChange }
 				/>
 			</div>
 		</div>

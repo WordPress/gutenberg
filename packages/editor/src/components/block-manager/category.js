@@ -1,73 +1,79 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl } from '@wordpress/components';
-import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import BlockTypesChecklist from './checklist';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
-function BlockManagerCategory( { title, blockTypes } ) {
+function BlockManagerCategory( {
+	title,
+	blockTypes,
+	selectedBlockTypes,
+	onChange,
+} ) {
 	const instanceId = useInstanceId( BlockManagerCategory );
-	const { allowedBlockTypes, hiddenBlockTypes } = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
-		const { get } = select( preferencesStore );
-		return {
-			allowedBlockTypes: getEditorSettings().allowedBlockTypes,
-			hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
-		};
-	}, [] );
-	const filteredBlockTypes = useMemo( () => {
-		if ( allowedBlockTypes === true ) {
-			return blockTypes;
-		}
-		return blockTypes.filter( ( { name } ) => {
-			return allowedBlockTypes?.includes( name );
-		} );
-	}, [ allowedBlockTypes, blockTypes ] );
-	const { showBlockTypes, hideBlockTypes } = unlock(
-		useDispatch( editorStore )
-	);
+
 	const toggleVisible = useCallback(
-		( blockName, nextIsChecked ) => {
+		( blockType, nextIsChecked ) => {
 			if ( nextIsChecked ) {
-				showBlockTypes( blockName );
+				onChange( [ ...selectedBlockTypes, blockType ] );
 			} else {
-				hideBlockTypes( blockName );
+				onChange(
+					selectedBlockTypes.filter(
+						( { name } ) => name !== blockType.name
+					)
+				);
 			}
 		},
-		[ showBlockTypes, hideBlockTypes ]
+		[ selectedBlockTypes, onChange ]
 	);
+
 	const toggleAllVisible = useCallback(
 		( nextIsChecked ) => {
-			const blockNames = blockTypes.map( ( { name } ) => name );
 			if ( nextIsChecked ) {
-				showBlockTypes( blockNames );
+				onChange( [
+					...selectedBlockTypes,
+					...blockTypes.filter(
+						( blockType ) =>
+							! selectedBlockTypes.find(
+								( { name } ) => name === blockType.name
+							)
+					),
+				] );
 			} else {
-				hideBlockTypes( blockNames );
+				onChange(
+					selectedBlockTypes.filter(
+						( selectedBlockType ) =>
+							! blockTypes.find(
+								( { name } ) => name === selectedBlockType.name
+							)
+					)
+				);
 			}
 		},
-		[ blockTypes, showBlockTypes, hideBlockTypes ]
+		[ blockTypes, selectedBlockTypes, onChange ]
 	);
 
-	if ( ! filteredBlockTypes.length ) {
+	if ( ! blockTypes.length ) {
 		return null;
 	}
 
-	const checkedBlockNames = filteredBlockTypes
+	const checkedBlockNames = blockTypes
 		.map( ( { name } ) => name )
-		.filter( ( type ) => ! ( hiddenBlockTypes ?? [] ).includes( type ) );
+		.filter( ( type ) =>
+			( selectedBlockTypes ?? [] ).some(
+				( selectedBlockType ) => selectedBlockType.name === type
+			)
+		);
 
 	const titleId = 'editor-block-manager__category-title-' + instanceId;
 
-	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
+	const isAllChecked = checkedBlockNames.length === blockTypes.length;
 	const isIndeterminate = ! isAllChecked && checkedBlockNames.length > 0;
 
 	return (
@@ -85,7 +91,7 @@ function BlockManagerCategory( { title, blockTypes } ) {
 				label={ <span id={ titleId }>{ title }</span> }
 			/>
 			<BlockTypesChecklist
-				blockTypes={ filteredBlockTypes }
+				blockTypes={ blockTypes }
 				value={ checkedBlockNames }
 				onItemChange={ toggleVisible }
 			/>

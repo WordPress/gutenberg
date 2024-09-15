@@ -17,7 +17,7 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 						label={ blockType.title }
 						checked={ value.includes( blockType.name ) }
 						onChange={ ( ...args ) =>
-							onItemChange( blockType.name, ...args )
+							onItemChange( blockType, ...args )
 						}
 					/>
 					<BlockIcon icon={ blockType.icon } />
