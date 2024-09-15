@@ -153,6 +153,7 @@ jobs:
                     - '8.0'
                     - '8.1'
                     - '8.2'
+                    - '8.3'
                 multisite: [false, true]
                 wordpress: [''] # Latest WordPress version.
                 include:
@@ -161,7 +162,7 @@ jobs:
                       wordpress: 'previous major version'
                     - php: '7.4'
                       wordpress: 'previous major version'
-                    - php: '8.2'
+                    - php: '8.3'
                       wordpress: 'previous major version'
 
         env:
