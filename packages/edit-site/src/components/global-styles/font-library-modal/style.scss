@@ -149,7 +149,11 @@ $footer-height: 70px;
 	align-items: center;
 	display: flex;
 	justify-content: center;
-	height: $grid-unit-80 * 4; // 256px
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756155039
+	height: $grid-unit-80 * 4 !important; // 256px
+
 	width: 100%;
 }
 
