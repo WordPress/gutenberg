@@ -72,9 +72,8 @@ $block-editor-link-control-number-of-actions: 1;
 		color: $gray-900;
 	}
 
-	input[type="text"],
-	// Specificity overide of URLInput defaults.
-	&.block-editor-url-input input[type="text"].block-editor-url-input__input {
+	input[type="text"]
+	{
 		@include input-control;
 		display: block;
 		border: $border-width solid $gray-600;
@@ -87,6 +86,12 @@ $block-editor-link-control-number-of-actions: 1;
 		.has-actions & {
 			padding-right: $grid-unit-20;
 		}
+	}
+	//Specificity override of URL input defaults
+	.components-input-control input[type="text"].components-input-control__input
+	{
+		border:none;
+		width: 100%;
 	}
 }
 

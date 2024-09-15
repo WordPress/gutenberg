@@ -12,6 +12,7 @@ import {
 	Notice,
 	TextControl,
 	__experimentalHStack as HStack,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useRef, useState, useEffect } from '@wordpress/element';
@@ -407,17 +408,20 @@ function LinkControl( {
 							// Passing the Button component as a suffix prop
 							suffix={
 								showActions ? undefined : (
-									<Button
-										// TODO: Switch to true (40px size) if possible
-										__next40pxDefaultSize={ false }
-										onClick={
-											isDisabled ? noop : handleSubmit
-										}
-										label={ __( 'Submit' ) }
-										icon={ keyboardReturn }
-										className="block-editor-link-control__search-submit"
-										aria-disabled={ isDisabled }
-									/>
+									<InputControlSuffixWrapper variant="control">
+										<Button
+											// TODO: Switch to true (40px size) if possible
+											__next40pxDefaultSize={ false }
+											onClick={
+												isDisabled ? noop : handleSubmit
+											}
+											label={ __( 'Submit' ) }
+											icon={ keyboardReturn }
+											className="block-editor-link-control__search-submit"
+											aria-disabled={ isDisabled }
+											size="small"
+										/>
+									</InputControlSuffixWrapper>
 								)
 							}
 							props

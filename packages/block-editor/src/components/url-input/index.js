@@ -449,7 +449,6 @@ class URLInput extends Component {
 			id: inputId,
 			value,
 			required: true,
-			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
 			onFocus: this.onFocus,

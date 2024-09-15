@@ -32,10 +32,6 @@ $input-size: 300px;
 	&.is-full-width {
 		width: 100%;
 
-		.block-editor-url-input__input[type="text"] {
-			width: 100%;
-		}
-
 		&__suggestions {
 			width: 100%;
 		}
@@ -47,10 +43,6 @@ $input-size: 300px;
 		top: calc(50% - #{$spinner-size} / 2);
 		right: $grid-unit;
 	}
-}
-
-.block-editor-url-input__input[type="text"] {
-	@include input-control;
 }
 
 // Suggestions
