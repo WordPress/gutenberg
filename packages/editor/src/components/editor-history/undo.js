@@ -21,8 +21,7 @@ function EditorHistoryUndo( props, ref ) {
 	const { undo } = useDispatch( editorStore );
 	return (
 		<Button
-			// TODO: Switch to `true` (40px size) if possible
-			__next40pxDefaultSize={ false }
+			__next40pxDefaultSize
 			{ ...props }
 			ref={ ref }
 			icon={ ! isRTL() ? undoIcon : redoIcon }
