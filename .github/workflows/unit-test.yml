@@ -196,12 +196,6 @@ jobs:
             - name: Override PHP version in composer.json
               run: composer config platform.php ${{ matrix.php }}
 
-            # The spatie/phpunit-watcher package is not compatible with PHP < 7.2.
-            # It must be removed before running the tests.
-            - name: Remove incompatible Composer packages
-              if: ${{ matrix.php < '7.2' }}
-              run: composer remove spatie/phpunit-watcher --dev --no-update
-
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
