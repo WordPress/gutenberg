@@ -23,7 +23,8 @@
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"composer/installers": true
-		}
+		},
+		"lock": false
 	},
 	"require-dev": {
 		"phpcompatibility/phpcompatibility-wp": "^2.1.3",
