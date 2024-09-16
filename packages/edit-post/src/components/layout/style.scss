@@ -7,7 +7,6 @@ $resize-handle-height: $grid-unit-30;
 
 	&:not(details) {
 		padding-top: $resize-handle-height;
-		max-height: 100%;
 	}
 
 	// The component renders as a details element in short viewports.
