@@ -5,6 +5,7 @@
 	"title": "Terms List",
 	"category": "widgets",
 	"description": "Display a list of all terms of a given taxonomy.",
+	"keywords": [ "categories" ],
 	"textdomain": "default",
 	"attributes": {
 		"taxonomy": {
