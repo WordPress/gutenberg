@@ -116,11 +116,6 @@
 		margin: 0;
 	}
 
-	.components-button {
-		position: relative;
-		left: $grid-unit-10;
-	}
-
 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
 		border-bottom-color: $gray-300;
 	}

@@ -1471,6 +1471,10 @@ Undocumented declaration.
 
 Displays the Post Trash Button and Confirm Dialog in the Editor.
 
+_Parameters_
+
+-   _An_ `?{onActionPerformed: Object}`: object containing the onActionPerformed function.
+
 _Returns_
 
 -   `JSX.Element|null`: The rendered PostTrash component.

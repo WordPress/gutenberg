@@ -88,7 +88,9 @@ export default function PostSummary( { onActionPerformed } ) {
 										<SiteDiscussion />
 										<PostFormatPanel />
 									</VStack>
-									<PostTrash />
+									<PostTrash
+										onActionPerformed={ onActionPerformed }
+									/>
 									{ fills }
 								</VStack>
 							) }
