@@ -26,6 +26,10 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
+	"wpScriptModuleExports": {
+		".": "./build-module/index.js",
+		"./debug": "./build-module/debug.js"
+	},
 	"dependencies": {
 		"@preact/signals": "^1.2.2",
 		"preact": "^10.19.3"

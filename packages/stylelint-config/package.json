@@ -28,15 +28,18 @@
 		"LICENSE",
 		"README.md",
 		"index.js",
-		"scss.js"
+		"scss.js",
+		"scss-stylistic.js",
+		"stylistic.js"
 	],
 	"main": "index.js",
 	"dependencies": {
-		"stylelint-config-recommended": "^6.0.0",
-		"stylelint-config-recommended-scss": "^5.0.2"
+		"@stylistic/stylelint-plugin": "^3.0.1",
+		"stylelint-config-recommended": "^14.0.1",
+		"stylelint-config-recommended-scss": "^14.1.0"
 	},
 	"peerDependencies": {
-		"stylelint": "^14.2"
+		"stylelint": "^16.8.2"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",

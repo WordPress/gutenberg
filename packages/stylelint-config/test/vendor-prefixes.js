@@ -1,26 +1,14 @@
 /**
- * External dependencies
- */
-const fs = require( 'fs' ),
-	stylelint = require( 'stylelint' );
-
-/**
  * Internal dependencies
  */
-const config = require( '../' ),
-	validCss = fs.readFileSync(
-		'./packages/stylelint-config/test/vendor-prefixes-valid.css',
-		'utf-8'
-	);
+const utils = require( './utils' );
+const getStylelintResult = utils.getStylelintResult;
 
 describe( 'flags no warnings with valid vendor prefixes css', () => {
 	let result;
 
 	beforeEach( () => {
-		result = stylelint.lint( {
-			code: validCss,
-			config,
-		} );
+		result = getStylelintResult( './vendor-prefixes-valid.css' );
 	} );
 
 	it( 'did not error', () => {

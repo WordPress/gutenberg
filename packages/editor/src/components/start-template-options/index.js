@@ -156,8 +156,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 			>
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ onClose }
 					>
