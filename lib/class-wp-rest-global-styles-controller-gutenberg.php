@@ -59,6 +59,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 							'type'        => 'string',
 						),
 					),
+					'allow_batch'         => $this->allow_batch,
 				),
 			),
 			/*
@@ -93,6 +94,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
 					),
+					'allow_batch'         => $this->allow_batch,
 				),
 			),
 			/*
@@ -246,18 +248,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		return true;
-	}
-
-	/**
-	 * Checks if a global style can be edited.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param WP_Post $post Post object.
-	 * @return bool Whether the post can be edited.
-	 */
-	protected function check_update_permission( $post ) {
-		return current_user_can( 'edit_post', $post->ID );
 	}
 
 	/**
@@ -465,21 +455,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		}
 
 		return $rels;
-	}
-
-	/**
-	 * Overwrites the default protected title format.
-	 *
-	 * By default, WordPress will show password protected posts with a title of
-	 * "Protected: %s", as the REST API communicates the protected status of a post
-	 * in a machine readable format, we remove the "Protected: " prefix.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @return string Protected title format.
-	 */
-	public function protected_title_format() {
-		return '%s';
 	}
 
 	/**
