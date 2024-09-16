@@ -1,10 +1,12 @@
+$resize-handle-height: $grid-unit-30;
+
 .edit-post-meta-boxes-main {
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	background-color: $white;
 	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
 
 	&:not(details) {
-		padding-top: 23px;
+		padding-top: $resize-handle-height;
 		max-height: 100%;
 	}
 
@@ -33,7 +35,7 @@
 	display: flex;
 	// The position is absolute by default inline style of ResizableBox.
 	inset: 0 0 auto 0;
-	height: 23px;
+	height: $resize-handle-height;
 	box-shadow: 0 $border-width $gray-300;
 
 	& > button {
