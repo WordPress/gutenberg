@@ -675,6 +675,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
+		error_log( '-------WP_Theme_JSON_Resolver_Gutenberg::get_style_variations()' );
+		error_log( print_r( $variations, true ) );
+
 		// Add resolved theme asset links.
 		foreach ( $variations as $variation ) {
 			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
