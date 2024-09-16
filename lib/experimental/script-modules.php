@@ -221,7 +221,6 @@ function gutenberg_a11y_script_module_html() {
 			$a11y_module_available = true;
 			break;
 		}
-
 	}
 	if ( ! $a11y_module_available ) {
 		foreach ( array_keys( $get_import_map->invoke( wp_script_modules() )['imports'] ) as $id ) {
