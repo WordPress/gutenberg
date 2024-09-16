@@ -277,7 +277,7 @@ export const { state, actions } = store( 'core/router', {
 					navigation.hasFinished = false;
 				}
 				if ( screenReaderAnnouncement ) {
-					a11yAnnounce( 'loading' );
+					a11ySpeak( 'loading' );
 				}
 			}, 400 );
 
@@ -317,7 +317,7 @@ export const { state, actions } = store( 'core/router', {
 				}
 
 				if ( screenReaderAnnouncement ) {
-					a11yAnnounce( 'loaded' );
+					a11ySpeak( 'loaded' );
 				}
 
 				// Scroll to the anchor if exits in the link.
@@ -366,7 +366,7 @@ export const { state, actions } = store( 'core/router', {
  *
  * @param messageKey The message to be announced by assistive technologies.
  */
-function a11yAnnounce( messageKey: keyof typeof navigationTexts ) {
+function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 	if ( ! hasLoadedNavigationTextsData ) {
 		hasLoadedNavigationTextsData = true;
 		const content = document.getElementById(
