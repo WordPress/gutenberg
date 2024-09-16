@@ -28,6 +28,14 @@ function gutenberg_override_global_styles_endpoint( array $args, string $post_ty
 }
 add_filter( 'register_post_type_args', 'gutenberg_override_global_styles_endpoint', 10, 2 );
 
+/**
+ * Registers the Global Styles REST API routes.
+ */
+function gutenberg_register_global_styles_endpoints() {
+	$global_styles_controller = new WP_REST_Global_Styles_Controller_Gutenberg();
+	$global_styles_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 
 /**
  * Registers the Edit Site Export REST API routes.
