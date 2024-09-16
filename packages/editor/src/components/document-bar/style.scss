@@ -27,7 +27,7 @@
 	}
 
 	&.has-back-button {
-		@media screen and (min-width: #{ ($break-medium) }) and (max-width: $break-large) {
+		@media screen and (min-width: #{ ($break-medium) }) and (max-width: #{ ($break-large) }) {
 			.editor-document-bar__post-type-label {
 				display: none;
 			}
@@ -77,6 +77,10 @@
 	flex: 0;
 	color: $gray-800;
 	padding-left: $grid-unit-05;
+
+	@media screen and (max-width: #{ ($break-small) }) {
+		display: none;
+	}
 }
 
 .editor-document-bar__shortcut {
