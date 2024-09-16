@@ -127,12 +127,12 @@ describe( 'private selectors', () => {
 						name: 'core/example-block',
 						supports: {
 							typography: {
-								__experimentalFontFamily: true,
-								__experimentalFontStyle: true,
-								__experimentalFontWeight: true,
-								__experimentalTextDecoration: true,
-								__experimentalTextTransform: true,
-								__experimentalLetterSpacing: true,
+								fontFamily: true,
+								fontStyle: true,
+								fontWeight: true,
+								textDecoration: true,
+								textTransform: true,
+								letterSpacing: true,
 								fontSize: true,
 								lineHeight: true,
 							},
