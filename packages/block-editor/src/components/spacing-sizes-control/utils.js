@@ -363,17 +363,34 @@ export function getInitialView( values = {}, sides ) {
 		top === bottom && left === right && ( !! top || !! left );
 	const hasNoValuesAndBalancedSides =
 		! sideValues.length && hasBalancedSidesSupport( sides );
-
-	// Only single side supported and no value defined.
-	if ( sides?.length === 1 ) {
-		return sides[ 0 ];
-	}
+	const hasOnlyAxialSides =
+		sides?.includes( 'horizontal' ) &&
+		sides?.includes( 'vertical' ) &&
+		sides?.length === 2;
 
 	if (
 		hasAxisSupport( sides ) &&
 		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
 	) {
 		return VIEWS.axial;
+	}
+
+	// Only axial sides are supported and single value defined.
+	// - Ensure the side returned is the first side that has a value.
+	if ( hasOnlyAxialSides && sideValues.length === 1 ) {
+		let side;
+
+		Object.entries( values ).some( ( [ key, value ] ) => {
+			side = key;
+			return value !== undefined;
+		} );
+
+		return side;
+	}
+
+	// Only single side supported and no value defined.
+	if ( sides?.length === 1 && ! sideValues.length ) {
+		return sides[ 0 ];
 	}
 
 	// Default to the Custom (separated sides) view.

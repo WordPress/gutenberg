@@ -378,41 +378,34 @@ describe( 'getInitialView', () => {
 				VIEWS.custom
 			);
 		} );
+		it( 'should return custom view even if only single side supported', () => {
+			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
+				VIEWS.custom
+			);
+			expect( getInitialView( { right: '1em' }, [ 'right' ] ) ).toBe(
+				VIEWS.custom
+			);
+			expect( getInitialView( { bottom: '1em' }, [ 'bottom' ] ) ).toBe(
+				VIEWS.custom
+			);
+			expect( getInitialView( { left: '1em' }, [ 'left' ] ) ).toBe(
+				VIEWS.custom
+			);
+		} );
 	} );
 
 	describe( 'Single side view', () => {
-		it( 'should return single side when only single side supported', () => {
-			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
-				VIEWS.top
-			);
-		} );
-
 		it( 'should return single side when only single side supported and no value defined', () => {
 			expect( getInitialView( {}, [ 'top' ] ) ).toBe( VIEWS.top );
 		} );
 
-		it( 'should return single side when only single side supported and all values defined', () => {
+		it( 'should return single side when only single side supported and has only axial sides', () => {
 			expect(
-				getInitialView(
-					{ top: '1em', right: '2em', bottom: '1em', left: '2em' },
-					[ 'top' ]
-				)
+				getInitialView( { top: '1em' }, [ 'horizontal', 'vertical' ] )
 			).toBe( VIEWS.top );
-		} );
-
-		it( 'should return single side view when only one side is supported', () => {
-			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
-				VIEWS.top
-			);
-			expect( getInitialView( { right: '1em' }, [ 'right' ] ) ).toBe(
-				VIEWS.right
-			);
-			expect( getInitialView( { bottom: '1em' }, [ 'bottom' ] ) ).toBe(
-				VIEWS.bottom
-			);
-			expect( getInitialView( { left: '1em' }, [ 'left' ] ) ).toBe(
-				VIEWS.left
-			);
+			expect(
+				getInitialView( { left: '4em' }, [ 'horizontal', 'vertical' ] )
+			).toBe( VIEWS.left );
 		} );
 	} );
 } );
