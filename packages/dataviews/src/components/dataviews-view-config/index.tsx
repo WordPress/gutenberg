@@ -554,7 +554,6 @@ function _DataViewsViewConfig( {
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
 			<Dropdown
 				popoverProps={ { placement: 'bottom-end', offset: 9 } }
-				contentClassName="dataviews-view-config"
 				renderToggle={ ( { onToggle } ) => {
 					return (
 						<Button
