@@ -44,18 +44,17 @@
 		border: none;
 		outline: none;
 		background-color: $gray-300;
-		// The visible width is the first unit, the rest is clipped when not hovered/focused.
-		width: $grid-unit-80 + $grid-unit-10 * 2;
+		width: $grid-unit-80;
 		height: $grid-unit-05;
-		clip-path: inset(0 $grid-unit-10 round $grid-unit-05);
-		transition: clip-path 0.3s ease-out;
+		border-radius: $radius-small;
+		transition: width 0.3s ease-out;
 		@include reduce-motion("transition");
 	}
 
 	&:hover > button,
 	> button:focus {
 		background-color: var(--wp-admin-theme-color);
-		clip-path: inset(0 0 round $grid-unit-05);
+		width: $grid-unit-80 + $grid-unit-20;
 	}
 }
 
