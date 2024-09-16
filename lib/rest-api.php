@@ -19,23 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array Array of arguments for registering a post type.
  */
-function gutenberg_override_global_styles_endpoint( array $args, string $post_type ): array {
-	if ( 'wp_global_styles' === $post_type ) {
-		$args['rest_controller_class'] = 'WP_REST_Global_Styles_Controller_Gutenberg';
-	}
+function gutenberg_override_global_styles_endpoint( array $args ): array {
+	$args['rest_controller_class'] = 'WP_REST_Global_Styles_Controller_Gutenberg';
+	$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Global_Styles_Revisions_Controller_6_6';
 
 	return $args;
 }
-add_filter( 'register_post_type_args', 'gutenberg_override_global_styles_endpoint', 10, 2 );
-
-/**
- * Registers the Global Styles REST API routes.
- */
-function gutenberg_register_global_styles_endpoints() {
-	$global_styles_controller = new WP_REST_Global_Styles_Controller_Gutenberg();
-	$global_styles_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
+add_filter( 'register_wp_global_styles_post_type_args', 'gutenberg_override_global_styles_endpoint', 10, 2 );
 
 /**
  * Registers the Edit Site Export REST API routes.
