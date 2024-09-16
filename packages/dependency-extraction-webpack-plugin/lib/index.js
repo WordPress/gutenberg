@@ -352,12 +352,25 @@ class DependencyExtractionWebpackPlugin {
 	/**
 	 * Can we trace a line of static dependencies from an entry to a module
 	 *
-	 * @param {webpack.Compilation}       compilation
-	 * @param {webpack.DependenciesBlock} block
+	 * @param {webpack.Compilation}            compilation
+	 * @param {webpack.DependenciesBlock}      block
+	 * @param {Set<webpack.DependenciesBlock>} visited
 	 *
 	 * @return {boolean} True if there is a static import path to the root
 	 */
-	static hasStaticDependencyPathToRoot( compilation, block ) {
+	static hasStaticDependencyPathToRoot(
+		compilation,
+		block,
+		visited = new Set()
+	) {
+		// If we've already visited this block, we're in a cycle
+		if ( visited.has( block ) ) {
+			return false;
+		}
+
+		// Add the current block to the visited set
+		visited.add( block );
+
 		const incomingConnections = [
 			...compilation.moduleGraph.getIncomingConnections( block ),
 		].filter(
@@ -369,8 +382,9 @@ class DependencyExtractionWebpackPlugin {
 		);
 
 		// If we don't have non-entry, non-library incoming connections,
-		// we've reached a root of
+		// we've reached a root
 		if ( ! incomingConnections.length ) {
+			visited.delete( block );
 			return true;
 		}
 
@@ -389,16 +403,24 @@ class DependencyExtractionWebpackPlugin {
 
 		// All the dependencies were Async, the module was reached via a dynamic import
 		if ( ! staticDependentModules.length ) {
+			visited.delete( block );
 			return false;
 		}
 
 		// Continue to explore any static dependencies
-		return staticDependentModules.some( ( parentStaticDependentModule ) =>
-			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
-				compilation,
-				parentStaticDependentModule
-			)
+		const result = staticDependentModules.some(
+			( parentStaticDependentModule ) =>
+				DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+					compilation,
+					parentStaticDependentModule,
+					visited
+				)
 		);
+
+		// Remove the current block from the visited set before returning
+		visited.delete( block );
+
+		return result;
 	}
 }
 

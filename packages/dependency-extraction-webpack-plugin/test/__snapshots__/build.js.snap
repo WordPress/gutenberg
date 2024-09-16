@@ -55,6 +55,21 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-depe
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-external-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '59584257c15ebb59974d', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-external-deps\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "import",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => '4f59b7847b70a07b2710', 'type' => 'module');
 "
@@ -394,12 +409,12 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dependency-g
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '455f3cab924853d41b8b');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => 'ac0e2f1bcd3a6a0e7aff');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-deps\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -412,12 +427,12 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-deps\` shoul
 ]
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('wp-interactivity'), 'version' => 'ac0e2f1bcd3a6a0e7aff');
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-external-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '455f3cab924853d41b8b');
 "
 `;
 
-exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-external-deps\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
