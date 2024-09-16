@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   Remove -webkit-clip-path prefixed CSS property.
+
 ## 4.7.0 (2024-09-05)
 
 ## 4.6.0 (2024-08-21)
