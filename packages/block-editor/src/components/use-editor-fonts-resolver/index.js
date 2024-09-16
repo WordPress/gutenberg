@@ -13,12 +13,12 @@ import { store as editorStore } from '../../store';
 function useEditorFontsResolver( ref ) {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
-	const { currentTheme, fontFamilies = [] } = useSelect( ( select ) => {
+	const { currentTheme = {}, fontFamilies = [] } = useSelect( ( select ) => {
 		return {
 			currentTheme:
 				// Disable Reason: Using 'core' as string to avoid circular dependency importing from @wordpress/core-data.
 				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				select( 'core' ).getCurrentTheme(),
+				select( 'core' )?.getCurrentTheme(),
 			fontFamilies:
 				select( editorStore ).getSettings()?.__experimentalFeatures
 					?.typography?.fontFamilies,
