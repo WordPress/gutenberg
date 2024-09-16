@@ -90,6 +90,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			pages,
+			format,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -163,6 +164,10 @@ export default function PostTemplateEdit( {
 			if ( parents?.length ) {
 				query.parent = parents;
 			}
+			if ( format?.length ) {
+				query.format = format;
+			}
+
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
@@ -205,6 +210,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			format,
 			restQueryArgs,
 			previewPostType,
 		]

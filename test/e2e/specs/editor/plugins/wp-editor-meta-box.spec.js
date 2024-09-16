@@ -20,7 +20,7 @@ test.describe( 'WP Editor Meta Boxes', () => {
 		await admin.createNewPost();
 
 		// Add title to enable valid non-empty post save.
-		await page
+		await editor.canvas
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
