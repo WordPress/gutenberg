@@ -38,6 +38,7 @@ import FontSize from './font-sizes/font-size';
 import FontSizes from './font-sizes/font-sizes';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
@@ -370,6 +371,10 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/revisions">
 				<ScreenRevisions />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/background">
+				<ScreenBackground />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (

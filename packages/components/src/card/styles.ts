@@ -12,7 +12,7 @@ import { COLORS, CONFIG } from '../utils';
 // (as opposed to the `border` property), the value of the border radius needs
 // to be adjusted by removing 1px (this is because the `box-shadow` renders
 // as an "outer radius").
-const adjustedBorderRadius = `calc(${ CONFIG.cardBorderRadius } - 1px)`;
+const adjustedBorderRadius = `calc(${ CONFIG.radiusLarge } - 1px)`;
 
 export const Card = css`
 	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
