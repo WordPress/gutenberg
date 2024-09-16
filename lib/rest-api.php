@@ -22,6 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_override_global_styles_endpoint( array $args ): array {
 	$args['rest_controller_class']           = 'WP_REST_Global_Styles_Controller_Gutenberg';
 	$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Global_Styles_Revisions_Controller_6_6';
+	$args['late_route_registration']         = true;
+	$args['show_in_rest']                    = true;
+	$args['rest_base']                       = 'global-styles';
 
 	return $args;
 }

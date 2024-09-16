@@ -60,7 +60,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						),
 					),
 				),
-			)
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 
 		// List themes global styles.
@@ -89,7 +94,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						),
 					),
 				),
-			)
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 
 		// Lists/updates a single global style variation based on the given id.
@@ -117,7 +127,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 				),
 				'schema'      => array( $this, 'get_public_item_schema' ),
 				'allow_batch' => $this->allow_batch,
-			)
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 	}
 
@@ -674,9 +689,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		gutenberg_register_block_style_variations_from_theme_json_partials( $partials );
 
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
-
-		error_log( '-------WP_Theme_JSON_Resolver_Gutenberg::get_style_variations()' );
-		error_log( print_r( $variations, true ) );
 
 		// Add resolved theme asset links.
 		foreach ( $variations as $variation ) {
