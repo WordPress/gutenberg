@@ -46,6 +46,7 @@ import {
 	DEFAULT_BACKGROUND_COLOR,
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -212,7 +213,7 @@ function CoverEdit( {
 				mediaAttributes.sizeSlug = imageDefaultSize;
 				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ]?.url;
 			} else {
-				mediaAttributes.sizeSlug = 'full';
+				mediaAttributes.sizeSlug = DEFAULT_MEDIA_SIZE_SLUG;
 			}
 		}
 

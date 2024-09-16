@@ -35,6 +35,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
 
 const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -107,7 +108,6 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
-		sizeSlug,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -116,6 +116,8 @@ export default function CoverInspectorControls( {
 		url,
 		overlayColor,
 	} = currentSettings;
+
+	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
 	const { getSettings } = useSelect( blockEditorStore );
