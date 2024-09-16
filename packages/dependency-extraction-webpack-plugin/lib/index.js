@@ -349,6 +349,9 @@ class DependencyExtractionWebpackPlugin {
 		}
 	}
 
+	static #staticDepsCurrent = new WeakSet();
+	static #staticDepsCache = new WeakMap();
+
 	/**
 	 * Can we trace a line of static dependencies from an entry to a module
 	 *
@@ -358,6 +361,20 @@ class DependencyExtractionWebpackPlugin {
 	 * @return {boolean} True if there is a static import path to the root
 	 */
 	static hasStaticDependencyPathToRoot( compilation, block ) {
+		if ( DependencyExtractionWebpackPlugin.#staticDepsCache.has( block ) ) {
+			return DependencyExtractionWebpackPlugin.#staticDepsCache.get(
+				block
+			);
+		}
+
+		if (
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.has( block )
+		) {
+			return false;
+		}
+
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.add( block );
+
 		const incomingConnections = [
 			...compilation.moduleGraph.getIncomingConnections( block ),
 		].filter(
@@ -371,6 +388,13 @@ class DependencyExtractionWebpackPlugin {
 		// If we don't have non-entry, non-library incoming connections,
 		// we've reached a root of
 		if ( ! incomingConnections.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				true
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
 			return true;
 		}
 
@@ -389,16 +413,28 @@ class DependencyExtractionWebpackPlugin {
 
 		// All the dependencies were Async, the module was reached via a dynamic import
 		if ( ! staticDependentModules.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				false
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
 			return false;
 		}
 
 		// Continue to explore any static dependencies
-		return staticDependentModules.some( ( parentStaticDependentModule ) =>
-			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
-				compilation,
-				parentStaticDependentModule
-			)
+		const result = staticDependentModules.some(
+			( parentStaticDependentModule ) =>
+				DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+					compilation,
+					parentStaticDependentModule
+				)
 		);
+
+		DependencyExtractionWebpackPlugin.#staticDepsCache.set( block, result );
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete( block );
+		return result;
 	}
 }
 
