@@ -34,22 +34,19 @@ export default function InserterSidebar() {
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
 
-		const {
-			getBlockRootClientId,
-			__unstableGetEditorMode,
-			getSectionRootClientId,
-		} = unlock( select( blockEditorStore ) );
+		const { getBlockRootClientId, getSectionRootClientId } = unlock(
+			select( blockEditorStore )
+		);
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const getBlockSectionRootClientId = () => {
-			if ( __unstableGetEditorMode() === 'zoom-out' ) {
-				const sectionRootClientId = getSectionRootClientId();
+			const sectionRootClientId = getSectionRootClientId();
 
-				if ( sectionRootClientId ) {
-					return sectionRootClientId;
-				}
+			if ( sectionRootClientId ) {
+				return sectionRootClientId;
 			}
+
 			return getBlockRootClientId();
 		};
 		return {
