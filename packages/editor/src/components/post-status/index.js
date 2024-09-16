@@ -173,6 +173,7 @@ export default function PostStatus() {
 					focusOnMount
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
+							className="editor-post-status__toggle"
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }

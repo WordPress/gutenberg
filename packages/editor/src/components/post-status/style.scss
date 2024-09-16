@@ -4,6 +4,11 @@
 	&.is-read-only {
 		padding: 6px 12px;
 	}
+
+	.editor-post-status__toggle.editor-post-status__toggle {
+		padding-top: $grid-unit-05;
+		padding-bottom: $grid-unit-05;
+	}
 }
 
 .editor-change-status__password-fieldset,
