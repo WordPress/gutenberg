@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { getAuthority } from '@wordpress/url';
 
 /**
@@ -38,11 +38,12 @@ export default function EmbedPreview( {
 } ) {
 	const [ interactive, setInteractive ] = useState( false );
 
-	useEffect( () => {
-		if ( isSelected && interactive ) {
-			setInteractive( false );
-		}
-	}, [ isSelected ] );
+	if ( ! isSelected && interactive ) {
+		// We only want to change this when the block is not selected, because changing it when
+		// the block becomes selected makes the overlap disappear too early. Hiding the overlay
+		// happens on mouseup when the overlay is clicked.
+		setInteractive( false );
+	}
 
 	const hideOverlay = () => {
 		// This is called onMouseUp on the overlay. We can't respond to the `isSelected` prop
