@@ -27,6 +27,7 @@
 -   `ResizeableBox`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
 -   `Snackbar`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
 -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
 
 ### Bug Fixes
 
@@ -37,6 +38,7 @@
 -   `Tabs`: improved performance of the indicator animation ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
+-   `BoxControl`: Fix critical error when null value is passed ([#65287](https://github.com/WordPress/gutenberg/pull/65287)).
 
 ## 28.7.0 (2024-09-05)
 
