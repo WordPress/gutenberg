@@ -541,6 +541,8 @@ function DataviewsViewConfigContent( {
 	);
 }
 
+const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
+
 function _DataViewsViewConfig( {
 	density,
 	setDensity,
@@ -554,7 +556,7 @@ function _DataViewsViewConfig( {
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
 			<Dropdown
-				popoverProps={ { placement: 'bottom-end', offset: 9 } }
+				popoverProps={ DATAVIEWS_CONFIG_POPOVER_PROPS }
 				renderToggle={ ( { onToggle } ) => {
 					return (
 						<Button
