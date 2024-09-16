@@ -88,6 +88,14 @@ export const registerPostTypeActions =
 				kind: 'postType',
 				name: postType,
 			} );
+
+		const canManageOptions = await registry
+			.resolveSelect( coreStore )
+			.canUser( 'update', {
+				kind: 'root',
+				name: 'site',
+			} );
+
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
@@ -118,7 +126,9 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			postTypeConfig.slug === 'page' ? setAsHomepage : undefined,
+			canManageOptions && postTypeConfig.slug === 'page'
+				? setAsHomepage
+				: undefined,
 			restorePost,
 			resetPost,
 			deletePost,

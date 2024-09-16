@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { select, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -30,8 +30,17 @@ const renamePost: Action< PostWithPermissions > = {
 			return false;
 		}
 
-		// TODO: add user permissions check.
-		return post.type === PAGE_POST_TYPE;
+		if ( post.type !== PAGE_POST_TYPE ) {
+			return false;
+		}
+
+		// @ts-ignore
+		const { page_on_front: pageOnFront } = select(
+			coreStore
+			// @ts-ignore
+		).getEntityRecord( 'root', 'site' );
+
+		return pageOnFront !== post.id;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -44,11 +53,13 @@ const renamePost: Action< PostWithPermissions > = {
 		async function onSetAsHomepage( event: React.FormEvent ) {
 			event.preventDefault();
 			try {
+				// @ts-ignore
 				await editEntityRecord( 'root', 'site', undefined, {
 					page_on_front: item.id,
 				} );
 				closeModal?.();
 				// Persist edited entity.
+				// @ts-ignore
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
 					page_on_front: item.id,
 				} );
