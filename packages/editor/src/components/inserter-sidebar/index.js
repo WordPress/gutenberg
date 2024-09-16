@@ -34,21 +34,17 @@ export default function InserterSidebar() {
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
 
-		const { getBlockRootClientId, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+		const { getSectionRootClientId } = unlock( select( blockEditorStore ) );
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const getBlockSectionRootClientId = () => {
 			const sectionRootClientId = getSectionRootClientId();
 
-			if ( sectionRootClientId ) {
-				return sectionRootClientId;
-			}
-
-			return getBlockRootClientId();
+			// '' is equiavlent to calling getBlockRootClientId() with no arguments.
+			return sectionRootClientId ?? '';
 		};
+
 		return {
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			insertionPoint: getInsertionPoint(),
