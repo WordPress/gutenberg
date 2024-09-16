@@ -365,12 +365,8 @@ export const { state, actions } = store( 'core/router', {
  * the package on demand and should be used instead of calling `ally.speak` direacly.
  *
  * @param messageKey The message to be announced by assistive technologies.
- * @param ariaLive   The politeness level for aria-live; default: 'polite'.
  */
-function a11yAnnounce(
-	messageKey: 'loading' | 'loaded',
-	ariaLive?: 'polite' | 'assertive'
-) {
+function a11yAnnounce( messageKey: 'loading' | 'loaded' ) {
 	if ( ! navigationTexts.loadedFromServer ) {
 		navigationTexts.loadedFromServer = true;
 		const content = document.getElementById(
@@ -393,7 +389,7 @@ function a11yAnnounce(
 
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		import( '@wordpress/a11y' ).then(
-			( { speak } ) => speak( message, ariaLive ),
+			( { speak } ) => speak( message ),
 			// Ignore failures to load the a11y module.
 			() => {}
 		);
