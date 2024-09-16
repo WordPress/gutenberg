@@ -366,7 +366,7 @@ export const { state, actions } = store( 'core/router', {
  *
  * @param messageKey The message to be announced by assistive technologies.
  */
-function a11yAnnounce( messageKey: 'loading' | 'loaded' ) {
+function a11yAnnounce( messageKey: keyof typeof navigationTexts ) {
 	if ( ! hasLoadedNavigationTextsData ) {
 		hasLoadedNavigationTextsData = true;
 		const content = document.getElementById(
