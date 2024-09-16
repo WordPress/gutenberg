@@ -9,7 +9,7 @@
 	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion-group" ],
-	"allowedBlocks": [ "core/accordion-trigger", "core/accordion-content" ],
+	"allowedBlocks": [ "core/accordion-header", "core/accordion-panel" ],
 	"supports": {
 		"align": [ "wide", "full" ],
 		"color": {

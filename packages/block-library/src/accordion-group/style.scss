@@ -39,13 +39,13 @@
 	width: 100%;
 }
 
-.is-layout-flow > .wp-block-accordion-content,
-.wp-block-accordion-content {
+.is-layout-flow > .wp-block-accordion-panel,
+.wp-block-accordion-panel {
 	overflow: hidden;
 	margin: 0;
 }
 
-.accordion-content__wrapper {
+.accordion-panel__wrapper {
 	padding-bottom: var(--wp--preset--spacing--20, 1em);
 }
 
@@ -54,7 +54,7 @@
 	background-color: unset;
 }
 
-.wp-block-accordion-trigger.icon-position-left .accordion-item__toggle {
+.wp-block-accordion-header.icon-position-left .accordion-item__toggle {
 	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
 	flex-direction: row-reverse;
 }

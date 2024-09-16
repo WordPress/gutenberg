@@ -1,29 +1,28 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/accordion-trigger",
+	"name": "core/accordion-panel",
 	"version": "0.1.0",
-	"title": "Trigger",
+	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Accordion item trigger.",
+	"description": "Accordion Panel",
 	"example": {},
 	"__experimental": true,
 	"parent": [ "core/accordion-item" ],
 	"supports": {
-		"anchor": true,
 		"color": {
 			"background": true,
 			"gradient": true
 		},
-		"align": false,
 		"border": true,
 		"interactivity": true,
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],
+			"blockGap": true,
 			"__experimentalDefaultControls": {
 				"padding": true,
-				"margin": true
+				"blockGap": true
 			}
 		},
 		"__experimentalBorder": {
@@ -39,8 +38,8 @@
 			}
 		},
 		"typography": {
-			"textAlign": true,
 			"fontSize": true,
+			"lineHeight": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -48,50 +47,28 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontFamily": true
+				"fontSize": true
 			}
 		},
 		"shadow": true,
 		"layout": true
 	},
 	"attributes": {
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ],
+			"default": false
+		},
 		"openByDefault": {
 			"type": "boolean",
 			"default": false
 		},
-		"title": {
-			"type": "rich-text",
-			"source": "rich-text",
-			"selector": "span"
-		},
-		"level": {
-			"type": "number",
-			"default": 3
-		},
-		"levelOptions": {
-			"type": "array"
-		},
-		"textAlignment": {
-			"type": "string",
-			"default": "left"
-		},
-		"icon": {
-			"type": [ "string", "boolean" ],
-			"enum": [
-				"plus",
-				"chevron",
-				"chevronRight",
-				"caret",
-				"circlePlus",
-				false
-			],
-			"default": "plus"
-		},
-		"iconPosition": {
-			"type": "string",
-			"enum": [ "left", "right" ],
-			"default": "right"
+		"isSelected": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"textdomain": "default"

@@ -14,8 +14,8 @@ function gutenberg_reregister_core_block_types() {
 	$blocks_dirs = array(
 		__DIR__ . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
-				'accordion-trigger',
-				'accordion-content',
+				'accordion-header',
+				'accordion-panel',
 				'audio',
 				'button',
 				'buttons',

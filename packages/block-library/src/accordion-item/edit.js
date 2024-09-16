@@ -66,9 +66,9 @@ export default function Edit( {
 		},
 		{
 			template: [
-				[ 'core/accordion-trigger', {} ],
+				[ 'core/accordion-header', {} ],
 				[
-					'core/accordion-content',
+					'core/accordion-panel',
 					{
 						isSelected: true,
 						openByDefault,
