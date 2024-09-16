@@ -209,8 +209,8 @@ const isValidEvent = ( event: MouseEvent ) =>
 // Variable to store the current navigation.
 let navigatingTo = '';
 
+let hasLoadedNavigationTextsData = false;
 const navigationTexts = {
-	loadedFromServer: false,
 	loading: 'Loading page, please wait.',
 	loaded: 'Page Loaded.',
 };
@@ -367,8 +367,8 @@ export const { state, actions } = store( 'core/router', {
  * @param messageKey The message to be announced by assistive technologies.
  */
 function a11yAnnounce( messageKey: 'loading' | 'loaded' ) {
-	if ( ! navigationTexts.loadedFromServer ) {
-		navigationTexts.loadedFromServer = true;
+	if ( ! hasLoadedNavigationTextsData ) {
+		hasLoadedNavigationTextsData = true;
 		const content = document.getElementById(
 			'wp-script-module-data-@wordpress/interactivity-router'
 		)?.textContent;
