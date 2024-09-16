@@ -104,8 +104,8 @@ export default function QueryInspectorControls( props ) {
 			updateQuery.format = [];
 		}
 
-		// All queries are inherited when outside a template, so we
-		// need to reset the inherit value if not in a template.
+		// Queries are not inherited when outside a template, so we
+		// need to reset the `inherit` value if not in a template.
 		if ( ! showDefaultControl ) {
 			updateQuery.inherit = false;
 		}
