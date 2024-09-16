@@ -16,10 +16,7 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
-	const getSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings
-	);
-
+	const { getSettings } = useSelect( blockEditorStore );
 	const { __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -51,6 +48,6 @@ export function useZoomOutModeExit( { editorMode } ) {
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
-		[ editorMode, __unstableSetEditorMode ]
+		[ editorMode, getSettings, __unstableSetEditorMode ]
 	);
 }
