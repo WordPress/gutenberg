@@ -20,6 +20,7 @@ import {
 	exportPattern,
 	permanentlyDeletePost,
 	restorePost,
+	setAsHomepage,
 	trashPost,
 	renamePost,
 	resetPost,
@@ -117,6 +118,7 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
+			postTypeConfig.slug === 'page' ? setAsHomepage : undefined,
 			restorePost,
 			resetPost,
 			deletePost,
