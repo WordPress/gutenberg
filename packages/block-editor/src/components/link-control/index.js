@@ -408,8 +408,7 @@ function LinkControl( {
 						{ ! showActions && (
 							<div className="block-editor-link-control__search-enter">
 								<Button
-									// TODO: Switch to `true` (40px size) if possible
-									__next40pxDefaultSize={ false }
+									__next40pxDefaultSize
 									onClick={ isDisabled ? noop : handleSubmit }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
@@ -470,16 +469,14 @@ function LinkControl( {
 					className="block-editor-link-control__search-actions"
 				>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ handleCancel }
 					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ isDisabled ? noop : handleSubmit }
 						className="block-editor-link-control__search-submit"
