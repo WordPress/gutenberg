@@ -16,6 +16,7 @@ export { default as arrowUp } from './library/arrow-up';
 export { default as atSymbol } from './library/at-symbol';
 export { default as aspectRatio } from './library/aspect-ratio';
 export { default as audio } from './library/audio';
+export { default as background } from './library/background';
 export { default as backup } from './library/backup';
 export { default as blockDefault } from './library/block-default';
 export { default as blockMeta } from './library/block-meta';
