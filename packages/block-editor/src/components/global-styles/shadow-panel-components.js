@@ -87,7 +87,7 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 				'is-active': isActive,
 			} ) }
 			render={
-				<Button
+				<button
 					__next40pxDefaultSize
 					className={ clsx(
 						'block-editor-global-styles__shadow-indicator',
@@ -98,10 +98,11 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 					onClick={ onSelect }
 					label={ label }
 					style={ { boxShadow: shadow } }
-					showTooltip
+					title={ label }
+					aria-label={ label }
 				>
 					{ isActive && <Icon icon={ check } /> }
-				</Button>
+				</button>
 			}
 		/>
 	);
