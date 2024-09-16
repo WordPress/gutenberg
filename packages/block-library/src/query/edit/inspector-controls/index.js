@@ -107,8 +107,8 @@ export default function QueryInspectorControls( props ) {
 
 		if ( ! yearRegex.test( value ) ) {
 			setQuery( {
-				after: undefined,
-				before: undefined,
+				after: '',
+				before: '',
 			} );
 			return;
 		}
