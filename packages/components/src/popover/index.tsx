@@ -287,11 +287,44 @@ const UnforwardedPopover = (
 				? undefined
 				: normalizedPlacementFromProps,
 		middleware,
-		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
-			autoUpdate( referenceParam, floatingParam, updateParam, {
-				layoutShift: false,
-				animationFrame: true,
-			} ),
+		whileElementsMounted: (
+			referenceParam,
+			floatingParam,
+			updateParam
+		) => {
+			const cleanupAutoUpdate = autoUpdate(
+				referenceParam,
+				floatingParam,
+				updateParam,
+				{
+					layoutShift: false,
+					animationFrame: true,
+				}
+			);
+
+			const targetElement = document.querySelector(
+				'.interface-interface-skeleton__body'
+			);
+
+			if ( targetElement ) {
+				const mutationObserver = new MutationObserver( () => {
+					updateParam();
+				} );
+
+				mutationObserver.observe( targetElement, {
+					childList: true,
+					subtree: true,
+					attributes: true,
+				} );
+
+				return () => {
+					cleanupAutoUpdate();
+					mutationObserver.disconnect();
+				};
+			}
+
+			return cleanupAutoUpdate;
+		},
 	} );
 
 	const arrowCallbackRef = useCallback(
