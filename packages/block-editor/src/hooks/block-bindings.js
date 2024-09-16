@@ -31,6 +31,8 @@ import { store as blockEditorStore } from '../store';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
+const EMPTY_OBJECT = {};
+
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -187,14 +189,14 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// `useSelect` is used purposely here to ensure `getFieldsList`
-	// is updated whenever there are attribute updates.
+	// is updated whenever there are updates in block context.
 	// `source.getFieldsList` may also call a selector via `registry.select`.
+	const _fieldsList = {};
 	const { fieldsList, canUpdateBlockBindings } = useSelect(
 		( select ) => {
 			if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
-				return {};
+				return EMPTY_OBJECT;
 			}
-			const _fieldsList = {};
 			const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 			const registeredSources = getBlockBindingsSources();
 			Object.entries( registeredSources ).forEach(
@@ -219,7 +221,10 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 				}
 			);
 			return {
-				fieldsList: _fieldsList,
+				fieldsList:
+					Object.values( _fieldsList ).length > 0
+						? _fieldsList
+						: EMPTY_OBJECT,
 				canUpdateBlockBindings:
 					select( blockEditorStore ).getSettings()
 						.canUpdateBlockBindings,
