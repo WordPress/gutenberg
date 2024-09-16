@@ -44,15 +44,6 @@ function RootMenu() {
 	return (
 		<>
 			<ItemGroup>
-				{ hasBackgroundPanel && (
-					<NavigationButtonAsItem
-						icon={ background }
-						path="/background"
-						aria-label={ __( 'Background styles' ) }
-					>
-						{ __( 'Background' ) }
-					</NavigationButtonAsItem>
-				) }
 				{ hasTypographyPanel && (
 					<NavigationButtonAsItem
 						icon={ typography }
@@ -69,6 +60,15 @@ function RootMenu() {
 						aria-label={ __( 'Colors styles' ) }
 					>
 						{ __( 'Colors' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasBackgroundPanel && (
+					<NavigationButtonAsItem
+						icon={ background }
+						path="/background"
+						aria-label={ __( 'Background styles' ) }
+					>
+						{ __( 'Background' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasShadowPanel && (

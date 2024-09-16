@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __experimentalText as Text } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,9 +23,11 @@ function ScreenBackground() {
 		<>
 			<ScreenHeader
 				title={ __( 'Background' ) }
-				description={ __(
-					'Edit styles that apply to the site’s background.'
-				) }
+				description={
+					<Text>
+						{ __( 'Set styles for the site’s background.' ) }
+					</Text>
+				}
 			/>
 			{ hasBackgroundPanel && <BackgroundPanel /> }
 		</>
