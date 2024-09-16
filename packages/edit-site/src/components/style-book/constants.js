@@ -5,20 +5,23 @@ import { __ } from '@wordpress/i18n';
 
 /*
   category: slug/identifier for the category
+  subCategories: array of subcategories
   label: display name for the category
-  blocks: block to display in the category in addition to any registered blocks in that category.
+  include: block to display in the category in addition to any registered blocks in that category.
+  exclude: block to exclude from the category.
   onClick: function to call when the category's blocks are clicked. Overrides the default behavior.
  */
 export const STYLE_BOOK_CATEGORIES = [
-	{
+/*	{
 		// Clicking examples on the landing tab
 		// will take you to the corresponding
 		// tab in the style book. E.g., image > media
 		// So the click events have to be handled separately.
 		category: 'overview',
 		label: __( 'Overview' ),
-		blocks: [
+		include: [
 			// colors
+			'custom/colors',
 			'core/heading',
 			'core/paragraph',
 			'core/image',
@@ -27,25 +30,25 @@ export const STYLE_BOOK_CATEGORIES = [
 			'core/pull-quote',
 			'core/search',
 		],
-	},
+	},*/
 	{
 		category: 'text',
 		label: __( 'Text' ),
-		blocks: [ 'core/post-content', 'core/home-link' ],
+		include: [ 'core/post-content', 'core/home-link' ],
 	},
 	{
 		category: 'colors',
 		label: __( 'Colors' ),
-		blocks: [],
+		include: [ 'custom/colors' ],
 	},
 	{
 		category: 'theme',
 		label: __( 'Theme' ),
-		categories: [
+		subCategories: [
 			{
 				category: 'site-identity',
 				label: __( 'Site Identity' ),
-				blocks: [
+				include: [
 					'core/site-logo',
 					'core/site-title',
 					'core/site-tagline',
@@ -54,21 +57,17 @@ export const STYLE_BOOK_CATEGORIES = [
 			{
 				category: 'design',
 				label: __( 'Design' ),
-				blocks: [
+				include: [
 					'core/navigation',
-					'core/buttons',
 					'core/avatar',
-					'core/time-to-read',
-					'core/table-of-contents',
-					'core/separator',
-					'core/more',
-					'core/page-break',
+					'core/post-time-to-read',
 				],
+				exclude: [ 'core/home-link' ],
 			},
 			{
 				category: 'posts',
 				label: __( 'Posts' ),
-				blocks: [
+				include: [
 					'core/post-title',
 					'core/post-excerpt',
 					'core/post-author',
@@ -86,7 +85,7 @@ export const STYLE_BOOK_CATEGORIES = [
 			{
 				category: 'comments',
 				label: __( 'Comments' ),
-				blocks: [
+				include: [
 					'core/comments-title',
 					'core/comments-pagination',
 					'core/comments-pagination-numbers',
@@ -106,17 +105,17 @@ export const STYLE_BOOK_CATEGORIES = [
 	{
 		category: 'media',
 		label: __( 'Media' ),
-		blocks: [ 'core/post-featured-image' ],
+		include: [ 'core/post-featured-image' ],
 	},
 	{
 		category: 'widgets',
 		label: __( 'Widgets' ),
-		blocks: [],
+		include: [],
 	},
 
-	{
-		category: 'embeds',
+/*	{
+		category: 'embed',
 		label: __( 'Embeds' ),
-		blocks: [],
-	},
+		include: [],
+	},*/
 ];
