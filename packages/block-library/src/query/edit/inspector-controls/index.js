@@ -17,6 +17,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { debounce } from '@wordpress/compose';
@@ -29,6 +31,7 @@ import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
 import { TaxonomyControls } from './taxonomy-controls';
+import FormatControls from './format-controls';
 import StickyControl from './sticky-control';
 import CreateNewPostLink from './create-new-post-link';
 import PerPageControl from './per-page-control';
@@ -64,13 +67,18 @@ export default function QueryInspectorControls( props ) {
 		parents,
 		after,
 		before,
+		format
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const [ queryYear, setQueryYear ] = useState(
 		!! after ? new Date( after ).getFullYear() : ''
 	);
-	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const {
+		postTypesTaxonomiesMap,
+		postTypesSelectOptions,
+		postTypeFormatSupportMap,
+	} = usePostTypes();
 	const taxonomies = useTaxonomies( postType );
 	const isPostTypeHierarchical = useIsPostTypeHierarchical( postType );
 	useEffect( () => {
@@ -99,6 +107,13 @@ export default function QueryInspectorControls( props ) {
 		}
 		// We need to reset `parents` because they are tied to each post type.
 		updateQuery.parents = [];
+		// Post types can register post format support with `add_post_type_support`.
+		// But we need to reset the `format` property when switching to post types
+		// that do not support post formats.
+		const hasFormatSupport = postTypeFormatSupportMap[ newValue ];
+		if ( ! hasFormatSupport ) {
+			updateQuery.format = [];
+		}
 		setQuery( updateQuery );
 	};
 	const onYearChange = ( value ) => {
@@ -163,11 +178,36 @@ export default function QueryInspectorControls( props ) {
 		isControlAllowed( allowedControls, 'parents' ) &&
 		isPostTypeHierarchical;
 
+	const postTypeHasFormatSupport = postTypeFormatSupportMap[ postType ];
+	const showFormatControl = useSelect(
+		( select ) => {
+			// Check if the post type supports post formats and if the control is allowed.
+			if (
+				! postTypeHasFormatSupport ||
+				! isControlAllowed( allowedControls, 'format' )
+			) {
+				return false;
+			}
+
+			const themeSupports = select( coreStore ).getThemeSupports();
+
+			// If there are no supported formats, getThemeSupports still includes the default 'standard' format,
+			// and in this case the control should not be shown since the user has no other formats to choose from.
+			return (
+				themeSupports.formats &&
+				themeSupports.formats.length > 0 &&
+				themeSupports.formats.some( ( type ) => type !== 'standard' )
+			);
+		},
+		[ allowedControls, postTypeHasFormatSupport ]
+	);
+
 	const showFiltersPanel =
 		showTaxControl ||
 		showAuthorControl ||
 		showSearchControl ||
-		showParentControl;
+		showParentControl ||
+		showFormatControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
@@ -346,6 +386,7 @@ export default function QueryInspectorControls( props ) {
 							taxQuery: null,
 							after: undefined,
 							before: undefined,
+							format: [],
 						} );
 						setQuerySearch( '' );
 					} }
@@ -425,6 +466,18 @@ export default function QueryInspectorControls( props ) {
 								parents={ parents }
 								postType={ postType }
 								onChange={ setQuery }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ showFormatControl && (
+						<ToolsPanelItem
+							hasValue={ () => !! format?.length }
+							label={ __( 'Formats' ) }
+							onDeselect={ () => setQuery( { format: [] } ) }
+						>
+							<FormatControls
+								onChange={ setQuery }
+								query={ query }
 							/>
 						</ToolsPanelItem>
 					) }

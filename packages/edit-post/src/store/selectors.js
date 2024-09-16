@@ -379,7 +379,6 @@ export const isMetaBoxLocationVisible = createRegistrySelector(
 			isMetaBoxLocationActive( state, location ) &&
 			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 				return select( editorStore ).isEditorPanelEnabled(
-					state,
 					`meta-box-${ id }`
 				);
 			} )

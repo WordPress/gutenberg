@@ -27,7 +27,8 @@
 				"taxQuery": null,
 				"after": "",
 				"before": "",
-				"parents": []
+				"parents": [],
+				"format": []
 			}
 		},
 		"tagName": {
