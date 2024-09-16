@@ -60,7 +60,6 @@ export default function QueryInspectorControls( props ) {
 		taxQuery,
 		parents,
 		format,
-		template,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -119,7 +118,13 @@ export default function QueryInspectorControls( props ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const showDefaultControl = template === 'wp_template';
+
+	const showDefaultControl = useSelect( ( select ) => {
+		const currentTemplate =
+			select( coreStore ).__experimentalGetTemplateForLink()?.type;
+		return 'wp_template' === currentTemplate;
+	}, [] );
+
 	const showInheritControl =
 		showDefaultControl && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =

@@ -48,14 +48,10 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
-	const { postsPerPage, currentTemplate } = useSelect( ( select ) => {
+	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const {
-			getEntityRecord,
-			getEntityRecordEdits,
-			canUser,
-			__experimentalGetTemplateForLink,
-		} = select( coreStore );
+		const { getEntityRecord, getEntityRecordEdits, canUser } =
+			select( coreStore );
 		const settingPerPage = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
@@ -69,15 +65,11 @@ export default function QueryContent( {
 		const editedSettingPerPage = +getEntityRecordEdits( 'root', 'site' )
 			?.posts_per_page;
 
-		// Find current template.
-		const template = __experimentalGetTemplateForLink()?.type;
-
 		return {
 			postsPerPage:
 				editedSettingPerPage ||
 				settingPerPage ||
 				DEFAULTS_POSTS_PER_PAGE,
-			currentTemplate: template,
 		};
 	}, [] );
 	// There are some effects running where some initialization logic is
@@ -98,17 +90,11 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-
-		// Set the current template.
-		if ( currentTemplate ) {
-			newQuery.template = currentTemplate;
-		}
-
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, postsPerPage, currentTemplate, inherit ] );
+	}, [ query.perPage, postsPerPage, inherit ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
