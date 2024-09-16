@@ -112,7 +112,7 @@ export function getExamples() {
 	return [ nonHeadingBlockExamples, ...headingsExample ];
 }
 
-function getCategoryExamples( category, examples ) {
+export function getCategoryExamples( category, examples ) {
 	if ( ! category || ! examples ) {
 		return [];
 	}
