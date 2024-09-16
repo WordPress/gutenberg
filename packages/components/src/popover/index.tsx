@@ -302,6 +302,7 @@ const UnforwardedPopover = (
 				}
 			);
 
+			// Observe mutations on the parent div of the inserter to update toolbar position.
 			const targetElement = document.querySelector(
 				'.interface-interface-skeleton__body'
 			);
