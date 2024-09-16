@@ -8,6 +8,7 @@ import type { ChangeEvent } from 'react';
  */
 import {
 	Button,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Dropdown,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -568,10 +569,12 @@ function _DataViewsViewConfig( {
 					);
 				} }
 				renderContent={ () => (
-					<DataviewsViewConfigContent
-						density={ density }
-						setDensity={ setDensity }
-					/>
+					<DropdownContentWrapper paddingSize="medium">
+						<DataviewsViewConfigContent
+							density={ density }
+							setDensity={ setDensity }
+						/>
+					</DropdownContentWrapper>
 				) }
 			/>
 		</>

@@ -1,12 +1,9 @@
 .dataviews-view-config {
-	.components-popover__content {
-		width: 320px;
-		/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
-		container-type: inline-size;
-		padding: $grid-unit-20;
-		font-size: $default-font-size;
-		line-height: $default-line-height;
-	}
+	width: 320px;
+	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
+	container-type: inline-size;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
 }
 
 .dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
