@@ -168,31 +168,34 @@ export default function PostExcerptEditor( {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 
-	// Only trim the excerpt if it's not a custom excerpt.
+	// By default, use the raw excerpt, which is the user-entered custom excerpt.
 	const hasCustomExcerpt = !! rawExcerpt?.length;
-	const trimmedExcerpt = hasCustomExcerpt
-		? rawExcerpt
-		: getTrimmedExcerpt(
-				strippedRenderedExcerpt,
-				excerptLength,
-				wordCountType
-		  );
+	let excerpt = rawExcerpt;
 
+	// When there's no custom excerpt is not custom, use the auto-generated excerpt, trimmed to the defined length.
+	if ( ! hasCustomExcerpt ) {
+		// Only trim the excerpt if it's not a custom excerpt.
+		excerpt = getTrimmedExcerpt(
+			strippedRenderedExcerpt,
+			excerptLength,
+			wordCountType
+		);
+
+		// Add the ellipsis if the excerpt was trimmed, otherwise the server returns an ellipsis.
+		excerpt =
+			excerpt === strippedRenderedExcerpt ? excerpt : excerpt + ELLIPSIS;
+	}
 	const excerptContent = isEditable ? (
 		<RichText
 			className={ excerptClassName }
 			aria-label={ __( 'Excerpt text' ) }
-			value={
-				( hasCustomExcerpt ? rawExcerpt : trimmedExcerpt + ELLIPSIS ) ||
-				__( 'No excerpt found' )
-			}
+			value={ excerpt || __( 'No excerpt found' ) }
 			onChange={ setExcerpt }
 			tagName="p"
 		/>
 	) : (
 		<p className={ excerptClassName }>
-			{ ( hasCustomExcerpt ? rawExcerpt : trimmedExcerpt + ELLIPSIS ) ||
-				__( 'No excerpt found' ) }
+			{ excerpt || __( 'No excerpt found' ) }
 		</p>
 	);
 	return (
