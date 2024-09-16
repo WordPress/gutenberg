@@ -11,6 +11,7 @@ import {
 	Button,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -109,12 +110,14 @@ export default function PostURL( { onClose } ) {
 								</InputControlPrefixWrapper>
 							}
 							suffix={
-								<Button
-									__next40pxDefaultSize
-									icon={ copySmall }
-									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
-								/>
+								<InputControlSuffixWrapper variant="control">
+									<Button
+										icon={ copySmall }
+										ref={ copyButtonRef }
+										size="small"
+										label="Copy"
+									/>
+								</InputControlSuffixWrapper>
 							}
 							label={ __( 'Link' ) }
 							hideLabelFromVision
