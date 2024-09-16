@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startOfYear, endOfYear, format } from 'date-fns';
+import { startOfYear, endOfYear, format as dateFormat } from 'date-fns';
 
 /**
  * WordPress dependencies
@@ -67,7 +67,7 @@ export default function QueryInspectorControls( props ) {
 		parents,
 		after,
 		before,
-		format
+		format,
 	} = query;
 	const allowedControls = useAllowedControls( attributes );
 	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
@@ -129,8 +129,8 @@ export default function QueryInspectorControls( props ) {
 		}
 
 		setQuery( {
-			after: format( startOfYear( value ), TIMEZONELESS_FORMAT ),
-			before: format( endOfYear( value ), TIMEZONELESS_FORMAT ),
+			after: dateFormat( startOfYear( value ), TIMEZONELESS_FORMAT ),
+			before: dateFormat( endOfYear( value ), TIMEZONELESS_FORMAT ),
 		} );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
@@ -207,7 +207,8 @@ export default function QueryInspectorControls( props ) {
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl ||
-		showFormatControl;
+		showFormatControl ||
+		showYearControl;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
