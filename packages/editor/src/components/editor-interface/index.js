@@ -58,7 +58,6 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	title,
-	icon,
 	iframeProps,
 } ) {
 	const {
@@ -140,7 +139,6 @@ export default function EditorInterface( {
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
-						icon={ icon }
 					/>
 				)
 			}
