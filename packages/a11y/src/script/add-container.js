@@ -1,7 +1,7 @@
 /**
  * Build the live regions markup.
  *
- * @param {string} [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
+ * @param {'polite'|'assertive'} [ariaLive] Value for the 'aria-live' attribute; default: 'polite'.
  *
  * @return {HTMLDivElement} The ARIA live region HTML element.
  */
