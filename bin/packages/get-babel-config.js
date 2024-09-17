@@ -11,7 +11,7 @@ module.exports = ( environment = '', file ) => {
 			name: `WP_BUILD_${ environment.toUpperCase() }`,
 		},
 	};
-	// Add `@wordpress/polyfill` import where needed.
+	// Add `/* wp:polyfill */` magic comment where needed.
 	callerOpts.caller.addPolyfillComments = true;
 	switch ( environment ) {
 		case 'main':
