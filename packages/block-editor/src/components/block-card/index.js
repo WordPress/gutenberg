@@ -22,7 +22,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 
-function BlockCard( { title, icon, description, blockType, className } ) {
+function BlockCard( { title, icon, description, blockType, className, name } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
@@ -65,7 +65,9 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			) }
 			<BlockIcon icon={ icon } showColors />
 			<VStack spacing={ 1 }>
-				<h2 className="block-editor-block-card__title">{ title }</h2>
+				<h2 className="block-editor-block-card__title">
+					{ name?.length ? `${ name } (${ title })` : title }
+				</h2>
 				{ description && (
 					<Text className="block-editor-block-card__description">
 						{ description }
