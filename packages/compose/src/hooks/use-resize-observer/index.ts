@@ -6,8 +6,8 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import useEvent from '../use-event';
-import type { ObservedSize } from './_legacy';
-import _useLegacyResizeObserver from './_legacy';
+import type { ObservedSize } from './legacy';
+import _useLegacyResizeObserver from './legacy';
 /**
  * External dependencies
  */
