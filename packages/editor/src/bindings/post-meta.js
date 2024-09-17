@@ -18,7 +18,9 @@ function getMetadata( registry, context, registeredFields ) {
 		// Populate the `metaFields` object with the default values.
 		Object.entries( registeredFields || {} ).forEach(
 			( [ key, props ] ) => {
-				metaFields[ key ] = props.default;
+				if ( props.default ) {
+					metaFields[ key ] = props.default;
+				}
 			}
 		);
 	} else {
@@ -47,7 +49,7 @@ export default {
 			const metaKey = source.args.key;
 			newValues[ attributeName ] =
 				metaFields?.[ metaKey ] ??
-				registeredFields?.[ metaKey ]?.label ??
+				registeredFields?.[ metaKey ]?.title ??
 				metaKey;
 		}
 		return newValues;
