@@ -13,6 +13,7 @@ import {
 	getBlockFromExample,
 	createBlock,
 } from '@wordpress/blocks';
+import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useMemo, useState, memo, useContext } from '@wordpress/element';
 
@@ -20,7 +21,7 @@ import { useMemo, useState, memo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { STYLE_BOOK_CATEGORIES } from './constants';
+import { STYLE_BOOK_CATEGORIES, STYLE_BOOK_THEME_SUBCATEGORIES } from './constants';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 const {
@@ -71,6 +72,29 @@ function getCustomExamples() {
 	];
 }
 
+// @TODO get other registered categories (aside from what's in STYLE_BOOK_CATEGORIES)
+// And their subcategories.
+export function getBlockCategories( examples ) {
+	const reservedCategories = [
+		...STYLE_BOOK_THEME_SUBCATEGORIES,
+		...STYLE_BOOK_CATEGORIES,
+	].map( ( category ) => category.category );
+
+	return getCategories()
+		.filter(
+			( category ) =>
+				! reservedCategories.includes( category.slug ) &&
+				examples.some(
+					( example ) => example.category === category.slug
+				)
+		)
+		.map( ( category ) => ( {
+			name: category.slug,
+			title: category.title,
+		} ) );
+}
+
+// Get all examples from every registered block.
 export function getExamples() {
 	const nonHeadingBlockExamples = getBlockTypes()
 		.filter( ( blockType ) => {
@@ -107,36 +131,37 @@ export function getExamples() {
 					} );
 				} ),
 		  }
-		: [];
+		: {};
 
-	return [ nonHeadingBlockExamples, ...headingsExample ];
+	return [ headingsExample, ...nonHeadingBlockExamples ];
 }
 
-export function getCategoryExamples( category, examples ) {
-	if ( ! category || ! examples ) {
+export function getCategoryExamples( categoryDefinition, examples ) {
+	if ( ! categoryDefinition?.name || ! examples?.length ) {
 		return [];
 	}
 
-	if ( category?.subCategories ) {
-		return category.subCategories.reduce(
+	if ( categoryDefinition?.subcategories?.length ) {
+		return categoryDefinition.subcategories.reduce(
 			( acc, subCategory ) => ( {
 				...acc,
-				...getCategoryExamples( subCategory.category, examples ),
+				...getCategoryExamples( subCategory, examples ),
 			} ),
 			{}
 		);
 	}
 
-	const { include, exclude } = category;
+	const blocksToInclude = categoryDefinition?.blocks || [];
+	const blocksToExclude = categoryDefinition?.exclude || [];
 
 	return {
-		[ category.category ]: {
-			label: category.label,
+		[ categoryDefinition.name ]: {
+			title: categoryDefinition.title,
 			examples: examples.filter( ( example ) => {
 				return (
-					! exclude.includes( example.name ) &&
-					( example.category === category ||
-						include.includes( example.name ) )
+					! blocksToExclude.includes( example.name ) &&
+					( example.category === categoryDefinition.name ||
+						blocksToInclude.includes( example.name ) )
 				);
 			} ),
 		},

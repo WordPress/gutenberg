@@ -37,6 +37,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
+import { STYLE_BOOK_CATEGORIES } from './constants';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -184,17 +185,11 @@ function StyleBook( {
 	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
-			getCategories()
-				.filter( ( category ) =>
-					examples.some(
-						( example ) => example.category === category.slug
-					)
+			STYLE_BOOK_CATEGORIES.filter( ( category ) =>
+				examples.some(
+					( example ) => example.category === category.name
 				)
-				.map( ( category ) => ( {
-					name: category.slug,
-					title: category.title,
-					icon: category.icon,
-				} ) ),
+			),
 		[ examples ]
 	);
 	const { base: baseConfig } = useContext( GlobalStylesContext );
@@ -379,6 +374,7 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
+
 		return (
 			<Composite
 				orientation="vertical"
