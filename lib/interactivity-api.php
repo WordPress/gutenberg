@@ -42,7 +42,7 @@ function gutenberg_reregister_interactivity_script_modules() {
 			),
 			'@wordpress/interactivity',
 		),
-		$full_page_navigation_enabled ? null : $default_version
+		$full_page_navigation_enabled ? null : $router_version
 	);
 }
 add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
