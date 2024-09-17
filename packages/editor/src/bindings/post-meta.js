@@ -22,7 +22,6 @@ function getMetadata( registry, context ) {
 	const { getRegisteredPostMeta } = unlock(
 		registry.select( coreDataStore )
 	);
-
 	// Inherit the postType from the slug if it is a template.
 	if ( ! context?.postType && type === 'wp_template' ) {
 		// Get the 'kind' from the start of the slug.
@@ -34,11 +33,11 @@ function getMetadata( registry, context ) {
 			if ( kind === 'page' ) {
 				postType = 'page';
 			} else if ( kind === 'single' ) {
+				// Get postTypes is returning [].
 				const postTypes =
 					getPostTypes( { per_page: -1 } )?.map(
 						( entity ) => entity.slug
 					) || [];
-
 				// Infer the post type from the slug.
 				// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
 				const match = slug.match(
@@ -48,13 +47,8 @@ function getMetadata( registry, context ) {
 			}
 		}
 		const fields = getRegisteredPostMeta( postType );
-
 		// Populate the `metaFields` object with the default values.
 		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
-			// If the template is global, skip the fields with a subtype.
-			if ( isGlobalTemplate && props.object_subtype ) {
-				return;
-			}
 			metaFields[ key ] = props.default;
 		} );
 	} else {
