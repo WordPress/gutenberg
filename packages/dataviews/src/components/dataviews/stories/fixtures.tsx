@@ -696,3 +696,22 @@ export const fields: Field< SpaceObject >[] = [
 		enableSorting: false,
 	},
 ];
+
+export const sortDataWithNull = [
+	{
+		id: 1,
+		message: null,
+	},
+	{
+		id: 2,
+		message: 'Something went wrong',
+	},
+	{
+		id: 3,
+		message: null,
+	},
+	{
+		id: 4,
+		message: 'An error has occurred',
+	},
+];

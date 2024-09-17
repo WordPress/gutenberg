@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 import { filterSortAndPaginate } from '../filter-and-sort-data-view';
-import { data, fields } from '../components/dataviews/stories/fixtures';
+import {
+	data,
+	fields,
+	sortDataWithNull,
+} from '../components/dataviews/stories/fixtures';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {
@@ -337,6 +341,61 @@ describe( 'sorting', () => {
 		expect( result ).toHaveLength( 2 );
 		expect( result[ 0 ].title ).toBe( 'Uranus' );
 		expect( result[ 1 ].title ).toBe( 'Neptune' );
+	} );
+
+	const testSorting = ( data, fields, sortDirection, expectedResults ) => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
+				sort: { field: fields[ 0 ].id, direction: sortDirection },
+			},
+			fields
+		);
+
+		result.forEach( ( item, index ) => {
+			expect( item[ fields[ 0 ].id ] ).toBe( expectedResults[ index ] );
+		} );
+	};
+
+	const expectedNullableResults = {
+		asc: [ 'An error has occurred', 'Something went wrong', null, null ],
+		desc: [ 'Something went wrong', 'An error has occurred', null, null ],
+	};
+
+	it( 'should asc sort null values to end for fields without type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { label: 'Error Message', id: 'message' } ],
+			'asc',
+			expectedNullableResults.asc
+		);
+	} );
+
+	it( 'should desc sort null values to end for fields without type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { label: 'Error Message', id: 'message' } ],
+			'desc',
+			expectedNullableResults.desc
+		);
+	} );
+
+	it( 'should asc sort null values to end for text fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'message', type: 'text' } ],
+			'asc',
+			expectedNullableResults.asc
+		);
+	} );
+
+	it( 'should desc sort null values to end for text fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'message', type: 'text' } ],
+			'desc',
+			expectedNullableResults.desc
+		);
 	} );
 } );
 
