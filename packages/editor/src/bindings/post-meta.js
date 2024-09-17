@@ -11,42 +11,15 @@ import { unlock } from '../lock-unlock';
 
 function getMetadata( registry, context ) {
 	let metaFields = {};
-	const {
-		type,
-		is_custom: isCustom,
-		slug,
-	} = registry.select( editorStore ).getCurrentPost();
-	const { getPostTypes, getEditedEntityRecord } =
-		registry.select( coreDataStore );
+	const { type } = registry.select( editorStore ).getCurrentPost();
+	const { getEditedEntityRecord } = registry.select( coreDataStore );
 
 	const { getRegisteredPostMeta } = unlock(
 		registry.select( coreDataStore )
 	);
 	// Inherit the postType from the slug if it is a template.
-	if ( ! context?.postType && type === 'wp_template' ) {
-		// Get the 'kind' from the start of the slug.
-		// Use 'post' as the default.
-		let postType = 'post';
-		const isGlobalTemplate = isCustom || slug === 'index';
-		if ( ! isGlobalTemplate ) {
-			const [ kind ] = slug.split( '-' );
-			if ( kind === 'page' ) {
-				postType = 'page';
-			} else if ( kind === 'single' ) {
-				// Get postTypes is returning [].
-				const postTypes =
-					getPostTypes( { per_page: -1 } )?.map(
-						( entity ) => entity.slug
-					) || [];
-				// Infer the post type from the slug.
-				// TODO: Review, as it may not have a post type. http://localhost:8888/wp-admin/site-editor.php?canvas=edit
-				const match = slug.match(
-					`^single-(${ postTypes.join( '|' ) })(?:-.+)?$`
-				);
-				postType = match ? match[ 1 ] : 'post';
-			}
-		}
-		const fields = getRegisteredPostMeta( postType );
+	if ( type === 'wp_template' ) {
+		const fields = getRegisteredPostMeta( context?.postType || 'post' );
 		// Populate the `metaFields` object with the default values.
 		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
 			metaFields[ key ] = props.default;
