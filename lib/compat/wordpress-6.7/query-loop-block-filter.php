@@ -15,7 +15,7 @@
  */
 function gutenberg_filter_query_loop_block_query_vars( $query, $block ) {
 
-	if ( ! empty( $block->context['query']['after'] ) || $block->context['query']['before'] ) {
+	if ( ! empty( $block->context['query']['after'] ) || ! empty( $block->context['query']['before'] ) ) {
 		$query['date_query'] = array(
 			array(
 				'after'     => $block->context['query']['after'],
