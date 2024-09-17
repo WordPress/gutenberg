@@ -111,7 +111,6 @@ function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 					{ isSourceInvalid
 						? __( 'Invalid source' )
 						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
-						  args?.key ||
 						  sourceProps?.label ||
 						  sourceName }
 				</Text>
