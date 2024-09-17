@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock, createBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
@@ -72,44 +72,48 @@ function useInsertionPoint( {
 } ) {
 	const registry = useRegistry();
 	const { getSelectedBlock } = useSelect( blockEditorStore );
-	const { destinationRootClientId, destinationIndex } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getBlockRootClientId,
-				getBlockIndex,
-				getBlockOrder,
-			} = select( blockEditorStore );
-			const selectedBlockClientId = getSelectedBlockClientId();
+	const { destinationRootClientId, destinationIndex, isZoomOutMode } =
+		useSelect(
+			( select ) => {
+				const {
+					getSelectedBlockClientId,
+					getBlockRootClientId,
+					getBlockIndex,
+					getBlockOrder,
+					__unstableGetEditorMode,
+				} = select( blockEditorStore );
+				const selectedBlockClientId = getSelectedBlockClientId();
 
-			let _destinationRootClientId = rootClientId;
-			let _destinationIndex;
+				let _destinationRootClientId = rootClientId;
+				let _destinationIndex;
 
-			if ( insertionIndex !== undefined ) {
-				// Insert into a specific index.
-				_destinationIndex = insertionIndex;
-			} else if ( clientId ) {
-				// Insert after a specific client ID.
-				_destinationIndex = getBlockIndex( clientId );
-			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = getBlockRootClientId(
-					selectedBlockClientId
-				);
-				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
-			} else {
-				// Insert at the end of the list.
-				_destinationIndex = getBlockOrder(
-					_destinationRootClientId
-				).length;
-			}
+				if ( insertionIndex !== undefined ) {
+					// Insert into a specific index.
+					_destinationIndex = insertionIndex;
+				} else if ( clientId ) {
+					// Insert after a specific client ID.
+					_destinationIndex = getBlockIndex( clientId );
+				} else if ( ! isAppender && selectedBlockClientId ) {
+					_destinationRootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
+					_destinationIndex =
+						getBlockIndex( selectedBlockClientId ) + 1;
+				} else {
+					// Insert at the end of the list.
+					_destinationIndex = getBlockOrder(
+						_destinationRootClientId
+					).length;
+				}
 
-			return {
-				destinationRootClientId: _destinationRootClientId,
-				destinationIndex: _destinationIndex,
-			};
-		},
-		[ rootClientId, insertionIndex, clientId, isAppender ]
-	);
+				return {
+					destinationRootClientId: _destinationRootClientId,
+					destinationIndex: _destinationIndex,
+					isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+				};
+			},
+			[ rootClientId, insertionIndex, clientId, isAppender ]
+		);
 
 	const {
 		replaceBlocks,
@@ -134,6 +138,12 @@ function useInsertionPoint( {
 			}
 
 			const selectedBlock = getSelectedBlock();
+
+			// Zoom Out mode handles "sections" of blocks, so any individual block(s)
+			// must be wrapped in a group block to act as a section.
+			if ( isZoomOutMode ) {
+				blocks = wrapBlocksInGroup( blocks );
+			}
 
 			if (
 				! isAppender &&
@@ -217,5 +227,17 @@ function useInsertionPoint( {
 
 	return [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ];
 }
+
+const wrapBlocksInGroup = ( blocks ) => {
+	if ( ! Array.isArray( blocks ) ) {
+		blocks = [ blocks ];
+	}
+	// Return if already a group.
+	if ( blocks.length === 1 && blocks[ 0 ].name === 'core/group' ) {
+		return blocks;
+	}
+
+	return [ createBlock( 'core/group', {}, blocks ) ];
+};
 
 export default useInsertionPoint;
