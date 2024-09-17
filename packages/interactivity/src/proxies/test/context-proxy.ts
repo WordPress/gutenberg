@@ -64,6 +64,14 @@ describe( 'Interactivity API', () => {
 				expect( 'a' in context.obj ).toBe( false );
 				expect( context.obj.b ).toBe( 2 );
 			} );
+
+			it( 'should work with the proxified state', () => {
+				const state = proxifyState( 'test', { a: 1 } );
+				const fallback: any = proxifyContext( state, {} );
+				const context: any = proxifyContext( state, fallback );
+
+				expect( context.a ).toBe( 1 );
+			} );
 		} );
 
 		describe( 'set', () => {
@@ -117,6 +125,17 @@ describe( 'Interactivity API', () => {
 
 				expect( context.prop ).toBe( 'modified' );
 				expect( fallback.prop ).toBeUndefined();
+			} );
+
+			it( 'should work with the proxified state', () => {
+				const state = proxifyState( 'test', { a: 1 } );
+				const fallback: any = proxifyContext( state, {} );
+				const context: any = proxifyContext( {}, fallback );
+
+				context.a = 2;
+
+				expect( context.a ).toBe( 2 );
+				expect( state.a ).toBe( 2 );
 			} );
 		} );
 
@@ -263,7 +282,9 @@ describe( 'Interactivity API', () => {
 		describe( 'proxifyContext', () => {
 			it( 'should throw when trying to re-proxify a proxy object', () => {
 				const context = proxifyContext( {}, {} );
-				expect( () => proxifyContext( context, {} ) ).toThrow();
+				expect( () => proxifyContext( context, {} ) ).toThrow(
+					'This object cannot be proxified.'
+				);
 			} );
 		} );
 	} );

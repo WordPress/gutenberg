@@ -21,6 +21,9 @@ const contextHandlers: ProxyHandler< object > = {
 	},
 	set: ( target, key, value ) => {
 		const fallback = contextObjectToFallback.get( target );
+
+		// If the property exists in the current context, modify it. Otherwise,
+		// add it to the current context.
 		const obj = key in target || ! ( key in fallback ) ? target : fallback;
 		obj[ key ] = value;
 
