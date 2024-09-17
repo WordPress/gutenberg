@@ -49,6 +49,7 @@ import type { SupportedLayouts, View, Field } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
+import { useInstanceId } from '@wordpress/compose';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
@@ -519,17 +520,29 @@ function DataviewsViewConfigDropdown( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 } ) {
 	const { view } = useContext( DataViewsContext );
-
+	const popoverId = useInstanceId(
+		_DataViewsViewConfig,
+		'dataviews-view-config-dropdown'
+	);
+	const popoverProps = useMemo(
+		() => ( {
+			...DATAVIEWS_CONFIG_POPOVER_PROPS,
+			id: popoverId,
+		} ),
+		[ popoverId ]
+	);
 	return (
 		<Dropdown
-			popoverProps={ DATAVIEWS_CONFIG_POPOVER_PROPS }
-			renderToggle={ ( { onToggle } ) => {
+			popoverProps={ popoverProps }
+			renderToggle={ ( { onToggle, isOpen } ) => {
 				return (
 					<Button
 						size="compact"
 						icon={ cog }
 						label={ _x( 'View options', 'View is used as a noun' ) }
 						onClick={ onToggle }
+						aria-expanded={ isOpen ? 'true' : 'false' }
+						aria-controls={ popoverId }
 					/>
 				);
 			} }
