@@ -428,7 +428,6 @@ describe( 'private selectors', () => {
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
 					] ),
-
 					order: new Map( [
 						[
 							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
@@ -443,6 +442,7 @@ describe( 'private selectors', () => {
 						],
 						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
+					byClientId: new Map( [] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],
@@ -495,6 +495,7 @@ describe( 'private selectors', () => {
 						],
 						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
+					byClientId: new Map( [] ),
 				},
 				blockEditingModes: new Map( [
 					[ '', 'disabled' ],

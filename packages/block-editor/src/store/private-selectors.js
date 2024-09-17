@@ -7,6 +7,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	getBlockAttributes,
 	getBlockOrder,
 	getBlockParents,
 	getBlockEditingMode,
@@ -17,6 +18,7 @@ import {
 	getClientIdsWithDescendants,
 	isNavigationMode,
 	getBlockRootClientId,
+	__unstableGetEditorMode,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -683,4 +685,67 @@ export function getClosestAllowedInsertionPointForPattern(
  */
 export function getInsertionPoint( state ) {
 	return state.insertionPoint;
+}
+
+/**
+ * Retrieves the editing mode of a pattern block and its children.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {string} The block editing mode.
+ */
+export function getPatternBlockEditingMode( state, clientId ) {
+	const parentPatternCount = getParentPatternCount( state, clientId );
+
+	// If there are no parent patterns, use the block's own editing mode.
+	if ( parentPatternCount === 0 ) {
+		return state.blockEditingModes.get( clientId );
+	}
+
+	// Disable nested patterns.
+	if ( parentPatternCount > 1 ) {
+		return 'disabled';
+	}
+
+	// Make the outer pattern block content only mode.
+	if (
+		getBlockName( state, clientId ) === 'core/block' &&
+		parentPatternCount === 0
+	) {
+		return 'contentOnly';
+	}
+
+	// Disable pattern content in zoom-out mode.
+	const _isZoomOut = __unstableGetEditorMode( state ) === 'zoom-out';
+	if ( _isZoomOut ) {
+		return 'disabled';
+	}
+
+	// If the block has a binding of any kind, allow content only editing.
+	const attributes = getBlockAttributes( state, clientId );
+	if ( Object.keys( attributes.metadata?.bindings ?? {} )?.length > 0 ) {
+		return 'contentOnly';
+	}
+
+	// Otherwise, the block is part of the pattern source and should not be editable.
+	return 'disabled';
+}
+
+/**
+ * Retrieves the number of parent pattern blocks.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID.
+ *
+ * @return {number} The number of parent pattern blocks.
+ */
+export function getParentPatternCount( state, clientId ) {
+	const parents = getBlockParents( state, clientId );
+	return parents.reduce( ( count, parent ) => {
+		if ( getBlockName( state, parent ) === 'core/block' ) {
+			return count + 1;
+		}
+		return count;
+	}, 0 );
 }

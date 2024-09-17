@@ -3079,7 +3079,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(
 						Object.entries( {
 							block1: { name: 'core/test-block-ancestor' },
-							block2: { name: 'core/block' },
+							block2: { name: 'core/group' },
 							block3: { name: 'core/test-block-parent' },
 						} )
 					),
