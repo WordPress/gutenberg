@@ -123,7 +123,7 @@ add_filter( 'wp_rest_server_class', 'gutenberg_override_default_rest_server', 1 
  *
  * @return WP_REST_Response The API root index data.
  */
-function gutenberg_add_language_direction_to_site_capabilities( $response, $request ) {
+function gutenberg_add_language_direction_to_site_capabilities( $response ) {
 	/*
 	* Locale settings.
 	*
@@ -155,4 +155,4 @@ function gutenberg_add_language_direction_to_site_capabilities( $response, $requ
 	return $response;
 }
 
-add_filter( 'rest_index', 'gutenberg_add_language_direction_to_site_capabilities', 10, 2 );
+add_filter( 'rest_index', 'gutenberg_add_language_direction_to_site_capabilities', 10, 1 );
