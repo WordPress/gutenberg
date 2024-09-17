@@ -96,15 +96,6 @@ function ToolSelector( props, ref ) {
 										</>
 									),
 								},
-								{
-									value: 'compose',
-									label: (
-										<>
-											<Icon icon={ composeIcon } />
-											{ __( 'Compose' ) }
-										</>
-									),
-								},
 							] }
 						/>
 					</NavigableMenu>
