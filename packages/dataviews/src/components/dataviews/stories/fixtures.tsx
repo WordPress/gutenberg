@@ -701,17 +701,25 @@ export const sortDataWithNull = [
 	{
 		id: 1,
 		message: null,
+		count: null,
+		login_at: null,
 	},
 	{
 		id: 2,
 		message: 'Something went wrong',
+		count: 1,
+		login_at: '2021-01-01T00:00:00Z',
 	},
 	{
 		id: 3,
 		message: null,
+		count: null,
+		login_at: null,
 	},
 	{
 		id: 4,
 		message: 'An error has occurred',
+		count: 5,
+		login_at: '2024-01-01T00:00:00Z',
 	},
 ];

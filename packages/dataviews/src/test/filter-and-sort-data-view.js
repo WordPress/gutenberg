@@ -365,7 +365,7 @@ describe( 'sorting', () => {
 	it( 'should asc sort null values to end for fields without type definition', () => {
 		testSorting(
 			sortDataWithNull,
-			[ { label: 'Error Message', id: 'message' } ],
+			[ { id: 'message' } ],
 			'asc',
 			expectedNullableResults.asc
 		);
@@ -374,7 +374,7 @@ describe( 'sorting', () => {
 	it( 'should desc sort null values to end for fields without type definition', () => {
 		testSorting(
 			sortDataWithNull,
-			[ { label: 'Error Message', id: 'message' } ],
+			[ { id: 'message' } ],
 			'desc',
 			expectedNullableResults.desc
 		);
@@ -395,6 +395,42 @@ describe( 'sorting', () => {
 			[ { id: 'message', type: 'text' } ],
 			'desc',
 			expectedNullableResults.desc
+		);
+	} );
+
+	it( 'should asc sort null values to end for integer fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'count', type: 'integer' } ],
+			'asc',
+			[ 1, 5, null, null ]
+		);
+	} );
+
+	it( 'should desc sort null values to end for integer fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'count', type: 'integer' } ],
+			'desc',
+			[ 5, 1, null, null ]
+		);
+	} );
+
+	it( 'should asc sort null values to end for datetime fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'login_at', type: 'datetime' } ],
+			'asc',
+			[ '2021-01-01T00:00:00Z', '2024-01-01T00:00:00Z', null, null ]
+		);
+	} );
+
+	it( 'should desc sort null values to end for datetime fields type definition', () => {
+		testSorting(
+			sortDataWithNull,
+			[ { id: 'login_at', type: 'datetime' } ],
+			'desc',
+			[ '2024-01-01T00:00:00Z', '2021-01-01T00:00:00Z', null, null ]
 		);
 	} );
 } );
