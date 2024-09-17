@@ -48,8 +48,13 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 		if ( false !== $reusable_blocks_key ) {
 			unset( $paths[ $reusable_blocks_key ] );
 		}
-	}
 
+		/*
+		 * Preload the global styles post data in the post editor.
+		 * This is required for non-admin users without access to the 'view' context.
+		 */
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id() . '?context=view';
+	}
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_7', 10, 2 );
