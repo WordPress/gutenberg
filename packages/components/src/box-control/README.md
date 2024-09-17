@@ -100,3 +100,10 @@ A handler for onMouseOver events.
 A handler for onMouseOut events.
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default size that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`
