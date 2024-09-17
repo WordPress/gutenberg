@@ -10,8 +10,8 @@ import { trash } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from './utils';
-import type { CoreDataError, PostWithPermissions } from '../types';
+import { getItemTitle, isTemplateOrTemplatePart } from '../utils';
+import type { CoreDataError, PostWithPermissions } from '../../types';
 
 const permanentlyDeletePost: Action< PostWithPermissions > = {
 	id: 'permanently-delete',

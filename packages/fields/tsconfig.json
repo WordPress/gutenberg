@@ -18,7 +18,12 @@
 		{ "path": "../warning" },
 		{ "path": "../url" },
 		{ "path": "../notices" },
-		{ "path": "../dataviews" }
+		{ "path": "../dataviews" },
+		{ "path": "../blob" },
+		{ "path": "../core-data" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" }
 	],
-	"include": [ "src" ]
+	"include": [ "src" ],
+	"exclude": [ "@wordpress/editor" ]
 }

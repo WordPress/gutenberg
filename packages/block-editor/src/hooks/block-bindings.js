@@ -98,7 +98,7 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	const isSourceInvalid = ! sourceProps;
 	return (
-		<VStack className="block-editor-bindings__item">
+		<VStack className="block-editor-bindings__item" spacing={ 0 }>
 			<Text truncate>{ attribute }</Text>
 			{ !! binding && (
 				<Text

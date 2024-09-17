@@ -17,8 +17,8 @@ import type { Action, RenderModalProps } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { CoreDataError, BasePost } from '../types';
-import { orderField } from '../fields';
+import type { CoreDataError, BasePost } from '../../types';
+import { orderField } from '../../fields';
 
 const fields = [ orderField ];
 const formOrderAction = {

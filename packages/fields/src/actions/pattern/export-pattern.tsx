@@ -15,8 +15,8 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import type { Pattern } from '../types';
-import { getItemTitle } from './utils';
+import type { Pattern } from '../../types';
+import { getItemTitle } from '../utils';
 
 function getJsonFromItem( item: Pattern ) {
 	return JSON.stringify(

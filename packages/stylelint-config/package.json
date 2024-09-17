@@ -28,7 +28,9 @@
 		"LICENSE",
 		"README.md",
 		"index.js",
-		"scss.js"
+		"scss.js",
+		"scss-stylistic.js",
+		"stylistic.js"
 	],
 	"main": "index.js",
 	"dependencies": {
