@@ -30,7 +30,7 @@ export default function addIntroText() {
 			'border:0;' +
 			'word-wrap:normal !important;'
 	);
-	introText.setAttribute( 'hidden', 'hidden' );
+	introText.setAttribute( 'hidden', '' );
 
 	const { body } = document;
 	if ( body ) {
