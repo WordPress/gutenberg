@@ -24,7 +24,6 @@ import {
 	useFocusOnMount,
 	useConstrainedTabbing,
 	useMergeRefs,
-	useReducedMotion,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
@@ -39,13 +38,7 @@ import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
-import { CONFIG } from '../utils';
-
-// Animation duration (ms) extracted to JS in order to be used on a setTimeout.
-const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
-const FRAME_ANIMATION_DURATION_NUMBER = Number.parseInt(
-	CONFIG.transitionDuration
-);
+import { useModalExitAnimation } from './use-modal-exit-animation';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
@@ -78,7 +71,7 @@ function UnforwardedModal(
 		closeButtonLabel,
 		children,
 		style,
-		overlayClassName,
+		overlayClassName: overlayClassnameProp,
 		className,
 		contentLabel,
 		onKeyDown,
@@ -192,49 +185,8 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const frameRef = useRef< HTMLDivElement >();
-	const [ isAnimatingOut, setIsAnimatingOut ] = useState( false );
-	const isReducedMotion = useReducedMotion();
-	const animateClose = useCallback< typeof onRequestClose >(
-		( event ) => {
-			function onAnimationEnd( e: AnimationEvent ) {
-				if (
-					e.animationName === 'components-modal__disappear-animation'
-				) {
-					setIsAnimatingOut( false );
-					onRequestCloseRef.current?.( event );
-				}
-			}
-
-			if ( isReducedMotion ) {
-				onRequestCloseRef.current?.( event );
-				return;
-			}
-
-			if ( ! frameRef.current ) {
-				return;
-			}
-
-			// Grab a reference to the frame element, to make sure we're referencing
-			// the same reference in the cleanup function.
-			const frameEl = frameRef.current;
-
-			setIsAnimatingOut( true );
-			frameEl.addEventListener( 'animationend', onAnimationEnd, {
-				once: true,
-			} );
-			const animationTimeout = window.setTimeout( () => {
-				setIsAnimatingOut( false );
-				onRequestCloseRef.current?.( event );
-			}, FRAME_ANIMATION_DURATION_NUMBER );
-
-			return () => {
-				frameEl.removeEventListener( 'animationend', onAnimationEnd );
-				window.clearTimeout( animationTimeout );
-			};
-		},
-		[ isReducedMotion ]
-	);
+	const { closeModal, frameRef, frameStyle, overlayClassname } =
+		useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -259,7 +211,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			animateClose( event );
+			closeModal( () => onRequestClose( event ) );
 		}
 	}
 
@@ -298,7 +250,7 @@ function UnforwardedModal(
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
 			if ( button === 0 && isSameTarget ) {
-				animateClose();
+				closeModal( () => onRequestClose() );
 			}
 		},
 	};
@@ -309,8 +261,8 @@ function UnforwardedModal(
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ clsx(
 				'components-modal__screen-overlay',
-				isAnimatingOut && 'is-animating-out',
-				overlayClassName
+				overlayClassname,
+				overlayClassnameProp
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
@@ -323,7 +275,7 @@ function UnforwardedModal(
 						className
 					) }
 					style={ {
-						'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }`,
+						...frameStyle,
 						...style,
 					} }
 					ref={ useMergeRefs( [
@@ -386,7 +338,13 @@ function UnforwardedModal(
 										/>
 										<Button
 											size="small"
-											onClick={ animateClose }
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) =>
+												closeModal( () =>
+													onRequestClose( event )
+												)
+											}
 											icon={ close }
 											label={
 												closeButtonLabel ||
