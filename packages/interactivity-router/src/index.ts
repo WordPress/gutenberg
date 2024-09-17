@@ -401,6 +401,14 @@ function a11ySpeak( messageKey: keyof typeof navigationTexts ) {
 					navigationTexts.loaded = parsed.i18n.loaded;
 				}
 			} catch {}
+		} else {
+			// Fallback to localized strings from Interactivity API state.
+			if ( state.navigation.texts?.loading ) {
+				navigationTexts.loading = state.navigation.texts.loading;
+			}
+			if ( state.navigation.texts?.loaded ) {
+				navigationTexts.loaded = state.navigation.texts.loaded;
+			}
 		}
 	}
 
