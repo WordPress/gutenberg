@@ -130,7 +130,7 @@ export default {
 				.map( ( [ key, value ] ) => [
 					key,
 					{
-						label: registeredFields?.[ key ]?.label || key,
+						label: registeredFields?.[ key ]?.title || key,
 						value,
 					},
 				] )
