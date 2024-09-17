@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, getServerContext } from '@wordpress/interactivity';
 
 store( 'directive-context', {
 	state: {
@@ -55,7 +55,7 @@ const html = `
 		<div
 			data-wp-interactive="directive-context-navigate"
 			data-wp-router-region="navigation"
-			data-wp-context='{ "text": "second page", "text2": "second page" }'
+			data-wp-context='{ "text": "second page", "text2": "second page", "serverText": "second page" }'
 		>
 			<div data-wp-context='{}'>
 				<div data-testid="navigation inherited text" data-wp-text="context.text"></div>
@@ -63,6 +63,7 @@ const html = `
 			</div>
 			<div data-testid="navigation text" data-wp-text="context.text"></div>
 			<div data-testid="navigation new text" data-wp-text="context.newText"></div>
+			<div data-testid="navigation server text" data-wp-text="context.serverText"></div>
 			<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 			<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
 			<button data-testid="add text2" data-wp-on--click="actions.addText2">Add Text 2</button>
@@ -97,6 +98,12 @@ const { actions } = store( 'directive-context-navigate', {
 			yield actions.navigate();
 			const ctx = getContext();
 			ctx.newText = 'changed from async action';
+		},
+	},
+	callbacks: {
+		updateServerText() {
+			const ctx = getContext();
+			ctx.serverText = getServerContext().serverText;
 		},
 	},
 } );

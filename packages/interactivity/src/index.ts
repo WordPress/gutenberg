@@ -17,7 +17,7 @@ import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 
 export { store, getConfig } from './store';
-export { getContext, getElement } from './scopes';
+export { getContext, getServerContext, getElement } from './scopes';
 export {
 	withScope,
 	useWatch,

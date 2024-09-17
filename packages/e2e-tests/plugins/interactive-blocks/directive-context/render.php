@@ -151,7 +151,7 @@
 <div
 	data-wp-interactive='{"namespace": "directive-context-navigate"}'
 	data-wp-router-region="navigation"
-	data-wp-context='{ "text": "first page" }'
+	data-wp-context='{ "text": "first page", "serverText": "first page" }'
 >
 	<div data-wp-context='{}'>
 		<div data-testid="navigation inherited text" data-wp-text="context.text"></div>
@@ -159,6 +159,8 @@
 	</div>
 	<div data-testid="navigation text" data-wp-text="context.text"></div>
 	<div data-testid="navigation new text" data-wp-text="context.newText"></div>
+	<div data-testid="navigation server text" data-wp-text="context.serverText"></div>
+	<div data-testid="server text" data-wp-text="context.serverText" data-wp-watch="callbacks.updateServerText"></div>
 	<button data-testid="toggle text" data-wp-on--click="actions.toggleText">Toggle Text</button>
 	<button data-testid="add new text" data-wp-on--click="actions.addNewText">Add New Text</button>
 	<button data-testid="add text2" data-wp-on--click="actions.addText2">Add Text 2</button>

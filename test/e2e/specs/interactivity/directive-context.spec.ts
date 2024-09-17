@@ -395,4 +395,11 @@ test.describe( 'data-wp-context', () => {
 		await expect( childProp ).toHaveText( 'fromChildNs' );
 		await expect( parentProp ).toHaveText( 'fromParentNs' );
 	} );
+
+	test( 'should update server context on navigation', async ( { page } ) => {
+		const element = page.getByTestId( 'navigation server text' );
+		await expect( element ).toHaveText( 'first page' );
+		await page.getByTestId( 'navigate' ).click();
+		await expect( element ).toHaveText( 'second page' );
+	} );
 } );
