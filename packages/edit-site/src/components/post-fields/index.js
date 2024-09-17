@@ -26,7 +26,7 @@ import {
 import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
-import { SlugView, SlugEdit } from '@wordpress/fields';
+import { slugField } from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -370,13 +370,7 @@ function usePostFields( viewType ) {
 					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
-			{
-				label: __( 'Link' ),
-				id: 'slug',
-				getValue: ( { item } ) => item.slug,
-				render: SlugView,
-				Edit: SlugEdit,
-			},
+			slugField,
 			{
 				id: 'comment_status',
 				label: __( 'Discussion' ),

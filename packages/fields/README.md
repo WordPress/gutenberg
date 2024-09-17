@@ -50,11 +50,7 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### SlugEdit
-
-Undocumented declaration.
-
-### SlugView
+### slugField
 
 Undocumented declaration.
 

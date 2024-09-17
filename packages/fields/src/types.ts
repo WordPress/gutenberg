@@ -35,6 +35,8 @@ export interface BasePost extends CommonPost {
 	menu_order?: number;
 	ping_status?: 'open' | 'closed';
 	link?: string;
+	slug?: string;
+	permalink_template?: string;
 }
 
 export interface Template extends CommonPost {

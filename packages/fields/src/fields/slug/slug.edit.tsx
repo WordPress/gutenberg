@@ -20,13 +20,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { SlugItem } from './types';
+import type { BasePost } from '../../types';
 
 const SlugEdit = ( {
 	field,
 	onChange,
 	data,
-}: DataFormControlProps< SlugItem > ) => {
+}: DataFormControlProps< BasePost > ) => {
 	const { id } = field;
 
 	const slug = field.getValue( { item: data } ) ?? '';

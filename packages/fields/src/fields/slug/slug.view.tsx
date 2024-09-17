@@ -6,9 +6,9 @@ import { useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { SlugItem } from './types';
+import type { BasePost } from '../../types';
 
-const SlugView = ( { item }: { item: SlugItem } ) => {
+const SlugView = ( { item }: { item: BasePost } ) => {
 	const slug = item.slug;
 	const originalSlug = useRef( slug );
 
