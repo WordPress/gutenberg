@@ -383,3 +383,36 @@ export const modifyContentLockBlock =
 			focusModeToRevert
 		);
 	};
+
+/**
+ * Sets the zoom level.
+ *
+ * @param {number} zoom the new zoom level
+ * @return {Object} Action object.
+ */
+export function setZoomOut( zoom = 50 ) {
+	let zoomValue;
+
+	if ( zoom === true ) {
+		zoomValue = 50;
+	} else if ( zoom === false ) {
+		zoomValue = 100; // Considered as a reset
+	} else {
+		zoomValue = zoom;
+	}
+
+	return {
+		type: 'SET_ZOOM_OUT',
+		zoom: zoomValue,
+	};
+}
+
+/**
+ * Resets the Zoom state.
+ * @return {Object} Action object.
+ */
+export function resetZoomOut() {
+	return {
+		type: 'RESET_ZOOM',
+	};
+}

@@ -2093,10 +2093,12 @@ export function hoveredBlockClientId( state = false, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function zoomOut( state = false, action ) {
+export function zoomLevel( state = 100, action ) {
 	switch ( action.type ) {
 		case 'SET_ZOOM_OUT':
-			return action.zoomOut;
+			return action.zoom;
+		case 'RESET_ZOOM':
+			return 100;
 	}
 
 	return state;
@@ -2135,7 +2137,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	hoveredBlockClientId,
-	zoomOut,
+	zoomLevel,
 } );
 
 function withAutomaticChangeReset( reducer ) {

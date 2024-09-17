@@ -181,7 +181,8 @@ function VisualEditor( {
 			getSettings,
 			__unstableGetEditorMode,
 			isZoomOut: _isZoomOut,
-		} = select( blockEditorStore );
+		} = unlock( select( blockEditorStore ) );
+
 		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,

@@ -3094,13 +3094,3 @@ export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
 	);
 	return getTemporarilyEditingFocusModeToRevert( state );
 }
-
-/**
- * Returns the zoom out state.
- *
- * @param {Object} state Global application state.
- * @return {boolean} The zoom out state.
- */
-export function isZoomOut( state ) {
-	return state.zoomOut;
-}

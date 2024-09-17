@@ -22,6 +22,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const selectIcon = (
 	<SVG
@@ -46,8 +47,9 @@ function ToolSelector( props, ref ) {
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode, setZoomOut } =
-		useDispatch( blockEditorStore );
+	const { __unstableSetEditorMode, setZoomOut } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	return (
 		<Dropdown
