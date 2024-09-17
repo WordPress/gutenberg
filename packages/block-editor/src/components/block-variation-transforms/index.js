@@ -142,11 +142,19 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { activeBlockVariation, variations, isContentOnly } = useSelect(
 		( select ) => {
-			const { getActiveBlockVariation, getBlockVariations } =
-				select( blocksStore );
+			const {
+				getActiveBlockVariation,
+				getBlockVariations,
+				__experimentalHasContentRoleAttribute,
+			} = select( blocksStore );
 			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
+
 			const name = blockClientId && getBlockName( blockClientId );
+
+			const isContentBlock =
+				__experimentalHasContentRoleAttribute( name );
+
 			return {
 				activeBlockVariation: getActiveBlockVariation(
 					name,
@@ -154,7 +162,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 				),
 				variations: name && getBlockVariations( name, 'transform' ),
 				isContentOnly:
-					getBlockEditingMode( blockClientId ) === 'contentOnly',
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
 			};
 		},
 		[ blockClientId ]
