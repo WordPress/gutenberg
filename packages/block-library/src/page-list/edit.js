@@ -72,10 +72,7 @@ function BlockContent( {
 
 	if ( pages.length === 0 ) {
 		return (
-			<span
-				className="rich-text"
-				data-rich-text-placeholder="You have no pages yet."
-			></span>
+			<span>{ __( 'No pages found.' ) }</span>
 		);
 	}
 
