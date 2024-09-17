@@ -61,8 +61,12 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_can_update_block_binding
  * @return array Modified arguments array including `label`.
  */
 function gutenberg_update_meta_args_with_label( $args ) {
-	// Default to empty string.
-	$schema = array( 'title' => isset( $args['label'] ) ? $args['label'] : '' );
+	// Don't update schema when label isn't provided.
+	if ( ! isset( $args['label'] ) ) {
+		return $args;
+	}
+
+	$schema = array( 'title' => $args['label'] );
 	if ( ! is_array( $args['show_in_rest'] ) ) {
 		$args['show_in_rest'] = array(
 			'schema' => $schema,
