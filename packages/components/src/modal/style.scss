@@ -102,8 +102,8 @@
 	}
 }
 
-// Note: this keyframe definition is also used in the animationend JS event
-// listener — make sure the two instances are kept in sync.
+// Note: this animation is also used in the animationend JS event listener.
+// Make sure that the animation name is kept in sync across the two files.
 @keyframes components-modal__disappear-animation {
 	from {
 		opacity: 1;
