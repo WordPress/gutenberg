@@ -38,6 +38,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import { STYLE_BOOK_CATEGORIES } from './constants';
+import { getCategoryExamples } from './utils';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -374,7 +375,15 @@ const StyleBookBody = ( {
 
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
+		const categoryDefinition = STYLE_BOOK_CATEGORIES.find(
+			( c ) => c.name === category
+		);
+		const filteredExamples = getCategoryExamples(
+			categoryDefinition,
+			examples
+		);
 
+		console.log( { filteredExamples } );
 		return (
 			<Composite
 				orientation="vertical"
@@ -382,11 +391,8 @@ const Examples = memo(
 				aria-label={ label }
 				role="grid"
 			>
-				{ examples
-					.filter( ( example ) =>
-						category ? example.category === category : true
-					)
-					.map( ( example ) => (
+				{ !! filteredExamples.examples?.length &&
+					filteredExamples.examples.map( ( example ) => (
 						<Example
 							key={ example.name }
 							id={ `example-${ example.name }` }
@@ -398,10 +404,43 @@ const Examples = memo(
 							} }
 						/>
 					) ) }
+				{ !! filteredExamples.subcategories?.length &&
+					filteredExamples.subcategories.map( ( subcategory ) => (
+						<Composite.Group
+							key={ `subcategory-${ subcategory.name }` }
+						>
+							<Composite.GroupLabel>
+								{ subcategory.title }
+							</Composite.GroupLabel>
+							<Subcategory
+								examples={ subcategory.examples }
+								isSelected={ isSelected }
+								onSelect={ onSelect }
+							/>
+						</Composite.Group>
+					) ) }
 			</Composite>
 		);
 	}
 );
+
+const Subcategory = ( { examples, isSelected, onSelect } ) => {
+	return (
+		!! examples?.length &&
+		examples.map( ( example ) => (
+			<Example
+				key={ example.name }
+				id={ `example-${ example.name }` }
+				title={ example.title }
+				blocks={ example.blocks }
+				isSelected={ isSelected( example.name ) }
+				onClick={ () => {
+					onSelect?.( example.name );
+				} }
+			/>
+		) )
+	);
+};
 
 const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(

@@ -21,7 +21,10 @@ import { useMemo, useState, memo, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { STYLE_BOOK_CATEGORIES, STYLE_BOOK_THEME_SUBCATEGORIES } from './constants';
+import {
+	STYLE_BOOK_CATEGORIES,
+	STYLE_BOOK_THEME_SUBCATEGORIES,
+} from './constants';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 const {
@@ -143,28 +146,36 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 
 	if ( categoryDefinition?.subcategories?.length ) {
 		return categoryDefinition.subcategories.reduce(
-			( acc, subCategory ) => ( {
-				...acc,
-				...getCategoryExamples( subCategory, examples ),
-			} ),
-			{}
+			( acc, subcategory ) => {
+				acc.subcategories.push(
+					getCategoryExamples( subcategory, examples )
+				);
+				return acc;
+			},
+			{
+				title: categoryDefinition.title,
+				name: categoryDefinition.name,
+				subcategories: [],
+			}
 		);
 	}
 
 	const blocksToInclude = categoryDefinition?.blocks || [];
 	const blocksToExclude = categoryDefinition?.exclude || [];
 
+	// @TODO maybe return an array. [ { label: string, examples: [] } ]
+	// With subcategories { subcategories: [ { title: string, examples: [] } ] }
+	// With single category examples { title: string,  examples: [] }
 	return {
-		[ categoryDefinition.name ]: {
-			title: categoryDefinition.title,
-			examples: examples.filter( ( example ) => {
-				return (
-					! blocksToExclude.includes( example.name ) &&
-					( example.category === categoryDefinition.name ||
-						blocksToInclude.includes( example.name ) )
-				);
-			} ),
-		},
+		title: categoryDefinition.title,
+		name: categoryDefinition.name,
+		examples: examples.filter( ( example ) => {
+			return (
+				! blocksToExclude.includes( example.name ) &&
+				( example.category === categoryDefinition.name ||
+					blocksToInclude.includes( example.name ) )
+			);
+		} ),
 	};
 }
 
