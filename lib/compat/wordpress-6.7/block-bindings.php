@@ -57,7 +57,7 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_can_update_block_binding
 /**
  * Add `label` to `register_meta`.
  *
- * @param array  $args         Array of arguments for registering meta.
+ * @param array  $args Array of arguments for registering meta.
  * @return array Modified arguments array including `label`.
  */
 function gutenberg_update_meta_args_with_label( $args ) {
