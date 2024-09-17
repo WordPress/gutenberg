@@ -16,8 +16,17 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { normalizeFields } from '../../normalize-fields';
-import type { DataFormProps, NormalizedField, Field } from '../../types';
+import {
+	normalizeFields,
+	normalizeCombinedFields,
+} from '../../normalize-fields';
+import type {
+	DataFormProps,
+	NormalizedField,
+	Field,
+	CombinedFormField,
+	NormalizedCombinedFormField,
+} from '../../types';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -133,6 +142,26 @@ function FormField< Item >( {
 	);
 }
 
+export function getVisibleFields(
+	fields: Field< any >[],
+	formFields: string[] = [],
+	combinedFields?: CombinedFormField< any >[]
+): Field< any >[] {
+	const visibleFields: Array<
+		Field< any > | NormalizedCombinedFormField< any >
+	> = [ ...fields ];
+	if ( combinedFields ) {
+		visibleFields.push(
+			...normalizeCombinedFields( combinedFields, fields )
+		);
+	}
+	return formFields
+		.map( ( fieldId ) =>
+			visibleFields.find( ( { id } ) => id === fieldId )
+		)
+		.filter( ( field ): field is Field< any > => !! field );
+}
+
 export default function FormPanel< Item >( {
 	data,
 	fields,
@@ -142,13 +171,13 @@ export default function FormPanel< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				( form.fields ?? [] )
-					.map( ( fieldId ) =>
-						fields.find( ( { id } ) => id === fieldId )
-					)
-					.filter( ( field ): field is Field< Item > => !! field )
+				getVisibleFields(
+					fields,
+					form.fields,
+					form.layout?.combinedFields
+				)
 			),
-		[ fields, form.fields ]
+		[ fields, form.fields, form.layout?.combinedFields ]
 	);
 
 	return (
