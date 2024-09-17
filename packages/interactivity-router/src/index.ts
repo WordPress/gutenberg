@@ -215,7 +215,26 @@ const navigationTexts = {
 	loaded: 'Page Loaded.',
 };
 
-export const { state, actions } = store( 'core/router', {
+interface Store {
+	state: {
+		url: string;
+		navigation: {
+			hasStarted: boolean;
+			hasFinished: boolean;
+			message: string;
+			texts?: {
+				loading?: string;
+				loaded?: string;
+			};
+		};
+	};
+	actions: {
+		navigate: ( href: string, options?: NavigateOptions ) => void;
+		prefetch: ( url: string, options?: PrefetchOptions ) => void;
+	};
+}
+
+export const { state, actions } = store< Store >( 'core/router', {
 	state: {
 		url: window.location.href,
 		navigation: {
