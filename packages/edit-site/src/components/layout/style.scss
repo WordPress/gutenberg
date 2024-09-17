@@ -250,6 +250,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	flex-grow: 1;
 	margin: 0;
 	overflow: hidden;
+	box-shadow: $elevation-x-small;
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
