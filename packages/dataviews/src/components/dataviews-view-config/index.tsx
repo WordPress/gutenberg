@@ -28,6 +28,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -49,7 +50,6 @@ import type { SupportedLayouts, View, Field } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { unlock } from '../../lock-unlock';
 import DensityPicker from '../../dataviews-layouts/grid/density-picker';
-import { useInstanceId } from '@wordpress/compose';
 
 const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
