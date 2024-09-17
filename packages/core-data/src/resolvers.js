@@ -992,14 +992,11 @@ export const getRevision =
  */
 export const getRegisteredPostMeta =
 	( postType ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { select, dispatch } ) => {
 		try {
-			const {
-				rest_namespace: restNamespace = 'wp/v2',
-				rest_base: restBase,
-			} = ( await resolveSelect.getPostType( postType ) ) || {};
+			const restBase = select.getPostType( postType )?.rest_base;
 			const options = await apiFetch( {
-				path: `${ restNamespace }/${ restBase }/?context=edit`,
+				path: `wp/v2/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
 			dispatch.receiveRegisteredPostMeta(
