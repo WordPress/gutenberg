@@ -64,7 +64,7 @@ function bubbleEvent( event, Constructor, frame ) {
 }
 
 /**
- * Bubbles some event types (keydown, keypress, and dragover) to parent document
+ * Bubbles some event types (keydown, keypress, and dragover) to parent
  * document to ensure that the keyboard shortcuts and drag and drop work.
  *
  * Ideally, we should remove event bubbling in the future. Keyboard shortcuts
@@ -110,6 +110,8 @@ function Iframe( {
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
+	lang,
+	dir,
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
@@ -122,6 +124,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
+	const [ iframeOwnerDocument, setIframeOwnerDocument ] = useState();
 	const prevContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
@@ -134,6 +137,7 @@ function Iframe( {
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
+			setIframeOwnerDocument( node.ownerDocument );
 		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
@@ -160,8 +164,6 @@ function Iframe( {
 						name === 'wp-embed-responsive'
 				)
 			);
-
-			contentDocument.dir = ownerDocument.dir;
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
@@ -260,11 +262,20 @@ function Iframe( {
 		isZoomedOut ? iframeResizeRef : null,
 	] );
 
+	// Fallback locale values from parent frame.
+	let defaultLang = iframeOwnerDocument?.lang;
+	let defaultDir = iframeOwnerDocument?.dir;
+
+	if ( lang && dir ) {
+		defaultLang = lang;
+		defaultDir = dir;
+	}
+
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
 	const html = `<!doctype html>
-<html>
+<html lang="${ defaultLang }" dir="${ defaultDir }">
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
@@ -429,7 +440,10 @@ function Iframe( {
 							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
-								...bodyClasses
+								...bodyClasses,
+								{
+									rtl: 'rtl' === dir,
+								}
 							) }
 						>
 							{ contentResizeListener }
