@@ -2,11 +2,8 @@
 /**
  * WordPress dependencies
  */
+import { useEvent } from '@wordpress/compose';
 import { useRef, useEffect } from '@wordpress/element';
-/**
- * Internal dependencies
- */
-import { useEvent } from './use-event';
 
 /**
  * Context object for the `onUpdate` callback of `useOnValueUpdate`.
