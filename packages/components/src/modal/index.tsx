@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ForwardedRef, KeyboardEvent, RefObject, UIEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -42,7 +41,7 @@ import { useModalExitAnimation } from './use-modal-exit-animation';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 type Dismissers = Set<
-	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
 >;
 const ModalContext = createContext< Dismissers >( new Set() );
 
@@ -51,7 +50,7 @@ const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		bodyOpenClassName = 'modal-open',
@@ -204,7 +203,9 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
-	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+	function handleEscapeKeyDown(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
 		if (
 			shouldCloseOnEsc &&
 			( event.code === 'Escape' || event.key === 'Escape' ) &&
@@ -216,7 +217,7 @@ function UnforwardedModal(
 	}
 
 	const onContentContainerScroll = useCallback(
-		( e: UIEvent< HTMLDivElement > ) => {
+		( e: React.UIEvent< HTMLDivElement > ) => {
 			const scrollY = e?.currentTarget?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
