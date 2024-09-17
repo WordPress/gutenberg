@@ -10,7 +10,7 @@ import { useCallback, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useResizeObserver from '../index';
+import { useResizeObserver } from '../use-resize-observer';
 
 export type ObservedSize = {
 	width: number | null;
