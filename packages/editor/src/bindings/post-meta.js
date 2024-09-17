@@ -71,7 +71,7 @@ export default {
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				metaFields?.[ source.args.key ] || source.args.key;
+				metaFields?.[ source.args.key ] ?? source.args.key;
 		}
 		return newValues;
 	},
