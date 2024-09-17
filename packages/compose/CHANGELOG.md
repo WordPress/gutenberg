@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useResizeObserver`: fixed a bug that caused elements to not be properly unobserved ([#65389](https://github.com/WordPress/gutenberg/pull/65389)).
+
 ### New Features
 
 -   `useEvent`: a new utility that creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
