@@ -125,6 +125,7 @@ export function RichTextWrapper(
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
+	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -178,6 +179,10 @@ export function RichTextWrapper(
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
+			const fieldsList = blockBindingsSource?.getFieldsList?.( {
+				registry,
+				context: blockContext,
+			} );
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
@@ -186,12 +191,17 @@ export function RichTextWrapper(
 					args: relatedBinding.args,
 				} );
 
+			const bindingKey =
+				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
+				relatedBinding?.args?.key ??
+				blockBindingsSource?.label;
+
 			const _bindingsPlaceholder = _disableBoundBlock
-				? relatedBinding?.args?.key || blockBindingsSource?.label
+				? bindingKey
 				: sprintf(
 						/* translators: %s: source label or key */
 						__( 'Add %s' ),
-						relatedBinding?.args?.key || blockBindingsSource?.label
+						bindingKey
 				  );
 
 			return {
@@ -201,7 +211,14 @@ export function RichTextWrapper(
 					_bindingsPlaceholder,
 			};
 		},
-		[ blockBindings, identifier, blockName, blockContext, adjustedValue ]
+		[
+			blockBindings,
+			identifier,
+			blockName,
+			blockContext,
+			registry,
+			adjustedValue,
+		]
 	);
 
 	const shouldDisableEditing = readOnly || disableBoundBlock;
@@ -371,7 +388,6 @@ export function RichTextWrapper(
 		element.focus();
 	}
 
-	const registry = useRegistry();
 	const TagName = tagName;
 	return (
 		<>
