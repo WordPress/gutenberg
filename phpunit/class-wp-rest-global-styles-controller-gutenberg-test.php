@@ -79,6 +79,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::register_routes
 	 */
 	public function test_register_routes() {
+		// Register routes so that they overwrite identical Core routes.
+		$global_styles_controller = new WP_REST_Global_Styles_Controller_Gutenberg();
+		$global_styles_controller->register_routes();
+
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey(
 			'/wp/v2/global-styles/(?P<id>[\/\w-]+)',
@@ -86,7 +90,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 			'Single global style based on the given ID route does not exist'
 		);
 		$this->assertCount(
-			4, // Double core because both sets get registered in the plugin.
+			2,
 			$routes['/wp/v2/global-styles/(?P<id>[\/\w-]+)'],
 			'Single global style based on the given ID route does not have exactly two elements'
 		);
@@ -96,7 +100,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 			'Theme global styles route does not exist'
 		);
 		$this->assertCount(
-			2, // Double core because both sets get registered in the plugin.
+			1,
 			$routes['/wp/v2/global-styles/themes/(?P<stylesheet>[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?)'],
 			'Theme global styles route does not have exactly one element'
 		);

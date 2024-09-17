@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -22,18 +22,13 @@ const meta: Meta< typeof ButtonGroup > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof ButtonGroup > = ( args ) => {
-	const style = { margin: '0 4px' };
-	return (
-		<ButtonGroup { ...args }>
-			<Button variant="primary" style={ style }>
-				Button 1
-			</Button>
-			<Button variant="primary" style={ style }>
-				Button 2
-			</Button>
-		</ButtonGroup>
-	);
+export const Default: StoryObj< typeof ButtonGroup > = {
+	args: {
+		children: (
+			<>
+				<Button variant="primary">Button 1</Button>
+				<Button>Button 2</Button>
+			</>
+		),
+	},
 };
-
-export const Default: StoryFn< typeof ButtonGroup > = Template.bind( {} );

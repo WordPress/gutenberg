@@ -9,7 +9,7 @@ import {
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { backup, closeSmall, seen } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -32,24 +32,15 @@ const { EditorContentSlotFill, ResizableEditor } = unlock( editorPrivateApis );
  *
  * @return {Object} Translated string for the view title and associated icon, both defaulting to ''.
  */
-function getEditorCanvasContainerTitleAndIcon( view ) {
+function getEditorCanvasContainerTitle( view ) {
 	switch ( view ) {
 		case 'style-book':
-			return {
-				title: __( 'Style Book' ),
-				icon: seen,
-			};
+			return __( 'Style Book' );
 		case 'global-styles-revisions':
 		case 'global-styles-revisions:style-book':
-			return {
-				title: __( 'Style Revisions' ),
-				icon: backup,
-			};
+			return __( 'Style Revisions' );
 		default:
-			return {
-				title: '',
-				icon: '',
-			};
+			return '';
 	}
 }
 
@@ -118,9 +109,7 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
-	const { title } = getEditorCanvasContainerTitleAndIcon(
-		editorCanvasContainerView
-	);
+	const title = getEditorCanvasContainerTitle( editorCanvasContainerView );
 	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (
@@ -158,4 +147,4 @@ function useHasEditorCanvasContainer() {
 }
 
 export default EditorCanvasContainer;
-export { useHasEditorCanvasContainer, getEditorCanvasContainerTitleAndIcon };
+export { useHasEditorCanvasContainer, getEditorCanvasContainerTitle };
