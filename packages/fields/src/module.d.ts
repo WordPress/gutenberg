@@ -1,2 +1,2 @@
-declare module '@wordpress/editor';
 declare module '@wordpress/patterns';
+declare module '@wordpress/block-editor';

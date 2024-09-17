@@ -10,7 +10,6 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import BackButton from './components/header/back-button';
-import CreateTemplatePartModal from './components/create-template-part-modal';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostCardPanel from './components/post-card-panel';
@@ -27,6 +26,7 @@ import {
 	registerCoreBlockBindingsSources,
 	bootstrapBlockBindingsSourcesFromServer,
 } from './bindings/api';
+import { CreateTemplatePartModal } from '@wordpress/fields';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 

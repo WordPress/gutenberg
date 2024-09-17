@@ -12,19 +12,21 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_PART_POST_TYPE } from '../../store/constants';
+import { TEMPLATE_PART_POST_TYPE } from '../../constants';
 
 export const useExistingTemplateParts = () => {
-	return useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords(
-				'postType',
-				TEMPLATE_PART_POST_TYPE,
-				{
-					per_page: -1,
-				}
-			),
-		[]
+	return (
+		useSelect(
+			( select ) =>
+				select( coreStore ).getEntityRecords(
+					'postType',
+					TEMPLATE_PART_POST_TYPE,
+					{
+						per_page: -1,
+					}
+				),
+			[]
+		) ?? []
 	);
 };
 

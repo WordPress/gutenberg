@@ -20,15 +20,11 @@ import type { Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import {
-	getItemTitle,
-	isTemplateOrTemplatePart,
-	TEMPLATE_ORIGINS,
-	TEMPLATE_POST_TYPE,
-} from '../utils';
+import { getItemTitle, isTemplateOrTemplatePart } from '../utils';
 import type { CoreDataError, Template, TemplatePart } from '../../types';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
+import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../constants';
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart

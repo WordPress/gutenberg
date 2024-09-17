@@ -1591,18 +1591,6 @@ _Returns_
 
 Undocumented declaration.
 
-### registerEntityAction
-
-Registers a new DataViews action.
-
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
-
-_Parameters_
-
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _config_ `Action`: Action configuration.
-
 ### RichText
 
 > **Deprecated** since 5.3, use `wp.blockEditor.RichText` instead.
@@ -1693,18 +1681,6 @@ _Returns_
 ### transformStyles
 
 Undocumented declaration.
-
-### unregisterEntityAction
-
-Unregisters a DataViews action.
-
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
-
-_Parameters_
-
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _actionId_ `string`: Action ID.
 
 ### UnsavedChangesWarning
 

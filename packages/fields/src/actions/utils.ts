@@ -7,14 +7,11 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import type { Post, TemplatePart, Template } from '../types';
-
-export const TEMPLATE_POST_TYPE = 'wp_template';
-export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
-export const TEMPLATE_ORIGINS = {
-	custom: 'custom',
-	theme: 'theme',
-	plugin: 'plugin',
-};
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../constants';
 
 export function isTemplate( post: Post ): post is Template {
 	return post.type === TEMPLATE_POST_TYPE;
