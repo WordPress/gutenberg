@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -28,18 +28,8 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
-const TYPE_LABELS = {
-	// translators: 1: Pattern title.
-	wp_pattern: __( 'Editing pattern: %s' ),
-	// translators: 1: Navigation menu title.
-	wp_navigation: __( 'Editing navigation menu: %s' ),
-	// translators: 1: Template title.
-	wp_template: __( 'Editing template: %s' ),
-	// translators: 1: Template part title.
-	wp_template_part: __( 'Editing template part: %s' ),
-};
+/** @typedef {import("@wordpress/components").IconType} IconType */
 
 const MotionButton = motion( Button );
 
@@ -52,21 +42,21 @@ const MotionButton = motion( Button );
  * ```jsx
  * <DocumentBar />
  * ```
- * @param {Object}                                   props       The component props.
- * @param {string}                                   props.title A title for the document, defaulting to the document or
- *                                                               template title currently being edited.
- * @param {import("@wordpress/components").IconType} props.icon  An icon for the document, defaulting to an icon for document
- *                                                               or template currently being edited.
+ * @param {Object}   props       The component props.
+ * @param {string}   props.title A title for the document, defaulting to the document or
+ *                               template title currently being edited.
+ * @param {IconType} props.icon  An icon for the document, no default.
+ *                               (A default icon indicating the document post type is no longer used.)
  *
  * @return {JSX.Element} The rendered DocumentBar component.
  */
 export default function DocumentBar( props ) {
 	const {
 		postType,
+		postTypeLabel,
 		documentTitle,
 		isNotFound,
 		isUnsyncedPattern,
-		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
@@ -76,8 +66,11 @@ export default function DocumentBar( props ) {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
-			select( coreStore );
+		const {
+			getEditedEntityRecord,
+			getPostType,
+			isResolving: isResolvingSelector,
+		} = select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
@@ -86,8 +79,11 @@ export default function DocumentBar( props ) {
 			_postId
 		);
 		const _templateInfo = getTemplateInfo( _document );
+		const _postTypeLabel = getPostType( _postType )?.labels?.singular_name;
+
 		return {
 			postType: _postType,
+			postTypeLabel: _postTypeLabel,
 			documentTitle: _document.title,
 			isNotFound:
 				! _document &&
@@ -98,12 +94,6 @@ export default function DocumentBar( props ) {
 					_postId
 				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
-			templateIcon: unlock( select( editorStore ) ).getPostIcon(
-				_postType,
-				{
-					area: _document?.area,
-				}
-			),
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -118,7 +108,7 @@ export default function DocumentBar( props ) {
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
 	const title = props.title || entityTitle;
-	const icon = props.icon || templateIcon;
+	const icon = props.icon;
 
 	const mountedRef = useRef( false );
 	useEffect( () => {
@@ -187,20 +177,18 @@ export default function DocumentBar( props ) {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ icon } />
-						<Text
-							size="body"
-							as="h1"
-							aria-label={
-								! props.title && TYPE_LABELS[ postType ]
-									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( TYPE_LABELS[ postType ], title )
-									: undefined
-							}
-						>
-							{ title
-								? decodeEntities( title )
-								: __( 'No title' ) }
+						{ icon && <BlockIcon icon={ icon } /> }
+						<Text size="body" as="h1">
+							<span className="editor-document-bar__post-title">
+								{ title
+									? decodeEntities( title )
+									: __( 'No title' ) }
+							</span>
+							{ postTypeLabel && ! props.title && (
+								<span className="editor-document-bar__post-type-label">
+									{ '· ' + decodeEntities( postTypeLabel ) }
+								</span>
+							) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">

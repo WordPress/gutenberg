@@ -428,8 +428,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			{ ! loading && hasCreateAction && (
 				<FlexItem>
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						onClick={ onToggleForm }
 						className="editor-post-taxonomies__hierarchical-terms-add"
 						aria-expanded={ showForm }
