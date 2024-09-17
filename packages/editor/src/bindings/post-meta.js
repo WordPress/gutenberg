@@ -9,31 +9,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-function getMetadata( registry, context ) {
-	let metaFields = {};
-	const { type } = registry.select( editorStore ).getCurrentPost();
-	const { getEditedEntityRecord } = registry.select( coreDataStore );
-	const { getRegisteredPostMeta } = unlock(
-		registry.select( coreDataStore )
-	);
-
-	if ( type === 'wp_template' ) {
-		const fields = getRegisteredPostMeta( context?.postType );
-		// Populate the `metaFields` object with the default values.
-		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
-			metaFields[ key ] = props.default;
-		} );
-	} else {
-		metaFields = getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		).meta;
-	}
-
-	return metaFields;
-}
-
 export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
@@ -109,8 +84,12 @@ export default {
 			is_custom: isCustom,
 			slug,
 		} = registry.select( editorStore ).getCurrentPost();
-		const { getRegisteredPostMeta, getPostTypes, getEditedEntityRecord } =
+		const { getPostTypes, getEditedEntityRecord } =
 			registry.select( coreDataStore );
+
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
 
 		// Inherit the postType from the slug if it is a template.
 		if ( ! context?.postType && type === 'wp_template' ) {
