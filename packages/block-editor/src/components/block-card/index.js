@@ -13,7 +13,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
-import { __, isRTL } from '@wordpress/i18n';
+import { __, isRTL, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -66,7 +66,14 @@ function BlockCard( { title, icon, description, blockType, className, name } ) {
 			<BlockIcon icon={ icon } showColors />
 			<VStack spacing={ 1 }>
 				<h2 className="block-editor-block-card__title">
-					{ name?.length ? `${ name } (${ title })` : title }
+					{ name?.length
+						? sprintf(
+								// translators:  %1$s: Custom block name. %2$s: Block title.
+								__( '%1$s (%2$s)' ),
+								name,
+								title
+						  )
+						: title }
 				</h2>
 				{ description && (
 					<Text className="block-editor-block-card__description">
