@@ -124,7 +124,7 @@ describe( 'Edit', () => {
 
 		const editElement = screen.getByTestId( 'foo-bar' );
 		expect( editElement ).toHaveClass( 'wp-block-test-block' );
-		expect( editElement ).toHaveClass( 'wp-block-test-block-variation' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block__variation' );
 	} );
 
 	it( 'should assign context', () => {
