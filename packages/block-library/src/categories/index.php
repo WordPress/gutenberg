@@ -64,6 +64,8 @@ function render_block_core_categories( $attributes, $content, $block ) {
 			);
 		}
 	} else {
+		$args['show_option_none'] = $taxonomy->labels->no_terms;
+
 		$wrapper_markup = '<ul %1$s>%2$s</ul>';
 		$items_markup   = wp_list_categories( $args );
 		$type           = 'list';
