@@ -2967,9 +2967,14 @@ export const getBlockEditingMode = createRegistrySelector(
 			);
 			if (
 				templateLock === 'contentOnly' ||
-				( editorMode === 'navigation' &&
-					! sectionsClientIds.includes( clientId ) )
+				editorMode === 'navigation'
 			) {
+				// Sections should always be contentOnly in navigation mode.
+				// This will also cause them to display in List View providing
+				// a structure.
+				if ( sectionsClientIds.includes( clientId ) ) {
+					return 'contentOnly';
+				}
 				const name = getBlockName( state, clientId );
 				const isContent =
 					select( blocksStore ).__experimentalHasContentRoleAttribute(
