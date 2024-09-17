@@ -3,6 +3,8 @@
  * HTML for testing the getServerState() function.
  *
  * @package gutenberg-test-interactive-blocks
+ *
+ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
 if ( isset( $attributes['state'] ) ) {
