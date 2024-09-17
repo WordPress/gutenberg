@@ -48,9 +48,6 @@ function Header( {
 	setEntitiesSavedStatesCallback,
 	title,
 } ) {
-	const zoomOutExperimentEnabled =
-		window.__experimentalEnableZoomOutExperiment;
-
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
@@ -146,7 +143,7 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				{ zoomOutExperimentEnabled && <ZoomOutToggle /> }
+				<ZoomOutToggle />
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
