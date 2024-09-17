@@ -252,8 +252,12 @@ export default function CategoriesEdit( {
 			) }
 			{ ! isResolving && categories?.length === 0 && (
 				<p>
-					{ __(
-						'Your site does not have any posts, so there is nothing to display here at the moment.'
+					{ sprintf(
+						/* translators: %s: taxonomy's singular name */
+						__(
+							'No terms from the "%s" taxonomy have been assigned to any posts, so there is nothing to display here at the moment.'
+						),
+						taxonomy.name
 					) }
 				</p>
 			) }
