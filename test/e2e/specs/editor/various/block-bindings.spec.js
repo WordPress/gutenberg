@@ -62,7 +62,7 @@ test.describe( 'Block bindings', () => {
 					name: 'Block: Paragraph',
 				} );
 				await expect( paragraphBlock ).toHaveText(
-					'text_custom_field'
+					'Value of the text custom field'
 				);
 			} );
 
@@ -922,7 +922,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Title input is enabled and with the original value.
 				await page
@@ -1064,7 +1064,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
 					.inputValue();
-				expect( titleValue ).toBe( 'text_custom_field' );
+				expect( titleValue ).toBe( 'Value of the text custom field' );
 			} );
 
 			test( 'should disable title input when title is bound to an undefined source', async ( {
@@ -1183,7 +1183,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
-				expect( altValue ).toBe( 'text_custom_field' );
+				expect( altValue ).toBe( 'Value of the text custom field' );
 
 				// Title input is enabled and with the original value.
 				await page
