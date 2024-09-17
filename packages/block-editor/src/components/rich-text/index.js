@@ -193,7 +193,6 @@ export function RichTextWrapper(
 
 			const bindingKey =
 				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				relatedBinding?.args?.key ??
 				blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
