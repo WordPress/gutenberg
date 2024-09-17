@@ -411,6 +411,10 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	margin-left: -1px;
 	margin-right: -1px;
 	transition: background-color 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.5em;
 
 	&.is-dragged-over {
 		background: $gray-400;
