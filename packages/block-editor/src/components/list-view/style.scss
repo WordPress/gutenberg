@@ -272,7 +272,7 @@
 
 	&.is-visible .block-editor-list-view-block-contents {
 		opacity: 1;
-		@include edit-post__fade-in-animation;
+		@include animation__fade-in;
 	}
 
 	.block-editor-block-icon {
