@@ -84,6 +84,7 @@ function ListViewBlockSelectButton(
 	return (
 		<Button
 			__next40pxDefaultSize
+			size="compact"
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
