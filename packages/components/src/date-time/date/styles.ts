@@ -21,11 +21,11 @@ export const Navigator = styled( HStack )`
 `;
 
 export const NavigatorHeading = styled( Heading )`
-	font-size: ${ CONFIG.fontSize };
-	font-weight: ${ CONFIG.fontWeight };
+	font-size: ${ CONFIG.fontSizeMedium };
+	font-weight: ${ CONFIG.fontWeightRegular };
 
 	strong {
-		font-weight: ${ CONFIG.fontWeightHeading };
+		font-weight: ${ CONFIG.fontWeightSemiBold };
 	}
 `;
 
@@ -39,7 +39,7 @@ export const Calendar = styled.div`
 
 export const DayOfWeek = styled.div`
 	color: ${ COLORS.theme.gray[ 700 ] };
-	font-size: ${ CONFIG.fontSize };
+	font-size: ${ CONFIG.fontSizeMedium };
 	line-height: ${ CONFIG.fontLineHeightBase };
 
 	&:nth-of-type( 1 ) {

@@ -90,7 +90,7 @@ export const rounded = css`
 	}
 `;
 
-const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase })`;
+const baseFontHeight = `calc(${ CONFIG.fontSizeMedium } * ${ CONFIG.fontLineHeightBase })`;
 
 /*
  * Math:

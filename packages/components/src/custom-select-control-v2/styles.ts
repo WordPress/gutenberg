@@ -158,7 +158,7 @@ export const SelectItem = styled( Ariakit.SelectItem )(
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		font-size: ${ CONFIG.fontSize };
+		font-size: ${ CONFIG.fontSizeMedium };
 		// TODO: reassess line-height for non-legacy v2
 		line-height: 28px;
 		padding-block: ${ space( 2 ) };

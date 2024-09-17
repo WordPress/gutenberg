@@ -57,8 +57,8 @@ export function getFontSize(
 		size = parsed;
 	}
 
-	const ratio = `(${ size } / ${ BASE_FONT_SIZE })`;
-	return `calc(${ ratio } * ${ CONFIG.fontSize })`;
+	//const ratio = `(${ size } / ${ BASE_FONT_SIZE })`;
+	return `${ size }px`;
 }
 
 export function getHeadingFontSize( size: ReactText = 3 ): string {
