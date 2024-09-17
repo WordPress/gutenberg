@@ -105,8 +105,10 @@ export default {
 	getFieldsList( { registry, context } ) {
 		const metaFields = getMetadata( registry, context );
 
+		// TODO: Fields returns undefined on the first click.
 		const fields = registry
 			.select( coreDataStore )
+			// TODO: Last item 'post' should not be hardcoded.
 			.getEntityRecord( 'root', 'postType', 'post' );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
