@@ -136,7 +136,6 @@ $editor-html-font: $font-family-mono;
  * Block & Editor UI.
  */
 
-$block-vertical-toolbar-height: $grid-unit-50;
 $block-toolbar-height: $grid-unit-60;
 $border-width: 1px;
 $border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
