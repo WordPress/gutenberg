@@ -251,15 +251,7 @@ export default function CategoriesEdit( {
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (
-				<p>
-					{ sprintf(
-						/* translators: %s: taxonomy's singular name */
-						__(
-							'No terms from the "%s" taxonomy have been assigned to any posts, so there is nothing to display here at the moment.'
-						),
-						taxonomy.name
-					) }
-				</p>
+				<p>{ taxonomy.labels.no_terms }</p>
 			) }
 			{ ! isResolving &&
 				categories?.length > 0 &&
