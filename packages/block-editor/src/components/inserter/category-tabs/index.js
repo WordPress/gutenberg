@@ -55,7 +55,6 @@ function CategoryTabs( {
 					<Tabs.Tab
 						key={ category.name }
 						tabId={ category.name }
-						className="block-editor-inserter__category-tab"
 						aria-label={ category.label }
 						aria-current={
 							category === selectedCategory ? 'true' : undefined

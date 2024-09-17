@@ -222,75 +222,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__category-tablist {
-	display: flex;
-	flex-direction: column;
-	border: none;
 	margin-bottom: $grid-unit-10;
-	// Push the listitem wrapping the "explore" button to the bottom of the panel.
-	div[role="listitem"]:last-child {
-		margin-top: auto;
-	}
-
-	// Temporarily disable the component's indicator animation.
-	// TODO: remove in favor of using the native component's styles and behavior,
-	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
-	&[aria-orientation="vertical"]::after {
-		content: none;
-	}
-
-	.block-editor-inserter__category-tab {
-		// Account for the icon on the right so that it's visually balanced.
-		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
-		text-align: left;
-		font-weight: inherit;
-		display: block;
-		position: relative;
-		height: auto;
-
-		&[aria-selected="true"] {
-			color: var(--wp-admin-theme-color);
-
-			.components-flex-item {
-				filter: brightness(0.95);
-			}
-
-			svg {
-				fill: var(--wp-admin-theme-color);
-			}
-
-			&::after {
-				content: "";
-				display: block;
-				outline: none;
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				border-radius: $radius-small;
-				opacity: 0.04;
-				background: var(--wp-admin-theme-color);
-				height: 100%;
-			}
-		}
-
-		&:focus-visible,
-		&:focus:not(:disabled) {
-			border-radius: $radius-small;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-
-		&::before {
-			display: none;
-		}
-
-		&::after {
-			display: none;
-		}
-	}
 }
 
 .block-editor-inserter__category-panel {
