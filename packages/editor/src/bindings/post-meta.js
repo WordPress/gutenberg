@@ -13,11 +13,10 @@ function getMetadata( registry, context ) {
 	let metaFields = {};
 	const { type } = registry.select( editorStore ).getCurrentPost();
 	const { getEditedEntityRecord } = registry.select( coreDataStore );
-
 	const { getRegisteredPostMeta } = unlock(
 		registry.select( coreDataStore )
 	);
-	// Inherit the postType from the slug if it is a template.
+
 	if ( type === 'wp_template' ) {
 		const fields = getRegisteredPostMeta( context?.postType || 'post' );
 		// Populate the `metaFields` object with the default values.
