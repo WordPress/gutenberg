@@ -229,18 +229,22 @@ const BlockInspectorSingleBlock = ( {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	const contentClientIds = useSelect(
 		( select ) => {
+			// Avoid unnecessary subscription.
+			if ( ! isContentLockingParent ) {
+				return;
+			}
+
 			const {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-			return isContentLockingParent
-				? getClientIdsOfDescendants( clientId ).filter(
-						( current ) =>
-							getBlockName( current ) !== 'core/list-item' &&
-							getBlockEditingMode( current ) === 'contentOnly'
-				  )
-				: undefined;
+
+			return getClientIdsOfDescendants( clientId ).filter(
+				( current ) =>
+					getBlockName( current ) !== 'core/list-item' &&
+					getBlockEditingMode( current ) === 'contentOnly'
+			);
 		},
 		[ isContentLockingParent, clientId ]
 	);
