@@ -40,9 +40,11 @@ export default function HeadingLevelDropdown( {
 	value,
 	onChange,
 } ) {
-	const validOptions = options.filter(
-		( option ) => option === 0 || HEADING_LEVELS.includes( option )
-	);
+	const validOptions = options
+		.filter(
+			( option ) => option === 0 || HEADING_LEVELS.includes( option )
+		)
+		.sort( ( a, b ) => a - b ); // Sorts numerically in ascending order;
 
 	return (
 		<ToolbarDropdownMenu
