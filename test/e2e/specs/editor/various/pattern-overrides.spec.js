@@ -150,7 +150,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			// Ensure the first pattern is selected.
-			await editor.selectBlocks( patternBlocks.first() );
+			await patternBlocks.first().selectText();
 			await expect( paragraphs.first() ).not.toHaveAttribute(
 				'inert',
 				'true'
@@ -168,7 +168,7 @@ test.describe( 'Pattern Overrides', () => {
 			await page.keyboard.type( 'I would word it this way' );
 
 			// Ensure the second pattern is selected.
-			await editor.selectBlocks( patternBlocks.last() );
+			await patternBlocks.last().selectText();
 			await patternBlocks
 				.last()
 				.getByRole( 'document', {

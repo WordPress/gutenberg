@@ -10,7 +10,6 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { getSelectionRoot } from './utils';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -24,27 +23,12 @@ export default function useSelectAll() {
 				return;
 			}
 
-			const selectionRoot = getSelectionRoot( node.ownerDocument );
 			const selectedClientIds = getSelectedBlockClientIds();
 
-			// Abort if there is selection, but it is not within a block.
-			if ( selectionRoot && ! selectedClientIds.length ) {
-				return;
-			}
-
 			if (
-				selectionRoot &&
 				selectedClientIds.length < 2 &&
-				! isEntirelySelected( selectionRoot )
+				! isEntirelySelected( event.target )
 			) {
-				if ( node === node.ownerDocument.activeElement ) {
-					event.preventDefault();
-					node.ownerDocument.defaultView
-						.getSelection()
-						.selectAllChildren( selectionRoot );
-					return;
-				}
-
 				return;
 			}
 
@@ -61,7 +45,6 @@ export default function useSelectAll() {
 					node.ownerDocument.defaultView
 						.getSelection()
 						.removeAllRanges();
-					node.contentEditable = 'false';
 					selectBlock( rootClientId );
 				}
 				return;
