@@ -9,20 +9,18 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-function getMetadata( registry, context ) {
+function getMetadata( registry, context, registeredFields ) {
 	let metaFields = {};
 	const { type } = registry.select( editorStore ).getCurrentPost();
 	const { getEditedEntityRecord } = registry.select( coreDataStore );
-	const { getRegisteredPostMeta } = unlock(
-		registry.select( coreDataStore )
-	);
 
 	if ( type === 'wp_template' ) {
-		const fields = getRegisteredPostMeta( context?.postType );
 		// Populate the `metaFields` object with the default values.
-		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
-			metaFields[ key ] = props.default;
-		} );
+		Object.entries( registeredFields || {} ).forEach(
+			( [ key, props ] ) => {
+				metaFields[ key ] = props.default;
+			}
+		);
 	} else {
 		metaFields = getEditedEntityRecord(
 			'postType',
@@ -37,19 +35,20 @@ function getMetadata( registry, context ) {
 export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
-		const metaFields = getMetadata( registry, context );
 		const { getRegisteredPostMeta } = unlock(
 			registry.select( coreDataStore )
 		);
 		const registeredFields = getRegisteredPostMeta( context?.postType );
+		const metaFields = getMetadata( registry, context, registeredFields );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			// Use the key if the value is not set.
+			// Use the value, the field label, or the field key.
+			const metaKey = source.args.key;
 			newValues[ attributeName ] =
-				metaFields?.[ source.args.key ] ??
-				registeredFields?.[ source.args.key ]?.label ??
-				source.args.key;
+				metaFields?.[ metaKey ] ??
+				registeredFields?.[ metaKey ]?.label ??
+				metaKey;
 		}
 		return newValues;
 	},
@@ -109,11 +108,11 @@ export default {
 		return true;
 	},
 	getFieldsList( { registry, context } ) {
-		const metaFields = getMetadata( registry, context );
 		const { getRegisteredPostMeta } = unlock(
 			registry.select( coreDataStore )
 		);
-		const registeredFields = getRegisteredPostMeta( postType );
+		const registeredFields = getRegisteredPostMeta( context?.postType );
+		const metaFields = getMetadata( registry, context, registeredFields );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
