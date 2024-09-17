@@ -222,6 +222,11 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__category-tablist {
+	&::before {
+		background-color: var(--wp-admin-theme-color) !important;
+		opacity: 0.04;
+	}
+
 	margin-bottom: $grid-unit-10;
 	// Push the listitem wrapping the "explore" button to the bottom of the panel.
 	// TODO: is this outdated? The selected element doesn't seem to exist.
@@ -230,10 +235,17 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__category-tab {
+
 		// Account for the icon on the right so that it's visually balanced.
 		// TODO: this is a style override, either the design or the component should
 		// be updated (e.g. by adding a variant).
 		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
+		font-weight: inherit;
+
+		&[aria-selected="true"] {
+			color: var(--wp-admin-theme-color);
+			fill: currentColor;
+		}
 	}
 }
 
