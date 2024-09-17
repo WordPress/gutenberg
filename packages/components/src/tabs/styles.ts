@@ -107,7 +107,7 @@ export const TabListWrapper = styled.div`
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: calc( var( --antialiasing-factor ) * 1px );
+		width: calc( var( --antialiasing-factor ) * 1px );
 		transform: translateY( calc( var( --indicator-top ) * 1px ) )
 			scaleY(
 				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
