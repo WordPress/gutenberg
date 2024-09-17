@@ -18,7 +18,7 @@ function getMetadata( registry, context ) {
 	);
 
 	if ( type === 'wp_template' ) {
-		const fields = getRegisteredPostMeta( context?.postType || 'post' );
+		const fields = getRegisteredPostMeta( context?.postType );
 		// Populate the `metaFields` object with the default values.
 		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
 			metaFields[ key ] = props.default;
