@@ -130,7 +130,8 @@ function VisualEditor( {
 			getRenderingMode,
 			getDeviceType,
 		} = select( editorStore );
-		const { getPostType, getEntityRecord, getEditedEntityRecord } = select( coreStore );
+		const { getPostType, getEntityRecord, getEditedEntityRecord } =
+			select( coreStore );
 		const postTypeSlug = getCurrentPostType();
 		const _renderingMode = getRenderingMode();
 		const siteData = getEntityRecord( 'root', '__unstableBase' );
