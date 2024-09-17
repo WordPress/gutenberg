@@ -1,186 +1,83 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import inserterMediaCategories from './inserter-media-categories';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-function useArchiveLabel( templateSlug ) {
-	const taxonomyMatches = templateSlug?.match(
-		/^(category|tag|taxonomy-([^-]+))$|^(((category|tag)|taxonomy-([^-]+))-(.+))$/
-	);
-	let taxonomy;
-	let term;
-	let isAuthor = false;
-	let authorSlug;
-	if ( taxonomyMatches ) {
-		// If is for a all taxonomies of a type
-		if ( taxonomyMatches[ 1 ] ) {
-			taxonomy = taxonomyMatches[ 2 ]
-				? taxonomyMatches[ 2 ]
-				: taxonomyMatches[ 1 ];
-		}
-		// If is for a all taxonomies of a type
-		else if ( taxonomyMatches[ 3 ] ) {
-			taxonomy = taxonomyMatches[ 6 ]
-				? taxonomyMatches[ 6 ]
-				: taxonomyMatches[ 4 ];
-			term = taxonomyMatches[ 7 ];
-		}
-		taxonomy = taxonomy === 'tag' ? 'post_tag' : taxonomy;
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-		//getTaxonomy( 'category' );
-		//wp.data.select('core').getEntityRecords( 'taxonomy', 'category', {slug: 'newcat'} );
-	} else {
-		const authorMatches = templateSlug?.match( /^(author)$|^author-(.+)$/ );
-		if ( authorMatches ) {
-			isAuthor = true;
-			if ( authorMatches[ 2 ] ) {
-				authorSlug = authorMatches[ 2 ];
-			}
-		}
-	}
-	return useSelect(
-		( select ) => {
-			const { getEntityRecords, getTaxonomy, getAuthors } =
-				select( coreStore );
-			let archiveTypeLabel;
-			let archiveNameLabel;
-			if ( taxonomy ) {
-				archiveTypeLabel =
-					getTaxonomy( taxonomy )?.labels?.singular_name;
-			}
-			if ( term ) {
-				const records = getEntityRecords( 'taxonomy', taxonomy, {
-					slug: term,
-					per_page: 1,
-				} );
-				if ( records && records[ 0 ] ) {
-					archiveNameLabel = records[ 0 ].name;
-				}
-			}
-			if ( isAuthor ) {
-				archiveTypeLabel = 'Author';
-				if ( authorSlug ) {
-					const authorRecords = getAuthors( { slug: authorSlug } );
-					if ( authorRecords && authorRecords[ 0 ] ) {
-						archiveNameLabel = authorRecords[ 0 ].name;
-					}
-				}
-			}
-			return {
-				archiveTypeLabel,
-				archiveNameLabel,
-			};
-		},
-		[ authorSlug, isAuthor, taxonomy, term ]
-	);
+function useNavigateToPreviousEntityRecord() {
+	const location = useLocation();
+	const previousLocation = usePrevious( location );
+	const history = useHistory();
+	const goBack = useMemo( () => {
+		const isFocusMode =
+			location.params.focusMode ||
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
+	return goBack;
 }
 
-export default function useSiteEditorSettings() {
-	const { setIsInserterOpened } = useDispatch( editSiteStore );
-	const { storedSettings, canvasMode, templateType } = useSelect(
-		( select ) => {
-			const { getSettings, getCanvasMode, getEditedPostType } = unlock(
+export function useSpecificEditorSettings() {
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+	const { canvasMode, settings, shouldUseTemplateAsDefaultRenderingMode } =
+		useSelect( ( select ) => {
+			const { getEditedPostContext, getCanvasMode, getSettings } = unlock(
 				select( editSiteStore )
 			);
+			const _context = getEditedPostContext();
 			return {
-				storedSettings: getSettings( setIsInserterOpened ),
 				canvasMode: getCanvasMode(),
-				templateType: getEditedPostType(),
-			};
-		},
-		[ setIsInserterOpened ]
-	);
-
-	const settingsBlockPatterns =
-		storedSettings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
-		storedSettings.__experimentalBlockPatterns; // WP 5.9
-	const settingsBlockPatternCategories =
-		storedSettings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
-		storedSettings.__experimentalBlockPatternCategories; // WP 5.9
-
-	const { restBlockPatterns, restBlockPatternCategories, templateSlug } =
-		useSelect( ( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			return {
-				restBlockPatterns: select( coreStore ).getBlockPatterns(),
-				restBlockPatternCategories:
-					select( coreStore ).getBlockPatternCategories(),
-				templateSlug: _record.slug,
+				settings: getSettings(),
+				// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
+				// @see https://github.com/WordPress/gutenberg/pull/62304/
+				shouldUseTemplateAsDefaultRenderingMode:
+					_context?.postId && _context?.postType !== 'post',
 			};
 		}, [] );
-	const archiveLabels = useArchiveLabel( templateSlug );
-
-	const blockPatterns = useMemo(
-		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
-					return (
-						! postTypes ||
-						( Array.isArray( postTypes ) &&
-							postTypes.includes( templateType ) )
-					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, templateType ]
-	);
-
-	const blockPatternCategories = useMemo(
-		() =>
-			[
-				...( settingsBlockPatternCategories || [] ),
-				...( restBlockPatternCategories || [] ),
-			].filter(
-				( x, index, arr ) =>
-					index === arr.findIndex( ( y ) => x.name === y.name )
-			),
-		[ settingsBlockPatternCategories, restBlockPatternCategories ]
-	);
-	return useMemo( () => {
-		const {
-			__experimentalAdditionalBlockPatterns,
-			__experimentalAdditionalBlockPatternCategories,
-			focusMode,
-			...restStoredSettings
-		} = storedSettings;
-
+	const defaultRenderingMode = shouldUseTemplateAsDefaultRenderingMode
+		? 'template-locked'
+		: 'post-only';
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
+	const defaultEditorSettings = useMemo( () => {
 		return {
-			...restStoredSettings,
-			inserterMediaCategories,
-			__experimentalBlockPatterns: blockPatterns,
-			__experimentalBlockPatternCategories: blockPatternCategories,
-			focusMode: canvasMode === 'view' && focusMode ? false : focusMode,
-			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
-			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			...settings,
+
+			richEditingEnabled: true,
+			supportsTemplateMode: true,
+			focusMode: canvasMode !== 'view',
+			defaultRenderingMode,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
-		storedSettings,
-		blockPatterns,
-		blockPatternCategories,
+		settings,
 		canvasMode,
-		archiveLabels.archiveTypeLabel,
-		archiveLabels.archiveNameLabel,
+		defaultRenderingMode,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 	] );
+
+	return defaultEditorSettings;
 }

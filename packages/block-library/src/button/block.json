@@ -9,6 +9,15 @@
 	"keywords": [ "link" ],
 	"textdomain": "default",
 	"attributes": {
+		"tagName": {
+			"type": "string",
+			"enum": [ "a", "button" ],
+			"default": "a"
+		},
+		"type": {
+			"type": "string",
+			"default": "button"
+		},
 		"textAlign": {
 			"type": "string"
 		},
@@ -22,14 +31,14 @@
 		"title": {
 			"type": "string",
 			"source": "attribute",
-			"selector": "a",
+			"selector": "a,button",
 			"attribute": "title",
 			"__experimentalRole": "content"
 		},
 		"text": {
-			"type": "string",
-			"source": "html",
-			"selector": "a",
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "a,button",
 			"__experimentalRole": "content"
 		},
 		"linkTarget": {
@@ -64,6 +73,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"splitting": true,
 		"align": false,
 		"alignWide": false,
 		"color": {
@@ -83,12 +93,15 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
 		},
 		"reusable": false,
-		"shadow": true,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -109,7 +122,10 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

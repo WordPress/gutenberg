@@ -299,11 +299,11 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *     @type string $slug Kebab-case unique identifier for the font size preset.
 	 *     @type string $size CSS font-size value, including units where applicable.
 	 * }
-	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
+	 * @param bool   $settings        Theme JSON settings array that overrides any global theme settings.
 	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
 	 */
-	public function test_gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography, $expected_output ) {
-		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
+	public function test_gutenberg_get_typography_font_size_value( $font_size, $settings, $expected_output ) {
+		$actual = gutenberg_get_typography_font_size_value( $font_size, $settings );
 
 		$this->assertSame( $expected_output, $actual );
 	}
@@ -316,291 +316,632 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	public function data_generate_font_size_preset_fixtures() {
 		return array(
 			'returns value when fluid typography is deactivated' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '28px',
 				),
-				'should_use_fluid_typography' => false,
-				'expected_output'             => '28px',
+				'settings'        => null,
+				'expected_output' => '28px',
 			),
 
 			'returns value where font size is 0'         => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => 0,
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 0,
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 0,
 			),
 
 			"returns value where font size is '0'"       => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '0',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '0',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '0',
 			),
 
 			'returns value where `size` is `null`'       => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => null,
 				),
-				'should_use_fluid_typography' => false,
-				'expected_output'             => null,
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => null,
 			),
 
 			'returns value when fluid is `false`'        => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => false,
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '28px',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => false,
+					),
+				),
+				'expected_output' => '28px',
+			),
+
+			'returns value when fluid is empty array'    => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(),
+					),
+				),
+				'expected_output' => '28px',
+			),
+
+			'returns clamp value with minViewportWidth override' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(
+							'minViewportWidth' => '500px',
+						),
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 5px) * 0.918), 28px)',
+			),
+
+			'returns clamp value with maxViewportWidth override' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(
+							'maxViewportWidth' => '500px',
+						),
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 5.608), 28px)',
+			),
+
+			'returns clamp value with layout.wideSize override' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+					'layout'     => array(
+						'wideSize' => '500px',
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 5.608), 28px)',
 			),
 
 			'returns already clamped value'              => array(
-				'font_size'                   => array(
-					'size'  => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
-					'fluid' => false,
+				'font_size'       => array(
+					'size' => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(21px, 1.313rem + ((1vw - 7.68px) * 2.524), 42px)',
 			),
 
 			'returns value with unsupported unit'        => array(
-				'font_size'                   => array(
-					'size'  => '1000%',
-					'fluid' => false,
+				'font_size'       => array(
+					'size' => '1000%',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '1000%',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '1000%',
 			),
 
 			'returns clamp value with rem min and max units' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '1.75rem',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 0.789), 1.75rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(1.119rem, 1.119rem + ((1vw - 0.2rem) * 0.789), 1.75rem)',
 			),
 
 			'returns clamp value with em min and max units' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '1.75em',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(1.119em, 1.119rem + ((1vw - 0.2em) * 0.789), 1.75em)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(1.119em, 1.119rem + ((1vw - 0.2em) * 0.789), 1.75em)',
 			),
 
 			'returns clamp value for floats'             => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '70.175px',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			),
 
 			'coerces integer to `px` and returns clamp value' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => 33,
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(20.515px, 1.282rem + ((1vw - 3.2px) * 0.975), 33px)',
 			),
 
 			'coerces float to `px` and returns clamp value' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => 70.175,
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(37.897px, 2.369rem + ((1vw - 3.2px) * 2.522), 70.175px)',
 			),
 
 			'returns clamp value when `fluid` is empty array' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => array(),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
 			'returns clamp value when `fluid` is `null`' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => null,
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
 			),
 
 			'returns clamp value where min and max fluid values defined' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '80px',
 					'fluid' => array(
 						'min' => '70px',
 						'max' => '125px',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(70px, 4.375rem + ((1vw - 3.2px) * 4.297), 125px)',
 			),
 
 			'returns clamp value where max is equal to size' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '7.8125rem',
 					'fluid' => array(
 						'min' => '4.375rem',
 						'max' => '7.8125rem',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(4.375rem, 4.375rem + ((1vw - 0.2rem) * 4.298), 7.8125rem)',
 			),
 
 			'returns clamp value if min font size is greater than max' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '3rem',
 					'fluid' => array(
 						'min' => '5rem',
 						'max' => '32px',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(5rem, 5rem + ((1vw - 0.2rem) * -3.75), 32px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(5rem, 5rem + ((1vw - 0.2rem) * -3.75), 32px)',
 			),
 
 			'returns value with invalid min/max fluid units' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '10em',
 					'fluid' => array(
 						'min' => '20vw',
 						'max' => '50%',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '10em',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '10em',
 			),
 
 			'returns value when size is < lower bounds and no fluid min/max set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '3px',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '3px',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '3px',
 			),
 
 			'returns value when size is equal to lower bounds and no fluid min/max set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '14px',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => '14px',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => '14px',
 			),
 
 			'returns clamp value with different min max units' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => array(
 						'min' => '20px',
 						'max' => '50rem',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(20px, 1.25rem + ((1vw - 3.2px) * 60.938), 50rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(20px, 1.25rem + ((1vw - 3.2px) * 60.938), 50rem)',
 			),
 
 			'returns clamp value where no fluid max size is set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '50px',
 					'fluid' => array(
 						'min' => '2.6rem',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(2.6rem, 2.6rem + ((1vw - 0.2rem) * 0.656), 50px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(2.6rem, 2.6rem + ((1vw - 0.2rem) * 0.656), 50px)',
 			),
 
 			'returns clamp value where no fluid min size is set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '28px',
 					'fluid' => array(
 						'max' => '80px',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 4.851), 80px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 4.851), 80px)',
 			),
 
 			'should not apply lower bound test when fluid values are set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '1.5rem',
 					'fluid' => array(
 						'min' => '0.5rem',
 						'max' => '5rem',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(0.5rem, 0.5rem + ((1vw - 0.2rem) * 5.625), 5rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(0.5rem, 0.5rem + ((1vw - 0.2rem) * 5.625), 5rem)',
 			),
 
 			'should not apply lower bound test when only fluid min is set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '20px',
 					'fluid' => array(
 						'min' => '12px',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(12px, 0.75rem + ((1vw - 3.2px) * 0.625), 20px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(12px, 0.75rem + ((1vw - 3.2px) * 0.625), 20px)',
 			),
 
 			'should not apply lower bound test when only fluid max is set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '0.875rem',
 					'fluid' => array(
 						'max' => '20rem',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(0.875rem, 0.875rem + ((1vw - 0.2rem) * 23.906), 20rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(0.875rem, 0.875rem + ((1vw - 0.2rem) * 23.906), 20rem)',
 			),
 
 			'returns clamp value when min and max font sizes are equal' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '4rem',
 					'fluid' => array(
 						'min' => '30px',
 						'max' => '30px',
 					),
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(30px, 1.875rem + ((1vw - 3.2px) * 1), 30px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(30px, 1.875rem + ((1vw - 3.2px) * 1), 30px)',
 			),
 
 			'should apply scaled min font size for em values when custom min font size is not set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '12rem',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(5.174rem, 5.174rem + ((1vw - 0.2rem) * 8.533), 12rem)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(5.174rem, 5.174rem + ((1vw - 0.2rem) * 8.533), 12rem)',
 			),
 
 			'should apply scaled min font size for px values when custom min font size is not set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size' => '200px',
 				),
-				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(85.342px, 5.334rem + ((1vw - 3.2px) * 8.958), 200px)',
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(85.342px, 5.334rem + ((1vw - 3.2px) * 8.958), 200px)',
 			),
 
 			'should not apply scaled min font size for minimum font size when custom min font size is set' => array(
-				'font_size'                   => array(
+				'font_size'       => array(
 					'size'  => '200px',
 					'fluid' => array(
 						'min' => '100px',
 					),
 				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => true,
+					),
+				),
+				'expected_output' => 'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
+			),
+
+			// Individual preset settings override global settings.
+			'should convert individual preset size to fluid if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => true,
+				),
+				'settings'        => array(
+					'typography' => array(),
+				),
+				'expected_output' => 'clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.234), 17px)',
+			),
+			'should use individual preset settings if fluid is disabled in global settings' => array(
+				'font_size'       => array(
+					'size'  => '17px',
+					'fluid' => array(
+						'min' => '16px',
+						'max' => '26px',
+					),
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => false,
+					),
+				),
+				'expected_output' => 'clamp(16px, 1rem + ((1vw - 3.2px) * 0.781), 26px)',
+			),
+		);
+	}
+
+	/**
+	 * Tests backwards compatibility for deprecated second argument $should_use_fluid_typography.
+	 *
+	 * @covers ::wp_get_typography_font_size_value
+	 *
+	 * @expectedDeprecated gutenberg_get_typography_font_size_value
+	 *
+	 * @dataProvider data_generate_font_size_preset_should_use_fluid_typography_deprecated_fixtures
+	 *
+	 * @param array  $font_size                     {
+	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
+	 *
+	 *     @type string $name Name of the font size preset.
+	 *     @type string $slug Kebab-case unique identifier for the font size preset.
+	 *     @type string $size CSS font-size value, including units where applicable.
+	 * }
+	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
+	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
+	 */
+	public function test_gutenberg_get_typography_font_size_value_should_use_fluid_typography_deprecated( $font_size, $should_use_fluid_typography, $expected_output ) {
+		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
+
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider for test_wp_get_typography_font_size_value_should_use_fluid_typography_deprecated.
+	 *
+	 * @return array
+	 */
+	public function data_generate_font_size_preset_should_use_fluid_typography_deprecated_fixtures() {
+		return array(
+			'returns value when fluid typography is deactivated' => array(
+				'font_size'                   => array(
+					'size' => '28px',
+				),
+				'should_use_fluid_typography' => false,
+				'expected_output'             => '28px',
+			),
+			'returns clamp value when fluid typography is activated' => array(
+				'font_size'                   => array(
+					'size' => '28px',
+				),
 				'should_use_fluid_typography' => true,
-				'expected_output'             => 'clamp(100px, 6.25rem + ((1vw - 3.2px) * 7.813), 200px)',
+				'expected_output'             => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+			),
+		);
+	}
+
+	/**
+	 * Tests that theme json settings passed to gutenberg_get_typography_font_size_value
+	 * override global theme settings.
+	 *
+	 * @covers ::gutenberg_get_typography_font_size_value
+	 *
+	 * @dataProvider data_generate_should_override_theme_settings_fixtures
+	 *
+	 * @param array  $font_size                     {
+	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
+	 *
+	 *     @type string $name Name of the font size preset.
+	 *     @type string $slug Kebab-case unique identifier for the font size preset.
+	 *     @type string $size CSS font-size value, including units where applicable.
+	 * }
+	 * @param bool   $settings        Theme JSON settings array that overrides any global theme settings.
+	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
+	 */
+	public function test_should_override_theme_settings( $font_size, $settings, $expected_output ) {
+		switch_theme( 'block-theme-child-with-fluid-typography' );
+		$actual = gutenberg_get_typography_font_size_value( $font_size, $settings );
+
+		$this->assertSame( $expected_output, $actual );
+	}
+
+	/**
+	 * Data provider for test_wp_get_typography_font_size_value_should_use_fluid_typography_deprecated.
+	 *
+	 * @return array
+	 */
+	public function data_generate_should_override_theme_settings_fixtures() {
+		return array(
+			'returns clamp value when theme activates fluid typography' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => null,
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 0.789), 28px)',
+			),
+			'returns value when settings argument deactivates fluid typography' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => false,
+					),
+				),
+				'expected_output' => '28px',
+			),
+
+			'returns clamp value when settings argument sets a fluid.minViewportWidth value' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(
+							'minViewportWidth' => '500px',
+						),
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 5px) * 0.918), 28px)',
+			),
+
+			'returns clamp value when settings argument sets a layout.wideSize value' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'layout' => array(
+						'wideSize' => '500px',
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 5.608), 28px)',
+			),
+
+			'returns clamp value with maxViewportWidth preferred over fallback layout.wideSize value' => array(
+				'font_size'       => array(
+					'size' => '28px',
+				),
+				'settings'        => array(
+					'typography' => array(
+						'fluid' => array(
+							'maxViewportWidth' => '1000px',
+						),
+					),
+					'layout'     => array(
+						'wideSize' => '500px',
+					),
+				),
+				'expected_output' => 'clamp(17.905px, 1.119rem + ((1vw - 3.2px) * 1.485), 28px)',
 			),
 		);
 	}
@@ -932,6 +1273,16 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 					'scale_factor'           => 1,
 				),
 				'expected_output' => 'clamp(50px, 3.125rem + ((1vw - 3.2px) * 7.353), 100px)',
+			),
+			'returns `null` when maximum and minimum viewport width are equal' => array(
+				'args'            => array(
+					'minimum_viewport_width' => '800px',
+					'maximum_viewport_width' => '800px',
+					'minimum_font_size'      => '50px',
+					'maximum_font_size'      => '100px',
+					'scale_factor'           => 1,
+				),
+				'expected_output' => null,
 			),
 			'returns `null` when `maximum_viewport_width` is an unsupported unit' => array(
 				'args'            => array(

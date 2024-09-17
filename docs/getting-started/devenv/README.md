@@ -1,228 +1,60 @@
-# Development Environment
+# Block Development Environment
 
-This guide is for setting up your local environment for JavaScript development for creating plugins and tools to extend WordPress and the block editor. If you are looking to contribute to Gutenberg project itself, see additional documentation in the [Getting Started guide](/docs/contributors/code/getting-started-with-code-contribution.md).
+This guide will help you set up the right development environment to create blocks and other plugins that extend and modify the Block Editor in WordPress.
 
-A development environment is a catch-all term for what you need setup on your computer to work. The three main pieces needed for our development environment are:
+A block development environment includes the tools you need on your computer to successfully develop for the Block Editor. The three essential requirements are:
 
-1. Node/NPM Development Tools
-2. WordPress Development Site
-3. Code Editor
+1.  [Code editor](#code-editor)
+2.  [Node.js development tools](#node-js-development-tools)
+3.  [Local WordPress environment (site)](#local-wordpress-environment)
 
-## Quick Start
+<div class="callout callout-info">
+    To contribute to the Gutenberg project itself, refer to the additional documentation in the <a href="https://developer.wordpress.org/block-editor/contributors/code/getting-started-with-code-contribution">code contribution guide</a>.
+</div>
 
-Here is a summary of the guide. See each section for additional details and explanations.
+## Code editor
 
-**1. Install Node development tools**
+A code editor is used to write code. You can use whichever editor you're most comfortable with. The key is having a way to open, edit, and save text files.
 
-Download and install [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm)
+If you do not already have a preferred code editor, [Visual Studio Code](https://code.visualstudio.com/) (VS Code) is a popular choice for JavaScript development among Core contributors. It works well across the three major platforms (Windows, Linux, and Mac), is open-source, and is actively maintained by Microsoft. VS Code also has a vibrant community providing plugins and extensions, including many for WordPress development.
 
-```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-```
+## Node.js development tools
 
-Quit and restart terminal
-Install Node.js v16.
+Node.js (`node`) is an open-source runtime environment that allows you to execute JavaScript outside of the web browser. While Node.js is not required for all WordPress JavaScript development, it's essential when working with modern JavaScript tools and developing for the Block Editor.
 
-```
-nvm install 16
-```
+Node.js and its accompanying development tools allow you to:
 
-**2. WordPress Development Site**
+-   Install and run WordPress packages needed for Block Editor development, such as `wp-scripts`
+-   Setup local WordPress environments with `wp-env` and `wp-now`
+-   Use the latest ECMAScript features and write code in ESNext
+-   Lint, format, and test JavaScript code
+-   Scaffold custom blocks with the `create-block` package
 
-First download, install, and start [Docker Desktop](https://www.docker.com/products/docker-desktop) following the instructions for your OS.
+The list goes on. While modern JavaScript development can be challenging, WordPress provides several tools, like [`wp-scripts`](/docs/getting-started/devenv/get-started-with-wp-scripts.md) and [`create-block`](/docs/getting-started/devenv/get-started-with-create-block.md), that streamline the process and are made possible by Node.js development tools.
 
--   Install WordPress environment tool
+**The recommended Node.js version for block development is [Active LTS](https://nodejs.org/en/about/previous-releases) (Long Term Support)**. However, there are times when you need to use different versions. A Node.js version manager tool like `nvm` is strongly recommended and allows you to change your `node` version when required. You will also need Node Package Manager (`npm`) and the Node Package eXecute (`npx`) to work with some WordPress packages. Both are installed automatically with Node.js.
 
-```
-npm -g install @wordpress/env
-```
+To be able to use the Node.js tools and [packages provided by WordPress](https://github.com/WordPress/gutenberg/tree/trunk/packages) for block development, you'll need to set a proper Node.js runtime environment on your machine. To learn more about how to do this, refer to the links below.
 
-Start the environment from an existing plugin or theme directory, or a new working directory:
+-   [Install Node.js for Mac and Linux](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-mac-and-linux-with-nvm)
+-   [Install Node.js for Windows](/docs/getting-started/devenv/nodejs-development-environment.md#node-js-installation-on-windows-and-others)
 
-```
-wp-env start
-```
+## Local WordPress environment
 
-You will have a full WordPress site installed, navigate to: http://localhost:8888/ using your browser, log in to the WordPress dashboard at http://localhost:8888/wp-admin/ using Username "admin" and Password "password", without the quotes.
+A local WordPress environment (site) provides a controlled, efficient, and secure space for development, allowing you to build and test your code before deploying it to a production site. The same [requirements](https://en-gb.wordpress.org/about/requirements/) for WordPress apply to local sites.
 
-**3. Code Editor**
+In the broader WordPress community, many tools are available for setting up a local WordPress environment on your computer. The Block Editor Handbook covers `wp-env`, which is open-source and maintained by the WordPress project itself. It's also the recommended tool for Gutenberg development. 
 
-You can use any text editor to write code. For example, [Visual Studio Code](https://code.visualstudio.com/) is a popular open-source editor. You can follow instructions on their site to install it for your OS.
+Refer to the [Get started with `wp-env`](/docs/getting-started/devenv/get-started-with-wp-env.md) guide for setup instructions.
 
-## Node Development Tools
+<div class="callout callout-info">
+    Throughout the Handbook, you may also see references to <code><a href="https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now">wp-now</a></code>. This is a lightweight tool powered by <a hre="https://developer.wordpress.org/playground/">WordPress Playground</a> that streamlines setting up a simple local WordPress environment. While still experimental, this tool is great for quickly testing WordPress releases, plugins, and themes. 
+</div>
 
-The tools needed for development are **Node** and **NPM**. **Nodejs** is a runtime environment that allows running JavaScript outside of the browser. NPM is the Node Package Manager, it is used for installing dependencies and running scripts. The script `npx` is also installed with Nodejs—this script is used to run packages not yet installed—we will use `npx` to bootstrap a block.
+This list is not exhaustive, but here are several additional options to choose from if you prefer not to use `wp-env`:
 
-The tools are used to convert the JavaScript we are going to write into a format that browsers can run. This is called transpiling or the build step.
-
-For Mac and Linux, it is recommended to use the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm). Using `nvm` to install node allows installing specific versions, plus installs locally in your home directory and avoids any global permission issues.
-
-For Windows, or alternative installs, you can [download a Nodejs installer](https://nodejs.org/en/download/) directly from the main Node.js website, v14 is recommended. Installers are available for Windows and Mac, and binaries available for Linux. See Node.js site for additional installation methods.
-
-Here are the quick instructions to install using nvm, see the [full installation instructions](https://github.com/nvm-sh/nvm#installing-and-updating) for additional details.
-
-Run the following on the command-line to install nvm:
-
-```sh
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-```
-
-Note: On macOS, the required developer tools are not installed by default, if not already installed you may be prompted to download the install.
-
-<img src="https://developer.wordpress.org/files/2020/07/git-install-prompt.png" alt="Mac git command requires command line developer tools" width="400" height="195"/>
-
-After installing nvm, you need to use it to install Node.js, to install v16, run:
-
-```sh
-nvm install 16
-```
-
-If there is an error running the above command, for example a common error that occurs is:
-
-```sh
-$ nvm install 16
-zsh: command not found: nvm
-```
-
-First, try quitting and restarting your terminal to pick up the installed config.
-
-If restarting did not resolve the problem, you might need to create the default profile file.
-
-On macOS Catalina, the default shell is zsh, to create the profile file type `touch ~/.zshrc` on the command-line. It is fine to run if the file already exists. Note, `~/` is a shortcut to your home directory. For Ubuntu, including WSL, the default profile is bash, use `touch ~/.bashrc` to create.
-
-After creating the profile file, re-run the install command:
-
-```sh
-nvm install 16
-```
-
-The important part after installing is being able to use them in your terminal. Open a terminal command-line and type `node -v` and `npm -v` to confirm they are installed.
-
-```sh
-> node -v
-v16.20.1
-
-> npm -v
-8.19.4
-```
-
-Your versions may not match exactly, that is fine. The minimum version for Node.js is >= 12 and for npm >= 6.9, using v14 will be supported until upgrade is required.
-
-## WordPress Development Site
-
-There are several ways to run WordPress locally on your own computer, or you could even develop on a cloud hosted computer, though this may be slower.
-
-The WordPress [wp-env package](https://www.npmjs.com/package/@wordpress/env) lets you set up a local WordPress environment for building and testing plugins and themes, without any additional configuration.
-
-The `wp-env` tool uses Docker to create a virtual machine that runs the WordPress site. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [other versions of Windows 10](https://docs.docker.com/docker-for-windows/wsl/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If using Ubuntu, see our additional notes for [help installing Docker on Ubuntu](/docs/getting-started/devenv/docker-ubuntu.md).
-
-After you have installed Docker, go ahead and install the `wp-env` tool. This command will install the tool globally, which means you can run it from any directory:
-
-```sh
-npm -g install @wordpress/env
-```
-
-To confirm it is installed and available, run:
-
-```sh
-wp-env --version
-> 1.6.0
-```
-
-The `wp-env` script is used to create a Docker WordPress environment. You can use this script to start an environment with your plugin activated by running it from the directory containing your plugin. For example if you are following the create block tutorial, this would be in the generated directory like so:
-
-```sh
-npx @wordpress/create-block starter-block
-cd starter-block
-wp-env start
-```
-
-You can access your environment in your browser at: [http://localhost:8888/](http://localhost:8888/), the default username is `admin` and default password is `password`. For more information controlling the Docker environment see the [@wordpress/env package readme](/packages/env/README.md).
-
-When using the script while developing a single plugin, `wp-env start` can mount and activate the plugin automatically when run from the directory containing the plugin. Note: This also works for themes when run from the directory in which you are developing the theme.
-
-If you run `wp-env start` from a directory that is not a plugin or theme, a generic WordPress environment will be created. The script will display the following warning, it is fine if this is your intention.
-
-```
-!! Warning: could not find a .wp-env.json configuration file and could not determine if 'DIR' is a WordPress installation, a plugin, or a theme.
-```
-
-You can use the `.wp-env.json` configuration file to create an environment that works with multiple plugins and/or themes. See the [@wordpress/env package for additional details](/packages/env/README.md#wp-envjson).
-
-#### Troubleshooting
-
-A common issue when running `wp-env` is `Error while running docker-compose command.`
-
--   Check that Docker Desktop is started and running.
--   Check Docker Desktop dashboard for logs, restart, or remove existing VMs.
-
-If you see the error: `Host is already in use by another container`
-
--   The container is already running, or another one is. You can stop an existing container running use `wp-env stop` from the directory you started it.
--   If you do not remember the directory you started wp-env in, you can stop all containers with `docker stop $(docker ps -q)`. Please note, this will stop all containers, use caution with this command.
-
-### Alternative to Docker
-
-Docker is just one method to run a local WordPress environment. Block development and extending WordPress is done using normal plugins, so any WordPress environment can be used. Here are some alternatives that you can consider which do not require installing Docker.
-
--   [Local](https://localwp.com/) - Local is a single application you download and install. You will need to know where the plugin directory is located after install. If you create a site called `mywp` typically the plugin directory is installed at `~\Local Sites\mywp\app\public\wp-content\plugins`
-
--   [WampServer](http://www.wampserver.com/en/) or [MAMP](https://www.mamp.info/) environments, both are quite similar to Local, combining a web server, PHP, and database. However these tools are not WordPress specific, so if you are not already using them, Local might be an easier option.
-
--   Remote server - you can work on a remote server, most hosts provide a quick WordPress setup. However, this will require additional time thorughout development syncing to the server, or working directly on the remote server.
-
-The important part is having a WordPress site installed, and know where and how to update files in the plugins directory.
-
-## Code Editor
-
-[Visual Studio Code](https://code.visualstudio.com/) is a popular code editor for JavaScript development. It works quite well across the three major platforms (Windows, Linux, and Mac), it is open-source and actively maintained by Microsoft. Plus Visual Studio Code has a vibrant community providing plugins and extensions; it is becoming the defacto standard for web development.
-
-Alternative editors include [Sublime Text](https://www.sublimetext.com/) that is also available across platforms, though is a commercial product; or other free alternatives include [Vim](https://www.vim.org/), [Atom](https://atom.io/), and [Notepad++](https://notepad-plus-plus.org/) all support standard JavaScript style development.
-
-You can use any editor you're comfortable with, it is more a personal preference. The development setup for WordPress block editor is a common JavaScript environment and most editors have plugins and support. The key is having a way to open, edit, and save text files.
-
-## Uninstall - Start Over
-
-Here are a few instructions if you need to start over, or want to remove what was installed.
-
-### Local Environment
-
--   If you just want to reset and clean the WordPress database:
-
-```
-wp-env clean all
-```
-
--   To remove the local environment completely for a specific project:
-
-```
-wp-env destroy
-```
-
--   To completely uninstall wp-env tool:
-
-```
-npm -g uninstall @wordpress/env
-```
-
--   To uninstall Docker, or Visual Studio Code use your OS method to remove packages. For example, on Windows run "Add or remove programs". You can additionally uninstall from the Docker Desktop app, click the bug icon at the top to switch to this Troubleshoot screen. Click Uninstall or remove.
-
-![Docker Troubleshoot Screenshot](https://developer.wordpress.org/files/2020/08/docker-uninstall-screen.png)
-
-### Uninstall Node/NVM
-
-To uninstall Node/NVM, delete the NVM directory, this is typically installed at `$HOME/.nvm`, delete using
-
-```
-rm -rf "$HOME/.nvm"
-```
-
-If this does not work and the `$NVM_DIR` environment variable is set you can remove using `rm -rf "$NVM_DIR"`
-
-To clean up any installed JavaScript packages remove the global `.npm` directory at `$HOME/.npm`,
-
-```
-rm -rf "$HOME/.npm"
-```
-
-Just as you confirmed the installation worked, you can confirm the uninstall worked. First quit and restart terminal and then try to run `npm -v`, `node -v`, and `nvm -v` you should then see a "command not found" error in the terminal.
+- [Local](https://localwp.com/)
+- [WP Studio](https://developer.wordpress.com/studio/)
+- [XAMPP](https://www.apachefriends.org/)
+- [MAMP](https://www.mamp.info/en/mamp/mac/)
+- [Varying Vagrant Vagrants](https://varyingvagrantvagrants.org/) (VVV)

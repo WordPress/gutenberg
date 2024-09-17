@@ -1,0 +1,15 @@
+[
+	{
+		"name": "core/block",
+		"isValid": true,
+		"attributes": {
+			"ref": 123,
+			"content": {
+				"V98q_x": {
+					"content": "Some value"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	sidesAll,
-	sidesAxial,
 	sidesBottom,
 	sidesHorizontal,
 	sidesLeft,
@@ -12,6 +11,8 @@ import {
 	sidesTop,
 	sidesVertical,
 } from '@wordpress/icons';
+
+export const RANGE_CONTROL_MAX_SIZE = 8;
 
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 
@@ -24,7 +25,7 @@ export const DEFAULT_VALUES = {
 
 export const ICONS = {
 	custom: sidesAll,
-	axial: sidesAxial,
+	axial: sidesAll,
 	horizontal: sidesHorizontal,
 	vertical: sidesVertical,
 	top: sidesTop,
@@ -363,29 +364,16 @@ export function getInitialView( values = {}, sides ) {
 	const hasNoValuesAndBalancedSides =
 		! sideValues.length && hasBalancedSidesSupport( sides );
 
+	// Only single side supported and no value defined.
+	if ( sides?.length === 1 ) {
+		return sides[ 0 ];
+	}
+
 	if (
 		hasAxisSupport( sides ) &&
 		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
 	) {
 		return VIEWS.axial;
-	}
-
-	// Single side.
-	// - Ensure the side returned is the first side that has a value.
-	if ( sideValues.length === 1 ) {
-		let side;
-
-		Object.entries( values ).some( ( [ key, value ] ) => {
-			side = key;
-			return value !== undefined;
-		} );
-
-		return side;
-	}
-
-	// Only single side supported and no value defined.
-	if ( sides?.length === 1 && ! sideValues.length ) {
-		return sides[ 0 ];
 	}
 
 	// Default to the Custom (separated sides) view.

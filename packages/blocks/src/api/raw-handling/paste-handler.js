@@ -8,6 +8,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
  */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
+import { getBlockInnerHTML } from '../serializer';
 import parse from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -16,6 +17,7 @@ import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
 import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
+import msListIgnore from './ms-list-ignore';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
@@ -31,23 +33,20 @@ import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
 
-/**
- * Browser dependencies
- */
-const { console } = window;
+const log = ( ...args ) => window?.console?.log?.( ...args );
 
 /**
  * Filters HTML to only contain phrasing content.
  *
- * @param {string}  HTML               The HTML to filter.
- * @param {boolean} preserveWhiteSpace Whether or not to preserve consequent white space.
+ * @param {string} HTML The HTML to filter.
  *
  * @return {string} HTML only containing phrasing content.
  */
-function filterInlineHTML( HTML, preserveWhiteSpace ) {
+function filterInlineHTML( HTML ) {
 	HTML = deepFilterHTML( HTML, [
 		headRemover,
 		googleDocsUIDRemover,
+		msListIgnore,
 		phrasingContentReducer,
 		commentRemover,
 	] );
@@ -55,64 +54,26 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 		inline: true,
 	} );
 
-	if ( ! preserveWhiteSpace ) {
-		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
-	}
+	HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 
 	// Allows us to ask for this information when we get a report.
-	console.log( 'Processed inline HTML:\n\n', HTML );
+	log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
 }
 
 /**
- * If we're allowed to return inline content, and there is only one inlineable
- * block, and the original plain text content does not have any line breaks,
- * then treat it as inline paste.
- *
- * @param {Object} options
- * @param {Array}  options.blocks
- * @param {string} options.plainText
- * @param {string} options.mode
- */
-function maybeConvertToInline( { blocks, plainText, mode } ) {
-	if (
-		mode === 'AUTO' &&
-		blocks.length === 1 &&
-		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
-	) {
-		const trimRegex = /^[\n]+|[\n]+$/g;
-		// Don't catch line breaks at the start or end.
-		const trimmedPlainText = plainText.replace( trimRegex, '' );
-
-		if (
-			trimmedPlainText !== '' &&
-			trimmedPlainText.indexOf( '\n' ) === -1
-		) {
-			const target = blocks[ 0 ].innerBlocks.length
-				? blocks[ 0 ].innerBlocks[ 0 ]
-				: blocks[ 0 ];
-			return target.attributes.content;
-		}
-	}
-
-	return blocks;
-}
-
-/**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param {Object}  options
- * @param {string}  [options.HTML]               The HTML to convert.
- * @param {string}  [options.plainText]          Plain text version.
- * @param {string}  [options.mode]               Handle content as blocks or inline content.
- *                                               * 'AUTO': Decide based on the content passed.
- *                                               * 'INLINE': Always handle as inline content, and return string.
- *                                               * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}   [options.tagName]            The tag into which content will be inserted.
- * @param {boolean} [options.preserveWhiteSpace] Whether or not to preserve consequent white space.
+ * @param {Object} options
+ * @param {string} [options.HTML]      The HTML to convert.
+ * @param {string} [options.plainText] Plain text version.
+ * @param {string} [options.mode]      Handle content as blocks or inline content.
+ *                                     * 'AUTO': Decide based on the content passed.
+ *                                     * 'INLINE': Always handle as inline content, and return string.
+ *                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}  [options.tagName]   The tag into which content will be inserted.
  *
- * @param {boolean} [options.disableFilters]     Whether or not to filter non semantic content.
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export function pasteHandler( {
@@ -120,8 +81,6 @@ export function pasteHandler( {
 	plainText = '',
 	mode = 'AUTO',
 	tagName,
-	preserveWhiteSpace,
-	disableFilters,
 } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
@@ -141,12 +100,17 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parse( content );
+			const parseResult = parse( content );
+			const isSingleFreeFormBlock =
+				parseResult.length === 1 &&
+				parseResult[ 0 ].name === 'core/freeform';
+			if ( ! isSingleFreeFormBlock ) {
+				return parseResult;
+			}
 		}
 	}
 
 	// Normalize unicode to use composed characters.
-	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
 	// Not normalizing the content will only affect older browsers and won't
 	// entirely break the app.
 	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
@@ -156,25 +120,34 @@ export function pasteHandler( {
 		HTML = HTML.normalize();
 	}
 
-	if ( disableFilters ) {
-		return maybeConvertToInline( {
-			blocks: htmlToBlocks( normaliseBlocks( HTML ), pasteHandler ),
-			plainText,
-			mode,
-		} );
-	}
+	// Must be run before checking if it's inline content.
+	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
 
-	// Parse Markdown (and encoded HTML) if:
+	// Consider plain text if:
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
-	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
+	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	// Parse Markdown (and encoded HTML) if it's considered plain text.
+	if ( isPlainText ) {
 		HTML = plainText;
 
 		// The markdown converter (Showdown) trims whitespace.
 		if ( ! /^\s+$/.test( plainText ) ) {
 			HTML = markdownConverter( HTML );
 		}
+	}
 
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
+	const pieces = shortcodeConverter( HTML );
+
+	// The call to shortcodeConverter will always return more than one element
+	// if shortcodes are matched. The reason is when shortcodes are matched
+	// empty HTML strings are included.
+	const hasShortcodes = pieces.length > 1;
+
+	if ( isPlainText && ! hasShortcodes ) {
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
 		// * The original plain text had no line breaks.
@@ -191,27 +164,15 @@ export function pasteHandler( {
 	}
 
 	if ( mode === 'INLINE' ) {
-		return filterInlineHTML( HTML, preserveWhiteSpace );
+		return filterInlineHTML( HTML );
 	}
-
-	// Must be run before checking if it's inline content.
-	HTML = deepFilterHTML( HTML, [ slackParagraphCorrector ] );
-
-	// An array of HTML strings and block objects. The blocks replace matched
-	// shortcodes.
-	const pieces = shortcodeConverter( HTML );
-
-	// The call to shortcodeConverter will always return more than one element
-	// if shortcodes are matched. The reason is when shortcodes are matched
-	// empty HTML strings are included.
-	const hasShortcodes = pieces.length > 1;
 
 	if (
 		mode === 'AUTO' &&
 		! hasShortcodes &&
 		isInlineContent( HTML, tagName )
 	) {
-		return filterInlineHTML( HTML, preserveWhiteSpace );
+		return filterInlineHTML( HTML );
 	}
 
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
@@ -235,7 +196,7 @@ export function pasteHandler( {
 				commentRemover,
 				iframeRemover,
 				figureContentReducer,
-				blockquoteNormaliser,
+				blockquoteNormaliser(),
 				divNormaliser,
 			];
 
@@ -255,12 +216,35 @@ export function pasteHandler( {
 			);
 
 			// Allows us to ask for this information when we get a report.
-			console.log( 'Processed HTML piece:\n\n', piece );
+			log( 'Processed HTML piece:\n\n', piece );
 
 			return htmlToBlocks( piece, pasteHandler );
 		} )
 		.flat()
 		.filter( Boolean );
 
-	return maybeConvertToInline( { blocks, plainText, mode } );
+	// If we're allowed to return inline content, and there is only one
+	// inlineable block, and the original plain text content does not have any
+	// line breaks, then treat it as inline paste.
+	if (
+		mode === 'AUTO' &&
+		blocks.length === 1 &&
+		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
+	) {
+		const trimRegex = /^[\n]+|[\n]+$/g;
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( trimRegex, '' );
+
+		if (
+			trimmedPlainText !== '' &&
+			trimmedPlainText.indexOf( '\n' ) === -1
+		) {
+			return removeInvalidHTML(
+				getBlockInnerHTML( blocks[ 0 ] ),
+				phrasingContentSchema
+			).replace( trimRegex, '' );
+		}
+	}
+
+	return blocks;
 }

@@ -6,5 +6,5 @@ inputs:
         description: Secret GitHub API token to use for making API requests.
         required: true
 runs:
-    using: node12
+    using: node20
     main: lib/index.js

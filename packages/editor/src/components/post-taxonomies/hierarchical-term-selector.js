@@ -3,6 +3,7 @@
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
 	CheckboxControl,
@@ -11,6 +12,7 @@ import {
 	withFilters,
 	Flex,
 	FlexItem,
+	SearchControl,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose';
@@ -148,7 +150,7 @@ export function getFilterMatcher( filterValue ) {
  *
  * @param {Object} props      Component props.
  * @param {string} props.slug Taxonomy slug.
- * @return {WPElement}        Hierarchical term selector component.
+ * @return {Element}        Hierarchical term selector component.
  */
 export function HierarchicalTermSelector( { slug } ) {
 	const [ adding, setAdding ] = useState( false );
@@ -216,6 +218,8 @@ export function HierarchicalTermSelector( { slug } ) {
 		[ availableTerms ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	if ( ! hasAssignAction ) {
 		return null;
 	}
@@ -227,7 +231,9 @@ export function HierarchicalTermSelector( { slug } ) {
 	 * @return {Promise} A promise that resolves to save term object.
 	 */
 	const addTerm = ( term ) => {
-		return saveEntityRecord( 'taxonomy', slug, term );
+		return saveEntityRecord( 'taxonomy', slug, term, {
+			throwOnError: true,
+		} );
 	};
 
 	/**
@@ -289,12 +295,18 @@ export function HierarchicalTermSelector( { slug } ) {
 			return;
 		}
 		setAdding( true );
-
-		const newTerm = await addTerm( {
-			name: formName,
-			parent: formParent ? formParent : undefined,
-		} );
-
+		let newTerm;
+		try {
+			newTerm = await addTerm( {
+				name: formName,
+				parent: formParent ? formParent : undefined,
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+			return;
+		}
 		const defaultName =
 			slug === 'category' ? __( 'Category' ) : __( 'Term' );
 		const termAddedMessage = sprintf(
@@ -395,7 +407,8 @@ export function HierarchicalTermSelector( { slug } ) {
 	return (
 		<Flex direction="column" gap="4">
 			{ showFilter && (
-				<TextControl
+				<SearchControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ filterLabel }
 					value={ filterValue }
@@ -415,6 +428,7 @@ export function HierarchicalTermSelector( { slug } ) {
 			{ ! loading && hasCreateAction && (
 				<FlexItem>
 					<Button
+						__next40pxDefaultSize
 						onClick={ onToggleForm }
 						className="editor-post-taxonomies__hierarchical-terms-add"
 						aria-expanded={ showForm }
@@ -428,6 +442,7 @@ export function HierarchicalTermSelector( { slug } ) {
 				<form onSubmit={ onAddTerm }>
 					<Flex direction="column" gap="4">
 						<TextControl
+							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							className="editor-post-taxonomies__hierarchical-terms-input"
 							label={ newTermLabel }
@@ -437,6 +452,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						/>
 						{ !! availableTerms.length && (
 							<TreeSelect
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ parentSelectLabel }
 								noOptionLabel={ noParentOption }
@@ -447,6 +463,7 @@ export function HierarchicalTermSelector( { slug } ) {
 						) }
 						<FlexItem>
 							<Button
+								__next40pxDefaultSize
 								variant="secondary"
 								type="submit"
 								className="editor-post-taxonomies__hierarchical-terms-submit"

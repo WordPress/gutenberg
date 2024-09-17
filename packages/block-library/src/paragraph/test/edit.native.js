@@ -4,6 +4,7 @@
 import {
 	act,
 	addBlock,
+	dismissModal,
 	getBlock,
 	typeInRichText,
 	fireEvent,
@@ -11,17 +12,20 @@ import {
 	initializeEditor,
 	render,
 	setupCoreBlocks,
+	triggerBlockListLayout,
 	waitFor,
 	within,
 	withFakeTimers,
 	waitForElementToBeRemoved,
+	waitForModalVisible,
 } from 'test/helpers';
 import Clipboard from '@react-native-clipboard/clipboard';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 
 /**
  * WordPress dependencies
  */
-import { ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -58,6 +62,131 @@ describe( 'Paragraph block', () => {
 	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
 		expect( screen.toJSON() ).toMatchSnapshot();
+	} );
+
+	it( 'should prevent deleting the first Paragraph block when pressing backspace at the start', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Heading block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '# ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+
+		const headingBlock = getBlock( screen, 'Heading' );
+		expect( headingBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Quote block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '> ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const quoteBlock = getBlock( screen, 'Quote' );
+		await triggerBlockListLayout( quoteBlock );
+
+		expect( quoteBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '- ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a numbered List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '1. ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 2,
+			finalSelectionEnd: 2,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
@@ -208,6 +337,41 @@ describe( 'Paragraph block', () => {
 		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should inherit parent alignment', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Quote' );
+		await triggerBlockListLayout( getBlock( screen, 'Quote' ) );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		fireEvent.press( screen.getByLabelText( 'Navigate Up' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text right' ) );
+
+		// Assert
+		// This not an ideal assertion, as it relies implementation details of the
+		// component: prop names. However, the only aspect we can assert is the prop
+		// passed to Aztec, the native module controlling visual alignment. A less
+		// brittle alternative might be snapshotting, but RNTL does not yet support
+		// focused snapshots, which means the snapshot would be huge.
+		// https://github.com/facebook/react/pull/25329
+		expect(
+			screen.UNSAFE_queryAllByProps( {
+				value: '<p>A quick brown fox jumps over the lazy dog.</p>',
+				placeholder: 'Start writing…',
+				textAlign: 'right',
+			} ).length
+		).toBe( 2 ); // One for Aztec mock, one for the TextInput.
 	} );
 
 	it( 'should preserve alignment when split', async () => {
@@ -684,5 +848,152 @@ describe( 'Paragraph block', () => {
 		<p>A <mark style="background-color:rgba(0, 0, 0, 0);color:#2411a4" class="has-inline-color has-tertiary-color">quick</mark> brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should show the expected font sizes values', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+		await waitFor( () => screen.getByLabelText( 'Selected: Default' ) );
+
+		// Assert
+		const modalContent = within( blockSettingsModal );
+		expect( modalContent.getByLabelText( 'Small' ) ).toBeVisible();
+		expect( modalContent.getByText( '14px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Medium' ) ).toBeVisible();
+		expect( modalContent.getByText( '17px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '30px' ) ).toBeVisible();
+		expect( modalContent.getByLabelText( 'Extra Large' ) ).toBeVisible();
+		expect( modalContent.getByText( '40px' ) ).toBeVisible();
+		expect(
+			modalContent.getByLabelText( 'Extra Extra Large' )
+		).toBeVisible();
+		expect( modalContent.getByText( '52px' ) ).toBeVisible();
+	} );
+
+	it( 'should set a font size value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		// Open Font size settings
+		fireEvent.press( screen.getByLabelText( 'Font Size, Custom' ) );
+
+		// Tap one font size
+		fireEvent.press( screen.getByLabelText( 'Large' ) );
+
+		// Dismiss the Block Settings modal.
+		await dismissModal( blockSettingsModal );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should set a line height value', async () => {
+		// Arrange
+		const screen = await initializeEditor( { withGlobalStyles: true } );
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		// Open Block Settings.
+		fireEvent.press( screen.getByLabelText( 'Open Settings' ) );
+
+		// Wait for Block Settings to be visible.
+		const blockSettingsModal = screen.getByTestId( 'block-settings-modal' );
+		await waitForModalVisible( blockSettingsModal );
+
+		const lineHeightControl = screen.getByLabelText( /Line Height/ );
+		fireEvent.press(
+			within( lineHeightControl ).getByText( '1.5', { hidden: true } )
+		);
+		const lineHeightTextInput = within(
+			lineHeightControl
+		).getByDisplayValue( '1.5', { hidden: true } );
+		fireEvent.changeText( lineHeightTextInput, '1.8' );
+
+		// Dismiss the Block Settings modal.
+		await dismissModal( blockSettingsModal );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should focus on the previous Paragraph block when backspacing in an empty Paragraph block', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, 'A quick brown fox jumps' );
+
+		await addBlock( screen, 'Paragraph' );
+		const secondParagraphBlock = getBlock( screen, 'Paragraph', {
+			rowIndex: 2,
+		} );
+		fireEvent.press( secondParagraphBlock );
+
+		// Clear mock history
+		TextInputState.focusTextInput.mockClear();
+
+		const secondParagraphTextInput =
+			within( secondParagraphBlock ).getByPlaceholderText(
+				'Start writing…'
+			);
+		fireEvent( secondParagraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( TextInputState.focusTextInput ).toHaveBeenCalled();
 	} );
 } );

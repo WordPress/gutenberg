@@ -14,12 +14,14 @@ import {
 } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { store as coreDataStore } from '../index';
-import { useEntityBlockEditor } from '../entity-provider';
+import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -136,12 +138,15 @@ describe( 'useEntityBlockEditor', () => {
 			title: 'block title',
 			edit,
 		} );
+
+		registerCoreBlocks();
 	} );
 
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
+		unregisterFormatType( 'core/footnote' );
 	} );
 
 	it( 'does not mutate block attributes that include an array of strings or null values', async () => {
@@ -246,7 +251,7 @@ describe( 'useEntityBlockEditor', () => {
 				[
 					createBlock( 'core/test-block', {
 						content:
-							'A new paragraph<sup data-fn="xyz" class="xyz"><a href="#xyz" id="xyz-link">999</a></sup>',
+							'A new paragraph<sup data-fn="xyz" class="fn"><a href="#xyz" id="xyz-link">999</a></sup>',
 					} ),
 					...blocks,
 				],
@@ -263,7 +268,7 @@ describe( 'useEntityBlockEditor', () => {
 		// The newly inserted block should have the footnote number 1, and the
 		// existing footnote number 1 should be updated to 2.
 		expect( blocks[ 0 ].attributes.content ).toEqual(
-			'A new paragraph<sup data-fn="xyz" class="xyz"><a href="#xyz" id="xyz-link">1</a></sup>'
+			'A new paragraph<sup data-fn="xyz" class="fn"><a href="#xyz" id="xyz-link">1</a></sup>'
 		);
 		expect( blocks[ 1 ].attributes.content ).toEqual(
 			'A paragraph<sup data-fn="abcd" class="fn"><a href="#abcd" id="abcd-link">2</a></sup>'

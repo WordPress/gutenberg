@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,14 +16,17 @@ import deprecated from '@wordpress/deprecated';
  */
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
+import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
+
+const EMPTY_ADDITIONAL_STYLES = [];
 
 export function BlockPreview( {
 	blocks,
 	viewportWidth = 1200,
 	minHeight,
-	additionalStyles = [],
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 	// Deprecated props:
 	__experimentalMinHeight,
 	__experimentalPadding,
@@ -53,7 +56,11 @@ export function BlockPreview( {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const renderedBlocks = useMemo(
@@ -88,7 +95,7 @@ export function BlockPreview( {
  * @param {Array|Object} preview.blocks        A block instance (object) or an array of blocks to be previewed.
  * @param {number}       preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default memo( BlockPreview );
 
@@ -113,7 +120,12 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const disabledRef = useDisabled();
@@ -128,6 +140,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
+			<EditorStyles />
 			<BlockListItems renderAppender={ false } layout={ layout } />
 		</ExperimentalBlockEditorProvider>
 	);
@@ -135,7 +148,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-preview__live-content',
 			'components-disabled'

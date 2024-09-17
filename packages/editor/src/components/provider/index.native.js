@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { BackHandler } from 'react-native';
 import memize from 'memize';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -20,6 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
+	subscribeToContentUpdate,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -27,14 +29,20 @@ import {
 	parse,
 	serialize,
 	getUnregisteredTypeHandlerName,
+	getBlockType,
 	createBlock,
+	pasteHandler,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
+import {
+	store as blockEditorStore,
+	getGlobalStyles,
+	getColorsAndGradients,
+} from '@wordpress/block-editor';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
+import { __ } from '@wordpress/i18n';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -56,13 +64,12 @@ const postTypeEntities = [
 import { EditorHelpTopics, store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-// eslint-disable-next-line no-restricted-imports
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
  */
 import EditorProvider from './index.js';
+import { insertContentWithTitle } from '../post-title';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -76,6 +83,9 @@ class NativeEditorProvider extends Component {
 			this.post.type,
 			this.post
 		);
+
+		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
+		this.onContentUpdate = this.onContentUpdate.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -94,6 +104,7 @@ class NativeEditorProvider extends Component {
 	componentDidMount() {
 		const {
 			capabilities,
+			createErrorNotice,
 			locale,
 			hostAppNamespace,
 			updateEditorSettings,
@@ -136,32 +147,33 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentMediaAppend = subscribeMediaAppend(
 			( payload ) => {
 				const blockName = 'core/' + payload.mediaType;
-				const newBlock = createBlock( blockName, {
-					id: payload.mediaId,
-					[ payload.mediaType === 'image' ? 'url' : 'src' ]:
-						payload.mediaUrl,
-				} );
+				const blockType = getBlockType( blockName );
 
-				const indexAfterSelected = this.props.selectedBlockIndex + 1;
-				const insertionIndex =
-					indexAfterSelected || this.props.blockCount;
+				if ( blockType && blockType?.name ) {
+					const newBlock = createBlock( blockType.name, {
+						id: payload.mediaId,
+						[ payload.mediaType === 'image' ? 'url' : 'src' ]:
+							payload.mediaUrl,
+					} );
 
-				this.props.insertBlock( newBlock, insertionIndex );
+					const indexAfterSelected =
+						this.props.selectedBlockIndex + 1;
+					const insertionIndex =
+						indexAfterSelected || this.props.blockCount;
+
+					this.props.insertBlock( newBlock, insertionIndex );
+				} else {
+					createErrorNotice(
+						__( 'File type not supported as a media file.' )
+					);
+				}
 			}
 		);
 
 		this.subscriptionParentUpdateEditorSettings =
-			subscribeUpdateEditorSettings(
-				( { galleryWithImageBlocks, ...editorSettings } ) => {
-					if ( typeof galleryWithImageBlocks === 'boolean' ) {
-						window.wp.galleryBlockV2Enabled =
-							galleryWithImageBlocks;
-					}
-					updateEditorSettings(
-						this.getThemeColors( editorSettings )
-					);
-				}
-			);
+			subscribeUpdateEditorSettings( ( { ...editorSettings } ) => {
+				updateEditorSettings( this.getThemeColors( editorSettings ) );
+			} );
 
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
 			( payload ) => {
@@ -178,6 +190,17 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentShowEditorHelp = subscribeShowEditorHelp( () => {
 			this.setState( { isHelpVisible: true } );
 		} );
+
+		this.hardwareBackPressListener = BackHandler.addEventListener(
+			'hardwareBackPress',
+			this.onHardwareBackPress
+		);
+
+		this.subscriptionOnContentUpdate = subscribeToContentUpdate(
+			( data ) => {
+				this.onContentUpdate( data );
+			}
+		);
 
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
@@ -238,6 +261,14 @@ class NativeEditorProvider extends Component {
 		if ( this.subscriptionParentShowEditorHelp ) {
 			this.subscriptionParentShowEditorHelp.remove();
 		}
+
+		if ( this.hardwareBackPressListener ) {
+			this.hardwareBackPressListener.remove();
+		}
+
+		if ( this.subscriptionOnContentUpdate ) {
+			this.subscriptionOnContentUpdate.remove();
+		}
 	}
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
@@ -266,6 +297,31 @@ class NativeEditorProvider extends Component {
 				unsupportedBlockNames
 			);
 		}
+	}
+
+	onHardwareBackPress() {
+		const { clearSelectedBlock, selectedBlockIndex } = this.props;
+
+		if ( selectedBlockIndex !== -1 ) {
+			clearSelectedBlock();
+			return true;
+		}
+		return false;
+	}
+
+	onContentUpdate( { content: rawContent } ) {
+		const {
+			editTitle,
+			onClearPostTitleSelection,
+			onInsertBlockAfter: onInsertBlocks,
+			title,
+		} = this.props;
+		const content = pasteHandler( {
+			plainText: rawContent,
+		} );
+
+		insertContentWithTitle( title, content, editTitle, onInsertBlocks );
+		onClearPostTitleSelection();
 	}
 
 	serializeToNativeAction() {
@@ -358,8 +414,8 @@ const ComposedNativeProvider = compose( [
 			getEditedPostAttribute,
 			getEditedPostContent,
 			getEditorSettings,
+			getEditorMode,
 		} = select( editorStore );
-		const { getEditorMode } = select( editPostStore );
 
 		const { getBlockIndex, getSelectedBlockClientId, getGlobalBlockCount } =
 			select( blockEditorStore );
@@ -383,20 +439,33 @@ const ComposedNativeProvider = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, updateEditorSettings } =
-			dispatch( editorStore );
-		const { updateSettings, insertBlock, replaceBlock } =
-			dispatch( blockEditorStore );
-		const { switchEditorMode } = dispatch( editPostStore );
+		const {
+			editPost,
+			resetEditorBlocks,
+			updateEditorSettings,
+			switchEditorMode,
+			togglePostTitleSelection,
+		} = dispatch( editorStore );
+		const {
+			clearSelectedBlock,
+			updateSettings,
+			insertBlock,
+			insertBlocks,
+			replaceBlock,
+		} = dispatch( blockEditorStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
-		const { createSuccessNotice } = dispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			dispatch( noticesStore );
 
 		return {
 			updateBlockEditorSettings: updateSettings,
 			updateEditorSettings,
 			addEntities,
 			insertBlock,
+			insertBlocks,
 			createSuccessNotice,
+			createErrorNotice,
+			clearSelectedBlock,
 			editTitle( title ) {
 				editPost( { title } );
 			},
@@ -408,6 +477,12 @@ const ComposedNativeProvider = compose( [
 			},
 			switchMode( mode ) {
 				switchEditorMode( mode );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, undefined, undefined, false );
+			},
+			onClearPostTitleSelection() {
+				togglePostTitleSelection( false );
 			},
 			replaceBlock,
 		};

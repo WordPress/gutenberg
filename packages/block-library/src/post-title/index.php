@@ -33,12 +33,12 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 	$tag_name = 'h2';
 	if ( isset( $attributes['level'] ) ) {
-		$tag_name = 'h' . $attributes['level'];
+		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
 	}
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$rel   = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
-		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $block->context['postId'] ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
+		$title = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', esc_url( get_the_permalink( $block->context['postId'] ) ), esc_attr( $attributes['linkTarget'] ), $rel, $title );
 	}
 
 	$classes = array();
@@ -60,6 +60,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-title` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_title() {
 	register_block_type_from_metadata(

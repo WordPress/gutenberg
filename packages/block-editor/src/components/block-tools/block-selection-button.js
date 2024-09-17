@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { dragHandle } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -23,8 +23,8 @@ import {
 	SPACE,
 } from '@wordpress/keycodes';
 import {
-	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
@@ -37,9 +37,7 @@ import BlockTitle from '../block-title';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
-import useBlockDisplayInformation from '../use-block-display-information';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockMover from '../block-mover';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -48,11 +46,11 @@ import BlockMover from '../block-mover';
  *
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
+ * @param {Object} ref            Reference to the component.
  *
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId } ) {
-	const blockInformation = useBlockDisplayInformation( clientId );
+function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -61,46 +59,46 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				hasBlockMovingClientId,
 				getBlockListSettings,
 				__unstableGetEditorMode,
+				getNextBlockClientId,
+				getPreviousBlockClientId,
+				canMoveBlock,
 			} = select( blockEditorStore );
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
 			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
-			const blockMovingMode = hasBlockMovingClientId();
+			const blockType = getBlockType( name );
+			const orientation =
+				getBlockListSettings( rootClientId )?.orientation;
+			const match = getActiveBlockVariation( name, attributes );
+
 			return {
-				index,
-				name,
-				attributes,
-				blockMovingMode,
-				orientation: getBlockListSettings( rootClientId )?.orientation,
+				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
+				icon: match?.icon || blockType.icon,
+				label: getAccessibleBlockLabel(
+					blockType,
+					attributes,
+					index + 1,
+					orientation
+				),
+				canMove: canMoveBlock( clientId, rootClientId ),
+				getNextBlockClientId,
+				getPreviousBlockClientId,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const {
-		index,
-		name,
-		attributes,
-		blockMovingMode,
-		orientation,
-		editorMode,
-	} = selected;
+	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
-	const ref = useRef();
-
-	const blockType = getBlockType( name );
-	const label = getAccessibleBlockLabel(
-		blockType,
-		attributes,
-		index + 1,
-		orientation
-	);
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
-		ref.current.focus();
-
-		speak( label );
-	}, [ label ] );
+		if ( editorMode === 'navigation' ) {
+			ref.current.focus();
+			speak( label );
+		}
+	}, [ label, editorMode ] );
 	const blockElement = useBlockElement( clientId );
 
 	const {
@@ -165,7 +163,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				selectedBlockClientId;
 		} else if ( navigateIn ) {
 			focusedBlockUid =
-				getClientIdsOfDescendants( [ selectedBlockClientId ] )[ 0 ] ??
+				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
 				selectedBlockClientId;
 		}
 		const startingBlockClientId = hasBlockMovingClientId();
@@ -192,6 +190,14 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			);
 			selectBlock( startingBlockClientId );
 			setBlockMovingClientId( null );
+		}
+		// Prevent the block from being moved into itself.
+		if (
+			startingBlockClientId &&
+			selectedBlockClientId === startingBlockClientId &&
+			navigateIn
+		) {
+			return;
 		}
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
 			if ( focusedBlockUid ) {
@@ -227,7 +233,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		}
 	}
 
-	const classNames = classnames(
+	const classNames = clsx(
 		'block-editor-block-list__block-selection-button',
 		{
 			'is-block-moving-mode': !! blockMovingMode,
@@ -235,6 +241,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 	);
 
 	const dragHandleLabel = __( 'Drag' );
+	const showBlockDraggable = canMove && editorMode === 'navigation';
 
 	return (
 		<div className={ classNames }>
@@ -243,19 +250,17 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				className="block-editor-block-list__block-selection-button__content"
 			>
 				<FlexItem>
-					<BlockIcon icon={ blockInformation?.icon } showColors />
+					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
-				<FlexItem>
-					{ editorMode === 'zoom-out' && (
-						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
-					) }
-					{ editorMode === 'navigation' && (
+				{ showBlockDraggable && (
+					<FlexItem>
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
 								<Button
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									icon={ dragHandle }
 									className="block-selection-button_drag-handle"
-									aria-hidden="true"
 									label={ dragHandleLabel }
 									// Should not be able to tab to drag handle as this
 									// button can only be used with a pointer device.
@@ -264,30 +269,34 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 								/>
 							) }
 						</BlockDraggable>
-					) }
-				</FlexItem>
-				<FlexItem>
-					<Button
-						ref={ ref }
-						onClick={
-							editorMode === 'navigation'
-								? () => setNavigationMode( false )
-								: undefined
-						}
-						onKeyDown={ onKeyDown }
-						label={ label }
-						showTooltip={ false }
-						className="block-selection-button_select-button"
-					>
-						<BlockTitle
-							clientId={ clientId }
-							maximumLength={ 35 }
-						/>
-					</Button>
-				</FlexItem>
+					</FlexItem>
+				) }
+				{ editorMode === 'navigation' && (
+					<FlexItem>
+						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
+							ref={ ref }
+							onClick={
+								editorMode === 'navigation'
+									? () => setNavigationMode( false )
+									: undefined
+							}
+							onKeyDown={ onKeyDown }
+							label={ label }
+							showTooltip={ false }
+							className="block-selection-button_select-button"
+						>
+							<BlockTitle
+								clientId={ clientId }
+								maximumLength={ 35 }
+							/>
+						</Button>
+					</FlexItem>
+				) }
 			</Flex>
 		</div>
 	);
 }
 
-export default BlockSelectionButton;
+export default forwardRef( BlockSelectionButton );

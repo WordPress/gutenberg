@@ -45,14 +45,16 @@ export default function useTemplatePartAreaLabel( clientId ) {
 					'core/editor'
 				).__experimentalGetDefaultTemplatePartAreas();
 			/* eslint-enable @wordpress/data-no-store-string-literals */
-			const { getEditedEntityRecord } = select( coreStore );
+			const { getCurrentTheme, getEditedEntityRecord } =
+				select( coreStore );
 
 			for ( const templatePartClientId of parentTemplatePartClientIds ) {
 				const templatePartBlock = getBlock( templatePartClientId );
 
 				// The 'area' usually isn't stored on the block, but instead
 				// on the entity.
-				const { theme, slug } = templatePartBlock.attributes;
+				const { theme = getCurrentTheme()?.stylesheet, slug } =
+					templatePartBlock.attributes;
 				const templatePartEntityId = createTemplatePartId(
 					theme,
 					slug

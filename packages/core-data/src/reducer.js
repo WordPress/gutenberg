@@ -8,7 +8,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  */
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { createUndoManager } from '@wordpress/undo-manager';
 
 /**
  * Internal dependencies
@@ -185,22 +185,25 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 
 const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
-		const { stackedEdits } = action;
+		const { record } = action;
 
 		let newState = state;
-		stackedEdits.forEach(
-			( { kind, name, recordId, property, from, to } ) => {
-				newState = reducer( newState, {
-					type: 'EDIT_ENTITY_RECORD',
-					kind,
-					name,
-					recordId,
-					edits: {
-						[ property ]: action.type === 'UNDO' ? from : to,
+		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			newState = reducer( newState, {
+				type: 'EDIT_ENTITY_RECORD',
+				kind,
+				name,
+				recordId,
+				edits: Object.entries( changes ).reduce(
+					( acc, [ key, value ] ) => {
+						acc[ key ] =
+							action.type === 'UNDO' ? value.from : value.to;
+						return acc;
 					},
-				} );
-			}
-		);
+					{}
+				),
+			} );
+		} );
 		return newState;
 	}
 
@@ -235,14 +238,13 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
@@ -254,7 +256,7 @@ function entity( entityConfig ) {
 						const nextState = { ...state };
 
 						for ( const record of action.items ) {
-							const recordId = record[ action.key ];
+							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
 								continue;
@@ -352,6 +354,38 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			revisions: ( state = {}, action ) => {
+				// Use the same queriedDataReducer shape for revisions.
+				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+					const recordKey = action.recordKey;
+					delete action.recordKey;
+					const newState = queriedDataReducer( state[ recordKey ], {
+						...action,
+						type: 'RECEIVE_ITEMS',
+					} );
+					return {
+						...state,
+						[ recordKey ]: newState,
+					};
+				}
+
+				if ( action.type === 'REMOVE_ITEMS' ) {
+					return Object.fromEntries(
+						Object.entries( state ).filter(
+							( [ id ] ) =>
+								! action.itemIds.some( ( itemId ) => {
+									if ( Number.isInteger( itemId ) ) {
+										return itemId === +id;
+									}
+									return itemId === id;
+								} )
+						)
+					);
+				}
+
+				return state;
+			},
 		} )
 	);
 }
@@ -435,151 +469,19 @@ export const entities = ( state = {}, action ) => {
 };
 
 /**
- * @typedef {Object} UndoStateMeta
- *
- * @property {number} list   The undo stack.
- * @property {number} offset Where in the undo stack we are.
- * @property {Object} cache  Cache of unpersisted edits.
+ * @type {UndoManager}
  */
+export function undoManager( state = createUndoManager() ) {
+	return state;
+}
 
-/** @typedef {Array<Object> & UndoStateMeta} UndoState */
-
-/**
- * @type {UndoState}
- *
- * @todo Given how we use this we might want to make a custom class for it.
- */
-const UNDO_INITIAL_STATE = { list: [], offset: 0 };
-
-/**
- * Reducer keeping track of entity edit undo history.
- *
- * @param {UndoState} state  Current state.
- * @param {Object}    action Dispatched action.
- *
- * @return {UndoState} Updated state.
- */
-export function undo( state = UNDO_INITIAL_STATE, action ) {
-	const omitPendingRedos = ( currentState ) => {
-		return {
-			...currentState,
-			list: currentState.list.slice(
-				0,
-				currentState.offset || undefined
-			),
-			offset: 0,
-		};
-	};
-
-	const appendCachedEditsToLastUndo = ( currentState ) => {
-		if ( ! currentState.cache ) {
-			return currentState;
-		}
-
-		let nextState = {
-			...currentState,
-			list: [ ...currentState.list ],
-		};
-		nextState = omitPendingRedos( nextState );
-		const previousUndoState = nextState.list.pop();
-		const updatedUndoState = currentState.cache.reduce(
-			appendEditToStack,
-			previousUndoState
-		);
-		nextState.list.push( updatedUndoState );
-
-		return {
-			...nextState,
-			cache: undefined,
-		};
-	};
-
-	const appendEditToStack = (
-		stack = [],
-		{ kind, name, recordId, property, from, to }
-	) => {
-		const existingEditIndex = stack?.findIndex(
-			( { kind: k, name: n, recordId: r, property: p } ) => {
-				return (
-					k === kind && n === name && r === recordId && p === property
-				);
-			}
-		);
-		const nextStack = [ ...stack ];
-		if ( existingEditIndex !== -1 ) {
-			// If the edit is already in the stack leave the initial "from" value.
-			nextStack[ existingEditIndex ] = {
-				...nextStack[ existingEditIndex ],
-				to,
-			};
-		} else {
-			nextStack.push( {
-				kind,
-				name,
-				recordId,
-				property,
-				from,
-				to,
-			} );
-		}
-		return nextStack;
-	};
-
+export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
-		case 'CREATE_UNDO_LEVEL':
-			return appendCachedEditsToLastUndo( state );
-
+		case 'EDIT_ENTITY_RECORD':
 		case 'UNDO':
-		case 'REDO': {
-			const nextState = appendCachedEditsToLastUndo( state );
-			return {
-				...nextState,
-				offset: state.offset + ( action.type === 'UNDO' ? -1 : 1 ),
-			};
-		}
-
-		case 'EDIT_ENTITY_RECORD': {
-			if ( ! action.meta.undo ) {
-				return state;
-			}
-
-			const edits = Object.keys( action.edits ).map( ( key ) => {
-				return {
-					kind: action.kind,
-					name: action.name,
-					recordId: action.recordId,
-					property: key,
-					from: action.meta.undo.edits[ key ],
-					to: action.edits[ key ],
-				};
-			} );
-
-			if ( action.meta.undo.isCached ) {
-				return {
-					...state,
-					cache: edits.reduce( appendEditToStack, state.cache ),
-				};
-			}
-
-			let nextState = omitPendingRedos( state );
-			nextState = appendCachedEditsToLastUndo( nextState );
-			nextState = { ...nextState, list: [ ...nextState.list ] };
-			// When an edit is a function it's an optimization to avoid running some expensive operation.
-			// We can't rely on the function references being the same so we opt out of comparing them here.
-			const comparisonUndoEdits = Object.values(
-				action.meta.undo.edits
-			).filter( ( edit ) => typeof edit !== 'function' );
-			const comparisonEdits = Object.values( action.edits ).filter(
-				( edit ) => typeof edit !== 'function'
-			);
-			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
-				nextState.list.push( edits );
-			}
-
-			return nextState;
-		}
+		case 'REDO':
+			return {};
 	}
-
 	return state;
 }
 
@@ -618,6 +520,11 @@ export function userPermissions( state = {}, action ) {
 			return {
 				...state,
 				[ action.key ]: action.isAllowed,
+			};
+		case 'RECEIVE_USER_PERMISSIONS':
+			return {
+				...state,
+				...action.permissions,
 			};
 	}
 
@@ -664,6 +571,14 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
+export function userPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+	return state;
+}
+
 export function navigationFallbackId( state = null, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
@@ -693,6 +608,45 @@ export function themeGlobalStyleRevisions( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the template lookup per query.
+ *
+ * @param {Record<string, string>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, string>} Updated state.
+ */
+export function defaultTemplates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_DEFAULT_TEMPLATE':
+			return {
+				...state,
+				[ JSON.stringify( action.query ) ]: action.templateId,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning an object of registered post meta.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function registeredPostMeta( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REGISTERED_POST_META':
+			return {
+				...state,
+				[ action.postType ]: action.registeredPostMeta,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -704,11 +658,15 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	taxonomies,
 	entities,
-	undo,
+	editsReference,
+	undoManager,
 	embedPreviews,
 	userPermissions,
 	autosaves,
 	blockPatterns,
 	blockPatternCategories,
+	userPatternCategories,
 	navigationFallbackId,
+	defaultTemplates,
+	registeredPostMeta,
 } );

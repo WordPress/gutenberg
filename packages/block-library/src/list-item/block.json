@@ -5,23 +5,46 @@
 	"title": "List item",
 	"category": "text",
 	"parent": [ "core/list" ],
-	"description": "Create a list item.",
+	"allowedBlocks": [ "core/list" ],
+	"description": "An individual item within a list.",
 	"textdomain": "default",
 	"attributes": {
 		"placeholder": {
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "li",
-			"default": "",
 			"__experimentalRole": "content"
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"className": false,
-		"__experimentalSelector": "li",
+		"splitting": true,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"color": {
+			"gradients": true,
+			"link": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -34,6 +57,13 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"root": ".wp-block-list > li",
+		"border": ".wp-block-list:not(.wp-block-list .wp-block-list) > li"
 	}
 }

@@ -1,9 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { createSelector, createRegistrySelector } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import type { State, UndoEdit } from './selectors';
+import type { State } from './selectors';
+import { STORE_NAME } from './name';
 
-type Optional< T > = T | undefined;
 type EntityRecordKey = string | number;
 
 /**
@@ -12,22 +17,10 @@ type EntityRecordKey = string | number;
  *
  * @param state State tree.
  *
- * @return The edit.
+ * @return The undo manager.
  */
-export function getUndoEdits( state: State ): Optional< UndoEdit[] > {
-	return state.undo.list[ state.undo.list.length - 1 + state.undo.offset ];
-}
-
-/**
- * Returns the next edit from the current undo offset
- * for the entity records edits history, if any.
- *
- * @param state State tree.
- *
- * @return The edit.
- */
-export function getRedoEdits( state: State ): Optional< UndoEdit[] > {
-	return state.undo.list[ state.undo.list.length + state.undo.offset ];
+export function getUndoManager( state: State ) {
+	return state.undoManager;
 }
 
 /**
@@ -40,4 +33,75 @@ export function getNavigationFallbackId(
 	state: State
 ): EntityRecordKey | undefined {
 	return state.navigationFallbackId;
+}
+
+export const getBlockPatternsForPostType = createRegistrySelector(
+	( select: any ) =>
+		createSelector(
+			( state, postType ) =>
+				select( STORE_NAME )
+					.getBlockPatterns()
+					.filter(
+						( { postTypes } ) =>
+							! postTypes ||
+							( Array.isArray( postTypes ) &&
+								postTypes.includes( postType ) )
+					),
+			() => [ select( STORE_NAME ).getBlockPatterns() ]
+		)
+);
+
+/**
+ * Returns the entity records permissions for the given entity record ids.
+ */
+export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state: State, kind: string, name: string, ids: string[] ) => {
+			const normalizedIds = Array.isArray( ids ) ? ids : [ ids ];
+			return normalizedIds.map( ( id ) => ( {
+				delete: select( STORE_NAME ).canUser( 'delete', {
+					kind,
+					name,
+					id,
+				} ),
+				update: select( STORE_NAME ).canUser( 'update', {
+					kind,
+					name,
+					id,
+				} ),
+			} ) );
+		},
+		( state ) => [ state.userPermissions ]
+	)
+);
+
+/**
+ * Returns the entity record permissions for the given entity record id.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param id    Entity record id.
+ *
+ * @return The entity record permissions.
+ */
+export function getEntityRecordPermissions(
+	state: State,
+	kind: string,
+	name: string,
+	id: string
+) {
+	return getEntityRecordsPermissions( state, kind, name, id )[ 0 ];
+}
+
+/**
+ * Returns the registered post meta fields for a given post type.
+ *
+ * @param state    Data state.
+ * @param postType Post type.
+ *
+ * @return Registered post meta fields.
+ */
+export function getRegisteredPostMeta( state: State, postType: string ) {
+	return state.registeredPostMeta?.[ postType ] ?? {};
 }

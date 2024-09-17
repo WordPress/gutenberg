@@ -5,8 +5,8 @@
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { QueryControls } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const QUERY_DEFAULTS = {
 	category: 1,
@@ -240,3 +240,10 @@ The selected category for the `categoriesList` prop.
 
 -   Required: No
 -   Platform: Web
+
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

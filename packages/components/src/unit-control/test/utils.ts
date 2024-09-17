@@ -248,7 +248,7 @@ describe( 'UnitControl utils', () => {
 		const cases: [
 			number | string | undefined,
 			number | undefined,
-			string | undefined
+			string | undefined,
 		][] = [
 			// Test undefined.
 			[ undefined, undefined, undefined ],

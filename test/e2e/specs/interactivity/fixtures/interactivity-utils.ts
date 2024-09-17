@@ -3,6 +3,11 @@
  */
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
+type AddPostWithBlockOptions = {
+	alias?: string;
+	attributes?: Record< string, any >;
+};
+
 export default class InteractivityUtils {
 	links: Map< string, string >;
 	requestUtils: RequestUtils;
@@ -20,23 +25,41 @@ export default class InteractivityUtils {
 			);
 		}
 
-		// Add an extra param to disable directives SSR. This is required at
-		// this moment, as SSR for directives is not stabilized yet and we need
-		// to ensure hydration works, even when the SSR'ed HTML is not correct.
+		/*
+		 * Add an extra param to disable directives SSR. This is required at
+		 * this moment, as SSR for directives is not stabilized yet and we need
+		 * to ensure hydration works, even when the SSR'ed HTML is not correct.
+		 */
 		const url = new URL( link );
-		url.searchParams.append( 'disable_directives_ssr', 'true' );
+		url.searchParams.append(
+			'disable_server_directive_processing',
+			'true'
+		);
 		return url.href;
 	}
 
-	async addPostWithBlock( blockName: string ) {
+	async addPostWithBlock(
+		name: string,
+		{ attributes, alias }: AddPostWithBlockOptions = {}
+	) {
+		const block = attributes
+			? `${ name } ${ JSON.stringify( attributes ) }`
+			: name;
+
+		if ( ! alias ) {
+			alias = block;
+		}
+
 		const payload = {
-			content: `<!-- wp:${ blockName } /-->`,
+			content: `<!-- wp:${ block } /-->`,
 			status: 'publish' as 'publish',
 			date_gmt: '2023-01-01T00:00:00',
+			title: alias,
 		};
 
 		const { link } = await this.requestUtils.createPost( payload );
-		this.links.set( blockName, link );
+		this.links.set( alias, link );
+		return this.getLink( alias );
 	}
 
 	async deleteAllPosts() {

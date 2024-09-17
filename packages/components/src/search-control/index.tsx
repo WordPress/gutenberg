@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,91 +9,117 @@ import classnames from 'classnames';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
-import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
-import type { SearchControlProps } from './types';
+import type { WordPressComponentProps } from '../context/wordpress-component';
+import type { SearchControlProps, SuffixItemProps } from './types';
 import type { ForwardedRef } from 'react';
+import { ContextSystemProvider } from '../context';
+import { StyledInputControl, SuffixItemWrapper } from './styles';
 
-function UnforwardedSearchControl(
-	{
-		__nextHasNoMarginBottom,
-		className,
-		onChange,
-		onKeyDown,
-		value,
-		label,
-		placeholder = __( 'Search' ),
-		hideLabelFromVision = true,
-		help,
-		onClose,
-		...restProps
-	}: WordPressComponentProps< SearchControlProps, 'input', false >,
-	forwardedRef: ForwardedRef< HTMLInputElement >
-) {
-	const searchRef = useRef< HTMLInputElement >();
-	const instanceId = useInstanceId( SearchControl );
-	const id = `components-search-control-${ instanceId }`;
-
-	const renderRightButton = () => {
-		if ( onClose ) {
-			return (
-				<Button
-					icon={ closeSmall }
-					label={ __( 'Close search' ) }
-					onClick={ onClose }
-				/>
-			);
-		}
-
-		if ( !! value ) {
-			return (
-				<Button
-					icon={ closeSmall }
-					label={ __( 'Reset search' ) }
-					onClick={ () => {
-						onChange( '' );
-						searchRef.current?.focus();
-					} }
-				/>
-			);
-		}
-
+function SuffixItem( {
+	searchRef,
+	value,
+	onChange,
+	onClose,
+}: SuffixItemProps ) {
+	if ( ! onClose && ! value ) {
 		return <Icon icon={ search } />;
+	}
+
+	const onReset = () => {
+		onChange( '' );
+		searchRef.current?.focus();
 	};
 
 	return (
-		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			label={ label }
-			id={ id }
-			hideLabelFromVision={ hideLabelFromVision }
-			help={ help }
-			className={ classnames( className, 'components-search-control' ) }
-		>
-			<div className="components-search-control__input-wrapper">
-				<input
-					{ ...restProps }
-					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
-					className="components-search-control__input"
-					id={ id }
-					type="search"
-					placeholder={ placeholder }
-					onChange={ ( event ) => onChange( event.target.value ) }
-					onKeyDown={ onKeyDown }
-					autoComplete="off"
-					value={ value || '' }
-				/>
-				<div className="components-search-control__icon">
-					{ renderRightButton() }
-				</div>
-			</div>
-		</BaseControl>
+		<Button
+			size="small"
+			icon={ closeSmall }
+			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+			onClick={ onClose ?? onReset }
+		/>
+	);
+}
+
+function UnforwardedSearchControl(
+	{
+		__nextHasNoMarginBottom = false,
+		className,
+		onChange,
+		value,
+		label = __( 'Search' ),
+		placeholder = __( 'Search' ),
+		hideLabelFromVision = true,
+		onClose,
+		size = 'default',
+		...restProps
+	}: Omit<
+		WordPressComponentProps< SearchControlProps, 'input', false >,
+		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
+		'disabled'
+	>,
+	forwardedRef: ForwardedRef< HTMLInputElement >
+) {
+	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
+	// Work with the design team (@WordPress/gutenberg-design) if you need this feature.
+	delete restProps.disabled;
+
+	const searchRef = useRef< HTMLInputElement >( null );
+	const instanceId = useInstanceId(
+		SearchControl,
+		'components-search-control'
+	);
+
+	const contextValue = useMemo(
+		() => ( {
+			BaseControl: {
+				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
+				// to provide backwards compatibile margin for SearchControl.
+				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
+				_overrides: { __nextHasNoMarginBottom },
+				__associatedWPComponentName: 'SearchControl',
+			},
+			// `isBorderless` is still experimental and not a public prop for InputControl yet.
+			InputBase: { isBorderless: true },
+		} ),
+		[ __nextHasNoMarginBottom ]
+	);
+
+	return (
+		<ContextSystemProvider value={ contextValue }>
+			<StyledInputControl
+				__next40pxDefaultSize
+				id={ instanceId }
+				hideLabelFromVision={ hideLabelFromVision }
+				label={ label }
+				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+				type="search"
+				size={ size }
+				className={ clsx( 'components-search-control', className ) }
+				onChange={ ( nextValue?: string ) =>
+					onChange( nextValue ?? '' )
+				}
+				autoComplete="off"
+				placeholder={ placeholder }
+				value={ value ?? '' }
+				suffix={
+					<SuffixItemWrapper size={ size }>
+						<SuffixItem
+							searchRef={ searchRef }
+							value={ value }
+							onChange={ onChange }
+							onClose={ onClose }
+						/>
+					</SuffixItemWrapper>
+				}
+				{ ...restProps }
+			/>
+		</ContextSystemProvider>
 	);
 }
 
@@ -109,6 +135,7 @@ function UnforwardedSearchControl(
  *
  *   return (
  *     <SearchControl
+ *       __nextHasNoMarginBottom
  *       value={ searchInput }
  *       onChange={ setSearchInput }
  *     />

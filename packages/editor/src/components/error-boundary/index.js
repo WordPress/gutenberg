@@ -29,7 +29,7 @@ function getContent() {
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button variant="secondary" ref={ ref }>
+		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);
@@ -75,4 +75,14 @@ class ErrorBoundary extends Component {
 	}
 }
 
+/**
+ * ErrorBoundary is used to catch JavaScript errors anywhere in a child component tree, log those errors, and display a fallback UI.
+ *
+ * It uses the lifecycle methods getDerivedStateFromError and componentDidCatch to catch errors in a child component tree.
+ *
+ * getDerivedStateFromError is used to render a fallback UI after an error has been thrown, and componentDidCatch is used to log error information.
+ *
+ * @class ErrorBoundary
+ * @augments Component
+ */
 export default ErrorBoundary;

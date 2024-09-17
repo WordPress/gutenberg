@@ -20,7 +20,16 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
-import { useBlockVariations, VariationsPanel } from './variations-panel';
+import {
+	useBlockVariations,
+	VariationsPanel,
+} from './variations/variations-panel';
+
+// Initial control values.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
+};
 
 function applyFallbackStyle( border ) {
 	if ( ! border ) {
@@ -61,21 +70,20 @@ const {
 	useHasDimensionsPanel,
 	useHasTypographyPanel,
 	useHasBorderPanel,
-	__experimentalUseHasBehaviorsPanel: useHasBehaviorsPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
-	useHasEffectsPanel,
 	useHasFiltersPanel,
+	useHasImageSettingsPanel,
 	useGlobalStyle,
-	__experimentalUseGlobalBehaviors: useGlobalBehaviors,
-	__experimentalBehaviorsPanel: StylesBehaviorsPanel,
+	useHasBackgroundPanel,
+	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
-	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
 
@@ -92,20 +100,46 @@ function ScreenBlock( { name, variation } ) {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const [ userSettings ] = useGlobalSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
-	const { inheritedBehaviors, setBehavior } = useGlobalBehaviors( name );
-	const { behavior } = useGlobalBehaviors( name, 'user' );
-
 	const blockType = getBlockType( name );
+
+	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
+	if (
+		settings?.spacing?.blockGap &&
+		blockType?.supports?.spacing?.blockGap &&
+		( blockType?.supports?.spacing?.__experimentalSkipSerialization ===
+			true ||
+			blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
+				( spacingType ) => spacingType === 'blockGap'
+			) )
+	) {
+		settings.spacing.blockGap = false;
+	}
+
+	// Only allow `aspectRatio` support if the block is not the grouping block.
+	// The grouping block allows the user to use Group, Row and Stack variations,
+	// and it is highly likely that the user will not want to set an aspect ratio
+	// for all three at once. Until there is the ability to set a different aspect
+	// ratio for each variation, we disable the aspect ratio controls for the
+	// grouping block in global styles.
+	if ( settings?.dimensions?.aspectRatio && name === 'core/group' ) {
+		settings.dimensions.aspectRatio = false;
+	}
+
 	const blockVariations = useBlockVariations( name );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
-	const hasBehaviorsPanel = useHasBehaviorsPanel( rawSettings, name );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasImageSettingsPanel = useHasImageSettingsPanel(
+		name,
+		userSettings,
+		settings
+	);
 	const hasVariationsPanel = !! blockVariations?.length && ! variation;
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -117,8 +151,7 @@ function ScreenBlock( { name, variation } ) {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const currentBlockStyle = variation
@@ -136,18 +169,39 @@ function ScreenBlock( { name, variation } ) {
 	const styleWithLayout = useMemo( () => {
 		return {
 			...style,
-			layout: settings.layout,
+			layout: userSettings.layout,
 		};
-	}, [ style, settings.layout ] );
+	}, [ style, userSettings.layout ] );
 	const onChangeDimensions = ( newStyle ) => {
 		const updatedStyle = { ...newStyle };
 		delete updatedStyle.layout;
 		setStyle( updatedStyle );
 
-		if ( newStyle.layout !== settings.layout ) {
+		if ( newStyle.layout !== userSettings.layout ) {
+			setSettings( {
+				...userSettings,
+				layout: newStyle.layout,
+			} );
+		}
+	};
+	const onChangeLightbox = ( newSetting ) => {
+		// If the newSetting is undefined, this means that the user has deselected
+		// (reset) the lightbox setting.
+		if ( newSetting === undefined ) {
 			setSettings( {
 				...rawSettings,
-				layout: newStyle.layout,
+				lightbox: undefined,
+			} );
+
+			// Otherwise, we simply set the lightbox setting to the new value but
+			// taking care of not overriding the other lightbox settings.
+		} else {
+			setSettings( {
+				...rawSettings,
+				lightbox: {
+					...rawSettings.lightbox,
+					...newSetting,
+				},
 			} );
 		}
 	};
@@ -190,7 +244,7 @@ function ScreenBlock( { name, variation } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ variation ? currentBlockStyle.label : blockType.title }
+				title={ variation ? currentBlockStyle?.label : blockType.title }
 			/>
 			<BlockPreviewPanel name={ name } variation={ variation } />
 			{ hasVariationsPanel && (
@@ -207,6 +261,15 @@ function ScreenBlock( { name, variation } ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+				/>
+			) }
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 				/>
 			) }
 			{ hasTypographyPanel && (
@@ -234,8 +297,8 @@ function ScreenBlock( { name, variation } ) {
 					settings={ settings }
 				/>
 			) }
-			{ hasEffectsPanel && (
-				<StylesEffectsPanel
+			{ hasFiltersPanel && (
+				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
 					onChange={ setStyle }
@@ -243,28 +306,21 @@ function ScreenBlock( { name, variation } ) {
 					includeLayoutControls
 				/>
 			) }
-			{ hasFiltersPanel && (
-				<StylesFiltersPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
-					onChange={ setStyle }
-					settings={ {
-						...settings,
-						color: {
-							...settings.color,
-							customDuotone: false, //TO FIX: Custom duotone only works on the block level right now
-						},
-					} }
-					includeLayoutControls
+			{ hasImageSettingsPanel && (
+				<ImageSettingsPanel
+					onChange={ onChangeLightbox }
+					value={ userSettings }
+					inheritedValue={ settings }
 				/>
 			) }
+
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
 					<p>
 						{ sprintf(
 							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
 							__(
-								'Add your own CSS to customize the appearance of the %s block.'
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
 							blockType?.title
 						) }
@@ -274,14 +330,6 @@ function ScreenBlock( { name, variation } ) {
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
 					/>
-					{ hasBehaviorsPanel && (
-						<StylesBehaviorsPanel
-							value={ behavior }
-							onChange={ setBehavior }
-							behaviors={ inheritedBehaviors }
-							blockName={ name }
-						></StylesBehaviorsPanel>
-					) }
 				</PanelBody>
 			) }
 		</>

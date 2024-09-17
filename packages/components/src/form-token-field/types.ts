@@ -5,6 +5,7 @@ import type {
 	ComponentPropsWithRef,
 	MouseEventHandler,
 	ReactNode,
+	FocusEvent,
 } from 'react';
 
 type Messages = {
@@ -156,6 +157,7 @@ export interface FormTokenFieldProps
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
@@ -182,13 +184,19 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	__nextHasNoMarginBottom?: boolean;
+	/**
+	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
+	 *
+	 * @default false
+	 */
+	tokenizeOnBlur?: boolean;
 }
 
 /**
  * `T` can be either a `string` or an object which must have a `value` prop as a string.
  */
 export interface SuggestionsListProps<
-	T = string | ( Record< string, unknown > & { value: string } )
+	T = string | ( Record< string, unknown > & { value: string } ),
 > {
 	selectedIndex: number;
 	scrollIntoView: boolean;

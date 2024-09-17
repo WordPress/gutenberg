@@ -1,0 +1,6 @@
+div.block-editor-bindings__panel {
+	grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+	button:hover .block-editor-bindings__item span {
+		color: inherit;
+	}
+}

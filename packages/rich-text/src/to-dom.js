@@ -104,7 +104,6 @@ function remove( node ) {
 
 export function toDom( {
 	value,
-	multilineTag,
 	prepareEditableTree,
 	isEditableTree = true,
 	placeholder,
@@ -134,7 +133,6 @@ export function toDom( {
 
 	const tree = toTree( {
 		value,
-		multilineTag,
 		createEmpty,
 		append,
 		getLastChild,
@@ -165,13 +163,11 @@ export function toDom( {
 
 /**
  * Create an `Element` tree from a Rich Text value and applies the difference to
- * the `Element` tree contained by `current`. If a `multilineTag` is provided,
- * text separated by two new lines will be wrapped in an `Element` of that type.
+ * the `Element` tree contained by `current`.
  *
  * @param {Object}        $1                       Named arguments.
  * @param {RichTextValue} $1.value                 Value to apply.
  * @param {HTMLElement}   $1.current               The live root node to apply the element tree to.
- * @param {string}        [$1.multilineTag]        Multiline tag.
  * @param {Function}      [$1.prepareEditableTree] Function to filter editorable formats.
  * @param {boolean}       [$1.__unstableDomOnly]   Only apply elements, no selection.
  * @param {string}        [$1.placeholder]         Placeholder text.
@@ -179,7 +175,6 @@ export function toDom( {
 export function apply( {
 	value,
 	current,
-	multilineTag,
 	prepareEditableTree,
 	__unstableDomOnly,
 	placeholder,
@@ -187,7 +182,6 @@ export function apply( {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
 		value,
-		multilineTag,
 		prepareEditableTree,
 		placeholder,
 		doc: current.ownerDocument,

@@ -10,10 +10,10 @@
 	"usesContext": [
 		"queryId",
 		"query",
-		"queryContext",
 		"displayLayout",
 		"templateSlug",
-		"previewPostType"
+		"previewPostType",
+		"enhancedPagination"
 	],
 	"supports": {
 		"reusable": false,
@@ -48,6 +48,9 @@
 			"__experimentalDefaultControls": {
 				"blockGap": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-post-template",

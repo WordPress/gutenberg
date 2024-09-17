@@ -20,6 +20,9 @@ export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 			styles.wpBlockQuoteLight,
 			styles.wpBlockQuoteDark
 		),
+		style?.baseColors?.color?.text && {
+			borderLeftColor: style.baseColors.color.text,
+		},
 		style?.color && {
 			borderLeftColor: style.color,
 		},
@@ -29,7 +32,10 @@ export const BlockQuotation = forwardRef( ( { ...props }, ref ) => {
 	const colorStyle = style?.color ? { color: style.color } : {};
 
 	const newChildren = Children.map( props.children, ( child ) => {
-		if ( child && child.props.identifier === 'citation' ) {
+		const { identifier, attributeKey } = child?.props || {};
+		const identifierKey = identifier ?? attributeKey;
+
+		if ( identifierKey === 'citation' ) {
 			return cloneElement( child, {
 				style: {
 					...styles.wpBlockQuoteCitation,

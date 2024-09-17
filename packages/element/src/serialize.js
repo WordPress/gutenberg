@@ -46,7 +46,7 @@ import {
 import { createContext, Fragment, StrictMode, forwardRef } from './react';
 import RawHTML from './raw-html';
 
-/** @typedef {import('./react').WPElement} WPElement */
+/** @typedef {import('react').ReactElement} ReactElement */
 
 const { Provider, Consumer } = createContext( undefined );
 const ForwardRef = forwardRef( () => {
@@ -672,15 +672,15 @@ export function renderNativeComponent(
 	return '<' + type + attributes + '>' + content + '</' + type + '>';
 }
 
-/** @typedef {import('./react').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * Serializes a non-native component type to string.
  *
- * @param {WPComponent} Component       Component type to serialize.
- * @param {Object}      props           Props object.
- * @param {Object}      [context]       Context object.
- * @param {Object}      [legacyContext] Legacy context object.
+ * @param {ComponentType} Component       Component type to serialize.
+ * @param {Object}        props           Props object.
+ * @param {Object}        [context]       Context object.
+ * @param {Object}        [legacyContext] Legacy context object.
  *
  * @return {string} Serialized element
  */
@@ -755,7 +755,7 @@ export function renderAttributes( props ) {
 
 		let value = getNormalAttributeValue( key, props[ key ] );
 
-		// If value is not of serializeable type, skip.
+		// If value is not of serializable type, skip.
 		if ( ! ATTRIBUTES_TYPES.has( typeof value ) ) {
 			continue;
 		}

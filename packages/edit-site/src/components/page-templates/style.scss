@@ -1,0 +1,124 @@
+.page-templates-preview-field {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	border-radius: $radius-medium;
+
+	.page-templates-preview-field__button {
+		box-shadow: none;
+		border: none;
+		padding: 0;
+		background-color: unset;
+		box-sizing: border-box;
+		cursor: pointer;
+		overflow: hidden;
+		height: 100%;
+		border-radius: $radius-medium;
+
+		&:focus-visible {
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+		}
+	}
+
+	.dataviews-view-list & {
+		.block-editor-block-preview__container {
+			height: 120px;
+		}
+	}
+
+	.dataviews-view-grid & {
+		.block-editor-block-preview__container {
+			height: 100%;
+		}
+	}
+
+	.dataviews-view-table & {
+		position: relative;
+		width: 120px;
+		max-height: 160px;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+			border-radius: $radius-medium;
+		}
+	}
+}
+
+.page-templates-description {
+	max-width: 50em;
+	text-wrap: balance; // Fallback for Safari
+	text-wrap: pretty;
+
+	.dataviews-view-table & {
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+.edit-site-page-templates {
+	.dataviews-pagination {
+		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
+	}
+}
+
+
+.page-templates-author-field__avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: left;
+	display: flex;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		object-fit: cover;
+		opacity: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+		border-radius: 100%;
+	}
+
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
+	}
+}
+
+.page-templates-author-field__icon {
+	display: flex;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+
+	svg {
+		margin-left: -$grid-unit-05;
+		fill: currentColor;
+	}
+}
+
+.page-templates-author-field__name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.edit-site-list__rename-modal {
+	// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
+	z-index: z-index(".edit-site-list__rename-modal");
+	.components-base-control {
+		@include break-medium() {
+			width: $grid-unit * 40;
+		}
+	}
+}

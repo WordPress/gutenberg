@@ -1,0 +1,21 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../data" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../warning" }
+	],
+	"include": [ "src" ]
+}

@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import LinkedButton from './linked-button';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 import {
 	getAllValue,
 	getAllUnit,
@@ -44,7 +44,7 @@ const MAX_BORDER_RADIUS_VALUES = {
  * @param {Function} props.onChange Callback to handle onChange.
  * @param {Object}   props.values   Border radius values.
  *
- * @return {WPElement}              Custom border radius control.
+ * @return {Element}              Custom border radius control.
  */
 export default function BorderRadiusControl( { onChange, values } ) {
 	const [ isLinked, setIsLinked ] = useState(
@@ -67,8 +67,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
 		)[ 1 ],
 	} );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
 	} );
 
 	const unit = getAllUnit( selectedUnits );
@@ -103,6 +104,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
 							units={ units }
 						/>
 						<RangeControl
+							__next40pxDefaultSize
 							label={ __( 'Border radius' ) }
 							hideLabelFromVision
 							className="components-border-radius-control__range-control"

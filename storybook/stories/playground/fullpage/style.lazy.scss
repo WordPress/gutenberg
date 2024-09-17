@@ -1,0 +1,48 @@
+@import "~@wordpress/base-styles/colors";
+@import "~@wordpress/base-styles/variables";
+@import "~@wordpress/base-styles/mixins";
+@import "~@wordpress/base-styles/breakpoints";
+@import "~@wordpress/base-styles/animations";
+@import "~@wordpress/base-styles/z-index";
+
+@import "./reset";
+
+.playground {
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	iframe {
+		width: 100%;
+	}
+}
+
+.playground__content {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	@include break-small() {
+		right: $sidebar-width;
+	}
+}
+
+.playground__sidebar {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: $sidebar-width;
+	border-left: $border-width solid $gray-300;
+	height: auto;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
+
+	// Temporarily disable the sidebar on mobile
+	display: none;
+	@include break-small() {
+		display: block;
+	}
+}

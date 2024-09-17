@@ -69,13 +69,16 @@ async function getDecFile( packagePath ) {
 
 async function typecheckDeclarations( file ) {
 	return new Promise( ( resolve, reject ) => {
-		exec( `npx tsc --noEmit ${ file }`, ( error, stdout, stderr ) => {
-			if ( error ) {
-				reject( { file, error, stderr, stdout } );
-			} else {
-				resolve( { file, stdout } );
+		exec(
+			`npx tsc --target esnext --moduleResolution node --noEmit --skipLibCheck "${ file }"`,
+			( error, stdout, stderr ) => {
+				if ( error ) {
+					reject( { file, error, stderr, stdout } );
+				} else {
+					resolve( { file, stdout } );
+				}
 			}
-		} );
+		);
 	} );
 }
 
@@ -83,7 +86,7 @@ async function checkUnverifiedDeclarationFiles() {
 	const packageDir = path.resolve( 'packages' );
 	const packageDirs = (
 		await fs.readdir( packageDir, { withFileTypes: true } )
-	 )
+	)
 		.filter( ( dirent ) => dirent.isDirectory() )
 		.map( ( dirent ) => path.join( packageDir, dirent.name ) );
 
@@ -97,7 +100,7 @@ async function checkUnverifiedDeclarationFiles() {
 					: null
 			)
 		)
-	 ).filter( Boolean );
+	).filter( Boolean );
 
 	const tscResults = await Promise.allSettled(
 		declarations.map( typecheckDeclarations )

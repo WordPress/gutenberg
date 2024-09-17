@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,11 @@ const CommentsFormPlaceholder = () => {
 	return (
 		<div className="comment-respond">
 			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
-			<form noValidate className="comment-form" inert="true">
+			<form
+				noValidate
+				className="comment-form"
+				onSubmit={ ( event ) => event.preventDefault() }
+			>
 				<p>
 					<label htmlFor={ `comment-${ instanceId }` }>
 						{ __( 'Comment' ) }
@@ -33,18 +37,20 @@ const CommentsFormPlaceholder = () => {
 						name="comment"
 						cols="45"
 						rows="8"
+						readOnly
 					/>
 				</p>
 				<p className="form-submit wp-block-button">
 					<input
 						name="submit"
 						type="submit"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }
+						aria-disabled="true"
 					/>
 				</p>
 			</form>
@@ -78,6 +84,7 @@ const CommentsForm = ( { postId, postType } ) => {
 		if ( 'closed' === commentStatus ) {
 			const actions = [
 				<Button
+					__next40pxDefaultSize
 					key="enableComments"
 					onClick={ () => setCommentStatus( 'open' ) }
 					variant="primary"

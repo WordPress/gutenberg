@@ -42,6 +42,6 @@ export const AsyncModeConsumer = Consumer;
  * It is possible to nest multiple levels of AsyncModeProvider to fine-tune the rendering behavior.
  *
  * @param {boolean} props.value Enable Async Mode.
- * @return {WPComponent} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 export default Provider;

@@ -2,17 +2,19 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
+import { LayoutGroup } from 'framer-motion';
+
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect, useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks';
 import BaseControl from '../../base-control';
 import type { ToggleGroupControlProps } from '../types';
@@ -21,14 +23,13 @@ import * as styles from './styles';
 import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
-const noop = () => {};
-
 function UnconnectedToggleGroupControl(
 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {
 		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		className,
 		isAdaptiveWidth = false,
 		isBlock = false,
@@ -36,22 +37,31 @@ function UnconnectedToggleGroupControl(
 		label,
 		hideLabelFromVision = false,
 		help,
-		onChange = noop,
+		onChange,
 		size = 'default',
 		value,
 		children,
 		...otherProps
 	} = useContextSystem( props, 'ToggleGroupControl' );
+
+	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+	const normalizedSize =
+		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+
 	const cx = useCx();
 
 	const classes = useMemo(
 		() =>
 			cx(
-				styles.ToggleGroupControl( { isBlock, isDeselectable, size } ),
+				styles.toggleGroupControl( {
+					isBlock,
+					isDeselectable,
+					size: normalizedSize,
+				} ),
 				isBlock && styles.block,
 				className
 			),
-		[ className, cx, isBlock, isDeselectable, size ]
+		[ className, cx, isBlock, isDeselectable, normalizedSize ]
 	);
 
 	const MainControl = isDeselectable
@@ -62,6 +72,7 @@ function UnconnectedToggleGroupControl(
 		<BaseControl
 			help={ help }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="ToggleGroupControl"
 		>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
@@ -70,15 +81,16 @@ function UnconnectedToggleGroupControl(
 			) }
 			<MainControl
 				{ ...otherProps }
-				children={ children }
 				className={ classes }
 				isAdaptiveWidth={ isAdaptiveWidth }
 				label={ label }
 				onChange={ onChange }
 				ref={ forwardedRef }
-				size={ size }
+				size={ normalizedSize }
 				value={ value }
-			/>
+			>
+				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
+			</MainControl>
 		</BaseControl>
 	);
 }
@@ -104,7 +116,12 @@ function UnconnectedToggleGroupControl(
  *
  * function Example() {
  *   return (
- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+ *     <ToggleGroupControl
+ *       label="my label"
+ *       value="vertical"
+ *       isBlock
+ *       __nextHasNoMarginBottom
+ *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
  *     </ToggleGroupControl>

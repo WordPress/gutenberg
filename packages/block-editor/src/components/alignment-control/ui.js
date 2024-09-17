@@ -32,7 +32,7 @@ function AlignmentUI( {
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
 	label = __( 'Align text' ),
-	describedBy = __( 'Change text alignment' ),
+	description = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
 } ) {
@@ -45,7 +45,9 @@ function AlignmentUI( {
 	);
 
 	function setIcon() {
-		if ( activeAlignment ) return activeAlignment.icon;
+		if ( activeAlignment ) {
+			return activeAlignment.icon;
+		}
 		return isRTL() ? alignRight : alignLeft;
 	}
 
@@ -54,7 +56,7 @@ function AlignmentUI( {
 		? { isCollapsed }
 		: {
 				toggleProps: {
-					describedBy,
+					description,
 				},
 				popoverProps: POPOVER_PROPS,
 		  };

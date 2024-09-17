@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,8 +14,10 @@ import {
 	InspectorControls,
 	ContrastChecker,
 	withColors,
+	InnerBlocks,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -26,8 +28,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
-
-const ALLOWED_BLOCKS = [ 'core/social-link' ];
+import { useSelect } from '@wordpress/data';
 
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
@@ -57,14 +58,22 @@ export function SocialLinksEdit( props ) {
 		size,
 	} = attributes;
 
+	const hasSelectedChild = useSelect(
+		( select ) =>
+			select( blockEditorStore ).hasSelectedInnerBlock( clientId ),
+		[ clientId ]
+	);
+
+	const hasAnySelected = isSelected || hasSelectedChild;
+
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
 	// Remove icon background color when logos only style is selected or
 	// restore it when any other style is selected.
-	const backgroundBackup = useRef( {} );
+	const backgroundBackupRef = useRef( {} );
 	useEffect( () => {
 		if ( logosOnly ) {
-			backgroundBackup.current = {
+			backgroundBackupRef.current = {
 				iconBackgroundColor,
 				iconBackgroundColorValue,
 				customIconBackgroundColor,
@@ -75,8 +84,9 @@ export function SocialLinksEdit( props ) {
 				iconBackgroundColorValue: undefined,
 			} );
 		} else {
-			setAttributes( { ...backgroundBackup.current } );
+			setAttributes( { ...backgroundBackupRef.current } );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ logosOnly ] );
 
 	const SocialPlaceholder = (
@@ -89,15 +99,9 @@ export function SocialLinksEdit( props ) {
 		</li>
 	);
 
-	const SelectedSocialPlaceholder = (
-		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Click plus to add' ) }
-		</li>
-	);
-
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
-	const className = classNames( size, {
+	const className = clsx( size, {
 		'has-visible-labels': showLabels,
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
@@ -106,11 +110,11 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
+		placeholder: ! isSelected && SocialPlaceholder,
 		templateLock: false,
 		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
+		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const POPOVER_PROPS = {
@@ -206,7 +210,7 @@ export function SocialLinksEdit( props ) {
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show labels' ) }
+						label={ __( 'Show text' ) }
 						checked={ showLabels }
 						onChange={ () =>
 							setAttributes( { showLabels: ! showLabels } )

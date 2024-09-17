@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,13 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 export default function Edit( {
-	attributes: { textAlign, showPostTitle, showCommentsCount, level },
+	attributes: {
+		textAlign,
+		showPostTitle,
+		showCommentsCount,
+		level,
+		levelOptions,
+	},
 	setAttributes,
 	context: { postType, postId },
 } ) {
@@ -32,7 +38,7 @@ export default function Edit( {
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -95,6 +101,7 @@ export default function Edit( {
 			/>
 			<HeadingLevelDropdown
 				value={ level }
+				options={ levelOptions }
 				onChange={ ( newLevel ) =>
 					setAttributes( { level: newLevel } )
 				}

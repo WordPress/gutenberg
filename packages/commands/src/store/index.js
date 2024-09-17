@@ -20,6 +20,14 @@ const STORE_NAME = 'core/commands';
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
+ *
+ * @example
+ * ```js
+ * import { store as commandsStore } from '@wordpress/commands';
+ * import { useDispatch } from '@wordpress/data';
+ * ...
+ * const { open: openCommandCenter } = useDispatch( commandsStore );
+ * ```
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,

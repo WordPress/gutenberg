@@ -4,7 +4,7 @@
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`]((/packages/components/src/toggle-group-control/toggle-group-control/README.md)).
+`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
 
 
 ## Usage
@@ -17,7 +17,12 @@ import {
 
 function Example() {
 	return (
-		<ToggleGroupControl label="my label" value="vertical" isBlock>
+		<ToggleGroupControl
+			label="my label"
+			value="vertical"
+			isBlock
+			__nextHasNoMarginBottom
+		>
 			<ToggleGroupControlOption
 				value="horizontal"
 				label="Horizontal"

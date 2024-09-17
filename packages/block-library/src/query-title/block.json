@@ -17,6 +17,9 @@
 			"type": "number",
 			"default": 1
 		},
+		"levelOptions": {
+			"type": "array"
+		},
 		"showPrefix": {
 			"type": "boolean",
 			"default": true
@@ -50,9 +53,22 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true,
-				"textTransform": true
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
 			}
 		}
 	},

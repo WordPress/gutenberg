@@ -50,7 +50,7 @@ A className passed to the header container.
 
 The icon to render.
 
--   Type: `Function|WPComponent|null`
+-   Type: `Function|Component|null`
 -   Required: No
 -   Default: `null`
 
@@ -79,7 +79,7 @@ A className passed to the panel that contains the contents of the sidebar.
 
 ### scope
 
-The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes
@@ -114,7 +114,7 @@ A slot that renders the currently active ComplementaryArea.
 
 ### scope
 
-The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes

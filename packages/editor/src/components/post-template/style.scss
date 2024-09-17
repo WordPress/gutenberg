@@ -1,0 +1,44 @@
+.editor-post-template__swap-template-modal {
+	z-index: z-index(".editor-post-template__swap-template-modal");
+}
+
+.editor-post-template__swap-template-modal-content .block-editor-block-patterns-list {
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	// Small top padding required to avoid cutting off the visible outline when hovering items
+	padding-top: $border-width-focus-fallback;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
+}
+
+.editor-post-template__dropdown {
+	.components-popover__content {
+		min-width: 240px;
+	}
+	.components-button.is-pressed,
+	.components-button.is-pressed:hover {
+		background: inherit;
+		color: inherit;
+	}
+}
+
+.editor-post-template__create-form {
+	@include break-medium() {
+		width: $grid-unit * 40;
+	}
+}
+
+.editor-post-template__classic-theme-dropdown {
+	padding: $grid-unit-10;
+}

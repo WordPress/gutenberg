@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,6 +10,7 @@ import classnames from 'classnames/dedupe';
 import { View } from '@wordpress/primitives';
 import {
 	BlockCaption,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -51,7 +52,7 @@ const EmbedPreview = ( {
 		styles[ `embed-preview__sandbox--align-${ align }` ];
 
 	function accessibilityLabelCreator( caption ) {
-		return ! caption
+		return RichText.isEmpty( caption )
 			? /* translators: accessibility text. Empty Embed caption. */
 			  __( 'Embed caption. Empty' )
 			: sprintf(
@@ -85,7 +86,7 @@ const EmbedPreview = ( {
 		__( 'Embedded content from %s' ),
 		parsedHostBaseUrl
 	);
-	const sandboxClassnames = classnames(
+	const sandboxClassnames = clsx(
 		type,
 		className,
 		'wp-block-embed__wrapper'

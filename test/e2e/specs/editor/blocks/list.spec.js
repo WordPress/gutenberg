@@ -8,12 +8,44 @@ test.describe( 'List (@firefox)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'can be copied from multi selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const copied = `<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`;
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			copied + '\n\n' + copied
+		);
+	} );
+
 	test( 'can be created by using an asterisk at the start of a paragraph block', async ( {
 		editor,
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* A list item' );
 
 		// Create a second list item.
@@ -21,7 +53,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'Another list item' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>A list item</li>
 <!-- /wp:list-item -->
 
@@ -38,13 +70,15 @@ test.describe( 'List (@firefox)', () => {
 		pageUtils,
 	} ) => {
 		// Create a list with the slash block shortcut.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
 		await page.keyboard.type( '* ' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>test</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -56,12 +90,14 @@ test.describe( 'List (@firefox)', () => {
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a list creation.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1) A list item' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>A list item</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
@@ -73,7 +109,9 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1. ' );
 		await pageUtils.pressKeys( 'primary+z' );
 
@@ -88,7 +126,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -103,7 +143,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await expect(
 			editor.canvas.locator( '[data-type="core/list"]' )
@@ -121,7 +163,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await editor.showBlockToolbar();
 		await page.keyboard.press( 'Backspace' );
@@ -137,7 +181,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.evaluate( () => delete window.requestIdleCallback );
 		await page.keyboard.type( '* ' );
 		await expect(
@@ -156,7 +202,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Escape' );
 
@@ -171,7 +219,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.press( 'Backspace' );
@@ -183,7 +233,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await expect(
 			editor.canvas.locator( '[data-type="core/list"]' )
@@ -200,7 +252,9 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'can be created by typing "/list"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/list' );
 		await expect(
 			page.locator( 'role=option[name="List"i][selected]' )
@@ -210,7 +264,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>I’m a list</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -221,13 +275,15 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>test</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -238,18 +294,22 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await editor.canvas.click( '[data-type="core/paragraph"] >> nth=0' );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"] >> nth=0' )
+			.click();
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
@@ -265,7 +325,9 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( 'two' );
@@ -273,7 +335,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
@@ -289,20 +351,24 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'shift+Enter' );
 		await page.keyboard.type( '...' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await editor.canvas.click( '[data-type="core/paragraph"] >> nth=0' );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"] >> nth=0' )
+			.click();
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/list' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one<br>...</li>
 <!-- /wp:list-item -->
 
@@ -318,7 +384,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -361,13 +427,13 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
@@ -391,7 +457,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
@@ -407,7 +473,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
@@ -432,7 +498,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
@@ -450,7 +516,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
@@ -460,7 +526,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -475,17 +541,15 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li></li>
-<!-- /wp:list-item --></ul>
-<!-- /wp:list -->
+<!-- /wp:list-item -->
 
-<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -561,7 +625,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1. one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
@@ -571,7 +637,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->
@@ -581,7 +647,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
@@ -599,9 +665,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>two</li>
 <!-- /wp:list-item -->
 
@@ -625,9 +691,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -638,11 +704,11 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'should change the base list type', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->`
@@ -658,14 +724,14 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list --></li>
@@ -688,7 +754,7 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>aaa</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
@@ -709,9 +775,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -723,7 +789,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -735,13 +801,6 @@ test.describe( 'List (@firefox)', () => {
 	} );
 
 	test( 'should indent and outdent level 2', async ( { editor, page } ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		await editor.insertBlock( { name: 'core/list' } );
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Enter' );
@@ -753,11 +812,11 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -771,9 +830,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
@@ -792,9 +851,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -823,11 +882,11 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>b<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -842,13 +901,13 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li>b<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -868,7 +927,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<br></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -891,7 +950,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -910,7 +969,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( '* 1' ); // Should be at level 0.
 		await page.keyboard.press( 'Enter' );
@@ -920,11 +981,11 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>i</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -939,9 +1000,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -957,9 +1018,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -975,9 +1036,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -990,7 +1051,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
@@ -1004,7 +1065,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -1024,7 +1085,9 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( ' a' );
@@ -1035,13 +1098,13 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li>2<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -1055,7 +1118,9 @@ test.describe( 'List (@firefox)', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
@@ -1063,7 +1128,7 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
@@ -1078,7 +1143,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		// Tests the shortcut with a non breaking space.
 		await page.keyboard.type( '*\u00a0' );
@@ -1094,7 +1161,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		// Tests the shortcut with a non breaking space.
 		await page.keyboard.type( '* 1' );
@@ -1113,9 +1182,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>2</li>
 <!-- /wp:list-item -->
 
@@ -1139,9 +1208,9 @@ test.describe( 'List (@firefox)', () => {
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>2</li>
 <!-- /wp:list-item -->
 
@@ -1158,7 +1227,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -1172,7 +1243,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:paragraph -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->`
@@ -1183,18 +1254,20 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* 1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
@@ -1213,18 +1286,20 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1. a' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -1250,7 +1325,7 @@ test.describe( 'List (@firefox)', () => {
 		// Add empty list block
 		await page.getByPlaceholder( 'Start writing with text or HTML' )
 			.fill( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -1260,7 +1335,7 @@ test.describe( 'List (@firefox)', () => {
 
 		// Verify no WSOD and content is proper.
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -1270,7 +1345,9 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* a' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'b' );
@@ -1279,7 +1356,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '* c' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -1289,7 +1366,7 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>c</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -1298,7 +1375,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>a</li>
 <!-- /wp:list-item -->
 
@@ -1313,13 +1390,15 @@ test.describe( 'List (@firefox)', () => {
 	} );
 
 	test( 'can be exited to selected paragraph', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* ' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '1' );
 
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->
@@ -1354,11 +1433,13 @@ test.describe( 'List (@firefox)', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Multiple blocks selected' } )
+			.click();
 		await page.getByRole( 'menuitem', { name: 'List' } ).click();
 
 		expect( await editor.getEditedPostContent() ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item -->
 
@@ -1368,11 +1449,8 @@ test.describe( 'List (@firefox)', () => {
 <!-- /wp:list -->` );
 	} );
 
-	test( 'should merge two list items with nested lists', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
+	test.describe( 'should merge two list items with nested lists', () => {
+		const start = {
 			name: 'core/list',
 			innerBlocks: [
 				{
@@ -1406,22 +1484,8 @@ test.describe( 'List (@firefox)', () => {
 					],
 				},
 			],
-		} );
-
-		// Navigate to the third item.
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
-
-		await page.keyboard.press( 'Backspace' );
-
-		// Test caret position.
-		await page.keyboard.type( '‸' );
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		};
+		const end = [
 			{
 				name: 'core/list',
 				innerBlocks: [
@@ -1444,6 +1508,103 @@ test.describe( 'List (@firefox)', () => {
 							},
 						],
 					},
+				],
+			},
+		];
+
+		test( 'Backspace', async ( { editor, page } ) => {
+			await editor.insertBlock( start );
+
+			// Navigate to the start of the third item.
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+
+			await page.keyboard.press( 'Backspace' );
+
+			// Test caret position.
+			await page.keyboard.type( '‸' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( end );
+		} );
+
+		test( 'Delete (forward)', async ( { editor, page } ) => {
+			await editor.insertBlock( start );
+
+			// Navigate to the end of the second item.
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'ArrowRight' );
+
+			await page.keyboard.press( 'Delete' );
+
+			// Test caret position.
+			await page.keyboard.type( '‸' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( end );
+		} );
+	} );
+
+	test( 'should leave nested list intact when deleting the parent item', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '1' },
+				},
+				{
+					name: 'core/list-item',
+					attributes: { content: '' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+							],
+						},
+					],
+				},
+				{ name: 'core/list-item', attributes: { content: '3' } },
+			],
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: '1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'a' },
+									},
+								],
+							},
+						],
+					},
+					{ name: 'core/list-item', attributes: { content: '3' } },
 				],
 			},
 		] );

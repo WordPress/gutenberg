@@ -11,7 +11,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 import Icon from '../../icon';
@@ -51,20 +51,20 @@ function UnforwardedToggleGroupControlOptionIcon(
  * import { formatLowercase, formatUppercase } from '@wordpress/icons';
  *
  * function Example() {
- *	return (
- *		<ToggleGroupControl>
- *			<ToggleGroupControlOptionIcon
- *				value="uppercase"
- *				label="Uppercase"
- *				icon={ formatUppercase }
- *			/>
- *			<ToggleGroupControlOptionIcon
- *				value="lowercase"
- *				label="Lowercase"
- *				icon={ formatLowercase }
- *			/>
- *		</ToggleGroupControl>
- *	);
+ *  return (
+ *    <ToggleGroupControl __nextHasNoMarginBottom>
+ *      <ToggleGroupControlOptionIcon
+ *        value="uppercase"
+ *        label="Uppercase"
+ *        icon={ formatUppercase }
+ *      />
+ *      <ToggleGroupControlOptionIcon
+ *        value="lowercase"
+ *        label="Lowercase"
+ *        icon={ formatLowercase }
+ *      />
+ *    </ToggleGroupControl>
+ *  );
  * }
  * ```
  */

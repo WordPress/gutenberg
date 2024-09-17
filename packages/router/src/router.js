@@ -3,9 +3,8 @@
  */
 import {
 	createContext,
-	useState,
-	useEffect,
 	useContext,
+	useSyncExternalStore,
 } from '@wordpress/element';
 
 /**
@@ -24,24 +23,12 @@ export function useHistory() {
 	return useContext( HistoryContext );
 }
 
-function getLocationWithParams( location ) {
-	const searchParams = new URLSearchParams( location.search );
-	return {
-		...location,
-		params: Object.fromEntries( searchParams.entries() ),
-	};
-}
-
 export function RouterProvider( { children } ) {
-	const [ location, setLocation ] = useState( () =>
-		getLocationWithParams( history.location )
+	const location = useSyncExternalStore(
+		history.listen,
+		history.getLocationWithParams,
+		history.getLocationWithParams
 	);
-
-	useEffect( () => {
-		return history.listen( ( { location: updatedLocation } ) => {
-			setLocation( getLocationWithParams( updatedLocation ) );
-		} );
-	}, [] );
 
 	return (
 		<HistoryContext.Provider value={ history }>

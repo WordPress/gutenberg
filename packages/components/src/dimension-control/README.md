@@ -1,6 +1,10 @@
 # DimensionControl
 
 <div class="callout callout-alert">
+This component is deprecated.
+</div>
+
+<div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
@@ -9,14 +13,15 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 export default function MyCustomDimensionControl() {
 	const [ paddingSize, setPaddingSize ] = useState( '' );
 
 	return (
 		<DimensionControl
+			__nextHasNoMarginBottom
 			label={ 'Padding' }
 			icon={ 'desktop' }
 			onChange={ ( value ) => setPaddingSize( value ) }
@@ -91,3 +96,19 @@ A callback which is triggered when a spacing size value changes (is selected/cli
 -   **Required:** No
 
 A string of classes to be added to the control component.
+
+### `__next40pxDefaultSize`
+
+-   **Type:** `Boolean`
+-   **Required:** No
+-   **Default:** `false`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+### `__nextHasNoMarginBottom`
+
+-   **Type:** `Boolean`
+-   **Required:** No
+-   **Default:** `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

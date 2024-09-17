@@ -16,8 +16,7 @@
 				Button,
 				{
 					className: 'e2e-reset-block-button',
-					variant: "secondary",
-					isLarge: true,
+					variant: 'secondary',
 					onClick() {
 						const emptyBlock = createBlock( props.name );
 						props.onReplace( emptyBlock );

@@ -1,0 +1,63 @@
+.wp-block-form-input__label {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-bottom: 0.5em;
+
+	&.is-label-inline {
+		flex-direction: row;
+		gap: 0.5em;
+		align-items: center;
+
+		.wp-block-form-input__label-content {
+			margin-bottom: 0.5em;
+		}
+	}
+
+	&:has(input[type="checkbox"]) {
+		flex-direction: row;
+		width: fit-content;
+
+		.wp-block-form-input__label-content {
+			margin: 0;
+		}
+	}
+
+	&:has(.wp-block-form-input__label-content + input[type="checkbox"]) {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This style is required for old markup. */
+		flex-direction: row-reverse;
+	}
+}
+
+.wp-block-form-input__label-content {
+	width: fit-content;
+}
+
+.wp-block-form-input__input {
+	padding: 0 0.5em;
+	font-size: 1em;
+	margin-bottom: 0.5em;
+
+	&[type="text"],
+	&[type="password"],
+	&[type="date"],
+	&[type="datetime"],
+	&[type="datetime-local"],
+	&[type="email"],
+	&[type="month"],
+	&[type="number"],
+	&[type="search"],
+	&[type="tel"],
+	&[type="time"],
+	&[type="url"],
+	&[type="week"] {
+		min-height: 2em;
+		line-height: 2;
+		border: 1px solid;
+	}
+}
+
+textarea.wp-block-form-input__input {
+	min-height: 10em;
+}

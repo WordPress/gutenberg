@@ -7,14 +7,23 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { attr, html, text, query, node, children, prop } from '../matchers';
-import { normalizeBlockType } from '../utils';
+import {
+	attr,
+	html,
+	text,
+	query,
+	node,
+	children,
+	prop,
+	richText,
+} from '../matchers';
+import { normalizeBlockType, getDefault } from '../utils';
 
 /**
  * Higher-order hpq matcher which enhances an attribute matcher to return true
@@ -27,24 +36,8 @@ import { normalizeBlockType } from '../utils';
  *
  * @return {Function} Enhanced hpq matcher.
  */
-export const toBooleanAttributeMatcher = ( matcher ) =>
-	pipe( [
-		matcher,
-		// Expected values from `attr( 'disabled' )`:
-		//
-		// <input>
-		// - Value:       `undefined`
-		// - Transformed: `false`
-		//
-		// <input disabled>
-		// - Value:       `''`
-		// - Transformed: `true`
-		//
-		// <input disabled="disabled">
-		// - Value:       `'disabled'`
-		// - Transformed: `true`
-		( value ) => value !== undefined,
-	] );
+export const toBooleanAttributeMatcher = ( matcher ) => ( value ) =>
+	matcher( value ) !== undefined;
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -58,6 +51,9 @@ export const toBooleanAttributeMatcher = ( matcher ) =>
  */
 export function isOfType( value, type ) {
 	switch ( type ) {
+		case 'rich-text':
+			return value instanceof RichTextData;
+
 		case 'string':
 			return typeof value === 'string';
 
@@ -134,6 +130,7 @@ export function getBlockAttribute(
 		case 'property':
 		case 'html':
 		case 'text':
+		case 'rich-text':
 		case 'children':
 		case 'node':
 		case 'query':
@@ -152,7 +149,7 @@ export function getBlockAttribute(
 	}
 
 	if ( value === undefined ) {
-		value = attributeSchema.default;
+		value = getDefault( attributeSchema );
 	}
 
 	return value;
@@ -200,17 +197,22 @@ export function isValidByEnum( value, enumSet ) {
  */
 export const matcherFromSource = memoize( ( sourceConfig ) => {
 	switch ( sourceConfig.source ) {
-		case 'attribute':
+		case 'attribute': {
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
 			if ( sourceConfig.type === 'boolean' ) {
 				matcher = toBooleanAttributeMatcher( matcher );
 			}
-
 			return matcher;
+		}
 		case 'html':
 			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
+		case 'rich-text':
+			return richText(
+				sourceConfig.selector,
+				sourceConfig.__unstablePreserveWhiteSpace
+			);
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':
@@ -225,12 +227,10 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 				)
 			);
 			return query( sourceConfig.selector, subMatchers );
-		case 'tag':
-			return pipe( [
-				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) =>
-					nodeName ? nodeName.toLowerCase() : undefined,
-			] );
+		case 'tag': {
+			const matcher = prop( sourceConfig.selector, 'nodeName' );
+			return ( domNode ) => matcher( domNode )?.toLowerCase();
+		}
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );

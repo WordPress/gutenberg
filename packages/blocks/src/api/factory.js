@@ -402,6 +402,10 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 					return true;
 				}
 
+				if ( t.type === 'prefix' ) {
+					return true;
+				}
+
 				if ( ! t.blocks || ! t.blocks.length ) {
 					return false;
 				}
@@ -580,11 +584,19 @@ export function switchToBlockType( blocks, name ) {
  * @return {Object} block.
  */
 export const getBlockFromExample = ( name, example ) => {
-	return createBlock(
-		name,
-		example.attributes,
-		( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
-			getBlockFromExample( innerBlock.name, innerBlock )
-		)
-	);
+	try {
+		return createBlock(
+			name,
+			example.attributes,
+			( example.innerBlocks ?? [] ).map( ( innerBlock ) =>
+				getBlockFromExample( innerBlock.name, innerBlock )
+			)
+		);
+	} catch {
+		return createBlock( 'core/missing', {
+			originalName: name,
+			originalContent: '',
+			originalUndelimitedContent: '',
+		} );
+	}
 };

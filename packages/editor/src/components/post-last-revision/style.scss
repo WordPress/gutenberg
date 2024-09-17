@@ -1,14 +1,11 @@
 .editor-post-last-revision__title {
 	width: 100%;
-	font-weight: 600;
-
-	.dashicon {
-		margin-right: 5px;
-	}
+	font-weight: 500;
 }
 
-.components-button.editor-post-last-revision__title {
+.editor-post-last-revision__title.components-button.has-icon {
 	height: 100%;
+	justify-content: space-between;
 
 	&:hover,
 	&:active {
@@ -20,4 +17,18 @@
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		border-radius: 0;
 	}
+}
+
+// Needs specificity, because this panel is just a button
+.components-panel__body.is-opened.editor-post-last-revision__panel {
+	padding: 0;
+	height: $grid-unit-60;
+
+	.editor-post-last-revision__title.components-button.components-button {
+		padding: $grid-unit-20;
+	}
+}
+
+.editor-private-post-last-revision__button {
+	display: inline-block;
 }

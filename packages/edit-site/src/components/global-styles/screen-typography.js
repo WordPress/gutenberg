@@ -1,117 +1,41 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-	FlexItem,
-} from '@wordpress/components';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { __experimentalVStack as VStack } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import TypographyElements from './typography-elements';
 import ScreenHeader from './header';
-import { NavigationButtonAsItem } from './navigation-button';
-import Subtitle from './subtitle';
-import { unlock } from '../../lock-unlock';
-
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-
-function Item( { parentMenu, element, label } ) {
-	const prefix =
-		element === 'text' || ! element ? '' : `elements.${ element }.`;
-	const extraStyles =
-		element === 'link'
-			? {
-					textDecoration: 'underline',
-			  }
-			: {};
-	const [ fontFamily ] = useGlobalStyle( prefix + 'typography.fontFamily' );
-	const [ fontStyle ] = useGlobalStyle( prefix + 'typography.fontStyle' );
-	const [ fontWeight ] = useGlobalStyle( prefix + 'typography.fontWeight' );
-	const [ letterSpacing ] = useGlobalStyle(
-		prefix + 'typography.letterSpacing'
-	);
-	const [ backgroundColor ] = useGlobalStyle( prefix + 'color.background' );
-	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient' );
-	const [ color ] = useGlobalStyle( prefix + 'color.text' );
-
-	const navigationButtonLabel = sprintf(
-		// translators: %s: is a subset of Typography, e.g., 'text' or 'links'.
-		__( 'Typography %s styles' ),
-		label
-	);
-
-	return (
-		<NavigationButtonAsItem
-			path={ parentMenu + '/typography/' + element }
-			aria-label={ navigationButtonLabel }
-		>
-			<HStack justify="flex-start">
-				<FlexItem
-					className="edit-site-global-styles-screen-typography__indicator"
-					style={ {
-						fontFamily: fontFamily ?? 'serif',
-						background: gradientValue ?? backgroundColor,
-						color,
-						fontStyle,
-						fontWeight,
-						letterSpacing,
-						...extraStyles,
-					} }
-				>
-					{ __( 'Aa' ) }
-				</FlexItem>
-				<FlexItem>{ label }</FlexItem>
-			</HStack>
-		</NavigationButtonAsItem>
-	);
-}
+import FontSizesCount from './font-sizes/font-sizes-count';
+import TypesetButton from './typeset-button';
+import FontFamilies from './font-families';
 
 function ScreenTypography() {
-	const parentMenu = '';
+	const fontLibraryEnabled = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryEnabled,
+		[]
+	);
 
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Manage the typography settings for different elements.'
+					'Typography styles and the application of those styles on site elements.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-typography">
-				<VStack spacing={ 3 }>
-					<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
-					<ItemGroup isBordered isSeparated>
-						<Item
-							parentMenu={ parentMenu }
-							element="text"
-							label={ __( 'Text' ) }
-						/>
-						<Item
-							parentMenu={ parentMenu }
-							element="link"
-							label={ __( 'Links' ) }
-						/>
-						<Item
-							parentMenu={ parentMenu }
-							element="heading"
-							label={ __( 'Headings' ) }
-						/>
-						<Item
-							parentMenu={ parentMenu }
-							element="caption"
-							label={ __( 'Captions' ) }
-						/>
-						<Item
-							parentMenu={ parentMenu }
-							element="button"
-							label={ __( 'Buttons' ) }
-						/>
-					</ItemGroup>
+			<div className="edit-site-global-styles-screen">
+				<VStack spacing={ 7 }>
+					<TypesetButton />
+					{ fontLibraryEnabled && <FontFamilies /> }
+					<TypographyElements />
+					<FontSizesCount />
 				</VStack>
 			</div>
 		</>

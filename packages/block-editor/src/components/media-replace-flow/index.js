@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
-	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -49,6 +48,7 @@ const MediaReplaceFlow = ( {
 	onError,
 	onSelect,
 	onSelectURL,
+	onReset,
 	onToggleFeaturedImage,
 	useFeaturedImage,
 	onFilesUpload = noop,
@@ -76,7 +76,7 @@ const MediaReplaceFlow = ( {
 		}
 		// We need to set a timeout for showing the notice
 		// so that VoiceOver and possibly other screen readers
-		// can announce the error afer the toolbar button
+		// can announce the error after the toolbar button
 		// regains focus once the upload dialog closes.
 		// Otherwise VO simply skips over the notice and announces
 		// the focused element and the open menu.
@@ -179,7 +179,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ accept }
-								multiple={ multiple }
+								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
@@ -203,12 +203,24 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
-						{ children }
+						{ mediaURL && onReset && (
+							<MenuItem
+								onClick={ () => {
+									onReset();
+									onClose();
+								} }
+							>
+								{ __( 'Reset' ) }
+							</MenuItem>
+						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form
-							className={ classnames(
+							className={ clsx(
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':
@@ -220,19 +232,15 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURL } position="bottom">
-								<div>
-									<LinkControl
-										value={ { url: mediaURL } }
-										settings={ [] }
-										showSuggestions={ false }
-										onChange={ ( { url } ) => {
-											onSelectURL( url );
-											editMediaButtonRef.current.focus();
-										} }
-									/>
-								</div>
-							</Tooltip>
+							<LinkControl
+								value={ { url: mediaURL } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( { url } ) => {
+									onSelectURL( url );
+									editMediaButtonRef.current.focus();
+								} }
+							/>
 						</form>
 					) }
 				</>

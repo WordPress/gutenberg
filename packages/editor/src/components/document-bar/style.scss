@@ -1,0 +1,108 @@
+.editor-document-bar {
+	display: flex;
+	align-items: center;
+	height: $button-size-compact;
+	justify-content: space-between;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
+	background: $gray-100;
+	border-radius: $grid-unit-05;
+	width: min(100%, 450px);
+
+	&:hover {
+		background-color: $gray-200;
+	}
+
+	.components-button {
+		border-radius: $grid-unit-05;
+		transition: all 0.1s ease-out;
+		@include reduce-motion("transition");
+
+		&:hover {
+			background: $gray-200;
+		}
+	}
+
+	&.has-back-button {
+		@media screen and (min-width: #{ ($break-medium) }) and (max-width: #{ ($break-large) }) {
+			.editor-document-bar__post-type-label {
+				display: none;
+			}
+		}
+	}
+}
+
+.editor-document-bar__command {
+	flex-grow: 1;
+	color: var(--wp-block-synced-color);
+	overflow: hidden;
+}
+
+.editor-document-bar__title {
+	overflow: hidden;
+	color: $gray-900;
+	margin: 0 auto;
+	max-width: 70%;
+
+	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
+	@include break-medium() {
+		padding-left: $grid-unit-30;
+	}
+
+	h1 {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 400;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+}
+
+.editor-document-bar__post-title {
+	color: currentColor;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	.editor-document-bar.is-global & {
+		color: var(--wp-block-synced-color);
+	}
+}
+
+.editor-document-bar__post-type-label {
+	flex: 0;
+	color: $gray-800;
+	padding-left: $grid-unit-05;
+
+	@media screen and (max-width: #{ ($break-small) }) {
+		display: none;
+	}
+}
+
+.editor-document-bar__shortcut {
+	color: $gray-800;
+	min-width: $grid-unit-30;
+	display: none;
+
+	@include break-medium() {
+		display: initial;
+	}
+}
+
+.editor-document-bar__back.components-button.has-icon.has-text {
+	min-width: $button-size;
+	flex-shrink: 0;
+	color: $gray-700;
+	gap: 0;
+	z-index: 1;
+	position: absolute;
+
+	&:hover {
+		color: $gray-900;
+		background-color: transparent;
+	}
+}

@@ -13,6 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import ColorVariations from './variations/variations-color';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
@@ -45,14 +46,13 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 
 	return (
 		<VStack
 			className="edit-site-global-styles-color-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeColors && !! themeColors.length && (
 				<PaletteEdit
@@ -83,12 +83,10 @@ export default function ColorPalettePanel( { name } ) {
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
-				emptyMessage={ __(
-					'Custom colors are empty! Add some colors to create your own color palette.'
-				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
+			<ColorVariations title={ __( 'Palettes' ) } />
 		</VStack>
 	);
 }

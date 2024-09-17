@@ -5,32 +5,28 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
+import useEditedEntityRecord from '../use-edited-entity-record';
 
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const isVisible = useSelect( ( select ) => {
-		const isTemplateActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuideTemplate'
-		);
-		const isEditorActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuide'
-		);
-		const { isPage, hasPageContentFocus } = select( editSiteStore );
-		return (
-			isTemplateActive &&
-			! isEditorActive &&
-			isPage() &&
-			! hasPageContentFocus()
-		);
+	const { isLoaded, record } = useEditedEntityRecord();
+	const isPostTypeTemplate = isLoaded && record.type === 'wp_template';
+	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		const { get } = select( preferencesStore );
+		return {
+			isActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
+			hasPreviousEntity:
+				!! getEditorSettings().onNavigateToPreviousEntityRecord,
+		};
 	}, [] );
+	const isVisible = isActive && isPostTypeTemplate && hasPreviousEntity;
 
 	if ( ! isVisible ) {
 		return null;

@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import type gradientParser from 'gradient-parser';
+import { type LinearGradientNode } from 'gradient-parser';
 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -60,7 +58,6 @@ const GradientAnglePicker = ( {
 	};
 	return (
 		<AnglePickerControl
-			__nextHasNoMarginBottom
 			onChange={ onAngleChange }
 			value={ hasGradient ? angle : '' }
 		/>
@@ -82,7 +79,7 @@ const GradientTypePicker = ( {
 					? undefined
 					: HORIZONTAL_GRADIENT_ORIENTATION,
 				type: 'linear-gradient',
-			} as gradientParser.LinearGradientNode )
+			} satisfies LinearGradientNode )
 		);
 	};
 
@@ -141,8 +138,6 @@ const GradientTypePicker = ( {
  * ```
  */
 export function CustomGradientPicker( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMargin = false,
 	value,
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
@@ -166,24 +161,8 @@ export function CustomGradientPicker( {
 		};
 	} );
 
-	if ( ! __nextHasNoMargin ) {
-		deprecated(
-			'Outer margin styles for wp.components.CustomGradientPicker',
-			{
-				since: '6.1',
-				version: '6.4',
-				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
-			}
-		);
-	}
-
 	return (
-		<VStack
-			spacing={ 4 }
-			className={ classnames( 'components-custom-gradient-picker', {
-				'is-next-has-no-margin': __nextHasNoMargin,
-			} ) }
-		>
+		<VStack spacing={ 4 } className="components-custom-gradient-picker">
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar

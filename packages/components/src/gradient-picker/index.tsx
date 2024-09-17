@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 import { useCallback, useMemo } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -12,7 +12,6 @@ import CircularOptionPicker from '../circular-option-picker';
 import CustomGradientPicker from '../custom-gradient-picker';
 import { VStack } from '../v-stack';
 import { ColorHeading } from '../color-palette/styles';
-import { Spacer } from '../spacer';
 import type {
 	GradientPickerComponentProps,
 	PickerProps,
@@ -40,12 +39,12 @@ function SingleOrigin( {
 	gradients,
 	onChange,
 	value,
-	actions,
+	...additionalProps
 }: PickerProps< GradientObject > ) {
 	const gradientOptions = useMemo( () => {
-		return gradients.map( ( { gradient, name }, index ) => (
+		return gradients.map( ( { gradient, name, slug }, index ) => (
 			<CircularOptionPicker.Option
-				key={ gradient }
+				key={ slug }
 				value={ gradient }
 				isSelected={ value === gradient }
 				tooltipText={
@@ -70,10 +69,10 @@ function SingleOrigin( {
 		) );
 	}, [ gradients, value, onChange, clearGradient ] );
 	return (
-		<CircularOptionPicker
+		<CircularOptionPicker.OptionGroup
 			className={ className }
 			options={ gradientOptions }
-			actions={ actions }
+			{ ...additionalProps }
 		/>
 	);
 }
@@ -84,15 +83,17 @@ function MultipleOrigin( {
 	gradients,
 	onChange,
 	value,
-	actions,
 	headingLevel,
 }: PickerProps< OriginObject > ) {
+	const instanceId = useInstanceId( MultipleOrigin );
+
 	return (
 		<VStack spacing={ 3 } className={ className }>
 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
+				const id = `color-palette-${ instanceId }-${ index }`;
 				return (
 					<VStack spacing={ 2 } key={ index }>
-						<ColorHeading level={ headingLevel }>
+						<ColorHeading level={ headingLevel } id={ id }>
 							{ name }
 						</ColorHeading>
 						<SingleOrigin
@@ -102,9 +103,7 @@ function MultipleOrigin( {
 								onChange( gradient, index )
 							}
 							value={ value }
-							{ ...( gradients.length === index + 1
-								? { actions }
-								: {} ) }
+							aria-labelledby={ id }
 						/>
 					</VStack>
 				);
@@ -114,10 +113,56 @@ function MultipleOrigin( {
 }
 
 function Component( props: PickerProps< any > ) {
-	if ( isMultipleOriginArray( props.gradients ) ) {
-		return <MultipleOrigin { ...props } />;
+	const {
+		asButtons,
+		loop,
+		actions,
+		headingLevel,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		...additionalProps
+	} = props;
+	const options = isMultipleOriginArray( props.gradients ) ? (
+		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
+	) : (
+		<SingleOrigin { ...additionalProps } />
+	);
+
+	let metaProps:
+		| { asButtons: false; loop?: boolean; 'aria-label': string }
+		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
+		| { asButtons: true };
+
+	if ( asButtons ) {
+		metaProps = { asButtons: true };
+	} else {
+		const _metaProps: { asButtons: false; loop?: boolean } = {
+			asButtons: false,
+			loop,
+		};
+
+		if ( ariaLabel ) {
+			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
+		} else if ( ariaLabelledby ) {
+			metaProps = {
+				..._metaProps,
+				'aria-labelledby': ariaLabelledby,
+			};
+		} else {
+			metaProps = {
+				..._metaProps,
+				'aria-label': __( 'Custom color picker.' ),
+			};
+		}
 	}
-	return <SingleOrigin { ...props } />;
+
+	return (
+		<CircularOptionPicker
+			{ ...metaProps }
+			actions={ actions }
+			options={ options }
+		/>
+	);
 }
 
 /**
@@ -134,7 +179,6 @@ function Component( props: PickerProps< any > ) {
  *
  *	return (
  *		<GradientPicker
- *			__nextHasNoMargin
  *			value={ gradient }
  *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
  *			gradients={ [
@@ -164,8 +208,6 @@ function Component( props: PickerProps< any > ) {
  *
  */
 export function GradientPicker( {
-	/** Start opting into the new margin-free styles that will become the default in a future version. */
-	__nextHasNoMargin = false,
 	className,
 	gradients = [],
 	onChange,
@@ -174,63 +216,46 @@ export function GradientPicker( {
 	disableCustomGradients = false,
 	__experimentalIsRenderedInSidebar,
 	headingLevel = 2,
+	...additionalProps
 }: GradientPickerComponentProps ) {
 	const clearGradient = useCallback(
 		() => onChange( undefined ),
 		[ onChange ]
 	);
 
-	if ( ! __nextHasNoMargin ) {
-		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
-			since: '6.1',
-			version: '6.4',
-			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
-		} );
-	}
-
-	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
-		? {
-				marginTop: ! gradients.length ? 3 : undefined,
-				marginBottom: ! clearable ? 6 : 0,
-		  }
-		: {};
-
 	return (
-		// Outmost Spacer wrapper can be removed when deprecation period is over
-		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
-			<VStack spacing={ gradients.length ? 4 : 0 }>
-				{ ! disableCustomGradients && (
-					<CustomGradientPicker
-						__nextHasNoMargin
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ value }
-						onChange={ onChange }
-					/>
-				) }
-				{ ( gradients.length || clearable ) && (
-					<Component
-						className={ className }
-						clearGradient={ clearGradient }
-						gradients={ gradients }
-						onChange={ onChange }
-						value={ value }
-						actions={
-							clearable &&
-							! disableCustomGradients && (
-								<CircularOptionPicker.ButtonAction
-									onClick={ clearGradient }
-								>
-									{ __( 'Clear' ) }
-								</CircularOptionPicker.ButtonAction>
-							)
-						}
-						headingLevel={ headingLevel }
-					/>
-				) }
-			</VStack>
-		</Spacer>
+		<VStack spacing={ gradients.length ? 4 : 0 }>
+			{ ! disableCustomGradients && (
+				<CustomGradientPicker
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					value={ value }
+					onChange={ onChange }
+				/>
+			) }
+			{ ( gradients.length > 0 || clearable ) && (
+				<Component
+					{ ...additionalProps }
+					className={ className }
+					clearGradient={ clearGradient }
+					gradients={ gradients }
+					onChange={ onChange }
+					value={ value }
+					actions={
+						clearable &&
+						! disableCustomGradients && (
+							<CircularOptionPicker.ButtonAction
+								onClick={ clearGradient }
+							>
+								{ __( 'Clear' ) }
+							</CircularOptionPicker.ButtonAction>
+						)
+					}
+					headingLevel={ headingLevel }
+				/>
+			) }
+		</VStack>
 	);
 }
 

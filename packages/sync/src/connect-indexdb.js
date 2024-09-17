@@ -20,8 +20,8 @@ import { IndexeddbPersistence } from 'y-indexeddb';
  * @return {Promise<() => void>} Promise that resolves when the connection is established.
  */
 export function connectIndexDb( objectId, objectType, doc ) {
-	const docName = `${ objectType }-${ objectId }`;
-	const provider = new IndexeddbPersistence( docName, doc );
+	const roomName = `${ objectType }-${ objectId }`;
+	const provider = new IndexeddbPersistence( roomName, doc );
 
 	return new Promise( ( resolve ) => {
 		provider.on( 'synced', () => {

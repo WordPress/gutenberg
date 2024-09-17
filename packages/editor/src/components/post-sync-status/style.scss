@@ -1,19 +1,4 @@
-.edit-post-sync-status {
-	width: 100%;
-	position: relative;
-	justify-content: flex-start;
-	align-items: flex-start;
-
-	> span {
-		display: block;
-		width: 45%;
-		flex-shrink: 0;
-		padding: $grid-unit-15 * 0.5 0;
-		word-break: break-word;
-	}
-
-	> div {
-		// Match padding on tertiary buttons for alignment.
-		padding: $grid-unit-15 * 0.5 0 $grid-unit-15 * 0.5 $grid-unit-15;
-	}
+.editor-post-sync-status__value {
+	// Match padding on tertiary buttons for alignment.
+	padding: $grid-unit-15 * 0.5 0 $grid-unit-15 * 0.5 $grid-unit-15;
 }

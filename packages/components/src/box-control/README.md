@@ -9,8 +9,8 @@ BoxControl components let users set values for Top, Right, Bottom, and Left. Thi
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ values, setValues ] = useState( {
@@ -100,3 +100,10 @@ A handler for onMouseOver events.
 A handler for onMouseOut events.
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default size that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`

@@ -18,7 +18,7 @@ import EmbedPreview from './embed-preview';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+import { getAuthority } from '@wordpress/url';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -57,45 +58,51 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
 
-	const { preview, fetching, themeSupportsResponsive, cannotEmbed } =
-		useSelect(
-			( select ) => {
-				const {
-					getEmbedPreview,
-					isPreviewEmbedFallback,
-					isRequestingEmbedPreview,
-					getThemeSupports,
-				} = select( coreStore );
-				if ( ! attributesUrl ) {
-					return { fetching: false, cannotEmbed: false };
-				}
+	const {
+		preview,
+		fetching,
+		themeSupportsResponsive,
+		cannotEmbed,
+		hasResolved,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEmbedPreview,
+				isPreviewEmbedFallback,
+				isRequestingEmbedPreview,
+				getThemeSupports,
+				hasFinishedResolution,
+			} = select( coreStore );
+			if ( ! attributesUrl ) {
+				return { fetching: false, cannotEmbed: false };
+			}
 
-				const embedPreview = getEmbedPreview( attributesUrl );
-				const previewIsFallback =
-					isPreviewEmbedFallback( attributesUrl );
+			const embedPreview = getEmbedPreview( attributesUrl );
+			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
-				// The external oEmbed provider does not exist. We got no type info and no html.
-				const badEmbedProvider =
-					embedPreview?.html === false &&
-					embedPreview?.type === undefined;
-				// Some WordPress URLs that can't be embedded will cause the API to return
-				// a valid JSON response with no HTML and `data.status` set to 404, rather
-				// than generating a fallback response as other embeds do.
-				const wordpressCantEmbed = embedPreview?.data?.status === 404;
-				const validPreview =
-					!! embedPreview &&
-					! badEmbedProvider &&
-					! wordpressCantEmbed;
-				return {
-					preview: validPreview ? embedPreview : undefined,
-					fetching: isRequestingEmbedPreview( attributesUrl ),
-					themeSupportsResponsive:
-						getThemeSupports()[ 'responsive-embeds' ],
-					cannotEmbed: ! validPreview || previewIsFallback,
-				};
-			},
-			[ attributesUrl ]
-		);
+			// The external oEmbed provider does not exist. We got no type info and no html.
+			const badEmbedProvider =
+				embedPreview?.html === false &&
+				embedPreview?.type === undefined;
+			// Some WordPress URLs that can't be embedded will cause the API to return
+			// a valid JSON response with no HTML and `data.status` set to 404, rather
+			// than generating a fallback response as other embeds do.
+			const wordpressCantEmbed = embedPreview?.data?.status === 404;
+			const validPreview =
+				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
+			return {
+				preview: validPreview ? embedPreview : undefined,
+				fetching: isRequestingEmbedPreview( attributesUrl ),
+				themeSupportsResponsive:
+					getThemeSupports()[ 'responsive-embeds' ],
+				cannotEmbed: ! validPreview || previewIsFallback,
+				hasResolved: hasFinishedResolution( 'getEmbedPreview', [
+					attributesUrl,
+				] ),
+			};
+		},
+		[ attributesUrl ]
+	);
 
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
@@ -126,16 +133,37 @@ const EmbedEdit = ( props ) => {
 	};
 
 	useEffect( () => {
-		if ( ! preview?.html || ! cannotEmbed || fetching ) {
+		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {
 			return;
 		}
+
 		// At this stage, we're not fetching the preview and know it can't be embedded,
 		// so try removing any trailing slash, and resubmit.
 		const newURL = attributesUrl.replace( /\/$/, '' );
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl, cannotEmbed, fetching ] );
+	}, [
+		preview?.html,
+		attributesUrl,
+		cannotEmbed,
+		hasResolved,
+		setAttributes,
+	] );
+
+	// Try a different provider in case the embed url is not supported.
+	useEffect( () => {
+		if ( ! cannotEmbed || fetching || ! url ) {
+			return;
+		}
+
+		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
+		if ( getAuthority( url ) === 'x.com' ) {
+			const newURL = new URL( url );
+			newURL.host = 'twitter.com';
+			setAttributes( { url: newURL.toString() } );
+		}
+	}, [ url, cannotEmbed, fetching, setAttributes ] );
 
 	// Handle incoming preview.
 	useEffect( () => {
@@ -197,7 +225,7 @@ const EmbedEdit = ( props ) => {
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
-					onChange={ ( event ) => setURL( event.target.value ) }
+					onChange={ ( value ) => setURL( value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
@@ -221,7 +249,7 @@ const EmbedEdit = ( props ) => {
 		allowResponsive,
 		className: classFromPreview,
 	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const className = clsx( classFromPreview, props.className );
 
 	return (
 		<>
@@ -248,6 +276,8 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
 				/>
 			</View>
 		</>

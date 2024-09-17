@@ -8,8 +8,8 @@ Focal Point Picker is a component which creates a UI for identifying the most im
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { FocalPointPicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ focalPoint, setFocalPoint ] = useState( {
@@ -28,6 +28,7 @@ const Example = () => {
 	return (
 		<>
 			<FocalPointPicker
+			  __nextHasNoMarginBottom
 				url={ url }
 				value={ focalPoint }
 				onDragStart={ setFocalPoint }
@@ -98,3 +99,19 @@ Callback which is called at the start of drag operations.
 -   Required: No
 
 Function which is called before internal updates to the value state. It receives the upcoming value and may return a modified one.
+
+### `__next40pxDefaultSize`
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+### `__nextHasNoMarginBottom`
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

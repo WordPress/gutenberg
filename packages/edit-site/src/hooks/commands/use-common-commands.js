@@ -3,22 +3,27 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { trash, backup, help, styles, external, brush } from '@wordpress/icons';
+import { __, isRTL } from '@wordpress/i18n';
+import {
+	rotateLeft,
+	rotateRight,
+	backup,
+	help,
+	styles,
+	external,
+	brush,
+} from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import getIsListPage from '../../utils/get-is-list-page';
 
 const { useGlobalStylesReset } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -28,19 +33,8 @@ function useGlobalStylesOpenStylesCommands() {
 		useDispatch( editSiteStore )
 	);
 	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
-	const { set } = useDispatch( preferencesStore );
-	const { createInfoNotice } = useDispatch( noticesStore );
-
 	const history = useHistory();
-	const isDistractionFree = useSelect( ( select ) => {
-		return select( preferencesStore ).get(
-			editSiteStore.name,
-			'distractionFree'
-		);
-	}, [] );
 
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
@@ -57,23 +51,14 @@ function useGlobalStylesOpenStylesCommands() {
 				label: __( 'Open styles' ),
 				callback: ( { close } ) => {
 					close();
-					if ( ! isEditorPage ) {
+					if ( ! params.postId ) {
 						history.push( {
 							path: '/wp_global_styles',
 							canvas: 'edit',
 						} );
 					}
-					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+					if ( params.postId && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
-					}
-					if ( isDistractionFree ) {
-						set( editSiteStore.name, 'distractionFree', false );
-						createInfoNotice(
-							__( 'Distraction free mode turned off.' ),
-							{
-								type: 'snackbar',
-							}
-						);
 					}
 					openGeneralSidebar( 'edit-site/global-styles' );
 				},
@@ -84,12 +69,9 @@ function useGlobalStylesOpenStylesCommands() {
 		history,
 		openGeneralSidebar,
 		setCanvasMode,
-		isEditorPage,
-		createInfoNotice,
 		getCanvasMode,
-		isDistractionFree,
 		isBlockBasedTheme,
-		set,
+		params.postId,
 	] );
 
 	return {
@@ -103,8 +85,6 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 		useDispatch( editSiteStore )
 	);
 	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { set } = useDispatch( preferencesStore );
 
@@ -124,13 +104,13 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 				label: __( 'Learn about styles' ),
 				callback: ( { close } ) => {
 					close();
-					if ( ! isEditorPage ) {
+					if ( ! params.postId ) {
 						history.push( {
 							path: '/wp_global_styles',
 							canvas: 'edit',
 						} );
 					}
-					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+					if ( params.postId && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
 					}
 					openGeneralSidebar( 'edit-site/global-styles' );
@@ -148,10 +128,10 @@ function useGlobalStylesToggleWelcomeGuideCommands() {
 		history,
 		openGeneralSidebar,
 		setCanvasMode,
-		isEditorPage,
 		getCanvasMode,
 		isBlockBasedTheme,
 		set,
+		params.postId,
 	] );
 
 	return {
@@ -170,8 +150,8 @@ function useGlobalStylesResetCommands() {
 		return [
 			{
 				name: 'core/edit-site/reset-global-styles',
-				label: __( 'Reset styles to defaults' ),
-				icon: trash,
+				label: __( 'Reset styles' ),
+				icon: isRTL() ? rotateRight : rotateLeft,
 				callback: ( { close } ) => {
 					close();
 					onReset();
@@ -190,9 +170,6 @@ function useGlobalStylesOpenCssCommands() {
 	const { openGeneralSidebar, setEditorCanvasContainerView, setCanvasMode } =
 		unlock( useDispatch( editSiteStore ) );
 	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isListPage = getIsListPage( params, isMobileViewport );
-	const isEditorPage = ! isListPage;
 	const history = useHistory();
 	const { canEditCSS } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
@@ -204,8 +181,7 @@ function useGlobalStylesOpenCssCommands() {
 			: undefined;
 
 		return {
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
@@ -222,13 +198,13 @@ function useGlobalStylesOpenCssCommands() {
 				icon: brush,
 				callback: ( { close } ) => {
 					close();
-					if ( ! isEditorPage ) {
+					if ( ! params.postId ) {
 						history.push( {
 							path: '/wp_global_styles',
 							canvas: 'edit',
 						} );
 					}
-					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+					if ( params.postId && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
 					}
 					openGeneralSidebar( 'edit-site/global-styles' );
@@ -241,9 +217,9 @@ function useGlobalStylesOpenCssCommands() {
 		openGeneralSidebar,
 		setEditorCanvasContainerView,
 		canEditCSS,
-		isEditorPage,
 		getCanvasMode,
 		setCanvasMode,
+		params.postId,
 	] );
 	return {
 		isLoading: false,
@@ -256,14 +232,17 @@ function useGlobalStylesOpenRevisionsCommands() {
 		unlock( useDispatch( editSiteStore ) );
 	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
 	const { params } = useLocation();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const hasRevisions = useSelect(
-		( select ) =>
-			select( coreStore ).getCurrentThemeGlobalStylesRevisions()?.length,
-		[]
-	);
+	const hasRevisions = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
+	}, [] );
+
 	const commands = useMemo( () => {
 		if ( ! hasRevisions ) {
 			return [];
@@ -276,13 +255,13 @@ function useGlobalStylesOpenRevisionsCommands() {
 				icon: backup,
 				callback: ( { close } ) => {
 					close();
-					if ( ! isEditorPage ) {
+					if ( ! params.postId ) {
 						history.push( {
 							path: '/wp_global_styles',
 							canvas: 'edit',
 						} );
 					}
-					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
+					if ( params.postId && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
 					}
 					openGeneralSidebar( 'edit-site/global-styles' );
@@ -295,9 +274,9 @@ function useGlobalStylesOpenRevisionsCommands() {
 		history,
 		openGeneralSidebar,
 		setEditorCanvasContainerView,
-		isEditorPage,
 		getCanvasMode,
 		setCanvasMode,
+		params.postId,
 	] );
 
 	return {
@@ -308,11 +287,9 @@ function useGlobalStylesOpenRevisionsCommands() {
 
 export function useCommonCommands() {
 	const homeUrl = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-
-		return getUnstableBase()?.home;
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
 	}, [] );
 
 	useCommand( {

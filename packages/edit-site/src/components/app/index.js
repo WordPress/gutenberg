@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
-import { UnsavedChangesWarning } from '@wordpress/editor';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
+import {
+	UnsavedChangesWarning,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -14,10 +16,26 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import Layout from '../layout';
-import { GlobalStylesProvider } from '../global-styles/global-styles-provider';
 import { unlock } from '../../lock-unlock';
+import { useCommonCommands } from '../../hooks/commands/use-common-commands';
+import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
+import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
+import useLayoutAreas from '../layout/router';
+import useSetCommandContext from '../../hooks/commands/use-set-command-context';
 
 const { RouterProvider } = unlock( routerPrivateApis );
+const { GlobalStylesProvider } = unlock( editorPrivateApis );
+
+function AppLayout() {
+	// This ensures the edited entity id and type are initialized properly.
+	useInitEditedEntityFromURL();
+	useEditModeCommands();
+	useCommonCommands();
+	useSetCommandContext();
+	const route = useLayoutAreas();
+
+	return <Layout route={ route } />;
+}
 
 export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -35,16 +53,14 @@ export default function App() {
 	}
 
 	return (
-		<ShortcutProvider style={ { height: '100%' } }>
-			<SlotFillProvider>
-				<GlobalStylesProvider>
-					<UnsavedChangesWarning />
-					<RouterProvider>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
-				</GlobalStylesProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<SlotFillProvider>
+			<GlobalStylesProvider>
+				<UnsavedChangesWarning />
+				<RouterProvider>
+					<AppLayout />
+					<PluginArea onError={ onPluginAreaError } />
+				</RouterProvider>
+			</GlobalStylesProvider>
+		</SlotFillProvider>
 	);
 }

@@ -1,16 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
-/** @typedef {import('./api').InserterMediaRequest} InserterMediaRequest */
-/** @typedef {import('./api').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
 
 /**
  * Fetches media items based on the provided category.
@@ -30,18 +31,18 @@ export function useMediaResults( category, query = {} ) {
 	// In the future we could use AbortController to cancel previous
 	// requests, but we don't for now as it involves adding support
 	// for this to `core-data` package.
-	const lastRequest = useRef();
+	const lastRequestRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
 				category: category.name,
 				...query,
 			} );
-			lastRequest.current = key;
+			lastRequestRef.current = key;
 			setIsLoading( true );
 			setMediaList( [] ); // Empty the previous results.
 			const _media = await category.fetch?.( query );
-			if ( key === lastRequest.current ) {
+			if ( key === lastRequestRef.current ) {
 				setMediaList( _media );
 				setIsLoading( false );
 			}
@@ -50,48 +51,14 @@ export function useMediaResults( category, query = {} ) {
 	return { mediaList, isLoading };
 }
 
-function useInserterMediaCategories() {
-	const {
-		inserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			inserterMediaCategories: settings.inserterMediaCategories,
-			allowedMimeTypes: settings.allowedMimeTypes,
-			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
-		};
-	}, [] );
-	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
-	// some of them. In this case we shouldn't add the category to the available media
-	// categories list in the inserter.
-	const allowedCategories = useMemo( () => {
-		if ( ! inserterMediaCategories || ! allowedMimeTypes ) {
-			return;
-		}
-		return inserterMediaCategories.filter( ( category ) => {
-			// Check if Openverse category is enabled.
-			if (
-				! enableOpenverseMediaCategory &&
-				category.name === 'openverse'
-			) {
-				return false;
-			}
-			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
-			);
-		} );
-	}, [
-		inserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-	] );
-	return allowedCategories;
-}
-
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
+
+	const inserterMediaCategories = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getInserterMediaCategories(),
+		[]
+	);
 	const { canInsertImage, canInsertVideo, canInsertAudio } = useSelect(
 		( select ) => {
 			const { canInsertBlockType } = select( blockEditorStore );
@@ -112,7 +79,6 @@ export function useMediaCategories( rootClientId ) {
 		},
 		[ rootClientId ]
 	);
-	const inserterMediaCategories = useInserterMediaCategories();
 	useEffect( () => {
 		( async () => {
 			const _categories = [];

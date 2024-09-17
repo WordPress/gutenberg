@@ -8,7 +8,7 @@ The block editor does support most existing meta boxes, see [the backward compat
 
 If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md).
 
-### Use Blocks to Store Meta
+### Use blocks to store meta
 
 Typically, blocks store attribute values in the serialized block HTML. However, you can also create a block that saves its attribute values as post meta, that can be accessed programmatically anywhere in your template.
 
@@ -16,9 +16,9 @@ This guide shows how to create a block that prompts a user for a single value, a
 
 ## Before you start
 
-This guide assumes you are already familiar with WordPress plugins, post meta, and basic JavaScript. Review the [Getting started with JavaScript tutorial](/docs/how-to-guides/javascript/README.md) for an introduction.
+This guide assumes you are already familiar with WordPress plugins, post meta, and basic JavaScript. Review the [Getting started with JavaScript tutorial](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) for an introduction.
 
-The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/create-block/README.md) for a deeper understanding of creating custom blocks.
+The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/tutorial.md) for a deeper understanding of creating custom blocks.
 
 You will need:
 
@@ -26,7 +26,7 @@ You will need:
 -   A minimal plugin activated and ready to edit
 -   JavaScript setup for building and enqueuing
 
-A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-jsx/meta-block) is available that you can use as a reference for your setup.
+A [complete meta-block example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/meta-block-bb1e55) is available that you can use as a reference for your setup.
 
 ## Step-by-step guide
 
@@ -35,7 +35,7 @@ A [complete meta-block example](https://github.com/WordPress/gutenberg-examples/
 3. [Use Post Meta Data](#step-3-use-post-meta-data)
 4. [Finishing Touches](#step-4-use-block-templates-optional)
 
-### Step 1: Register Meta Field
+### Step 1: Register meta field
 
 A post meta field is a WordPress object used to store extra data about a post. You need to first register a new meta field prior to use. See Managing [Post Metadata](https://developer.wordpress.org/plugins/metadata/managing-post-metadata/) to learn more about post meta.
 
@@ -58,7 +58,7 @@ function myguten_register_post_meta() {
 add_action( 'init', 'myguten_register_post_meta' );
 ```
 
-### Step 2: Add Meta Block
+### Step 2: Add meta block
 
 With the meta field registered in the previous step, next create a new block to display the field value to the user.
 
@@ -107,18 +107,17 @@ registerBlockType( 'myguten/meta-block', {
 } );
 ```
 
-Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by
-saving and reloading your draft, the form will still be filled in on reload.
+Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by saving and reloading your draft, the form will still be filled in on reload.
 
 You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
 
 **Troubleshooting**: Be sure to build your code between changes, you updated the PHP code from Step 1, and JavaScript files are enqueued. Check the build output and developer console for errors.
 
-### Step 3: Use Post Meta Data
+### Step 3: Use post meta data
 
 You can use the post meta data stored in the last step in multiple ways.
 
-#### Use Post Meta in PHP
+#### Use post meta in PHP
 
 The first example uses the value from the post meta field and appends it to the end of the post content wrapped in a `H4` tag.
 
@@ -134,7 +133,7 @@ function myguten_content_filter( $content ) {
 add_filter( 'the_content', 'myguten_content_filter' );
 ```
 
-#### Use Post Meta in Block
+#### Use post meta in a block
 
 You can also use the post meta data in other blocks. For this example the data is loaded at the end of every Paragraph block when it is rendered, ie. shown to the user. You can replace this for any core or custom block types as needed.
 
@@ -157,7 +156,7 @@ register_block_type( 'core/paragraph', array(
 ) );
 ```
 
-### Step 4: Use Block Templates (optional)
+### Step 4: Use block templates (optional)
 
 One problem using a meta block is the block is easy for an author to forget, since it requires being added to each post. You solve this by using [block templates](/docs/reference-guides/block-api/block-templates.md). A block template is a predefined list of block items per post type. Templates allow you to specify a default initial state for a post type.
 
@@ -181,9 +180,9 @@ You can also add other block types in the array, including placeholders, or even
 
 This guide showed how using blocks you can read and write to post meta. See the section below for backward compatibility with existing meta boxes.
 
-## Backward Compatibility
+## Backward compatibility
 
-### Testing, Converting, and Maintaining Existing Meta Boxes
+### Testing, converting, and maintaining existing meta boxes
 
 Before converting meta boxes to blocks, it may be easier to test if a meta box works with the block editor, and explicitly mark it as such.
 
@@ -213,7 +212,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 
 When the block editor is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will display as before in the classic editor.
 
-### Meta Box Data Collection
+### Meta box data collection
 
 On each block editor page load, we register an action that collects the meta box data to determine if an area is empty. The original global state is reset upon collection of meta box data.
 
@@ -227,14 +226,14 @@ Then each location for this particular type of meta box is checked for whether i
 
 Ideally, this could be done at instantiation of the editor and help simplify this flow. However, it is not possible to know the meta box state before `admin_enqueue_scripts`, where we are calling `initializeEditor()`. This will have to do, unless we want to move `initializeEditor()` to fire in the footer or at some point after `admin_head`. With recent changes to editor bootstrapping this might now be possible. Test with ACF to make sure.
 
-### Redux and React Meta Box Management
+### Redux and React meta box management
 
 When rendering the block editor, the meta boxes are rendered to a hidden div `#metaboxes`.
 
 _The Redux store will hold all meta boxes as inactive by default_. When
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box areas by setting the `isActive` flag to `true`. Once this happens React will check for the new props sent in by Redux on the `MetaBox` component. If that `MetaBox` is now active, instead of rendering null, a `MetaBoxArea` component will be rendered. The `MetaBox` component is the container component that mediates between the `MetaBoxArea` and the Redux Store. _If no meta boxes are active, nothing happens. This will be the default behavior, as all core meta boxes have been stripped._
 
-#### MetaBoxArea Component
+#### MetaBoxArea component
 
 When the component renders it will store a reference to the meta boxes container and retrieve the meta boxes HTML from the prefetch location.
 
@@ -244,13 +243,13 @@ When the meta box area is saving, we display an updating overlay, to prevent use
 
 An example save url would look like:
 
-`mysite.com/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
+`example.org/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 
 This page mimics the `post.php` post form, so when it is submitted it will fire all of the normal hooks and actions, and have the proper global state to correctly fire any PHP meta box mumbo jumbo without needing to modify any existing code. On successful submission, React will signal a `handleMetaBoxReload` to remove the updating overlay.
 
-### Common Compatibility Issues
+### Common compatibility issues
 
 Most PHP meta boxes should continue to work in the block editor, but some meta boxes that include advanced functionality could break. Here are some common reasons why meta boxes might not work as expected in the block editor:
 
@@ -259,3 +258,7 @@ Most PHP meta boxes should continue to work in the block editor, but some meta b
 -   Plugins making updates to their DOM on "submit" or on "save".
 
 Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as _meta boxes overlaying the editor_ or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.
+
+## Additional resources
+
+- [Creating a custom block that stores post meta](https://developer.wordpress.org/news/2023/03/03/creating-a-custom-block-that-stores-post-meta/)

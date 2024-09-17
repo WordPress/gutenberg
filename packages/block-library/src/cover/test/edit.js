@@ -47,13 +47,13 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
 
 async function createAndSelectBlock() {
 	await userEvent.click(
-		screen.getByRole( 'button', {
+		screen.getByRole( 'option', {
 			name: 'Color: Black',
 		} )
 	);
 	await userEvent.click(
 		screen.getByRole( 'button', {
-			name: 'Select Cover',
+			name: 'Select parent block: Cover',
 		} )
 	);
 }
@@ -64,15 +64,15 @@ describe( 'Cover block', () => {
 			await setup();
 
 			expect(
-				screen.getByRole( 'group', {
-					name: 'To edit this block, you need permission to upload media.',
-				} )
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
+					'To edit this block, you need permission to upload media.'
+				)
 			).toBeInTheDocument();
 		} );
 
 		test( 'can set overlay color using color picker on block placeholder', async () => {
 			const { container } = await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( colorPicker );
@@ -96,7 +96,7 @@ describe( 'Cover block', () => {
 			await setup();
 
 			await userEvent.click(
-				screen.getByRole( 'button', {
+				screen.getByRole( 'option', {
 					name: 'Color: Black',
 				} )
 			);
@@ -155,6 +155,34 @@ describe( 'Cover block', () => {
 				'is-position-top-left'
 			);
 		} );
+
+		test( 'clears media when clear media button clicked', async () => {
+			await setup( {
+				url: 'http://localhost/my-image.jpg',
+			} );
+
+			await selectBlock( 'Block: Cover' );
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
+					'img'
+				)
+			).toBeInTheDocument();
+
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'Replace' } )
+			);
+			await userEvent.click(
+				screen.getByRole( 'menuitem', {
+					name: 'Reset',
+				} )
+			);
+
+			expect(
+				within( screen.getByLabelText( 'Block: Cover' ) ).queryByRole(
+					'img'
+				)
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'Inspector controls', () => {
@@ -163,7 +191,7 @@ describe( 'Cover block', () => {
 				await setup();
 				expect(
 					screen.queryByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).not.toBeInTheDocument();
 			} );
@@ -175,7 +203,7 @@ describe( 'Cover block', () => {
 				await selectBlock( 'Block: Cover' );
 				expect(
 					screen.getByRole( 'button', {
-						name: 'Media settings',
+						name: 'Settings',
 					} )
 				).toBeInTheDocument();
 			} );
@@ -240,30 +268,6 @@ describe( 'Cover block', () => {
 				'Me'
 			);
 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
-		} );
-
-		test( 'clears media  when clear media button clicked', async () => {
-			await setup( {
-				url: 'http://localhost/my-image.jpg',
-			} );
-
-			await selectBlock( 'Block: Cover' );
-			expect(
-				within( screen.getByLabelText( 'Block: Cover' ) ).getByRole(
-					'img'
-				)
-			).toBeInTheDocument();
-
-			await userEvent.click(
-				screen.getByRole( 'button', {
-					name: 'Clear Media',
-				} )
-			);
-			expect(
-				within( screen.queryByLabelText( 'Block: Cover' ) ).queryByRole(
-					'img'
-				)
-			).not.toBeInTheDocument();
 		} );
 
 		describe( 'Color panel', () => {
@@ -372,10 +376,10 @@ describe( 'Cover block', () => {
 					} )
 				);
 				await userEvent.clear(
-					screen.getByLabelText( 'Minimum height of cover' )
+					screen.getByLabelText( 'Minimum height' )
 				);
 				await userEvent.type(
-					screen.getByLabelText( 'Minimum height of cover' ),
+					screen.getByLabelText( 'Minimum height' ),
 					'300'
 				);
 
@@ -389,7 +393,7 @@ describe( 'Cover block', () => {
 	describe( 'isDark settings', () => {
 		test( 'should toggle is-light class if background changed from light to dark', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( colorPicker );
@@ -405,7 +409,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 			await userEvent.click( screen.getByText( 'Overlay' ) );
-			const popupColorPicker = screen.getByRole( 'button', {
+			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Color: Black',
 			} );
 			await userEvent.click( popupColorPicker );
@@ -413,7 +417,7 @@ describe( 'Cover block', () => {
 		} );
 		test( 'should remove is-light class if overlay color is removed', async () => {
 			await setup();
-			const colorPicker = screen.getByRole( 'button', {
+			const colorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( colorPicker );
@@ -428,7 +432,7 @@ describe( 'Cover block', () => {
 			await userEvent.click( screen.getByText( 'Overlay' ) );
 			// The default color is black, so clicking the black color option will remove the background color,
 			// which should remove the isDark setting and assign the is-light class.
-			const popupColorPicker = screen.getByRole( 'button', {
+			const popupColorPicker = screen.getByRole( 'option', {
 				name: 'Color: White',
 			} );
 			await userEvent.click( popupColorPicker );

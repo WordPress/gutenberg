@@ -14,7 +14,7 @@ global.navigator = global.navigator ?? {};
 require( '../../packages/react-native-editor/src/globals' );
 
 // Set up Reanimated library for testing
-require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
+require( 'react-native-reanimated' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
 global.ReanimatedDataMock = {
 	now: () => 0,
@@ -81,6 +81,7 @@ jest.mock( '@wordpress/api-fetch', () => {
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		logException: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
 		requestBlockTypeImpressions: jest.fn( ( callback ) => {
@@ -107,7 +108,12 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeShowEditorHelp: jest.fn(),
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
+		subscribeConnectionStatus: jest.fn( () => ( { remove: jest.fn() } ) ),
+		subscribeToContentUpdate: jest.fn(),
+		requestConnectionStatus: jest.fn( ( callback ) => callback( true ) ),
 		editorDidMount: jest.fn(),
+		showAndroidSoftKeyboard: jest.fn(),
+		hideAndroidSoftKeyboard: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
@@ -115,8 +121,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		provideToNative_Html: jest.fn(),
 		requestImageFailedRetryDialog: jest.fn(),
 		requestImageUploadCancelDialog: jest.fn(),
+		requestImageUploadCancel: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
+		requestMediaImport: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
 		mediaSources: {
@@ -129,6 +137,10 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		generateHapticFeedback: jest.fn(),
 		toggleUndoButton: jest.fn(),
 		toggleRedoButton: jest.fn(),
+		sendActionButtonPressedAction: jest.fn(),
+		actionButtons: {
+			missingBlockAlertActionButton: 'missing_block_alert_action_button',
+		},
 	};
 } );
 
@@ -147,6 +159,7 @@ jest.mock( 'react-native-svg', () => {
 		G: () => 'G',
 		Polygon: () => 'Polygon',
 		Rect: () => 'Rect',
+		SvgXml: jest.fn(),
 	};
 } );
 
@@ -273,3 +286,17 @@ jest.mock( '@wordpress/compose', () => {
 jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
 );
+
+jest.spyOn( Image, 'prefetch' ).mockImplementation(
+	( url, callback = () => {} ) => {
+		const mockRequestId = `mockRequestId-${ url }`;
+		callback( mockRequestId );
+		return Promise.resolve( true );
+	}
+);
+
+jest.mock( 'react-native/Libraries/Utilities/BackHandler', () => {
+	return jest.requireActual(
+		'react-native/Libraries/Utilities/__mocks__/BackHandler.js'
+	);
+} );

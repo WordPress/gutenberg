@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -109,15 +109,11 @@ const deprecated = [
 			);
 		},
 		isEligible: ( { layout } ) =>
-			! layout ||
-			layout.inherit ||
-			( layout.contentSize && layout.type !== 'constrained' ),
+			layout?.inherit ||
+			( layout?.contentSize && layout?.type !== 'constrained' ),
 		migrate: ( attributes ) => {
 			const { layout = null } = attributes;
-			if ( ! layout ) {
-				return attributes;
-			}
-			if ( layout.inherit || layout.contentSize ) {
+			if ( layout?.inherit || layout?.contentSize ) {
 				return {
 					...attributes,
 					layout: {
@@ -201,7 +197,7 @@ const deprecated = [
 				backgroundColor
 			);
 			const textClass = getColorClassName( 'color', textColor );
-			const className = classnames( backgroundClass, textClass, {
+			const className = clsx( backgroundClass, textClass, {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 			} );
@@ -257,7 +253,7 @@ const deprecated = [
 				backgroundColor
 			);
 			const textClass = getColorClassName( 'color', textColor );
-			const className = classnames( backgroundClass, {
+			const className = clsx( backgroundClass, {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 			} );
@@ -301,7 +297,7 @@ const deprecated = [
 				'background-color',
 				backgroundColor
 			);
-			const className = classnames( backgroundClass, {
+			const className = clsx( backgroundClass, {
 				'has-background': backgroundColor || customBackgroundColor,
 			} );
 

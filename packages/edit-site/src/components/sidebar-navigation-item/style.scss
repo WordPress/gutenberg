@@ -4,7 +4,6 @@
 	padding: $grid-unit-10 6px $grid-unit-10 $grid-unit-20;
 	border: none;
 	min-height: $grid-unit-50;
-	border-radius: $radius-block-ui;
 
 	&:hover,
 	&:focus,
@@ -33,5 +32,5 @@
 
 .edit-site-sidebar-navigation-screen__content .block-editor-list-view-block-select-button {
 	cursor: grab;
-	padding: $grid-unit-10;
+	padding: $grid-unit-10 $grid-unit-10 $grid-unit-10 0;
 }

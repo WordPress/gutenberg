@@ -7,14 +7,15 @@ ToggleControl is used to generate a toggle user interface.
 Render a user interface to change fixed background setting.
 
 ```jsx
+import { useState } from 'react';
 import { ToggleControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyToggleControl = () => {
 	const [ hasFixedBackground, setHasFixedBackground ] = useState( false );
 
 	return (
 		<ToggleControl
+			__nextHasNoMarginBottom
 			label="Fixed Background"
 			help={
 				hasFixedBackground
@@ -22,8 +23,8 @@ const MyToggleControl = () => {
 					: 'No fixed background.'
 			}
 			checked={ hasFixedBackground }
-			onChange={ () => {
-				setHasFixedBackground( ( state ) => ! state );
+			onChange={ (newValue) => {
+				setHasFixedBackground( newValue );
 			} }
 		/>
 	);
@@ -47,7 +48,7 @@ If this property is added, a help text will be generated using help property as 
 For controlled components the `help` prop can also be a function which will return a help text
 dynamically depending on the boolean `checked` parameter.
 
--   Type: `String|WPElement|Function`
+-   Type: `String|Element|Function`
 -   Required: No
 
 ### checked
@@ -78,3 +79,11 @@ The class that will be added with `components-base-control` and `components-togg
 
 -		Type: `String`
 -		Required: No
+
+### `__nextHasNoMarginBottom`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

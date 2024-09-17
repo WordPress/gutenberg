@@ -5,7 +5,7 @@
 		display: block;
 		height: 100%;
 	}
-	img {
+	:where(img) {
 		max-width: 100%;
 		width: 100%;
 		height: auto;
@@ -38,5 +38,9 @@
 				opacity: $i * 0.1;
 			}
 		}
+	}
+
+	&:where(.alignleft, .alignright) {
+		width: 100%;
 	}
 }

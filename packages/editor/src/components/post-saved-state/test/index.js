@@ -47,11 +47,14 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: true,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
 
-		expect( screen.getByText( 'Saving' ) ).toBeVisible();
+		expect(
+			screen.getByRole( 'button', { name: /Saving/i } )
+		).toBeVisible();
 	} );
 
 	it( 'returns a disabled button if the post is not saveable', () => {
@@ -60,6 +63,7 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -73,6 +77,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -91,6 +96,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		// Simulate the viewport being considered large.

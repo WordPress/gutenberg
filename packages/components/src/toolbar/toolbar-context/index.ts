@@ -1,13 +1,15 @@
 /**
  * External dependencies
  */
-import type { ToolbarStore } from '@ariakit/react/toolbar';
+import type * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
 
-const ToolbarContext = createContext< ToolbarStore | undefined >( undefined );
+const ToolbarContext = createContext< Ariakit.ToolbarStore | undefined >(
+	undefined
+);
 
 export default ToolbarContext;

@@ -1,0 +1,22 @@
+$vertical-tabs-width: 160px;
+
+.preferences__tabs-tablist {
+	position: absolute !important;
+	top: $header-height + $grid-unit-30;
+	// Aligns button text instead of button box.
+	left: $grid-unit-20;
+	width: $vertical-tabs-width;
+}
+
+.preferences__tabs-tabpanel {
+	padding-left: $grid-unit-30;
+	margin-left: $vertical-tabs-width;
+}
+
+@media (max-width: #{ ($break-medium - 1) }) {
+	// Keep the navigator component from overflowing the modal content area
+	// to ensure that sticky position elements stick where intended.
+	.preferences__provider {
+		height: 100%;
+	}
+}

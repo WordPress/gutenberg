@@ -12,19 +12,18 @@ import { RegistryConsumer } from '../registry-provider';
  * Higher-order component which renders the original component with the current
  * registry context passed as its `registry` prop.
  *
- * @param {WPComponent} OriginalComponent Original component.
+ * @param {Component} OriginalComponent Original component.
  *
- * @return {WPComponent} Enhanced component.
+ * @return {Component} Enhanced component.
  */
 const withRegistry = createHigherOrderComponent(
-	( OriginalComponent ) => ( props ) =>
-		(
-			<RegistryConsumer>
-				{ ( registry ) => (
-					<OriginalComponent { ...props } registry={ registry } />
-				) }
-			</RegistryConsumer>
-		),
+	( OriginalComponent ) => ( props ) => (
+		<RegistryConsumer>
+			{ ( registry ) => (
+				<OriginalComponent { ...props } registry={ registry } />
+			) }
+		</RegistryConsumer>
+	),
 	'withRegistry'
 );
 

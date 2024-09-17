@@ -49,8 +49,11 @@ describe( 'useEntityRecords', () => {
 		expect( data ).toEqual( {
 			records: null,
 			hasResolved: false,
+			hasStarted: false,
 			isResolving: false,
 			status: 'IDLE',
+			totalItems: null,
+			totalPages: null,
 		} );
 
 		// Fetch request should have been issued
@@ -63,8 +66,11 @@ describe( 'useEntityRecords', () => {
 		expect( data ).toEqual( {
 			records: TEST_RECORDS,
 			hasResolved: true,
+			hasStarted: true,
 			isResolving: false,
 			status: 'SUCCESS',
+			totalItems: 3,
+			totalPages: 1,
 		} );
 	} );
 } );

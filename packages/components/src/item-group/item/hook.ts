@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ElementType } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -11,8 +6,8 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
@@ -32,11 +27,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 
 	const size = sizeProp || contextSize;
 
-	const as =
-		asProp ||
-		( ( typeof onClick !== 'undefined'
-			? 'button'
-			: 'div' ) as ElementType );
+	const as = asProp || ( typeof onClick !== 'undefined' ? 'button' : 'div' );
 
 	const cx = useCx();
 

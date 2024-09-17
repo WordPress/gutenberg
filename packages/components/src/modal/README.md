@@ -4,12 +4,6 @@ Modals give users information and choices related to a task they’re trying to 
 
 ![An alert modal for trashing a post](https://wordpress.org/gutenberg/files/2019/04/Modal.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -120,8 +114,8 @@ The modal is used to create an accessible modal over an application.
 The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Modal } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyModal = () => {
 	const [ isOpen, setOpen ] = useState( false );
@@ -187,9 +181,15 @@ Titles are required for accessibility reasons, see `aria.labelledby` and `title`
 
 -   Required: No
 
-#### `focusOnMount`: `boolean | 'firstElement'`
+#### `focusOnMount`: `boolean | 'firstElement'` | 'firstContentElement'
 
 If this property is true, it will focus the first tabbable element rendered in the modal.
+
+If this property is false, focus will not be transferred and it is the responsibility of the consumer to ensure accessible focus management.
+
+If set to `firstElement` focus will be placed on the first tabbable element anywhere within the Modal.
+
+If set to `firstContentElement` focus will be placed on the first tabbable element within the Modal's **content** (i.e. children). Note that it is the responsibility of the consumer to ensure there is at least one tabbable element within the children **or the focus will be lost**.
 
 -   Required: No
 -   Default: `true`
@@ -214,6 +214,14 @@ This property when set to `true` will render a full screen modal.
 
 -   Required: No
 -   Default: `false`
+
+#### `size`: `'small' | 'medium' | 'large' | 'fill'`
+
+If this property is added it will cause the modal to render at a preset width, or expand to fill the screen. This prop will be ignored if `isFullScreen` is set to `true`.
+
+-   Required: No
+
+Note: `Modal`'s width can also be controlled by adjusting the width of the modal's contents via CSS.
 
 #### `onRequestClose`: ``
 

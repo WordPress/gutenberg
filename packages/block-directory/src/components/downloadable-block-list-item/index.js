@@ -6,7 +6,7 @@ import {
 	Button,
 	Spinner,
 	VisuallyHidden,
-	__unstableCompositeItem as CompositeItem,
+	Composite,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -62,7 +62,7 @@ function getDownloadableBlockLabel(
 	);
 }
 
-function DownloadableBlockListItem( { composite, item, onClick } ) {
+function DownloadableBlockListItem( { item, onClick } ) {
 	const { author, description, icon, rating, title } = item;
 	// getBlockType returns a block object if this block exists, or null if not.
 	const isInstalled = !! getBlockType( item.name );
@@ -90,25 +90,30 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 	}
 
 	return (
-		<CompositeItem
-			__experimentalIsFocusable
-			role="option"
-			as={ Button }
-			{ ...composite }
-			className="block-directory-downloadable-block-list-item"
-			onClick={ ( event ) => {
-				event.preventDefault();
-				onClick();
-			} }
-			isBusy={ isInstalling }
+		<Composite.Item
+			render={
+				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
+					accessibleWhenDisabled
+					type="button"
+					role="option"
+					className="block-directory-downloadable-block-list-item"
+					isBusy={ isInstalling }
+					onClick={ ( event ) => {
+						event.preventDefault();
+						onClick();
+					} }
+					label={ getDownloadableBlockLabel( item, {
+						hasNotice,
+						isInstalled,
+						isInstalling,
+					} ) }
+					showTooltip
+					tooltipPosition="top center"
+				/>
+			}
 			disabled={ isInstalling || ! isInstallable }
-			label={ getDownloadableBlockLabel( item, {
-				hasNotice,
-				isInstalled,
-				isInstalling,
-			} ) }
-			showTooltip={ true }
-			tooltipPosition="top center"
 		>
 			<div className="block-directory-downloadable-block-list-item__icon">
 				<DownloadableBlockIcon icon={ icon } title={ title } />
@@ -154,7 +159,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 					</>
 				) }
 			</span>
-		</CompositeItem>
+		</Composite.Item>
 	);
 }
 

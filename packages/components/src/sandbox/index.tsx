@@ -55,7 +55,9 @@ const observeAndResizeJS = function () {
 				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
 			 ).forEach( function ( style ) {
 				if (
-					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+					/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test(
+						ruleOrNode.style[ style ]
+					)
 				) {
 					ruleOrNode.style[ style ] = '';
 				}
@@ -130,6 +132,7 @@ function SandBox( {
 	styles = [],
 	scripts = [],
 	onFocus,
+	tabIndex,
 }: SandBoxProps ) {
 	const ref = useRef< HTMLIFrameElement >();
 	const [ width, setWidth ] = useState( 0 );
@@ -282,6 +285,7 @@ function SandBox( {
 		<iframe
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			title={ title }
+			tabIndex={ tabIndex }
 			className="components-sandbox"
 			sandbox="allow-scripts allow-same-origin allow-presentation"
 			onFocus={ onFocus }

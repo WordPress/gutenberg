@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,9 +28,7 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
-import { useResourcePermissions } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
 import { useMergeRefs, usePrevious } from '@wordpress/compose';
@@ -135,13 +133,18 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, type, url, description, rel, title } = attributes;
+	const { label, url, description, rel, title } = attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlock,
+		selectBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
+	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -149,9 +152,6 @@ export default function NavigationSubmenuEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add text…' );
 	const ref = useRef();
-
-	const pagesPermissions = useResourcePermissions( 'pages' );
-	const postsPermissions = useResourcePermissions( 'posts' );
 
 	const {
 		parentCount,
@@ -241,9 +241,6 @@ export default function NavigationSubmenuEdit( {
 			) {
 				// Focus and select the label text.
 				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
 			}
 		}
 	}, [ url ] );
@@ -263,13 +260,6 @@ export default function NavigationSubmenuEdit( {
 		selection.addRange( range );
 	}
 
-	let userCanCreate = false;
-	if ( ! type || type === 'page' ) {
-		userCanCreate = pagesPermissions.canCreate;
-	} else if ( type === 'post' ) {
-		userCanCreate = postsPermissions.canCreate;
-	}
-
 	const {
 		textColor,
 		customTextColor,
@@ -279,13 +269,20 @@ export default function NavigationSubmenuEdit( {
 
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			// Required to prevent the command center from opening,
+			// as it shares the CMD+K shortcut.
+			// See https://github.com/WordPress/gutenberg/pull/59845.
+			event.preventDefault();
+			// If we don't stop propogation, this event bubbles up to the parent submenu item
+			event.stopPropagation();
 			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
 		}
 	}
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -366,7 +363,10 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsLinkOpen( true ) }
+							onClick={ ( event ) => {
+								setIsLinkOpen( true );
+								setOpenedBy( event.currentTarget );
+							} }
 						/>
 					) }
 
@@ -376,7 +376,7 @@ export default function NavigationSubmenuEdit( {
 						title={ __( 'Convert to Link' ) }
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"
-						isDisabled={ ! canConvertToLink }
+						disabled={ ! canConvertToLink }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
@@ -385,20 +385,22 @@ export default function NavigationSubmenuEdit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ label || '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
-						label={ __( 'Label' ) }
+						label={ __( 'Text' ) }
 						autoComplete="off"
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
 						} }
-						label={ __( 'URL' ) }
+						label={ __( 'Link' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
@@ -416,6 +418,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -428,6 +431,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -444,40 +448,46 @@ export default function NavigationSubmenuEdit( {
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
 					{ /* eslint-enable */ }
-					{
-						<RichText
-							ref={ ref }
-							identifier="label"
-							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+					<RichText
+						ref={ ref }
+						identifier="label"
+						className="wp-block-navigation-item__label"
+						value={ label }
+						onChange={ ( labelValue ) =>
+							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						aria-label={ __( 'Navigation link text' ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
+						onClick={ () => {
+							if ( ! openSubmenusOnClick && ! url ) {
+								setIsLinkOpen( true );
+								setOpenedBy( ref.current );
 							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
-							withoutInteractiveFormatting
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/image',
-								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! openSubmenusOnClick && ! url ) {
-									setIsLinkOpen( true );
-								}
-							} }
-						/>
-					}
+						} }
+					/>
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								setIsLinkOpen( false );
+								if ( openedBy ) {
+									openedBy.focus();
+									setOpenedBy( null );
+								} else {
+									selectBlock( clientId );
+								}
+							} }
 							anchor={ popoverAnchor }
-							hasCreateSuggestion={ userCanCreate }
 							onRemove={ () => {
 								setAttributes( { url: '' } );
 								speak( __( 'Link removed.' ), 'assertive' );

@@ -9,7 +9,7 @@ import { getType } from 'mime';
  * Internal dependencies
  */
 import type { PageUtils } from './index';
-import type { ElementHandle, Locator } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 
 type FileObject = {
 	name: string;
@@ -52,29 +52,6 @@ async function dragFiles(
 				base64,
 			};
 		} )
-	);
-
-	const dataTransfer = await this.page.evaluateHandle(
-		async ( _fileObjects ) => {
-			const dt = new DataTransfer();
-			const fileInstances = await Promise.all(
-				_fileObjects.map( async ( fileObject ) => {
-					const blob = await fetch(
-						`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
-					).then( ( res ) => res.blob() );
-					return new File( [ blob ], fileObject.name, {
-						type: fileObject.mimeType ?? undefined,
-					} );
-				} )
-			);
-
-			fileInstances.forEach( ( file ) => {
-				dt.items.add( file );
-			} );
-
-			return dt;
-		},
-		fileObjects
 	);
 
 	// CDP doesn't actually support dragging files, this is only a _good enough_
@@ -141,25 +118,52 @@ async function dragFiles(
 
 		/**
 		 * Drop the files at the current position.
-		 *
-		 * @param locator
 		 */
-		drop: async ( locator: Locator | ElementHandle | null ) => {
-			if ( ! locator ) {
-				const topMostElement = await this.page.evaluateHandle(
-					( { x, y } ) => {
-						return document.elementFromPoint( x, y );
-					},
-					position
-				);
-				locator = topMostElement.asElement();
-			}
+		drop: async () => {
+			const topMostElement = await this.page.evaluateHandle(
+				( { x, y } ) => {
+					const element = document.elementFromPoint( x, y );
+					if ( element instanceof HTMLIFrameElement ) {
+						const offsetBox = element.getBoundingClientRect();
+						return element.contentDocument!.elementFromPoint(
+							x - offsetBox.x,
+							y - offsetBox.y
+						);
+					}
+					return element;
+				},
+				position
+			);
+			const elementHandle = topMostElement.asElement();
 
-			if ( ! locator ) {
+			if ( ! elementHandle ) {
 				throw new Error( 'Element not found.' );
 			}
 
-			await locator.dispatchEvent( 'drop', { dataTransfer } );
+			const dataTransfer = await elementHandle.evaluateHandle(
+				async ( _node, _fileObjects ) => {
+					const dt = new DataTransfer();
+					const fileInstances = await Promise.all(
+						_fileObjects.map( async ( fileObject: any ) => {
+							const blob = await fetch(
+								`data:${ fileObject.mimeType };base64,${ fileObject.base64 }`
+							).then( ( res ) => res.blob() );
+							return new File( [ blob ], fileObject.name, {
+								type: fileObject.mimeType ?? undefined,
+							} );
+						} )
+					);
+
+					fileInstances.forEach( ( file ) => {
+						dt.items.add( file );
+					} );
+
+					return dt;
+				},
+				fileObjects
+			);
+
+			await elementHandle.dispatchEvent( 'drop', { dataTransfer } );
 
 			await cdpSession.detach();
 		},

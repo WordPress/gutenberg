@@ -15,7 +15,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	store as blockEditorStore,
-	useSetting,
+	useSettings,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -60,14 +60,9 @@ function ColumnEdit( {
 
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	const updateAlignment = ( alignment ) => {
@@ -111,10 +106,10 @@ function ColumnEdit( {
 	};
 
 	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
-		const isFullWidth = columnWidth === screenWidth;
-
 		if ( isSelected ) {
+			const { width: columnWidth } = contentStyle[ clientId ] || {};
+			const isFullWidth = columnWidth === screenWidth;
+
 			return (
 				<View
 					style={ [
@@ -133,7 +128,7 @@ function ColumnEdit( {
 			);
 		}
 		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	}, [ contentStyle, clientId, screenWidth, isSelected, hasChildren ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -165,7 +160,7 @@ function ColumnEdit( {
 						/>
 					</BlockControls>
 					<InspectorControls>
-						<PanelBody title={ __( 'Column settings' ) }>
+						<PanelBody title={ __( 'Settings' ) }>
 							<UnitControl
 								label={ __( 'Width' ) }
 								min={ 1 }
@@ -225,7 +220,9 @@ function ColumnEditWrapper( props ) {
 	const { verticalAlignment } = props.attributes;
 
 	const getVerticalAlignmentRemap = ( alignment ) => {
-		if ( ! alignment ) return styles.flexBase;
+		if ( ! alignment ) {
+			return styles.flexBase;
+		}
 		return {
 			...styles.flexBase,
 			...styles[ `is-vertically-aligned-${ alignment }` ],

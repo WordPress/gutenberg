@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ComboboxControl from '..';
+import _ComboboxControl from '..';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
 
 const timezones = [
@@ -56,7 +56,10 @@ const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
 const getAllOptions = () => screen.getAllByRole( 'option' );
 const getOptionSearchString = ( option: ComboboxControlOption ) =>
 	option.label.substring( 0, 11 );
-const setupUser = () => userEvent.setup();
+
+const ComboboxControl = ( props: ComboboxControlProps ) => {
+	return <_ComboboxControl { ...props } __nextHasNoMarginBottom />;
+};
 
 const ControlledComboboxControl = ( {
 	value: valueProp,
@@ -90,7 +93,6 @@ describe.each( [
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
 		const label = getLabel( defaultLabelText );
-		expect( label ).toBeInTheDocument();
 		expect( label ).toBeVisible();
 	} );
 
@@ -99,7 +101,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 			/>
 		);
 		const label = getLabel( defaultLabelText );
@@ -112,7 +114,7 @@ describe.each( [
 	} );
 
 	it( 'should render with the correct options', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		render(
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
@@ -133,7 +135,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option via click events', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 2 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -157,7 +159,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option via keypress events', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetIndex = 4;
 		const targetOption = timezones[ targetIndex ];
 		const onChangeSpy = jest.fn();
@@ -187,7 +189,7 @@ describe.each( [
 	} );
 
 	it( 'should select the correct option from a search', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 13 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -214,7 +216,7 @@ describe.each( [
 	} );
 
 	it( 'should render aria-live announcement upon selection', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const targetOption = timezones[ 9 ];
 		const onChangeSpy = jest.fn();
 		render(
@@ -242,7 +244,7 @@ describe.each( [
 	} );
 
 	it( 'should process multiple entries in a single session', async () => {
-		const user = setupUser();
+		const user = await userEvent.setup();
 		const unmatchedString = 'Mordor';
 		const targetOption = timezones[ 6 ];
 		const onChangeSpy = jest.fn();
@@ -306,5 +308,132 @@ describe.each( [
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.label );
+	} );
+
+	it( 'should render with Reset button disabled', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toBeVisible();
+		expect( resetButton ).toBeDisabled();
+	} );
+
+	it( 'should reset input when clicking the Reset button', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toBeEnabled();
+
+		await user.click( resetButton );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should reset input when pressing the Reset button with the Enter key', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		// Pressing tab moves focus to the Reset buttons
+		await user.tab();
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		// If the button has focus that implies it is enabled.
+		expect( resetButton ).toHaveFocus();
+
+		// Pressing Enter/Return resets the input.
+		await user.keyboard( '{Enter}' );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		// Pressing tab moves focus to the Reset buttons.
+		await user.tab();
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		// If the button has focus that implies it is enabled.
+		expect( resetButton ).toHaveFocus();
+
+		// Pressing Spacebar resets the input.
+		await user.keyboard( '[Space]' );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
 	} );
 } );

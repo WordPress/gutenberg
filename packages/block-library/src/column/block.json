@@ -30,12 +30,14 @@
 		"color": {
 			"gradients": true,
 			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,
@@ -46,10 +48,12 @@
 		},
 		"__experimentalBorder": {
 			"color": true,
+			"radius": true,
 			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"color": true,
+				"radius": true,
 				"style": true,
 				"width": true
 			}
@@ -67,6 +71,9 @@
 				"fontSize": true
 			}
 		},
-		"layout": true
+		"layout": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

@@ -1,0 +1,19 @@
+// The following styles are to prevent duplicate spacing and border for the tag cloud
+// block in the editor given it uses server side rendering. The specificity
+// must be higher than `0-1-0` to override global styles. Targeting the
+// inner use of the .wp-block-tag-cloud class should minimize impact on
+// other 3rd party styles targeting the block.
+.wp-block-tag-cloud .wp-block-tag-cloud {
+	margin: 0;
+	padding: 0;
+	border: none;
+	border-radius: inherit;
+}
+
+.wp-block-tag-cloud__inspector-settings {
+	.components-base-control,
+	.components-base-control:last-child {
+		// Cancel out extra margins added by block inspector
+		margin-bottom: 0;
+	}
+}

@@ -14,7 +14,7 @@ Install the module to your project using [npm](https://www.npmjs.com/).
 npm install @wordpress/babel-plugin-import-jsx-pragma
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Usage
 
@@ -38,7 +38,7 @@ _Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/b
 
 As the `@babel/plugin-transform-react-jsx` plugin offers options to customize the `pragma` to which the transform references, there are equivalent options to assign for customizing the imports generated.
 
-For example, if you are using the `@wordpress/element` package, you may want to use the following configuration:
+For example, if you are using the `react` package, you may want to use the following configuration:
 
 ```js
 // .babelrc.js
@@ -49,7 +49,7 @@ module.exports = {
 			{
 				scopeVariable: 'createElement',
 				scopeVariableFrag: 'Fragment',
-				source: '@wordpress/element',
+				source: 'react',
 				isDefault: false,
 			},
 		],

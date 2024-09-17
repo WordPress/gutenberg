@@ -15,8 +15,6 @@ $input-size: 300px;
 			width: $input-size;
 		}
 		padding: $input-padding;
-		border: none;
-		border-radius: 0;
 		margin-left: 0;
 		margin-right: 0;
 
@@ -122,8 +120,8 @@ $input-size: 300px;
 }
 
 .block-editor-url-input__button-modal {
-	box-shadow: $shadow-popover;
-	border: 1px solid $gray-300;
+	box-shadow: $elevation-x-small;
+	border: $border-width solid $gray-300;
 	background: $white;
 }
 

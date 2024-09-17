@@ -51,7 +51,7 @@
 	padding: 2px 5px 2px 1px;
 	color: $gray-900;
 	text-align: left;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
 	&:disabled {
 		cursor: default;
@@ -80,4 +80,16 @@
 
 .document-outline__item-content {
 	padding: 1px 0;
+}
+
+.editor-document-outline.has-no-headings {
+	& > svg {
+		margin-top: $grid-unit-30 + $grid-unit-05;
+	}
+	& > p {
+		padding-left: $grid-unit-40;
+		padding-right: $grid-unit-40;
+	}
+	text-align: center;
+	color: $gray-700;
 }

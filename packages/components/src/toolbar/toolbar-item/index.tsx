@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
+import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -43,10 +43,13 @@ function ToolbarItem(
 		return children( allProps );
 	}
 
-	const render = isRenderProp ? children : Component && <Component />;
+	const render = isRenderProp
+		? children
+		: Component && <Component>{ children }</Component>;
 
 	return (
-		<BaseToolbarItem
+		<Ariakit.ToolbarItem
+			accessibleWhenDisabled
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }

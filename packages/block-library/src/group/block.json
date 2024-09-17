@@ -28,15 +28,24 @@
 		"anchor": true,
 		"ariaLabel": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
@@ -79,6 +88,9 @@
 		},
 		"layout": {
 			"allowSizingOnChildren": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",

@@ -20,7 +20,7 @@ test.describe( 'Style Book', () => {
 
 	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		await styleBook.open();
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
@@ -30,19 +30,13 @@ test.describe( 'Style Book', () => {
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Toggle block inserter"i]' )
-		).not.toBeVisible();
+		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )
-		).not.toBeVisible();
+		).toBeDisabled();
 		await expect(
-			page.locator( 'role=button[name="Undo"i]' )
-		).not.toBeVisible();
-		await expect(
-			page.locator( 'role=button[name="Redo"i]' )
-		).not.toBeVisible();
-		await expect(
-			page.locator( 'role=button[name="View"i]' )
-		).not.toBeVisible();
+			page.locator( 'role=button[name="Document Overview"i]' )
+		).toBeDisabled();
 	} );
 
 	test( 'should have tabs containing block examples', async ( { page } ) => {
@@ -116,8 +110,8 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
 			page.locator( 'role=button[name="Blocks styles"]' )
@@ -132,14 +126,12 @@ test.describe( 'Style Book', () => {
 		} );
 
 		// Close Style Book via click event.
-		await styleBookRegion
-			.getByRole( 'button', { name: 'Close Style Book' } )
-			.click();
+		await styleBookRegion.getByRole( 'button', { name: 'Close' } ).click();
 
 		await expect(
 			styleBookRegion,
 			'should close when close button is clicked'
-		).not.toBeVisible();
+		).toBeHidden();
 
 		// Open Style Book again.
 		await page.getByRole( 'button', { name: 'Style Book' } ).click();
@@ -153,7 +145,51 @@ test.describe( 'Style Book', () => {
 		await expect(
 			styleBookRegion,
 			'should close when Escape key is pressed'
-		).not.toBeVisible();
+		).toBeHidden();
+	} );
+
+	test( 'should persist when navigating the global styles sidebar', async ( {
+		page,
+	} ) => {
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Browse styles' } )
+			.click();
+
+		const styleBookRegion = page.getByRole( 'region', {
+			name: 'Style Book',
+		} );
+		await expect(
+			styleBookRegion,
+			'style book should be visible'
+		).toBeVisible();
+
+		await page.click( 'role=button[name="Back"]' );
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Typography' } )
+			.click();
+
+		await expect(
+			styleBookRegion,
+			'style book should be visible'
+		).toBeVisible();
+	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+	} ) => {
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Book',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
+		).toBeVisible();
 	} );
 } );
 

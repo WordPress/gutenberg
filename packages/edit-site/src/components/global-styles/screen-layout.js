@@ -18,6 +18,7 @@ function ScreenLayout() {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />

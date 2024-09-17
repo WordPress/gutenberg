@@ -30,10 +30,10 @@ export default function useTransformImage( {
 			setEditedUrl();
 			setRotation( angle );
 			setAspect( defaultAspect );
-			setPosition( {
-				x: -( position.y * naturalAspectRatio ),
-				y: position.x * naturalAspectRatio,
-			} );
+			setPosition( ( prevPosition ) => ( {
+				x: -( prevPosition.y * naturalAspectRatio ),
+				y: prevPosition.x * naturalAspectRatio,
+			} ) );
 			return;
 		}
 
@@ -69,10 +69,10 @@ export default function useTransformImage( {
 				setEditedUrl( URL.createObjectURL( blob ) );
 				setRotation( angle );
 				setAspect( canvas.width / canvas.height );
-				setPosition( {
-					x: -( position.y * naturalAspectRatio ),
-					y: position.x * naturalAspectRatio,
-				} );
+				setPosition( ( prevPosition ) => ( {
+					x: -( prevPosition.y * naturalAspectRatio ),
+					y: prevPosition.x * naturalAspectRatio,
+				} ) );
 			} );
 		}
 
@@ -88,7 +88,7 @@ export default function useTransformImage( {
 		if ( typeof imgCrossOrigin === 'string' ) {
 			el.crossOrigin = imgCrossOrigin;
 		}
-	}, [ rotation, defaultAspect ] );
+	}, [ rotation, defaultAspect, url ] );
 
 	return useMemo(
 		() => ( {

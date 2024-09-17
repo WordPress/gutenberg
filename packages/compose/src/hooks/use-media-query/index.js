@@ -3,6 +3,8 @@
  */
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 
+const matchMediaCache = new Map();
+
 /**
  * A new MediaQueryList object for the media query
  *
@@ -10,12 +12,23 @@ import { useMemo, useSyncExternalStore } from '@wordpress/element';
  * @return {MediaQueryList|null} A new object for the media query
  */
 function getMediaQueryList( query ) {
+	if ( ! query ) {
+		return null;
+	}
+
+	let match = matchMediaCache.get( query );
+
+	if ( match ) {
+		return match;
+	}
+
 	if (
-		query &&
 		typeof window !== 'undefined' &&
 		typeof window.matchMedia === 'function'
 	) {
-		return window.matchMedia( query );
+		match = window.matchMedia( query );
+		matchMediaCache.set( query, match );
+		return match;
 	}
 
 	return null;
@@ -38,9 +51,10 @@ export default function useMediaQuery( query ) {
 					return () => {};
 				}
 
-				mediaQueryList.addEventListener( 'change', onStoreChange );
+				// Avoid a fatal error when browsers don't support `addEventListener` on MediaQueryList.
+				mediaQueryList.addEventListener?.( 'change', onStoreChange );
 				return () => {
-					mediaQueryList.removeEventListener(
+					mediaQueryList.removeEventListener?.(
 						'change',
 						onStoreChange
 					);

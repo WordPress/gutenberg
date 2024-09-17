@@ -1,6 +1,4 @@
 export {
-	__experimentalUseGlobalBehaviors,
-	__experimentalUseHasBehaviorsPanel,
 	useGlobalStylesReset,
 	useGlobalSetting,
 	useGlobalStyle,
@@ -9,6 +7,8 @@ export {
 export { getBlockCSSSelector } from './get-block-css-selector';
 export {
 	getLayoutStyles,
+	getBlockSelectors,
+	toStyles,
 	useGlobalStylesOutput,
 	useGlobalStylesOutputWithConfig,
 } from './use-global-styles-output';
@@ -21,10 +21,21 @@ export {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
-export { default as BorderPanel, useHasBorderPanel } from './border-panel';
+export {
+	default as BorderPanel,
+	useHasBorderPanel,
+	useHasBorderPanelControls,
+} from './border-panel';
 export { default as ColorPanel, useHasColorPanel } from './color-panel';
-export { default as EffectsPanel, useHasEffectsPanel } from './effects-panel';
 export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';
-export { default as __experimentalBehaviorsPanel } from './behaviors-panel';
+export {
+	default as ImageSettingsPanel,
+	useHasImageSettingsPanel,
+} from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
+export {
+	default as BackgroundPanel,
+	useHasBackgroundPanel,
+} from './background-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
+export { default as getGlobalStylesChanges } from './get-global-styles-changes';

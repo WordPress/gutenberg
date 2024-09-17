@@ -1,10 +1,12 @@
 # Gutenberg PHP
 
+This documentation is intended for developers who are contributing to the PHP code in the Gutenberg plugin, and pertains to files in the `lib` directory.
+
 The Gutenberg plugin is continuously enhancing existing features and creating new ones. Some features, once considered stable and useful, are merged into Core (the WordPress source code) during a WordPress release. Others remain in the plugin forever or are eventually removed as the minimum supported WordPress version changes.
 
 During a WordPress release, new features, bugfixes and other changes are "synced" between the Gutenberg plugin and WordPress Core. Consistent naming and directory structures make this process easier by preventing naming conflicts and compartmentalizing release-specific code.
 
-The following documentation is intended to act as a guide only. If you're unsure about naming or where to place new PHP files, please don't hesitate to ping other contributors on Github or ask in the #core-editor channel on [WordPress Slack](https://make.wordpress.org/chat/).
+The following documentation is intended to act as a guide only. If you're unsure about naming or where to place new PHP files, please don't hesitate to ping other contributors on GitHub or ask in the #core-editor channel on [WordPress Slack](https://make.wordpress.org/chat/).
 
 ## File structure
 
@@ -58,6 +60,8 @@ function wp_get_something_useful() {
 
 Plugin code that is stable and expected to be merged "as-is" into Core in the near future can use the `wp_` prefix for functions or a `WP_` prefix for classes.
 
+#### Avoiding duplicate declarations
+
 When doing so, care must be taken to ensure that no duplicate declarations to create functions or classes exist between Gutenberg and WordPress core code. A quick codebase search will also help you know if your new names are unique.
 
 Wrapping such code in `class_exists()` and `function_exists()` checks should be used to ensure it executes in the plugin up until it is merged to Core, or when running the plugin on older versions of WordPress.
@@ -84,21 +88,38 @@ Or for classes:
  * @package WordPress
  * @since 6.3.0
  */
-if ( class_exists( 'WP_A_Stable_Class' ) ) {
-	return;
+if ( ! class_exists( 'WP_A_Stable_Class' ) ) {
+	// Do not invert this pattern with an early `return`.
+	// See below for details...
+	class WP_A_Stable_Class { ... }
 }
-
-/**
- * A very stable class that does something.
- *
- * @since 6.3.0
- */
-class WP_A_Stable_Class { ... }
 ```
 
 Wrapping code in `class_exists()` and `function_exists()` is usually inappropriate for evergreen code, or any plugin code that we expect to undergo constant change between WordPress releases, because it would prevent the latest versions of the code from being used. For example, the statement `class_exists( 'WP_Theme_JSON' )` would return `true` because the class already exists in Core.
 
+The `return` operator is considered an anti-pattern in the context provided below because it [does not halt](https://www.php.net/manual/en/function.return.php#112515) the parsing of the PHP script and can cause [unexpected side effects](https://github.com/WordPress/gutenberg/pull/58429#issuecomment-1916670097):
+```php
+/**
+ * ANTI-PATTERN
+ * DO NOT COPY!
+ *
+ */
+if ( class_exists( 'WP_A_Stable_Class' ) ) {
+	return; // do not do this.
+}
+```
+
 When to use which prefix is a judgement call, but the general rule is that if you're unsure, use the `gutenberg` prefix because it will less likely give rise to naming conflicts.
+
+#### When not to use plugin-specific prefixes/suffixes
+
+The above recommendations in relation to plugin-specific prefixes/suffixes are relevant only to files in the `lib` directory and only in the Gutenberg plugin.
+
+`Gutenberg` prefixes/suffixes _should not_ be used in Core PHP code. When syncing `/lib` files to Core, plugin-specific prefixes/suffixes are generally replaced with their `WP_` or `wp_` equivalents manually.
+
+Accordingly, unless required to run plugin-only code, you should avoid using plugin-specific prefixes/suffixes in any block PHP code. Core blocks in the plugin are [published as NPM packages](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/release.md#packages-releases-to-npm-and-wordpress-core-updates), which Core consumes as NPM dependencies.
+
+See [block naming conventions](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library#naming-convention-for-php-functions) for more information on block naming conventions.
 
 As always, get in touch with your fellow contributors if you're unsure.
 
@@ -164,18 +185,19 @@ add_action( 'init', 'wp_register_navigation_cpt' );
 ```
 
 ### Requiring files in lib/load.php
+
 Should the load order allow it, try to group imports according to WordPress release, then feature. It'll help everyone to quickly recognise the files that belong to specific WordPress releases.
 
 Existing comments in `lib/load.php` should act as a guide.
 
 ## When to sync changes to Gutenberg PHP with Core and vice versa
 
-If you've changed or added PHP files to the Gutenberg plugin, you'll need to confirm whether the changes are to be synced to WordPress Core, and therefore featured in the next release of WordPress.
+On open Gutenberg PRs, changes to certain files are flagged as requiring syncing (also called "backporting") to WordPress Core, for example, PHP files in `/lib` and PHP unit tests.
 
-The Gutenberg Github pull request in question should be labeled with the `Needs PHP backport` label if the changes are to be synced to Core.
+The CI checks will indicate whether you need to create a Core PR. If you do, you'll need to create a corresponding markdown file and place it within the appropriate release subdirectory in the [Core backport changelog](https://github.com/WordPress/gutenberg/tree/trunk/backport-changelog/).
 
-If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after your pull request is merged.
+For more information, please refer to the [Core backport changelog documentation](https://github.com/WordPress/gutenberg/tree/trunk/backport-changelog/readme.md).
 
-So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced (often called "backporting") to Gutenberg. The relevant Gutenberg Github pull request should be labeled with the `Backport from WordPress Core` label.
+So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced to Gutenberg. The relevant Gutenberg GitHub pull request should be labeled with the `Backport from WordPress Core` label.
 
 If you're unsure, you can always ask for help in the #core-editor channel in [WordPress Slack](https://make.wordpress.org/chat/).

@@ -1,0 +1,39 @@
+.edit-site-global-styles-variations_item {
+	box-sizing: border-box;
+	// To round the outline in Windows 10 high contrast mode.
+	cursor: pointer;
+
+	.edit-site-global-styles-variations_item-preview {
+		border-radius: $radius-small;
+		outline: $border-width solid rgba($black, 0.1);
+		outline-offset: -$border-width;
+		overflow: hidden;
+		position: relative;
+		// Add the same transition that block style variations and other buttons have.
+		transition: outline 0.1s linear;
+		@include reduce-motion("transition");
+
+		&.is-pill {
+			height: $button-size-compact;
+
+			.block-editor-iframe__scale-container {
+				overflow: hidden;
+			}
+		}
+	}
+
+	&:not(.is-active):hover .edit-site-global-styles-variations_item-preview {
+		outline-color: rgba($black, 0.3);
+	}
+
+	&.is-active .edit-site-global-styles-variations_item-preview,
+	&:focus-visible .edit-site-global-styles-variations_item-preview {
+		outline-color: $gray-900;
+		outline-offset: $border-width;
+		outline-width: var(--wp-admin-border-width-focus);
+	}
+
+	&:focus-visible .edit-site-global-styles-variations_item-preview {
+		outline-color: var(--wp-admin-theme-color);
+	}
+}

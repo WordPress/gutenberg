@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,9 +16,10 @@ import { useState, forwardRef } from '@wordpress/element';
 import InputBase from './input-base';
 import InputField from './input-field';
 import type { InputControlProps } from './types';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { useDraft } from './utils';
 import BaseControl from '../base-control';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 const noop = () => {};
 
@@ -30,8 +31,11 @@ function useUniqueId( idProp?: string ) {
 }
 
 export function UnforwardedInputControl(
-	{
-		__next36pxDefaultSize,
+	props: InputControlProps,
+	ref: ForwardedRef< HTMLInputElement >
+) {
+	const {
+		__next40pxDefaultSize,
 		__unstableStateReducer: stateReducer = ( state ) => state,
 		__unstableInputWidth,
 		className,
@@ -50,25 +54,19 @@ export function UnforwardedInputControl(
 		style,
 		suffix,
 		value,
-		...props
-	}: InputControlProps,
-	ref: ForwardedRef< HTMLInputElement >
-) {
-	const [ isFocused, setIsFocused ] = useState( false );
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
 	const id = useUniqueId( idProp );
-	const classes = classNames( 'components-input-control', className );
+	const classes = clsx( 'components-input-control', className );
 
 	const draftHookProps = useDraft( {
 		value,
-		onBlur: props.onBlur,
+		onBlur: restProps.onBlur,
 		onChange,
 	} );
 
-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
-	const helpPropName =
-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
-	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
+	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
 
 	return (
 		<BaseControl
@@ -78,13 +76,12 @@ export function UnforwardedInputControl(
 			__nextHasNoMarginBottom
 		>
 			<InputBase
-				__next36pxDefaultSize={ __next36pxDefaultSize }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
 				disabled={ disabled }
 				gap={ 3 }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFocused={ isFocused }
 				justify="left"
 				label={ label }
 				labelPosition={ labelPosition }
@@ -94,20 +91,18 @@ export function UnforwardedInputControl(
 				suffix={ suffix }
 			>
 				<InputField
-					{ ...props }
+					{ ...restProps }
 					{ ...helpProp }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
-					isFocused={ isFocused }
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
-					paddingInlineStart={ prefix ? space( 2 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					paddingInlineStart={ prefix ? space( 1 ) : undefined }
+					paddingInlineEnd={ suffix ? space( 1 ) : undefined }
 					ref={ ref }
-					setIsFocused={ setIsFocused }
 					size={ size }
 					stateReducer={ stateReducer }
 					{ ...draftHookProps }
@@ -123,7 +118,7 @@ export function UnforwardedInputControl(
  *
  * ```jsx
  * import { __experimentalInputControl as InputControl } from '@wordpress/components';
- * import { useState } from '@wordpress/compose';
+ * import { useState } from 'react';
  *
  * const Example = () => {
  *   const [ value, setValue ] = useState( '' );

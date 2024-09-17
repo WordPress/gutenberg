@@ -2,19 +2,27 @@
  * WordPress dependencies
  */
 import { Draggable } from '@wordpress/components';
-import { serialize, store as blocksStore } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	serialize,
+	store as blocksStore,
+} from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from '../block-draggable/draggable-chip';
+import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const InserterDraggableBlocks = ( {
 	isEnabled,
 	blocks,
 	icon,
 	children,
-	isPattern,
+	pattern,
 } ) => {
 	const transferData = {
 		type: 'inserter',
@@ -31,26 +39,50 @@ const InserterDraggableBlocks = ( {
 		[ blocks ]
 	);
 
+	const { startDragging, stopDragging } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
+	if ( ! isEnabled ) {
+		return children( {
+			draggable: false,
+			onDragStart: undefined,
+			onDragEnd: undefined,
+		} );
+	}
+
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				event.dataTransfer.setData( 'text/html', serialize( blocks ) );
+				startDragging();
+				const parsedBlocks =
+					pattern?.type === INSERTER_PATTERN_TYPES.user &&
+					pattern?.syncStatus !== 'unsynced'
+						? [ createBlock( 'core/block', { ref: pattern.id } ) ]
+						: blocks;
+				event.dataTransfer.setData(
+					'text/html',
+					serialize( parsedBlocks )
+				);
+			} }
+			onDragEnd={ () => {
+				stopDragging();
 			} }
 			__experimentalDragComponent={
 				<BlockDraggableChip
 					count={ blocks.length }
-					icon={ icon || ( ! isPattern && blockTypeIcon ) }
-					isPattern={ isPattern }
+					icon={ icon || ( ! pattern && blockTypeIcon ) }
+					isPattern={ !! pattern }
 				/>
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					draggable: isEnabled,
-					onDragStart: isEnabled ? onDraggableStart : undefined,
-					onDragEnd: isEnabled ? onDraggableEnd : undefined,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

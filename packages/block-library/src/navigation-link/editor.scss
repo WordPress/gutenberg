@@ -67,14 +67,6 @@
 	color: #000;
 }
 
-.wp-block-navigation-link__missing_text-tooltip {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-}
 /**
  * Menu item setup state. Is shown when a menu item has no URL configured.
  */
@@ -95,9 +87,6 @@
 		$stop2: 64%;
 
 		--wp-underline-color: var(--wp-admin-theme-color);
-		.is-dark-theme & {
-			--wp-underline-color: #{ $dark-theme-focus };
-		}
 
 		background-image:
 			linear-gradient(45deg, transparent ($stop1 - $blur), var(--wp-underline-color) $stop1, var(--wp-underline-color) ($stop1 + $width), transparent ($stop1 + $width + $blur)),

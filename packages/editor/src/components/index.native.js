@@ -9,5 +9,7 @@ export { default as EditorProvider } from './provider';
 
 // Other Components.
 export { default as EditorHelpTopics } from './editor-help';
+export { default as OfflineStatus } from './offline-status';
+export { default as ErrorBoundary } from './error-boundary';
 
 export * from './deprecated';

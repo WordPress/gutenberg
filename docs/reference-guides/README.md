@@ -18,7 +18,7 @@
 
 ## [Hooks Reference](/docs/reference-guides/filters/README.md)
 
--   [Block Hooks](/docs/reference-guides/filters/block-filters.md)
+-   [Block Filters](/docs/reference-guides/filters/block-filters.md)
 -   [Editor Hooks](/docs/reference-guides/filters/editor-filters.md)
 -   [i18n Hooks](/docs/reference-guides/filters/i18n-filters.md)
 -   [Parser Hooks](/docs/reference-guides/filters/parser-filters.md)
@@ -39,7 +39,8 @@
 
 ## [Theme.json Reference](/docs/reference-guides/theme-json-reference/README.md)
 
--   [Version 2 (living reference)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
+-   [Version 3 (latest)](/docs/reference-guides/theme-json-reference/theme-json-living.md)
+-   [Version 2](/docs/reference-guides/theme-json-reference/theme-json-v2.md)
 -   [Version 1](/docs/reference-guides/theme-json-reference/theme-json-v1.md)
 -   [Migrating to Newer Versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md)
 

@@ -6,11 +6,13 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	Icon,
-	positionCenter,
+	alignNone,
 	stretchWide,
 	justifyLeft,
 	justifyCenter,
@@ -21,9 +23,10 @@ import { getCSSRules } from '@wordpress/style-engine';
 /**
  * Internal dependencies
  */
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
+import { BlockControls, JustifyContentControl } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
@@ -36,7 +39,10 @@ export default {
 		layoutBlockSupport = {},
 	} ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
-		const { allowJustification = true } = layoutBlockSupport;
+		const {
+			allowJustification = true,
+			allowCustomContentAndWideSize = true,
+		} = layoutBlockSupport;
 		const onJustificationChange = ( value ) => {
 			onChange( {
 				...layout,
@@ -60,24 +66,21 @@ export default {
 				label: __( 'Justify items right' ),
 			},
 		];
+		const [ availableUnits ] = useSettings( 'spacing.units' );
 		const units = useCustomUnits( {
-			availableUnits: useSetting( 'spacing.units' ) || [
-				'%',
-				'px',
-				'em',
-				'rem',
-				'vw',
-			],
+			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 		} );
 		return (
-			<>
-				<div className="block-editor-hooks__layout-controls">
-					<div className="block-editor-hooks__layout-controls-unit">
+			<VStack
+				spacing={ 4 }
+				className="block-editor-hooks__layout-constrained"
+			>
+				{ allowCustomContentAndWideSize && (
+					<>
 						<UnitControl
-							className="block-editor-hooks__layout-controls-unit-input"
-							label={ __( 'Content' ) }
+							__next40pxDefaultSize
+							label={ __( 'Content width' ) }
 							labelPosition="top"
-							__unstableInputWidth="80px"
 							value={ contentSize || wideSize || '' }
 							onChange={ ( nextWidth ) => {
 								nextWidth =
@@ -90,15 +93,16 @@ export default {
 								} );
 							} }
 							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ alignNone } />
+								</InputControlPrefixWrapper>
+							}
 						/>
-						<Icon icon={ positionCenter } />
-					</div>
-					<div className="block-editor-hooks__layout-controls-unit">
 						<UnitControl
-							className="block-editor-hooks__layout-controls-unit-input"
-							label={ __( 'Wide' ) }
+							__next40pxDefaultSize
+							label={ __( 'Wide width' ) }
 							labelPosition="top"
-							__unstableInputWidth="80px"
 							value={ wideSize || contentSize || '' }
 							onChange={ ( nextWidth ) => {
 								nextWidth =
@@ -111,17 +115,22 @@ export default {
 								} );
 							} }
 							units={ units }
+							prefix={
+								<InputControlPrefixWrapper variant="icon">
+									<Icon icon={ stretchWide } />
+								</InputControlPrefixWrapper>
+							}
 						/>
-						<Icon icon={ stretchWide } />
-					</div>
-				</div>
-				<p className="block-editor-hooks__layout-controls-helptext">
-					{ __(
-						'Customize the width for all elements that are assigned to the center or wide columns.'
-					) }
-				</p>
+						<p className="block-editor-hooks__layout-constrained-helptext">
+							{ __(
+								'Customize the width for all elements that are assigned to the center or wide columns.'
+							) }
+						</p>
+					</>
+				) }
 				{ allowJustification && (
 					<ToggleGroupControl
+						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Justification' ) }
 						value={ justifyContent }
@@ -141,11 +150,27 @@ export default {
 						) }
 					</ToggleGroupControl>
 				) }
-			</>
+			</VStack>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
-		return null;
+	toolBarControls: function DefaultLayoutToolbarControls( {
+		layout = {},
+		onChange,
+		layoutBlockSupport,
+	} ) {
+		const { allowJustification = true } = layoutBlockSupport;
+
+		if ( ! allowJustification ) {
+			return null;
+		}
+		return (
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DefaultLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</BlockControls>
+		);
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -215,15 +240,23 @@ export default {
 			const paddingValues = getCSSRules( style );
 			paddingValues.forEach( ( rule ) => {
 				if ( rule.key === 'paddingRight' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingRightValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-right: calc(${ rule.value } * -1);
+						margin-right: calc(${ paddingRightValue } * -1);
 					}
 					`;
 				} else if ( rule.key === 'paddingLeft' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingLeftValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-left: calc(${ rule.value } * -1);
+						margin-left: calc(${ paddingLeftValue } * -1);
 					}
 					`;
 				}
@@ -276,3 +309,27 @@ export default {
 		return alignments;
 	},
 };
+
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
+function DefaultLayoutJustifyContentControl( { layout, onChange } ) {
+	const { justifyContent = 'center' } = layout;
+	const onJustificationChange = ( value ) => {
+		onChange( {
+			...layout,
+			justifyContent: value,
+		} );
+	};
+	const allowedControls = [ 'left', 'center', 'right' ];
+
+	return (
+		<JustifyContentControl
+			allowedControls={ allowedControls }
+			value={ justifyContent }
+			onChange={ onJustificationChange }
+			popoverProps={ POPOVER_PROPS }
+		/>
+	);
+}

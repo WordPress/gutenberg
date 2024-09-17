@@ -1,68 +1,9 @@
 /**
- * WordPress dependencies
- */
-import { useEffect, useState } from '@wordpress/element';
-import {
-	BlockEditorKeyboardShortcuts,
-	BlockEditorProvider,
-	BlockList,
-	BlockTools,
-	BlockInspector,
-	WritingFlow,
-} from '@wordpress/block-editor';
-import { SlotFillProvider } from '@wordpress/components';
-import { registerCoreBlocks } from '@wordpress/block-library';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
-import '@wordpress/format-library';
-
-/**
  * Internal dependencies
  */
-import styles from './style.lazy.scss';
-
-function App() {
-	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
-
-	// Ensures that the CSS intended for the playground (especially the style resets)
-	// are only loaded for the playground and don't leak into other stories.
-	useEffect( () => {
-		styles.use();
-
-		return styles.unuse;
-	} );
-
-	return (
-		<div className="playground">
-			<ShortcutProvider>
-				<SlotFillProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ updateBlocks }
-						onChange={ updateBlocks }
-					>
-						<div className="playground__sidebar">
-							<BlockInspector />
-						</div>
-						<div className="playground__content">
-							<BlockTools>
-								<div className="editor-styles-wrapper">
-									<BlockEditorKeyboardShortcuts.Register />
-									<WritingFlow>
-										<BlockList />
-									</WritingFlow>
-								</div>
-							</BlockTools>
-						</div>
-					</BlockEditorProvider>
-				</SlotFillProvider>
-			</ShortcutProvider>
-		</div>
-	);
-}
+import EditorFullPage from './fullpage';
+import EditorBox from './box';
+import EditorWithUndoRedo from './with-undo-redo';
 
 export default {
 	title: 'Playground/Block Editor',
@@ -72,5 +13,25 @@ export default {
 };
 
 export const _default = () => {
-	return <App />;
+	return <EditorFullPage />;
+};
+
+_default.parameters = {
+	sourceLink: 'storybook/stories/playground/fullpage/index.js',
+};
+
+export const Box = () => {
+	return <EditorBox />;
+};
+
+Box.parameters = {
+	sourceLink: 'storybook/stories/playground/box/index.js',
+};
+
+export const UndoRedo = () => {
+	return <EditorWithUndoRedo />;
+};
+
+UndoRedo.parameters = {
+	sourceLink: 'storybook/stories/playground/with-undo-redo/index.js',
 };

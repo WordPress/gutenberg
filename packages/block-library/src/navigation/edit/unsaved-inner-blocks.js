@@ -5,17 +5,13 @@ import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { areBlocksDirty } from './are-blocks-dirty';
-import {
-	DEFAULT_BLOCK,
-	ALLOWED_BLOCKS,
-	SELECT_NAVIGATION_MENUS_ARGS,
-} from '../constants';
+import { DEFAULT_BLOCK, SELECT_NAVIGATION_MENUS_ARGS } from '../constants';
 
 const EMPTY_OBJECT = {};
 
@@ -24,13 +20,13 @@ export default function UnsavedInnerBlocks( {
 	createNavigationMenu,
 	hasSelection,
 } ) {
-	const originalBlocks = useRef();
+	const originalBlocksRef = useRef();
 
 	useEffect( () => {
 		// Initially store the uncontrolled inner blocks for
 		// dirty state comparison.
-		if ( ! originalBlocks?.current ) {
-			originalBlocks.current = blocks;
+		if ( ! originalBlocksRef?.current ) {
+			originalBlocksRef.current = blocks;
 		}
 	}, [ blocks ] );
 
@@ -42,19 +38,8 @@ export default function UnsavedInnerBlocks( {
 	// entity records. As a result we need to perform a deep equality check skipping
 	// the page list's inner blocks.
 	const innerBlocksAreDirty = areBlocksDirty(
-		originalBlocks?.current,
+		originalBlocksRef?.current,
 		blocks
-	);
-
-	const shouldDirectInsert = useMemo(
-		() =>
-			blocks.every(
-				( { name } ) =>
-					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu' ||
-					name === 'core/page-list'
-			),
-		[ blocks ]
 	);
 
 	// The block will be disabled in a block preview, use this as a way of
@@ -67,9 +52,8 @@ export default function UnsavedInnerBlocks( {
 		},
 		{
 			renderAppender: hasSelection ? undefined : false,
-			allowedBlocks: ALLOWED_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
-			directInsert: shouldDirectInsert,
+			directInsert: true,
 		}
 	);
 

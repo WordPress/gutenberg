@@ -2,10 +2,12 @@
  * External dependencies
  */
 import {
+	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
-	TouchableWithoutFeedback,
+	Pressable,
 	Platform,
+	TouchableWithoutFeedback,
 } from 'react-native';
 
 /**
@@ -63,6 +65,10 @@ class AztecView extends Component {
 		this._onAztecFocus = this._onAztecFocus.bind( this );
 		this.blur = this.blur.bind( this );
 		this.focus = this.focus.bind( this );
+	}
+
+	componentWillUnmount() {
+		AztecInputState.blurOnUnmount( this.aztecViewRef.current );
 	}
 
 	dispatch( command, params ) {
@@ -229,6 +235,22 @@ class AztecView extends Component {
 		return focusedElement && focusedElement === this.aztecViewRef.current;
 	}
 
+	onRemoveMarkFormatting() {
+		UIManager.dispatchViewManagerCommand(
+			findNodeHandle( this.aztecViewRef.current ),
+			'onRemoveMarkFormatting',
+			[]
+		);
+	}
+
+	onMarkFormatting( color ) {
+		UIManager.dispatchViewManagerCommand(
+			findNodeHandle( this.aztecViewRef.current ),
+			'onMarkFormatting',
+			[ color ]
+		);
+	}
+
 	_onPress( event ) {
 		if ( ! this.isFocused() ) {
 			this.focus(); // Call to move the focus in RN way (TextInputState)
@@ -304,8 +326,17 @@ class AztecView extends Component {
 			delete style.fontSize;
 		}
 
+		// We need to use `Pressable` on iOS to avoid issues with VoiceOver and assistive
+		// input like the Braille Screen Input.
+		// More information about this can be found in https://github.com/WordPress/gutenberg/pull/53895.
+		const TouchableComponent =
+			Platform.OS === 'ios' ? Pressable : TouchableWithoutFeedback;
+
 		return (
-			<TouchableWithoutFeedback onPress={ this._onPress }>
+			<TouchableComponent
+				accessible={ Platform.OS !== 'ios' }
+				onPress={ this._onPress }
+			>
 				<RCTAztecView
 					{ ...otherProps }
 					style={ style }
@@ -322,7 +353,7 @@ class AztecView extends Component {
 					onBlur={ this._onBlur }
 					ref={ this.aztecViewRef }
 				/>
-			</TouchableWithoutFeedback>
+			</TouchableComponent>
 		);
 	}
 }

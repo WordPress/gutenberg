@@ -5,6 +5,10 @@ import { createSlotFill } from '@wordpress/components';
 
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
 const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
+const InspectorControlsBindings = createSlotFill( 'InspectorControlsBindings' );
+const InspectorControlsBackground = createSlotFill(
+	'InspectorControlsBackground'
+);
 const InspectorControlsBorder = createSlotFill( 'InspectorControlsBorder' );
 const InspectorControlsColor = createSlotFill( 'InspectorControlsColor' );
 const InspectorControlsFilter = createSlotFill( 'InspectorControlsFilter' );
@@ -17,19 +21,23 @@ const InspectorControlsTypography = createSlotFill(
 );
 const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
 const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
+const InspectorControlsEffects = createSlotFill( 'InspectorControlsEffects' );
 
 const groups = {
 	default: InspectorControlsDefault,
 	advanced: InspectorControlsAdvanced,
+	background: InspectorControlsBackground,
+	bindings: InspectorControlsBindings,
 	border: InspectorControlsBorder,
 	color: InspectorControlsColor,
-	filter: InspectorControlsFilter,
 	dimensions: InspectorControlsDimensions,
+	effects: InspectorControlsEffects,
+	filter: InspectorControlsFilter,
 	list: InspectorControlsListView,
+	position: InspectorControlsPosition,
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
-	position: InspectorControlsPosition,
 };
 
 export default groups;

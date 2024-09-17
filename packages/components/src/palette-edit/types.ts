@@ -116,11 +116,8 @@ export type OptionProps< T extends Color | Gradient > = {
 	onChange: ( newElement: T ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	isEditing: boolean;
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
-	onStartEditing: () => void;
-	onStopEditing: () => void;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	slugPrefix: string;
 };
@@ -130,6 +127,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	onChange: ( newElements?: T[] ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+	addColorRef: React.RefObject< HTMLButtonElement >;
 	editingElement?: EditingElement;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;

@@ -1,14 +1,16 @@
 # Create Block Tutorial Template
 
-This is a template for [`@wordpress/create-block`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md) that is the finished version of the block in the official [WordPress Tutorial](https://github.com/WordPress/gutenberg/tree/HEAD/docs/getting-started/create-block/README.md) for the block editor.
+This is a template for [`@wordpress/create-block`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/create-block/README.md) that creates an example "Copyright Date" block. This block is used in the official WordPress block development [Quick Start Guide](https://developer.wordpress.org/block-editor/getting-started/quick-start-guide).
 
 ## Usage
 
 This block template can be used by running the following command:
 
 ```bash
-npx  @wordpress/create-block --template @wordpress/create-block-tutorial-template
+npx @wordpress/create-block --template @wordpress/create-block-tutorial-template
 ```
+
+Use the default options when prompted in the terminal.
 
 ## Contributing to this package
 

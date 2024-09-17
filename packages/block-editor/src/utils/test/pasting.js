@@ -11,20 +11,19 @@ const mocks = {
 
 describe( 'shouldDismissPastedFiles', () => {
 	it( 'should return false when no HTML is present', () => {
-		expect(
-			shouldDismissPastedFiles( [ mocks.pngImageFile ], '', '' )
-		).toBe( false );
+		expect( shouldDismissPastedFiles( [ mocks.pngImageFile ], '' ) ).toBe(
+			false
+		);
 	} );
 	it( 'should return false when file is not an image', () => {
-		expect(
-			shouldDismissPastedFiles( [ mocks.documentFile ], '', '' )
-		).toBe( false );
+		expect( shouldDismissPastedFiles( [ mocks.documentFile ], '' ) ).toBe(
+			false
+		);
 	} );
 	it( 'should return false when multiple images are present', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile, mocks.jpgImageFile ],
-				'',
 				''
 			)
 		).toBe( false );
@@ -33,8 +32,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<img src="path.png">',
-				''
+				'<img src="path.png">'
 			)
 		).toBe( false );
 	} );
@@ -42,8 +40,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<img src="1.png"><br><img src="2.png">',
-				''
+				'<img src="1.png"><br><img src="2.png">'
 			)
 		).toBe( true );
 	} );
@@ -56,8 +53,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<img src="https://lh3.googleusercontent.com/ab/SOMESTRING?authuser=0">',
-				'https://lh3.googleusercontent.com/ab/SOMESTRING?authuser=0'
+				'<img src="https://lh3.googleusercontent.com/ab/SOMESTRING?authuser=0">'
 			)
 		).toBe( false );
 	} );
@@ -66,8 +62,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<figure><img src="blob:..."></figure>',
-				''
+				'<figure><img src="blob:..."></figure>'
 			)
 		).toBe( false );
 	} );
@@ -76,8 +71,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<meta charset="UTF-8"><table>Some table text</table>',
-				'Some table text'
+				'<meta charset="UTF-8"><table>Some table text</table>'
 			)
 		).toBe( true );
 	} );
@@ -86,8 +80,7 @@ describe( 'shouldDismissPastedFiles', () => {
 		expect(
 			shouldDismissPastedFiles(
 				[ mocks.pngImageFile ],
-				'<p>A</p><img src="file:////.../clip_image001.png" alt="..."><p>B</p>',
-				'A\nB'
+				'<p>A</p><img src="file:////.../clip_image001.png" alt="..."><p>B</p>'
 			)
 		).toBe( true );
 	} );

@@ -6,6 +6,7 @@ import type { BaseControlProps } from '../base-control/types';
 export type ComboboxControlOption = {
 	label: string;
 	value: string;
+	disabled?: boolean;
 	[ key: string ]: any;
 };
 
@@ -30,6 +31,7 @@ export type ComboboxControlProps = Pick<
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
@@ -44,6 +46,13 @@ export type ComboboxControlProps = Pick<
 	 * @default true
 	 */
 	allowReset?: boolean;
+	/**
+	 * Automatically expand the dropdown when the control is focused.
+	 * If the control is clicked, the dropdown will expand regardless of this prop.
+	 *
+	 * @default true
+	 */
+	expandOnFocus?: boolean;
 	/**
 	 * Customizable UI messages.
 	 */
@@ -73,4 +82,8 @@ export type ComboboxControlProps = Pick<
 	 * The current value of the control.
 	 */
 	value?: string | null;
+	/**
+	 * If passed, the combobox input will show a placeholder string if no values are present.
+	 */
+	placeholder?: string;
 };

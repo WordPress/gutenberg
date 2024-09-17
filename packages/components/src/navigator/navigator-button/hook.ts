@@ -7,10 +7,10 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { useContextSystem } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import Button from '../../button';
-import useNavigator from '../use-navigator';
+import { useNavigator } from '../use-navigator';
 import type { NavigatorButtonProps } from '../types';
 
 const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>

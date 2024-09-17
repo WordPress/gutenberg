@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import type { ChangeEvent } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +10,51 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import { StyledTextarea } from './styles/textarea-control-styles';
 import type { TextareaControlProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+
+function UnforwardedTextareaControl(
+	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
+	ref: React.ForwardedRef< HTMLTextAreaElement >
+) {
+	const {
+		__nextHasNoMarginBottom,
+		label,
+		hideLabelFromVision,
+		value,
+		help,
+		onChange,
+		rows = 4,
+		className,
+		...additionalProps
+	} = props;
+	const instanceId = useInstanceId( TextareaControl );
+	const id = `inspector-textarea-control-${ instanceId }`;
+	const onChangeValue = ( event: React.ChangeEvent< HTMLTextAreaElement > ) =>
+		onChange( event.target.value );
+
+	return (
+		<BaseControl
+			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="TextareaControl"
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+			id={ id }
+			help={ help }
+			className={ className }
+		>
+			<StyledTextarea
+				className="components-textarea-control__input"
+				id={ id }
+				rows={ rows }
+				onChange={ onChangeValue }
+				aria-describedby={ !! help ? id + '__help' : undefined }
+				value={ value }
+				ref={ ref }
+				{ ...additionalProps }
+			/>
+		</BaseControl>
+	);
+}
 
 /**
  * TextareaControls are TextControls that allow for multiple lines of text, and
@@ -30,6 +70,7 @@ import type { WordPressComponentProps } from '../ui/context';
  *
  *   return (
  *     <TextareaControl
+ *       __nextHasNoMarginBottom
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }
@@ -39,45 +80,6 @@ import type { WordPressComponentProps } from '../ui/context';
  * };
  * ```
  */
-export function TextareaControl(
-	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
-) {
-	const {
-		__nextHasNoMarginBottom,
-		label,
-		hideLabelFromVision,
-		value,
-		help,
-		onChange,
-		rows = 4,
-		className,
-		...additionalProps
-	} = props;
-	const instanceId = useInstanceId( TextareaControl );
-	const id = `inspector-textarea-control-${ instanceId }`;
-	const onChangeValue = ( event: ChangeEvent< HTMLTextAreaElement > ) =>
-		onChange( event.target.value );
-
-	return (
-		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-			id={ id }
-			help={ help }
-			className={ className }
-		>
-			<StyledTextarea
-				className="components-textarea-control__input"
-				id={ id }
-				rows={ rows }
-				onChange={ onChangeValue }
-				aria-describedby={ !! help ? id + '__help' : undefined }
-				value={ value }
-				{ ...additionalProps }
-			/>
-		</BaseControl>
-	);
-}
+export const TextareaControl = forwardRef( UnforwardedTextareaControl );
 
 export default TextareaControl;

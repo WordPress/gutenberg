@@ -9,8 +9,8 @@ This feature is still experimental. “Experimental” means this is an early im
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
@@ -115,8 +115,8 @@ Collection of available units.
 Example:
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
@@ -147,3 +147,10 @@ Example:
 ```
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`

@@ -4,7 +4,6 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useGlobalStyles } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -19,8 +18,9 @@ import InspectorControls from '../inspector-controls';
 import {
 	useHasColorPanel,
 	useHasTextPanel,
-	useHasBackgroundPanel,
+	useHasBackgroundColorPanel,
 } from './color-panel.js';
+import { useGlobalStyles } from './use-global-styles-context';
 
 const ColorPanel = ( {
 	value,
@@ -95,7 +95,7 @@ const ColorPanel = ( {
 	);
 
 	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const setBackgroundColor = useCallback(

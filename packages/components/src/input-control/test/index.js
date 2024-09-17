@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import BaseInputControl from '../';
 
-const setupUser = () => userEvent.setup();
-
 const getInput = () => screen.getByTestId( 'input' );
 
 describe( 'InputControl', () => {
@@ -55,7 +53,7 @@ describe( 'InputControl', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should render help as aria-details when not plain text', () => {
+		it( 'should still render help as aria-describedby when not plain text', () => {
 			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
 
 			const input = screen.getByRole( 'textbox' );
@@ -63,14 +61,14 @@ describe( 'InputControl', () => {
 
 			expect(
 				// eslint-disable-next-line testing-library/no-node-access
-				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
+				help.closest( `#${ input.getAttribute( 'aria-describedby' ) }` )
 			).toBeVisible();
 		} );
 	} );
 
 	describe( 'Ensurance of focus for number inputs', () => {
 		it( 'should focus its input on mousedown events', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render( <InputControl type="number" onFocus={ spy } /> );
 			const target = getInput();
@@ -87,7 +85,7 @@ describe( 'InputControl', () => {
 
 	describe( 'Value', () => {
 		it( 'should update value onChange', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render(
 				<InputControl value="Hello" onChange={ ( v ) => spy( v ) } />
@@ -102,7 +100,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			const heldKeySet = new Set();
 			const Example = () => {
@@ -114,10 +112,13 @@ describe( 'InputControl', () => {
 				const onKeyDown = ( { key } ) => {
 					heldKeySet.add( key );
 					if ( key === 'Escape' ) {
-						if ( heldKeySet.has( 'Meta' ) ) setState( 'qux' );
-						else if ( heldKeySet.has( 'Alt' ) )
+						if ( heldKeySet.has( 'Meta' ) ) {
+							setState( 'qux' );
+						} else if ( heldKeySet.has( 'Alt' ) ) {
 							setState( undefined );
-						else setState( '' );
+						} else {
+							setState( '' );
+						}
 					}
 				};
 				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
@@ -173,7 +174,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should not commit value until blurred when isPressEnterToChange is true', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spy = jest.fn();
 			render(
 				<InputControl
@@ -193,7 +194,7 @@ describe( 'InputControl', () => {
 		} );
 
 		it( 'should commit value when blurred if value is invalid', async () => {
-			const user = setupUser();
+			const user = await userEvent.setup();
 			const spyChange = jest.fn();
 			render(
 				<InputControl
@@ -206,8 +207,9 @@ describe( 'InputControl', () => {
 						if (
 							action.type === 'COMMIT' &&
 							action.payload.event.type === 'blur'
-						)
+						) {
 							value = value.replace( /\bnow\b/, 'meow' );
+						}
 
 						return { ...state, value };
 					} }

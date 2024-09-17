@@ -9,10 +9,20 @@ import { filterURLForDisplay, safeDecodeURIComponent } from '@wordpress/url';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Represents a label component for a post URL.
+ *
+ * @return {Component} The PostURLLabel component.
+ */
 export default function PostURLLabel() {
 	return usePostURLLabel();
 }
 
+/**
+ * Custom hook to get the label for the post URL.
+ *
+ * @return {string} The filtered and decoded post URL label.
+ */
 export function usePostURLLabel() {
 	const postLink = useSelect(
 		( select ) => select( editorStore ).getPermalink(),

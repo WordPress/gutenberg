@@ -1,0 +1,204 @@
+// Fixed height for the modal footer.
+// Ensures that the footer is always visible when the modal content is scrollable.
+$footer-height: 70px;
+
+.font-library-modal {
+	// @todo If a new prop is added to the Modal component that constrains
+	// the content width, we should use that prop instead of this style.
+	// see https://github.com/WordPress/gutenberg/issues/54471.
+	&.font-library-modal {
+		@include break-medium() {
+			width: 65vw;
+		}
+	}
+
+	.components-modal__header {
+		border-bottom: none;
+	}
+
+	.components-modal__content {
+		padding-top: 0;
+		margin-bottom: $footer-height;
+	}
+
+	.font-library-modal__subtitle {
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+	}
+
+	// Add padding so the focus state outline (box-shadow) of font list items is visible
+	.components-navigator-screen {
+		padding: 3px;
+	}
+}
+
+.font-library-modal__tabpanel-layout {
+	margin-top: $grid-unit-40;
+
+	.font-library-modal__loading {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		position: absolute;
+		left: 0;
+		top: 0;
+		align-items: center;
+		justify-content: center;
+		// Push down so that the progress bar is centered vertically.
+		// It should be 120px (72px modal header height + 48px tab height)
+		padding-top: $header-height + $grid-unit-15 + $grid-unit-60;
+	}
+}
+
+.font-library-modal__footer {
+	border-top: 1px solid $gray-300;
+	margin: 0 #{$grid-unit-40 * -1} #{$grid-unit-40 * -1};
+	padding: $grid-unit-20 $grid-unit-40;
+	position: absolute;
+	bottom: $grid-unit-40;
+	width: 100%;
+	height: $footer-height;
+	background-color: $white;
+}
+
+.font-library-modal__page-selection {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
+}
+
+// TODO: See if this can be removed after https://github.com/WordPress/gutenberg/issues/38730
+.font-library-modal__tabpanel-layout .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.font-library-modal__fonts-title {
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 600;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library-modal__fonts-list {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library-modal__fonts-list-item {
+	margin-bottom: 0;
+}
+
+.font-library-modal__font-card {
+	border: $border-width solid $gray-200;
+	width: 100%;
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756147260
+	height: auto !important;
+
+	padding: $grid-unit-20;
+	margin-top: -1px; /* To collapse the margin with the previous element */
+
+	&:hover {
+		background-color: $gray-100;
+	}
+
+	.font-library-modal__font-card__name {
+		font-weight: bold;
+	}
+
+	.font-library-modal__font-card__count {
+		color: $gray-700;
+	}
+
+	.font-library-modal__font-variant_demo-image {
+		display: block;
+		height: $grid-unit-30;
+		width: auto;
+	}
+
+	.font-library-modal__font-variant_demo-text {
+		white-space: nowrap;
+		flex-shrink: 0;
+		transition: opacity 0.3s ease-in-out;
+		@include reduce-motion("transition");
+	}
+}
+
+.font-library-modal__font-variant {
+	border-bottom: 1px solid $gray-200;
+	padding-bottom: $grid-unit-20;
+}
+
+.font-library-modal__tablist {
+	position: sticky;
+	top: 0;
+	border-bottom: 1px solid $gray-300;
+	background: $white;
+	margin: 0 #{$grid-unit-40 * -1};
+	padding: 0 $grid-unit-20;
+	z-index: 1;
+}
+
+
+.font-library-modal__upload-area {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+
+	// Override the default 40px height set by the Button component.
+	// Ref - https://github.com/WordPress/gutenberg/pull/65258#discussion_r1756155039
+	height: $grid-unit-80 * 4 !important; // 256px
+
+	width: 100%;
+}
+
+button.font-library-modal__upload-area {
+	background-color: $gray-100;
+}
+
+.font-library-modal__local-fonts {
+	margin: 0 auto;
+	width: 80%;
+
+	.font-library-modal__upload-area__text {
+		color: $gray-700;
+	}
+}
+
+.font-library__google-fonts-confirm {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top: $grid-unit-80;
+
+	p {
+		line-height: $default-line-height;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: 400;
+	}
+
+	.components-card {
+		padding: $grid-unit-20;
+		width: 400px;
+	}
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+}
+
+.font-library-modal__select-all {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 + $border-width;
+
+	.components-checkbox-control__label {
+		padding-left: $grid-unit-20;
+	}
+}

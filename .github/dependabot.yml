@@ -10,5 +10,17 @@ updates:
       open-pull-requests-limit: 10
       labels:
           - 'GitHub Actions'
-          - 'Automated Testing'
           - '[Type] Build Tooling'
+      groups:
+          github-actions:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'
+          react-native:
+              patterns:
+                  - 'actions/setup-java'
+                  - 'gradle/*'
+                  - 'reactivecircus/*'

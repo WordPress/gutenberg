@@ -9,6 +9,7 @@ test.describe( 'missing block', () => {
 	} );
 
 	test( 'should strip potentially malicious on* attributes', async ( {
+		editor,
 		page,
 	} ) => {
 		let hasAlert = false;
@@ -17,12 +18,9 @@ test.describe( 'missing block', () => {
 			hasAlert = true;
 		} );
 
-		await page.evaluate( () => {
-			const block = window.wp.blocks.parse(
-				`<!-- wp:non-existing-block-here --><img src onerror=alert(1)>`
-			);
-			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks( block );
-		} );
+		await editor.setContent(
+			`<!-- wp:non-existing-block-here --><img src onerror=alert(1)>`
+		);
 
 		// Give the browser time to show the alert.
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
@@ -31,6 +29,7 @@ test.describe( 'missing block', () => {
 	} );
 
 	test( 'should strip potentially malicious script tags', async ( {
+		editor,
 		page,
 	} ) => {
 		let hasAlert = false;
@@ -39,12 +38,9 @@ test.describe( 'missing block', () => {
 			hasAlert = true;
 		} );
 
-		await page.evaluate( () => {
-			const block = window.wp.blocks.parse(
-				`<!-- wp:non-existing-block-here --><script>alert("EVIL");</script>`
-			);
-			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks( block );
-		} );
+		await editor.setContent(
+			`<!-- wp:non-existing-block-here --><script>alert("EVIL");</script>`
+		);
 
 		// Give the browser time to show the alert.
 		await page.evaluate( () => new Promise( window.requestIdleCallback ) );

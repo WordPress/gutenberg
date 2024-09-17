@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { menu } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
@@ -22,7 +22,7 @@ import type {
 } from './types';
 
 function mergeProps<
-	T extends { className?: string; [ key: string ]: unknown }
+	T extends { className?: string; [ key: string ]: unknown },
 >( defaultProps: Partial< T > = {}, props: T = {} as T ) {
 	const mergedProps: T = {
 		...defaultProps,
@@ -30,10 +30,7 @@ function mergeProps<
 	};
 
 	if ( props.className && defaultProps.className ) {
-		mergedProps.className = classnames(
-			props.className,
-			defaultProps.className
-		);
+		mergedProps.className = clsx( props.className, defaultProps.className );
 	}
 
 	return mergedProps;
@@ -56,6 +53,10 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		disableOpenOnArrowDown = false,
 		text,
 		noIcons,
+
+		open,
+		defaultOpen,
+		onToggle: onToggleProp,
 
 		// Context
 		variant,
@@ -109,12 +110,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 				const mergedToggleProps = mergeProps(
 					{
-						className: classnames(
-							'components-dropdown-menu__toggle',
-							{
-								'is-opened': isOpen,
-							}
-						),
+						className: clsx( 'components-dropdown-menu__toggle', {
+							'is-opened': isOpen,
+						} ),
 					},
 					restToggleProps
 				);
@@ -153,10 +151,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 				const mergedMenuProps = mergeProps(
 					{
 						'aria-label': label,
-						className: classnames(
-							'components-dropdown-menu__menu',
-							{ 'no-icons': noIcons }
-						),
+						className: clsx( 'components-dropdown-menu__menu', {
+							'no-icons': noIcons,
+						} ),
 					},
 					menuProps
 				);
@@ -178,7 +175,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 											control.onClick();
 										}
 									} }
-									className={ classnames(
+									className={ clsx(
 										'components-dropdown-menu__menu-item',
 										{
 											'has-separator':
@@ -202,6 +199,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 											? control.role
 											: 'menuitem'
 									}
+									accessibleWhenDisabled
 									disabled={ control.isDisabled }
 								>
 									{ control.title }
@@ -211,6 +209,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 					</NavigableMenu>
 				);
 			} }
+			open={ open }
+			defaultOpen={ defaultOpen }
+			onToggle={ onToggleProp }
 		/>
 	);
 }

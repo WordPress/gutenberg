@@ -38,6 +38,8 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
@@ -51,17 +53,20 @@ class URLInputButton extends Component {
 					>
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								className="block-editor-url-input__back"
 								icon={ arrowLeft }
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
 							<URLInput
-								__nextHasNoMarginBottom
 								value={ url || '' }
 								onChange={ onChange }
 							/>
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								icon={ keyboardReturn }
 								label={ __( 'Submit' ) }
 								type="submit"

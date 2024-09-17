@@ -29,9 +29,9 @@
  * @example
  *
  *```js
+ * import { useEffect } from 'react';
  * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * import { useSelect, useDispatch } from '@wordpress/data';
- * import { useEffect } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  *
  * const ExampleComponent = () => {
@@ -91,22 +91,22 @@ export function registerShortcut( {
  * @example
  *
  *```js
+ * import { useEffect } from 'react';
  * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * import { useSelect, useDispatch } from '@wordpress/data';
- * import { useEffect } from '@wordpress/element';
  * import { __ } from '@wordpress/i18n';
  *
  * const ExampleComponent = () => {
  *     const { unregisterShortcut } = useDispatch( keyboardShortcutsStore );
  *
  *     useEffect( () => {
- *         unregisterShortcut( 'core/edit-post/next-region' );
+ *         unregisterShortcut( 'core/editor/next-region' );
  *     }, [] );
  *
  *     const shortcut = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getShortcutKeyCombination(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );

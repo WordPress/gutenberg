@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../ui/context';
+import { useContextSystem, contextConnect } from '../context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -94,6 +94,7 @@ const UnconnectedColorPicker = (
 						}
 						label={ __( 'Color format' ) }
 						hideLabelFromVision
+						variant="minimal"
 					/>
 					<ColorCopyButton
 						color={ safeColordColor }

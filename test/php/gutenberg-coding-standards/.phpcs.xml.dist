@@ -1,14 +1,7 @@
 <?xml version="1.0"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="WordPress Coding Standards" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Gutenberg Coding Standards" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd">
 
 	<description>The Coding standard for the Gutenberg Coding Standards itself.</description>
-
-	<!--
-	#############################################################################
-	COMMAND LINE ARGUMENTS
-	https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-Ruleset
-	#############################################################################
-	-->
 
 	<file>.</file>
 
@@ -27,7 +20,6 @@
 	<!-- Check up to 8 files simultaneously. -->
 	<arg name="parallel" value="8"/>
 
-
 	<!--
 	#############################################################################
 	SET UP THE RULESETS
@@ -38,51 +30,15 @@
 		<!-- This project needs to comply with naming standards from PHPCS, not WP. -->
 		<exclude name="WordPress.Files.FileName"/>
 		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
+	</rule>
 
-		<!-- While conditions with assignments are a typical way to walk the token stream. -->
-		<exclude name="Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition"/>
-
-		<!-- The code in this project is run in the context of PHPCS, not WP. -->
-		<exclude name="WordPress.DateTime"/>
-		<exclude name="WordPress.DB"/>
-		<exclude name="WordPress.Security"/>
-		<exclude name="WordPress.WP"/>
-
-		<!-- Linting is done in a separate CI job, no need to duplicate it. -->
-		<exclude name="Generic.PHP.Syntax"/>
-		<!--This rule should only be applied to code that is intended to be merged into Core. -->
-		<exclude name="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames"/>
+	<rule ref="Squiz.Commenting.FunctionCommentThrowTag.Missing">
+		<exclude-pattern>/Gutenberg/Tests/.+$</exclude-pattern>
 	</rule>
 
 	<!-- Check code for cross-version PHP compatibility. -->
-	<config name="testVersion" value="5.4-"/>
-	<rule ref="PHPCompatibility">
-		<!-- Exclude PHP constants back-filled by PHPCS. -->
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_finallyFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_yieldFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_ellipsisFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_powFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_pow_equalFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_spaceshipFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_coalesceFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_coalesce_equalFound"/>
-		<exclude name="PHPCompatibility.Constants.NewConstants.t_yield_fromFound"/>
-	</rule>
+	<config name="testVersion" value="7.0-"/>
 
 	<!-- Enforce PSR1 compatible namespaces. -->
 	<rule ref="PSR1.Classes.ClassDeclaration"/>
-
-	<!--
-	#############################################################################
-	SNIFF SPECIFIC CONFIGURATION
-	#############################################################################
-	-->
-
-	<rule ref="WordPress.Arrays.MultipleStatementAlignment">
-		<properties>
-			<property name="alignMultilineItems" value="!=100"/>
-			<property name="exact" value="false" phpcs-only="true"/>
-		</properties>
-	</rule>
-
 </ruleset>

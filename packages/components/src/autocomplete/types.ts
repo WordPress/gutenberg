@@ -1,7 +1,11 @@
 /**
+ * External dependencies
+ */
+import type { ReactElement } from 'react';
+
+/**
  * WordPress dependencies
  */
-import type { WPElement } from '@wordpress/element';
 import type { RichTextValue } from '@wordpress/rich-text';
 
 /**
@@ -20,7 +24,7 @@ export type ReplaceOption = { action: 'replace'; value: RichTextValue };
 
 export type OptionCompletion = React.ReactNode | InsertOption | ReplaceOption;
 
-type OptionLabel = string | WPElement | Array< string | WPElement >;
+type OptionLabel = string | ReactElement | Array< string | ReactElement >;
 export type KeyedOption = {
 	key: string;
 	value: any;
@@ -196,9 +200,8 @@ export type AutocompleteProps = UseAutocompleteProps & {
 		props: Omit< ReturnType< typeof useAutocomplete >, 'popover' >
 	) => React.ReactNode;
 	/**
-	 * Whether or not the Autocomplte componenet is selected, and if its
-	 * `Popover`
-	 * should be displayed.
+	 * Whether or not the Autocomplete component is selected, and if its
+	 * `Popover` should be displayed.
 	 */
 	isSelected: boolean;
 };

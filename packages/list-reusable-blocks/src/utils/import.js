@@ -31,7 +31,7 @@ async function importReusableBlock( file ) {
 		( parsedContent.syncStatus &&
 			typeof parsedContent.syncStatus !== 'string' )
 	) {
-		throw new Error( 'Invalid Pattern JSON file' );
+		throw new Error( 'Invalid pattern JSON file' );
 	}
 	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
 	const reusableBlock = await apiFetch( {

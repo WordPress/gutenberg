@@ -14,14 +14,14 @@ import {
 } from '../base-control/styles/base-control-styles';
 import { LabelWrapper } from '../input-control/styles/input-control-styles';
 import { COLORS, CONFIG, rtl } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 
 const toolsPanelGrid = {
 	columns: ( columns: number ) => css`
 		grid-template-columns: ${ `repeat( ${ columns }, minmax(0, 1fr) )` };
 	`,
 	spacing: css`
-		column-gap: ${ space( 2 ) };
+		column-gap: ${ space( 4 ) };
 		row-gap: ${ space( 4 ) };
 	`,
 	item: {

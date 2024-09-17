@@ -35,6 +35,13 @@ import {
 	writeBlockFixtureSerializedHTML,
 } from '../fixtures';
 
+/* eslint-disable no-restricted-syntax */
+import * as form from '@wordpress/block-library/src/form';
+import * as formInput from '@wordpress/block-library/src/form-input';
+import * as formSubmitButton from '@wordpress/block-library/src/form-submit-button';
+import * as formSubmissionNotification from '@wordpress/block-library/src/form-submission-notification';
+/* eslint-enable no-restricted-syntax */
+
 const blockBasenames = getAvailableBlockFixturesBasenames();
 
 /**
@@ -64,7 +71,18 @@ describe( 'full post content fixture', () => {
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		registerCoreBlocks();
-		if ( process.env.IS_GUTENBERG_PLUGIN ) {
+
+		// Form-related blocks will not be registered unless they are opted
+		// in on the experimental settings page. Therefore, these blocks
+		// must be explicitly registered.
+		registerCoreBlocks( [
+			form,
+			formInput,
+			formSubmitButton,
+			formSubmissionNotification,
+		] );
+
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );

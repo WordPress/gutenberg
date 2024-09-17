@@ -40,6 +40,9 @@ export default function useInnerBlockTemplateSync(
 	templateLock,
 	templateInsertUpdatesSelection
 ) {
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+
 	const {
 		getBlocks,
 		getSelectedBlocksInitialCaretPosition,
@@ -48,15 +51,8 @@ export default function useInnerBlockTemplateSync(
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { innerBlocks } = useSelect(
-		( select ) => ( {
-			innerBlocks: select( blockEditorStore ).getBlocks( clientId ),
-		} ),
-		[ clientId ]
-	);
-
 	// Maintain a reference to the previous value so we can do a deep equality check.
-	const existingTemplate = useRef( null );
+	const existingTemplateRef = useRef( null );
 
 	useLayoutEffect( () => {
 		let isCancelled = false;
@@ -80,14 +76,14 @@ export default function useInnerBlockTemplateSync(
 
 			const hasTemplateChanged = ! fastDeepEqual(
 				template,
-				existingTemplate.current
+				existingTemplateRef.current
 			);
 
 			if ( ! shouldApplyTemplate || ! hasTemplateChanged ) {
 				return;
 			}
 
-			existingTemplate.current = template;
+			existingTemplateRef.current = template;
 			const nextBlocks = synchronizeBlocksWithTemplate(
 				currentInnerBlocks,
 				template
@@ -114,5 +110,5 @@ export default function useInnerBlockTemplateSync(
 		return () => {
 			isCancelled = true;
 		};
-	}, [ innerBlocks, template, templateLock, clientId ] );
+	}, [ template, templateLock, clientId ] );
 }

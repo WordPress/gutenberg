@@ -19,6 +19,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { getBlockClientId, isInSameBlock } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { getSelectionRoot } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -114,6 +115,10 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		if ( node.closest( '[inert]' ) ) {
+			return;
+		}
+
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (
@@ -186,8 +191,7 @@ export default function useArrowNav() {
 				return;
 			}
 
-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
-				event;
+			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -228,6 +232,11 @@ export default function useArrowNav() {
 
 				return;
 			}
+
+			const target =
+				ownerDocument.activeElement === node
+					? getSelectionRoot( ownerDocument )
+					: event.target;
 
 			// Abort if our current target is not a candidate for navigation
 			// (e.g. preserve native input behaviors).
@@ -270,6 +279,7 @@ export default function useArrowNav() {
 				( altKey ? isHorizontalEdge( target, isReverseDir ) : true ) &&
 				! keepCaretInsideBlock
 			) {
+				node.contentEditable = false;
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverse,
@@ -293,6 +303,7 @@ export default function useArrowNav() {
 				isHorizontalEdge( target, isReverseDir ) &&
 				! keepCaretInsideBlock
 			) {
+				node.contentEditable = false;
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverseDir,

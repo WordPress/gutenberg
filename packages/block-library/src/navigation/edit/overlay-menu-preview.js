@@ -20,14 +20,16 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
 				__nextHasNoMarginBottom
 				label={ __( 'Show icon button' ) }
 				help={ __(
-					'Configure the visual appearance of the button opening the overlay menu.'
+					'Configure the visual appearance of the button that toggles the overlay menu.'
 				) }
 				onChange={ ( value ) => setAttributes( { hasIcon: value } ) }
 				checked={ hasIcon }
 			/>
 
 			<ToggleGroupControl
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
+				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }
 				onChange={ ( value ) => setAttributes( { icon: value } ) }

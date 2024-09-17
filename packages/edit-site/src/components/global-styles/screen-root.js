@@ -24,11 +24,12 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
-import StylesPreview from './preview';
+import PreviewStyles from './preview-styles';
 import { unlock } from '../../lock-unlock';
 
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+
 function ScreenRoot() {
-	const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
 	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
@@ -47,18 +48,21 @@ function ScreenRoot() {
 			hasVariations:
 				!! __experimentalGetCurrentThemeGlobalStylesVariations()
 					?.length,
-			canEditCSS:
-				!! globalStyles?._links?.[ 'wp:action-edit-css' ] ?? false,
+			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
 
 	return (
-		<Card size="small" className="edit-site-global-styles-screen-root">
+		<Card
+			size="small"
+			className="edit-site-global-styles-screen-root"
+			isRounded={ false }
+		>
 			<CardBody>
 				<VStack spacing={ 4 }>
-					<Card>
-						<CardMedia>
-							<StylesPreview />
+					<Card className="edit-site-global-styles-screen-root__active-style-tile">
+						<CardMedia className="edit-site-global-styles-screen-root__active-style-tile-preview">
+							<PreviewStyles />
 						</CardMedia>
 					</Card>
 					{ hasVariations && (

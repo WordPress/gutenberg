@@ -321,7 +321,7 @@ describe( 'Basic rendering', () => {
 
 			// Click the "Edit" button to trigger into the editing mode.
 			const editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -379,7 +379,7 @@ describe( 'Basic rendering', () => {
 			render( <LinkControl value={ { url: 'https://example.com' } } /> );
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 
 			expect( unLinkButton ).not.toBeInTheDocument();
@@ -397,7 +397,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 			expect( unLinkButton ).toBeVisible();
 
@@ -418,7 +418,7 @@ describe( 'Basic rendering', () => {
 			);
 
 			const unLinkButton = screen.queryByRole( 'button', {
-				name: 'Unlink',
+				name: 'Remove link',
 			} );
 			expect( unLinkButton ).toBeVisible();
 
@@ -766,9 +766,6 @@ describe( 'Manual link entry', () => {
 					name: 'Save',
 				} );
 
-				// debug the UI state
-				// screen.debug();
-
 				// Verify the submission UI is disabled.
 				expect( submitButton ).toBeVisible();
 				expect( submitButton ).toHaveAttribute(
@@ -825,7 +822,7 @@ describe( 'Manual link entry', () => {
 
 			// Click the "Edit" button to trigger into the editing mode.
 			let editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -859,7 +856,7 @@ describe( 'Manual link entry', () => {
 
 			// Re-query the edit button as it's been replaced.
 			editButton = screen.queryByRole( 'button', {
-				name: 'Edit',
+				name: 'Edit link',
 			} );
 
 			await user.click( editButton );
@@ -939,6 +936,92 @@ describe( 'Manual link entry', () => {
 	} );
 } );
 
+describe( 'Link submission', () => {
+	it( 'should show a submit button when creating a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( {} );
+
+			return <LinkControl value={ link } onChange={ setLink } />;
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const submitButton = screen.getByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		expect( submitButton ).toBeVisible();
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( submitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( submitButton ).toBeVisible();
+
+		await user.type( searchInput, 'https://wordpress.org' );
+
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
+	it( 'should show a submit button when editing a link', async () => {
+		const user = userEvent.setup();
+
+		const LinkControlConsumer = () => {
+			const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+
+			return (
+				<LinkControl
+					forceIsEditingLink
+					value={ link }
+					onChange={ setLink }
+				/>
+			);
+		};
+
+		render( <LinkControlConsumer /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		const createSubmitButton = screen.queryByRole( 'button', {
+			name: 'Submit',
+		} );
+
+		// Check the submit button for "creation" of links is not displayed.
+		expect( createSubmitButton ).not.toBeInTheDocument();
+
+		const editSubmitButton = screen.getByRole( 'button', {
+			name: 'Save',
+		} );
+
+		expect( editSubmitButton ).toBeVisible();
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// Click the button and check it's not possible to prematurely submit the link.
+		await user.click( editSubmitButton );
+
+		expect( searchInput ).toBeVisible();
+		expect( editSubmitButton ).toBeVisible();
+
+		await user.type( searchInput, '#appendtolinktext' );
+
+		// As typing triggers the search handler, we need to wait for the
+		// search results to be returned. We can use the presence of the
+		// search results listbox as a proxy for this.
+		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+
+		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+} );
+
 describe( 'Default search suggestions', () => {
 	it( 'should display a list of initial search suggestions when there is no search value or suggestions', async () => {
 		render( <LinkControl showInitialSuggestions /> );
@@ -977,7 +1060,7 @@ describe( 'Default search suggestions', () => {
 		// shown.
 		const currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
-			name: 'Edit',
+			name: 'Edit link',
 		} );
 		await user.click( currentLinkBtn );
 
@@ -1135,9 +1218,8 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// Resolve the `createSuggestion` promise.
 			resolver();
 
-			const currentLink = await screen.findByLabelText(
-				'Currently selected'
-			);
+			const currentLink =
+				await screen.findByLabelText( 'Currently selected' );
 
 			expect( currentLink ).toHaveTextContent( entityNameText );
 			expect( currentLink ).toHaveTextContent( '/?p=123' );
@@ -1420,7 +1502,7 @@ describe( 'Selecting links', () => {
 
 		expect( currentLink ).toBeVisible();
 		expect(
-			screen.queryByRole( 'button', { name: 'Edit' } )
+			screen.queryByRole( 'button', { name: 'Edit link' } )
 		).toBeVisible();
 		expect( currentLinkAnchor ).toBeVisible();
 	} );
@@ -1445,7 +1527,7 @@ describe( 'Selecting links', () => {
 		// Required in order to select the button below.
 		let currentLinkUI = screen.getByLabelText( 'Currently selected' );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
-			name: 'Edit',
+			name: 'Edit link',
 		} );
 
 		// Simulate searching for a term.
@@ -1515,7 +1597,7 @@ describe( 'Selecting links', () => {
 
 				// Check that this suggestion is now shown as selected.
 				expect(
-					screen.getByRole( 'button', { name: 'Edit' } )
+					screen.getByRole( 'button', { name: 'Edit link' } )
 				).toBeVisible();
 				expect( currentLinkAnchor ).toBeVisible();
 			}
@@ -1627,7 +1709,7 @@ describe( 'Selecting links', () => {
 
 				expect( currentLink ).toBeVisible();
 				expect(
-					screen.getByRole( 'button', { name: 'Edit' } )
+					screen.getByRole( 'button', { name: 'Edit link' } )
 				).toBeVisible();
 				expect( currentLinkAnchor ).toBeVisible();
 			}
@@ -1734,65 +1816,6 @@ describe( 'Selecting links', () => {
 } );
 
 describe( 'Addition Settings UI', () => {
-	it( 'should allow toggling the "Opens in new tab" setting control (only) on the link preview', async () => {
-		const user = userEvent.setup();
-		const selectedLink = fauxEntitySuggestions[ 0 ];
-		const mockOnChange = jest.fn();
-
-		const customSettings = [
-			{
-				id: 'opensInNewTab',
-				title: 'Open in new tab',
-			},
-			{
-				id: 'noFollow',
-				title: 'No follow',
-			},
-		];
-
-		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( selectedLink );
-
-			return (
-				<LinkControl
-					value={ link }
-					settings={ customSettings }
-					onChange={ ( newVal ) => {
-						mockOnChange( newVal );
-						setLink( newVal );
-					} }
-				/>
-			);
-		};
-
-		render( <LinkControlConsumer /> );
-
-		const opensInNewTabField = screen.queryByRole( 'checkbox', {
-			name: 'Open in new tab',
-			checked: false,
-		} );
-
-		expect( opensInNewTabField ).toBeInTheDocument();
-
-		// No matter which settings are passed in only the `Opens in new tab`
-		// setting should be shown on the link preview (non-editing) state.
-		const noFollowField = screen.queryByRole( 'checkbox', {
-			name: 'No follow',
-		} );
-		expect( noFollowField ).not.toBeInTheDocument();
-
-		// Check that the link value is updated immediately upon checking
-		// the checkbox.
-		await user.click( opensInNewTabField );
-
-		expect( opensInNewTabField ).toBeChecked();
-
-		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
-		expect( mockOnChange ).toHaveBeenCalledWith( {
-			opensInNewTab: true,
-		} );
-	} );
-
 	it( 'should hide advanced link settings and toggle when not editing a link', async () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
@@ -2038,7 +2061,7 @@ describe( 'Post types', () => {
 describe( 'Rich link previews', () => {
 	const selectedLink = {
 		id: '1',
-		title: 'Wordpress.org', // Customize this for differentiation in assertions.
+		title: 'WordPress.org', // Customize this for differentiation in assertions.
 		url: 'https://www.wordpress.org',
 		type: 'URL',
 	};
@@ -2142,7 +2165,8 @@ describe( 'Rich link previews', () => {
 
 		const titlePreview = screen.getByText( selectedLink.title );
 
-		expect( titlePreview ).toHaveClass(
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( titlePreview.parentElement.parentElement ).toHaveClass(
 			'block-editor-link-control__search-item-title'
 		);
 	} );

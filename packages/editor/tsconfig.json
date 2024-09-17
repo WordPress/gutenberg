@@ -1,0 +1,39 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../api-fetch" },
+		{ "path": "../blob" },
+		{ "path": "../block-editor" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../date" },
+		{ "path": "../deprecated" },
+		{ "path": "../dom" },
+		{ "path": "../element" },
+		{ "path": "../fields" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes" },
+		{ "path": "../media-utils" },
+		{ "path": "../notices" },
+		{ "path": "../plugins" },
+		{ "path": "../private-apis" },
+		{ "path": "../rich-text" },
+		{ "path": "../url" },
+		{ "path": "../warning" },
+		{ "path": "../wordcount" }
+	],
+	"include": [ "src" ]
+}

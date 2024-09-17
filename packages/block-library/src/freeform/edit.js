@@ -75,25 +75,28 @@ function ClassicEdit( {
 	onReplace,
 } ) {
 	const { getMultiSelectedBlockClientIds } = useSelect( blockEditorStore );
-	const didMount = useRef( false );
+	const didMountRef = useRef( false );
 
 	useEffect( () => {
-		if ( ! didMount.current ) {
+		if ( ! didMountRef.current ) {
 			return;
 		}
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
-		const currentContent = editor?.getContent();
+		if ( ! editor ) {
+			return;
+		}
 
+		const currentContent = editor.getContent();
 		if ( currentContent !== content ) {
 			editor.setContent( content || '' );
 		}
-	}, [ content ] );
+	}, [ clientId, content ] );
 
 	useEffect( () => {
 		const { baseURL, suffix } = window.wpEditorL10n.tinymce;
 
-		didMount.current = true;
+		didMountRef.current = true;
 
 		window.tinymce.EditorManager.overrideDefaults( {
 			base_url: baseURL,
@@ -227,6 +230,7 @@ function ClassicEdit( {
 				onReadyStateChange
 			);
 			wp.oldEditor.remove( `editor-${ clientId }` );
+			didMountRef.current = false;
 		};
 	}, [] );
 

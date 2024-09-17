@@ -27,6 +27,13 @@ export type FocalPointPickerProps = Pick<
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
 	 *
 	 * @default true

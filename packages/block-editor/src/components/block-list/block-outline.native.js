@@ -13,16 +13,13 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './block.scss';
 
-const BLOCKS_WITH_OUTLINE = [ 'core/social-link', 'core/missing' ];
+const TEXT_BLOCKS_WITH_OUTLINE = [ 'core/missing', 'core/freeform' ];
+const DESIGN_BLOCKS_WITHOUT_OUTLINE = [ 'core/button', 'core/spacer' ];
+const MEDIA_BLOCKS_WITH_OUTLINE = [ 'core/audio', 'core/file' ];
 
-function BlockOutline( {
-	blockCategory,
-	hasInnerBlocks,
-	isRootList,
-	isSelected,
-	name,
-} ) {
-	const textBlockWithOutline = BLOCKS_WITH_OUTLINE.includes( name );
+function BlockOutline( { blockCategory, hasInnerBlocks, isSelected, name } ) {
+	const textBlockWithOutline = TEXT_BLOCKS_WITH_OUTLINE.includes( name );
+
 	const hasBlockTextCategory =
 		blockCategory === 'text' && ! textBlockWithOutline;
 	const hasBlockMediaCategory =
@@ -42,18 +39,39 @@ function BlockOutline( {
 		hasBlockTextCategory && styles.solidBorderTextContent,
 	];
 
-	const shoudlShowOutline =
-		isSelected &&
-		( ( hasBlockTextCategory && hasInnerBlocks ) ||
-			( ! hasBlockTextCategory && hasInnerBlocks ) ||
-			( ! hasBlockTextCategory && isRootList ) ||
-			textBlockWithOutline );
+	if ( ! isSelected ) {
+		return null;
+	}
 
-	return (
-		shoudlShowOutline && (
-			<View pointerEvents="box-none" style={ styleSolidBorder } />
-		)
-	);
+	let shouldShowOutline = true;
+	if ( hasBlockTextCategory && ! hasInnerBlocks ) {
+		shouldShowOutline = false;
+	} else if (
+		blockCategory === 'media' &&
+		! hasInnerBlocks &&
+		! MEDIA_BLOCKS_WITH_OUTLINE.includes( name )
+	) {
+		shouldShowOutline = false;
+	} else if ( blockCategory === 'media' && name === 'core/cover' ) {
+		shouldShowOutline = false;
+	} else if (
+		blockCategory === 'design' &&
+		DESIGN_BLOCKS_WITHOUT_OUTLINE.includes( name )
+	) {
+		shouldShowOutline = false;
+	}
+
+	if ( shouldShowOutline ) {
+		return (
+			<View
+				pointerEvents="box-none"
+				style={ styleSolidBorder }
+				testID="block-outline"
+			/>
+		);
+	}
+
+	return null;
 }
 
 export default BlockOutline;

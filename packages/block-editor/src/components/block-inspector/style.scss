@@ -11,10 +11,8 @@
 	}
 
 	.components-base-control {
-		margin-bottom: #{ $grid-unit-30 };
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
+		&:where(:not(:last-child)) {
+			margin-bottom: $grid-unit-20;
 		}
 	}
 
@@ -33,10 +31,6 @@
 
 		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
-	}
-
-	.block-editor-block-card {
-		padding: $grid-unit-20;
 	}
 }
 

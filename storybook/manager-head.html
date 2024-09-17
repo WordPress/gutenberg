@@ -1,0 +1,50 @@
+<script>
+	( function redirectIfStoryMoved() {
+		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
+			'alignmentmatrixcontrol',
+			'customselectcontrol-v2',
+			'dimensioncontrol',
+			'navigation',
+			'progressbar',
+			'theme',
+		];
+		const REDIRECTS = [
+			{
+				from: /\/components-deprecated-/,
+				to: '/components-',
+			},
+			{
+				from: new RegExp(
+					`\/components-experimental-(?=${ PREVIOUSLY_EXPERIMENTAL_COMPONENTS.map(
+						( str ) => `${ str }\\b`
+					).join( '|' ) })`
+				),
+				to: '/components-',
+			},
+		];
+
+		const params = new URLSearchParams( window.location.search );
+
+		const matchedRedirect = REDIRECTS.find( ( { from } ) =>
+			from.test( params.get( 'path' ) )
+		);
+
+		if ( ! matchedRedirect ) {
+			return;
+		}
+
+		params.set(
+			'path',
+			params
+				.get( 'path' )
+				.replace( matchedRedirect.from, matchedRedirect.to )
+		);
+
+		const { pathname, origin } = window.location;
+		// The decodeURIComponent keeps the slashes intact, to match how Storybook presents the `path` param.
+		const newUrl =
+			new URL( pathname, origin ) + '?' + decodeURIComponent( params );
+
+		window.location.replace( newUrl );
+	} )();
+</script>

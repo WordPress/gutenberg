@@ -177,7 +177,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -202,7 +202,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -291,11 +291,9 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
+		} );
 
-		expect( filtered ).toBe( '<h1 class="wp-block-heading">FOO</h1>' );
+		expect( filtered ).toBe( 'FOO' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -320,7 +318,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -371,6 +369,34 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should convert pre', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre>1\n2</pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-preformatted">1\n2</pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert code', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre><code>1\n2</code></pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-code"><code>1\n2</code></pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
@@ -385,6 +411,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',
+			'ms-word-list',
 			'ms-word-styled',
 			'ms-word-online',
 			'evernote',
@@ -397,6 +424,7 @@ describe( 'Blocks raw handling', () => {
 			'shortcode-matching',
 			'slack-quote',
 			'slack-paragraphs',
+			'mixed-content',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
@@ -531,6 +559,14 @@ describe( 'rawHandler', () => {
 
 	it( 'should preserve alignment', () => {
 		const HTML = '<p style="text-align:center">center</p>';
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve all paragraphs', () => {
+		const HTML = `<p></p>
+<p>&nbsp;&nbsp;</p>
+<p class="p"></p>
+<p style="border: 1px solid tomato;"></p>`;
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );

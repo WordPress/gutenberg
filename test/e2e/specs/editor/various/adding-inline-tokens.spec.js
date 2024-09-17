@@ -22,7 +22,9 @@ test.describe( 'adding inline tokens', () => {
 		pageUtils,
 	} ) => {
 		// Create a paragraph.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( 'a ' );
 
@@ -62,13 +64,16 @@ test.describe( 'adding inline tokens', () => {
 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
 
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.fill( 'role=spinbutton[name="WIDTH"i]', '20' );
+		await expect(
+			page.locator( 'role=spinbutton[name="Width"i]' )
+		).toBeFocused();
+		await page.fill( 'role=spinbutton[name="Width"i]', '20' );
+		await page.fill( 'role=textbox[name="Alternative text"i]', 'Alt' );
 		await page.click( 'role=button[name="Apply"i]' );
 
 		// Check the content.
 		const contentRegex2 = new RegExp(
-			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?>`
+			`a <img class="wp-image-\\d+" style="width:\\s*20px;?" src="[^"]+\\/${ filename }\\.png" alt="Alt"\\/?>`
 		);
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

@@ -9,19 +9,20 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
-import { COLORS } from '../../utils';
+import { COLORS, CONFIG } from '../../utils';
 import type { FocalPointPickerControlsProps } from '../types';
 import { INITIAL_BOUNDS } from '../utils';
 
 export const MediaWrapper = styled.div`
 	background-color: transparent;
+	display: flex;
 	text-align: center;
 	width: 100%;
 `;
 
 export const MediaContainer = styled.div`
 	align-items: center;
-	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
+	border-radius: ${ CONFIG.radiusSmall };
 	cursor: pointer;
 	display: inline-flex;
 	justify-content: center;
@@ -29,8 +30,21 @@ export const MediaContainer = styled.div`
 	position: relative;
 	height: 100%;
 
+	&:after {
+		border-radius: inherit;
+		bottom: 0;
+		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
+		content: '';
+		left: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
+
 	img,
 	video {
+		border-radius: inherit;
 		box-sizing: border-box;
 		display: block;
 		height: auto;
@@ -45,6 +59,7 @@ export const MediaContainer = styled.div`
 
 export const MediaPlaceholder = styled.div`
 	background: ${ COLORS.gray[ 100 ] };
+	border-radius: inherit;
 	box-sizing: border-box;
 	height: ${ INITIAL_BOUNDS.height }px;
 	max-width: 280px;
@@ -53,7 +68,7 @@ export const MediaPlaceholder = styled.div`
 `;
 
 export const StyledUnitControl = styled( UnitControl )`
-	width: 100px;
+	width: 100%;
 `;
 
 const deprecatedBottomMargin = ( {
@@ -91,29 +106,31 @@ export const GridView = styled.div`
 	position: absolute;
 	top: 50%;
 	transform: translate3d( -50%, -50%, 0 );
-	transition: opacity 120ms linear;
 	z-index: 1;
+
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 100ms linear;
+	}
 
 	opacity: ${ ( { showOverlay }: { showOverlay?: boolean } ) =>
 		showOverlay ? 1 : 0 };
 `;
 
 export const GridLine = styled.div`
-	background: white;
-	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
+	background: rgba( 255, 255, 255, 0.4 );
+	backdrop-filter: blur( 16px ) saturate( 180% );
 	position: absolute;
-	opacity: 0.4;
 	transform: translateZ( 0 );
 `;
 
 export const GridLineX = styled( GridLine )`
 	height: 1px;
-	left: 0;
-	right: 0;
+	left: 1px;
+	right: 1px;
 `;
 
 export const GridLineY = styled( GridLine )`
 	width: 1px;
-	top: 0;
-	bottom: 0;
+	top: 1px;
+	bottom: 1px;
 `;

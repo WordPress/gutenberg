@@ -10,35 +10,31 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 
 import { unlock } from '../../lock-unlock';
-import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStylesOutputWithConfig } =
-	unlock( blockEditorPrivateApis );
+const {
+	ExperimentalBlockEditorProvider,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+	__unstableBlockStyleVariationOverridesWithConfig,
+} = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-function Revisions( { onClose, userConfig, blocks } ) {
-	const { baseConfig } = useSelect(
-		( select ) => ( {
-			baseConfig:
-				select(
-					coreStore
-				).__experimentalGetCurrentThemeBaseGlobalStyles(),
-		} ),
-		[]
-	);
+function Revisions( { userConfig, blocks } ) {
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
@@ -71,21 +67,19 @@ function Revisions( { onClose, userConfig, blocks } ) {
 	return (
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
-			onClose={ onClose }
 			closeButtonLabel={ __( 'Close revisions' ) }
-			enableResizing={ true }
+			enableResizing
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"
 				name="revisions"
 				tabIndex={ 0 }
 			>
-				<EditorStyles styles={ editorStyles } />
 				<style>
 					{
 						// Forming a "block formatting context" to prevent margin collapsing.
 						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-						`.is-root-container { display: flow-root; } body { position: relative; padding: 32px; }`
+						`.is-root-container { display: flow-root; }`
 					}
 				</style>
 				<Disabled className="edit-site-revisions__example-preview__content">
@@ -94,6 +88,14 @@ function Revisions( { onClose, userConfig, blocks } ) {
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />
+						{ /*
+						 * Styles are printed inside the block editor provider,
+						 * so they can access any registered style overrides.
+						 */ }
+						<EditorStyles styles={ editorStyles } />
+						<__unstableBlockStyleVariationOverridesWithConfig
+							config={ mergedConfig }
+						/>
 					</ExperimentalBlockEditorProvider>
 				</Disabled>
 			</Iframe>

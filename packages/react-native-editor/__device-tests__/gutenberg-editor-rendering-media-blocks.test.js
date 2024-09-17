@@ -8,7 +8,7 @@ describe( 'Gutenberg Editor Rendering Media Blocks test', () => {
 		await editorPage.initializeEditor( { initialData: mediaBlocks } );
 
 		// Give some time to media placeholders to render.
-		await editorPage.driver.sleep( 3000 );
+		await editorPage.driver.pause( 3000 );
 
 		// Scroll to the last element.
 		const addBlockPlaceholder =

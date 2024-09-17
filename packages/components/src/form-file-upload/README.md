@@ -38,9 +38,9 @@ Children are passed as children of `Button`.
 
 ### icon
 
-The icon to render. Supported values are: Dashicons (specified as strings), functions, WPComponent instances and `null`.
+The icon to render. Supported values are: Dashicons (specified as strings), functions, Component instances and `null`.
 
--   Type: `String|Function|WPComponent|null`
+-   Type: `String|Function|Component|null`
 -   Required: No
 -   Default: `null`
 
@@ -85,3 +85,11 @@ Optional callback function used to render the UI. If passed, the component does 
 
 -   Type: `Function`
 -   Required: No
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

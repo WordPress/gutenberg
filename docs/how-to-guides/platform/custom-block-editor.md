@@ -10,21 +10,6 @@ This flexibility and interoperability makes blocks a powerful tool for building 
 
 This guide covers the basics of creating your first custom block editor.
 
-## Table of contents
-
--   [Introduction](#introduction)
-- 	[Code Syntax](#code-syntax)
--   [What you're going to be building](#what-youre-going-to-be-building)
--   [Plugin setup and organization](#plugin-setup-and-organization)
--   [The "Core" of the editor](#the-core-of-the-editor)
--   [Creating the custom "Block Editor" page](#creating-the-custom-block-editor-page)
--   [Registering and rendering the custom block editor](#registering-and-rendering-the-custom-block-editor)
--   [Reviewing the `<Editor>` component](#reviewing-the-editor-component)
--   [The custom `<BlockEditor>`](#the-custom-blockeditor)
--   [Reviewing the sidebar](#reviewing-the-sidebar)
--   [Block persistence](#block-persistence)
--   [Wrapping up](#wrapping-up)
-
 ## Introduction
 
 With its many packages and components, the Gutenberg codebase can be daunting at first. But at its core, it's all about managing and editing blocks. So if you want to work on the editor, it's essential to understand how block editing works at a fundamental level.
@@ -39,7 +24,7 @@ By the end of this article, you will have a solid understanding of the block edi
 
 ## Code syntax
 
-The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so most code examples in the Block Editor Handbook use this syntax.
+The code snippets in this guide use JSX syntax. However, you could use plain JavaScript if you prefer. However, once familiar with JSX, many developers find it easier to read and write, so all code examples in the Block Editor Handbook use this syntax.
 
 ## What you're going to be building
 
@@ -70,7 +55,7 @@ Here is a brief summary of what's going on:
 -   `src/` (directory) - This is where the JavaScript and CSS source files will live. These files are _not_ directly enqueued by the plugin.
 -   `webpack.config.js` - A custom Webpack config extending the defaults provided by the [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) npm package to allow for custom CSS styles (via Sass).
 
-The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin seperately.
+The only item not shown above is the `build/` directory, which is where the _compiled_ JS and CSS files are outputted by `@wordpress/scripts`. These files are enqueued by the plugin separately.
 
 <div class="callout callout-info">
 	Throughout this guide, filename references will be placed in a comment at the top of each code snippet so you can follow along.
@@ -168,7 +153,7 @@ wp_enqueue_script( $script_handle, $script_url, $script_asset['dependencies'], $
 
 To save time and space, the `$script_` variables assignment has been omitted. You can [review these here](https://github.com/getdave/standalone-block-editor/blob/974a59dcbc539a0595e8fa34670e75ec541853ab/init.php#L19).
 
-Note the third arguement for script dependencies, `$script_asset['dependencies']`. These dependencies are
+Note the third argument for script dependencies, `$script_asset['dependencies']`. These dependencies are
 dynamically generated using [@wordpress/dependency-extraction-webpack-plugin](https://developer.wordpress.org/block-editor/packages/packages-dependency-extraction-webpack-plugin/) which will
 [ensure that](https://developer.wordpress.org/block-editor/packages/packages-scripts/#default-webpack-config) WordPress provided scripts are not included in the built
 bundle.
@@ -215,9 +200,11 @@ Begin by opening the main `src/index.js` file. Then pull in the required JavaScr
 ```js
 // File: src/index.js
 
+// External dependencies.
+import { createRoot } from 'react-dom';
+
 // WordPress dependencies.
 import domReady from '@wordpress/dom-ready';
-import { render } from '@wordpress/element';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 // Internal dependencies.
@@ -233,11 +220,11 @@ Next, once the DOM is ready you will need to run a function which:
 
 ```jsx
 domReady( function () {
+	const root = createRoot( document.getElementById( 'getdave-sbe-block-editor' ) );
 	const settings = window.getdaveSbeSettings || {};
 	registerCoreBlocks();
-	render(
-		<Editor settings={ settings } />,
-		document.getElementById( 'getdave-sbe-block-editor' )
+	root.render(
+		<Editor settings={ settings } />
 	);
 } );
 ```
@@ -278,26 +265,22 @@ With these components available, you can define the `<Editor>` component.
 
 function Editor( { settings } ) {
 	return (
-		<SlotFillProvider>
-			<DropZoneProvider>
-				<div className="getdavesbe-block-editor-layout">
-					<Notices />
-					<Header />
-					<Sidebar />
-					<BlockEditor settings={ settings } />
-				</div>
-			</DropZoneProvider>
-		</SlotFillProvider>
+		<DropZoneProvider>
+			<div className="getdavesbe-block-editor-layout">
+				<Notices />
+				<Header />
+				<Sidebar />
+				<BlockEditor settings={ settings } />
+			</div>
+		</DropZoneProvider>
 	);
 }
 ```
 
-In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://reactjs.org/docs/context.html#contextprovider) that make specific functionality available throughout the component hierarchy.
+In this process, the core of the editor's layout is being scaffolded, along with a few specialized [context providers](https://react.dev/reference/react/createContext#provider) that make specific functionality available throughout the component hierarchy.
 
 Let's examine these in more detail:
 
--   `<SlotFillProvider>` – Enables the use of the ["Slot/Fill"
-    pattern](/docs/reference-guides/slotfills/README.md) through the component tree
 -   `<DropZoneProvider>` – Enables the use of [dropzones for drag and drop functionality](https://github.com/WordPress/gutenberg/tree/e38dbe958c04d8089695eb686d4f5caff2707505/packages/components/src/drop-zone)
 -   `<Notices>` – Provides a "snack bar" Notice that will be rendered if any messages are dispatched to the `core/notices` store
 -   `<Header>` – Renders the static title "Standalone Block Editor" at the top of the editor UI
@@ -336,12 +319,7 @@ return (
 			<Sidebar.InspectorFill>
 				<BlockInspector />
 			</Sidebar.InspectorFill>
-			<div className="editor-styles-wrapper">
-				<BlockEditorKeyboardShortcuts />
-				<WritingFlow>
-					<BlockList className="getdavesbe-block-editor__block-list" />
-				</WritingFlow>
-			</div>
+			<BlockCanvas height="400px" />
 		</BlockEditorProvider>
 	</div>
 );
@@ -423,27 +401,6 @@ Here is roughly how this works together to render the list of blocks:
 
 The `@wordpress/block-editor` package components are among the most complex and involved. Understanding them is crucial if you want to grasp how the editor functions at a fundamental level. Studying these components is strongly advised.
 
-### Utility components in the custom block editor
-
-Jumping back to your custom `<BlockEditor>` component, it is also worth noting the following "utility" components:
-
-```js
-// File: src/components/block-editor/index.js
-
-<div className="editor-styles-wrapper">
-	<BlockEditorKeyboardShortcuts /> /* 1. */
-	<WritingFlow>
-		/* 2. */
-		<BlockList className="getdavesbe-block-editor__block-list" />
-	</WritingFlow>
-</div>
-```
-
-These provide other important elements of functionality for the editor instance.
-
-1. [`<BlockEditorKeyboardShortcuts />`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/keyboard-shortcuts/index.js) – Enables and usage of keyboard shortcuts within the editor
-2. [`<WritingFlow>`](https://github.com/WordPress/gutenberg/blob/e38dbe958c04d8089695eb686d4f5caff2707505/packages/block-editor/src/components/writing-flow/index.js) – Handles selection, focus management, and navigation across blocks
-
 ## Reviewing the sidebar
 
 Also within the render of the `<BlockEditor>`, is the `<Sidebar>` component.
@@ -457,9 +414,7 @@ return (
             <Sidebar.InspectorFill> /* <-- SIDEBAR */
                 <BlockInspector />
             </Sidebar.InspectorFill>
-            <div className="editor-styles-wrapper">
-                // snip
-            </div>
+            <BlockCanvas height="400px" />
         </BlockEditorProvider>
     </div>
 );

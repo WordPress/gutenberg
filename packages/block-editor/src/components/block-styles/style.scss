@@ -1,7 +1,3 @@
-.block-editor-block-styles + .default-style-picker__default-switcher {
-	margin-top: $grid-unit-20;
-}
-
 .block-editor-block-styles__preview-panel {
 	display: none;
 	// Same layer as the sidebar from which it's triggered.
@@ -12,17 +8,6 @@
 		display: block;
 	}
 
-	// Overrides for InserterPreviewPanel.
-	.block-editor-inserter__preview-container {
-		left: auto;
-		right: auto;
-		top: auto;
-		position: static;
-	}
-
-	.block-editor-block-card__title.block-editor-block-card__title {
-		margin: 0;
-	}
 	.block-editor-block-icon {
 		display: none;
 	}
@@ -36,13 +21,13 @@
 
 	button.components-button.block-editor-block-styles__item {
 		color: $gray-900;
-		box-shadow: inset 0 0 0 1px $gray-400;
+		box-shadow: inset 0 0 0 $border-width $gray-300;
 		display: inline-block;
 		width: calc(50% - #{$grid-unit-05});
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
-			box-shadow: inset 0 0 0 1px $gray-400;
+			box-shadow: inset 0 0 0 $border-width $gray-300;
 		}
 
 		&.is-active,
@@ -58,7 +43,7 @@
 
 		&:focus,
 		&.is-active:focus {
-			@include button-style__focus();
+			@include block-toolbar-button-style__focus();
 		}
 	}
 

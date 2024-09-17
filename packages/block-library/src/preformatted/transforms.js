@@ -34,10 +34,7 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
-				createBlock( 'core/paragraph', {
-					...attributes,
-					content: attributes.content.replace( /\n/g, '<br>' ),
-				} ),
+				createBlock( 'core/paragraph', attributes ),
 		},
 		{
 			type: 'block',

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -29,24 +29,35 @@ const EMPTY_INSERTION_POINT = {
  *
  * @return {Object[]} API List of widgets.
  */
-export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const widgets = select( coreStore ).getEntityRecords(
-		'root',
-		'widget',
-		buildWidgetsQuery()
-	);
+export const getWidgets = createRegistrySelector( ( select ) =>
+	createSelector(
+		() => {
+			const widgets = select( coreStore ).getEntityRecords(
+				'root',
+				'widget',
+				buildWidgetsQuery()
+			);
 
-	return (
-		// Key widgets by their ID.
-		widgets?.reduce(
-			( allWidgets, widget ) => ( {
-				...allWidgets,
-				[ widget.id ]: widget,
-			} ),
-			{}
-		) || {}
-	);
-} );
+			return (
+				// Key widgets by their ID.
+				widgets?.reduce(
+					( allWidgets, widget ) => ( {
+						...allWidgets,
+						[ widget.id ]: widget,
+					} ),
+					{}
+				) ?? {}
+			);
+		},
+		() => [
+			select( coreStore ).getEntityRecords(
+				'root',
+				'widget',
+				buildWidgetsQuery()
+			),
+		]
+	)
+);
 
 /**
  * Returns API widget data for a particular widget ID.

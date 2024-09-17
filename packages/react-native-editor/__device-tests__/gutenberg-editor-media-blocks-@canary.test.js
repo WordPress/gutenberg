@@ -15,7 +15,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 
 		// dismiss the media picker automatically opened when adding an audio block
 		await waitForMediaLibrary( editorPage.driver );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		// verify there's an audio block
 		const block = await editorPage.getFirstBlockVisible();
@@ -30,7 +30,7 @@ describe( 'Gutenberg Editor Audio Block tests', () => {
 		// tap on Media Library option
 		await editorPage.chooseMediaLibrary();
 		// wait until the media is added
-		await editorPage.driver.sleep( 500 );
+		await editorPage.driver.pause( 500 );
 
 		// get the html version of the content
 		const html = await editorPage.getHtmlContent();
@@ -50,7 +50,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 
 		// dismiss the media picker automatically opened when adding a file block
 		await waitForMediaLibrary( editorPage.driver );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		// verify there's a file block
 		const block = await editorPage.getFirstBlockVisible();
@@ -65,7 +65,7 @@ describe( 'Gutenberg Editor File Block tests', () => {
 		// tap on Media Library option
 		await editorPage.chooseMediaLibrary();
 		// wait until the media is added
-		await editorPage.driver.sleep( 500 );
+		await editorPage.driver.pause( 500 );
 
 		// get the html version of the content
 		const html = await editorPage.getHtmlContent();
@@ -82,7 +82,7 @@ onlyOniOS( 'Gutenberg Editor Image Block tests', () => {
 	it( 'should be able to add an image block', async () => {
 		await editorPage.initializeEditor();
 		await editorPage.addNewBlock( blockNames.image );
-		await editorPage.closePicker();
+		await editorPage.closeMediaPicker();
 
 		const imageBlock = await editorPage.getBlockAtPosition(
 			blockNames.image
@@ -151,8 +151,7 @@ onlyOniOS( 'Gutenberg Editor Cover Block test', () => {
 		await editorPage.replaceMediaImage();
 
 		// First modal should no longer be presented.
-		const replaceButtons =
-			await editorPage.driver.elementsByAccessibilityId( 'Replace' );
+		const replaceButtons = await editorPage.driver.$$( '~Replace' );
 		// eslint-disable-next-line jest/no-conditional-expect
 		expect( replaceButtons.length ).toBe( 0 );
 

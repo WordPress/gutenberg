@@ -19,6 +19,46 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
+	example: {
+		viewportWidth: 650,
+		attributes: {
+			namespace: 'core/posts-list',
+			query: {
+				perPage: 4,
+				pages: 1,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				sticky: 'exclude',
+				inherit: false,
+			},
+		},
+		innerBlocks: [
+			{
+				name: 'core/post-template',
+				attributes: {
+					layout: {
+						type: 'grid',
+						columnCount: 2,
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/post-title',
+					},
+					{
+						name: 'core/post-date',
+					},
+					{
+						name: 'core/post-excerpt',
+					},
+				],
+			},
+		],
+	},
 	save,
 	variations,
 	deprecated,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ import {
 } from './styles/focal-point-picker-style';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
@@ -70,6 +70,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
  * 	return (
  * 		<>
  * 			<FocalPointPicker
+ *        __nextHasNoMarginBottom
  * 				url={ url }
  * 				value={ focalPoint }
  * 				onDragStart={ setFocalPoint }
@@ -110,7 +111,9 @@ export function FocalPointPicker( {
 
 			// `value` can technically be undefined if getValueWithinDragArea() is
 			// called before dragAreaRef is set, but this shouldn't happen in reality.
-			if ( ! value ) return;
+			if ( ! value ) {
+				return;
+			}
 
 			onDragStart?.( value, event );
 			setPoint( value );
@@ -119,7 +122,9 @@ export function FocalPointPicker( {
 			// Prevents text-selection when dragging.
 			event.preventDefault();
 			const value = getValueWithinDragArea( event );
-			if ( ! value ) return;
+			if ( ! value ) {
+				return;
+			}
 			onDrag?.( value, event );
 			setPoint( value );
 		},
@@ -135,7 +140,9 @@ export function FocalPointPicker( {
 	const dragAreaRef = useRef< HTMLDivElement >( null );
 	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
 	const refUpdateBounds = useRef( () => {
-		if ( ! dragAreaRef.current ) return;
+		if ( ! dragAreaRef.current ) {
+			return;
+		}
 
 		const { clientWidth: width, clientHeight: height } =
 			dragAreaRef.current;
@@ -149,7 +156,9 @@ export function FocalPointPicker( {
 
 	useEffect( () => {
 		const updateBounds = refUpdateBounds.current;
-		if ( ! dragAreaRef.current ) return;
+		if ( ! dragAreaRef.current ) {
+			return;
+		}
 
 		const { defaultView } = dragAreaRef.current.ownerDocument;
 		defaultView?.addEventListener( 'resize', updateBounds );
@@ -170,7 +179,9 @@ export function FocalPointPicker( {
 		clientY: number;
 		shiftKey: boolean;
 	} ) => {
-		if ( ! dragAreaRef.current ) return;
+		if ( ! dragAreaRef.current ) {
+			return;
+		}
 
 		const { top, left } = dragAreaRef.current.getBoundingClientRect();
 		let nextX = ( clientX - left ) / bounds.width;
@@ -202,8 +213,9 @@ export function FocalPointPicker( {
 			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
 				code
 			)
-		)
+		) {
 			return;
+		}
 
 		event.preventDefault();
 		const value = { x, y };
@@ -216,14 +228,11 @@ export function FocalPointPicker( {
 	};
 
 	const focalPointPosition = {
-		left: x * bounds.width,
-		top: y * bounds.height,
+		left: x !== undefined ? x * bounds.width : 0.5 * bounds.width,
+		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = classnames(
-		'components-focal-point-picker-control',
-		className
-	);
+	const classes = clsx( 'components-focal-point-picker-control', className );
 
 	const instanceId = useInstanceId( FocalPointPicker );
 	const id = `inspector-focal-point-picker-control-${ instanceId }`;
@@ -241,6 +250,7 @@ export function FocalPointPicker( {
 		<BaseControl
 			{ ...restProps }
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="FocalPointPicker"
 			label={ label }
 			id={ id }
 			help={ help }
@@ -252,7 +262,9 @@ export function FocalPointPicker( {
 					onKeyDown={ arrowKeyStep }
 					onMouseDown={ startDrag }
 					onBlur={ () => {
-						if ( isDragging ) endDrag();
+						if ( isDragging ) {
+							endDrag();
+						}
 					} }
 					ref={ dragAreaRef }
 					role="button"

@@ -17,8 +17,25 @@
 			"default": true
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"className": true,
+		"color": {
+			"background": true,
+			"text": false,
+			"gradients": true,
+			"link": true
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -31,6 +48,16 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
-	}
+	},
+	"style": "wp-block-loginout"
 }

@@ -10,6 +10,7 @@
  * The list of core modules allowed to opt-in to the private APIs.
  */
 const CORE_MODULES_USING_PRIVATE_APIS = [
+	'@wordpress/block-directory',
 	'@wordpress/block-editor',
 	'@wordpress/block-library',
 	'@wordpress/blocks',
@@ -23,9 +24,14 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/edit-site',
 	'@wordpress/edit-widgets',
 	'@wordpress/editor',
+	'@wordpress/format-library',
+	'@wordpress/interface',
 	'@wordpress/patterns',
+	'@wordpress/preferences',
 	'@wordpress/reusable-blocks',
 	'@wordpress/router',
+	'@wordpress/dataviews',
+	'@wordpress/fields',
 ];
 
 /**
@@ -51,7 +57,7 @@ const registeredPrivateApis = [];
  * CHANGE MAY OCCUR IN EITHER A MAJOR OR MINOR RELEASE.
  */
 const requiredConsent =
-	'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.';
+	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
 /** @type {boolean} */
 let allowReRegistration;
@@ -61,7 +67,7 @@ let allowReRegistration;
 // Let's default to true, then. Try/catch will fall back to "true" even if the
 // environment variable is not explicitly defined.
 try {
-	allowReRegistration = process.env.IS_WORDPRESS_CORE ? false : true;
+	allowReRegistration = globalThis.IS_WORDPRESS_CORE ? false : true;
 } catch ( error ) {
 	allowReRegistration = true;
 }

@@ -100,21 +100,25 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
 			).toBeVisible();
-			const ariaOwns = await editor.canvas.evaluate( () => {
-				return document.activeElement.getAttribute( 'aria-owns' );
-			} );
-			const ariaActiveDescendant = await editor.canvas.evaluate( () => {
-				return document.activeElement.getAttribute(
-					'aria-activedescendant'
-				);
-			} );
+			const ariaOwns = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute( 'aria-owns' );
+				} );
+			const ariaActiveDescendant = await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => {
+					return document.activeElement.getAttribute(
+						'aria-activedescendant'
+					);
+				} );
 			// Ensure `aria-owns` is part of the same document and ensure the
 			// selected option is equal to the active descendant.
 			await expect(
@@ -148,9 +152,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( 'Stuck in the middle with you.' );
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
 			await page.keyboard.type( testData.triggerString );
@@ -188,9 +192,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
 				page.locator(
@@ -230,9 +234,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
@@ -269,9 +273,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
@@ -306,9 +310,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 			await page.keyboard.type( testData.triggerString );
 			await expect(
 				page.locator( `role=option[name="${ testData.optionText }"i]` )
@@ -327,9 +331,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				page,
 				editor,
 			} ) => {
-				await editor.canvas.click(
-					'role=button[name="Add default block"i]'
-				);
+				await editor.canvas
+					.locator( 'role=button[name="Add default block"i]' )
+					.click();
 				// The 'Grapes' option is disabled in our test plugin, so it should not insert the grapes emoji
 				await page.keyboard.type( 'Sorry, we are all out of ~g' );
 				await expect(
@@ -395,9 +399,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 <!-- /wp:paragraph -->`;
 			}
 
-			await editor.canvas.click(
-				'role=button[name="Add default block"i]'
-			);
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
 
 			for ( let i = 0; i < 4; i++ ) {
 				await page.keyboard.type( testData.triggerString );
@@ -417,34 +421,93 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		} );
 	} );
 
+	test( `should insert mention in a table block`, async ( {
+		page,
+		editor,
+	} ) => {
+		// Insert table block.
+		await editor.insertBlock( { name: 'core/table' } );
+
+		// Create the table.
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
+
+		// Select the first cell.
+		await editor.canvas
+			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
+			.click();
+
+		// Type autocomplete text.
+		await page.keyboard.type( '@j' );
+
+		// Verify that option is selected.
+		const selectedOption = page.getByRole( 'option', {
+			name: 'Jane Doe',
+			selected: true,
+		} );
+		await expect( selectedOption ).toBeVisible();
+
+		// Insert the option.
+		await selectedOption.click();
+
+		// Verify it's been inserted.
+		const snapshot = `<!-- wp:table -->
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td>@testuser</td><td></td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->`;
+		await expect.poll( editor.getEditedPostContent ).toBe( snapshot );
+	} );
+
 	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
 	// When present, the regression will cause this test to time out.
 	test( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+
 		await page.keyboard.type( '@fr' );
 		await expect(
-			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+			page.getByRole( 'option', {
+				name: 'Frodo Baggins',
+				selected: true,
+			} )
 		).toBeVisible();
+
 		await page.keyboard.press( 'Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '@ringbearer' },
+			},
+		] );
+
 		await page.keyboard.type( ' +bi' );
 		await expect(
-			page.locator( 'role=option', { hasText: 'Bilbo Baggins' } )
+			page.getByRole( 'option', {
+				name: 'Bilbo Baggins',
+				selected: true,
+			} )
 		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
-		await expect.poll( editor.getEditedPostContent )
-			.toBe( `<!-- wp:paragraph -->
-<p>@ringbearer +thebetterhobbit</p>
-<!-- /wp:paragraph -->` );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '@ringbearer +thebetterhobbit' },
+			},
+		] );
 	} );
 
 	test( 'should hide UI when selection changes (by keyboard)', async ( {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '@fr' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
@@ -452,7 +515,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should hide UI when selection changes (by mouse)', async ( {
@@ -460,7 +523,9 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '@' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( 'f' );
@@ -470,17 +535,21 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
 		).toBeVisible();
 		// Use the strong tag to move the selection by mouse within the mention.
-		await editor.canvas.click( '[data-type="core/paragraph"] strong' );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"] strong' )
+			.click();
 		await expect(
 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'should allow speaking number of initial results', async ( {
 		page,
 		editor,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/' );
 		await expect(
 			page.locator( `role=option[name="Image"i]` )

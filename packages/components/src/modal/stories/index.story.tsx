@@ -7,7 +7,7 @@ import type { StoryFn, Meta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { fullscreen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,7 +28,8 @@ const meta: Meta< typeof Modal > = {
 			control: { type: null },
 		},
 		focusOnMount: {
-			control: { type: 'boolean' },
+			options: [ true, false, 'firstElement', 'firstContentElement' ],
+			control: { type: 'select' },
 		},
 		role: {
 			control: { type: 'text' },
@@ -60,11 +61,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 				Open Modal
 			</Button>
 			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					style={ { maxWidth: '600px' } }
-					{ ...args }
-				>
+				<Modal onRequestClose={ closeModal } { ...args }>
 					<p>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 						sed do eiusmod tempor incididunt ut labore et magna
@@ -100,22 +97,22 @@ Default.parameters = {
 	},
 };
 
-const LikeButton = () => {
-	const [ isLiked, setIsLiked ] = useState( false );
-	return (
-		<Button
-			icon={ isLiked ? starFilled : starEmpty }
-			label="Like"
-			onClick={ () => setIsLiked( ! isLiked ) }
-		/>
-	);
+export const WithsizeSmall: StoryFn< typeof Modal > = Template.bind( {} );
+WithsizeSmall.args = {
+	size: 'small',
 };
+WithsizeSmall.storyName = 'With size: small';
 
+/**
+ * The `headerActions` prop can be used to add auxiliary actions to the header, for example a fullscreen mode toggle.
+ */
 export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
 WithHeaderActions.args = {
 	...Default.args,
-	headerActions: <LikeButton />,
-	isDismissible: false,
+	headerActions: (
+		<Button icon={ fullscreen } label="Fullscreen mode" size="small" />
+	),
+	children: <div style={ { height: '200px' } } />,
 };
 WithHeaderActions.parameters = {
 	...Default.parameters,

@@ -1,16 +1,12 @@
 # AlignmentMatrixControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
 
 ## Usage
 
 ```jsx
-import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
+import { AlignmentMatrixControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ alignment, setAlignment ] = useState( 'center center' );

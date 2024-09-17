@@ -12,6 +12,10 @@ _Required._ HTML string to make editable. The HTML should be valid, and valid in
 
 _Required._ Called when the value changes.
 
+### `identifier: String`
+
+_Optional._ If the editable field is bound to a block attribute (through the `value` and `onChange` props) then this prop should specify the attribute name. The field will use this value to set the block editor selection correctly, specifying in which attribute and at what offset does the selection start or end.
+
 ### `tagName: String`
 
 _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element.
@@ -21,13 +25,9 @@ _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-na
 _Optional._ Placeholder text to show when the field is empty, similar to the
 [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
-### `multiline: Boolean | String`
+### `disableLineBreaks: Boolean`
 
-_Optional._ By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
-
-### `onSplit( value: String ): Function`
-
-_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
+_Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
 
 ### `onReplace( blocks: Array ): Function`
 
@@ -50,6 +50,7 @@ _Optional._ By default, all registered formats are allowed. This setting can be 
 ```js
 <RichText
 	tagName="h2"
+	identifier="content"
 	value={ attributes.content }
 	allowedFormats={ [ 'core/bold', 'core/italic' ] } // Allow the content to be made bold or italic, but do not allow othe formatting options
 	onChange={ ( content ) => setAttributes( { content } ) }
@@ -71,7 +72,8 @@ _Optional._ A list of autocompleters to use instead of the default.
 
 ### `preserveWhiteSpace: Boolean`
 
-_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space. If turned on, soft line breaks will be saved as newline characters, not as line break elements.
+_Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
+trimmed.
 
 ## RichText.Content
 
@@ -79,44 +81,9 @@ _Optional._ Whether or not to preserve white space characters in the `value`. No
 
 ## Example
 
-{% codetabs %}
-{% ES5 %}
-
 ```js
-wp.blocks.registerBlockType( /* ... */, {
-	// ...
-
-	attributes: {
-		content: {
-			source: 'html',
-			selector: 'h2',
-		},
-	},
-
-	edit: function( props ) {
-		return wp.element.createElement( wp.editor.RichText, {
-			tagName: 'h2',
-			className: props.className,
-			value: props.attributes.content,
-			onChange: function( content ) {
-				props.setAttributes( { content: content } );
-			}
-		} );
-	},
-
-	save: function( props ) {
-		return wp.element.createElement( wp.editor.RichText.Content, {
-			tagName: 'h2', value: props.attributes.content
-		} );
-	}
-} );
-```
-
-{% ESNext %}
-
-```js
-const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
+import { registerBlockType } from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -133,6 +100,7 @@ registerBlockType( /* ... */, {
 			<RichText
 				tagName="h2"
 				className={ className }
+				identifier="content"
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
 			/>
@@ -145,7 +113,6 @@ registerBlockType( /* ... */, {
 } );
 ```
 
-{% end %}
 
 ## RichTextToolbarButton
 
@@ -153,30 +120,10 @@ Slot to extend the format toolbar. Use it in the edit function of a `registerFor
 
 ### Example
 
-{% codetabs %}
-{% ES5 %}
 
 ```js
-wp.richText.registerFormatType( /* ... */, {
-	/* ... */
-	edit: function( props ) {
-		return wp.element.createElement(
-			wp.editor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'My formatting button',
-				onClick: function() { /* ... */ }
-				isActive: props.isActive,
-			} );
-	},
-	/* ... */
-} );
-```
-
-{% ESNext %}
-
-```js
-import { registerFormatType } from 'wp-rich-text';
-import { richTextToolbarButton } from 'wp-editor';
+import { registerFormatType } from '@wordpress/rich-text';
+import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 registerFormatType( /* ... */, {
 	/* ... */
@@ -193,5 +140,3 @@ registerFormatType( /* ... */, {
 	/* ... */
 } );
 ```
-
-{% end %}

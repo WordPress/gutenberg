@@ -14,6 +14,10 @@ const resultsFiles = [
 		metricsPrefix: '',
 	},
 	{
+		file: 'site-editor.performance-results.json',
+		metricsPrefix: 'site-editor-',
+	},
+	{
 		file: 'front-end-block-theme.performance-results.json',
 		metricsPrefix: 'block-theme-',
 	},
@@ -46,7 +50,7 @@ const data = new TextEncoder().encode(
 						performanceResults[ index ][ hash ] ?? {}
 					).map( ( [ key, value ] ) => [
 						metricsPrefix + key,
-						value,
+						typeof value === 'object' ? value.q50 : value,
 					] )
 				),
 			};
@@ -60,7 +64,7 @@ const data = new TextEncoder().encode(
 							performanceResults[ index ][ baseHash ] ?? {}
 						).map( ( [ key, value ] ) => [
 							metricsPrefix + key,
-							value,
+							typeof value === 'object' ? value.q50 : value,
 						] )
 					),
 				};

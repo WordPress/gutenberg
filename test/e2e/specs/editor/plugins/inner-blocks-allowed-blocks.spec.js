@@ -46,9 +46,13 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Toggle block inserter' } );
-		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
-		} );
+		const blockLibrary = page
+			.getByRole( 'region', {
+				name: 'Block Library',
+			} )
+			.locator(
+				'.block-editor-inserter__insertable-blocks-at-selection'
+			);
 
 		await blockInserter.click();
 		await expect( blockLibrary ).toBeVisible();
@@ -89,9 +93,13 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Toggle block inserter' } );
-		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
-		} );
+		const blockLibrary = page
+			.getByRole( 'region', {
+				name: 'Block Library',
+			} )
+			.locator(
+				'.block-editor-inserter__insertable-blocks-at-selection'
+			);
 
 		await blockInserter.click();
 		await expect( blockLibrary ).toBeVisible();
@@ -107,7 +115,9 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await page.keyboard.press( 'Enter' );
 
@@ -128,18 +138,36 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		await blockListBox.getByRole( 'option', { name: 'List' } ).click();
 		// Select the list wrapper and then parent block.
 		await page.keyboard.press( 'ArrowUp' );
-		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
 
 		// Insert the image.
 		await blockAppender.click();
 		await blockListBox.getByRole( 'option', { name: 'Image' } ).click();
 
-		await editor.clickBlockToolbarButton( 'Select Allowed Blocks Dynamic' );
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
 		await blockAppender.click();
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
 			'Gallery',
+			'Video',
+		] );
+
+		await blockListBox.getByRole( 'option', { name: 'Gallery' } ).click();
+
+		await editor.clickBlockToolbarButton(
+			'Select parent block: Allowed Blocks Dynamic'
+		);
+		await blockAppender.click();
+
+		// It should display a different allowed block list.
+		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
+			'Gallery',
+			'List',
 			'Video',
 		] );
 	} );

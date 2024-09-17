@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
  * Internal dependencies
  */
 import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
@@ -37,7 +37,7 @@ export const StyledField = styled.div`
 const labelStyles = css`
 	${ baseLabelTypography };
 
-	display: inline-block;
+	display: block;
 	margin-bottom: ${ space( 2 ) };
 	/**
 	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from

@@ -20,6 +20,7 @@ a "shape" abstraction.
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -30,13 +31,12 @@ const colors = [
 
 const MyBorderControl = () => {
 	const [ border, setBorder ] = useState();
-	const onChange = ( newBorder ) => setBorder( newBorder );
 
 	return (
 		<BorderControl
 			colors={ colors }
 			label={ __( 'Border' ) }
-			onChange={ onChange }
+			onChange={ setBorder }
 			value={ border }
 		/>
 	);
@@ -173,3 +173,10 @@ Flags whether this `BorderControl` should also render a `RangeControl` for
 additional control over a border's width.
 
 - Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

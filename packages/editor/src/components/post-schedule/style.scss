@@ -1,0 +1,10 @@
+.editor-post-schedule__panel-dropdown {
+	width: 100%;
+}
+
+.editor-post-schedule__dialog {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}

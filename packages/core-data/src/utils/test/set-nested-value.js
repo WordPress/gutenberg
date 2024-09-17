@@ -19,6 +19,13 @@ describe( 'setNestedValue', () => {
 		expect( result ).toEqual( { x: { y: { z: 456 } } } );
 	} );
 
+	it( 'should set values at deep level having a string as path', () => {
+		const input = { x: { y: { z: 123 } } };
+		const result = setNestedValue( input, 'x.y.z', 456 );
+
+		expect( result ).toEqual( { x: { y: { z: 456 } } } );
+	} );
+
 	it( 'should create nested objects if necessary', () => {
 		const result = setNestedValue( {}, [ 'x', 'y', 'z' ], 123 );
 

@@ -1,21 +1,56 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockPopoverInbetween from '../block-popover/inbetween';
+import ZoomOutModeInserterButton from './zoom-out-mode-inserter-button';
 import { store as blockEditorStore } from '../../store';
-import Inserter from '../inserter';
+import { unlock } from '../../lock-unlock';
 
-function ZoomOutModeInserters( { __unstableContentRef } ) {
+function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
-	const blockOrder = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlockOrder();
+	const {
+		hasSelection,
+		blockInsertionPoint,
+		blockOrder,
+		blockInsertionPointVisible,
+		setInserterIsOpened,
+		sectionRootClientId,
+		selectedBlockClientId,
+		hoveredBlockClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			getBlockInsertionPoint,
+			getBlockOrder,
+			getSelectionStart,
+			getSelectedBlockClientId,
+			getHoveredBlockClientId,
+			isBlockInsertionPointVisible,
+			getSectionRootClientId,
+		} = unlock( select( blockEditorStore ) );
+
+		const root = getSectionRootClientId();
+
+		return {
+			hasSelection: !! getSelectionStart().clientId,
+			blockInsertionPoint: getBlockInsertionPoint(),
+			blockOrder: getBlockOrder( root ),
+			blockInsertionPointVisible: isBlockInsertionPointVisible(),
+			sectionRootClientId: root,
+			setInserterIsOpened:
+				getSettings().__experimentalSetIsInserterOpened,
+			selectedBlockClientId: getSelectedBlockClientId(),
+			hoveredBlockClientId: getHoveredBlockClientId(),
+		};
 	}, [] );
+
+	const { showInsertionPoint } = useDispatch( blockEditorStore );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -31,24 +66,44 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		return null;
 	}
 
-	return blockOrder.map( ( clientId, index ) => {
-		if ( index === blockOrder.length - 1 ) {
-			return null;
-		}
+	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
+		const shouldRenderInsertionPoint =
+			blockInsertionPointVisible && blockInsertionPoint.index === index;
+
+		const previousClientId = clientId;
+		const nextClientId = blockOrder[ index ];
+
+		const isSelected =
+			hasSelection &&
+			( selectedBlockClientId === previousClientId ||
+				selectedBlockClientId === nextClientId );
+
+		const isHovered =
+			hoveredBlockClientId === previousClientId ||
+			hoveredBlockClientId === nextClientId;
+
 		return (
 			<BlockPopoverInbetween
-				key={ clientId }
-				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index + 1 ] }
-				__unstableContentRef={ __unstableContentRef }
+				key={ index }
+				previousClientId={ previousClientId }
+				nextClientId={ nextClientId }
 			>
-				<div className="block-editor-block-list__insertion-point-inserter is-with-inserter">
-					<Inserter
-						position="bottom center"
-						clientId={ blockOrder[ index + 1 ] }
-						__experimentalIsQuick
+				{ ! shouldRenderInsertionPoint && (
+					<ZoomOutModeInserterButton
+						isVisible={ isSelected || isHovered }
+						onClick={ () => {
+							setInserterIsOpened( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
+								tab: 'patterns',
+								category: 'all',
+							} );
+							showInsertionPoint( sectionRootClientId, index, {
+								operation: 'insert',
+							} );
+						} }
 					/>
-				</div>
+				) }
 			</BlockPopoverInbetween>
 		);
 	} );

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
@@ -23,7 +23,7 @@ import {
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
@@ -35,6 +35,8 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -62,7 +64,6 @@ function ClipboardToolbarButton( { text, disabled } ) {
 function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
-		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -72,13 +73,13 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const { media, mediaUpload } = useSelect(
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const { media } = useSelect(
 		( select ) => ( {
 			media:
 				id === undefined
 					? undefined
 					: select( coreStore ).getMedia( id ),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);
@@ -87,45 +88,58 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	useUploadMediaFromBlobURL( {
+		url: temporaryURL,
+		onChange: onSelectFile,
+		onError: onUploadError,
+	} );
+
+	// Note: Handle setting a default value for `downloadButtonText` via HTML API
+	// when it supports replacing text content for HTML tags.
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor.
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
-
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: onUploadError,
+		if ( RichText.isEmpty( downloadButtonText ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
-
-			revokeBlobURL( href );
 		}
-
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
-		}
+		// Reason: This effect should only run on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	useEffect( () => {
-		if ( ! fileId && href ) {
-			// Add a unique fileId to each file block.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-		}
-	}, [ href, fileId, clientId ] );
-
 	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
-			const isPdf = newMedia.url.endsWith( '.pdf' );
+		if ( ! newMedia || ! newMedia.url ) {
+			// Reset attributes.
 			setAttributes( {
-				href: newMedia.url,
-				fileName: newMedia.title,
-				textLinkHref: newMedia.url,
-				id: newMedia.id,
-				displayPreview: isPdf ? true : undefined,
-				previewHeight: isPdf ? 600 : undefined,
+				href: undefined,
+				fileName: undefined,
+				textLinkHref: undefined,
+				id: undefined,
+				fileId: undefined,
+				displayPreview: undefined,
+				previewHeight: undefined,
 			} );
+			setTemporaryURL();
+			return;
 		}
+
+		if ( isBlobURL( newMedia.url ) ) {
+			setTemporaryURL( newMedia.url );
+			return;
+		}
+
+		const isPdf = newMedia.url.endsWith( '.pdf' );
+		setAttributes( {
+			href: newMedia.url,
+			fileName: newMedia.title,
+			textLinkHref: newMedia.url,
+			id: newMedia.id,
+			displayPreview: isPdf ? true : undefined,
+			previewHeight: isPdf ? 600 : undefined,
+			fileId: `wp-block-file--media-${ clientId }`,
+			blob: undefined,
+		} );
+		setTemporaryURL();
 	}
 
 	function onUploadError( message ) {
@@ -146,13 +160,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -177,17 +184,17 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const attachmentPage = media && media.link;
 
 	const blockProps = useBlockProps( {
-		className: classnames(
-			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
+		className: clsx(
+			!! temporaryURL && getAnimateClassName( { type: 'loading' } ),
 			{
-				'is-transient': isBlobURL( href ),
+				'is-transient': !! temporaryURL,
 			}
 		),
 	} );
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
-	if ( ! href ) {
+	if ( ! href && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -209,7 +216,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	return (
 		<>
 			<FileBlockInspector
-				hrefs={ { href, textLinkHref, attachmentPage } }
+				hrefs={ {
+					href: href || temporaryURL,
+					textLinkHref,
+					attachmentPage,
+				} }
 				{ ...{
 					openInNewWindow: !! textLinkTarget,
 					showDownloadButton,
@@ -229,6 +240,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					accept="*"
 					onSelect={ onSelectFile }
 					onError={ onUploadError }
+					onReset={ () => onSelectFile( undefined ) }
 				/>
 				<ClipboardToolbarButton
 					text={ href }
@@ -270,28 +282,28 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						) }
 					</ResizableBox>
 				) }
-				<div className={ 'wp-block-file__content-wrapper' }>
+				<div className="wp-block-file__content-wrapper">
 					<RichText
+						identifier="fileName"
 						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
 					{ showDownloadButton && (
-						<div
-							className={
-								'wp-block-file__button-richtext-wrapper'
-							}
-						>
+						<div className="wp-block-file__button-richtext-wrapper">
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
+								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ classnames(
+								className={ clsx(
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'
@@ -301,7 +313,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>

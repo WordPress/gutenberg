@@ -17,19 +17,11 @@ import { LAYOUT_DEFINITIONS } from './definitions';
  * @return {string} - CSS selector.
  */
 export function appendSelectors( selectors, append = '' ) {
-	// Ideally we shouldn't need the `.editor-styles-wrapper` increased specificity here
-	// The problem though is that we have a `.editor-styles-wrapper p { margin: reset; }` style
-	// it's used to reset the default margin added by wp-admin to paragraphs
-	// so we need this to be higher speficity otherwise, it won't be applied to paragraphs inside containers
-	// When the post editor is fully iframed, this extra classname could be removed.
-
 	return selectors
 		.split( ',' )
 		.map(
 			( subselector ) =>
-				`.editor-styles-wrapper ${ subselector }${
-					append ? ` ${ append }` : ''
-				}`
+				`${ subselector }${ append ? ` ${ append }` : '' }`
 		)
 		.join( ',' );
 }
@@ -90,7 +82,8 @@ export function getBlockGapCSS(
 export function getAlignmentsInfo( layout ) {
 	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo = {};
-	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
+	const sizeRegex =
+		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
 	if ( sizeRegex.test( contentSize ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)
 		alignmentInfo.none = sprintf( __( 'Max %s wide' ), contentSize );

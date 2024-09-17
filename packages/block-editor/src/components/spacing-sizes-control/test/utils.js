@@ -373,8 +373,8 @@ describe( 'getInitialView', () => {
 				getInitialView( { top: '1em', right: '10px' }, ALL_SIDES )
 			).toBe( VIEWS.custom );
 		} );
-		it( 'should not return custom view if there is only a single side value', () => {
-			expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).not.toBe(
+		it( 'should return custom view if there is only a single side value', () => {
+			expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).toBe(
 				VIEWS.custom
 			);
 		} );
@@ -387,20 +387,19 @@ describe( 'getInitialView', () => {
 			);
 		} );
 
-		it( 'should return the single side view if there is only a single side value set and supported sides > 1', () => {
-			expect( getInitialView( { top: '1em' }, ALL_SIDES ) ).toBe(
-				VIEWS.top
-			);
-			expect( getInitialView( { right: '1em' }, ALL_SIDES ) ).toBe(
-				VIEWS.right
-			);
-			expect( getInitialView( { bottom: '1em' }, ALL_SIDES ) ).toBe(
-				VIEWS.bottom
-			);
-			expect( getInitialView( { left: '1em' }, ALL_SIDES ) ).toBe(
-				VIEWS.left
-			);
+		it( 'should return single side when only single side supported and no value defined', () => {
+			expect( getInitialView( {}, [ 'top' ] ) ).toBe( VIEWS.top );
 		} );
+
+		it( 'should return single side when only single side supported and all values defined', () => {
+			expect(
+				getInitialView(
+					{ top: '1em', right: '2em', bottom: '1em', left: '2em' },
+					[ 'top' ]
+				)
+			).toBe( VIEWS.top );
+		} );
+
 		it( 'should return single side view when only one side is supported', () => {
 			expect( getInitialView( { top: '1em' }, [ 'top' ] ) ).toBe(
 				VIEWS.top

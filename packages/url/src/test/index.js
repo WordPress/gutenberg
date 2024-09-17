@@ -17,6 +17,7 @@ import {
 	hasQueryArg,
 	isEmail,
 	isURL,
+	isPhoneNumber,
 	isValidAuthority,
 	isValidFragment,
 	isValidPath,
@@ -69,6 +70,52 @@ describe( 'isEmail', () => {
 		"returns false when given things that don't look like an email: %s",
 		( email ) => {
 			expect( isEmail( email ) ).toBe( false );
+		}
+	);
+} );
+
+describe( 'isPhoneNumber', () => {
+	it.each( [
+		'+1 (555) 123-4567',
+		'(555) 123-4567',
+		'555-123-4567',
+		'5551234567',
+		'+91 987 654 3210',
+		'123-456-7890',
+		'(123) 456-7890',
+		'123 456 7890',
+		'123.456.7890',
+		'+1 123 456 7890',
+		'1234567890',
+		'+44 791 112 3456',
+		'(123) 4567',
+		'+1 (123) 45678901',
+		'12-34-56',
+		'123456789012345',
+		'+12 3456789012345',
+		'tel:+1-123-456-7890',
+	] )(
+		'returns true when given things that look like a phone number: %s',
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( true );
+		}
+	);
+
+	it.each( [
+		'not a phone number',
+		'123',
+		'1234',
+		'12345',
+		'+91 123',
+		'abc-def-ghij',
+		'a123456789b',
+		'12-34-5',
+		'tel:911',
+		'tel:12345',
+	] )(
+		"returns false when given things that don't look like a phone number: %s",
+		( phoneNumber ) => {
+			expect( isPhoneNumber( phoneNumber ) ).toBe( false );
 		}
 	);
 } );
@@ -254,23 +301,20 @@ describe( 'isValidPath', () => {
 } );
 
 describe( 'getFilename', () => {
-	it( 'returns the filename part of the URL', () => {
-		expect( getFilename( 'https://wordpress.org/image.jpg' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'https://wordpress.org/image.jpg?query=test' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( 'https://wordpress.org/image.jpg#anchor' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'http://localhost:8080/a/path/to/an/image.jpg' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
+	it.each( [
+		[ 'https://wordpress.org/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg?query=test', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg#anchor', 'image.jpg' ],
+		[ 'http://localhost:8080/a/path/to/an/image.jpg', 'image.jpg' ],
+		[ '/path/to/an/image.jpg', 'image.jpg' ],
+		[ 'path/to/an/image.jpg', 'image.jpg' ],
+		[ '/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/file.pdf', 'file.pdf' ],
+		[ 'https://wordpress.org/image.webp?query=test', 'image.webp' ],
+		[ 'https://wordpress.org/video.mov#anchor', 'video.mov' ],
+		[ 'http://localhost:8080/a/path/to/audio.mp3', 'audio.mp3' ],
+	] )( 'returns the filename part of the URL: %s', ( url, filename ) => {
+		expect( getFilename( url ) ).toBe( filename );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a filename', () => {
@@ -286,6 +330,8 @@ describe( 'getFilename', () => {
 		);
 		expect( getFilename( 'a/path/' ) ).toBe( undefined );
 		expect( getFilename( '/' ) ).toBe( undefined );
+		expect( getFilename( undefined ) ).toBe( undefined );
+		expect( getFilename( null ) ).toBe( undefined );
 	} );
 } );
 
@@ -993,11 +1039,23 @@ describe( 'safeDecodeURI', () => {
 } );
 
 describe( 'filterURLForDisplay', () => {
+	it( 'should return an empty string if the url is empty or falsy', () => {
+		let url = filterURLForDisplay( '' );
+		expect( url ).toBe( '' );
+		url = filterURLForDisplay( null );
+		expect( url ).toBe( '' );
+	} );
 	it( 'should remove protocol', () => {
 		let url = filterURLForDisplay( 'http://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
 		url = filterURLForDisplay( 'https://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
+		url = filterURLForDisplay( 'file:///folder/file.txt' );
+		expect( url ).toBe( '/folder/file.txt' );
+		url = filterURLForDisplay( 'tel:0123456789' );
+		expect( url ).toBe( '0123456789' );
+		url = filterURLForDisplay( 'blob:data' );
+		expect( url ).toBe( 'data' );
 	} );
 	it( 'should remove www subdomain', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org' );

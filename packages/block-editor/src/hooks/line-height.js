@@ -8,7 +8,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
-import useSetting from '../components/use-setting';
+import { useSettings } from '../components/use-settings';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
@@ -17,7 +17,7 @@ export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {Element} Line height edit element.
  */
 export function LineHeightEdit( props ) {
 	const {
@@ -39,7 +39,6 @@ export function LineHeightEdit( props ) {
 	return (
 		<LineHeightControl
 			__unstableInputWidth="100%"
-			__nextHasNoMarginBottom={ true }
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
 			size="__unstable-large"
@@ -54,9 +53,9 @@ export function LineHeightEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useSetting( 'typography.lineHeight' );
+	const [ isEnabled ] = useSettings( 'typography.lineHeight' );
 
 	return (
-		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled
+		! isEnabled || ! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY )
 	);
 }

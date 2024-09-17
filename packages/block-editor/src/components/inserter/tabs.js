@@ -1,10 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { symbol as reusableBlockIcon } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
-import { TabPanel } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const blocksTab = {
 	name: 'blocks',
@@ -16,53 +26,53 @@ const patternsTab = {
 	/* translators: Theme and Directory Patterns tab title in the block inserter. */
 	title: __( 'Patterns' ),
 };
-const reusableBlocksTab = {
-	name: 'reusable',
-	/* translators: Locally created Patterns tab title in the block inserter. */
-	title: __( 'Synced patterns' ),
-	icon: reusableBlockIcon,
-};
+
 const mediaTab = {
 	name: 'media',
 	/* translators: Media tab title in the block inserter. */
 	title: __( 'Media' ),
 };
 
-function InserterTabs( {
-	children,
-	showPatterns = false,
-	showReusableBlocks = false,
-	showMedia = false,
-	onSelect,
-	prioritizePatterns,
-} ) {
-	const tabs = useMemo( () => {
-		const tempTabs = [];
-		if ( prioritizePatterns && showPatterns ) {
-			tempTabs.push( patternsTab );
-		}
-		tempTabs.push( blocksTab );
-		if ( ! prioritizePatterns && showPatterns ) {
-			tempTabs.push( patternsTab );
-		}
-		if ( showMedia ) {
-			tempTabs.push( mediaTab );
-		}
-		if ( showReusableBlocks ) {
-			tempTabs.push( reusableBlocksTab );
-		}
-		return tempTabs;
-	}, [ prioritizePatterns, showPatterns, showReusableBlocks, showMedia ] );
+function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
+	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
-		<TabPanel
-			className="block-editor-inserter__tabs"
-			tabs={ tabs }
-			onSelect={ onSelect }
-		>
-			{ children }
-		</TabPanel>
+		<div className="block-editor-inserter__tabs" ref={ ref }>
+			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
+				<div className="block-editor-inserter__tablist-and-close-button">
+					<Button
+						className="block-editor-inserter__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close block inserter' ) }
+						onClick={ () => onClose() }
+						size="small"
+					/>
+
+					<Tabs.TabList className="block-editor-inserter__tablist">
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab
+								key={ tab.name }
+								tabId={ tab.name }
+								className="block-editor-inserter__tab"
+							>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+				</div>
+				{ tabs.map( ( tab ) => (
+					<Tabs.TabPanel
+						key={ tab.name }
+						tabId={ tab.name }
+						focusable={ false }
+						className="block-editor-inserter__tabpanel"
+					>
+						{ children }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
+		</div>
 	);
 }
 
-export default InserterTabs;
+export default forwardRef( InserterTabs );

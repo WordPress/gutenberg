@@ -6,8 +6,7 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-let hiddenElements: Element[] = [],
-	isHidden = false;
+const hiddenElementsByDepth: Element[][] = [];
 
 /**
  * Hides all elements in the body element from screen-readers except
@@ -19,31 +18,30 @@ let hiddenElements: Element[] = [],
  * we should consider removing these helper functions in favor of
  * `aria-modal="true"`.
  *
- * @param {HTMLDivElement} unhiddenElement The element that should not be hidden.
+ * @param modalElement The element that should not be hidden.
  */
-export function hideApp( unhiddenElement?: HTMLDivElement ) {
-	if ( isHidden ) {
-		return;
-	}
+export function modalize( modalElement?: HTMLDivElement ) {
 	const elements = Array.from( document.body.children );
-	elements.forEach( ( element ) => {
-		if ( element === unhiddenElement ) {
-			return;
+	const hiddenElements: Element[] = [];
+	hiddenElementsByDepth.push( hiddenElements );
+	for ( const element of elements ) {
+		if ( element === modalElement ) {
+			continue;
 		}
+
 		if ( elementShouldBeHidden( element ) ) {
 			element.setAttribute( 'aria-hidden', 'true' );
 			hiddenElements.push( element );
 		}
-	} );
-	isHidden = true;
+	}
 }
 
 /**
  * Determines if the passed element should not be hidden from screen readers.
  *
- * @param {HTMLElement} element The element that should be checked.
+ * @param element The element that should be checked.
  *
- * @return {boolean} Whether the element should not be hidden from screen-readers.
+ * @return Whether the element should not be hidden from screen-readers.
  */
 export function elementShouldBeHidden( element: Element ) {
 	const role = element.getAttribute( 'role' );
@@ -56,16 +54,15 @@ export function elementShouldBeHidden( element: Element ) {
 }
 
 /**
- * Makes all elements in the body that have been hidden by `hideApp`
- * visible again to screen-readers.
+ * Accessibly reveals the elements hidden by the latest modal.
  */
-export function showApp() {
-	if ( ! isHidden ) {
+export function unmodalize() {
+	const hiddenElements = hiddenElementsByDepth.pop();
+	if ( ! hiddenElements ) {
 		return;
 	}
-	hiddenElements.forEach( ( element ) => {
+
+	for ( const element of hiddenElements ) {
 		element.removeAttribute( 'aria-hidden' );
-	} );
-	hiddenElements = [];
-	isHidden = false;
+	}
 }

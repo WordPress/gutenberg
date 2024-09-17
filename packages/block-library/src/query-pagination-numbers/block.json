@@ -5,9 +5,15 @@
 	"title": "Page Numbers",
 	"category": "theme",
 	"parent": [ "core/query-pagination" ],
-	"description": "Displays a list of page numbers for pagination",
+	"description": "Displays a list of page numbers for pagination.",
 	"textdomain": "default",
-	"usesContext": [ "queryId", "query" ],
+	"attributes": {
+		"midSize": {
+			"type": "number",
+			"default": 2
+		}
+	},
+	"usesContext": [ "queryId", "query", "enhancedPagination" ],
 	"supports": {
 		"reusable": false,
 		"html": false,
@@ -30,6 +36,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-numbers-editor"

@@ -21,25 +21,14 @@
 		}
 	}
 
-	.components-search-control {
-		input[type="search"].components-search-control__input {
-			background: $white;
-			border: 1px solid $gray-300;
-
-			&:focus {
-				border-color: var(--wp-admin-theme-color);
-				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-			}
-		}
-	}
-
 	@include break-medium() {
 		width: 456px;
 	}
 
 	.edit-site-custom-template-modal__suggestions_list {
 		@include break-small() {
-			overflow: scroll;
+			max-height: $grid-unit-70 * 4; // Height of four buttons
+			overflow-y: auto;
 		}
 
 		&__list-item {
@@ -92,8 +81,8 @@
 }
 
 .edit-site-custom-template-modal__no-results {
-	border: 1px solid $gray-400;
-	border-radius: $radius-block-ui;
+	border: $border-width solid $gray-400;
+	border-radius: $radius-small;
 	padding: $grid-unit-20;
 }
 
@@ -107,36 +96,13 @@
 	}
 }
 
-.edit-site-template-actions-loading-screen-modal {
-	backdrop-filter: none;
-	background-color: transparent;
-
-	&.is-full-screen {
-		background-color: $white;
-		box-shadow: 0 0 0 transparent;
-		min-width: 100%;
-		min-height: 100%;
-	}
-
-	&__content {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-	}
-}
-
 .edit-site-add-new-template__modal {
-	max-width: $grid-unit-80 * 13;
-	width: calc(100% - #{$grid-unit-80});
-	margin-top: $grid-unit-80;
-	max-height: calc(100% - #{$grid-unit-80 * 2});
 
 	@include break-large() {
+		max-width: $grid-unit-80 * 13;
+		margin-top: $grid-unit-80;
 		width: calc(100% - #{$grid-unit-80 * 2});
+		max-height: calc(100% - #{$grid-unit-80 * 2});
 	}
 
 	.edit-site-add-new-template__template-button,
@@ -166,7 +132,6 @@
 .edit-site-add-new-template__template-list__contents {
 	> .components-button {
 		padding: $grid-unit-40;
-		border-radius: $radius-block-ui;
 		display: flex;
 		flex-direction: column;
 		border: $border-width solid $gray-300;
@@ -208,8 +173,7 @@
 
 	.edit-site-add-new-template__custom-template-button,
 	.edit-site-add-new-template__template-list__prompt {
-		grid-column-start: 1;
-		grid-column-end: 4;
+		grid-column: 1 / -1;
 	}
 }
 

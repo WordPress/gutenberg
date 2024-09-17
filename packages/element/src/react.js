@@ -13,6 +13,7 @@ import {
 	Fragment,
 	isValidElement,
 	memo,
+	PureComponent,
 	StrictMode,
 	useCallback,
 	useContext,
@@ -37,26 +38,40 @@ import {
 /**
  * Object containing a React element.
  *
- * @typedef {import('react').ReactElement} WPElement
+ * @typedef {import('react').ReactElement} Element
  */
 
 /**
  * Object containing a React component.
  *
- * @typedef {import('react').ComponentType} WPComponent
+ * @typedef {import('react').ComponentType} ComponentType
  */
 
 /**
  * Object containing a React synthetic event.
  *
- * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
+ * @typedef {import('react').SyntheticEvent} SyntheticEvent
  */
 
 /**
- * Object containing a React synthetic event.
+ * Object containing a React ref object.
  *
  * @template T
  * @typedef {import('react').RefObject<T>} RefObject<T>
+ */
+
+/**
+ * Object containing a React ref callback.
+ *
+ * @template T
+ * @typedef {import('react').RefCallback<T>} RefCallback<T>
+ */
+
+/**
+ * Object containing a React ref.
+ *
+ * @template T
+ * @typedef {import('react').Ref<T>} Ref<T>
  */
 
 /**
@@ -67,10 +82,10 @@ export { Children };
 /**
  * Creates a copy of an element with extended props.
  *
- * @param {WPElement} element Element
- * @param {?Object}   props   Props to apply to cloned element
+ * @param {Element} element Element
+ * @param {?Object} props   Props to apply to cloned element
  *
- * @return {WPElement} Cloned element.
+ * @return {Element} Cloned element.
  */
 export { cloneElement };
 
@@ -96,9 +111,9 @@ export { createContext };
  * @param {Object}             props    Element properties, either attribute
  *                                      set to apply to DOM node or values to
  *                                      pass through to element creator
- * @param {...WPElement}       children Descendant elements
+ * @param {...Element}         children Descendant elements
  *
- * @return {WPElement} Element.
+ * @return {Element} Element.
  */
 export { createElement };
 
@@ -120,7 +135,7 @@ export { createRef };
  * @param {Function} forwarder Function passed `props` and `ref`, expected to
  *                             return an element.
  *
- * @return {WPComponent} Enhanced component.
+ * @return {Component} Enhanced component.
  */
 export { forwardRef };
 
@@ -130,16 +145,16 @@ export { forwardRef };
 export { Fragment };
 
 /**
- * Checks if an object is a valid WPElement.
+ * Checks if an object is a valid React Element.
  *
  * @param {Object} objectToCheck The object to be checked.
  *
- * @return {boolean} true if objectToTest is a valid WPElement and false otherwise.
+ * @return {boolean} true if objectToTest is a valid React Element and false otherwise.
  */
 export { isValidElement };
 
 /**
- * @see https://reactjs.org/docs/react-api.html#reactmemo
+ * @see https://react.dev/reference/react/memo
  */
 export { memo };
 
@@ -149,94 +164,99 @@ export { memo };
 export { StrictMode };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usecallback
+ * @see https://react.dev/reference/react/useCallback
  */
 export { useCallback };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usecontext
+ * @see https://react.dev/reference/react/useContext
  */
 export { useContext };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usedebugvalue
+ * @see https://react.dev/reference/react/useDebugValue
  */
 export { useDebugValue };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usedeferredvalue
+ * @see https://react.dev/reference/react/useDeferredValue
  */
 export { useDeferredValue };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useeffect
+ * @see https://react.dev/reference/react/useEffect
  */
 export { useEffect };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useid
+ * @see https://react.dev/reference/react/useId
  */
 export { useId };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useimperativehandle
+ * @see https://react.dev/reference/react/useImperativeHandle
  */
 export { useImperativeHandle };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useinsertioneffect
+ * @see https://react.dev/reference/react/useInsertionEffect
  */
 export { useInsertionEffect };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#uselayouteffect
+ * @see https://react.dev/reference/react/useLayoutEffect
  */
 export { useLayoutEffect };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usememo
+ * @see https://react.dev/reference/react/useMemo
  */
 export { useMemo };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usereducer
+ * @see https://react.dev/reference/react/useReducer
  */
 export { useReducer };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useref
+ * @see https://react.dev/reference/react/useRef
  */
 export { useRef };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usestate
+ * @see https://react.dev/reference/react/useState
  */
 export { useState };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usesyncexternalstore
+ * @see https://react.dev/reference/react/useSyncExternalStore
  */
 export { useSyncExternalStore };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#usetransition
+ * @see https://react.dev/reference/react/useTransition
  */
 export { useTransition };
 
 /**
- * @see https://reactjs.org/docs/react-api.html#starttransition
+ * @see https://react.dev/reference/react/startTransition
  */
 export { startTransition };
 
 /**
- * @see https://reactjs.org/docs/react-api.html#reactlazy
+ * @see https://react.dev/reference/react/lazy
  */
 export { lazy };
 
 /**
- * @see https://reactjs.org/docs/react-api.html#reactsuspense
+ * @see https://react.dev/reference/react/Suspense
  */
 export { Suspense };
+
+/**
+ * @see https://react.dev/reference/react/PureComponent
+ */
+export { PureComponent };
 
 /**
  * Concatenate two or more React children objects.

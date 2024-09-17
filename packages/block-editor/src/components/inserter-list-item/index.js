@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,22 +32,23 @@ function InserterListItem( {
 	isDraggable,
 	...props
 } ) {
-	const isDragging = useRef( false );
+	const isDraggingRef = useRef( false );
 	const itemIconStyle = item.icon
 		? {
 				backgroundColor: item.icon.background,
 				color: item.icon.foreground,
 		  }
 		: {};
-	const blocks = useMemo( () => {
-		return [
+	const blocks = useMemo(
+		() => [
 			createBlock(
 				item.name,
 				item.initialAttributes,
 				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
 			),
-		];
-	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
+		],
+		[ item.name, item.initialAttributes, item.innerBlocks ]
+	);
 
 	const isSynced =
 		( isReusableBlock( item ) && item.syncStatus !== 'unsynced' ) ||
@@ -55,29 +56,28 @@ function InserterListItem( {
 
 	return (
 		<InserterDraggableBlocks
-			isEnabled={ isDraggable && ! item.disabled }
+			isEnabled={ isDraggable && ! item.isDisabled }
 			blocks={ blocks }
 			icon={ item.icon }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-types-list__list-item',
-
 						{
 							'is-synced': isSynced,
 						}
 					) }
 					draggable={ draggable }
 					onDragStart={ ( event ) => {
-						isDragging.current = true;
+						isDraggingRef.current = true;
 						if ( onDragStart ) {
 							onHover( null );
 							onDragStart( event );
 						}
 					} }
 					onDragEnd={ ( event ) => {
-						isDragging.current = false;
+						isDraggingRef.current = false;
 						if ( onDragEnd ) {
 							onDragEnd( event );
 						}
@@ -85,7 +85,7 @@ function InserterListItem( {
 				>
 					<InserterListboxItem
 						isFirst={ isFirst }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-types-list__item',
 							className
 						) }
@@ -110,7 +110,7 @@ function InserterListItem( {
 							}
 						} }
 						onMouseEnter={ () => {
-							if ( isDragging.current ) {
+							if ( isDraggingRef.current ) {
 								return;
 							}
 							onHover( item );

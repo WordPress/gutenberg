@@ -4,7 +4,7 @@
 	justify-content: center;
 	align-items: flex-start;
 	width: 100%;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 
 	&.view-mode-grid {
 		padding-top: $grid-unit-05;
@@ -32,6 +32,8 @@
 			}
 
 			.block-editor-block-pattern-setup-list__item {
+				scroll-margin: 5px 0;
+
 				&:hover .block-editor-block-preview__container {
 					box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
 				}
@@ -44,6 +46,7 @@
 					color: var(--wp-admin-theme-color);
 				}
 			}
+
 			.block-editor-block-pattern-setup-list__list-item {
 				break-inside: avoid-column;
 				margin-bottom: $grid-unit-30;
@@ -57,7 +60,7 @@
 
 				.block-editor-block-preview__container {
 					min-height: 100px;
-					border-radius: $radius-block-ui;
+					border-radius: $radius-medium;
 					border: $border-width solid $gray-300;
 				}
 
@@ -85,7 +88,7 @@
 		align-items: center;
 		justify-content: space-between;
 		border-top: 1px solid $gray-300;
-		align-self: flex-end;
+		align-self: stretch;
 
 		.block-editor-block-pattern-setup__display-controls {
 			display: flex;

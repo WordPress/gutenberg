@@ -67,9 +67,8 @@ describe( 'Inserter', () => {
 			fireEvent( addBlockButton, 'onLongPress' );
 
 			// Get Add To Beginning option
-			const addBlockToBeginningButton = await getByLabelText(
-				'Add To Beginning'
-			);
+			const addBlockToBeginningButton =
+				await getByLabelText( 'Add To Beginning' );
 			expect( addBlockToBeginningButton ).toBeVisible();
 			fireEvent.press( addBlockToBeginningButton );
 
@@ -97,9 +96,8 @@ describe( 'Inserter', () => {
 			fireEvent( addBlockButton, 'onLongPress' );
 
 			// Get Add Block Before option
-			const addBlockBeforeButton = await getByLabelText(
-				'Add Block Before'
-			);
+			const addBlockBeforeButton =
+				await getByLabelText( 'Add Block Before' );
 			expect( addBlockBeforeButton ).toBeVisible();
 			fireEvent.press( addBlockBeforeButton );
 
@@ -135,9 +133,8 @@ describe( 'Inserter', () => {
 			fireEvent( addBlockButton, 'onLongPress' );
 
 			// Get Add Block After option
-			const addBlockAfterButton = await getByLabelText(
-				'Add Block After'
-			);
+			const addBlockAfterButton =
+				await getByLabelText( 'Add Block After' );
 			expect( addBlockAfterButton ).toBeVisible();
 			fireEvent.press( addBlockAfterButton );
 
@@ -233,9 +230,8 @@ describe( 'Inserter', () => {
 			await addBlock( screen, 'Heading' );
 
 			// Select the title
-			const titleInputElement = await getAllByLabelText(
-				'Post title. test'
-			)[ 0 ];
+			const titleInputElement =
+				await getAllByLabelText( 'Post title. test' )[ 0 ];
 			expect( titleInputElement ).toBeVisible();
 			fireEvent.press( titleInputElement );
 

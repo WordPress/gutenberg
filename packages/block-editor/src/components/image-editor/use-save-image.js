@@ -13,9 +13,6 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 export default function useSaveImage( {
 	crop,
 	rotation,
-	height,
-	width,
-	aspect,
 	url,
 	id,
 	onSaveImage,
@@ -27,7 +24,7 @@ export default function useSaveImage( {
 	const cancel = useCallback( () => {
 		setIsInProgress( false );
 		onFinishEditing();
-	}, [ setIsInProgress, onFinishEditing ] );
+	}, [ onFinishEditing ] );
 
 	const apply = useCallback( () => {
 		setIsInProgress( true );
@@ -55,6 +52,13 @@ export default function useSaveImage( {
 					height: crop.height,
 				},
 			} );
+		}
+
+		if ( modifiers.length === 0 ) {
+			// No changes to apply.
+			setIsInProgress( false );
+			onFinishEditing();
+			return;
 		}
 
 		apiFetch( {
@@ -86,16 +90,12 @@ export default function useSaveImage( {
 				onFinishEditing();
 			} );
 	}, [
-		setIsInProgress,
 		crop,
 		rotation,
-		height,
-		width,
-		aspect,
+		id,
 		url,
 		onSaveImage,
 		createErrorNotice,
-		setIsInProgress,
 		onFinishEditing,
 	] );
 

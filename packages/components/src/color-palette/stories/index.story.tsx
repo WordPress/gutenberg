@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
@@ -29,8 +28,12 @@ const meta: Meta< typeof ColorPalette > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
-	const [ color, setColor ] = useState< string | undefined >();
+const Template: StoryFn< typeof ColorPalette > = ( {
+	onChange,
+	value,
+	...args
+} ) => {
+	const [ color, setColor ] = useState< string | undefined >( value );
 
 	return (
 		<ColorPalette
@@ -51,6 +54,16 @@ Default.args = {
 		{ name: 'White', color: '#fff' },
 		{ name: 'Blue', color: '#00f' },
 	],
+};
+
+export const InitialValue = Template.bind( {} );
+InitialValue.args = {
+	colors: [
+		{ name: 'Red', color: '#f00' },
+		{ name: 'White', color: '#fff' },
+		{ name: 'Blue', color: '#00f' },
+	],
+	value: '#00f',
 };
 
 export const MultipleOrigins = Template.bind( {} );
@@ -78,13 +91,11 @@ MultipleOrigins.args = {
 export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={
-				{
-					'--red': '#f00',
-					'--yellow': '#ff0',
-					'--blue': '#00f',
-				} as CSSProperties
-			}
+			style={ {
+				'--red': '#f00',
+				'--yellow': '#ff0',
+				'--blue': '#00f',
+			} }
 		>
 			<Template { ...args } />
 		</div>

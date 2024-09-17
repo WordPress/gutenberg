@@ -18,6 +18,17 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts}' ).map(
 	( fileName ) => fileName.split( '/' )[ 1 ]
 );
 
+// The following unit tests related to the `raw-handling` API will be enabled when addressing
+// the various errors we encounter when running them in the native version.
+// Reference: https://github.com/WordPress/gutenberg/issues/55652
+const RAW_HANDLING_UNSUPPORTED_UNIT_TESTS = [
+	'html-formatting-remover',
+	'phrasing-content-reducer',
+	'figure-content-reducer',
+	'normalise-blocks',
+	'image-corrector',
+];
+
 module.exports = {
 	rootDir: '../../',
 	// Automatically clear mock calls and instances between every test.
@@ -29,6 +40,10 @@ module.exports = {
 		'<rootDir>/test/**/*.native.[jt]s?(x)',
 		'<rootDir>/**/test/!(helper)*.native.[jt]s?(x)',
 		'<rootDir>/packages/react-native-*/**/?(*.)+(spec|test).[jt]s?(x)',
+		// Enable `raw-handling` API unit tests to check jsdom patches.
+		`<rootDir>/packages/blocks/src/api/raw-handling/**/test/!(${ RAW_HANDLING_UNSUPPORTED_UNIT_TESTS.join(
+			'|'
+		) }).[jt]s?(x)`,
 	],
 	testPathIgnorePatterns: [ '/node_modules/', '/__device-tests__/' ],
 	testEnvironmentOptions: {
@@ -42,7 +57,7 @@ module.exports = {
 		'node_modules',
 	],
 	moduleNameMapper: {
-		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
+		// Mock the CSS modules. See https://jestjs.io/docs/webpack#handling-static-assets
 		'\\.(scss)$': '<rootDir>/test/native/__mocks__/styleMock.js',
 		'\\.(eot|otf|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
 			'<rootDir>/test/native/__mocks__/fileMock.js',

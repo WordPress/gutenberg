@@ -6,11 +6,6 @@ The `LineHeightControl` component adds a lineHeight attribute to the core Paragr
 
 _Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights) before it'll be available.
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -23,7 +18,6 @@ const MyLineHeightControl = () => (
 	<LineHeightControl
 		value={ lineHeight }
 		onChange={ onChange }
-		__nextHasNoMarginBottom={ true }
 	/>
 );
 ```
@@ -42,12 +36,12 @@ The value of the line height.
 
 A callback function that handles the application of the line height value.
 
-#### `__nextHasNoMarginBottom`
+#### `__next40pxDefaultSize`
 
--   **Type:** `boolean`
--   **Default:** `false`
+- **Type:** `boolean`
+- **Default:** `false`
 
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+Start opting into the larger default height that will become the default size in a future version.
 
 ## Related components
 

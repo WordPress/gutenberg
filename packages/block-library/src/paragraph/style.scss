@@ -38,7 +38,8 @@ p.has-drop-cap.has-background {
 	overflow: hidden;
 }
 
-p.has-background {
+// Specificity is reduced to 0-1-0 so global styles can override this.
+:root :where(p.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
 
@@ -48,4 +49,9 @@ p.has-background {
 // For example, this is what global styles does.
 :where(p.has-text-color:not(.has-link-color)) a {
 	color: inherit;
+}
+
+p.has-text-align-right[style*="writing-mode:vertical-rl"],
+p.has-text-align-left[style*="writing-mode:vertical-lr"] {
+	rotate: 180deg;
 }

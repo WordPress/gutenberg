@@ -1,46 +1,80 @@
-$toggle-width: 36px;
-$toggle-height: 18px;
+@use "sass:math";
+
+$toggle-width: $grid-unit-40;
+$toggle-height: $grid-unit-20;
 $toggle-border-width: 1px;
+$toggle-thumb-size:  $grid-unit-15;
+
+$transition-duration: 0.2s;
 
 .components-form-toggle {
 	position: relative;
 	display: inline-block;
+	height: $toggle-height;
 
 	// Unchecked state.
 	.components-form-toggle__track {
+		position: relative;
 		content: "";
 		display: inline-block;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
-		border: $toggle-border-width solid $gray-900;
+		border: $toggle-border-width solid $gray-600;
 		width: $toggle-width;
 		height: $toggle-height;
-		border-radius: $toggle-height * 0.5;
-		transition: 0.2s background ease;
+		border-radius: math.div($toggle-height, 2);
+		transition:
+			$transition-duration background-color ease,
+			$transition-duration border-color ease;
 		@include reduce-motion("transition");
+		overflow: hidden;
+
+		// Windows High Contrast Mode
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			box-sizing: border-box;
+			// Expand the border to fake a solid in Windows High Contrast Mode.
+			border-top: #{ $toggle-height } solid transparent;
+
+			transition: $transition-duration opacity ease;
+			@include reduce-motion("transition");
+
+			opacity: 0;
+		}
 	}
 
 	.components-form-toggle__thumb {
 		display: block;
 		position: absolute;
 		box-sizing: border-box;
-		top: $toggle-border-width * 3;
-		left: $toggle-border-width * 3;
-		width: $toggle-height - ($toggle-border-width * 6);
-		height: $toggle-height - ($toggle-border-width * 6);
-		border-radius: 50%;
-		transition: 0.1s transform ease;
+		top: math.div($toggle-thumb-size, 6);
+		left: math.div($toggle-thumb-size, 6);
+		width: $toggle-thumb-size;
+		height: $toggle-thumb-size;
+		border-radius: $radius-round;
+		transition:
+			$transition-duration transform ease,
+			$transition-duration background-color ease-out;
 		@include reduce-motion("transition");
 		background-color: $gray-900;
-		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
+		box-shadow: $elevation-x-small;
+
+		// Transparent border acts as a fill in Windows High Contrast Mode.
+		border: math.div($toggle-thumb-size, 2) solid transparent;
 	}
 
 	// Checked state.
 	&.is-checked .components-form-toggle__track {
 		background-color: $components-color-accent;
-		border: $toggle-border-width solid $components-color-accent;
-		border: #{ $toggle-height * 0.5 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+		border-color: $components-color-accent;
+
+		// Windows High Contrast Mode
+		&::after {
+			opacity: 1;
+		}
 	}
 
 	.components-form-toggle__input:focus + .components-form-toggle__track {
@@ -83,5 +117,9 @@ $toggle-border-width: 1px;
 	// Don't show custom checkbox checkmark.
 	&::before {
 		content: "";
+	}
+
+	&:not(:disabled, [aria-disabled="true"]) {
+		cursor: pointer;
 	}
 }

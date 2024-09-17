@@ -26,6 +26,17 @@ const meta: Meta< typeof Button > = {
 	component: Button,
 	argTypes: {
 		// Overrides a limitation of the docgen interpreting our TS types for this as required.
+		'aria-pressed': {
+			control: { type: 'select' },
+			description:
+				'Indicates the current "pressed" state, implying it is a toggle button. Implicitly set by `isPressed`, but takes precedence if both are provided.',
+			options: [ undefined, 'true', 'false', 'mixed' ],
+			table: {
+				type: {
+					summary: 'boolean | "true" | "false" | "mixed"',
+				},
+			},
+		},
 		href: { type: { name: 'string', required: false } },
 		icon: {
 			control: { type: 'select' },

@@ -1,0 +1,15 @@
+.editor-post-discussion__panel-dialog .editor-post-discussion {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+}
+.editor-post-discussion__panel-toggle {
+
+	.components-text {
+		color: inherit;
+	}
+}
+
+.editor-post-discussion__panel-dialog .components-popover__content {
+	min-width: 320px;
+}

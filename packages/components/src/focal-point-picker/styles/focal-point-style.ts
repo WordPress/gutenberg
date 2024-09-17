@@ -3,21 +3,36 @@
  */
 import styled from '@emotion/styled';
 
+/**
+ * Internal dependencies
+ */
+import { CONFIG } from '../../utils';
+
 export const PointerCircle = styled.div`
 	background-color: transparent;
 	cursor: grab;
-	height: 48px;
-	margin: -24px 0 0 -24px;
+	height: 40px;
+	margin: -20px 0 0 -20px;
 	position: absolute;
 	user-select: none;
-	width: 48px;
+	width: 40px;
 	will-change: transform;
 	z-index: 10000;
-	background: rgba( 255, 255, 255, 0.6 );
-	border-radius: 50%;
-	backdrop-filter: blur( 4px );
-	box-shadow: rgb( 0 0 0 / 20% ) 0px 0px 10px;
+	background: rgba( 255, 255, 255, 0.4 );
+	border: 1px solid rgba( 255, 255, 255, 0.4 );
+	border-radius: ${ CONFIG.radiusRound };
+	backdrop-filter: blur( 16px ) saturate( 180% );
+	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
+
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 100ms linear;
+	}
 
 	${ ( { isDragging }: { isDragging: boolean } ) =>
-		isDragging && 'cursor: grabbing;' }
+		isDragging &&
+		`
+			box-shadow: rgb( 0 0 0 / 12% ) 0px 0px 10px;
+			transform: scale( 1.1 );
+			cursor: grabbing;
+			` }
 `;

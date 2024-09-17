@@ -30,11 +30,11 @@ The global function `wp_style_engine_get_styles` accepts a style object as its f
 
 ```php
 $block_styles =  array(
-     'spacing' => array( 'padding' => '10px', 'margin' => array( 'top' => '1em') ),
-     'typography' => array( 'fontSize' => '2.2rem' ),
+	'spacing' => array( 'padding' => '10px', 'margin' => array( 'top' => '1em') ),
+	'typography' => array( 'fontSize' => '2.2rem' ),
 );
 $styles = wp_style_engine_get_styles(
-    $block_styles
+	$block_styles
 );
 print_r( $styles );
 
@@ -51,7 +51,7 @@ When [registering a block support](https://developer.wordpress.org/reference/cla
 
 If a block has opted into the block support, the values of "class" and "style" will be applied to the block element's "class" and "style" attributes accordingly when rendered in the frontend HTML. Note, this applies only to server-side rendered blocks, for example, the [Site Title block](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/#site-title).
 
-The callback receives `$block_type` and `$block_attributes` as arguments. The `style` attribute within `$block_attributes` only contains the raw style object, if any styles have been set for the block, and not any CSS or classnames to be applied to the block's HTML elements. 
+The callback receives `$block_type` and `$block_attributes` as arguments. The `style` attribute within `$block_attributes` only contains the raw style object, if any styles have been set for the block, and not any CSS or classnames to be applied to the block's HTML elements.
 
 Here is where `wp_style_engine_get_styles` comes in handy: it will generate CSS and, if appropriate, classnames to be added to the "style" and "class" HTML attributes in the final rendered block markup.
 
@@ -100,7 +100,7 @@ Before passing the block style object to the Style Engine, you'll need to take i
 
 If a block either:
 
-- has no support for a style, or 
+- has no support for a style, or
 - skips serialization of that style
 
 it's likely that you'll want to remove those style values from the style object before passing it to the Style Engine with help of two functions:
@@ -108,24 +108,24 @@ it's likely that you'll want to remove those style values from the style object 
 - wp_should_skip_block_supports_serialization()
 - block_has_support()
 
-We can now update the apply callback code above so that we'll only return "style" and "class", where a block has support and it doesn't skip serialization:
+We can now update the "apply" callback code above so that we'll only return "style" and "class", where a block has support, and it doesn't skip serialization:
 
 ```php
 function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	// The return value.
 	$attributes = array();
-    
+
 	// Return early if the block skips all serialization for block supports.
 	if ( gutenberg_should_skip_block_supports_serialization( $block_type, 'color' ) ) {
 		return $attributes;
 	}
 
 	// Checks for support and skip serialization.
-	$has_text_support                        = block_has_support( $block_type, array( 'color', 'text' ), false ); 
+	$has_text_support                        = block_has_support( $block_type, array( 'color', 'text' ), false );
 	$has_background_support                  = block_has_support( $block_type, array( 'color', 'background' ), false );
-	$skips_serialization_of_color_text       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' ); 
-	$skips_serialization_of_color_background = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' ); 
-    
+	$skips_serialization_of_color_text       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'text' );
+	$skips_serialization_of_color_background = wp_should_skip_block_supports_serialization( $block_type, 'color', 'background' );
+
 	// Get the color styles from the style object.
 	$block_color_styles = isset( $block_attributes['style']['color'] ) ? $block_attributes['style']['color'] : null;
 
@@ -133,8 +133,14 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$color_block_styles = array();
 
 	// Set the color style values according to whether the block has support and does not skip serialization.
-	$spacing_block_styles['text']       = $has_text_support && ! $skips_serialization_of_color_text ? _wp_array_get( $block_color_styles, array( 'text' ), null ) : null;
-	$spacing_block_styles['background'] = $has_background_support && ! $skips_serialization_of_color_background ? _wp_array_get( $block_color_styles, array( 'background' ), null ) : null;
+	$spacing_block_styles['text']       = null;
+	$spacing_block_styles['background'] = null;
+	if ( $has_text_support && ! $skips_serialization_of_color_text ) {
+		$spacing_block_styles['text'] = $block_color_styles['text'] ?? null;
+	}
+	if $has_background_support && ! $skips_serialization_of_color_background ) {
+		$spacing_block_styles['background'] = $block_color_styles['background'] ?? null;
+	}
 
 	// Pass the color styles, excluding those that have no support or skip serialization, to the Style Engine.
 	$styles = wp_style_engine_get_styles( array( 'color' => $block_color_styles ) );
@@ -155,7 +161,7 @@ Styling a block using these presets normally involves adding the selector to the
 
 For styles that can have preset values, such as text color and font family, the Style Engine knows how to construct the classnames using the preset slug.
 
-To discern CSS values from preset values however, the Style Engine expects a special format.
+To discern CSS values from preset values, the Style Engine expects a special format.
 
 Preset values must follow the pattern `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`.
 
@@ -165,13 +171,16 @@ Example:
 
 ```php
 // Let's say the block attributes styles contain a fontSize preset slug of "small".
+// $block_attributes['fontSize'] = 'var:preset|font-size|small';
 $preset_font_size        = "var:preset|font-size|{$block_attributes['fontSize']}";
 // Now let's say the block attributes styles contain a backgroundColor preset slug of "blue".
+// $block_attributes['backgroundColor'] = 'var:preset|color|blue';
 $preset_background_color = "var:preset|color|{$block_attributes['backgroundColor']}";
 
 $block_styles =  array(
 	'typography' => array( 'fontSize' => $preset_font_size ),
-	'color'      => array( 'background' => $preset_background_color )
+	'color'      => array( 'background' => $preset_background_color ),
+	'spacing'    => array( 'padding' => '10px', 'margin' => array( 'top' => '1em') ),
 );
 
 $styles = wp_style_engine_get_styles(
@@ -181,19 +190,29 @@ print_r( $styles );
 
 /*
 array(
-    'css'        => 'background-color:var(--wp--preset--color--blue);font-size:var(--wp--preset--font-size--small);',
-    'classnames' => 'has-background-color has-blue-background-color has-small-font-size',
+	'css'          => 'background-color:var(--wp--preset--color--blue);padding:10px;margin-top:1em;font-size:var(--wp--preset--font-size--small);',
+	'declarations' => array(
+		'background-color' => 'var(--wp--preset--color--blue)',
+		'padding' => '10px',
+		'margin-top' => '1em',
+		'font-size' => 'var(--wp--preset--font-size--small)',
+	),
+    'classnames'   => 'has-background has-blue-background-color has-small-font-size',
 )
 */
 ```
 
-If you don't want the Style Engine to output the CSS custom vars as well, which you might not if you're applying both the CSS and classnames to the block element, you can pass `'convert_vars_to_classnames' => true` in the options array.
+If you don't want the Style Engine to output the CSS custom vars in the generated CSS string as well, which you might not if you're applying both the CSS rules and classnames to the block element, you can pass `'convert_vars_to_classnames' => true` in the options array.
+
+This flag means "convert the vars to classnames and don't output the vars to the CSS". The Style Engine will therefore **only** generate the required classnames and omit the CSS custom vars in the CSS.
+
+Using the above example code, observe the different output when we pass the option:
 
 ```php
 $options = array(
-	// Whether to skip converting CSS var:? values to var( --wp--preset--* ) values. Default is `false`.
-	'convert_vars_to_classnames' => 'true',
+	'convert_vars_to_classnames' => true,
 );
+
 $styles = wp_style_engine_get_styles(
 	$block_styles,
 	$options
@@ -202,10 +221,14 @@ print_r( $styles );
 
 /*
 array(
-    'css'        => 'letter-spacing:12px;', // non-preset-based CSS will still be compiled.
-    'classnames' => 'has-background-color has-blue-background-color has-small-font-size',
+	'css'          => 'padding:10px;margin-top:1em;',
+	'declarations' => array(
+		'padding' => '10px',
+		'margin-top' => '1em',
+	),
+	'classnames'   => 'has-background has-blue-background-color has-small-font-size',
 )
 */
 ```
 
-Read more about [global styles](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#global-styles) and [preset CSS custom properties](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#css-custom-properties-presets-custom) and [theme supports](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/).
+Read more about [global styles](https://developer.wordpress.org/block-editor/explanations/architecture/styles/#global-styles) and [preset CSS custom properties](https://developer.wordpress.org/block-editor/how-to-guides/themes/global-settings-and-styles.md#css-custom-properties-presets-custom) and [theme supports](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/).

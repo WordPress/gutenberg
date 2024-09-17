@@ -15,41 +15,41 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as reusableBlocksStore } from '../../store';
 
 function ReusableBlocksManageButton( { clientId } ) {
-	const { canRemove, isVisible, innerBlockCount, managePatternsUrl } =
-		useSelect(
-			( select ) => {
-				const { getBlock, canRemoveBlock, getBlockCount, getSettings } =
-					select( blockEditorStore );
-				const { canUser } = select( coreStore );
-				const reusableBlock = getBlock( clientId );
-				const isBlockTheme = getSettings().__unstableIsBlockBasedTheme;
+	const { canRemove, isVisible, managePatternsUrl } = useSelect(
+		( select ) => {
+			const { getBlock, canRemoveBlock, getBlockCount } =
+				select( blockEditorStore );
+			const { canUser } = select( coreStore );
+			const reusableBlock = getBlock( clientId );
 
-				return {
-					canRemove: canRemoveBlock( clientId ),
-					isVisible:
-						!! reusableBlock &&
-						isReusableBlock( reusableBlock ) &&
-						!! canUser(
-							'update',
-							'blocks',
-							reusableBlock.attributes.ref
-						),
-					innerBlockCount: getBlockCount( clientId ),
-					// The site editor and templates both check whether the user
-					// has edit_theme_options capabilities. We can leverage that here
-					// and omit the manage patterns link if the user can't access it.
-					managePatternsUrl:
-						isBlockTheme && canUser( 'read', 'templates' )
-							? addQueryArgs( 'site-editor.php', {
-									path: '/patterns',
-							  } )
-							: addQueryArgs( 'edit.php', {
-									post_type: 'wp_block',
-							  } ),
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				canRemove: canRemoveBlock( clientId ),
+				isVisible:
+					!! reusableBlock &&
+					isReusableBlock( reusableBlock ) &&
+					!! canUser( 'update', {
+						kind: 'postType',
+						name: 'wp_block',
+						id: reusableBlock.attributes.ref,
+					} ),
+				innerBlockCount: getBlockCount( clientId ),
+				// The site editor and templates both check whether the user
+				// has edit_theme_options capabilities. We can leverage that here
+				// and omit the manage patterns link if the user can't access it.
+				managePatternsUrl: canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} )
+					? addQueryArgs( 'site-editor.php', {
+							path: '/patterns',
+					  } )
+					: addQueryArgs( 'edit.php', {
+							post_type: 'wp_block',
+					  } ),
+			};
+		},
+		[ clientId ]
+	);
 
 	const { __experimentalConvertBlockToStatic: convertBlockToStatic } =
 		useDispatch( reusableBlocksStore );
@@ -65,9 +65,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 			</MenuItem>
 			{ canRemove && (
 				<MenuItem onClick={ () => convertBlockToStatic( clientId ) }>
-					{ innerBlockCount > 1
-						? __( 'Detach patterns' )
-						: __( 'Detach pattern' ) }
+					{ __( 'Detach' ) }
 				</MenuItem>
 			) }
 		</>

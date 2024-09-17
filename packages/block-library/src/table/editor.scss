@@ -1,7 +1,4 @@
 .wp-block-table {
-	// Remove default <figure> style.
-	margin: 0;
-
 	.wp-block[data-align="left"] > &,
 	.wp-block[data-align="right"] > &,
 	.wp-block[data-align="center"] > & {
@@ -58,27 +55,14 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-
-	> * {
-		margin-bottom: $grid-unit-10;
-	}
+	gap: $grid-unit-10;
 
 	@include break-medium() {
 		flex-direction: row;
 		align-items: flex-end;
-
-		> * {
-			margin-bottom: 0;
-		}
 	}
 }
 
 .blocks-table__placeholder-input {
 	width: $grid-unit-10 * 14;
-	margin-right: $grid-unit-10;
-	margin-bottom: 0;
-
-	input {
-		height: $button-size;
-	}
 }

@@ -51,7 +51,7 @@ jobs:
                     return $?
                   }
 
-                  # Only update trunk *if* the published release's version in Github is GREATER
+                  # Only update trunk *if* the published release's version in GitHub is GREATER
                   # than the version currently published in the WP plugins repo. If not, then it
                   # will upload it as a new tag.
                   shouldUpdateTrunk=false
@@ -96,10 +96,11 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Update the Changelog to include the release notes
               run: |
@@ -146,7 +147,7 @@ jobs:
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
@@ -188,7 +189,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
               with:
                   name: changelog trunk
                   path: trunk
@@ -199,7 +200,8 @@ jobs:
                   svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
                   svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
                   svn commit -m "Committing version $VERSION" \
-                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                   --config-option=servers:global:http-timeout=300
 
             - name: Create the SVN tag
               working-directory: ./trunk
@@ -245,7 +247,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
               with:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}
@@ -253,4 +255,5 @@ jobs:
             - name: Add the new version directory and commit changes to the SVN repository
               run: |
                   svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
-                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                  --config-option=servers:global:http-timeout=300

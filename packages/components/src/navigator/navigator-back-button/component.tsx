@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useNavigatorBackButton } from './hook';
 import type { NavigatorBackButtonProps } from '../types';
@@ -48,7 +48,7 @@ function UnconnectedNavigatorBackButton(
  *     <NavigatorScreen path="/child">
  *       <p>This is the child screen.</p>
  *       <NavigatorBackButton>
- *         Go back
+ *         Go back (to parent)
  *       </NavigatorBackButton>
  *     </NavigatorScreen>
  *   </NavigatorProvider>

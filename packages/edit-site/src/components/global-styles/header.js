@@ -7,26 +7,22 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
 	__experimentalView as View,
-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 
-function ScreenHeader( { title, description } ) {
+function ScreenHeader( { title, description, onBack } ) {
 	return (
 		<VStack spacing={ 0 }>
 			<View>
 				<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 					<HStack spacing={ 2 }>
-						<NavigatorToParentButton
-							style={
-								// TODO: This style override is also used in ToolsPanelHeader.
-								// It should be supported out-of-the-box by Button.
-								{ minWidth: 24, padding: 0 }
-							}
+						<NavigatorBackButton
 							icon={ isRTL() ? chevronRight : chevronLeft }
-							isSmall
-							aria-label={ __( 'Navigate to the previous view' ) }
+							size="small"
+							label={ __( 'Back' ) }
+							onClick={ onBack }
 						/>
 						<Spacer>
 							<Heading

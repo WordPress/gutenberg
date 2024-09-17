@@ -4,12 +4,6 @@ SelectControl allow users to select from a single or multiple option menu. It fu
 
 ![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -82,8 +76,8 @@ Use sentences in your menu.
 Render a user interface to select the size of an image.
 
 ```jsx
+import { useState } from 'react';
 import { SelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MySelectControl = () => {
 	const [ size, setSize ] = useState( '50%' );
@@ -109,7 +103,7 @@ Render a user interface to select multiple users from a list.
 ```jsx
 <SelectControl
 	multiple
-	label={ __( 'Select some users:' ) }
+	label={ __( 'User' ) }
 	value={ this.state.users } // e.g: value = [ 'a', 'c' ]
 	onChange={ ( users ) => {
 		this.setState( { users } );
@@ -132,7 +126,7 @@ const [ item, setItem ] = useState( '' );
 // ...
 
 <SelectControl
-    label={ __( 'Select an item:' ) }
+    label={ __( 'My dinosaur' ) }
     value={ item } // e.g: value = 'a'
     onChange={ ( selection ) => { setItem( selection ) } }
     __nextHasNoMarginBottom
@@ -182,7 +176,7 @@ If true, the label will only be visible to screen readers.
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 #### multiple
@@ -196,7 +190,7 @@ In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl`
 
 #### options
 
-An array of objects containing the following properties:
+An array of objects containing the following properties, as well as any other `option` element attributes:
 
 -   `label`: (string) The label to be shown to the user.
 -   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
@@ -219,6 +213,29 @@ If multiple is false the value received is a single value with the new selected 
 
 -   Type: `function`
 -   Required: Yes
+
+#### value
+
+The value of the selected option. If `multiple` is true, the `value` should be an array with the values of the selected options.
+
+-   Type: `String|String[]`
+-   Required: No
+
+#### variant
+
+The style variant of the control.
+
+-   Type: `'default' | 'minimal'`
+-   Required: No
+-   Default: `'default'`
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 ### __nextHasNoMarginBottom
 

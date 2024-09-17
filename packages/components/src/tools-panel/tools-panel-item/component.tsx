@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
  */
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import type { ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It

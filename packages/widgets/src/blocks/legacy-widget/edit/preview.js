@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -113,12 +113,9 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				</Placeholder>
 			) }
 			<div
-				className={ classnames(
-					'wp-block-legacy-widget__edit-preview',
-					{
-						'is-offscreen': ! isVisible || ! isLoaded,
-					}
-				) }
+				className={ clsx( 'wp-block-legacy-widget__edit-preview', {
+					'is-offscreen': ! isVisible || ! isLoaded,
+				} ) }
 			>
 				<Disabled>
 					{ /*

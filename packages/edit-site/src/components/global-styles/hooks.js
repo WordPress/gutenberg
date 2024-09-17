@@ -58,6 +58,13 @@ export function useStylesPreviewColors() {
 	const [ headingColor = textColor ] = useGlobalStyle(
 		'elements.h1.color.text'
 	);
+	const [ linkColor = headingColor ] = useGlobalStyle(
+		'elements.link.color.text'
+	);
+
+	const [ buttonBackgroundColor = linkColor ] = useGlobalStyle(
+		'elements.button.color.background'
+	);
 	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
 	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
 	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
@@ -65,10 +72,20 @@ export function useStylesPreviewColors() {
 	const paletteColors = ( themeColors ?? [] )
 		.concat( customColors ?? [] )
 		.concat( coreColors ?? [] );
-	const highlightedColors = paletteColors
+
+	const textColorObject = paletteColors.filter(
+		( { color } ) => color === textColor
+	);
+	const buttonBackgroundColorObject = paletteColors.filter(
+		( { color } ) => color === buttonBackgroundColor
+	);
+
+	const highlightedColors = textColorObject
+		.concat( buttonBackgroundColorObject )
+		.concat( paletteColors )
 		.filter(
-			// we exclude these two colors because they are already visible in the preview.
-			( { color } ) => color !== backgroundColor && color !== headingColor
+			// we exclude these background color because it is already visible in the preview.
+			( { color } ) => color !== backgroundColor
 		)
 		.slice( 0, 2 );
 

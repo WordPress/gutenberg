@@ -14,8 +14,8 @@ import { requestMediaPicker } from '@wordpress/react-native-bridge';
 /**
  * Internal dependencies
  */
+import { MediaUpload } from '../index';
 import {
-	MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MEDIA_TYPE_AUDIO,
@@ -23,7 +23,7 @@ import {
 	OPTION_TAKE_PHOTO,
 	OPTION_INSERT_FROM_URL,
 	OPTION_WORDPRESS_MEDIA_LIBRARY,
-} from '../index';
+} from '../constants';
 
 const MEDIA_URL = 'http://host.media.type';
 const MEDIA_ID = 123;

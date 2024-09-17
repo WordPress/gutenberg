@@ -52,6 +52,10 @@ const meta: Meta< typeof Toolbar > = {
 	},
 	argTypes: {
 		children: { control: { type: null } },
+		variant: {
+			options: [ undefined, 'unstyled' ],
+			control: { type: 'radio' },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -117,9 +121,8 @@ Default.args = {
 				<ToolbarButton icon={ link } label="Link" />
 				<ToolbarGroup
 					isCollapsed
-					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
-					icon={ false }
-					label="More rich text controls"
+					icon={ null }
+					title="More rich text controls"
 					controls={ [
 						{ icon: code, title: 'Inline code' },
 						{ icon: <InlineImageIcon />, title: 'Inline image' },
@@ -131,9 +134,8 @@ Default.args = {
 				/>
 			</ToolbarGroup>
 			<ToolbarGroup
-				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
 				icon={ more }
-				label="Align"
+				title="Align"
 				isCollapsed
 				controls={ [
 					{
@@ -182,4 +184,15 @@ WithoutGroup.args = {
 			<ToolbarButton icon={ link } label="Link" />
 		</>
 	),
+};
+
+/**
+ * Set the variant to `unstyled` to remove default border styles.
+ * Otherwise, leave it as `undefined` for default styles.
+ */
+
+export const Unstyled = Template.bind( {} );
+Unstyled.args = {
+	...Default.args,
+	variant: 'unstyled',
 };
