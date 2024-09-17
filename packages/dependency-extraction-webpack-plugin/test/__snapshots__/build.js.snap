@@ -235,6 +235,13 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`overrides\` should 
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '9725ab782f6b09598d3d', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'a1906cfc819b623c86f8', 'type' => 'module');
 "
@@ -618,6 +625,13 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`overrides\` should 
   },
 ]
 `;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '464c785b5c938d4fde3f');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('wp-blob'), 'version' => 'd3cda564b538b44d38ef');
