@@ -511,7 +511,7 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent( {
+function DataviewsViewConfigDropdown( {
 	density,
 	setDensity,
 }: {
@@ -519,25 +519,43 @@ function DataviewsViewConfigContent( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 } ) {
 	const { view } = useContext( DataViewsContext );
+
 	return (
-		<VStack className="dataviews-view-config" spacing={ 6 }>
-			<SettingsSection title={ __( 'Appearance' ) }>
-				<HStack expanded className="is-divided-in-two">
-					<SortFieldControl />
-					<SortDirectionControl />
-				</HStack>
-				{ view.type === LAYOUT_GRID && (
-					<DensityPicker
-						density={ density }
-						setDensity={ setDensity }
+		<Dropdown
+			popoverProps={ DATAVIEWS_CONFIG_POPOVER_PROPS }
+			renderToggle={ ( { onToggle } ) => {
+				return (
+					<Button
+						size="compact"
+						icon={ cog }
+						label={ _x( 'View options', 'View is used as a noun' ) }
+						onClick={ onToggle }
 					/>
-				) }
-				<ItemsPerPageControl />
-			</SettingsSection>
-			<SettingsSection title={ __( 'Properties' ) }>
-				<FieldControl />
-			</SettingsSection>
-		</VStack>
+				);
+			} }
+			renderContent={ () => (
+				<DropdownContentWrapper paddingSize="medium">
+					<VStack className="dataviews-view-config" spacing={ 6 }>
+						<SettingsSection title={ __( 'Appearance' ) }>
+							<HStack expanded className="is-divided-in-two">
+								<SortFieldControl />
+								<SortDirectionControl />
+							</HStack>
+							{ view.type === LAYOUT_GRID && (
+								<DensityPicker
+									density={ density }
+									setDensity={ setDensity }
+								/>
+							) }
+							<ItemsPerPageControl />
+						</SettingsSection>
+						<SettingsSection title={ __( 'Properties' ) }>
+							<FieldControl />
+						</SettingsSection>
+					</VStack>
+				</DropdownContentWrapper>
+			) }
+		/>
 	);
 }
 
@@ -555,29 +573,9 @@ function _DataViewsViewConfig( {
 	return (
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-			<Dropdown
-				popoverProps={ DATAVIEWS_CONFIG_POPOVER_PROPS }
-				renderToggle={ ( { onToggle } ) => {
-					return (
-						<Button
-							size="compact"
-							icon={ cog }
-							label={ _x(
-								'View options',
-								'View is used as a noun'
-							) }
-							onClick={ onToggle }
-						/>
-					);
-				} }
-				renderContent={ () => (
-					<DropdownContentWrapper paddingSize="medium">
-						<DataviewsViewConfigContent
-							density={ density }
-							setDensity={ setDensity }
-						/>
-					</DropdownContentWrapper>
-				) }
+			<DataviewsViewConfigDropdown
+				density={ density }
+				setDensity={ setDensity }
 			/>
 		</>
 	);
