@@ -129,8 +129,8 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_meta_fields' ) ) 
 					$global_fields = get_registered_meta_keys( 'post' );
 					$post_type_fields = get_registered_meta_keys( 'post', $item['slug'] );
 					foreach ( array_merge( $global_fields, $post_type_fields ) as $key => $properties ) {
-						// Only expose fields with `show_in_rest` set to true.
-						if ( $properties['show_in_rest'] ) {
+						// Only expose fields with `show_in_rest` set to true. Not protected meta. Not footnotes.
+						if ( $properties['show_in_rest'] && ! is_protected_meta( $key ) && $key !== 'footnotes' ) {
 							$public_fields[ $key ] = array(
 								'default'     => $properties['default'] ?? '',
 								'description' => $properties['description'],
