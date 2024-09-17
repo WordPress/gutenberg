@@ -13,6 +13,7 @@
 
 ### New Features
 
+-   `Tabs`: add overflow behavior ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 
 ### Enhancements
