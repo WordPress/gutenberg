@@ -464,13 +464,11 @@ function ShadowPopover( { shadowObj, onChange } ) {
 				<ShadowInputControl
 					label={ __( 'X Position' ) }
 					value={ shadowObj.x }
-					hasNegativeRange
 					onChange={ ( value ) => onShadowChange( 'x', value ) }
 				/>
 				<ShadowInputControl
 					label={ __( 'Y Position' ) }
 					value={ shadowObj.y }
-					hasNegativeRange
 					onChange={ ( value ) => onShadowChange( 'y', value ) }
 				/>
 				<ShadowInputControl
@@ -481,7 +479,6 @@ function ShadowPopover( { shadowObj, onChange } ) {
 				<ShadowInputControl
 					label={ __( 'Spread' ) }
 					value={ shadowObj.spread }
-					hasNegativeRange
 					onChange={ ( value ) => onShadowChange( 'spread', value ) }
 				/>
 			</Grid>
