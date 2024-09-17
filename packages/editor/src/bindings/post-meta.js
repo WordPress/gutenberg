@@ -38,12 +38,18 @@ export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
 		const metaFields = getMetadata( registry, context );
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
+		const registeredFields = getRegisteredPostMeta( context?.postType );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				metaFields?.[ source.args.key ] ?? source.args.key;
+				metaFields?.[ source.args.key ] ??
+				registeredFields?.[ source.args.key ]?.label ??
+				source.args.key;
 		}
 		return newValues;
 	},
@@ -104,17 +110,30 @@ export default {
 	},
 	getFieldsList( { registry, context } ) {
 		const metaFields = getMetadata( registry, context );
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
+		const registeredFields = getRegisteredPostMeta( postType );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
 		}
 
-		// Remove footnotes or private keys from the list of fields.
-		// TODO: Remove this once we retrieve the fields from 'types' endpoint in post or page editor.
 		return Object.fromEntries(
-			Object.entries( metaFields ).filter(
-				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
-			)
+			Object.entries( metaFields )
+				// Remove footnotes or private keys from the list of fields.
+				.filter(
+					( [ key ] ) =>
+						key !== 'footnotes' && key.charAt( 0 ) !== '_'
+				)
+				// Return object with label and value.
+				.map( ( [ key, value ] ) => [
+					key,
+					{
+						label: registeredFields?.[ key ]?.label || key,
+						value,
+					},
+				] )
 		);
 	},
 };
