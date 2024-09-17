@@ -195,12 +195,10 @@ export default function useSelectionObserver() {
 					return;
 				}
 
-				setContentEditableWrapper(
-					node,
-					!! ( startClientId && endClientId )
-				);
-
 				const isSingularSelection = startClientId === endClientId;
+
+				setContentEditableWrapper( node, ! isSingularSelection );
+
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
 						if ( getSelectedBlockClientId() !== startClientId ) {
