@@ -24,7 +24,6 @@ export function useResizeObserver< T extends HTMLElement >(
 		if ( element === observedElementRef.current ) {
 			return;
 		}
-		observedElementRef.current = element;
 
 		// Set up `ResizeObserver`.
 		resizeObserverRef.current ??= new ResizeObserver( callbackEvent );
@@ -36,6 +35,7 @@ export function useResizeObserver< T extends HTMLElement >(
 		}
 
 		// Observe new element.
+		observedElementRef.current = element;
 		if ( element ) {
 			resizeObserver.observe( element, resizeObserverOptions );
 		}
