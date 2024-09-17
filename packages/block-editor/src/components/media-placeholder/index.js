@@ -51,7 +51,8 @@ const InsertFromURLPopover = ( {
 				value={ src }
 			/>
 			<Button
-				__next40pxDefaultSize
+				// TODO: Switch to `true` (40px size) if possible
+				__next40pxDefaultSize={ false }
 				className="block-editor-media-placeholder__url-input-submit-button"
 				icon={ keyboardReturn }
 				label={ __( 'Apply' ) }

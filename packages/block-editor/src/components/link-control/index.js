@@ -408,7 +408,8 @@ function LinkControl( {
 						{ ! showActions && (
 							<div className="block-editor-link-control__search-enter">
 								<Button
-									__next40pxDefaultSize
+									// TODO: Switch to `true` (40px size) if possible
+									__next40pxDefaultSize={ false }
 									onClick={ isDisabled ? noop : handleSubmit }
 									label={ __( 'Submit' ) }
 									icon={ keyboardReturn }
