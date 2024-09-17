@@ -68,7 +68,7 @@ export function useModalExitAnimation() {
 		overlayClassname: isAnimatingOut ? 'is-animating-out' : undefined,
 		frameRef,
 		frameStyle: {
-			'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }ms`,
+			'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }`,
 		},
 		closeModal,
 	};
