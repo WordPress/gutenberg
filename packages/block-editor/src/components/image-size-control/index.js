@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import {
-	Button,
-	ButtonGroup,
 	SelectControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -32,6 +32,47 @@ export default function ImageSizeControl( {
 } ) {
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+
+	/**
+	 * Updates the dimensions for the given scale.
+	 * Handler for toggle group control change.
+	 *
+	 * @param {number} scale The scale to update the dimensions for.
+	 */
+	const handleUpdateDimensions = ( scale ) => {
+		/**
+		 * Check if scale is deselected from toggle group control option.
+		 */
+		if ( undefined === scale ) {
+			/**
+			 * Update dimensions to default.
+			 */
+			updateDimensions();
+			return;
+		}
+
+		/**
+		 * Calculate scaled width and height.
+		 */
+		const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+		const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+
+		/**
+		 * Update dimensions.
+		 */
+		updateDimensions( scaledHeight, scaledWidth );
+	};
+
+	/**
+	 * Handler for adding the value to toggle group control.
+	 */
+	const addSelectedScaleValue = () => {
+		/**
+		 * Calculate scale size based on current width and image width.
+		 */
+		const scaleSize = Math.round( currentWidth * ( 100 / imageWidth ) );
+		return scaleSize;
+	};
 
 	return (
 		<>
@@ -70,47 +111,28 @@ export default function ImageSizeControl( {
 							size="__unstable-large"
 						/>
 					</HStack>
-					<HStack>
-						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
-							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
-								const scaledWidth = Math.round(
-									imageWidth * ( scale / 100 )
-								);
-								const scaledHeight = Math.round(
-									imageHeight * ( scale / 100 )
-								);
-
-								const isCurrent =
-									currentWidth === scaledWidth &&
-									currentHeight === scaledHeight;
-
-								return (
-									<Button
-										key={ scale }
-										size="small"
-										variant={
-											isCurrent ? 'primary' : undefined
-										}
-										isPressed={ isCurrent }
-										onClick={ () =>
-											updateDimensions(
-												scaledHeight,
-												scaledWidth
-											)
-										}
-									>
-										{ scale }%
-									</Button>
-								);
-							} ) }
-						</ButtonGroup>
-						<Button
-							size="small"
-							onClick={ () => updateDimensions() }
-						>
-							{ __( 'Reset' ) }
-						</Button>
-					</HStack>
+					<ToggleGroupControl
+						label={ __( 'Image size presets' ) }
+						hideLabelFromVision
+						onChange={ ( scale ) =>
+							handleUpdateDimensions( scale )
+						}
+						value={ addSelectedScaleValue() }
+						isBlock
+						isDeselectable
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+					>
+						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
+							return (
+								<ToggleGroupControlOption
+									key={ scale }
+									value={ scale }
+									label={ `${ scale }%` }
+								/>
+							);
+						} ) }
+					</ToggleGroupControl>
 				</div>
 			) }
 		</>
