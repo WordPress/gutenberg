@@ -46,18 +46,18 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
-		isContentLockingParent,
+		isSectionBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-			getContentLockingParent,
-			isContentLockingParent: _isContentLockingParent,
+			getParentSectionBlock,
+			isSectionBlock: _isSectionBlock,
 		} = unlock( select( blockEditorStore ) );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const renderedBlockClientId =
-			getContentLockingParent( _selectedBlockClientId ) ||
+			getParentSectionBlock( _selectedBlockClientId ) ||
 			getSelectedBlockClientId();
 		const _selectedBlockName =
 			renderedBlockClientId && getBlockName( renderedBlockClientId );
@@ -69,9 +69,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockClientId: renderedBlockClientId,
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
-			isContentLockingParent: _isContentLockingParent(
-				renderedBlockClientId
-			),
+			isSectionBlock: _isSectionBlock( renderedBlockClientId ),
 		};
 	}, [] );
 
@@ -91,7 +89,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		blockName: selectedBlockName,
 	} );
 
-	if ( count > 1 && ! isContentLockingParent ) {
+	if ( count > 1 && ! isSectionBlock ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
@@ -167,7 +165,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			<BlockInspectorSingleBlock
 				clientId={ selectedBlockClientId }
 				blockName={ blockType.name }
-				isContentLockingParent={ isContentLockingParent }
+				isSectionBlock={ isSectionBlock }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -212,10 +210,10 @@ const AnimatedContainer = ( {
 const BlockInspectorSingleBlock = ( {
 	clientId,
 	blockName,
-	isContentLockingParent,
+	isSectionBlock,
 } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
-	const showTabs = ! isContentLockingParent && availableTabs?.length > 1;
+	const showTabs = ! isSectionBlock && availableTabs?.length > 1;
 
 	const hasBlockStyles = useSelect(
 		( select ) => {
@@ -230,7 +228,7 @@ const BlockInspectorSingleBlock = ( {
 	const contentClientIds = useSelect(
 		( select ) => {
 			// Avoid unnecessary subscription.
-			if ( ! isContentLockingParent ) {
+			if ( ! isSectionBlock ) {
 				return;
 			}
 
@@ -239,14 +237,13 @@ const BlockInspectorSingleBlock = ( {
 				getBlockName,
 				getBlockEditingMode,
 			} = select( blockEditorStore );
-
 			return getClientIdsOfDescendants( clientId ).filter(
 				( current ) =>
 					getBlockName( current ) !== 'core/list-item' &&
 					getBlockEditingMode( current ) === 'contentOnly'
 			);
 		},
-		[ isContentLockingParent, clientId ]
+		[ isSectionBlock, clientId ]
 	);
 
 	return (
@@ -279,7 +276,7 @@ const BlockInspectorSingleBlock = ( {
 						</PanelBody>
 					) }
 
-					{ ! isContentLockingParent && (
+					{ ! isSectionBlock && (
 						<>
 							<InspectorControls.Slot />
 							<InspectorControls.Slot group="list" />

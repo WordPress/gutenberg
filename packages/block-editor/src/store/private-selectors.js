@@ -481,7 +481,34 @@ export const getContentLockingParent = createSelector(
 		let current = clientId;
 		let result;
 		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if ( isContentLockingParent( state, current ) ) {
+			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [
+		state.blocks.parents,
+		state.blockListSettings,
+		state.editorMode,
+		getSectionRootClientId( state ),
+	]
+);
+
+/**
+ * Retrieves the client ID of the parent section block.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const getParentSectionBlock = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
+			if ( isSectionBlock( state, current ) ) {
 				result = current;
 			}
 		}
@@ -503,7 +530,7 @@ export const getContentLockingParent = createSelector(
  *
  * @return {boolean} Whether the block is a content locking parent.
  */
-export function isContentLockingParent( state, clientId ) {
+export function isSectionBlock( state, clientId ) {
 	const sectionRootClientId = getSectionRootClientId( state );
 	const sectionClientIds = getBlockOrder( state, sectionRootClientId );
 	return (
