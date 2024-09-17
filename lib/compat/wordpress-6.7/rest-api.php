@@ -134,6 +134,8 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_meta_fields' ) ) 
 							$public_fields[ $key ] = array(
 								'default'     => $properties['default'] ?? '',
 								'description' => $properties['description'],
+								// Add property to indicate if it is specific to this post type.
+								'subtype'     => array_key_exists( $key, $post_type_fields ) ? $item['slug'] : null,
 							);
 						}
 					}
