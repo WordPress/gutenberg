@@ -21,28 +21,38 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
+import { unlock } from '../../lock-unlock';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
-	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
-		useSelect( ( select ) => {
-			const { getDeviceType, getCurrentPostType } = select( editorStore );
-			const { getEntityRecord, getPostType } = select( coreStore );
-			const { get } = select( preferencesStore );
-			const _currentPostType = getCurrentPostType();
-			return {
-				deviceType: getDeviceType(),
-				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
-				isTemplate: _currentPostType === 'wp_template',
-				isViewable: getPostType( _currentPostType )?.viewable ?? false,
-				showIconLabels: get( 'core', 'showIconLabels' ),
-			};
-		}, [] );
+	const {
+		isZoomOut,
+		deviceType,
+		homeUrl,
+		isTemplate,
+		isViewable,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { getDeviceType, getCurrentPostType } = select( editorStore );
+		const { getEntityRecord, getPostType } = select( coreStore );
+		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
+		const { get } = select( preferencesStore );
+		const _currentPostType = getCurrentPostType();
+		return {
+			deviceType: getDeviceType(),
+			homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+			isTemplate: _currentPostType === 'wp_template',
+			isViewable: getPostType( _currentPostType )?.viewable ?? false,
+			showIconLabels: get( 'core', 'showIconLabels' ),
+			isZoomOut: _isZoomOut(),
+		};
+	}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -82,17 +92,22 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			label: __( 'Desktop' ),
 			icon: desktop,
 		},
-		{
-			value: 'Tablet',
-			label: __( 'Tablet' ),
-			icon: tablet,
-		},
-		{
-			value: 'Mobile',
-			label: __( 'Mobile' ),
-			icon: mobile,
-		},
 	];
+
+	if ( ! isZoomOut ) {
+		choices.push(
+			{
+				value: 'Tablet',
+				label: __( 'Tablet' ),
+				icon: tablet,
+			},
+			{
+				value: 'Mobile',
+				label: __( 'Mobile' ),
+				icon: mobile,
+			}
+		);
+	}
 
 	return (
 		<DropdownMenu
