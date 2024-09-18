@@ -283,6 +283,22 @@ export default function DimensionsPanel( {
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );
 
+	// Content and Wide widths help text.
+	let introText = '';
+	if ( showContentSizeControl && showWideSizeControl ) {
+		introText = __(
+			'Customize the Default and Wide content widths provided by the active theme.'
+		);
+	} else if ( showContentSizeControl && ! showWideSizeControl ) {
+		introText = __(
+			'Customize the Default content width provided by the active theme.'
+		);
+	} else if ( ! showContentSizeControl && showWideSizeControl ) {
+		introText = __(
+			'Customize the Wide content width provided by the active theme.'
+		);
+	}
+
 	// Padding
 	const showPaddingControl = useHasPadding( settings );
 	const rawPadding = decodeValue( inheritedValue?.spacing?.padding );
@@ -457,13 +473,11 @@ export default function DimensionsPanel( {
 			panelId={ panelId }
 		>
 			{ ( showContentSizeControl || showWideSizeControl ) && (
-				<span className="span-columns">
-					{ __( 'Set the width of the main content area.' ) }
-				</span>
+				<span className="span-columns">{ introText }</span>
 			) }
 			{ showContentSizeControl && (
 				<ToolsPanelItem
-					label={ __( 'Content width' ) }
+					label={ __( 'Maximum default width' ) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={
@@ -474,7 +488,7 @@ export default function DimensionsPanel( {
 				>
 					<UnitControl
 						__next40pxDefaultSize
-						label={ __( 'Content width' ) }
+						label={ __( 'Maximum default width' ) }
 						labelPosition="top"
 						value={ contentSizeValue || '' }
 						onChange={ ( nextContentSize ) => {
@@ -491,7 +505,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showWideSizeControl && (
 				<ToolsPanelItem
-					label={ __( 'Wide width' ) }
+					label={ __( 'Maximum wide width' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={
@@ -501,7 +515,7 @@ export default function DimensionsPanel( {
 				>
 					<UnitControl
 						__next40pxDefaultSize
-						label={ __( 'Wide width' ) }
+						label={ __( 'Maximum wide width' ) }
 						labelPosition="top"
 						value={ wideSizeValue || '' }
 						onChange={ ( nextWideSize ) => {

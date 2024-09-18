@@ -4,12 +4,6 @@
 	}
 }
 
-.block-editor-hooks__layout-constrained-helptext {
-	color: $gray-700;
-	font-size: $helptext-font-size;
-	margin-bottom: 0; // Cancel out margins added by common.css
-}
-
 .block-editor-hooks__flex-layout-justification-controls,
 .block-editor-hooks__flex-layout-orientation-controls {
 	margin-bottom: $grid-unit-15;

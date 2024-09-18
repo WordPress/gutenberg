@@ -15,6 +15,7 @@ export const BLOCK_ALIGNMENTS_CONTROLS = {
 	none: {
 		icon: alignNone,
 		title: _x( 'None', 'Alignment option' ),
+		widthTitle: __( 'Default width' ),
 	},
 	left: {
 		icon: positionLeft,

@@ -233,7 +233,7 @@ function LayoutPanelPure( {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={ __( 'Inner blocks use content width' ) }
+								label={ __( 'Customize nested blocks width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
 									hasContentSizeOrLegacySettings
@@ -254,10 +254,10 @@ function LayoutPanelPure( {
 									layoutType?.name === 'constrained' ||
 									hasContentSizeOrLegacySettings
 										? __(
-												'Nested blocks use content width with options for full and wide widths.'
+												'Customize the Default and Wide widths for nested blocks.'
 										  )
 										: __(
-												'Nested blocks will fill the width of this container. Toggle to constrain.'
+												'Nested blocks fill the width of this container. Toggle to customize.'
 										  )
 								}
 							/>

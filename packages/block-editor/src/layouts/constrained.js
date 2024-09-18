@@ -79,7 +79,7 @@ export default {
 					<>
 						<UnitControl
 							__next40pxDefaultSize
-							label={ __( 'Content width' ) }
+							label={ __( 'Maximum default width' ) }
 							labelPosition="top"
 							value={ contentSize || wideSize || '' }
 							onChange={ ( nextWidth ) => {
@@ -101,7 +101,7 @@ export default {
 						/>
 						<UnitControl
 							__next40pxDefaultSize
-							label={ __( 'Wide width' ) }
+							label={ __( 'Maximum wide width' ) }
 							labelPosition="top"
 							value={ wideSize || contentSize || '' }
 							onChange={ ( nextWidth ) => {
@@ -121,11 +121,6 @@ export default {
 								</InputControlPrefixWrapper>
 							}
 						/>
-						<p className="block-editor-hooks__layout-constrained-helptext">
-							{ __(
-								'Customize the width for all elements that are assigned to the center or wide columns.'
-							) }
-						</p>
 					</>
 				) }
 				{ allowJustification && (
@@ -285,7 +280,7 @@ export default {
 			}
 			return layout.alignments.map( ( alignment ) => ( {
 				name: alignment,
-				info: alignmentInfo[ alignment ],
+				widthInfo: alignmentInfo[ alignment ].width,
 			} ) );
 		}
 		const { contentSize, wideSize } = layout;
@@ -301,10 +296,16 @@ export default {
 		}
 
 		if ( wideSize ) {
-			alignments.unshift( { name: 'wide', info: alignmentInfo.wide } );
+			alignments.unshift( {
+				name: 'wide',
+				widthInfo: alignmentInfo.wide.width,
+			} );
 		}
 
-		alignments.unshift( { name: 'none', info: alignmentInfo.none } );
+		alignments.unshift( {
+			name: 'none',
+			widthInfo: alignmentInfo.none.width,
+		} );
 
 		return alignments;
 	},

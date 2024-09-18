@@ -676,7 +676,7 @@ describe( 'Embed block', () => {
 			'Align left',
 			'Align center',
 			'Align right',
-			'Wide width',
+			'Maximum wide width',
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {

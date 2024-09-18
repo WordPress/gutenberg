@@ -39,7 +39,7 @@ describe( 'Align options', () => {
 			'Align left',
 			'Align center',
 			'Align right',
-			'Wide width',
+			'Maximum wide width',
 			'Full width',
 		].forEach( ( alignmentOption ) =>
 			it( `sets ${ alignmentOption } option`, async () => {
@@ -95,40 +95,41 @@ describe( 'Align options', () => {
 	} );
 
 	describe( 'for group block', () => {
-		[ 'None', 'Wide width', 'Full width' ].forEach( ( alignmentOption ) =>
-			it( `sets ${ alignmentOption } option`, async () => {
-				const screen = await initializeEditor();
-				const { getByLabelText } = screen;
+		[ 'None', 'Maximum wide width', 'Full width' ].forEach(
+			( alignmentOption ) =>
+				it( `sets ${ alignmentOption } option`, async () => {
+					const screen = await initializeEditor();
+					const { getByLabelText } = screen;
 
-				// Add Group block
-				await addBlock( screen, 'Group' );
+					// Add Group block
+					await addBlock( screen, 'Group' );
 
-				// Get Paragraph block
-				const groupBlock = await getBlock( screen, 'Group' );
-				expect( groupBlock ).toBeVisible();
+					// Get Paragraph block
+					const groupBlock = await getBlock( screen, 'Group' );
+					expect( groupBlock ).toBeVisible();
 
-				// Trigger inner blocks layout
-				const innerBlockListWrapper =
-					await within( groupBlock ).findByTestId(
-						'block-list-wrapper'
-					);
-				fireEvent( innerBlockListWrapper, 'layout', {
-					nativeEvent: {
-						layout: {
-							width: 300,
+					// Trigger inner blocks layout
+					const innerBlockListWrapper =
+						await within( groupBlock ).findByTestId(
+							'block-list-wrapper'
+						);
+					fireEvent( innerBlockListWrapper, 'layout', {
+						nativeEvent: {
+							layout: {
+								width: 300,
+							},
 						},
-					},
-				} );
+					} );
 
-				// Open alignments menu
-				const alignmentButtons = getByLabelText( 'Align' );
-				fireEvent.press( alignmentButtons );
+					// Open alignments menu
+					const alignmentButtons = getByLabelText( 'Align' );
+					fireEvent.press( alignmentButtons );
 
-				// Select alignment option.
-				fireEvent.press( await getByLabelText( alignmentOption ) );
+					// Select alignment option.
+					fireEvent.press( await getByLabelText( alignmentOption ) );
 
-				expect( getEditorHtml() ).toMatchSnapshot();
-			} )
+					expect( getEditorHtml() ).toMatchSnapshot();
+				} )
 		);
 	} );
 } );
