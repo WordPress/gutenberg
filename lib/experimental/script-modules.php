@@ -246,10 +246,6 @@ function gutenberg_a11y_script_module_html() {
  * @since 19.3
  */
 function gutenberg_register_script_modules() {
-	// When in production, use the plugin's version as the default asset version;
-	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-
 	wp_deregister_script_module( '@wordpress/a11y' );
 	wp_register_script_module(
 		'@wordpress/a11y',
@@ -258,7 +254,52 @@ function gutenberg_register_script_modules() {
 		$default_version
 	);
 
-	add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
-	add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
+	$suffix = defined( 'WP_RUN_CORE_TESTS' ) ? '.min' : wp_scripts_get_suffix();
+
+
+	/*
+	 * Expects multidimensional array like:
+	 *
+	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
+	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
+	 *     'interactivity-router/index.min.js' => …
+	 */
+	$assets = include gutenberg_dir_path( 'build-module/assets.production.php' );
+
+	foreach ( $assets as $file_name => $script_module_data ) {
+		$package_name     = dirname( $file_name );
+		$package_sub_name = basename( $file_name, "{$suffix}.js" );
+
+		switch ( $package_name ) {
+			/*
+			 * Interactivity exposes two entrypoints, `/index` and `/debug`.
+			 * They're the production and development versions of the package.
+			 */
+			case 'interactivity':
+				if ( SCRIPT_DEBUG ) {
+					if ( 'index' === $package_sub_name ) {
+						continue 2;
+					}
+				} else {
+					if ( 'debug' === $package_sub_name ) {
+						continue 2;
+					}
+				}
+				$script_module_id = '@wordpress/interactivity';
+				break;
+
+			default:
+				$script_module_id = 'index' === $package_sub_name ?
+					"@wordpress/{$package_name}" :
+					"@wordpress/{$package_name}/{$package_sub_name}";
+		}
+
+		$path = gutenberg_url( "build-module/{$file_name}" );
+		wp_deregister_style( $script_module_id );
+		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
+	}
 }
+
 add_action( 'init', 'gutenberg_register_script_modules' );
+add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
+add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
