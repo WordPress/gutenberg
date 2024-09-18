@@ -38,6 +38,7 @@ import {
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
+	isSectionBlock,
 } from './private-selectors';
 
 /**
@@ -1579,6 +1580,11 @@ const canInsertBlockTypeUnmemoized = (
 
 	const isLocked = !! getTemplateLock( state, rootClientId );
 	if ( isLocked ) {
+		return false;
+	}
+
+	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+	if ( _isSectionBlock ) {
 		return false;
 	}
 
