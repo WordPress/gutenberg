@@ -28,7 +28,6 @@ import BlogTitle from '../blog-title';
 import PostsPerPage from '../posts-per-page';
 import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
-import TemplateAreas from '../template-areas';
 import { PrivatePostLastRevision } from '../post-last-revision';
 
 /**
@@ -84,7 +83,6 @@ export default function PostSummary( { onActionPerformed } ) {
 										<SiteDiscussion />
 										<PostFormatPanel />
 									</VStack>
-									<TemplateAreas />
 									{ fills }
 								</VStack>
 							) }

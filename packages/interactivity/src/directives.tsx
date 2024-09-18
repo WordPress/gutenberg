@@ -295,7 +295,33 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useWatch( () => evaluate( entry ) );
+			useWatch( () => {
+				let start;
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						// eslint-disable-next-line no-unused-vars
+						start = performance.now();
+					}
+				}
+				const result = evaluate( entry );
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						performance.measure(
+							`interactivity api watch ${ entry.namespace }`,
+							{
+								start,
+								end: performance.now(),
+								detail: {
+									devtools: {
+										track: `IA: watch ${ entry.namespace }`,
+									},
+								},
+							}
+						);
+					}
+				}
+				return result;
+			} );
 		} );
 	} );
 
@@ -303,7 +329,33 @@ export default () => {
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
 			// TODO: Replace with useEffect to prevent unneeded scopes.
-			useInit( () => evaluate( entry ) );
+			useInit( () => {
+				let start;
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						start = performance.now();
+					}
+				}
+				const result = evaluate( entry );
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( globalThis.SCRIPT_DEBUG ) {
+						performance.measure(
+							`interactivity api init ${ entry.namespace }`,
+							{
+								// eslint-disable-next-line no-undef
+								start,
+								end: performance.now(),
+								detail: {
+									devtools: {
+										track: `IA: init ${ entry.namespace }`,
+									},
+								},
+							}
+						);
+					}
+				}
+				return result;
+			} );
 		} );
 	} );
 
@@ -327,7 +379,30 @@ export default () => {
 					if ( existingHandler ) {
 						existingHandler( event );
 					}
+					let start;
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							start = performance.now();
+						}
+					}
 					evaluate( entry, event );
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( globalThis.SCRIPT_DEBUG ) {
+							performance.measure(
+								`interactivity api on ${ entry.namespace }`,
+								{
+									// eslint-disable-next-line no-undef
+									start,
+									end: performance.now(),
+									detail: {
+										devtools: {
+											track: `IA: on ${ entry.namespace }`,
+										},
+									},
+								}
+							);
+						}
+					}
 				} );
 			};
 		} );

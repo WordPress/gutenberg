@@ -168,12 +168,16 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 
 export const MarkLabel = styled.span`
 	color: ${ COLORS.gray[ 300 ] };
-	left: 0;
 	font-size: 11px;
 	position: absolute;
 	top: 12px;
-	transform: translateX( -50% );
 	white-space: nowrap;
+
+	${ rtl( { left: 0 } ) };
+	${ rtl(
+		{ transform: 'translateX( -50% )' },
+		{ transform: 'translateX( 50% )' }
+	) };
 
 	${ markLabelFill };
 `;

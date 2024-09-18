@@ -25,7 +25,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
@@ -74,10 +74,10 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
-	const isTemporaryVideo = ! id && isBlobURL( src );
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
 	useUploadMediaFromBlobURL( {
-		url: src,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectVideo,
 		onError: onUploadError,
@@ -100,19 +100,28 @@ function VideoEdit( {
 				id: undefined,
 				poster: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
+			return;
+		}
+
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
 			return;
 		}
 
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
 		setAttributes( {
+			blob: undefined,
 			src: media.url,
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
 			caption: media.caption,
 		} );
+		setTemporaryURL();
 	}
 
 	function onSelectURL( newSrc ) {
@@ -125,7 +134,13 @@ function VideoEdit( {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined, poster: undefined } );
+			setAttributes( {
+				blob: undefined,
+				src: newSrc,
+				id: undefined,
+				poster: undefined,
+			} );
+			setTemporaryURL();
 		}
 	}
 
@@ -135,14 +150,14 @@ function VideoEdit( {
 	}
 
 	const classes = clsx( className, {
-		'is-transient': isTemporaryVideo,
+		'is-transient': !! temporaryURL,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
 
-	if ( ! src ) {
+	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -264,13 +279,13 @@ function VideoEdit( {
 					<video
 						controls={ controls }
 						poster={ poster }
-						src={ src }
+						src={ src || temporaryURL }
 						ref={ videoPlayer }
 					>
 						<Tracks tracks={ tracks } />
 					</video>
 				</Disabled>
-				{ isTemporaryVideo && <Spinner /> }
+				{ !! temporaryURL && <Spinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

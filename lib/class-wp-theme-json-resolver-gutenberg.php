@@ -764,8 +764,18 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations( $scope = 'theme' ) {
+		return static::get_style_variations_from_directory( get_stylesheet_directory(), $scope );
+	}
+
+	/**
+	 * Returns the style variation files defined by the theme (parent and child).
+	 *
+	 * @since 6.7.0
+	 *
+	 * @return array An array of style variation files.
+	 */
+	protected static function get_style_variation_files_from_current_theme() {
 		$variation_files    = array();
-		$variations         = array();
 		$base_directory     = get_stylesheet_directory() . '/styles';
 		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
@@ -782,6 +792,29 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				}
 			}
 			$variation_files = array_merge( $variation_files, $variation_files_parent );
+		}
+
+		return $variation_files;
+	}
+
+	/**
+	 * Returns the style variations in the given directory.
+	 *
+	 * @since 6.7.0
+	 *
+	 * @param string $directory The directory to get the style variations from.
+	 * @param string $scope     The scope or type of style variation to retrieve e.g. theme, block etc.
+	 * @return array
+	 */
+	public static function get_style_variations_from_directory( $directory, $scope = 'theme' ) {
+		$variation_files = array();
+		$variations      = array();
+		if ( is_dir( $directory ) ) {
+			if ( get_stylesheet_directory() === $directory ) {
+				$variation_files = static::get_style_variation_files_from_current_theme();
+			} else {
+				$variation_files = static::recursively_iterate_json( $directory );
+			}
 		}
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
@@ -805,6 +838,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * as the value of `_link` object in REST API responses.
 	 *
 	 * @since 6.6.0
+	 * @since 6.7.0 Added support for resolving block styles.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
@@ -818,10 +852,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$theme_json_data = $theme_json->get_raw_data();
 
-		// Top level styles.
-		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
 		$placeholder = 'file:./';
+
+		// Top level styles.
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 		if (
 			isset( $background_image_url ) &&
 			is_string( $background_image_url ) &&
@@ -838,6 +873,33 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$resolved_theme_uri['type'] = $file_type['type'];
 				}
 				$resolved_theme_uris[] = $resolved_theme_uri;
+		}
+
+		// Block styles.
+		if ( ! empty( $theme_json_data['styles']['blocks'] ) ) {
+			foreach ( $theme_json_data['styles']['blocks'] as $block_name => $block_styles ) {
+				if ( ! isset( $block_styles['background']['backgroundImage']['url'] ) ) {
+					continue;
+				}
+				$background_image_url = $block_styles['background']['backgroundImage']['url'] ?? null;
+				if (
+					isset( $background_image_url ) &&
+					is_string( $background_image_url ) &&
+					// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+					str_starts_with( $background_image_url, $placeholder ) ) {
+					$file_type          = wp_check_filetype( $background_image_url );
+					$src_url            = str_replace( $placeholder, '', $background_image_url );
+					$resolved_theme_uri = array(
+						'name'   => $background_image_url,
+						'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+						'target' => "styles.blocks.{$block_name}.background.backgroundImage.url",
+					);
+					if ( isset( $file_type['type'] ) ) {
+						$resolved_theme_uri['type'] = $file_type['type'];
+					}
+					$resolved_theme_uris[] = $resolved_theme_uri;
+				}
+			}
 		}
 
 		return $resolved_theme_uris;

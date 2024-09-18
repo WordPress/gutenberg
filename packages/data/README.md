@@ -586,7 +586,7 @@ _Returns_
 
 A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here: <https://reactjs.org/docs/context.html#contextprovider>
+You can read more about the react context api here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
 
 _Usage_
 

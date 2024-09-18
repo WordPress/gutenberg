@@ -17,6 +17,9 @@
 			"type": "number",
 			"default": 1
 		},
+		"levelOptions": {
+			"type": "array"
+		},
 		"showPrefix": {
 			"type": "boolean",
 			"default": true

@@ -188,7 +188,7 @@ export function RichTextWrapper(
 						binding.source
 					);
 					if (
-						! blockBindingsSource?.canUserEditValue( {
+						! blockBindingsSource?.canUserEditValue?.( {
 							select,
 							context: blockContext,
 							args: binding.args,

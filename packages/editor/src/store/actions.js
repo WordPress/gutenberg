@@ -196,22 +196,45 @@ export const savePost =
 			content,
 		};
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
-		await registry
-			.dispatch( coreStore )
-			.saveEntityRecord(
-				'postType',
-				previousRecord.type,
-				edits,
+
+		let error = false;
+		try {
+			error = await applyFilters(
+				'editor.__unstablePreSavePost',
+				Promise.resolve( false ),
 				options
 			);
+		} catch ( err ) {
+			error = err;
+		}
 
-		let error = registry
-			.select( coreStore )
-			.getLastEntitySaveError(
-				'postType',
-				previousRecord.type,
-				previousRecord.id
-			);
+		if ( ! error ) {
+			try {
+				await registry
+					.dispatch( coreStore )
+					.saveEntityRecord(
+						'postType',
+						previousRecord.type,
+						edits,
+						options
+					);
+			} catch ( err ) {
+				error =
+					err.message && err.code !== 'unknown_error'
+						? err.message
+						: __( 'An error occurred while updating.' );
+			}
+		}
+
+		if ( ! error ) {
+			error = registry
+				.select( coreStore )
+				.getLastEntitySaveError(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				);
+		}
 
 		if ( ! error ) {
 			await applyFilters(

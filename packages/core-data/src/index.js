@@ -18,7 +18,7 @@ import {
 	getMethodName,
 } from './entities';
 import { STORE_NAME } from './name';
-import { unlock } from './private-apis';
+import { unlock } from './lock-unlock';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecords)
@@ -86,3 +86,4 @@ export * from './entity-provider';
 export * from './entity-types';
 export * from './fetch';
 export * from './hooks';
+export * from './private-apis';

@@ -4,6 +4,7 @@
 	 * we need to right-align the toggle.
 	 */
 	.components-toggle-control .components-h-stack {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
 		flex-direction: row-reverse;
 	}
 

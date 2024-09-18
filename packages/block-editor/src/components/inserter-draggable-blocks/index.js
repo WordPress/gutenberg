@@ -43,6 +43,14 @@ const InserterDraggableBlocks = ( {
 		useDispatch( blockEditorStore )
 	);
 
+	if ( ! isEnabled ) {
+		return children( {
+			draggable: false,
+			onDragStart: undefined,
+			onDragEnd: undefined,
+		} );
+	}
+
 	return (
 		<Draggable
 			__experimentalTransferDataType="wp-blocks"
@@ -72,9 +80,9 @@ const InserterDraggableBlocks = ( {
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					draggable: isEnabled,
-					onDragStart: isEnabled ? onDraggableStart : undefined,
-					onDragEnd: isEnabled ? onDraggableEnd : undefined,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

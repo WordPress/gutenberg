@@ -152,7 +152,7 @@ export default function GlobalStylesSidebar() {
 							isPressed={
 								isStyleBookOpened || isRevisionsStyleBookOpened
 							}
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 							disabled={ shouldClearCanvasContainerView }
 							onClick={ toggleStyleBook }
 							size="compact"
@@ -163,7 +163,7 @@ export default function GlobalStylesSidebar() {
 							label={ __( 'Revisions' ) }
 							icon={ backup }
 							onClick={ toggleRevisions }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 							disabled={ ! hasRevisions }
 							isPressed={
 								isRevisionsOpened || isRevisionsStyleBookOpened

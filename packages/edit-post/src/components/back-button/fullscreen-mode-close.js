@@ -19,23 +19,16 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
-
 function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
-	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
+	const { isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
-			const { isFeatureActive } = select( editPostStore );
 			const { getEntityRecord, getPostType, isResolving } =
 				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 			const _postType = initialPost?.type || getCurrentPostType();
 			return {
-				isActive: isFeatureActive( 'fullscreenMode' ),
 				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
 					'root',
 					'__unstableBase',
@@ -50,7 +43,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	const disableMotion = useReducedMotion();
 
-	if ( ! isActive || ! postType ) {
+	if ( ! postType ) {
 		return null;
 	}
 
@@ -83,8 +76,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
-	const classes = clsx( {
-		'edit-post-fullscreen-mode-close': true,
+	const classes = clsx( 'edit-post-fullscreen-mode-close', {
 		'has-icon': siteIconUrl,
 	} );
 

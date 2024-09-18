@@ -2,10 +2,6 @@
 // They need to be updated in both places.
 
 .edit-post-fullscreen-mode-close.components-button {
-	// Do not show the toolbar icon on small screens,
-	// when Fullscreen Mode is not an option in the "More" menu.
-	display: none;
-
 	@include break-medium() {
 		display: flex;
 		align-items: center;

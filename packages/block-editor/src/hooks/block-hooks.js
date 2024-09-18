@@ -43,25 +43,12 @@ function BlockHooksControlPure( {
 		[ blockTypes, name, ignoredHookedBlocks ]
 	);
 
-	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
-		( select ) => {
-			const { getBlocks, getBlockIndex, getBlockRootClientId } =
-				select( blockEditorStore );
-
-			return {
-				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlocks( clientId )?.length,
-				rootClientId: getBlockRootClientId( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
 	const hookedBlockClientIds = useSelect(
 		( select ) => {
-			const { getBlocks, getGlobalBlockCount } =
+			const { getBlocks, getBlockRootClientId, getGlobalBlockCount } =
 				select( blockEditorStore );
 
+			const rootClientId = getBlockRootClientId( clientId );
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
 				( clientIds, block ) => {
 					// If the block doesn't exist anywhere in the block tree,
@@ -127,9 +114,11 @@ function BlockHooksControlPure( {
 
 			return EMPTY_OBJECT;
 		},
-		[ hookedBlocksForCurrentBlock, name, clientId, rootClientId ]
+		[ hookedBlocksForCurrentBlock, name, clientId ]
 	);
 
+	const { getBlockIndex, getBlockCount, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { insertBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	if ( ! hookedBlocksForCurrentBlock.length ) {
@@ -150,6 +139,10 @@ function BlockHooksControlPure( {
 	);
 
 	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
+		const blockIndex = getBlockIndex( clientId );
+		const innerBlocksLength = getBlockCount( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
+
 		switch ( relativePosition ) {
 			case 'before':
 			case 'after':

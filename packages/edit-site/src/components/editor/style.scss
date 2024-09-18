@@ -1,7 +1,7 @@
 .edit-site-editor__editor-interface {
 	opacity: 1;
 	transition: opacity 0.1s ease-out;
-	@include reduce-motion("transition");
+	@include reduce-motion( "transition" );
 
 	&.is-loading {
 		opacity: 0;
@@ -16,4 +16,62 @@
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
+}
+
+.edit-site-editor__view-mode-toggle {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable */
+	top: 0;
+	left: 0;
+	height: $header-height;
+	width: $header-height;
+	z-index: 100;
+
+	.components-button {
+		color: $white;
+		height: 100%;
+		width: 100%;
+		border-radius: 0;
+		overflow: hidden;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&:hover,
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.edit-site-editor__view-mode-toggle-icon {
+		svg,
+		img {
+			background: $gray-900;
+			display: block;
+		}
+	}
+}
+
+.edit-site-editor__back-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 60px;
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: hsla(0, 0%, 80%);
+	pointer-events: none;
+
+	&.has-site-icon {
+		background-color: hsla(0, 0%, 100%, 0.6);
+		-webkit-backdrop-filter: saturate(180%) blur(15px);
+		backdrop-filter: saturate(180%) blur(15px);
+	}
 }

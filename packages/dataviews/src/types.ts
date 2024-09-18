@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type {
+	ReactElement,
+	ComponentType,
+	Dispatch,
+	SetStateAction,
+} from 'react';
 
 /**
  * Internal dependencies
@@ -44,10 +49,21 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
+export type FieldType = 'text' | 'integer';
+
+export type ValidationContext = {
+	elements?: Option[];
+};
+
 /**
  * A dataview field for a specific property of a data type.
  */
 export type Field< Item > = {
+	/**
+	 * Type of the fields.
+	 */
+	type?: FieldType;
+
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -56,27 +72,37 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
+
+	/**
+	 * A description of the field.
+	 */
+	description?: string;
+
+	/**
+	 * Placeholder for the field.
+	 */
+	placeholder?: string;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: Item } ) => ReactNode;
+	render?: ComponentType< { item: Item } >;
 
 	/**
-	 * The width of the field column.
+	 * Callback used to render an edit control for the field.
 	 */
-	width?: string | number;
+	Edit?: ComponentType< DataFormControlProps< Item > >;
 
 	/**
-	 * The minimum width of the field column.
+	 * Callback used to sort the field.
 	 */
-	maxWidth?: string | number;
+	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * The maximum width of the field column.
+	 * Callback used to validate the field.
 	 */
-	minWidth?: string | number;
+	isValid?: ( item: Item, context?: ValidationContext ) => boolean;
 
 	/**
 	 * Whether the field is sortable.
@@ -119,9 +145,12 @@ export type Field< Item > = {
 	  } );
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
 	getValue: ( args: { item: Item } ) => any;
-	render: ( args: { item: Item } ) => ReactNode;
+	render: ComponentType< { item: Item } >;
+	Edit: ComponentType< DataFormControlProps< Item > >;
+	sort: ( a: Item, b: Item, direction: SortDirection ) => number;
+	isValid: ( item: Item, context?: ValidationContext ) => boolean;
 };
 
 /**
@@ -130,6 +159,19 @@ export type NormalizedField< Item > = Field< Item > & {
 export type Fields< Item > = Field< Item >[];
 
 export type Data< Item > = Item[];
+
+/**
+ * The form configuration.
+ */
+export type Form = {
+	visibleFields?: string[];
+};
+
+export type DataFormControlProps< Item > = {
+	data: Item;
+	field: NormalizedField< Item >;
+	onChange: Dispatch< SetStateAction< Item > >;
+};
 
 /**
  * The filters applied to the dataset.
@@ -202,7 +244,7 @@ interface ViewBase {
 	/**
 	 * The filters to apply.
 	 */
-	filters: Filter[];
+	filters?: Filter[];
 
 	/**
 	 * The sorting configuration.
@@ -230,31 +272,69 @@ interface ViewBase {
 	perPage?: number;
 
 	/**
-	 * The hidden fields.
+	 * The fields to render
 	 */
-	hiddenFields?: string[];
+	fields?: string[];
+}
+
+export interface CombinedField {
+	id: string;
+
+	label: string;
+
+	/**
+	 * The fields to use as columns.
+	 */
+	children: string[];
+
+	/**
+	 * The direction of the stack.
+	 */
+	direction: 'horizontal' | 'vertical';
+}
+
+export interface ColumnStyle {
+	/**
+	 * The width of the field column.
+	 */
+	width?: string | number;
+
+	/**
+	 * The minimum width of the field column.
+	 */
+	maxWidth?: string | number;
+
+	/**
+	 * The maximum width of the field column.
+	 */
+	minWidth?: string | number;
 }
 
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
 		primaryField?: string;
 
 		/**
-		 * The field to use as the media field.
+		 * The fields to use as columns.
 		 */
-		mediaField?: string;
+		combinedFields?: CombinedField[];
+
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 
 export interface ViewList extends ViewBase {
 	type: 'list';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -270,7 +350,7 @@ export interface ViewList extends ViewBase {
 export interface ViewGrid extends ViewBase {
 	type: 'grid';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -387,11 +467,12 @@ export interface ViewBaseProps< Item > {
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: View ): void;
-	onSelectionChange: SetSelection;
+	onChangeView: ( view: View ) => void;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
@@ -410,3 +491,9 @@ export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
+
+export interface SupportedLayouts {
+	list?: Omit< ViewList, 'type' >;
+	grid?: Omit< ViewGrid, 'type' >;
+	table?: Omit< ViewTable, 'type' >;
+}

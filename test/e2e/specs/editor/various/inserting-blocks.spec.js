@@ -636,7 +636,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			page.getByRole( 'region', {
 				name: 'Block Library',
 			} )
-		).toBeHidden();
+		).toBeVisible();
 	} );
 
 	test( 'shows block preview when hovering over block in inserter', async ( {

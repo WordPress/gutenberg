@@ -69,6 +69,7 @@ function UnforwardedTextareaControl(
  *
  *   return (
  *     <TextareaControl
+ *       __nextHasNoMarginBottom
  *       label="Text"
  *       help="Enter some text"
  *       value={ text }

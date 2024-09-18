@@ -37,6 +37,7 @@ function getSelectOptions(
  *
  * 	return (
  * 		<TreeSelect
+ *      __nextHasNoMarginBottom
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }

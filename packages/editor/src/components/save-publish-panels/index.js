@@ -14,7 +14,6 @@ import PostPublishPanel from '../post-publish-panel';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 import PluginPostPublishPanel from '../plugin-post-publish-panel';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
@@ -41,9 +40,7 @@ export default function SavePublishPanels( {
 			isEditedPostDirty,
 			hasNonPostEntityChanges,
 		} = select( editorStore );
-		const _hasOtherEntitiesChanges =
-			hasNonPostEntityChanges() ||
-			unlock( select( editorStore ) ).hasPostMetaChanges();
+		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
 		return {
 			publishSidebarOpened: isPublishSidebarOpened(),
 			isPublishable:
@@ -92,7 +89,7 @@ export default function SavePublishPanels( {
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 					disabled={ ! isDirty }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>

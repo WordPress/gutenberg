@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
  * Internal dependencies
  */
 import {
@@ -13,7 +8,6 @@ import {
 	CompositeRow as CompositeRowV2,
 	useCompositeStore as useCompositeStoreV2,
 } from './composite/v2';
-import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
 import { createPrivateSlotFill } from './slot-fill';
 import {
@@ -39,7 +33,6 @@ lock( privateApis, {
 	CompositeItemV2,
 	CompositeRowV2,
 	useCompositeStoreV2,
-	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,

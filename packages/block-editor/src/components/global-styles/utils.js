@@ -525,3 +525,115 @@ export function getBlockStyleVariationSelector( variation, blockSelector ) {
 
 	return result.join( ',' );
 }
+
+/**
+ * Converts style preset values `var:` to CSS custom var values.
+ * TODO: Export and use the style engine util: getCSSVarFromStyleValue().
+ *
+ * Example:
+ *
+ * compileStyleValue( 'var:preset|color|primary' ) // returns 'var(--wp--color-primary)'
+ *
+ * @param {string} uncompiledValue A block style value.
+ * @return {string} The compiled, or original value.
+ */
+export function compileStyleValue( uncompiledValue ) {
+	const VARIABLE_REFERENCE_PREFIX = 'var:';
+	if (
+		'string' === typeof uncompiledValue &&
+		uncompiledValue?.startsWith?.( VARIABLE_REFERENCE_PREFIX )
+	) {
+		const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+		const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
+/**
+ * Looks up a theme file URI based on a relative path.
+ *
+ * @param {string}        file          A relative path.
+ * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
+ * @return {string} A resolved theme file URI, if one is found in the themeFileURIs collection.
+ */
+export function getResolvedThemeFilePath( file, themeFileURIs ) {
+	if ( ! file || ! themeFileURIs || ! Array.isArray( themeFileURIs ) ) {
+		return file;
+	}
+
+	const uri = themeFileURIs.find(
+		( themeFileUri ) => themeFileUri?.name === file
+	);
+
+	if ( ! uri?.href ) {
+		return file;
+	}
+
+	return uri?.href;
+}
+
+/**
+ * Resolves ref values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedRefValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
+		const refPath = ruleValue.ref.split( '.' );
+		const resolvedRuleValue = compileStyleValue(
+			getValueFromObjectPath( tree, refPath )
+		);
+
+		/*
+		 * Presence of another ref indicates a reference to another dynamic value.
+		 * Pointing to another dynamic value is not supported.
+		 */
+		if ( resolvedRuleValue?.ref ) {
+			return undefined;
+		}
+
+		if ( ! resolvedRuleValue ) {
+			return ruleValue;
+		}
+
+		return resolvedRuleValue;
+	}
+	return ruleValue;
+}
+
+/**
+ * Resolves ref and relative path values in theme JSON.
+ *
+ * @param {Object|string} ruleValue A block style value that may contain a reference to a theme.json value.
+ * @param {Object}        tree      A theme.json object.
+ * @return {*} The resolved value or incoming ruleValue.
+ */
+export function getResolvedValue( ruleValue, tree ) {
+	if ( ! ruleValue || ! tree ) {
+		return ruleValue;
+	}
+
+	// Resolve ref values.
+	const resolvedValue = getResolvedRefValue( ruleValue, tree );
+
+	// Resolve relative paths.
+	if ( resolvedValue?.url ) {
+		resolvedValue.url = getResolvedThemeFilePath(
+			resolvedValue.url,
+			tree?._links?.[ 'wp:theme-file' ]
+		);
+	}
+
+	return resolvedValue;
+}

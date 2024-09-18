@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
 	return (
@@ -26,6 +26,7 @@ function ButtonBlockAppender(
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalIsQuick
+			onSelectOrClose={ onSelect }
 			renderToggle={ ( {
 				onToggle,
 				disabled,

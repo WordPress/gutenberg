@@ -14,8 +14,10 @@ import {
 	registerBlockType,
 	registerBlockCollection,
 	registerBlockVariation,
+	registerBlockBindingsSource,
 	unregisterBlockCollection,
 	unregisterBlockType,
+	unregisterBlockBindingsSource,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -28,6 +30,7 @@ import {
 	getBlockTypes,
 	getBlockSupport,
 	getBlockVariations,
+	getBlockBindingsSource,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -36,6 +39,7 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -64,12 +68,13 @@ describe( 'blocks', () => {
 		for ( const key in logged ) {
 			delete logged[ key ];
 		}
+		warningLoggedSet.clear();
 	} );
 
 	describe( 'registerBlockType()', () => {
 		it( 'should reject numbers', () => {
 			const block = registerBlockType( 999 );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must be strings.'
 			);
 			expect( block ).toBeUndefined();
@@ -77,7 +82,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -85,7 +90,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -93,7 +98,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -101,7 +106,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -112,7 +117,7 @@ describe( 'blocks', () => {
 				'my-plugin/4-fancy-block',
 				defaultBlockSettings
 			);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -123,7 +128,7 @@ describe( 'blocks', () => {
 				'my-plugin/fancy-block-4',
 				defaultBlockSettings
 			);
-			expect( console ).not.toHaveErrored();
+			expect( console ).not.toHaveWarned();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
@@ -148,7 +153,7 @@ describe( 'blocks', () => {
 				'core/test-block',
 				defaultBlockSettings
 			);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block "core/test-block" is already registered.'
 			);
 			expect( block ).toBeUndefined();
@@ -161,7 +166,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				save: 'invalid',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The "save" property must be a valid function.'
 			);
 			expect( block ).toBeUndefined();
@@ -178,7 +183,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-6',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The "edit" property must be a valid component.'
 			);
 			expect( block ).toBeUndefined();
@@ -224,7 +229,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-9',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The block "my-plugin/fancy-block-9" must have a title.'
 			);
 			expect( block ).toBeUndefined();
@@ -241,7 +246,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-10',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The block "my-plugin/fancy-block-10" must have a title.'
 			);
 			expect( block ).toBeUndefined();
@@ -258,7 +263,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-11',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block titles must be strings.'
 			);
 			expect( block ).toBeUndefined();
@@ -498,7 +503,7 @@ describe( 'blocks', () => {
 				'core/test-block-icon-normalize-element',
 				blockType
 			);
-			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 			expect( block ).toBeUndefined();
 		} );
 
@@ -746,7 +751,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-12',
 					defaultBlockSettings
 				);
-				expect( console ).toHaveErroredWith(
+				expect( console ).toHaveWarnedWith(
 					'The block "my-plugin/fancy-block-12" must have a title.'
 				);
 				expect( block ).toBeUndefined();
@@ -764,7 +769,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-13',
 					defaultBlockSettings
 				);
-				expect( console ).toHaveErroredWith(
+				expect( console ).toHaveWarnedWith(
 					'Block settings must be a valid object.'
 				);
 				expect( block ).toBeUndefined();
@@ -1090,7 +1095,7 @@ describe( 'blocks', () => {
 	describe( 'unregisterBlockType()', () => {
 		it( 'should fail if a block is not registered', () => {
 			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block "core/test-block" is not registered.'
 			);
 			expect( oldBlock ).toBeUndefined();
@@ -1117,7 +1122,7 @@ describe( 'blocks', () => {
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console ).not.toHaveErrored();
+			expect( console ).not.toHaveWarned();
 			expect( oldBlock ).toEqual( {
 				name: 'core/test-block',
 				save: noop,
@@ -1430,6 +1435,347 @@ describe( 'blocks', () => {
 					description: 'Variation description',
 				},
 			] );
+		} );
+	} );
+
+	describe( 'registerBlockBindingsSource', () => {
+		// Check the name is correct.
+		it( 'should contain name property', () => {
+			const source = registerBlockBindingsSource( {} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source must contain a name.'
+			);
+			expect( source ).toBeUndefined();
+		} );
+
+		it( 'should reject numbers', () => {
+			const source = registerBlockBindingsSource( { name: 1 } );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source name must be a string.'
+			);
+			expect( source ).toBeUndefined();
+		} );
+
+		it( 'should reject names with uppercase characters', () => {
+			registerBlockBindingsSource( {
+				name: 'Core/WrongName',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source name must not contain uppercase characters.'
+			);
+			expect(
+				getBlockBindingsSource( 'Core/WrongName' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject names with invalid characters', () => {
+			registerBlockBindingsSource( {
+				name: 'core/_wrong_name',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
+			);
+			expect(
+				getBlockBindingsSource( 'core/_wrong_name' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject invalid names without namespace', () => {
+			registerBlockBindingsSource( {
+				name: 'wrong-name',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
+			);
+			expect( getBlockBindingsSource( 'wrong-name' ) ).toBeUndefined();
+		} );
+
+		// Check the label is correct.
+		it( 'should contain label property', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source must contain a label.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject invalid label', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 1,
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source label must be a string.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should not override label from the server', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Client label',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings "core/server" source label is already defined in the server.'
+			);
+		} );
+
+		// Check the `usesContext` array is correct.
+		it( 'should reject invalid usesContext property', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: 'should be an array',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source usesContext must be an array.'
+			);
+		} );
+
+		it( 'should add usesContext when only defined in the server', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client without usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should add usesContext when only defined in the client', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postId', 'postType' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should merge usesContext from server and client without duplicates', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postType', 'clientContext' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [
+				'postId',
+				'postType',
+				'clientContext',
+			] );
+		} );
+
+		// Check the `getValues` callback is correct.
+		it( 'should reject invalid getValues callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getValues: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getValues must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `setValues` callback is correct.
+		it( 'should reject invalid setValues callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				setValues: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source setValues must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `getPlaceholder` callback is correct.
+		it( 'should reject invalid getPlaceholder callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getPlaceholder: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getPlaceholder must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `canUserEditValue` callback is correct.
+		it( 'should reject invalid canUserEditValue callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				canUserEditValue: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source canUserEditValue must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `getFieldsList` callback is correct.
+		it( 'should reject invalid getFieldsList callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getFieldsList: 'should be a function',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source getFieldsList must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check correct sources are registered as expected.
+		it( 'should register a valid source', () => {
+			const sourceProperties = {
+				label: 'Valid Source',
+				usesContext: [ 'postId' ],
+				getValues: () => 'value',
+				setValues: () => 'new values',
+				getPlaceholder: () => 'placeholder',
+				canUserEditValue: () => true,
+				getFieldsList: () => {
+					return { field: 'value' };
+				},
+			};
+			registerBlockBindingsSource( {
+				name: 'core/valid-source',
+				...sourceProperties,
+			} );
+			expect( getBlockBindingsSource( 'core/valid-source' ) ).toEqual(
+				sourceProperties
+			);
+			unregisterBlockBindingsSource( 'core/valid-source' );
+		} );
+
+		it( 'should register a source with default values', () => {
+			registerBlockBindingsSource( {
+				name: 'core/valid-source',
+				label: 'Valid Source',
+			} );
+			const source = getBlockBindingsSource( 'core/valid-source' );
+			expect( source.usesContext ).toBeUndefined();
+			expect( source.getValues ).toBeUndefined();
+			expect( source.setValues ).toBeUndefined();
+			expect( source.getPlaceholder ).toBeUndefined();
+			expect( source.canUserEditValue ).toBeUndefined();
+			expect( source.getFieldsList ).toBeUndefined();
+			unregisterBlockBindingsSource( 'core/valid-source' );
+		} );
+
+		it( 'should reject registering the same source twice', () => {
+			const source = {
+				name: 'core/test-source',
+				label: 'Test Source',
+				getValues: () => 'value',
+			};
+			registerBlockBindingsSource( source );
+			registerBlockBindingsSource( source );
+			unregisterBlockBindingsSource( 'core/test-source' );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source "core/test-source" is already registered.'
+			);
+		} );
+
+		it( 'should correctly merge properties when bootstrap happens after registration', () => {
+			// Register source in the client.
+			const clientOnlyProperties = {
+				getValues: () => 'values',
+				setValues: () => 'new values',
+				getPlaceholder: () => 'placeholder',
+				canUserEditValue: () => true,
+			};
+			registerBlockBindingsSource( {
+				name: 'core/custom-source',
+				label: 'Client Label',
+				usesContext: [ 'postId', 'postType' ],
+				...clientOnlyProperties,
+			} );
+
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/custom-source',
+				label: 'Server Label',
+				usesContext: [ 'postId', 'serverContext' ],
+			} );
+
+			// Check that the bootstrap values prevail and the client properties are still there.
+			expect( getBlockBindingsSource( 'core/custom-source' ) ).toEqual( {
+				// Should use the server label.
+				label: 'Server Label',
+				// Should merge usesContext from server and client.
+				usesContext: [ 'postId', 'postType', 'serverContext' ],
+				// Should keep client properties.
+				...clientOnlyProperties,
+			} );
+
+			unregisterBlockBindingsSource( 'core/custom-source' );
+		} );
+	} );
+
+	describe( 'unregisterBlockBindingsSource', () => {
+		it( 'should remove an existing block bindings source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/test-source',
+				label: 'Test Source',
+			} );
+			unregisterBlockBindingsSource( 'core/test-source' );
+			expect(
+				getBlockBindingsSource( 'core/test-source' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject removing a source that does not exist', () => {
+			unregisterBlockBindingsSource( 'core/non-existing-source' );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source "core/non-existing-source" is not registered.'
+			);
 		} );
 	} );
 } );

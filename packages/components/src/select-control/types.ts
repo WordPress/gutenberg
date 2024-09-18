@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 
 /**
  * Internal dependencies
@@ -22,9 +22,12 @@ type SelectControlBaseProps = Pick<
 	| 'suffix'
 > &
 	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
-		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-		options?: {
+		/**
+		 * An array of option property objects to be rendered,
+		 * each with a `label` and `value` property, as well as any other
+		 * `<option>` attributes.
+		 */
+		options?: ( {
 			/**
 			 * The label to be shown to the user.
 			 */
@@ -34,25 +37,21 @@ type SelectControlBaseProps = Pick<
 			 * This is also the value passed to `onChange` when the option is selected.
 			 */
 			value: string;
-			id?: string;
-			/**
-			 * Whether or not the option should have the disabled attribute.
-			 *
-			 * @default false
-			 */
-			disabled?: boolean;
-			/**
-			 * Whether or not the option should be hidden.
-			 *
-			 * @default false
-			 */
-			hidden?: boolean;
-		}[];
+		} & Omit<
+			React.OptionHTMLAttributes< HTMLOptionElement >,
+			'label' | 'value'
+		> )[];
 		/**
 		 * As an alternative to the `options` prop, `optgroup`s and `options` can be
 		 * passed in as `children` for more customizability.
 		 */
 		children?: ReactNode;
+		/**
+		 * The style variant of the control.
+		 *
+		 * @default 'default'
+		 */
+		variant?: 'default' | 'minimal';
 	};
 
 export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
@@ -64,6 +63,11 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
 	 * @default false
 	 */
 	multiple?: false;
+	/**
+	 * The value of the selected option.
+	 *
+	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
+	 */
 	value?: string;
 	/**
 	 * A function that receives the value of the new option that is being selected as input.
@@ -86,6 +90,11 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
 	 * @default false
 	 */
 	multiple: true;
+	/**
+	 * The value of the selected option.
+	 *
+	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
+	 */
 	value?: string[];
 	/**
 	 * A function that receives the value of the new option that is being selected as input.

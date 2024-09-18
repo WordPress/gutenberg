@@ -144,6 +144,7 @@ function Guide( {
 							className="components-guide__back-button"
 							variant="tertiary"
 							onClick={ goBack }
+							__next40pxDefaultSize
 						>
 							{ __( 'Previous' ) }
 						</Button>
@@ -153,6 +154,7 @@ function Guide( {
 							className="components-guide__forward-button"
 							variant="primary"
 							onClick={ goForward }
+							__next40pxDefaultSize
 						>
 							{ __( 'Next' ) }
 						</Button>

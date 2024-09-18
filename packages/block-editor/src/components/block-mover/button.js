@@ -143,7 +143,7 @@ const BlockMoverButton = forwardRef(
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(

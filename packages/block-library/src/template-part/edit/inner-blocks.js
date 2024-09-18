@@ -127,14 +127,19 @@ export default function TemplatePartInnerBlocks( {
 	const { canViewTemplatePart, canEditTemplatePart } = useSelect(
 		( select ) => {
 			return {
-				canViewTemplatePart:
-					select( coreStore ).canUser( 'read', 'templates' ) ?? false,
-				canEditTemplatePart:
-					select( coreStore ).canUser( 'create', 'templates' ) ??
-					false,
+				canViewTemplatePart: !! select( coreStore ).canUser( 'read', {
+					kind: 'postType',
+					name: 'wp_template_part',
+					id,
+				} ),
+				canEditTemplatePart: !! select( coreStore ).canUser( 'update', {
+					kind: 'postType',
+					name: 'wp_template_part',
+					id,
+				} ),
 			};
 		},
-		[]
+		[ id ]
 	);
 
 	if ( ! canViewTemplatePart ) {

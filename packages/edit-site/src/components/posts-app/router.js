@@ -13,7 +13,7 @@ import Editor from '../editor';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import DataViewsSidebarContent from '../sidebar-dataviews';
-import PostsList from '../posts-app/posts-list';
+import PostList from '../post-list';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -40,7 +40,7 @@ export default function useLayoutAreas() {
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
-				content: <PostsList postType={ postType } />,
+				content: <PostList postType={ postType } />,
 				preview: ( isListLayout || canvas === 'edit' ) && (
 					<Editor isPostsList />
 				),
@@ -48,7 +48,7 @@ export default function useLayoutAreas() {
 					canvas === 'edit' ? (
 						<Editor isPostsList />
 					) : (
-						<PostsList postType={ postType } />
+						<PostList postType={ postType } />
 					),
 			},
 			widths: {

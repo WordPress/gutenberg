@@ -49,5 +49,5 @@ export function useZoomOut( zoomOut = true ) {
 		) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
-	}, [ __unstableSetEditorMode, zoomOut, mode ] );
+	}, [ __unstableGetEditorMode, __unstableSetEditorMode, zoomOut ] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
 }

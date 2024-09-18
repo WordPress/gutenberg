@@ -182,30 +182,32 @@ function InterfaceSkeleton(
 								ariaLabel={ mergedLabels.secondarySidebar }
 								as={ motion.div }
 								initial="closed"
-								animate={
-									isMobileViewport ? 'mobileOpen' : 'open'
-								}
+								animate="open"
 								exit="closed"
 								variants={ {
 									open: { width: secondarySidebarSize.width },
 									closed: { width: 0 },
-									mobileOpen: { width: '100vw' },
 								} }
 								transition={ defaultTransition }
 							>
-								<div
+								<motion.div
 									style={ {
 										position: 'absolute',
 										width: isMobileViewport
 											? '100vw'
 											: 'fit-content',
 										height: '100%',
-										right: 0,
+										left: 0,
 									} }
+									variants={ {
+										open: { x: 0 },
+										closed: { x: '-100%' },
+									} }
+									transition={ defaultTransition }
 								>
 									{ secondarySidebarResizeListener }
 									{ secondarySidebar }
-								</div>
+								</motion.div>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>

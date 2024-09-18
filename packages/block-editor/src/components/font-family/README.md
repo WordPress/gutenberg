@@ -24,6 +24,7 @@ const MyFontFamilyControl = () => {
 			onChange={ ( newFontFamily ) => {
 				setFontFamily( newFontFamily );
 			} }
+			__nextHasNoMarginBottom
 		/>
 	);
 };
@@ -69,3 +70,10 @@ The current font family value.
 - Default: ''
 
 The rest of the props are passed down to the underlying `<SelectControl />` instance.
+
+#### `__nextHasNoMarginBottom`
+
+-   **Type:** `boolean`
+-   **Default:** `false`
+
+Start opting into the new margin-free styles that will become the default in a future version.

@@ -85,7 +85,11 @@ const VALID_SETTINGS = [
 ];
 
 export const useGlobalStylesReset = () => {
-	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
+	const { user, setUserConfig } = useContext( GlobalStylesContext );
+	const config = {
+		settings: user.settings,
+		styles: user.styles,
+	};
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
@@ -368,6 +372,15 @@ export function useSettingsForBlockElement(
 			) {
 				updatedSettings.border = {
 					...updatedSettings.border,
+					[ key ]: false,
+				};
+			}
+		} );
+
+		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.background = {
+					...updatedSettings.background,
 					[ key ]: false,
 				};
 			}

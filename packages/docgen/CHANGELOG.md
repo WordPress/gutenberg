@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
 ### Bug Fixes
 
 -   Fix getting param annotations for exported variables assigned to function expressions ([#tbd](https://github.com/WordPress/gutenberg/pull/tbd)).

@@ -10,12 +10,15 @@ import {
  * Internal dependencies
  */
 import StylesPreviewTypography from '../preview-typography';
-import { useTypographyVariations } from '../hooks';
-import Variation from './variation';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Subtitle from '../subtitle';
+import Variation from './variation';
 
 export default function TypographyVariations( { title, gap = 2 } ) {
-	const typographyVariations = useTypographyVariations();
+	const propertiesToFilter = [ 'typography' ];
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
+
 	// Return null if there is only one variation (the default).
 	if ( typographyVariations?.length <= 1 ) {
 		return null;
@@ -34,7 +37,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 						<Variation
 							key={ index }
 							variation={ variation }
-							property="typography"
+							properties={ propertiesToFilter }
 							showTooltip
 						>
 							{ () => (

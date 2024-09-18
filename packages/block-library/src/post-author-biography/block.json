@@ -12,6 +12,9 @@
 		}
 	},
 	"usesContext": [ "postType", "postId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"spacing": {
 			"margin": true,

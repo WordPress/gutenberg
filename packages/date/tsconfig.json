@@ -3,8 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types",
-		"noUnusedParameters": false
+		"declarationDir": "build-types"
 	},
 	"references": [ { "path": "../deprecated" } ],
 	"include": [ "src/**/*" ]

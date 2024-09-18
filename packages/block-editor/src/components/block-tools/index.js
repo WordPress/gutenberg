@@ -20,6 +20,7 @@ import {
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
 import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
+import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
@@ -79,6 +80,7 @@ export default function BlockTools( {
 		showEmptyBlockSideInserter,
 		showBreadcrumb,
 		showBlockToolbarPopover,
+		showZoomOutToolbar,
 	} = useShowBlockTools();
 
 	const {
@@ -229,6 +231,13 @@ export default function BlockTools( {
 					/>
 				) }
 
+				{ showZoomOutToolbar && (
+					<ZoomOutPopover
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
+
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode && ! hasFixedToolbar && (
 					<Popover.Slot
@@ -242,12 +251,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ window.__experimentalEnableZoomedOutPatternsTab &&
-					isZoomOutMode && (
-						<ZoomOutModeInserters
-							__unstableContentRef={ __unstableContentRef }
-						/>
-					) }
+				{ isZoomOutMode && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

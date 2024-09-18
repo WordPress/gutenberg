@@ -4,7 +4,6 @@
 import AdvancedControls from './advanced-controls-panel';
 import PositionControls from './position-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
-import SettingsTabHint from './settings-tab-hint';
 
 const SettingsTab = ( { showAdvancedControls = false } ) => (
 	<>
@@ -15,7 +14,6 @@ const SettingsTab = ( { showAdvancedControls = false } ) => (
 				<AdvancedControls />
 			</div>
 		) }
-		<SettingsTabHint />
 	</>
 );
 

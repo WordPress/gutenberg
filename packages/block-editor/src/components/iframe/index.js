@@ -242,10 +242,8 @@ function Iframe( {
 	const isZoomedOut = scale !== 1;
 
 	useEffect( () => {
-		if ( ! isZoomedOut ) {
-			prevContainerWidth.current = containerWidth;
-		}
-	}, [ containerWidth, isZoomedOut ] );
+		prevContainerWidth.current = containerWidth;
+	}, [ containerWidth ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
@@ -305,7 +303,7 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		const maxWidth = 800;
+		const maxWidth = 750;
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
@@ -378,10 +376,8 @@ function Iframe( {
 			<iframe
 				{ ...props }
 				style={ {
-					border: 0,
 					...props.style,
 					height: props.style?.height,
-					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }

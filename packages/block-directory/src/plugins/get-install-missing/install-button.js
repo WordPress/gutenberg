@@ -42,7 +42,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
 					}
 				} )
 			}
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 			disabled={ isInstallingBlock }
 			isBusy={ isInstallingBlock }
 			variant="primary"

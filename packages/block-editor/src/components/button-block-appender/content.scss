@@ -52,7 +52,7 @@
 			left: 0;
 			pointer-events: none;
 			border: $border-width dashed currentColor;
-			@include placeholder-style();
+			border-radius: $radius-block-ui;
 		}
 
 		.block-editor-inserter {

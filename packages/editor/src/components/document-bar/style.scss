@@ -10,7 +10,7 @@
 	min-width: 0;
 	background: $gray-100;
 	border-radius: $grid-unit-05;
-	width: min(100%, 416px);
+	width: min(100%, 450px);
 
 	&:hover {
 		background-color: $gray-200;
@@ -25,10 +25,6 @@
 			background: $gray-200;
 		}
 	}
-
-	@include break-large() {
-		width: min(100%, 450px);
-	}
 }
 
 .editor-document-bar__command {
@@ -38,7 +34,7 @@
 }
 
 .editor-document-bar__title {
-	flex-grow: 1;
+	flex: 1;
 	overflow: hidden;
 	color: $gray-900;
 	gap: $grid-unit-05;

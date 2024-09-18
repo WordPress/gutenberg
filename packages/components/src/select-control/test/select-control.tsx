@@ -17,8 +17,8 @@ describe( 'SelectControl', () => {
 		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'should not render its children', async () => {
-		const user = await userEvent.setup();
+	it( 'should render its children', async () => {
+		const user = userEvent.setup();
 		const handleChangeMock = jest.fn();
 
 		render(
@@ -46,8 +46,8 @@ describe( 'SelectControl', () => {
 		);
 	} );
 
-	it( 'should not render its options', async () => {
-		const user = await userEvent.setup();
+	it( 'should render its options', async () => {
+		const user = userEvent.setup();
 		const handleChangeMock = jest.fn();
 
 		render(
@@ -80,5 +80,24 @@ describe( 'SelectControl', () => {
 			'option-2',
 			expect.anything()
 		);
+	} );
+
+	it( 'should pass through options props', () => {
+		render(
+			<SelectControl
+				label="Select"
+				options={ [
+					{
+						value: 'value',
+						label: 'label',
+						'aria-label': 'Aria label',
+					},
+				] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'option', { name: 'Aria label' } )
+		).toBeInTheDocument();
 	} );
 } );

@@ -8,9 +8,9 @@ import {
 	TextControl,
 	ExternalLink,
 	VisuallyHidden,
-	CustomSelectControl,
 	ToggleControl,
 	__experimentalVStack as VStack,
+	CustomSelectControl,
 } from '@wordpress/components';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
@@ -117,7 +117,7 @@ function NonDefaultControls( { format, onChange } ) {
 		name: __( 'Custom' ),
 		className:
 			'block-editor-date-format-picker__custom-format-select-control__custom-option',
-		__experimentalHint: __( 'Enter your own date format' ),
+		hint: __( 'Enter your own date format' ),
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
