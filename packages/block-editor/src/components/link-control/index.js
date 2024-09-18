@@ -384,7 +384,7 @@ function LinkControl( {
 								value={ internalControlValue?.title }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
-								size="__unstable-large"
+								__next40pxDefaultSize
 							/>
 						) }
 						<LinkControlSearchInput
@@ -405,13 +405,10 @@ function LinkControl( {
 								createSuggestionButtonText
 							}
 							hideLabelFromVision={ ! showTextControl }
-							// Passing the Button component as a suffix prop
 							suffix={
 								showActions ? undefined : (
 									<InputControlSuffixWrapper variant="control">
 										<Button
-											// TODO: Switch to true (40px size) if possible
-											__next40pxDefaultSize={ false }
 											onClick={
 												isDisabled ? noop : handleSubmit
 											}
