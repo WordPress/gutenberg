@@ -52,35 +52,8 @@ export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 		],
 	},
 ];
-/*
 
-  name: slug/identifier for the category // @TODO maybe rename to `slug` after the results of getCategories()
-  subcategories: array of subcategories
-  title: display name for the category
-  include: block to display in the category in addition to any registered blocks in that category.
-  exclude: block to exclude from the category.
-  onClick: function to call when the category's blocks are clicked. Overrides the default behavior.
- */
 export const STYLE_BOOK_CATEGORIES = [
-	/*	{
-		// Clicking examples on the landing tab
-		// will take you to the corresponding
-		// tab in the style book. E.g., image > media
-		// So the click events have to be handled separately.
-		name: 'overview',
-		title: __( 'Overview' ),
-		blocks: [
-			// colors
-			'custom/colors',
-			'core/heading',
-			'core/paragraph',
-			'core/image',
-			'core/separator',
-			'core/buttons',
-			'core/pull-quote',
-			'core/search',
-		],
-	},*/
 	{
 		name: 'text',
 		title: __( 'Text' ),
