@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { store, typed } from '../store';
+import { store } from '../store';
 
 describe( 'Interactivity API', () => {
 	describe( 'store', () => {
@@ -279,38 +279,6 @@ describe( 'Interactivity API', () => {
 
 					// @ts-expect-error
 					myStore.state.nonExistent satisfies {};
-				};
-			} );
-
-			describe( 'generators can use the `type` function to type promises.', () => {
-				// eslint-disable-next-line no-unused-expressions
-				async () => {
-					const myPromise = async ( n: number ) => {
-						return n;
-					};
-
-					const myStore = store( 'test', {
-						actions: {
-							*asyncAction( n: number ) {
-								const n1 = yield* typed( myPromise( n ) );
-								const n2: number = n1;
-								return n2;
-							},
-							*anotherAsyncAction() {
-								const n1 = yield* typed(
-									myStore.actions.asyncAction( 1 )
-								);
-								n1 satisfies number;
-								// @ts-expect-error
-								n1 satisfies string;
-							},
-						},
-					} );
-
-					myStore.actions.asyncAction(
-						1
-					) satisfies Promise< number >;
-					( await myStore.actions.asyncAction( 1 ) ) satisfies number;
 				};
 			} );
 		} );
