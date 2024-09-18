@@ -46,7 +46,11 @@ export default function CategoriesEdit( {
 		'taxonomy'
 	);
 
-	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
+	const taxonomies = allTaxonomies?.filter(
+		( t ) =>
+			t.visibility.public &&
+			( taxonomySlug === 'category' ) === ( t.slug === 'category' )
+	);
 
 	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
 
@@ -185,21 +189,24 @@ export default function CategoriesEdit( {
 		<TagName { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ Array.isArray( taxonomies ) && (
-						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Taxonomy' ) }
-							options={ taxonomies.map( ( t ) => ( {
-								label: t.name,
-								value: t.slug,
-							} ) ) }
-							value={ taxonomySlug }
-							onChange={ ( selectedTaxonomy ) =>
-								setAttributes( { taxonomy: selectedTaxonomy } )
-							}
-						/>
-					) }
+					{ taxonomySlug !== 'category' && // For back-compat, the Category taxonomy has its own block variation.
+						Array.isArray( taxonomies ) && (
+							<SelectControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Taxonomy' ) }
+								options={ taxonomies.map( ( t ) => ( {
+									label: t.name,
+									value: t.slug,
+								} ) ) }
+								value={ taxonomySlug }
+								onChange={ ( selectedTaxonomy ) =>
+									setAttributes( {
+										taxonomy: selectedTaxonomy,
+									} )
+								}
+							/>
+						) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
