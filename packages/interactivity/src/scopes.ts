@@ -99,11 +99,33 @@ export const getElement = () => {
 };
 
 /**
- * TODO: write tsdoc comment.
+ * Retrieves the part of the inherited context defined and updated from the
+ * server.
+ *
+ * The object returned is read-only, and includes the context defined in PHP
+ * with `wp_interactivity_data_wp_context()`, including the corresponding
+ * inherited properties. When `actions.navigate()` is called, this object is
+ * updated to reflect the changes in the new visited page, without affecting the
+ * context returned by `getContext()`. Directives can subscribe to those changes
+ * to update the context if needed.
+ *
+ * @example
+ * ```js
+ *  store('...', {
+ *    callbacks: {
+ *      updateServerContext() {
+ *        const context = getContext();
+ *        const serverContext = getServerContext();
+ *        // Override some property with the new value that came from the server.
+ *        context.overridableProp = serverContext.overridableProp;
+ *      },
+ *    },
+ *  });
+ * ```
  *
  * @param namespace Store namespace. By default, the namespace where the calling
  *                  function exists is used.
- * @return The context content.
+ * @return The server context content.
  */
 export const getServerContext = < T extends object >(
 	namespace?: string
