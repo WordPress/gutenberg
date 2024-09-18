@@ -73,9 +73,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		);
 
 		// Add the 'edit_theme_options' capability to the theme manager (subscriber).
-		$theme_manager_id = get_user_by('id', self::$theme_manager_id );
+		$theme_manager_id = get_user_by( 'id', self::$theme_manager_id );
 		if ( $theme_manager_id instanceof WP_User ) {
-			$theme_manager_id->add_cap('edit_theme_options');
+			$theme_manager_id->add_cap( 'edit_theme_options' );
 		}
 
 		// This creates the global styles for the current theme.
