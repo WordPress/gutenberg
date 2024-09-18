@@ -22,9 +22,8 @@ import {
 	restorePost,
 	trashPost,
 	renamePost,
-	deletePatternAction,
 	resetTemplateAction,
-	deleteTemplateAction,
+	deletePost,
 } from '@wordpress/fields';
 import duplicateTemplatePart from '../actions/duplicate-template-part';
 
@@ -118,11 +117,9 @@ export const registerPostTypeActions =
 				? reorderPage
 				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			deletePatternAction,
-			resetTemplateAction,
 			restorePost,
 			resetTemplateAction,
-			deleteTemplateAction,
+			deletePost,
 			trashPost,
 			permanentlyDeletePost,
 		];

@@ -10,30 +10,48 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// @ts-ignore
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import type { Action } from '@wordpress/dataviews';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import { isTemplateRemovable, getItemTitle } from '../utils';
-import type { Template, TemplatePart } from '../../types';
-import { decodeEntities } from '@wordpress/html-entities';
+import {
+	getItemTitle,
+	isTemplateOrTemplatePart,
+	isTemplateRemovable,
+} from '../utils';
+import type { Pattern, Template, TemplatePart } from '../../types';
 import type { NoticeSettings } from '../../mutation';
 import { deletePostWithNotices } from '../../mutation';
+import { unlock } from '../../lock-unlock';
 
-const deleteTemplateAction: Action< Template | TemplatePart > = {
-	id: 'delete-template',
+const { PATTERN_TYPES } = unlock( patternsPrivateApis );
+
+// This action is used for templates, patterns and template parts.
+// Every other post type uses the similar `trashPostAction` which
+// moves the post to trash.
+const deletePostAction: Action< Template | TemplatePart | Pattern > = {
+	id: 'delete-post',
 	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
-		return isTemplateRemovable( post );
+		if ( isTemplateOrTemplatePart( post ) ) {
+			return isTemplateRemovable( post );
+		}
+		// We can only remove user patterns.
+		return post.type === PATTERN_TYPES.user;
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-		const isResetting = items.every( ( item ) => item?.has_theme_file );
+		const isResetting = items.every(
+			( item ) => isTemplateOrTemplatePart( item ) && item?.has_theme_file
+		);
 		return (
 			<VStack spacing="5">
 				<Text>
@@ -68,7 +86,7 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 						onClick={ async () => {
 							setIsBusy( true );
 							const notice: NoticeSettings<
-								Template | TemplatePart
+								Template | TemplatePart | Pattern
 							> = {
 								success: {
 									messages: {
@@ -182,4 +200,4 @@ const deleteTemplateAction: Action< Template | TemplatePart > = {
 	},
 };
 
-export default deleteTemplateAction;
+export default deletePostAction;
