@@ -68,7 +68,7 @@ const SlugEdit = ( {
 	} );
 
 	return (
-		<fieldset className="edit-site-dataviews-controls__slug">
+		<fieldset className="fields-controls__slug">
 			{ isEditable && (
 				<VStack>
 					<VStack spacing="0px">
@@ -100,7 +100,7 @@ const SlugEdit = ( {
 						autoComplete="off"
 						spellCheck="false"
 						type="text"
-						className="edit-site-dataviews-controls__slug-input"
+						className="fields-controls__slug-input"
 						onChange={ ( newValue?: string ) => {
 							onChangeControl( newValue );
 						} }
@@ -111,14 +111,14 @@ const SlugEdit = ( {
 						} }
 						help={
 							<ExternalLink
-								className="edit-site-dataviews-controls__slug-help"
+								className="fields-controls__slug-help"
 								href={ permalink }
 							>
 								<span>{ permalinkPrefix }</span>
-								<span className="edit-site-dataviews-controls__slug-help-slug">
+								<span className="fields-controls__slug-help-slug">
 									{ slugToDisplay }
 								</span>
-								<span className="edit-site-dataviews-controls__slug-help-suffix">
+								<span className="fields-controls__slug-help-suffix">
 									{ permalinkSuffix }
 								</span>
 							</ExternalLink>
@@ -128,7 +128,7 @@ const SlugEdit = ( {
 			) }
 			{ ! isEditable && (
 				<ExternalLink
-					className="edit-site-dataviews-controls__slug-help"
+					className="fields-controls__slug-help"
 					href={ permalink }
 				>
 					{ permalink }

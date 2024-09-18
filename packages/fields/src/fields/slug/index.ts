@@ -8,8 +8,8 @@ import type { Field } from '@wordpress/dataviews';
  */
 import type { BasePost } from '../../types';
 import { __ } from '@wordpress/i18n';
-import SlugEdit from './slug.edit';
-import SlugView from './slug.view';
+import SlugEdit from './slug-edit';
+import SlugView from './slug-view';
 
 const slugField: Field< BasePost > = {
 	id: 'slug',
