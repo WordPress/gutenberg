@@ -74,11 +74,11 @@ function Editor( {
 					<EditorInterface { ...props }>
 						{ extraContent }
 					</EditorInterface>
+					{ children }
 					<Sidebar
 						onActionPerformed={ onActionPerformed }
 						extraPanels={ extraSidebarPanels }
 					/>
-					{ children }
 				</ExperimentalEditorProvider>
 			) }
 		</>

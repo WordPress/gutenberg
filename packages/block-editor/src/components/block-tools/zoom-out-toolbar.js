@@ -31,7 +31,12 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 				getPreviousBlockClientId,
 				canRemoveBlock,
 				canMoveBlock,
+				getSettings,
 			} = select( blockEditorStore );
+
+			const { __experimentalSetIsInserterOpened: setIsInserterOpened } =
+				getSettings();
+
 			const { getBlockType } = select( blocksStore );
 			const { name } = getBlock( clientId );
 			const blockType = getBlockType( name );
@@ -63,6 +68,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 				isPrevBlockTemplatePart,
 				canRemove: canRemoveBlock( clientId ),
 				canMove: canMoveBlock( clientId ),
+				setIsInserterOpened,
 			};
 		},
 		[ clientId ]
@@ -75,6 +81,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
+		setIsInserterOpened,
 	} = selected;
 
 	const { removeBlock, __unstableSetEditorMode } =
@@ -132,6 +139,10 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ () => {
+						// Setting may be undefined.
+						if ( typeof setIsInserterOpened === 'function' ) {
+							setIsInserterOpened( false );
+						}
 						__unstableSetEditorMode( 'edit' );
 						__unstableContentRef.current?.focus();
 					} }

@@ -7,22 +7,43 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+function getMetadata( registry, context ) {
+	let metaFields = {};
+	const { type } = registry.select( editorStore ).getCurrentPost();
+	const { getEditedEntityRecord } = registry.select( coreDataStore );
+	const { getRegisteredPostMeta } = unlock(
+		registry.select( coreDataStore )
+	);
+
+	if ( type === 'wp_template' ) {
+		const fields = getRegisteredPostMeta( context?.postType );
+		// Populate the `metaFields` object with the default values.
+		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
+			metaFields[ key ] = props.default;
+		} );
+	} else {
+		metaFields = getEditedEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId
+		).meta;
+	}
+
+	return metaFields;
+}
 
 export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
-		const meta = registry
-			.select( coreDataStore )
-			.getEditedEntityRecord(
-				'postType',
-				context?.postType,
-				context?.postId
-			)?.meta;
+		const metaFields = getMetadata( registry, context );
+
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			// Use the key if the value is not set.
 			newValues[ attributeName ] =
-				meta?.[ source.args.key ] ?? source.args.key;
+				metaFields?.[ source.args.key ] ?? source.args.key;
 		}
 		return newValues;
 	},
@@ -82,19 +103,14 @@ export default {
 		return true;
 	},
 	getFieldsList( { registry, context } ) {
-		const metaFields = registry
-			.select( coreDataStore )
-			.getEditedEntityRecord(
-				'postType',
-				context?.postType,
-				context?.postId
-			).meta;
+		const metaFields = getMetadata( registry, context );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
 		}
 
 		// Remove footnotes or private keys from the list of fields.
+		// TODO: Remove this once we retrieve the fields from 'types' endpoint in post or page editor.
 		return Object.fromEntries(
 			Object.entries( metaFields ).filter(
 				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'

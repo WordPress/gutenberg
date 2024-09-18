@@ -8,7 +8,7 @@ import type { ChangeEvent } from 'react';
  */
 import {
 	Button,
-	Popover,
+	Dropdown,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
@@ -24,7 +24,7 @@ import {
 	BaseControl,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { memo, useContext, useState, useMemo } from '@wordpress/element';
+import { memo, useContext, useMemo } from '@wordpress/element';
 import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 
@@ -549,34 +549,32 @@ function _DataViewsViewConfig( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 	defaultLayouts?: SupportedLayouts;
 } ) {
-	const [ isShowingViewPopover, setIsShowingViewPopover ] =
-		useState< boolean >( false );
-
 	return (
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-			<div>
-				<Button
-					size="compact"
-					icon={ cog }
-					label={ _x( 'View options', 'View is used as a noun' ) }
-					onClick={ () => setIsShowingViewPopover( true ) }
-				/>
-				{ isShowingViewPopover && (
-					<Popover
-						placement="bottom-end"
-						onClose={ () => {
-							setIsShowingViewPopover( false );
-						} }
-						focusOnMount
-					>
-						<DataviewsViewConfigContent
-							density={ density }
-							setDensity={ setDensity }
+			<Dropdown
+				popoverProps={ { placement: 'bottom-end', offset: 9 } }
+				contentClassName="dataviews-view-config"
+				renderToggle={ ( { onToggle } ) => {
+					return (
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+							onClick={ onToggle }
 						/>
-					</Popover>
+					);
+				} }
+				renderContent={ () => (
+					<DataviewsViewConfigContent
+						density={ density }
+						setDensity={ setDensity }
+					/>
 				) }
-			</div>
+			/>
 		</>
 	);
 }

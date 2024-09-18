@@ -141,7 +141,7 @@ export default function Edit( props ) {
 	return (
 		<div>
 			<TextControl
-				label={ __( 'Record ID:' ) }
+				label={ __( 'Record ID' ) }
 				value={ recordId }
 				onChange={ ( val ) =>
 					setAttributes( { recordId: Number( val ) } )
