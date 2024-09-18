@@ -34,6 +34,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### featuredImageField
+
+Undocumented declaration.
+
 ### orderField
 
 Undocumented declaration.

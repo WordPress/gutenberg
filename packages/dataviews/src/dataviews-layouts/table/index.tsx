@@ -19,7 +19,7 @@ import { useEffect, useId, useRef, useState } from '@wordpress/element';
  */
 import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
 import ItemActions from '../../components/dataviews-item-actions';
-import { sortValues } from '../../constants';
+import { LAYOUT_TABLE, sortValues } from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -110,7 +110,7 @@ function TableColumnField< Item >( {
 					primaryField?.id === field.id,
 			} ) }
 		>
-			<field.render { ...{ item } } />
+			<field.render { ...{ item } } view={ LAYOUT_TABLE } />
 		</div>
 	);
 }

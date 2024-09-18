@@ -8,12 +8,11 @@ import clsx from 'clsx';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { featuredImageField } from '@wordpress/fields';
 import {
 	createInterpolateElement,
 	useMemo,
 	useState,
-	useCallback,
-	useRef,
 } from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import {
@@ -24,15 +23,8 @@ import {
 	pending,
 	notAllowed,
 	commentAuthorAvatar as authorIcon,
-	lineSolid,
 } from '@wordpress/icons';
-import {
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-	__experimentalGrid as Grid,
-	Icon,
-	Button,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 
@@ -41,13 +33,10 @@ import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
  */
 import {
 	LAYOUT_GRID,
-	LAYOUT_LIST,
 	LAYOUT_TABLE,
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
-import { default as Link, useLink } from '../routes/link';
-import Media from '../media';
-import { MediaUpload } from '@wordpress/block-editor';
+import { default as Link } from '../routes/link';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -90,78 +79,6 @@ const getFormattedDate = ( dateToDisplay ) =>
 		getSettings().formats.datetimeAbbreviated,
 		getDate( dateToDisplay )
 	);
-
-function FeaturedImage( { item, viewType } ) {
-	const mediaId = item.featured_media;
-
-	const media = useSelect(
-		( select ) => {
-			const { getEntityRecord } = select( coreStore );
-			return getEntityRecord( 'root', 'media', mediaId );
-		},
-		[ mediaId ]
-	);
-	const url = media?.source_url;
-	const title = media?.title?.rendered;
-
-	const { onClick } = useLink( {
-		postId: item.id,
-		postType: item.type,
-		canvas: 'edit',
-	} );
-
-	if ( viewType === LAYOUT_GRID ) {
-		if ( ! url ) {
-			return null;
-		}
-		return (
-			<button
-				className="edit-site-post-list__featured-image-button"
-				type="button"
-				onClick={ onClick }
-				aria-label={ item.title?.rendered || __( '(no title)' ) }
-			>
-				<Media
-					className="edit-site-post-list__featured-image"
-					id={ item.featured_media }
-					size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
-				/>
-			</button>
-		);
-	}
-
-	if ( viewType === LAYOUT_LIST ) {
-		if ( ! url ) {
-			return null;
-		}
-
-		return (
-			<div className="edit-site-post-featured-image-container">
-				<img
-					className="edit-site-post-featured-image"
-					src={ url }
-					alt=""
-				/>
-			</div>
-		);
-	}
-
-	if ( ! url ) {
-		return (
-			<HStack className="edit-site-post-featured-image-container">
-				<span className="edit-site-post-featured-image-placeholder" />
-				<span>{ __( 'Choose an image…' ) }</span>
-			</HStack>
-		);
-	}
-
-	return (
-		<HStack className="edit-site-post-featured-image-container">
-			<img className="edit-site-post-featured-image" src={ url } alt="" />
-			<span>{ title }</span>
-		</HStack>
-	);
-}
 
 function PostStatusField( { item } ) {
 	const status = STATUSES.find( ( { value } ) => value === item.status );
@@ -232,120 +149,7 @@ function usePostFields( viewType ) {
 
 	const fields = useMemo(
 		() => [
-			{
-				id: 'featured_media',
-				label: __( 'Featured Image' ),
-				type: 'image',
-				render: ( { item } ) => (
-					<FeaturedImage item={ item } viewType={ viewType } />
-				),
-				Edit: ( { field, onChange, data } ) => {
-					const { id } = field;
-
-					const value = field.getValue( { item: data } );
-
-					const media = useSelect(
-						( select ) => {
-							const { getEntityRecord } = select( coreStore );
-							return getEntityRecord( 'root', 'media', value );
-						},
-						[ value ]
-					);
-
-					const onChangeControl = useCallback(
-						( newValue ) =>
-							onChange( {
-								[ id ]: newValue,
-							} ),
-						[ id, onChange ]
-					);
-
-					const url = media?.source_url;
-					const title = media?.title?.rendered;
-					const ref = useRef( null );
-
-					return (
-						<fieldset className="edit-site-dataviews-controls__featured-image">
-							<div className="edit-side-dataviews-controls__featured-image-container">
-								<MediaUpload
-									onSelect={ ( selectedMedia ) => {
-										onChangeControl( selectedMedia.id );
-									} }
-									allowedTypes={ [ 'image' ] }
-									render={ ( { open } ) => {
-										return (
-											<div
-												ref={ ref }
-												role="button"
-												tabIndex={ -1 }
-												onClick={ () => {
-													open();
-												} }
-												onKeyDown={ open }
-											>
-												<Grid
-													rowGap={ 0 }
-													columnGap={ 8 }
-													templateColumns="24px 1fr 0.5fr"
-												>
-													{ url && (
-														<>
-															<img
-																className="edit-site-post-featured-image"
-																alt=""
-																src={ url }
-															/>
-															<Text
-																as="span"
-																truncate
-																numberOfLines={
-																	0
-																}
-															>
-																{ title }
-															</Text>
-														</>
-													) }
-													{ ! url && (
-														<>
-															<span className="edit-site-post-featured-image-placeholder" />
-															<span>
-																{ __(
-																	'Choose an image…'
-																) }
-															</span>
-														</>
-													) }
-													{ url && (
-														<>
-															<Button
-																size="small"
-																className="edit-site-dataviews-controls__featured-image-remove-button"
-																icon={
-																	lineSolid
-																}
-																onClick={ (
-																	event
-																) => {
-																	event.stopPropagation();
-																	onChangeControl(
-																		0
-																	);
-																} }
-															/>
-														</>
-													) }
-												</Grid>
-											</div>
-										);
-									} }
-								/>
-							</div>
-						</fieldset>
-					);
-				},
-				enableSorting: false,
-			},
+			featuredImageField,
 			{
 				label: __( 'Title' ),
 				id: 'title',

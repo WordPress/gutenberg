@@ -34,6 +34,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
@@ -49,6 +50,7 @@
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/router": "file:../router",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"change-case": "4.1.2",

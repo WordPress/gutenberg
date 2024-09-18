@@ -72,7 +72,7 @@ function PostEditForm( { postType, postId } ) {
 		for ( const id of ids ) {
 			if (
 				edits.status !== 'future' &&
-				record.status === 'future' &&
+				record?.status === 'future' &&
 				new Date( record.date ) > new Date()
 			) {
 				edits.date = null;
