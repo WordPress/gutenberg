@@ -56,11 +56,6 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			$wp_styles  = new WP_Styles();
 			$wp_scripts = new WP_Scripts();
 
-			// Register all currently registered styles and scripts. The actions that
-			// follow enqueue assets, but don't necessarily register them.
-			$wp_styles->registered  = isset( $current_wp_styles->registered ) ? $current_wp_styles->registered : array();
-			$wp_scripts->registered = isset( $current_wp_scripts->registered ) ? $current_wp_scripts->registered : array();
-
 			// We generally do not need reset styles for the block editor. However, if
 			// it's a classic theme, margins will be added to every block, which is
 			// reset specifically for list items, so classic themes rely on these
