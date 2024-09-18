@@ -16,6 +16,8 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
+import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -27,8 +29,6 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../utils';
 import type { CoreDataError, Template, TemplatePart } from '../../types';
-import { addQueryArgs } from '@wordpress/url';
-import apiFetch from '@wordpress/api-fetch';
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart

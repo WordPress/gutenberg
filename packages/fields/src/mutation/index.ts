@@ -3,12 +3,12 @@
  */
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import type { CoreDataError, Post } from '../types';
-import { dispatch } from '@wordpress/data';
 
 const getErrorMessagesFromPromises = < T >(
 	allSettledResults: PromiseSettledResult< T >[]
