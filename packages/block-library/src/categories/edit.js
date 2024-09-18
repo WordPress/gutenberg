@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import {
 	PanelBody,
 	Placeholder,
-	SelectControl,
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
@@ -23,7 +22,7 @@ import {
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 
 export default function CategoriesEdit( {
 	attributes: {
@@ -41,17 +40,14 @@ export default function CategoriesEdit( {
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 
-	const { records: allTaxonomies, isResolvingTaxonomies } = useEntityRecords(
+	const { record: taxonomy, isResolvingTaxonomy } = useEntityRecord(
 		'root',
-		'taxonomy'
+		'taxonomy',
+		taxonomySlug
 	);
 
-	const taxonomies = allTaxonomies?.filter( ( t ) => t.visibility.public );
-
-	const taxonomy = taxonomies?.find( ( t ) => t.slug === taxonomySlug );
-
 	const isHierarchicalTaxonomy =
-		! isResolvingTaxonomies && taxonomy?.hierarchical;
+		! isResolvingTaxonomy && taxonomy?.hierarchical;
 
 	const query = { per_page: -1, hide_empty: ! showEmpty, context: 'view' };
 	if ( isHierarchicalTaxonomy && showOnlyTopLevel ) {
@@ -185,21 +181,6 @@ export default function CategoriesEdit( {
 		<TagName { ...blockProps }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
-					{ Array.isArray( taxonomies ) && (
-						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Taxonomy' ) }
-							options={ taxonomies.map( ( t ) => ( {
-								label: t.name,
-								value: t.slug,
-							} ) ) }
-							value={ taxonomySlug }
-							onChange={ ( selectedTaxonomy ) =>
-								setAttributes( { taxonomy: selectedTaxonomy } )
-							}
-						/>
-					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Display as dropdown' ) }
