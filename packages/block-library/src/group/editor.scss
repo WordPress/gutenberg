@@ -41,7 +41,7 @@
 		display: flex;
 		flex: 1 0 $button-size-next-default-40px;
 		pointer-events: none;
-		min-height: $grid-unit-50 - $border-width - $border-width;
+		min-height: $button-size-next-default-40px - $border-width - $border-width;
 		border: $border-width dashed currentColor;
 	}
 
