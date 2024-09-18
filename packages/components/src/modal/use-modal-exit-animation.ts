@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { CONFIG } from '../utils';
+import warning from '@wordpress/warning';
 
 // Animation duration (ms) extracted to JS in order to be used on a setTimeout.
 const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
@@ -29,7 +30,15 @@ export function useModalExitAnimation() {
 				// the value held by the react ref might change at runtime.
 				const frameEl = frameRef.current;
 
-				if ( isReducedMotion || ! frameEl ) {
+				if ( isReducedMotion ) {
+					closeModalResolve();
+					return;
+				}
+
+				if ( ! frameEl ) {
+					warning(
+						"wp.components.Modal: the Modal component can't be closed with an exit animation because of a missing reference to the modal frame element."
+					);
 					closeModalResolve();
 					return;
 				}
