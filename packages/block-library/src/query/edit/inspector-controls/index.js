@@ -45,7 +45,8 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout } = props;
+	const { attributes, setQuery, setDisplayLayout, postTypeFromContext } =
+		props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
@@ -126,11 +127,16 @@ export default function QueryInspectorControls( props ) {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 
-	const isTemplate = useSelect( ( select ) => {
-		const currentTemplate =
-			select( coreStore ).__experimentalGetTemplateForLink()?.type;
-		return 'wp_template' === currentTemplate;
-	}, [] );
+	const isTemplate = useSelect(
+		( select ) => {
+			const currentTemplate =
+				select( coreStore ).__experimentalGetTemplateForLink()?.type;
+			const isInTemplate = 'wp_template' === currentTemplate;
+			const isInSingularContent = postTypeFromContext !== undefined;
+			return isInTemplate && ! isInSingularContent;
+		},
+		[ postTypeFromContext ]
+	);
 
 	const showInheritControl =
 		isTemplate && isControlAllowed( allowedControls, 'inherit' );
