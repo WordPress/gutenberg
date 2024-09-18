@@ -234,12 +234,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	const onBlur = () => {
 		setInputHasFocus( false );
-
-		if ( ! currentOption ) {
-			onFilterValueChange( '' );
-		}
-
-		setInputValue( '' );
 	};
 
 	const onFocus = () => {
