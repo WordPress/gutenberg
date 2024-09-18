@@ -645,7 +645,7 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const themeGlobalStyles = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeBaseGlobalStyles(
 			currentTheme.stylesheet,
@@ -658,7 +658,7 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
 	async ( { resolveSelect, dispatch } ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		const variations = await apiFetch( {
-			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations`,
+			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
 			currentTheme.stylesheet,
