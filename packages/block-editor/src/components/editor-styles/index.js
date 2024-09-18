@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useMemo, memo, useCallback } from '@wordpress/element';
+import { useCallback, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
