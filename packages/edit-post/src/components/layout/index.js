@@ -31,6 +31,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { chevronDown, chevronUp } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -43,12 +44,13 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	ResizableBox,
+	Icon,
 	SlotFillProvider,
 	Tooltip,
 	VisuallyHidden,
 } from '@wordpress/components';
 import {
+	__experimentalUseDragging as useDragging,
 	useMediaQuery,
 	useRefEffect,
 	useViewportMatch,
@@ -183,7 +185,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		];
 	}, [] );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const resizableBoxRef = useRef();
+	const metaBoxesMainRef = useRef();
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
 	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
@@ -198,7 +200,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			':scope > .components-notice-list'
 		);
 		const resizeHandle = container.querySelector(
-			'.edit-post-meta-boxes-main__resize-handle'
+			'.edit-post-meta-boxes-main__presenter'
 		);
 		const actualize = () => {
 			const fullHeight = container.offsetHeight;
@@ -220,13 +222,51 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
 
-	const [ isUntouched, setIsUntouched ] = useState( true );
+	const heightRef = useRef();
+	const { startDrag, endDrag, isDragging } = useDragging( {
+		onDragStart: () => {
+			if ( isAutoHeight || heightRef.current === undefined ) {
+				// Sets the starting height to avoid visual jumps in height and
+				// aria-valuenow being `NaN` for the first (few) resize events.
+				heightRef.current = metaBoxesMainRef.current.offsetHeight;
+				metaBoxesMainRef.current.style.height = `${ heightRef.current }px`;
+			} else if ( heightRef.current > max ) {
+				// Starts from max in case shortening the window has imposed it.
+				heightRef.current = max;
+			}
+		},
+		onDragMove: ( { movementY } ) => {
+			const { current: fromHeight } = heightRef;
+			const candidateHeight = fromHeight - movementY;
+			// Keeps the unconstrained height for subsequent calculations so that when
+			// dragging takes the height out of range and the cursor detaches from its
+			// initial position relative to the drag handle, any movement back toward the
+			// range is absorbed without affecting the applied height as that would
+			// otherwise maintain the cursor’s detachment.
+			heightRef.current = candidateHeight;
+			const nextHeight = Math.min(
+				max,
+				Math.max( min, candidateHeight )
+			);
+			metaBoxesMainRef.current.style.height = `${ nextHeight }px`;
+			separatorRef.current.ariaValueNow = getAriaValueNow( nextHeight );
+		},
+		onDragEnd: () => {
+			const nextHeight = metaBoxesMainRef.current.offsetHeight;
+			// Syncs the final height to ensure the next resize starts with it.
+			heightRef.current = nextHeight;
+			setPreference(
+				'core/edit-post',
+				'metaBoxesMainOpenHeight',
+				nextHeight
+			);
+		},
+	} );
 
 	if ( ! hasAnyVisible ) {
 		return;
 	}
 
-	const className = 'edit-post-meta-boxes-main';
 	const contents = (
 		<div
 			className={ clsx(
@@ -248,7 +288,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	let usedMax = '50%'; // Approximation before max has a value.
 	if ( max !== undefined ) {
 		// Halves the available max height until a user height is set.
-		usedMax = isAutoHeight && isUntouched ? max / 2 : max;
+		usedMax = isAutoHeight && ! isDragging ? max / 2 : max;
 	}
 
 	const getAriaValueNow = ( height ) =>
@@ -256,45 +296,23 @@ function MetaBoxesMain( { isLegacy } ) {
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
 
-	if ( isShort ) {
-		return (
-			<details
-				className={ className }
-				open={ isOpen }
-				onToggle={ ( { target } ) => {
-					setPreference(
-						'core/edit-post',
-						'metaBoxesMainIsOpen',
-						target.open
-					);
-				} }
-			>
-				<summary>{ __( 'Meta Boxes' ) }</summary>
-				{ contents }
-			</details>
-		);
-	}
+	const toggle = () =>
+		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', ! isOpen );
 
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
 	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 	const onSeparatorKeyDown = ( event ) => {
 		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
 		if ( delta ) {
-			const { resizable } = resizableBoxRef.current;
-			const fromHeight = isAutoHeight
-				? resizable.offsetHeight
-				: openHeight;
+			const pane = metaBoxesMainRef.current;
+			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
 			const nextHeight = Math.min(
 				max,
 				Math.max( min, delta + fromHeight )
 			);
-			resizableBoxRef.current.updateSize( {
-				height: nextHeight,
-				// Oddly, if left unspecified a subsequent drag gesture applies a fixed
-				// width and the pane fails to shrink/grow with parent width changes from
-				// sidebars opening/closing or window resizes.
-				width: 'auto',
-			} );
+			// Syncs the ref’d height to ensure a dragged resize starts with it.
+			// TODO: there may be a nicer way to handle things so this isn’t required.
+			heightRef.current = nextHeight;
 			setPreference(
 				'core/edit-post',
 				'metaBoxesMainOpenHeight',
@@ -303,86 +321,63 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 	};
 
+	const paneLabel = __( 'Meta Boxes' );
+
 	return (
-		<ResizableBox
-			className={ className }
-			defaultSize={ { height: openHeight } }
-			ref={ resizableBoxRef }
-			enable={ {
-				top: true,
-				right: false,
-				bottom: false,
-				left: false,
-				topLeft: false,
-				topRight: false,
-				bottomRight: false,
-				bottomLeft: false,
-			} }
-			minHeight={ min }
-			maxHeight={ usedMax }
-			bounds="parent"
-			boundsByDirection
-			// Avoids hiccups while dragging over objects like iframes and ensures that
-			// the event to end the drag is captured by the target (resize handle)
-			// whether or not it’s under the pointer.
-			onPointerDown={ ( { pointerId, target } ) => {
-				target.setPointerCapture( pointerId );
-			} }
-			onResizeStart={ ( event, direction, elementRef ) => {
-				if ( isAutoHeight ) {
-					const heightNow = elementRef.offsetHeight;
-					// Sets the starting height to avoid visual jumps in height and
-					// aria-valuenow being `NaN` for the first (few) resize events.
-					resizableBoxRef.current.updateSize( { height: heightNow } );
-					// Causes `maxHeight` to update to full `max` value instead of half.
-					setIsUntouched( false );
-				}
-			} }
-			onResize={ () => {
-				const { height } = resizableBoxRef.current.state;
-				const separator = separatorRef.current;
-				separator.ariaValueNow = getAriaValueNow( height );
-			} }
-			onResizeStop={ () => {
-				const nextHeight = resizableBoxRef.current.state.height;
-				setPreference(
-					'core/edit-post',
-					'metaBoxesMainOpenHeight',
-					nextHeight
-				);
-			} }
-			handleClasses={ {
-				top: 'edit-post-meta-boxes-main__resize-handle',
-			} }
-			handleComponent={ {
-				top: (
-					<>
-						<Tooltip text={ __( 'Drag to resize' ) }>
-							{ /* Disable reason: aria-valuenow is supported by separator role. */ }
-							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
-							<button
-								ref={ separatorRef }
-								aria-label={ __( 'Drag to resize' ) }
-								aria-describedby={ separatorHelpId }
-								onKeyDown={ onSeparatorKeyDown }
-								// Disable reason: buttons are allowed to be separator role.
-								// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
-								role="separator"
-								aria-valuenow={ usedAriaValueNow }
-							/>
-						</Tooltip>
-						<VisuallyHidden id={ separatorHelpId }>
-							{ __(
-								'Use up and down arrow keys to resize the metabox panel.'
-							) }
-						</VisuallyHidden>
-					</>
-				),
-			} }
+		<aside
+			aria-label={ paneLabel }
+			className={ clsx(
+				'edit-post-meta-boxes-main',
+				isShort && isOpen && 'is-open',
+				isShort ? 'is-toggle-only' : 'is-resizable'
+			) }
+			ref={ metaBoxesMainRef }
+			style={
+				isShort ? null : { height: openHeight, maxHeight: usedMax }
+			}
 		>
-			<meta ref={ effectSizeConstraints } />
+			{ ! isShort && <meta ref={ effectSizeConstraints } /> }
+			<button
+				className="edit-post-meta-boxes-main__presenter"
+				ref={ isShort ? null : separatorRef }
+				role={ isShort ? null : 'separator' }
+				aria-valuenow={ ! isShort ? usedAriaValueNow : null }
+				aria-label={
+					isShort
+						? __( 'Expand or collapse meta boxes pane' )
+						: __( 'Drag to resize' )
+				}
+				aria-describedby={ isShort ? null : separatorHelpId }
+				onMouseDown={ isShort ? null : startDrag }
+				onMouseUp={ isShort ? null : endDrag }
+				// Avoids hiccups while dragging over objects like iframes and ensures that
+				// the event to end the drag is captured by the target (resize handle)
+				// whether or not it’s under the pointer.
+				onPointerDown={ ( { pointerId, target } ) => {
+					target.setPointerCapture( pointerId );
+				} }
+				onClick={ isShort ? toggle : null }
+				onKeyDown={ isShort ? null : onSeparatorKeyDown }
+			>
+				{ isShort ? (
+					<>
+						{ paneLabel }
+						<Icon icon={ isOpen ? chevronUp : chevronDown } />
+					</>
+				) : (
+					<Tooltip text={ __( 'Drag to resize' ) }>
+						<div tabIndex={ -1 }>
+							<VisuallyHidden id={ separatorHelpId }>
+								{ __(
+									'Use up and down arrow keys to resize the metabox pane.'
+								) }
+							</VisuallyHidden>
+						</div>
+					</Tooltip>
+				) }
+			</button>
 			{ contents }
-		</ResizableBox>
+		</aside>
 	);
 }
 
