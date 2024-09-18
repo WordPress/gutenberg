@@ -32,7 +32,7 @@ export default ( props ) => ( element ) => {
 				}
 
 				const reference = text.slice( ampAt, value.start ) + ';';
-				if ( ! /^&[a-zA-Z0-9]+;$/.test( reference ) ) {
+				if ( ! /^&#?[a-zA-Z0-9]+;$/.test( reference ) ) {
 					return false;
 				}
 
@@ -44,7 +44,7 @@ export default ( props ) => ( element ) => {
 					return false;
 				}
 
-				let newValue = remove( value, ampAt, value.start );
+				let newValue = remove( value, ampAt, value.text.length );
 				newValue = insert( newValue, replacement, ampAt, ampAt );
 
 				__unstableMarkLastChangeAsPersistent();
