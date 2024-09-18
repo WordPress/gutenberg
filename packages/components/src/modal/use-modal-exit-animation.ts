@@ -56,7 +56,10 @@ export function useModalExitAnimation() {
 					new Promise< void >( ( timeoutResolve ) => {
 						setTimeout(
 							() => timeoutResolve(),
-							FRAME_ANIMATION_DURATION_NUMBER + 1
+							// Allow an extra 20% of the animation duration for the
+							// animationend event to fire, in case the animation frame is
+							// slightly delayes by some other events in the event loop.
+							FRAME_ANIMATION_DURATION_NUMBER * 1.2
 						);
 					} );
 
