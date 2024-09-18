@@ -424,13 +424,11 @@ export default function SearchEdit( {
 							}
 							step={ 1 }
 							onChange={ ( newWidth ) => {
-								const filteredWidth =
-									widthUnit === '%' &&
-									parseInt( newWidth, 10 ) > 100
-										? 100
-										: newWidth;
+								const parsedNewWidth = parseInt( newWidth, 10 );
 								setAttributes( {
-									width: parseInt( filteredWidth, 10 ),
+									width: Number.isNaN( parsedNewWidth )
+										? undefined
+										: parsedNewWidth,
 								} );
 							} }
 							onUnitChange={ ( newUnit ) => {
@@ -566,7 +564,11 @@ export default function SearchEdit( {
 
 			<ResizableBox
 				size={ {
-					width: `${ width }${ widthUnit }`,
+					width:
+						width === undefined
+							? 'auto'
+							: `${ width }${ widthUnit }`,
+					height: 'auto',
 				} }
 				className={ clsx(
 					'wp-block-search__inside-wrapper',
