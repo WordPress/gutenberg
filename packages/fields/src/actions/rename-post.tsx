@@ -20,7 +20,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../lock-unlock';
 import {
 	getItemTitle,
 	isTemplateRemovable,
@@ -29,8 +29,8 @@ import {
 	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
-} from '../utils';
-import type { CoreDataError, PostWithPermissions } from '../../types';
+} from './utils';
+import type { CoreDataError, PostWithPermissions } from '../types';
 
 // Patterns.
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );

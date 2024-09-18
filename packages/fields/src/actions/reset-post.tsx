@@ -27,8 +27,8 @@ import {
 	isTemplateOrTemplatePart,
 	TEMPLATE_ORIGINS,
 	TEMPLATE_POST_TYPE,
-} from '../utils';
-import type { CoreDataError, Template, TemplatePart } from '../../types';
+} from './utils';
+import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
@@ -180,8 +180,8 @@ const revertTemplate = async (
 	}
 };
 
-const resetTemplateAction: Action< Template | TemplatePart > = {
-	id: 'reset-template',
+const resetPostAction: Action< Template | TemplatePart > = {
+	id: 'reset-post',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		return (
@@ -297,4 +297,4 @@ const resetTemplateAction: Action< Template | TemplatePart > = {
 	},
 };
 
-export default resetTemplateAction;
+export default resetPostAction;

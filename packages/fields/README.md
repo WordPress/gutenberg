@@ -58,7 +58,7 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### resetTemplateAction
+### resetPost
 
 Undocumented declaration.
 

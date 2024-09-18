@@ -22,11 +22,11 @@ import {
 	getItemTitle,
 	isTemplateOrTemplatePart,
 	isTemplateRemovable,
-} from '../utils';
-import type { Pattern, Template, TemplatePart } from '../../types';
-import type { NoticeSettings } from '../../mutation';
-import { deletePostWithNotices } from '../../mutation';
-import { unlock } from '../../lock-unlock';
+} from './utils';
+import type { Pattern, Template, TemplatePart } from '../types';
+import type { NoticeSettings } from '../mutation';
+import { deletePostWithNotices } from '../mutation';
+import { unlock } from '../lock-unlock';
 
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
