@@ -223,44 +223,40 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorHelpId = useId();
 
 	const heightRef = useRef();
-	const { startDrag, endDrag, isDragging } = useDragging( {
-		onDragStart: () => {
-			if ( isAutoHeight || heightRef.current === undefined ) {
-				// Sets the starting height to avoid visual jumps in height and
-				// aria-valuenow being `NaN` for the first (few) resize events.
-				heightRef.current = metaBoxesMainRef.current.offsetHeight;
-				metaBoxesMainRef.current.style.height = `${ heightRef.current }px`;
-			} else if ( heightRef.current > max ) {
-				// Starts from max in case shortening the window has imposed it.
-				heightRef.current = max;
-			}
-		},
-		onDragMove: ( { movementY } ) => {
-			const { current: fromHeight } = heightRef;
-			const candidateHeight = fromHeight - movementY;
-			// Keeps the unconstrained height for subsequent calculations so that when
-			// dragging takes the height out of range and the cursor detaches from its
-			// initial position relative to the drag handle, any movement back toward the
-			// range is absorbed without affecting the applied height as that would
-			// otherwise maintain the cursor’s detachment.
-			heightRef.current = candidateHeight;
-			const nextHeight = Math.min(
-				max,
-				Math.max( min, candidateHeight )
-			);
-			metaBoxesMainRef.current.style.height = `${ nextHeight }px`;
-			separatorRef.current.ariaValueNow = getAriaValueNow( nextHeight );
-		},
-		onDragEnd: () => {
-			const nextHeight = metaBoxesMainRef.current.offsetHeight;
-			// Syncs the final height to ensure the next resize starts with it.
+	const actualizeHeight = ( candidateHeight, isPersistent ) => {
+		const nextHeight = Math.min( max, Math.max( min, candidateHeight ) );
+		if ( isPersistent ) {
 			heightRef.current = nextHeight;
 			setPreference(
 				'core/edit-post',
 				'metaBoxesMainOpenHeight',
 				nextHeight
 			);
+		} else {
+			// Keeps the unconstrained height for subsequent calculations so that when
+			// dragging takes the height out of range and the cursor detaches from its
+			// initial position relative to the drag handle, any movement back toward the
+			// range is absorbed without affecting the applied height as that would
+			// otherwise maintain the cursor’s detachment.
+			heightRef.current = candidateHeight;
+			metaBoxesMainRef.current.style.height = `${ nextHeight }px`;
+			separatorRef.current.ariaValueNow = getAriaValueNow( nextHeight );
+		}
+	};
+	const { startDrag, endDrag, isDragging } = useDragging( {
+		onDragStart: () => {
+			if ( isAutoHeight || heightRef.current === undefined ) {
+				// Sets the starting height to avoid visual jumps in height and
+				// aria-valuenow being `NaN` for the first (few) resize events.
+				actualizeHeight( metaBoxesMainRef.current.offsetHeight );
+			} else if ( heightRef.current > max ) {
+				// Starts from max in case shortening the window has imposed it.
+				actualizeHeight( max );
+			}
 		},
+		onDragMove: ( { movementY } ) =>
+			actualizeHeight( heightRef.current - movementY ),
+		onDragEnd: () => actualizeHeight( heightRef.current, true ),
 	} );
 
 	if ( ! hasAnyVisible ) {
@@ -306,18 +302,7 @@ function MetaBoxesMain( { isLegacy } ) {
 		if ( delta ) {
 			const pane = metaBoxesMainRef.current;
 			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
-			const nextHeight = Math.min(
-				max,
-				Math.max( min, delta + fromHeight )
-			);
-			// Syncs the ref’d height to ensure a dragged resize starts with it.
-			// TODO: there may be a nicer way to handle things so this isn’t required.
-			heightRef.current = nextHeight;
-			setPreference(
-				'core/edit-post',
-				'metaBoxesMainOpenHeight',
-				nextHeight
-			);
+			actualizeHeight( delta + fromHeight, true );
 		}
 	};
 
