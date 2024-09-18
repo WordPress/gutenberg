@@ -277,6 +277,30 @@ describe( 'Interactivity API', () => {
 					'fromFallback',
 				] );
 			} );
+
+			it( 'should handle deeply nested properties that are initially undefined', () => {
+				const context: any = proxifyContext( {}, {} );
+
+				let deepValue: any;
+				const spy = jest.fn( () => {
+					deepValue = context.a?.b?.c?.d;
+				} );
+				effect( spy );
+
+				// Initial call, the deep value is undefined
+				expect( spy ).toHaveBeenCalledTimes( 1 );
+				expect( deepValue ).toBeUndefined();
+
+				// Add a deeply nested object to the context
+				context.a = { b: { c: { d: 'test value' } } };
+
+				// The effect should be called again
+				expect( spy ).toHaveBeenCalledTimes( 2 );
+				expect( deepValue ).toBe( 'test value' );
+
+				// Reading the value directly should also work
+				expect( context.a.b.c.d ).toBe( 'test value' );
+			} );
 		} );
 
 		describe( 'proxifyContext', () => {
