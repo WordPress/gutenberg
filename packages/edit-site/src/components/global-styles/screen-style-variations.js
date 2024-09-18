@@ -3,30 +3,18 @@
  */
 import { Card, CardBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useZoomOut } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import ScreenHeader from './header';
 import SidebarNavigationScreenGlobalStylesContent from '../sidebar-navigation-screen-global-styles/content';
-import { unlock } from '../../lock-unlock';
 
 function ScreenStyleVariations() {
-	// Move to zoom out mode when this component is mounted
-	// and back to the previous mode when unmounted.
-	// useZoomOut();
-
-	const { setZoomOut } = unlock( useDispatch( blockEditorStore ) );
-
-	useEffect( () => {
-		setZoomOut( true );
-		return () => {
-			setZoomOut( false );
-		};
-	}, [ setZoomOut ] );
+	// Zoom canvas when component is mounted
+	// and back to the previous zoom when unmounted.
+	useZoomOut();
 
 	return (
 		<>
