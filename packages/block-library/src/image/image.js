@@ -559,7 +559,8 @@ export default function Image( {
 	const mediaReplaceFlow = isSingleSelected &&
 		! isEditingImage &&
 		! lockUrlControls && (
-			<BlockControls group="other">
+			// For contentOnly mode, put this button in its own area so it has borders around it.
+			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
