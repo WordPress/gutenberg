@@ -246,17 +246,6 @@ function gutenberg_a11y_script_module_html() {
  * @since 19.3
  */
 function gutenberg_register_script_modules() {
-	wp_deregister_script_module( '@wordpress/a11y' );
-	wp_register_script_module(
-		'@wordpress/a11y',
-		gutenberg_url( 'build-module/a11y/index.min.js' ),
-		array(),
-		$default_version
-	);
-
-	$suffix = defined( 'WP_RUN_CORE_TESTS' ) ? '.min' : wp_scripts_get_suffix();
-
-
 	/*
 	 * Expects multidimensional array like:
 	 *
@@ -264,11 +253,11 @@ function gutenberg_register_script_modules() {
 	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
 	 *     'interactivity-router/index.min.js' => …
 	 */
-	$assets = include gutenberg_dir_path( 'build-module/assets.production.php' );
+	$assets = include gutenberg_dir_path() . '/build-module/assets.production.php';
 
 	foreach ( $assets as $file_name => $script_module_data ) {
 		$package_name     = dirname( $file_name );
-		$package_sub_name = basename( $file_name, "{$suffix}.js" );
+		$package_sub_name = basename( $file_name, '.min.js' );
 
 		switch ( $package_name ) {
 			/*
@@ -295,11 +284,10 @@ function gutenberg_register_script_modules() {
 		}
 
 		$path = gutenberg_url( "build-module/{$file_name}" );
-		wp_deregister_style( $script_module_id );
+		wp_deregister_script_module( $script_module_id );
 		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
 	}
 }
-
-add_action( 'init', 'gutenberg_register_script_modules' );
+add_action( 'after_setup_theme', 'gutenberg_register_script_modules', 20 );
 add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
 add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
