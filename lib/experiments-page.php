@@ -175,17 +175,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-zoom-out-experiment',
-		__( 'Zoom out experiments', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable zoom out experiments; shows zoom out in the device preview and other zoom out experiments.', 'gutenberg' ),
-			'id'    => 'gutenberg-zoom-out-experiment',
-		)
-	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
