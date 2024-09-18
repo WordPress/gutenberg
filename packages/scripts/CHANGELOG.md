@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Internal
+
+-   The bundled `webpack-dev-server` dependency has been updated from `^4.15.1` to `^5.1.0` ([#tbd](https://github.com/WordPress/gutenberg/pull/tbd)).
 
 ### Breaking Changes
 

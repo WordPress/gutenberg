@@ -275,13 +275,15 @@ const scriptConfig = {
 				allowedHosts: 'auto',
 				host: 'localhost',
 				port: 8887,
-				proxy: {
-					'/build': {
+				proxy: [
+					{
+						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},
 					},
-				},
+				],
 		  },
 
 	plugins: [
