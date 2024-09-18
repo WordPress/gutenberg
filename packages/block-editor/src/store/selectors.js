@@ -39,6 +39,7 @@ import {
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
 	isSectionBlock,
+	getParentSectionBlock,
 } from './private-selectors';
 
 /**
@@ -1736,6 +1737,11 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	if ( isBlockWithinSection ) {
 		return false;
 	}
 
