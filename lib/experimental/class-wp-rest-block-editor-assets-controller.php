@@ -77,7 +77,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			// Enqueue frequent dependent, admin-only `dashicon` asset.
 			wp_enqueue_style( 'dashicons' );
 
-			// Enqueue frequent dependent, admin-only `postbox` asset.
+			// Enqueue the admin-only `postbox` asset required for the block editor.
 			$suffix = wp_scripts_get_suffix();
 			wp_enqueue_script( 'postbox', "/wp-admin/js/postbox$suffix.js", array( 'jquery-ui-sortable', 'wp-a11y' ), false, 1 );
 
@@ -85,15 +85,15 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			wp_enqueue_script( 'wp-edit-post' );
 			wp_enqueue_style( 'wp-edit-post' );
 
+			// Ensure the block editor scripts and styles are enqueued.
 			add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
 			do_action( 'enqueue_block_assets' );
 			do_action( 'enqueue_block_editor_assets' );
 			remove_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
 
-			$block_registry = WP_Block_Type_Registry::get_instance();
-
-			// Additionally, do enqueue `editorStyle` and `editorScript` assets for all
+			// Additionally, enqueue `editorStyle` and `editorScript` assets for all
 			// blocks, which contains editor-only styling for blocks (editor content).
+			$block_registry = WP_Block_Type_Registry::get_instance();
 			foreach ( $block_registry->get_all_registered() as $block_type ) {
 				if ( isset( $block_type->editor_style_handles ) && is_array( $block_type->editor_style_handles ) ) {
 					foreach ( $block_type->editor_style_handles as $style_handle ) {
