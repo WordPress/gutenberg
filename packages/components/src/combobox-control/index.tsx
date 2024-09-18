@@ -241,6 +241,9 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		if ( expandOnFocus ) {
 			setIsExpanded( true );
 		}
+
+		onFilterValueChange( '' );
+		setInputValue( '' );
 	};
 
 	const onClick = () => {
