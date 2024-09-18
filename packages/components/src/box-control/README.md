@@ -6,7 +6,7 @@ A control that lets users set values for top, right, bottom, and left. Can be us
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import { BoxControl } from '@wordpress/components';
 
 function Example() {
 	const [ values, setValues ] = useState( {

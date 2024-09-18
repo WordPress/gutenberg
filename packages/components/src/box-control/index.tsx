@@ -51,7 +51,7 @@ function useUniqueId( idProp?: string ) {
  * used as an input control for values like `padding` or `margin`.
  *
  * ```jsx
- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+ * import { BoxControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
  * function Example() {

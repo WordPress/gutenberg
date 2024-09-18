@@ -40,6 +40,7 @@ export {
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {
+	default as BoxControl,
 	default as __experimentalBoxControl,
 	applyValueToSides as __experimentalApplyValueToSides,
 } from './box-control';
