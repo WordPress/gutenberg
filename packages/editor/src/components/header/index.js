@@ -143,7 +143,7 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				<ZoomOutToggle />
+				{ isWideViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
