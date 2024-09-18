@@ -28,28 +28,24 @@ $child_ctx  = $attributes['childContext'];
 	data-wp-watch="callbacks.updateServerContextParent"
 	<?php echo wp_interactivity_data_wp_context( $parent_ctx ); ?>
 >
-	<div data-testid="parent.prop" data-wp-text="context.prop"></div>
-	<div data-testid="parent.nested.prop" data-wp-text="context.nested.prop"></div>
-	<div data-testid="parent.newProp" data-wp-text="context.newProp"></div>
-	<div data-testid="parent.nested.newProp" data-wp-text="context.nested.newProp"></div>
-	<div data-testid="parent.inherited.prop" data-wp-text="context.inherited.prop"></div>
-	<div data-testid="parent.inherited.newProp" data-wp-text="context.inherited.newProp"></div>
 	<div
 		data-wp-watch="callbacks.updateServerContextChild"
 		<?php echo wp_interactivity_data_wp_context( $child_ctx ); ?>
 	>
-		<div data-testid="child.prop" data-wp-text="context.prop"></div>
-		<div data-testid="child.nested.prop" data-wp-text="context.nested.prop"></div>
-		<div data-testid="child.newProp" data-wp-text="context.newProp"></div>
-		<div data-testid="child.nested.newProp" data-wp-text="context.nested.newProp"></div>
-		<div data-testid="child.inherited.prop" data-wp-text="context.inherited.prop"></div>
-		<div data-testid="child.inherited.newProp" data-wp-text="context.inherited.newProp"></div>
+		<div data-testid="prop" data-wp-text="context.prop"></div>
+		<div data-testid="nested.prop" data-wp-text="context.nested.prop"></div>
+		<div data-testid="newProp" data-wp-text="context.newProp"></div>
+		<div data-testid="nested.newProp" data-wp-text="context.nested.newProp"></div>
+		<div data-testid="inherited.prop" data-wp-text="context.inherited.prop"></div>
+		<div data-testid="inherited.newProp" data-wp-text="context.inherited.newProp"></div>
 
 		<button
-			data-testid="tryToUpdateServerContext"
-			data-wp-on--click="actions.tryToUpdateServerContext"
+			data-testid="tryToModifyServerContext"
+			<?php echo wp_interactivity_data_wp_context( array( 'result' => 'modify' ) ); ?>
+			data-wp-on--click="actions.attemptModification"
+			data-wp-text="context.result">
 		>
-			try update
+			modify
 		</button>
 	</div>
 </div>

@@ -96,96 +96,71 @@ test.describe( 'getServerContext()', () => {
 	} );
 
 	test( 'should update modified props on navigation', async ( { page } ) => {
-		const parentProp = page.getByTestId( 'parent.prop' );
-		const parentNestedProp = page.getByTestId( 'parent.nested.prop' );
-		const parentInheritedProp = page.getByTestId( 'parent.inherited.prop' );
-		const childProp = page.getByTestId( 'child.prop' );
-		const childNestedProp = page.getByTestId( 'child.nested.prop' );
-		const childInheritedProp = page.getByTestId( 'child.inherited.prop' );
+		const prop = page.getByTestId( 'prop' );
+		const nestedProp = page.getByTestId( 'nested.prop' );
+		const inheritedProp = page.getByTestId( 'inherited.prop' );
 
-		await expect( parentProp ).toHaveText( 'parent' );
-		await expect( parentNestedProp ).toHaveText( 'parent' );
-		await expect( parentInheritedProp ).toHaveText( 'parent' );
-		await expect( childProp ).toHaveText( 'child' );
-		await expect( childNestedProp ).toHaveText( 'child' );
-		await expect( childInheritedProp ).toHaveText( 'parent' );
+		await expect( prop ).toHaveText( 'child' );
+		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( inheritedProp ).toHaveText( 'parent' );
 
 		await page.getByTestId( 'modified' ).click();
 
-		await expect( parentProp ).toHaveText( 'parentModified' );
-		await expect( parentNestedProp ).toHaveText( 'parentModified' );
-		await expect( parentInheritedProp ).toHaveText( 'parentModified' );
-		await expect( childProp ).toHaveText( 'childModified' );
-		await expect( childNestedProp ).toHaveText( 'childModified' );
-		await expect( childInheritedProp ).toHaveText( 'parentModified' );
+		await expect( prop ).toHaveText( 'childModified' );
+		await expect( nestedProp ).toHaveText( 'childModified' );
+		await expect( inheritedProp ).toHaveText( 'parentModified' );
 
 		await page.goBack();
 
-		await expect( parentProp ).toHaveText( 'parent' );
-		await expect( parentNestedProp ).toHaveText( 'parent' );
-		await expect( parentInheritedProp ).toHaveText( 'parent' );
-		await expect( childProp ).toHaveText( 'child' );
-		await expect( childNestedProp ).toHaveText( 'child' );
-		await expect( childInheritedProp ).toHaveText( 'parent' );
+		await expect( prop ).toHaveText( 'child' );
+		await expect( nestedProp ).toHaveText( 'child' );
+		await expect( inheritedProp ).toHaveText( 'parent' );
 	} );
 
 	test( 'should add new props on navigation', async ( { page } ) => {
-		const parentProp = page.getByTestId( 'parent.newProp' );
-		const parentNestedProp = page.getByTestId( 'parent.nested.newProp' );
-		const parentInheritedProp = page.getByTestId(
-			'parent.inherited.newProp'
-		);
-		const childProp = page.getByTestId( 'child.newProp' );
-		const childNestedProp = page.getByTestId( 'child.nested.newProp' );
-		const childInheritedProp = page.getByTestId(
-			'child.inherited.newProp'
-		);
+		const newProp = page.getByTestId( 'newProp' );
+		const nestedNewProp = page.getByTestId( 'nested.newProp' );
+		const inheritedNewProp = page.getByTestId( 'inherited.newProp' );
 
-		await expect( parentProp ).toBeEmpty();
-		await expect( parentNestedProp ).toBeEmpty();
-		await expect( parentInheritedProp ).toBeEmpty();
-		await expect( childProp ).toBeEmpty();
-		await expect( childNestedProp ).toBeEmpty();
-		await expect( childInheritedProp ).toBeEmpty();
+		await expect( newProp ).toBeEmpty();
+		await expect( nestedNewProp ).toBeEmpty();
+		await expect( inheritedNewProp ).toBeEmpty();
 
 		await page.getByTestId( 'newProps' ).click();
 
-		await expect( parentProp ).toHaveText( 'parent' );
-		await expect( parentNestedProp ).toHaveText( 'parent' );
-		await expect( parentInheritedProp ).toHaveText( 'parent' );
-		await expect( childProp ).toHaveText( 'child' );
-		await expect( childNestedProp ).toHaveText( 'child' );
-		await expect( childInheritedProp ).toHaveText( 'parent' );
+		await expect( newProp ).toHaveText( 'child' );
+		await expect( nestedNewProp ).toHaveText( 'child' );
+		await expect( inheritedNewProp ).toHaveText( 'parent' );
 	} );
 
 	test( 'should keep new props on navigation', async ( { page } ) => {
-		const parentProp = page.getByTestId( 'parent.newProp' );
-		const parentNestedProp = page.getByTestId( 'parent.nested.newProp' );
-		const parentInheritedProp = page.getByTestId(
-			'parent.inherited.newProp'
-		);
-		const childProp = page.getByTestId( 'child.newProp' );
-		const childNestedProp = page.getByTestId( 'child.nested.newProp' );
-		const childInheritedProp = page.getByTestId(
-			'child.inherited.newProp'
-		);
+		const newProp = page.getByTestId( 'newProp' );
+		const nestedNewProp = page.getByTestId( 'nested.newProp' );
+		const inheritedNewProp = page.getByTestId( 'inherited.newProp' );
 
 		await page.getByTestId( 'newProps' ).click();
 
-		await expect( parentProp ).toHaveText( 'parent' );
-		await expect( parentNestedProp ).toHaveText( 'parent' );
-		await expect( parentInheritedProp ).toHaveText( 'parent' );
-		await expect( childProp ).toHaveText( 'child' );
-		await expect( childNestedProp ).toHaveText( 'child' );
-		await expect( childInheritedProp ).toHaveText( 'parent' );
+		await expect( newProp ).toHaveText( 'child' );
+		await expect( nestedNewProp ).toHaveText( 'child' );
+		await expect( inheritedNewProp ).toHaveText( 'parent' );
 
 		await page.goBack();
 
-		await expect( parentProp ).toHaveText( 'parent' );
-		await expect( parentNestedProp ).toHaveText( 'parent' );
-		await expect( parentInheritedProp ).toHaveText( 'parent' );
-		await expect( childProp ).toHaveText( 'child' );
-		await expect( childNestedProp ).toHaveText( 'child' );
-		await expect( childInheritedProp ).toHaveText( 'parent' );
+		await expect( newProp ).toHaveText( 'child' );
+		await expect( nestedNewProp ).toHaveText( 'child' );
+		await expect( inheritedNewProp ).toHaveText( 'parent' );
+	} );
+
+	test( 'should prevent any manual modifications', async ( { page } ) => {
+		const prop = page.getByTestId( 'prop' );
+		const button = page.getByTestId( 'tryToModifyServerContext' );
+
+		await expect( prop ).toHaveText( 'child' );
+		await expect( button ).toHaveText( 'modify' );
+
+		await button.click();
+
+		await expect( prop ).toHaveText( 'child' );
+		await expect( button ).toHaveText( 'not modified ✅' );
 	} );
 } );

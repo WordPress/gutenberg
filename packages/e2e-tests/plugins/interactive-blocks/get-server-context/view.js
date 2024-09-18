@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { store, getServerContext } from '@wordpress/interactivity';
+import { store, getContext, getServerContext } from '@wordpress/interactivity';
 
-const { state } = store( 'test/get-server-state', {
+store( 'test/get-server-context', {
 	actions: {
 		*navigate( e ) {
 			e.preventDefault();
@@ -12,17 +12,35 @@ const { state } = store( 'test/get-server-state', {
 			);
 			yield actions.navigate( e.target.href );
 		},
-		tryToUpdateServerState() {
-			getServerContext().prop = 'updated from client';
+		attemptModification() {
+			try {
+				getServerContext().prop = 'updated from client';
+				getContext().result = 'unexpectedly modified ❌';
+			} catch ( e ) {
+				getContext().result = 'not modified ✅';
+			}
 		},
 	},
 	callbacks: {
-		updateState() {
-			const { prop, newProp, nested } = getServerContext();
-			state.prop = prop;
-			state.newProp = newProp;
-			state.nested.prop = nested.prop;
-			state.nested.newProp = nested.newProp;
+		updateServerContextParent() {
+			const ctx = getContext();
+			const { prop, newProp, nested, inherited } = getServerContext();
+			ctx.prop = prop;
+			ctx.newProp = newProp;
+			ctx.nested.prop = nested.prop;
+			ctx.nested.newProp = nested.newProp;
+			ctx.inherited.prop = inherited.prop;
+			ctx.inherited.newProp = inherited.newProp;
+		},
+		updateServerContextChild() {
+			const ctx = getContext();
+			const { prop, newProp, nested, inherited } = getServerContext();
+			ctx.prop = prop;
+			ctx.newProp = newProp;
+			ctx.nested.prop = nested.prop;
+			ctx.nested.newProp = nested.newProp;
+			ctx.inherited.prop = inherited.prop;
+			ctx.inherited.newProp = inherited.newProp;
 		},
 	},
 } );
