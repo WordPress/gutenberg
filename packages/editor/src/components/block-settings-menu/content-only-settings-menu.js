@@ -156,7 +156,7 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 						onClose();
 					} }
 				>
-					{ _x( 'Unlock test', 'Unlock content locked blocks' ) }
+					{ _x( 'Unlock', 'Unlock content locked blocks' ) }
 				</MenuItem>
 			</BlockSettingsMenuFirstItem>
 			<Text
