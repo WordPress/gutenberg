@@ -41,6 +41,7 @@
 			"default": false
 		}
 	},
+	"usesContext": [ "postType" ],
 	"providesContext": {
 		"queryId": "queryId",
 		"query": "query",

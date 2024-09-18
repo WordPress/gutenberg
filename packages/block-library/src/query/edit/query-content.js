@@ -32,6 +32,7 @@ export default function QueryContent( {
 	openPatternSelectionModal,
 	name,
 	clientId,
+	context,
 } ) {
 	const {
 		queryId,
@@ -41,6 +42,7 @@ export default function QueryContent( {
 		tagName: TagName = 'div',
 		query: { inherit } = {},
 	} = attributes;
+	const { postType } = context;
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const instanceId = useInstanceId( QueryContent );
@@ -135,6 +137,7 @@ export default function QueryContent( {
 					setDisplayLayout={ updateDisplayLayout }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					postTypeFromContext={ postType }
 				/>
 			</InspectorControls>
 			<BlockControls>
