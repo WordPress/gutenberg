@@ -13,12 +13,9 @@ import {
  */
 import type { DataFormCombinedEditProps, NormalizedField } from '../../types';
 
-function FieldHeader( { title }: { title: string } ) {
+function Header( { title }: { title: string } ) {
 	return (
-		<VStack
-			className="dataforms-layouts-panel__dropdown-header"
-			spacing={ 4 }
-		>
+		<VStack className="dataforms-layouts__dropdown-header" spacing={ 4 }>
 			<HStack alignment="center">
 				<Heading level={ 2 } size={ 13 }>
 					{ title }
@@ -33,6 +30,7 @@ function DataFormCombinedEdit< Item >( {
 	field,
 	data,
 	onChange,
+	hideLabelFromVision,
 }: DataFormCombinedEditProps< Item > ) {
 	const className = 'dataforms-combined-edit';
 	const visibleChildren = ( field.children ?? [] )
@@ -44,28 +42,28 @@ function DataFormCombinedEdit< Item >( {
 	const children = visibleChildren.map( ( child, index ) => {
 		return (
 			<div className="dataforms-combined-edit__field" key={ child.id }>
-				{ index !== 0 && <FieldHeader title={ child.label } /> }
+				{ index !== 0 && hideLabelFromVision && (
+					<Header title={ child.label } />
+				) }
 				<child.Edit
 					data={ data }
 					field={ child }
 					onChange={ onChange }
-					hideLabelFromVision
+					hideLabelFromVision={ hideLabelFromVision }
 				/>
 			</div>
 		);
 	} );
 
-	if ( field.direction === 'horizontal' ) {
-		return (
-			<HStack spacing={ 4 } className={ className }>
-				{ children }
-			</HStack>
-		);
-	}
+	const Stack = field.direction === 'horizontal' ? HStack : VStack;
+
 	return (
-		<VStack spacing={ 4 } className={ className }>
-			{ children }
-		</VStack>
+		<>
+			{ ! hideLabelFromVision && <Header title={ field.label } /> }
+			<Stack spacing={ 4 } className={ className }>
+				{ children }
+			</Stack>
+		</>
 	);
 }
 

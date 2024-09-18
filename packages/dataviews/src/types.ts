@@ -524,6 +524,7 @@ export interface DataFormCombinedEditProps< Item > {
 	field: NormalizedCombinedFormField< Item >;
 	data: Item;
 	onChange: ( value: Record< string, any > ) => void;
+	hideLabelFromVision?: boolean;
 }
 
 export type NormalizedCombinedFormField< Item > = CombinedFormField< Item > & {

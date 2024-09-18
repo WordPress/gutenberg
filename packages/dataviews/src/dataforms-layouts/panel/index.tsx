@@ -16,17 +16,9 @@ import { closeSmall } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import {
-	normalizeFields,
-	normalizeCombinedFields,
-} from '../../normalize-fields';
-import type {
-	DataFormProps,
-	NormalizedField,
-	Field,
-	CombinedFormField,
-	NormalizedCombinedFormField,
-} from '../../types';
+import { normalizeFields } from '../../normalize-fields';
+import { getVisibleFields } from '../get-visible-fields';
+import type { DataFormProps, NormalizedField } from '../../types';
 
 interface FormFieldProps< Item > {
 	data: Item;
@@ -140,26 +132,6 @@ function FormField< Item >( {
 			</div>
 		</HStack>
 	);
-}
-
-export function getVisibleFields(
-	fields: Field< any >[],
-	formFields: string[] = [],
-	combinedFields?: CombinedFormField< any >[]
-): Field< any >[] {
-	const visibleFields: Array<
-		Field< any > | NormalizedCombinedFormField< any >
-	> = [ ...fields ];
-	if ( combinedFields ) {
-		visibleFields.push(
-			...normalizeCombinedFields( combinedFields, fields )
-		);
-	}
-	return formFields
-		.map( ( fieldId ) =>
-			visibleFields.find( ( { id } ) => id === fieldId )
-		)
-		.filter( ( field ): field is Field< any > => !! field );
 }
 
 export default function FormPanel< Item >( {

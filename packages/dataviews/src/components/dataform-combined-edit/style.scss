@@ -1,6 +1,8 @@
-.dataforms-combined-edit {
-	&__field:not(:first-child) {
-		border-top: $border-width solid $gray-200;
-		padding-top: $grid-unit-20;
+.dataforms-layouts-panel__field-dropdown {
+	.dataforms-combined-edit {
+		&__field:not(:first-child) {
+			border-top: $border-width solid $gray-200;
+			padding-top: $grid-unit-20;
+		}
 	}
 }
