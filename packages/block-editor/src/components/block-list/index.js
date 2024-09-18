@@ -182,7 +182,8 @@ function Items( {
 				getTemplateLock,
 				getBlockEditingMode,
 				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+				isSectionBlock,
+			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
 
@@ -201,15 +202,16 @@ function Items( {
 				visibleBlocks: __unstableGetVisibleBlocks(),
 				isZoomOut: __unstableGetEditorMode() === 'zoom-out',
 				shouldRenderAppender:
+					! isSectionBlock( rootClientId ) &&
+					! getBlockEditingMode( rootClientId ) !== 'disabled' &&
+					! getTemplateLock( rootClientId ) &&
 					hasAppender &&
 					__unstableGetEditorMode() !== 'zoom-out' &&
-					( hasCustomAppender
-						? ! getTemplateLock( rootClientId ) &&
-						  getBlockEditingMode( rootClientId ) !== 'disabled'
-						: rootClientId === selectedBlockClientId ||
-						  ( ! rootClientId &&
-								! selectedBlockClientId &&
-								! _order.length ) ),
+					( hasCustomAppender ||
+						rootClientId === selectedBlockClientId ||
+						( ! rootClientId &&
+							! selectedBlockClientId &&
+							! _order.length ) ),
 			};
 		},
 		[ rootClientId, hasAppender, hasCustomAppender ]
