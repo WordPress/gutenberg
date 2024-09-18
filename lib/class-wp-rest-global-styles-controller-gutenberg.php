@@ -532,27 +532,39 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 * Checks if a given request has access to read a single theme global styles config.
 	 *
 	 * @since 5.9.0
+	 * @since 6.7.0 Allow users with edit post capabilities to view theme global styles.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_theme_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		/*
+		 * Verify if the current user has edit_posts capability.
+		 */
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
+		}
+
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
 
 		/*
 		 * Verify if the current user has edit_theme_options capability.
-		 * This capability is required to edit/view/delete global styles.
 		 */
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
+		if ( current_user_can( 'edit_theme_options' ) ) {
+			return true;
 		}
 
-		return true;
+		return new WP_Error(
+			'rest_cannot_read_global_styles',
+			__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
 	}
 
 	/**
@@ -616,23 +628,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
-	public function get_theme_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
-		/*
-		 * Verify if the current user has edit_theme_options capability.
-		 * This capability is required to edit/view/delete global styles.
-		 */
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
-
-		return true;
+	public function get_theme_items_permissions_check( $request ) {
+		return $this->get_theme_item_permissions_check( $request );
 	}
 
 	/**
