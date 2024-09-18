@@ -81,6 +81,10 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Assets_Controller' ) ) {
 			$suffix = wp_scripts_get_suffix();
 			wp_enqueue_script( 'postbox', "/wp-admin/js/postbox$suffix.js", array( 'jquery-ui-sortable', 'wp-a11y' ), false, 1 );
 
+			// Enqueue foundational post editor assets.
+			wp_enqueue_script( 'wp-edit-post' );
+			wp_enqueue_style( 'wp-edit-post' );
+
 			add_filter( 'should_load_block_editor_scripts_and_styles', '__return_true' );
 			do_action( 'enqueue_block_assets' );
 			do_action( 'enqueue_block_editor_assets' );
