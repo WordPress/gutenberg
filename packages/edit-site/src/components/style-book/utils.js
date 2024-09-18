@@ -57,15 +57,22 @@ export function getExamples() {
 // Get examples for a given category.
 export function getCategoryExamples( categoryDefinition, examples ) {
 	if ( ! categoryDefinition?.name || ! examples?.length ) {
-		return [];
+		return;
 	}
 
 	if ( categoryDefinition?.subcategories?.length ) {
 		return categoryDefinition.subcategories.reduce(
 			( acc, subcategory ) => {
-				acc.subcategories.push(
-					getCategoryExamples( subcategory, examples )
+				const subcategoryExamples = getCategoryExamples(
+					subcategory,
+					examples
 				);
+				if ( subcategoryExamples ) {
+					acc.subcategories = [
+						...acc.subcategories,
+						subcategoryExamples,
+					];
+				}
 				return acc;
 			},
 			{
