@@ -198,7 +198,7 @@ export function RichTextWrapper(
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey
 				: sprintf(
-						/* translators: %s: source label or key */
+						/* translators: %s: connected field label or source label */
 						__( 'Add %s' ),
 						bindingKey
 				  );
