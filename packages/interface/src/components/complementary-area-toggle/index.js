@@ -31,11 +31,6 @@ function ComplementaryAreaToggle( {
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
-	const isPostEditorComplementaryArea = [
-		'edit-post/document',
-		'edit-post/block',
-	].includes( identifier );
-
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
@@ -47,7 +42,7 @@ function ComplementaryAreaToggle( {
 					enableComplementaryArea( scope, identifier );
 				}
 			} }
-			shortcut={ isPostEditorComplementaryArea ? shortcut : undefined }
+			shortcut={ shortcut }
 			{ ...props }
 		/>
 	);
