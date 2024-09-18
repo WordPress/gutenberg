@@ -89,7 +89,9 @@ module.exports = {
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './[name].min.js',
+		filename: `[name]${
+			baseConfig.mode === 'production' ? '.min' : ''
+		}.js`,
 		library: {
 			type: 'module',
 		},
