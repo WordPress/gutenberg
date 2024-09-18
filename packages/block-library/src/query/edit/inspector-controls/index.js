@@ -45,8 +45,7 @@ import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, setDisplayLayout, postTypeFromContext } =
-		props;
+	const { attributes, setQuery, setDisplayLayout, isTemplate } = props;
 	const { query, displayLayout } = attributes;
 	const {
 		order,
@@ -120,25 +119,6 @@ export default function QueryInspectorControls( props ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-
-	const isTemplate = useSelect(
-		( select ) => {
-			const currentTemplate =
-				select( coreStore ).__experimentalGetTemplateForLink()?.type;
-			const isInTemplate = 'wp_template' === currentTemplate;
-			const isInSingularContent = postTypeFromContext !== undefined;
-			return isInTemplate && ! isInSingularContent;
-		},
-		[ postTypeFromContext ]
-	);
-
-	// We need to reset the `inherit` value if not in a template, as queries
-	// are not inherited when outside a template (e.g. when in singular content).
-	useEffect( () => {
-		if ( ! isTemplate && query.inherit ) {
-			setQuery( { inherit: false } );
-		}
-	}, [ isTemplate, query.inherit, setQuery ] );
 
 	const showInheritControl =
 		isTemplate && isControlAllowed( allowedControls, 'inherit' );

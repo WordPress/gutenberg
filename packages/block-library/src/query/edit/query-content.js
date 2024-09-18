@@ -50,6 +50,16 @@ export default function QueryContent( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 	} );
+	const isTemplate = useSelect(
+		( select ) => {
+			const currentTemplate =
+				select( coreStore ).__experimentalGetTemplateForLink()?.type;
+			const isInTemplate = 'wp_template' === currentTemplate;
+			const isInSingularContent = postType !== undefined;
+			return isInTemplate && ! isInSingularContent;
+		},
+		[ postType ]
+	);
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, getEntityRecordEdits, canUser } =
@@ -92,11 +102,16 @@ export default function QueryContent( {
 		} else if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
+		// We need to reset the `inherit` value if not in a template, as queries
+		// are not inherited when outside a template (e.g. when in singular content).
+		if ( ! isTemplate && query.inherit ) {
+			newQuery.inherit = false;
+		}
 		if ( !! Object.keys( newQuery ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, postsPerPage, inherit ] );
+	}, [ query.perPage, postsPerPage, inherit, isTemplate ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -137,7 +152,7 @@ export default function QueryContent( {
 					setDisplayLayout={ updateDisplayLayout }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					postTypeFromContext={ postType }
+					isTemplate={ isTemplate }
 				/>
 			</InspectorControls>
 			<BlockControls>
