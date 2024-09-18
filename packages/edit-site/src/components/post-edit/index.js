@@ -69,6 +69,15 @@ function PostEditForm( { postType, postId } ) {
 			'comment_status',
 		],
 	};
+
+	const fieldsWithBulkEditSupport = [
+		'title',
+		'status',
+		'date',
+		'author',
+		'comment_status',
+	];
+
 	const onChange = ( edits ) => {
 		for ( const id of ids ) {
 			if (
@@ -102,7 +111,16 @@ function PostEditForm( { postType, postId } ) {
 			<DataForm
 				data={ ids.length === 1 ? record : multiEdits }
 				fields={ fields }
-				form={ form }
+				form={
+					ids.length === 1
+						? form
+						: {
+								...form,
+								fields: form.fields.filter( ( field ) =>
+									fieldsWithBulkEditSupport.includes( field )
+								),
+						  }
+				}
 				onChange={ onChange }
 			/>
 		</VStack>
