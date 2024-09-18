@@ -99,7 +99,7 @@ const deselectable = css`
 
 export const ButtonContentView = styled.div`
 	display: flex;
-	font-size: ${ CONFIG.fontSizeMedium };
+	font-size: ${ CONFIG.fontSize };
 	line-height: 1;
 `;
 

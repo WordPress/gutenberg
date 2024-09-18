@@ -52,7 +52,7 @@ export default function useText(
 		truncate = false,
 		upperCase = false,
 		variant,
-		weight = CONFIG.fontWeightRegular,
+		weight = CONFIG.fontWeight,
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 

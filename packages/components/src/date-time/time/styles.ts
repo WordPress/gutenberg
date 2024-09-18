@@ -17,7 +17,7 @@ import NumberControl from '../../number-control';
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;
-	font-size: ${ CONFIG.fontSizeMedium };
+	font-size: ${ CONFIG.fontSize };
 `;
 
 export const Fieldset = styled.fieldset`
@@ -62,7 +62,7 @@ export const HoursInput = styled( NumberControl )`
 export const TimeSeparator = styled.span`
 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
 	border-bottom: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
-	font-size: ${ CONFIG.fontSizeMedium };
+	font-size: ${ CONFIG.fontSize };
 	line-height: calc(
 		${ CONFIG.controlHeight } - ${ CONFIG.borderWidth } * 2
 	);

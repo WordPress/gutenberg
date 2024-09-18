@@ -53,33 +53,20 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
 	spinnerSize: 16,
-	fontSizeXSmall: '11px',
-	fontSizeSmall: '12px',
-	fontSizeMedium: '13px',
-	fontSizeLarge: '15px',
-	fontSizeXLarge: '20px',
-	fontSize2XLarge: '32px',
-	fontSizeH1: '32px', // Todo: consolidate with fontSize properties
-	fontSizeH2: '20px', // Todo: consolidate with fontSize properties
-	fontSizeH3: '15px', // Todo: consolidate with fontSize properties
-	fontSizeH4: '13px', // Todo: consolidate with fontSize properties
-	fontSizeH5: '12px', // Todo: consolidate with fontSize properties
-	fontSizeH6: '11px', // Todo: consolidate with fontSize properties
+	fontSize: '13px',
+	fontSizeH1: 'calc(2.44 * 13px)',
+	fontSizeH2: 'calc(1.95 * 13px)',
+	fontSizeH3: 'calc(1.56 * 13px)',
+	fontSizeH4: 'calc(1.25 * 13px)',
+	fontSizeH5: '13px',
+	fontSizeH6: 'calc(0.8 * 13px)',
 	fontSizeInputMobile: '16px',
-	fontLineHeightBase: '1.4', // Todo: Deprecate in favor of fontLineHeight tokens
-	fontLineHeightXSmall: '16px',
-	fontLineHeightSmall: '20px',
-	fontLineHeightMedium: '24px',
-	fontLineHeightLarge: '28px',
-	fontLineHeightXLarge: '32px',
-	fontLineHeight2XLarge: '40px',
-	fontWeightRegular: '400',
-	fontWeightSemiBold: '500',
-	fontFamilyHeadings:
-		'-apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
-	fontFamilyBody:
-		'-apple-system, "system-ui", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif',
-	fontFamilyMono: 'Menlo, Consolas, monaco, monospace',
+	fontSizeMobile: '15px',
+	fontSizeSmall: 'calc(0.92 * 13px)',
+	fontSizeXSmall: 'calc(0.75 * 13px)',
+	fontLineHeightBase: '1.4',
+	fontWeight: 'normal',
+	fontWeightHeading: '600',
 	gridBase: '4px',
 	cardPaddingXSmall: `${ space( 2 ) }`,
 	cardPaddingSmall: `${ space( 4 ) }`,
