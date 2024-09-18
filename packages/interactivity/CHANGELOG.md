@@ -15,6 +15,8 @@
 
 ### Enhancements
 
+-   Improve TypeScript support for generators, including converting types to and from promises, and a `typed` function to be able to use promise types when yielding ([#64577](https://github.com/WordPress/gutenberg/pull/64577)
+
 -   Improve internal `deepMerge` function ([#64879](https://github.com/WordPress/gutenberg/pull/64879)).
 
 ### Bug Fixes

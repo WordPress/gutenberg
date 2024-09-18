@@ -16,7 +16,7 @@ import { getNamespace } from './namespaces';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 
-export { store, getConfig } from './store';
+export { store, getConfig, typed } from './store';
 export { getContext, getElement } from './scopes';
 export {
 	withScope,
