@@ -50,6 +50,7 @@ function Header( {
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
 		isTextEditor,
@@ -143,7 +144,7 @@ function Header( {
 				/>
 				<PostViewLink />
 
-				{ isWideViewport && <ZoomOutToggle /> }
+				{ ! isMobileViewport && <ZoomOutToggle /> }
 
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
