@@ -124,25 +124,75 @@ const renamePost: Action< PostWithPermissions > = {
 			}
 		}
 
-		const modalTranslatedString =
-			'publish' !== item.status
-				? // translators: %1$s: title of a unpublished page to be set as the home page. %2$s: title of the current home page.
-				  __(
-						'The page "%1$s" is not published. Set it as the site homepage? This will publish the page and replace the current homepage: "%2$s"'
-				  )
-				: // translators: %1$s: title of page to be set as the home page. %2$s: title of the current home page.
-				  __(
-						'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
-				  );
+		async function onSetLatestPostsHomepage( event: React.FormEvent ) {
+			event.preventDefault();
 
-		const modalDescription = sprintf(
-			modalTranslatedString,
-			title,
-			getItemTitle( currentHomePage )
-		);
+			try {
+				// @ts-ignore
+				await editEntityRecord( 'root', 'site', undefined, {
+					show_on_front: 'posts',
+				} );
+
+				closeModal?.();
+
+				await saveEditedEntityRecord( 'root', 'site', undefined, {
+					show_on_front: 'posts',
+				} );
+
+				createSuccessNotice(
+					__( 'Homepage set to display latest posts' ),
+					{
+						type: 'snackbar',
+					}
+				);
+				onActionPerformed?.( items );
+			} catch ( error ) {
+				const typedError = error as CoreDataError;
+				const errorMessage =
+					typedError.message && typedError.code !== 'unknown_error'
+						? typedError.message
+						: __(
+								'An error occurred while setting the homepage to display latest posts'
+						  );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+		const currentHomePageTitle = getItemTitle( currentHomePage );
+
+		let modalDescription;
+		let submitAction;
+
+		if ( item.id === pageForPosts ) {
+			modalDescription = sprintf(
+				// translators: %s: title of the current home page.
+				__(
+					'Set the homepage to display the latest posts? This will replace the current home page: "%s"'
+				),
+				currentHomePageTitle
+			);
+			submitAction = onSetLatestPostsHomepage;
+		} else {
+			const modalTranslatedString =
+				'publish' !== item.status
+					? // translators: %1$s: title of a unpublished page to be set as the home page. %2$s: title of the current home page.
+					  __(
+							'The page "%1$s" is not published. Set it as the site homepage? This will publish the page and replace the current homepage: "%2$s"'
+					  )
+					: // translators: %1$s: title of page to be set as the home page. %2$s: title of the current home page.
+					  __(
+							'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
+					  );
+
+			modalDescription = sprintf(
+				modalTranslatedString,
+				title,
+				currentHomePageTitle
+			);
+			submitAction = onSetAsHomepage;
+		}
 
 		return (
-			<form onSubmit={ onSetAsHomepage }>
+			<form onSubmit={ submitAction }>
 				<VStack spacing="5">
 					<Text>{ modalDescription }</Text>
 					<HStack justify="right">
