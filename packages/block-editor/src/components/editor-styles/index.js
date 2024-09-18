@@ -9,7 +9,7 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useMemo, memo, useRef } from '@wordpress/element';
+import { useMemo, memo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,45 +22,50 @@ import useEditorFontsResolver from '../use-editor-fonts-resolver';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( scope, ref ) {
-	if ( ! ref.current ) {
-		return;
-	}
+function useDarkThemeBodyClassName( styles, scope ) {
+	return useCallback(
+		( node ) => {
+			if ( ! node ) {
+				return;
+			}
 
-	const { ownerDocument } = ref.current;
-	const { defaultView, body } = ownerDocument;
-	const canvas = scope ? ownerDocument.querySelector( scope ) : body;
+			const { ownerDocument } = node;
+			const { defaultView, body } = ownerDocument;
+			const canvas = scope ? ownerDocument.querySelector( scope ) : body;
 
-	let backgroundColor;
+			let backgroundColor;
 
-	if ( ! canvas ) {
-		// The real .editor-styles-wrapper element might not exist in the
-		// DOM, so calculate the background color by creating a fake
-		// wrapper.
-		const tempCanvas = ownerDocument.createElement( 'div' );
-		tempCanvas.classList.add( 'editor-styles-wrapper' );
-		body.appendChild( tempCanvas );
+			if ( ! canvas ) {
+				// The real .editor-styles-wrapper element might not exist in the
+				// DOM, so calculate the background color by creating a fake
+				// wrapper.
+				const tempCanvas = ownerDocument.createElement( 'div' );
+				tempCanvas.classList.add( 'editor-styles-wrapper' );
+				body.appendChild( tempCanvas );
 
-		backgroundColor = defaultView
-			?.getComputedStyle( tempCanvas, null )
-			.getPropertyValue( 'background-color' );
+				backgroundColor = defaultView
+					?.getComputedStyle( tempCanvas, null )
+					.getPropertyValue( 'background-color' );
 
-		body.removeChild( tempCanvas );
-	} else {
-		backgroundColor = defaultView
-			?.getComputedStyle( canvas, null )
-			.getPropertyValue( 'background-color' );
-	}
-	const colordBackgroundColor = colord( backgroundColor );
-	// If background is transparent, it should be treated as light color.
-	if (
-		colordBackgroundColor.luminance() > 0.5 ||
-		colordBackgroundColor.alpha() === 0
-	) {
-		body.classList.remove( 'is-dark-theme' );
-	} else {
-		body.classList.add( 'is-dark-theme' );
-	}
+				body.removeChild( tempCanvas );
+			} else {
+				backgroundColor = defaultView
+					?.getComputedStyle( canvas, null )
+					.getPropertyValue( 'background-color' );
+			}
+			const colordBackgroundColor = colord( backgroundColor );
+			// If background is transparent, it should be treated as light color.
+			if (
+				colordBackgroundColor.luminance() > 0.5 ||
+				colordBackgroundColor.alpha() === 0
+			) {
+				body.classList.remove( 'is-dark-theme' );
+			} else {
+				body.classList.add( 'is-dark-theme' );
+			}
+		},
+		[ styles, scope ]
+	);
 }
 
 function EditorStyles( { styles, scope, transformOptions } ) {
@@ -94,15 +99,15 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 		];
 	}, [ styles, overrides, scope, transformOptions ] );
 
-	const styleRef = useRef( null );
-	useDarkThemeBodyClassName( scope, styleRef );
-	useEditorFontsResolver( styleRef );
-
 	return (
 		<>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
-			<style ref={ styleRef } />
+			<style
+				ref={ useDarkThemeBodyClassName( transformedStyles, scope ) }
+			/>
+
+			<style ref={ useEditorFontsResolver() } />
 
 			{ transformedStyles.map( ( css, index ) => (
 				<style key={ index }>{ css }</style>

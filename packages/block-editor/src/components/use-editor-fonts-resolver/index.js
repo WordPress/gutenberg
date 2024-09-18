@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -10,7 +10,7 @@ import { useSelect } from '@wordpress/data';
 import { getDisplaySrcFromFontFace, loadFontFaceInBrowser } from './utils';
 import { store as editorStore } from '../../store';
 
-function useEditorFontsResolver( ref ) {
+function useEditorFontsResolver() {
 	const [ loadedFontUrls, setLoadedFontUrls ] = useState( new Set() );
 
 	const { currentTheme = {}, fontFamilies = [] } = useSelect( ( select ) => {
@@ -34,7 +34,7 @@ function useEditorFontsResolver( ref ) {
 	}, [ fontFamilies ] );
 
 	const loadFontFaceAsset = useCallback(
-		async ( fontFace ) => {
+		async ( fontFace, ownerDocument ) => {
 			if ( ! fontFace.src ) {
 				return;
 			}
@@ -48,15 +48,25 @@ function useEditorFontsResolver( ref ) {
 				return;
 			}
 
-			loadFontFaceInBrowser( fontFace, src, ref.current.ownerDocument );
+			loadFontFaceInBrowser( fontFace, src, ownerDocument );
 			setLoadedFontUrls( ( prevUrls ) => new Set( prevUrls ).add( src ) );
 		},
 		[ currentTheme, loadedFontUrls ]
 	);
 
-	useEffect( () => {
-		fontFaces.forEach( loadFontFaceAsset );
-	}, [ fontFaces, loadFontFaceAsset ] );
+	return useCallback(
+		( node ) => {
+			if ( ! node ) {
+				return;
+			}
+
+			const { ownerDocument } = node;
+			fontFaces.forEach( ( fontFace ) =>
+				loadFontFaceAsset( fontFace, ownerDocument )
+			);
+		},
+		[ fontFaces, loadFontFaceAsset ]
+	);
 }
 
 export default useEditorFontsResolver;
