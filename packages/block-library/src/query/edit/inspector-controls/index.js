@@ -105,12 +105,6 @@ export default function QueryInspectorControls( props ) {
 			updateQuery.format = [];
 		}
 
-		// We need to reset the `inherit` value if not in a template, as queries
-		// are not inherited when outside a template (e.g. when in singular content).
-		if ( ! isTemplate ) {
-			updateQuery.inherit = false;
-		}
-
 		setQuery( updateQuery );
 	};
 	const [ querySearch, setQuerySearch ] = useState( query.search );
@@ -137,6 +131,14 @@ export default function QueryInspectorControls( props ) {
 		},
 		[ postTypeFromContext ]
 	);
+
+	// We need to reset the `inherit` value if not in a template, as queries
+	// are not inherited when outside a template (e.g. when in singular content).
+	useEffect( () => {
+		if ( ! isTemplate && query.inherit ) {
+			setQuery( { inherit: false } );
+		}
+	}, [ isTemplate, query.inherit, setQuery ] );
 
 	const showInheritControl =
 		isTemplate && isControlAllowed( allowedControls, 'inherit' );
