@@ -104,9 +104,9 @@ export default function QueryInspectorControls( props ) {
 			updateQuery.format = [];
 		}
 
-		// Queries are not inherited when outside a template, so we
-		// need to reset the `inherit` value if not in a template.
-		if ( ! showDefaultControl ) {
+		// We need to reset the `inherit` value if not in a template, as queries
+		// are not inherited when outside a template (e.g. when in singular content).
+		if ( ! isTemplate ) {
 			updateQuery.inherit = false;
 		}
 
@@ -126,17 +126,17 @@ export default function QueryInspectorControls( props ) {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 
-	const showDefaultControl = useSelect( ( select ) => {
+	const isTemplate = useSelect( ( select ) => {
 		const currentTemplate =
 			select( coreStore ).__experimentalGetTemplateForLink()?.type;
 		return 'wp_template' === currentTemplate;
 	}, [] );
 
 	const showInheritControl =
-		showDefaultControl && isControlAllowed( allowedControls, 'inherit' );
+		isTemplate && isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		( ! inherit && isControlAllowed( allowedControls, 'postType' ) ) ||
-		! showDefaultControl;
+		! isTemplate;
 	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
 		'Select the type of content to display: posts, pages, or custom post types.'
@@ -144,12 +144,12 @@ export default function QueryInspectorControls( props ) {
 	const showColumnsControl = false;
 	const showOrderControl =
 		( ! inherit && isControlAllowed( allowedControls, 'order' ) ) ||
-		! showDefaultControl;
+		! isTemplate;
 	const showStickyControl =
 		( ! inherit &&
 			showSticky &&
 			isControlAllowed( allowedControls, 'sticky' ) ) ||
-		! showDefaultControl;
+		( showSticky && ! isTemplate );
 	const showSettingsPanel =
 		showInheritControl ||
 		showPostTypeControl ||
