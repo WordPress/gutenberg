@@ -57,17 +57,12 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__search-input-wrapper {
 	margin-bottom: $grid-unit-10;
 	position: relative;
-	//Specificity override for URLInput:
-	.block-editor-link-control__search-input-container .block-editor-link-control__field {
-		width: auto;
-	}
 }
 
 // Provides positioning context for search actions
 .block-editor-link-control__search-input-container,
 .block-editor-link-control__search-input-wrapper {
 	position: relative;
-
 }
 
 .block-editor-link-control__field {
