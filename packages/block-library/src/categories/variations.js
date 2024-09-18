@@ -30,6 +30,9 @@ const variations = [
 			taxonomy: 'category',
 		},
 		isActive: [ 'taxonomy' ],
+		// The following is needed to prevent "Terms List" from showing up twice in the inserter
+		// (once for the block, once for the variation). Fortunately, it does not collide with
+		// `categories` being the default value of the `taxonomy` attribute.
 		isDefault: true,
 	},
 ];
