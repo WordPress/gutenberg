@@ -7,6 +7,6 @@
 		"checkJs": false,
 		"strict": false
 	},
-	"references": [ { "path": "../interactivity" } ],
+	"references": [ { "path": "../a11y" }, { "path": "../interactivity" } ],
 	"include": [ "src/**/*" ]
 }

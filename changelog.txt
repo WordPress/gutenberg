@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 19.2.0-rc.1 =
-
+= 19.2.0 =
 
 ## Changelog
 
@@ -39,6 +38,12 @@
 - Lock editing in fields in editor if meta fields panel is opened. ([64738](https://github.com/WordPress/gutenberg/pull/64738))
 - Rely on `Text` component instead of `Truncate` in bindings panel. ([65007](https://github.com/WordPress/gutenberg/pull/65007))
 - Remove `getPlaceholder` API and rely on `key` argument or source label. ([64910](https://github.com/WordPress/gutenberg/pull/64910))
+
+#### Data Views
+- Add: Reorder control at the field level on the new view configuration UI. ([64381](https://github.com/WordPress/gutenberg/pull/64381))
+- Dataviews Filter search widget: Do not use Composite store. ([64985](https://github.com/WordPress/gutenberg/pull/64985))
+- Dataviews list view: Do not use Composite store. ([64987](https://github.com/WordPress/gutenberg/pull/64987))
+- Move bulk actions menu to the Footer, consolidate with floating toolbar and total items display. ([64268](https://github.com/WordPress/gutenberg/pull/64268))
 
 #### Block Editor
 - Add 'Reset' option to MediaReplaceFlow component. ([64826](https://github.com/WordPress/gutenberg/pull/64826))
@@ -106,12 +111,14 @@
 
 - Add safeguard to `mediaUploadMiddleware`. ([64843](https://github.com/WordPress/gutenberg/pull/64843))
 - Allow multi-select on iOS Safari/touch devices. ([63671](https://github.com/WordPress/gutenberg/pull/63671))
+- Core Data: Fix the 'query._fields' property check inside 'getEntityRecord' resolver. ([65079](https://github.com/WordPress/gutenberg/pull/65079))
 - Fix Modify content-locked menu item not showing if the block is not selected. ([61605](https://github.com/WordPress/gutenberg/pull/61605))
 - Fix editor error in Safari due to availability of checkVisibility method. ([65069](https://github.com/WordPress/gutenberg/pull/65069))
 - Fix: Pagination arrows are pointing in the wrong direction in RTL languages. ([64962](https://github.com/WordPress/gutenberg/pull/64962))
 - Footnotes: Only replace attribute if footnotes were detected. ([63935](https://github.com/WordPress/gutenberg/pull/63935))
 - Paste: Fix image paste from Google Forms. ([64502](https://github.com/WordPress/gutenberg/pull/64502))
 - Revert Focus pattern inserter search when activating zoom out inserter. ([64748](https://github.com/WordPress/gutenberg/pull/64748))
+- Try: Update block warnings. ([64997](https://github.com/WordPress/gutenberg/pull/64997))
 
 #### Block Library
 - De-duplicate block toolbar icons for patterns. ([65054](https://github.com/WordPress/gutenberg/pull/65054))
@@ -175,6 +182,9 @@
 #### Site Editor
 - DataViews: Fix pattern title direction in RTL languages. ([64967](https://github.com/WordPress/gutenberg/pull/64967))
 
+#### Typography
+- Site Title, Post Title: Fix typography for blocks with `a` children. ([64911](https://github.com/WordPress/gutenberg/pull/64911))
+
 #### NUX
 - Fix visibility of the template Welcome Guide in the Site Editor. ([64789](https://github.com/WordPress/gutenberg/pull/64789))
 
@@ -222,6 +232,9 @@
 #### Site Editor
 - Add 'OPTIONS /page' to preloaded paths. ([64890](https://github.com/WordPress/gutenberg/pull/64890))
 - Editor: Don't use selector shortcuts for the Site data. ([64884](https://github.com/WordPress/gutenberg/pull/64884))
+
+#### Interactivity API
+- Prevent calling `proxifyContext` with context proxies inside `wp-context`. ([65090](https://github.com/WordPress/gutenberg/pull/65090))
 
 #### Block Library
 - Media & Text: Don't use background-image. ([64981](https://github.com/WordPress/gutenberg/pull/64981))
@@ -353,7 +366,7 @@ The following PRs were merged by first-time contributors:
 
 The following contributors merged PRs in this release:
 
-@aaronrobertshaw @afercia @akasunil @Aljullu @andrewserong @atachibana @benoitchantre @carolinan @cbravobernal @ciampo @DAreRodz @dcalhoun @desrosj @dsas @ellatrix @fullofcaffeine @getdave @gziolo @Imran92 @imrraaj @jacobcassidy @jameskoster @jasmussen @jawadmalikdev @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @lezama @Mamaduka @matiasbenedetto @mirka @noisysocks @ntsekouras @oandregal @ockham @ramonjd @richtabor @rithik56 @rohitmathur-7 @ryanwelcher @SantosGuillamot @scruffian @sgomes @shail-mehta @spacedmonkey @stokesman @swissspidy @t-hamano @talldan @tjcafferkey @tyxla
+@aaronrobertshaw @afercia @akasunil @Aljullu @andrewserong @atachibana @benoitchantre @carolinan @cbravobernal @ciampo @DAreRodz @dcalhoun @desrosj @dsas @ellatrix @fullofcaffeine @getdave @gziolo @Imran92 @imrraaj @jacobcassidy @jameskoster @jasmussen @jawadmalikdev @jeryj @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @lezama @Mamaduka @matiasbenedetto @mirka @noisysocks @ntsekouras @oandregal @ockham @rafaelgallani @ramonjd @richtabor @rithik56 @rohitmathur-7 @ryanwelcher @SantosGuillamot @scruffian @sgomes @shail-mehta @spacedmonkey @stokesman @swissspidy @t-hamano @talldan @tjcafferkey @tyxla
 
 
 = 19.1.0 =

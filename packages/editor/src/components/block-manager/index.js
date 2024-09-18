@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { SearchControl, Button } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useEffect, useState } from '@wordpress/element';
-import { useDebounce, compose } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -17,21 +17,48 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import BlockManagerCategory from './category';
 
-function BlockManager( {
-	blockTypes,
-	categories,
-	hasBlockSupport,
-	isMatchingSearchTerm,
-	numberOfHiddenBlocks,
-	enableAllBlockTypes,
-} ) {
+export default function BlockManager() {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
+	const { showBlockTypes } = unlock( useDispatch( editorStore ) );
 
-	// Filtering occurs here (as opposed to `withSelect`) to avoid
-	// wasted renders by consequence of `Array#filter` producing
-	// a new value reference on each call.
-	blockTypes = blockTypes.filter(
+	const {
+		blockTypes,
+		categories,
+		hasBlockSupport,
+		isMatchingSearchTerm,
+		numberOfHiddenBlocks,
+	} = useSelect( ( select ) => {
+		// Some hidden blocks become unregistered
+		// by removing for instance the plugin that registered them, yet
+		// they're still remain as hidden by the user's action.
+		// We consider "hidden", blocks which were hidden and
+		// are still registered.
+		const _blockTypes = select( blocksStore ).getBlockTypes();
+		const hiddenBlockTypes = (
+			select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ?? []
+		).filter( ( hiddenBlock ) => {
+			return _blockTypes.some(
+				( registeredBlock ) => registeredBlock.name === hiddenBlock
+			);
+		} );
+
+		return {
+			blockTypes: _blockTypes,
+			categories: select( blocksStore ).getCategories(),
+			hasBlockSupport: select( blocksStore ).hasBlockSupport,
+			isMatchingSearchTerm: select( blocksStore ).isMatchingSearchTerm,
+			numberOfHiddenBlocks:
+				Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length,
+		};
+	}, [] );
+
+	function enableAllBlockTypes( newBlockTypes ) {
+		const blockNames = newBlockTypes.map( ( { name } ) => name );
+		showBlockTypes( blockNames );
+	}
+
+	const filteredBlockTypes = blockTypes.filter(
 		( blockType ) =>
 			hasBlockSupport( blockType, 'inserter', true ) &&
 			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
@@ -44,14 +71,14 @@ function BlockManager( {
 		if ( ! search ) {
 			return;
 		}
-		const count = blockTypes.length;
+		const count = filteredBlockTypes.length;
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
 			_n( '%d result found.', '%d results found.', count ),
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-	}, [ blockTypes.length, search, debouncedSpeak ] );
+	}, [ filteredBlockTypes?.length, search, debouncedSpeak ] );
 
 	return (
 		<div className="editor-block-manager__content">
@@ -67,10 +94,11 @@ function BlockManager( {
 						numberOfHiddenBlocks
 					) }
 					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
+						__next40pxDefaultSize
 						variant="link"
-						onClick={ () => enableAllBlockTypes( blockTypes ) }
+						onClick={ () =>
+							enableAllBlockTypes( filteredBlockTypes )
+						}
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -90,7 +118,7 @@ function BlockManager( {
 				aria-label={ __( 'Available block types' ) }
 				className="editor-block-manager__results"
 			>
-				{ blockTypes.length === 0 && (
+				{ filteredBlockTypes.length === 0 && (
 					<p className="editor-block-manager__no-results">
 						{ __( 'No blocks found.' ) }
 					</p>
@@ -99,7 +127,7 @@ function BlockManager( {
 					<BlockManagerCategory
 						key={ category.slug }
 						title={ category.title }
-						blockTypes={ blockTypes.filter(
+						blockTypes={ filteredBlockTypes.filter(
 							( blockType ) =>
 								blockType.category === category.slug
 						) }
@@ -107,7 +135,7 @@ function BlockManager( {
 				) ) }
 				<BlockManagerCategory
 					title={ __( 'Uncategorized' ) }
-					blockTypes={ blockTypes.filter(
+					blockTypes={ filteredBlockTypes.filter(
 						( { category } ) => ! category
 					) }
 				/>
@@ -115,48 +143,3 @@ function BlockManager( {
 		</div>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const {
-			getBlockTypes,
-			getCategories,
-			hasBlockSupport,
-			isMatchingSearchTerm,
-		} = select( blocksStore );
-		const { get } = select( preferencesStore );
-
-		// Some hidden blocks become unregistered
-		// by removing for instance the plugin that registered them, yet
-		// they're still remain as hidden by the user's action.
-		// We consider "hidden", blocks which were hidden and
-		// are still registered.
-		const blockTypes = getBlockTypes();
-		const hiddenBlockTypes = (
-			get( 'core', 'hiddenBlockTypes' ) ?? []
-		).filter( ( hiddenBlock ) => {
-			return blockTypes.some(
-				( registeredBlock ) => registeredBlock.name === hiddenBlock
-			);
-		} );
-		const numberOfHiddenBlocks =
-			Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
-
-		return {
-			blockTypes,
-			categories: getCategories(),
-			hasBlockSupport,
-			isMatchingSearchTerm,
-			numberOfHiddenBlocks,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { showBlockTypes } = unlock( dispatch( editorStore ) );
-		return {
-			enableAllBlockTypes: ( blockTypes ) => {
-				const blockNames = blockTypes.map( ( { name } ) => name );
-				showBlockTypes( blockNames );
-			},
-		};
-	} ),
-] )( BlockManager );
