@@ -28,6 +28,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
+import { unlock } from '../lock-unlock';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1278,8 +1279,11 @@ export function getRenderingMode( state ) {
  */
 export const getDeviceType = createRegistrySelector(
 	( select ) => ( state ) => {
-		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
-		if ( editorMode === 'compose' ) {
+		const isComposeMode = unlock(
+			select( blockEditorStore )
+		).isComposeMode();
+
+		if ( isComposeMode ) {
 			return 'Desktop';
 		}
 		return state.deviceType;

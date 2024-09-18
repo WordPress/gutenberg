@@ -39,7 +39,6 @@ export function useZoomOut( zoomOut = true ) {
 	// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
 	useEffect( () => {
 		if ( zoomOut && currentZoomOutState === false ) {
-			// __unstableSetEditorMode( 'compose' );
 			setZoomOut( true );
 		} else if (
 			! zoomOut &&

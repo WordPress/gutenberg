@@ -18,6 +18,7 @@ import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import BlockDropZonePopover from '../block-popover/drop-zone';
+import { unlock } from '../../lock-unlock';
 
 export const InsertionPointOpenRef = createContext();
 
@@ -49,8 +50,8 @@ function InbetweenInsertionPointPopover( {
 			getNextBlockClientId,
 			getSettings,
 			isNavigationMode: _isNavigationMode,
-			__unstableGetEditorMode,
-		} = select( blockEditorStore );
+			isComposeMode: _isComposeMode,
+		} = unlock( select( blockEditorStore ) );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
@@ -81,7 +82,7 @@ function InbetweenInsertionPointPopover( {
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
-			isComposeMode: __unstableGetEditorMode() === 'compose',
+			isComposeMode: _isComposeMode(),
 		};
 	}, [] );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );

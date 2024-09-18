@@ -33,20 +33,18 @@ function selector( select ) {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
-		__unstableGetEditorMode,
 		isTyping,
-	} = select( blockEditorStore );
+		isComposeMode: _isComposeMode,
+	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-	const editorMode = __unstableGetEditorMode();
 
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isComposeMode: editorMode === 'compose',
+		isComposeMode: _isComposeMode(),
 	};
 }
 

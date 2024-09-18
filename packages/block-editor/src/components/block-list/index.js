@@ -191,8 +191,8 @@ function Items( {
 				__unstableGetVisibleBlocks,
 				getTemplateLock,
 				getBlockEditingMode,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+				isComposeMode: _isComposeMode,
+			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
 
@@ -209,10 +209,10 @@ function Items( {
 				order: _order,
 				selectedBlocks: getSelectedBlockClientIds(),
 				visibleBlocks: __unstableGetVisibleBlocks(),
-				isComposeMode: __unstableGetEditorMode() === 'compose',
+				isComposeMode: _isComposeMode(),
 				shouldRenderAppender:
 					hasAppender &&
-					__unstableGetEditorMode() !== 'compose' &&
+					! _isComposeMode() &&
 					( hasCustomAppender
 						? ! getTemplateLock( rootClientId ) &&
 						  getBlockEditingMode( rootClientId ) !== 'disabled'

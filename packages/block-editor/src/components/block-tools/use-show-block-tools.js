@@ -8,6 +8,7 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Source of truth for which block tools are showing in the block editor.
@@ -25,7 +26,8 @@ export function useShowBlockTools() {
 			hasMultiSelection,
 			__unstableGetEditorMode,
 			isTyping,
-		} = select( blockEditorStore );
+			isComposeMode: _isComposeMode,
+		} = unlock( select( blockEditorStore ) );
 
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
@@ -47,7 +49,7 @@ export function useShowBlockTools() {
 			! hasMultiSelection() &&
 			editorMode === 'navigation';
 
-		const isComposeMode = editorMode === 'compose';
+		const isComposeMode = _isComposeMode();
 		const _showZoomOutToolbar =
 			isComposeMode &&
 			block?.attributes?.align === 'full' &&

@@ -179,8 +179,8 @@ function VisualEditor( {
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
-			__unstableGetEditorMode,
 			isZoomOut: _isZoomOut,
+			isComposeMode: _isComposeMode,
 		} = unlock( select( blockEditorStore ) );
 
 		const _settings = getSettings();
@@ -189,7 +189,7 @@ function VisualEditor( {
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
-			isComposeMode: __unstableGetEditorMode() === 'compose',
+			isComposeMode: _isComposeMode(),
 			isZoomOut: _isZoomOut(),
 		};
 	}, [] );
@@ -294,13 +294,7 @@ function VisualEditor( {
 				layout?.wideSize )
 			? { ...globalLayoutSettings, ...layout, type: 'constrained' }
 			: { ...globalLayoutSettings, ...layout, type: 'default' };
-	}, [
-		layout?.type,
-		layout?.inherit,
-		layout?.contentSize,
-		layout?.wideSize,
-		globalLayoutSettings,
-	] );
+	}, [ layout, globalLayoutSettings ] );
 
 	// If there is a Post Content block we use its layout for the block list;
 	// if not, this must be a classic theme, in which case we use the fallback layout.

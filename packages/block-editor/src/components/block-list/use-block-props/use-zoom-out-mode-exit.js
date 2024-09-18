@@ -9,6 +9,7 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { composeModeKey } from '../../../store/private-keys';
 
 /**
  * Allows Zoom Out mode to be exited by double clicking in the selected block.
@@ -29,14 +30,14 @@ export function useZoomOutModeExit( { editorMode } ) {
 
 	return useRefEffect(
 		( node ) => {
-			if ( editorMode !== 'compose' ) {
+			if ( editorMode !== composeModeKey ) {
 				return;
 			}
 
 			function onDoubleClick( event ) {
 				if ( ! event.defaultPrevented ) {
 					event.preventDefault();
-					if ( getEditorMode() === 'compose' ) {
+					if ( getEditorMode() === composeModeKey ) {
 						__unstableSetEditorMode( 'edit' );
 						setZoomOut( false );
 					}

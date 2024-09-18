@@ -33,15 +33,12 @@ export default function InserterSidebar() {
 			getInsertionPoint,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
-		const {
-			getBlockRootClientId,
-			__unstableGetEditorMode,
-			getSectionRootClientId,
-		} = unlock( select( blockEditorStore ) );
+		const { getBlockRootClientId, getSectionRootClientId, isComposeMode } =
+			unlock( select( blockEditorStore ) );
 		const { get } = select( preferencesStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
-			if ( __unstableGetEditorMode() === 'compose' ) {
+			if ( isComposeMode() ) {
 				const sectionRootClientId = getSectionRootClientId();
 
 				if ( sectionRootClientId ) {

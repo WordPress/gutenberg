@@ -82,14 +82,16 @@ function useEditorStyles() {
 		renderingMode,
 		postType,
 	} = useSelect( ( select ) => {
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { isComposeMode: _isComposeMode } = unlock(
+			select( blockEditorStore )
+		);
 		const { getCurrentPostType, getRenderingMode } = select( editorStore );
 		const _postType = getCurrentPostType();
 		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
-			isComposeMode: __unstableGetEditorMode() === 'compose',
+			isComposeMode: _isComposeMode(),
 			renderingMode: getRenderingMode(),
 			postType: _postType,
 		};
@@ -148,11 +150,13 @@ function useEditorStyles() {
 
 		return baseStyles;
 	}, [
-		editorSettings.defaultEditorStyles,
+		editorSettings?.defaultEditorStyles,
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
+		isComposeMode,
 		postType,
+		renderingMode,
 	] );
 }
 

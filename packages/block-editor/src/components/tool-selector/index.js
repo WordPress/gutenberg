@@ -22,6 +22,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { composeModeKey } from '../../store/private-keys';
 
 const selectIcon = (
 	<SVG
@@ -38,7 +39,7 @@ const selectIcon = (
 const ICON_MAPPING = {
 	edit: editIcon,
 	navigation: selectIcon,
-	compose: composeIcon,
+	[ composeModeKey ]: composeIcon,
 };
 
 function ToolSelector( props, ref ) {

@@ -18,13 +18,18 @@ const ZoomOutToggle = () => {
 		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
 	} ) );
 
-	const { setZoomOut, __unstableSetEditorMode } = unlock(
+	const { setZoomOut, __unstableSetEditorMode, setComposeMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	const handleZoomOut = () => {
-		setZoomOut( isZoomOut ? false : true );
-		__unstableSetEditorMode( isZoomOut ? 'edit' : 'compose' );
+		if ( isZoomOut ) {
+			__unstableSetEditorMode( 'edit' );
+			setZoomOut( false );
+		} else {
+			setComposeMode();
+			setZoomOut( true );
+		}
 	};
 
 	return (

@@ -24,6 +24,7 @@ import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -67,7 +68,9 @@ function Header( {
 			getEditorSettings,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
 		} = select( editorStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { isComposeMode: _isComposeMode } = unlock(
+			select( blockEditorStore )
+		);
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
@@ -76,7 +79,7 @@ function Header( {
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			isNestedEntity:
 				!! getEditorSettings().onNavigateToPreviousEntityRecord,
-			isComposeMode: __unstableGetEditorMode() === 'compose',
+			isComposeMode: _isComposeMode(),
 		};
 	}, [] );
 

@@ -32,6 +32,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
+import { unlock } from '../../lock-unlock';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -53,8 +54,7 @@ function InserterMenu(
 	ref
 ) {
 	const isComposeMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'compose',
+		( select ) => unlock( select( blockEditorStore ) ).isComposeMode(),
 		[]
 	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
@@ -110,7 +110,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -119,7 +119,7 @@ function InserterMenu(
 			onInsertBlocks( blocks, { patternName } );
 			onSelect();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(

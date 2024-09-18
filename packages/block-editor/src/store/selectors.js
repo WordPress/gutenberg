@@ -39,6 +39,7 @@ import {
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
 } from './private-selectors';
+import { composeModeKey } from './private-keys';
 
 /**
  * A block selection object.
@@ -2837,7 +2838,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	const editorMode = __unstableGetEditorMode( state );
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
-	if ( editorMode === 'compose' ) {
+	if ( editorMode === composeModeKey ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
@@ -2930,7 +2931,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
-			if ( editorMode === 'compose' ) {
+			if ( editorMode === composeModeKey ) {
 				const sectionRootClientId = getSectionRootClientId( state );
 
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {

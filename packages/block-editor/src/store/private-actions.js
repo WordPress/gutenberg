@@ -8,6 +8,7 @@ import { Platform } from '@wordpress/element';
  */
 import { store as blockEditorStore } from './index';
 import { unlock } from '../lock-unlock';
+import { composeModeKey } from './private-keys';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -414,5 +415,20 @@ export function setZoomOut( zoom = 50 ) {
 export function resetZoomOut() {
 	return {
 		type: 'RESET_ZOOM',
+	};
+}
+
+/**
+ * Sets the block editor mode
+ * to the private compose mode.
+ *
+ * This is intentionally private as it may change or be removed in the future.
+ *
+ * @return {Object} Action object.
+ */
+export function setComposeMode() {
+	return {
+		type: 'SET_EDITOR_MODE',
+		mode: composeModeKey,
 	};
 }

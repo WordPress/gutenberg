@@ -29,6 +29,7 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	composeModeKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -538,14 +539,14 @@ export const getBlockStyles = createSelector(
 );
 
 /**
- * Returns whether zoom out mode is enabled.
+ * Returns whether compose mode is enabled.
  *
  * @param {Object} state Editor state.
  *
- * @return {boolean} Is zoom out mode enabled.
+ * @return {boolean} Is compose mode enabled.
  */
 export function isComposeMode( state ) {
-	return state.editorMode === 'compose';
+	return state.editorMode === composeModeKey;
 }
 
 /**

@@ -34,6 +34,7 @@ import {
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 const noop = () => {};
 
@@ -45,8 +46,7 @@ export function PatternCategoryPreviews( {
 	showTitlesAsTooltip,
 } ) {
 	const isComposeMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__unstableGetEditorMode() === 'compose',
+		( select ) => unlock( select( blockEditorStore ) ).isComposeMode(),
 		[]
 	);
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
