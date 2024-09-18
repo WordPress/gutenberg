@@ -11,7 +11,7 @@ import { unlock } from '../lock-unlock';
 
 function getMetadata( registry, context, registeredFields ) {
 	let metaFields = {};
-	const { type } = registry.select( editorStore ).getCurrentPost();
+	const type = registry.select( editorStore ).getCurrentPostType();
 	const { getEditedEntityRecord } = registry.select( coreDataStore );
 
 	if ( type === 'wp_template' ) {
