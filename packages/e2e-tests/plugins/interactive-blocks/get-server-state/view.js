@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getServerState } from '@wordpress/interactivity';
+import { store, getServerState, getContext } from '@wordpress/interactivity';
 
 const { state } = store( 'test/get-server-state', {
 	actions: {
@@ -12,8 +12,13 @@ const { state } = store( 'test/get-server-state', {
 			);
 			yield actions.navigate( e.target.href );
 		},
-		tryToUpdateServerState() {
-			getServerState().prop = 'updated from client';
+		attemptModification() {
+			try {
+				getServerState().prop = 'updated from client';
+				getContext().result = 'unexpectedly modified ❌';
+			} catch ( e ) {
+				getContext().result = 'not modified ✅';
+			}
 		},
 	},
 	callbacks: {

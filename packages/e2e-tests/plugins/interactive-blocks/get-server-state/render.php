@@ -22,10 +22,12 @@ if ( isset( $attributes['state'] ) ) {
 	<div data-testid="nested.newProp" data-wp-text="state.nested.newProp"></div>
 
 	<button
-		data-testid="tryToUpdateServerState"
-		data-wp-on--click="actions.tryToUpdateServerState"
+		data-testid="tryToModifyServerState"
+		<?php echo wp_interactivity_data_wp_context( array( 'result' => 'modify' ) ); ?>
+		data-wp-on--click="actions.attemptModification"
+		data-wp-text="context.result">
 	>
-		try update
+		modify
 	</button>
 
 

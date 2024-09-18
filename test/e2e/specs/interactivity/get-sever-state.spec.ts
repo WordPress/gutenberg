@@ -104,16 +104,16 @@ test.describe( 'getServerState()', () => {
 		await expect( nestedNewProp ).toHaveText( 'link 2' );
 	} );
 
-	test( 'should not be modifiable', async ( { page } ) => {
+	test( 'should prevent any manual modifications', async ( { page } ) => {
 		const prop = page.getByTestId( 'prop' );
+		const button = page.getByTestId( 'tryToModifyServerState' );
 
 		await expect( prop ).toHaveText( 'main' );
+		await expect( button ).toHaveText( 'modify' );
 
-		await page.getByTestId( 'tryToUpdateServerState' ).click();
-		await expect( prop ).not.toHaveText( 'updated from client' );
+		await button.click();
+
 		await expect( prop ).toHaveText( 'main' );
-
-		await page.getByTestId( 'link 1' ).click();
-		await expect( prop ).toHaveText( 'link 1' );
+		await expect( button ).toHaveText( 'not modified ✅' );
 	} );
 } );
