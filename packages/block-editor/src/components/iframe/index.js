@@ -456,7 +456,7 @@ function Iframe( {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,
 					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ containerWidth.current }px`,
+						isZoomedOut && `${ prevContainerWidthRef.current }px`,
 				} }
 			>
 				{ iframe }
