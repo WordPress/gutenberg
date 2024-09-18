@@ -22,7 +22,6 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 const selectIcon = (
 	<SVG
@@ -47,9 +46,7 @@ function ToolSelector( props, ref ) {
 		( select ) => select( blockEditorStore ).__unstableGetEditorMode(),
 		[]
 	);
-	const { __unstableSetEditorMode, setZoomOut } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	return (
 		<Dropdown
@@ -73,12 +70,7 @@ function ToolSelector( props, ref ) {
 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
 							value={ mode }
-							onSelect={ ( newVal ) => {
-								if ( newVal === 'compose' ) {
-									setZoomOut( true );
-								}
-								__unstableSetEditorMode( newVal );
-							} }
+							onSelect={ __unstableSetEditorMode }
 							choices={ [
 								{
 									value: 'edit',
