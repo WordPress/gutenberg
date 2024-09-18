@@ -2964,13 +2964,19 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( ! clientId ) {
 				return 'default';
 			}
-			const rootClientId = getBlockRootClientId( state, clientId );
-			const templateLock = getTemplateLock( state, rootClientId );
 			const sectionRootClientId = getSectionRootClientId( state );
+			if (
+				editorMode === 'navigation' &&
+				clientId === sectionRootClientId
+			) {
+				return 'default';
+			}
 			const sectionsClientIds = getBlockOrder(
 				state,
 				sectionRootClientId
 			);
+			const rootClientId = getBlockRootClientId( state, clientId );
+			const templateLock = getTemplateLock( state, rootClientId );
 			if (
 				templateLock === 'contentOnly' ||
 				editorMode === 'navigation'
