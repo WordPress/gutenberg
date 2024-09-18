@@ -8,46 +8,47 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
 
 /**
- * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+ * A hook used to set the zoomed out view, invoking the hook sets the mode.
  *
- * @param {boolean} zoomOut If we should enter into zoomOut mode or not
+ * @param {boolean} zoomOut If we should zoom out or not.
  */
 export function useZoomOut( zoomOut = true ) {
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
+	const { setZoomOut } = unlock( useDispatch( blockEditorStore ) );
+	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
 
-	const originalEditingModeRef = useRef( null );
-	const mode = __unstableGetEditorMode();
+	const originalIsZoomOutRef = useRef( null );
+	const currentZoomOutState = isZoomOut();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
-		if ( ! originalEditingModeRef.current ) {
-			originalEditingModeRef.current = mode;
+		if ( ! originalIsZoomOutRef.current ) {
+			originalIsZoomOutRef.current = currentZoomOutState;
 		}
 
 		return () => {
-			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
-			if (
-				__unstableGetEditorMode() === 'zoom-out' &&
-				__unstableGetEditorMode() !== originalEditingModeRef.current
-			) {
-				__unstableSetEditorMode( originalEditingModeRef.current );
+			// We need to use  isZoomOut() here and not `currentZoomOutState`, as currentZoomOutState may not update on unmount
+			if ( isZoomOut() && isZoomOut() !== originalIsZoomOutRef.current ) {
+				setZoomOut( originalIsZoomOutRef.current );
 			}
 		};
-	}, [] );
+	}, [ currentZoomOutState, isZoomOut, setZoomOut ] );
 
-	// The effect opens the zoom-out view if we want it open and it's not currently in zoom-out mode.
+	// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
 	useEffect( () => {
-		if ( zoomOut && mode !== 'zoom-out' ) {
-			__unstableSetEditorMode( 'zoom-out' );
+		if ( zoomOut && currentZoomOutState === false ) {
+			// __unstableSetEditorMode( 'compose' );
+			setZoomOut( true );
 		} else if (
 			! zoomOut &&
-			__unstableGetEditorMode() === 'zoom-out' &&
-			originalEditingModeRef.current !== mode
+			isZoomOut() &&
+			originalIsZoomOutRef.current !== currentZoomOutState
 		) {
-			__unstableSetEditorMode( originalEditingModeRef.current );
+			setZoomOut( originalIsZoomOutRef.current );
 		}
-	}, [ __unstableGetEditorMode, __unstableSetEditorMode, zoomOut ] ); // Mode is deliberately excluded from the dependencies so that the effect does not run when mode changes.
+		// currentZoomOutState is deliberately excluded from the dependencies so that the effect does not run when mode changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ isZoomOut, setZoomOut, zoomOut ] );
 }
