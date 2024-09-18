@@ -47,6 +47,11 @@ export default ( props ) => ( element ) => {
 				let newValue = remove( value, ampAt, value.text.length );
 				newValue = insert( newValue, replacement, ampAt, ampAt );
 
+				const {
+					__unstableMarkLastChangeAsPersistent,
+					__unstableMarkAutomaticChange,
+				} = registry.dispatch( blockEditorStore );
+
 				__unstableMarkLastChangeAsPersistent();
 				onChange( newValue );
 				__unstableMarkAutomaticChange();
