@@ -212,7 +212,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			closeModal( () => onRequestClose( event ) );
+			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
 
@@ -251,7 +251,7 @@ function UnforwardedModal(
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
 			if ( button === 0 && isSameTarget ) {
-				closeModal( () => onRequestClose() );
+				closeModal().then( () => onRequestClose() );
 			}
 		},
 	};
@@ -342,7 +342,7 @@ function UnforwardedModal(
 											onClick={ (
 												event: React.MouseEvent< HTMLButtonElement >
 											) =>
-												closeModal( () =>
+												closeModal().then( () =>
 													onRequestClose( event )
 												)
 											}

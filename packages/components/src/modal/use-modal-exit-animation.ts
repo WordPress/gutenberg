@@ -23,44 +23,61 @@ export function useModalExitAnimation() {
 	const isReducedMotion = useReducedMotion();
 
 	const closeModal = useCallback(
-		( onAnimationEnd: () => void ) => {
-			function handleAnimationEnd( e: AnimationEvent ) {
-				if ( e.animationName === EXIT_ANIMATION_NAME ) {
-					setIsAnimatingOut( false );
-					onAnimationEnd();
+		() =>
+			new Promise< void >( ( closeModalResolve, closeModalReject ) => {
+				// Grab a "stable" reference of the frame element, since
+				// the value held by the react ref might change at runtime.
+				const frameEl = frameRef.current;
+
+				if ( ! frameEl ) {
+					closeModalReject();
+					return;
 				}
-			}
 
-			if ( isReducedMotion ) {
-				onAnimationEnd();
-				return;
-			}
+				if ( isReducedMotion ) {
+					closeModalResolve();
+					return;
+				}
 
-			if ( ! frameRef.current ) {
-				return;
-			}
+				let handleAnimationEnd:
+					| undefined
+					| ( ( e: AnimationEvent ) => void );
 
-			// Grab a reference to the frame element, to make sure we're referencing
-			// the same reference in the cleanup function.
-			const frameEl = frameRef.current;
+				const startAnimation = () =>
+					new Promise< void >( ( animationResolve ) => {
+						handleAnimationEnd = ( e: AnimationEvent ) => {
+							if ( e.animationName === EXIT_ANIMATION_NAME ) {
+								animationResolve();
+							}
+						};
 
-			setIsAnimatingOut( true );
-			frameEl.addEventListener( 'animationend', handleAnimationEnd, {
-				once: true,
-			} );
-			const animationTimeout = window.setTimeout( () => {
-				setIsAnimatingOut( false );
-				onAnimationEnd();
-			}, FRAME_ANIMATION_DURATION_NUMBER );
+						frameEl.addEventListener(
+							'animationend',
+							handleAnimationEnd
+						);
+						setIsAnimatingOut( true );
+					} );
+				const animationTimeout = () =>
+					new Promise< void >( ( timeoutResolve ) => {
+						setTimeout(
+							() => timeoutResolve(),
+							FRAME_ANIMATION_DURATION_NUMBER + 1
+						);
+					} );
 
-			return () => {
-				frameEl.removeEventListener(
-					'animationend',
-					handleAnimationEnd
+				Promise.race( [ startAnimation(), animationTimeout() ] ).then(
+					() => {
+						if ( handleAnimationEnd ) {
+							frameEl.removeEventListener(
+								'animationend',
+								handleAnimationEnd
+							);
+						}
+						setIsAnimatingOut( false );
+						closeModalResolve();
+					}
 				);
-				window.clearTimeout( animationTimeout );
-			};
-		},
+			} ),
 		[ isReducedMotion ]
 	);
 
