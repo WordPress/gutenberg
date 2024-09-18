@@ -101,7 +101,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
-		templateLock,
+		isSectionBlock,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -120,7 +120,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useDisabled( { isDisabled: ! hasOverlay } ),
 		useFlashEditableBlocks( {
 			clientId,
-			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+			isEnabled: isSectionBlock,
 		} ),
 		useScrollIntoView( { isSelected } ),
 	] );
