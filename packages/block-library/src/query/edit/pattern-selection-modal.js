@@ -70,7 +70,7 @@ export default function PatternSelectionModal( {
 						__nextHasNoMarginBottom
 						onChange={ setSearchValue }
 						value={ searchValue }
-						label={ __( 'Search for patterns' ) }
+						label={ __( 'Search' ) }
 						placeholder={ __( 'Search' ) }
 					/>
 				</div>

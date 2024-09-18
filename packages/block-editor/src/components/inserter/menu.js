@@ -163,7 +163,7 @@ function InserterMenu(
 						setFilterValue( value );
 					} }
 					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
+					label={ __( 'Search' ) }
 					placeholder={ __( 'Search' ) }
 				/>
 				{ !! delayedFilterValue && (
