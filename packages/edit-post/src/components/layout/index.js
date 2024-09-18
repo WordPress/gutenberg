@@ -305,62 +305,65 @@ function MetaBoxesMain( { isLegacy } ) {
 			actualizeHeight( delta + fromHeight, true );
 		}
 	};
-
+	const className = 'edit-post-meta-boxes-main';
 	const paneLabel = __( 'Meta Boxes' );
+	let paneProps, paneButtonProps;
+	if ( isShort ) {
+		paneProps = {
+			className: clsx( className, 'is-toggle-only', isOpen && 'is-open' ),
+		};
+		paneButtonProps = {
+			'aria-label': __( 'Expand or collapse meta boxes pane' ),
+			onClick: toggle,
+			children: (
+				<>
+					{ paneLabel }
+					<Icon icon={ isOpen ? chevronUp : chevronDown } />
+				</>
+			),
+		};
+	} else {
+		paneProps = {
+			ref: metaBoxesMainRef,
+			className: clsx( className, 'is-resizable' ),
+			style: { height: openHeight, maxHeight: usedMax },
+		};
+		paneButtonProps = {
+			ref: separatorRef,
+			role: 'separator',
+			'aria-valuenow': usedAriaValueNow,
+			'aria-label': __( 'Drag to resize' ),
+			'aria-describedby': separatorHelpId,
+			onKeyDown: onSeparatorKeyDown,
+			onMouseDown: startDrag,
+			onMouseUp: endDrag,
+			// Avoids hiccups while dragging over objects like iframes and ensures that
+			// the event to end the drag is captured by the target (resize handle)
+			// whether or not it’s under the pointer.
+			onPointerDown: ( { pointerId, target } ) => {
+				target.setPointerCapture( pointerId );
+			},
+			children: (
+				<Tooltip text={ __( 'Drag to resize' ) }>
+					<div tabIndex={ -1 }>
+						<VisuallyHidden id={ separatorHelpId }>
+							{ __(
+								'Use up and down arrow keys to resize the metabox pane.'
+							) }
+						</VisuallyHidden>
+					</div>
+				</Tooltip>
+			),
+		};
+	}
 
 	return (
-		<aside
-			aria-label={ paneLabel }
-			className={ clsx(
-				'edit-post-meta-boxes-main',
-				isShort && isOpen && 'is-open',
-				isShort ? 'is-toggle-only' : 'is-resizable'
-			) }
-			ref={ metaBoxesMainRef }
-			style={
-				isShort ? null : { height: openHeight, maxHeight: usedMax }
-			}
-		>
+		<aside aria-label={ paneLabel } { ...paneProps }>
 			{ ! isShort && <meta ref={ effectSizeConstraints } /> }
 			<button
 				className="edit-post-meta-boxes-main__presenter"
-				ref={ isShort ? null : separatorRef }
-				role={ isShort ? null : 'separator' }
-				aria-valuenow={ ! isShort ? usedAriaValueNow : null }
-				aria-label={
-					isShort
-						? __( 'Expand or collapse meta boxes pane' )
-						: __( 'Drag to resize' )
-				}
-				aria-describedby={ isShort ? null : separatorHelpId }
-				onMouseDown={ isShort ? null : startDrag }
-				onMouseUp={ isShort ? null : endDrag }
-				// Avoids hiccups while dragging over objects like iframes and ensures that
-				// the event to end the drag is captured by the target (resize handle)
-				// whether or not it’s under the pointer.
-				onPointerDown={ ( { pointerId, target } ) => {
-					target.setPointerCapture( pointerId );
-				} }
-				onClick={ isShort ? toggle : null }
-				onKeyDown={ isShort ? null : onSeparatorKeyDown }
-			>
-				{ isShort ? (
-					<>
-						{ paneLabel }
-						<Icon icon={ isOpen ? chevronUp : chevronDown } />
-					</>
-				) : (
-					<Tooltip text={ __( 'Drag to resize' ) }>
-						<div tabIndex={ -1 }>
-							<VisuallyHidden id={ separatorHelpId }>
-								{ __(
-									'Use up and down arrow keys to resize the metabox pane.'
-								) }
-							</VisuallyHidden>
-						</div>
-					</Tooltip>
-				) }
-			</button>
+				{ ...paneButtonProps }
+			/>
 			{ contents }
 		</aside>
 	);
