@@ -30,6 +30,7 @@ const variations = [
 			taxonomy: 'category',
 		},
 		isActive: [ 'taxonomy' ],
+		isDefault: true,
 	},
 ];
 
