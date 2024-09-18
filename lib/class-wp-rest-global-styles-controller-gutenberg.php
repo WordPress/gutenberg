@@ -540,7 +540,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	public function get_theme_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		/*
 		 * Verify if the current user has edit_posts capability.
-		 * This capability is required to view global styles.
 		 */
 		if ( current_user_can( 'edit_posts' ) ) {
 			return true;
@@ -550,6 +549,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 			if ( current_user_can( $post_type->cap->edit_posts ) ) {
 				return true;
 			}
+		}
+
+		/*
+		 * Verify if the current user has edit_theme_options capability.
+		 */
+		if ( current_user_can( 'edit_theme_options' ) ) {
+			return true;
 		}
 
 		return new WP_Error(
