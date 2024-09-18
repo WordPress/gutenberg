@@ -262,7 +262,7 @@
 		"typescript": "5.5.3",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
-		"webpack": "5.88.2",
+		"webpack": "5.94.0",
 		"webpack-bundle-analyzer": "4.9.1",
 		"worker-farm": "1.7.0"
 	},
