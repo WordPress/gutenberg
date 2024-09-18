@@ -24,17 +24,12 @@ export function useModalExitAnimation() {
 
 	const closeModal = useCallback(
 		() =>
-			new Promise< void >( ( closeModalResolve, closeModalReject ) => {
+			new Promise< void >( ( closeModalResolve ) => {
 				// Grab a "stable" reference of the frame element, since
 				// the value held by the react ref might change at runtime.
 				const frameEl = frameRef.current;
 
-				if ( ! frameEl ) {
-					closeModalReject();
-					return;
-				}
-
-				if ( isReducedMotion ) {
+				if ( isReducedMotion || ! frameEl ) {
 					closeModalResolve();
 					return;
 				}
