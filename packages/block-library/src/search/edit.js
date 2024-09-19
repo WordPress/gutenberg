@@ -424,11 +424,12 @@ export default function SearchEdit( {
 							}
 							step={ 1 }
 							onChange={ ( newWidth ) => {
-								const parsedNewWidth = parseInt( newWidth, 10 );
-								setAttributes( {
-									width: Number.isNaN( parsedNewWidth )
+								const parsedNewWidth =
+									newWidth === ''
 										? undefined
-										: parsedNewWidth,
+										: parseInt( newWidth, 10 );
+								setAttributes( {
+									width: parsedNewWidth,
 								} );
 							} }
 							onUnitChange={ ( newUnit ) => {
