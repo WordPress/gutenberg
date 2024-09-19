@@ -30,6 +30,9 @@ test.describe( 'Site editor command palette', () => {
 		await expect( page ).toHaveURL(
 			'/wp-admin/post-new.php?post_type=page'
 		);
+		await expect( page ).toHaveURL(
+			/\/wp-admin\/site-editor.php\?postId=(\d+)&postType=page&canvas=edit/
+		);
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeVisible();
