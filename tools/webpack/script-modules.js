@@ -108,7 +108,7 @@ module.exports = {
 		...plugins,
 		new DependencyExtractionWebpackPlugin( {
 			combineAssets: true,
-			combinedOutputFile: `./assets.${ baseConfig.mode }.php`,
+			combinedOutputFile: `./assets.php`,
 		} ),
 	],
 	watchOptions: {

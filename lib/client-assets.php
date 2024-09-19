@@ -614,7 +614,7 @@ function gutenberg_register_script_modules() {
 	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
 	 *     'interactivity-router/index.min.js' => …
 	 */
-	$assets = include gutenberg_dir_path() . '/build-module/assets.production.php';
+	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
 
 	foreach ( $assets as $file_name => $script_module_data ) {
 		$package_name     = dirname( $file_name );
