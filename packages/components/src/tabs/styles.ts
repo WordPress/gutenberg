@@ -102,7 +102,7 @@ export const Tab = styled( Ariakit.Tab )`
 		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
 		padding: ${ space( 4 ) };
 		margin-left: 0;
-		font-weight: 500;
+		font-weight: 400;
 		text-align: inherit;
 		hyphens: auto;
 		color: ${ COLORS.theme.foreground };
@@ -120,6 +120,10 @@ export const Tab = styled( Ariakit.Tab )`
 			position: relative;
 			box-shadow: none;
 			outline: none;
+		}
+
+		&[data-active-item] {
+			font-weight: 500;
 		}
 
 		// Focus.
