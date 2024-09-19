@@ -20,7 +20,7 @@ export function useZoomOut( zoomOut = true ) {
 	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
 
 	const originalIsZoomOutRef = useRef( null );
-	const currentZoomOutState = isZoomOut() ? 50 : 100;
+	const currentZoomOutState = isZoomOut();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
