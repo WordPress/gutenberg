@@ -3,13 +3,13 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useAsyncList } from '@wordpress/compose';
+import { useAsyncList, usePrevious } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -161,10 +161,16 @@ export default function StartPageOptions() {
 		[]
 	);
 
-	useEffect( () => {
-		// Should reset the start page state when navigating to a new page/post.
+	const previousPostType = usePrevious( postType );
+	const previousPostId = usePrevious( postId );
+
+	// Reset the isClosed state when navigating to a new page/post.
+	if (
+		( previousPostType && previousPostType !== postType ) ||
+		( previousPostId && previousPostId !== postId )
+	) {
 		setIsClosed( false );
-	}, [ postType, postId ] );
+	}
 
 	// A pattern is a start pattern if it includes 'core/post-content' in its
 	// blockTypes, and it has no postTypes declared and the current post type is
