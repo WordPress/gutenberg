@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
-const VARIATION_PREFIX = 'is-style-';
+export const VARIATION_PREFIX = 'is-style-';
 
 function getVariationMatches( className ) {
 	if ( ! className ) {
@@ -44,7 +44,7 @@ function getVariationMatches( className ) {
  *
  * @return {string|null} The name of the first registered variation.
  */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );
@@ -327,7 +327,7 @@ function useBlockProps( { name, className, clientId } ) {
 			getBlockStyles,
 			clientId
 		);
-		const hasBlockGapSupport = false;
+		const hasBlockGapSupport = true;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
 		const disableRootPadding = true;

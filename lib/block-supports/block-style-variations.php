@@ -155,8 +155,13 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	);
 
 	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => array(
+		'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'settings' => array(
+			'spacing' => array(
+				'blockGap' => $theme_json['settings']['spacing']['blockGap'] ?? false,
+			),
+		),
+		'styles'   => array(
 			'elements' => $elements_data,
 			'blocks'   => $blocks_data,
 		),
@@ -190,18 +195,22 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
 
+	/*
+	 * Add variation instance class name to block's className string so it can
+	 * be enforced in the block markup via render_block filter.
+	 *
+	 * Note: This class is added before the check for empty variation styles
+	 * as layout styles could be contained within the variation style data and they
+	 * are handled by the layout block support.
+	 */
+	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+
 	if ( empty( $variation_styles ) ) {
 		return $parsed_block;
 	}
 
 	wp_register_style( 'block-style-variation-styles', false, array( 'wp-block-library', 'global-styles' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
-
-	/*
-	 * Add variation instance class name to block's className string so it can
-	 * be enforced in the block markup via render_block filter.
-	 */
-	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
 
 	return $parsed_block;
 }

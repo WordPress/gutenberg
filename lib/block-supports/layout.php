@@ -859,6 +859,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$full_block_name  = 'core' === $split_block_name[0] ? end( $split_block_name ) : implode( '-', $split_block_name );
 	$class_names[]    = 'wp-block-' . $full_block_name . '-' . $layout_classname;
 
+	// Add a combined layout and block style variation class name for variation support to hook onto.
+	if ( ! empty( $block['attrs']['className'] ) ) {
+		/*
+		* Matches a class prefixed by `is-style`, followed by the
+		* variation slug, then `--`, and finally an instance number.
+		*/
+		preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
+
+		if ( ! empty( $matches ) ) {
+			$class_names[] = $matches[0] . '-' . $layout_classname;
+		}
+	}
+
 	// Add classes to the outermost HTML tag if necessary.
 	if ( ! empty( $outer_class_names ) ) {
 		foreach ( $outer_class_names as $outer_class_name ) {

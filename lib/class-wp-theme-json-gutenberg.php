@@ -739,7 +739,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin     Optional. What source of data this object represents.
 	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
-	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
+	public function __construct( $theme_json = array( 'version' => self::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
@@ -2761,8 +2761,9 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $include_variations && isset( $node['variations'] ) ) {
 				foreach ( $node['variations'] as $variation => $node ) {
 					$variation_selectors[] = array(
-						'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
-						'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
+						'path'      => array( 'styles', 'blocks', $name, 'variations', $variation ),
+						'selector'  => $selectors[ $name ]['styleVariations'][ $variation ],
+						'className' => '.is-style-' . $variation,
 					);
 				}
 			}
@@ -2822,8 +2823,9 @@ class WP_Theme_JSON_Gutenberg {
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
-		$style_variation_declarations = array();
-		$style_variation_custom_css   = array();
+		$style_variation_declarations  = array();
+		$style_variation_custom_css    = array();
+		$style_variation_layout_styles = '';
 		if ( ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node           = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
@@ -2855,6 +2857,16 @@ class WP_Theme_JSON_Gutenberg {
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
 					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
+				}
+				// Generate any layout and gap styles for the style variation.
+				if ( ! empty( $style_variation_node['spacing']['blockGap'] ) ) {
+					$style_variation_metadata = array(
+						'name'     => $block_metadata['name'],
+						'path'     => $style_variation['path'],
+						'selector' => $style_variation['className'],
+					);
+
+					$style_variation_layout_styles .= $this->get_layout_styles( $style_variation_metadata );
 				}
 			}
 		}
@@ -3010,6 +3022,7 @@ class WP_Theme_JSON_Gutenberg {
 				$block_rules .= $style_variation_custom_css[ $style_variation_selector ];
 			}
 		}
+		$block_rules .= $style_variation_layout_styles;
 
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {

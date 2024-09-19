@@ -1080,6 +1080,24 @@ export const toStyles = (
 										';'
 									) };}`;
 								}
+
+								// Only process layout styles if variation contains block gap value.
+								if ( styleVariations.spacing?.blockGap ) {
+									const variationLayoutStyles =
+										getLayoutStyles( {
+											style: styleVariations,
+											selector:
+												getBlockStyleVariationSelector(
+													styleVariationName,
+													false
+												),
+											hasBlockGapSupport,
+											hasFallbackGapSupport,
+											fallbackGapValue: false,
+										} );
+									ruleset += variationLayoutStyles;
+								}
+
 								if ( styleVariations?.css ) {
 									ruleset += processCSSNesting(
 										styleVariations.css,

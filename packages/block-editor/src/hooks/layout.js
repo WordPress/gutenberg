@@ -8,7 +8,11 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	Button,
@@ -29,6 +33,10 @@ import { getLayoutType, getLayoutTypes } from '../layouts';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
+import {
+	VARIATION_PREFIX,
+	getVariationNameFromClass,
+} from './block-style-variation';
 import { unlock } from '../lock-unlock';
 
 const layoutBlockSupportKey = 'layout';
@@ -46,10 +54,15 @@ function hasLayoutBlockSupport( blockName ) {
  *
  * @param { Object } blockAttributes Block attributes.
  * @param { string } blockName       Block name.
+ * @param { string } clientId        Block's client ID.
  *
  * @return { Array } Array of CSS classname strings.
  */
-export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
+export function useLayoutClasses(
+	blockAttributes = {},
+	blockName = '',
+	clientId = ''
+) {
 	const { layout } = blockAttributes;
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
@@ -59,6 +72,21 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 			: layout || defaultBlockLayout || {};
 
 	const layoutClassnames = [];
+
+	const { hasGlobalPadding, getBlockStyles } = useSelect(
+		( select ) => {
+			return {
+				hasGlobalPadding:
+					( usedLayout?.inherit ||
+						usedLayout?.contentSize ||
+						usedLayout?.type === 'constrained' ) &&
+					select( blockEditorStore ).getSettings()
+						.__experimentalFeatures?.useRootPaddingAwareAlignments,
+				getBlockStyles: select( blocksStore ).getBlockStyles,
+			};
+		},
+		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
+	);
 
 	if ( LAYOUT_DEFINITIONS[ usedLayout?.type || 'default' ]?.className ) {
 		const baseClassName =
@@ -70,20 +98,21 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 				: splitBlockName.join( '-' );
 		const compoundClassName = `wp-block-${ fullBlockName }-${ baseClassName }`;
 		layoutClassnames.push( baseClassName, compoundClassName );
-	}
 
-	const hasGlobalPadding = useSelect(
-		( select ) => {
-			return (
-				( usedLayout?.inherit ||
-					usedLayout?.contentSize ||
-					usedLayout?.type === 'constrained' ) &&
-				select( blockEditorStore ).getSettings().__experimentalFeatures
-					?.useRootPaddingAwareAlignments
+		// Add combined block style variation and layout classname.
+		if ( blockAttributes.className ) {
+			const variation = getVariationNameFromClass(
+				blockAttributes.className,
+				getBlockStyles( blockName )
 			);
-		},
-		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
-	);
+			if ( variation ) {
+				const variationClass = `${ VARIATION_PREFIX }${ variation }-${ clientId }`;
+				layoutClassnames.push(
+					`${ variationClass }-${ baseClassName }`
+				);
+			}
+		}
+	}
 
 	if ( hasGlobalPadding ) {
 		layoutClassnames.push( 'has-global-padding' );
@@ -417,7 +446,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { clientId, name, attributes } = props;
 		const blockSupportsLayout = hasLayoutBlockSupport( name );
-		const layoutClasses = useLayoutClasses( attributes, name );
+		const layoutClasses = useLayoutClasses( attributes, name, clientId );
 		const extraProps = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.
