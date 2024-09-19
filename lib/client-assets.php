@@ -606,7 +606,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  *
  * Script modules that are registered by Core will be re-registered by Gutenberg.
  */
-function gutenberg_register_script_modules() {
+function gutenberg_default_script_modules() {
 	/*
 	 * Expects multidimensional array like:
 	 *
@@ -645,11 +645,11 @@ function gutenberg_register_script_modules() {
 		}
 
 		$path = gutenberg_url( "build-module/{$file_name}" );
-		wp_deregister_script_module( $script_module_id );
 		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
 	}
 }
-add_action( 'after_setup_theme', 'gutenberg_register_script_modules', 20 );
+remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
+add_action( 'wp_default_scripts', 'gutenberg_register_script_modules' );
 
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
