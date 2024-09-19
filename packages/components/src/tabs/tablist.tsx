@@ -42,12 +42,12 @@ export const TabList = forwardRef<
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate( selectedId, ( { previousValue } ) => {
-		selectedElement?.scrollIntoView( {
-			behavior: 'instant',
-			block: 'nearest',
-			inline: 'nearest',
-		} );
 		if ( previousValue ) {
+			selectedElement?.scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 			setAnimationEnabled( true );
 		}
 	} );
