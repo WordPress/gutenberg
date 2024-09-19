@@ -26,4 +26,5 @@ module.exports = {
 			.replace( '__experimental', '' )
 			.replace( '__unstable', '' );
 	},
+	processors: [ 'count-components-and-props' ],
 };
