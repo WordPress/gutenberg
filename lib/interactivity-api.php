@@ -8,6 +8,8 @@
 /**
  * Deregisters the Core Interactivity API Modules and replace them
  * with the ones from the Gutenberg plugin.
+ *
+ * @deprecated 19.3.0 Script module registration is handled by {@see gutenberg_default_script_modules()}.
  */
 function gutenberg_reregister_interactivity_script_modules() {}
 

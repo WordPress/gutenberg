@@ -605,6 +605,8 @@ add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
  * Registers or re-registers Gutenberg Script Modules.
  *
  * Script modules that are registered by Core will be re-registered by Gutenberg.
+ *
+ * @since 19.3.0
  */
 function gutenberg_default_script_modules() {
 	/*
@@ -649,7 +651,7 @@ function gutenberg_default_script_modules() {
 	}
 }
 remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
-add_action( 'wp_default_scripts', 'gutenberg_register_script_modules' );
+add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
 
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
