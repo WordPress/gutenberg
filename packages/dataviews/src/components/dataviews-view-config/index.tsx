@@ -8,7 +8,8 @@ import type { ChangeEvent } from 'react';
  */
 import {
 	Button,
-	Popover,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	Dropdown,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
@@ -24,9 +25,10 @@ import {
 	BaseControl,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { memo, useContext, useState, useMemo } from '@wordpress/element';
+import { memo, useContext, useMemo } from '@wordpress/element';
 import { chevronDown, chevronUp, cog, seen, unseen } from '@wordpress/icons';
 import warning from '@wordpress/warning';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -54,6 +56,8 @@ const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
 }
+
+const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
 
 function ViewTypeMenu( {
 	defaultLayouts = { list: {}, grid: {}, table: {} },
@@ -510,7 +514,7 @@ function SettingsSection( {
 	);
 }
 
-function DataviewsViewConfigContent( {
+function DataviewsViewConfigDropdown( {
 	density,
 	setDensity,
 }: {
@@ -518,25 +522,52 @@ function DataviewsViewConfigContent( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 } ) {
 	const { view } = useContext( DataViewsContext );
+	const popoverId = useInstanceId(
+		_DataViewsViewConfig,
+		'dataviews-view-config-dropdown'
+	);
+
 	return (
-		<VStack className="dataviews-view-config" spacing={ 6 }>
-			<SettingsSection title={ __( 'Appearance' ) }>
-				<HStack expanded className="is-divided-in-two">
-					<SortFieldControl />
-					<SortDirectionControl />
-				</HStack>
-				{ view.type === LAYOUT_GRID && (
-					<DensityPicker
-						density={ density }
-						setDensity={ setDensity }
+		<Dropdown
+			popoverProps={ {
+				...DATAVIEWS_CONFIG_POPOVER_PROPS,
+				id: popoverId,
+			} }
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				return (
+					<Button
+						size="compact"
+						icon={ cog }
+						label={ _x( 'View options', 'View is used as a noun' ) }
+						onClick={ onToggle }
+						aria-expanded={ isOpen ? 'true' : 'false' }
+						aria-controls={ popoverId }
 					/>
-				) }
-				<ItemsPerPageControl />
-			</SettingsSection>
-			<SettingsSection title={ __( 'Properties' ) }>
-				<FieldControl />
-			</SettingsSection>
-		</VStack>
+				);
+			} }
+			renderContent={ () => (
+				<DropdownContentWrapper paddingSize="medium">
+					<VStack className="dataviews-view-config" spacing={ 6 }>
+						<SettingsSection title={ __( 'Appearance' ) }>
+							<HStack expanded className="is-divided-in-two">
+								<SortFieldControl />
+								<SortDirectionControl />
+							</HStack>
+							{ view.type === LAYOUT_GRID && (
+								<DensityPicker
+									density={ density }
+									setDensity={ setDensity }
+								/>
+							) }
+							<ItemsPerPageControl />
+						</SettingsSection>
+						<SettingsSection title={ __( 'Properties' ) }>
+							<FieldControl />
+						</SettingsSection>
+					</VStack>
+				</DropdownContentWrapper>
+			) }
+		/>
 	);
 }
 
@@ -549,34 +580,13 @@ function _DataViewsViewConfig( {
 	setDensity: React.Dispatch< React.SetStateAction< number > >;
 	defaultLayouts?: SupportedLayouts;
 } ) {
-	const [ isShowingViewPopover, setIsShowingViewPopover ] =
-		useState< boolean >( false );
-
 	return (
 		<>
 			<ViewTypeMenu defaultLayouts={ defaultLayouts } />
-			<div>
-				<Button
-					size="compact"
-					icon={ cog }
-					label={ _x( 'View options', 'View is used as a noun' ) }
-					onClick={ () => setIsShowingViewPopover( true ) }
-				/>
-				{ isShowingViewPopover && (
-					<Popover
-						placement="bottom-end"
-						onClose={ () => {
-							setIsShowingViewPopover( false );
-						} }
-						focusOnMount
-					>
-						<DataviewsViewConfigContent
-							density={ density }
-							setDensity={ setDensity }
-						/>
-					</Popover>
-				) }
-			</div>
+			<DataviewsViewConfigDropdown
+				density={ density }
+				setDensity={ setDensity }
+			/>
 		</>
 	);
 }

@@ -46,24 +46,38 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution, canUser } =
-				select( coreStore );
+			const {
+				getEntityRecord,
+				getEditedEntityRecord,
+				hasFinishedResolution,
+				canUser,
+			} = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 
-			const record =
-				_globalStylesId &&
-				canUser( 'read', {
-					kind: 'root',
-					name: 'globalStyles',
-					id: _globalStylesId,
-				} )
-					? getEditedEntityRecord(
-							'root',
-							'globalStyles',
-							_globalStylesId
-					  )
-					: undefined;
+			let record;
+			const userCanEditGlobalStyles = canUser( 'update', {
+				kind: 'root',
+				name: 'globalStyles',
+				id: _globalStylesId,
+			} );
+
+			if ( _globalStylesId ) {
+				if ( userCanEditGlobalStyles ) {
+					record = getEditedEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId
+					);
+				} else {
+					record = getEntityRecord(
+						'root',
+						'globalStyles',
+						_globalStylesId,
+						{ context: 'view' }
+					);
+				}
+			}
 
 			let hasResolved = false;
 			if (
@@ -71,13 +85,22 @@ function useGlobalStylesUserConfig() {
 					'__experimentalGetCurrentGlobalStylesId'
 				)
 			) {
-				hasResolved = _globalStylesId
-					? hasFinishedResolution( 'getEditedEntityRecord', [
-							'root',
-							'globalStyles',
-							_globalStylesId,
-					  ] )
-					: true;
+				if ( _globalStylesId ) {
+					hasResolved = userCanEditGlobalStyles
+						? hasFinishedResolution( 'getEditedEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+						  ] )
+						: hasFinishedResolution( 'getEntityRecord', [
+								'root',
+								'globalStyles',
+								_globalStylesId,
+								{ context: 'view' },
+						  ] );
+				} else {
+					hasResolved = true;
+				}
 			}
 
 			return {
@@ -145,20 +168,11 @@ function useGlobalStylesUserConfig() {
 }
 
 function useGlobalStylesBaseConfig() {
-	const baseConfig = useSelect( ( select ) => {
-		const {
-			__experimentalGetCurrentThemeBaseGlobalStyles,
-			getCurrentTheme,
-			canUser,
-		} = select( coreStore );
-		const currentTheme = getCurrentTheme();
-
-		return currentTheme &&
-			canUser( 'read', 'global-styles/themes', currentTheme.stylesheet )
-			? __experimentalGetCurrentThemeBaseGlobalStyles()
-			: undefined;
-	}, [] );
-
+	const baseConfig = useSelect(
+		( select ) =>
+			select( coreStore ).__experimentalGetCurrentThemeBaseGlobalStyles(),
+		[]
+	);
 	return [ !! baseConfig, baseConfig ];
 }
 

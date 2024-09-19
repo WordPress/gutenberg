@@ -38,6 +38,8 @@ import {
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
 } from './private-selectors';
 
 /**
@@ -1582,6 +1584,11 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+	if ( _isSectionBlock ) {
+		return false;
+	}
+
 	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
@@ -1730,6 +1737,11 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	if ( isBlockWithinSection ) {
 		return false;
 	}
 
@@ -2674,12 +2686,17 @@ export function __unstableGetEditorMode( state ) {
 /**
  * Returns whether block moving mode is enabled.
  *
- * @param {Object} state Editor state.
- *
- * @return {string} Client Id of moving block.
+ * @deprecated
  */
-export function hasBlockMovingClientId( state ) {
-	return state.hasBlockMovingClientId;
+export function hasBlockMovingClientId() {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).hasBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
+		}
+	);
+	return false;
 }
 
 /**
@@ -2862,11 +2879,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		'__experimentalDisableBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+	const shouldEnableIfUnselected = blockSupportDisable
+		? false
+		: areInnerBlocksControlled( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&
@@ -2926,6 +2941,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( clientId === null ) {
 				clientId = '';
 			}
+
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
@@ -2943,9 +2959,13 @@ export const getBlockEditingMode = createRegistrySelector(
 					state,
 					sectionRootClientId
 				);
-				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return 'disabled';
+
+				// Sections are always contentOnly.
+				if ( sectionsClientIds?.includes( clientId ) ) {
+					return 'contentOnly';
 				}
+
+				return 'disabled';
 			}
 
 			const blockEditingMode = state.blockEditingModes.get( clientId );
@@ -2955,9 +2975,29 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( ! clientId ) {
 				return 'default';
 			}
+			const sectionRootClientId = getSectionRootClientId( state );
+			if (
+				editorMode === 'navigation' &&
+				clientId === sectionRootClientId
+			) {
+				return 'default';
+			}
+			const sectionsClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
-			if ( templateLock === 'contentOnly' ) {
+			if (
+				templateLock === 'contentOnly' ||
+				editorMode === 'navigation'
+			) {
+				// Sections should always be contentOnly in navigation mode.
+				// This will also cause them to display in List View providing
+				// a structure.
+				if ( sectionsClientIds.includes( clientId ) ) {
+					return 'contentOnly';
+				}
 				const name = getBlockName( state, clientId );
 				const isContent =
 					select( blocksStore ).__experimentalHasContentRoleAttribute(
