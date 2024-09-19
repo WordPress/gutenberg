@@ -111,7 +111,13 @@ export function PageAttributesParent() {
 					label:
 						'— '.repeat( level ) +
 						decodeEntities( treeNode.name ) +
-						( fieldValue ? ` (ID: ${ treeNode.id })` : '' ),
+						( fieldValue
+							? ` (${ sprintf(
+									/* translators: %s: Post ID */
+									__( 'ID: %s' ),
+									treeNode.id
+							  ) })`
+							: '' ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -152,7 +158,13 @@ export function PageAttributesParent() {
 				value: parentPostId,
 				label:
 					parentPostTitle +
-					( fieldValue ? ` (ID: ${ parentPostId })` : '' ),
+					( fieldValue
+						? ` (${ sprintf(
+								/* translators: %s: Post ID */
+								__( 'ID: %s' ),
+								parentPostId
+						  ) })`
+						: '' ),
 			} );
 		}
 		return opts;
