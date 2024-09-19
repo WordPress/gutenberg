@@ -27,15 +27,7 @@ export function useZoomOut( zoomOut = true ) {
 			originalIsZoomOutRef.current = isZoomOut();
 		}
 
-		return () => {
-			if ( isZoomOut() && isZoomOut() !== originalIsZoomOutRef.current ) {
-				setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
-			}
-		};
-	}, [ isZoomOut, setZoomLevel ] );
-
-	// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
-	useEffect( () => {
+		// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
 		if ( zoomOut && isZoomOut() === false ) {
 			setZoomLevel( 50 );
 		} else if (
@@ -45,5 +37,11 @@ export function useZoomOut( zoomOut = true ) {
 		) {
 			setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
 		}
+
+		return () => {
+			if ( isZoomOut() && isZoomOut() !== originalIsZoomOutRef.current ) {
+				setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
+			}
+		};
 	}, [ isZoomOut, setZoomLevel, zoomOut ] );
 }
