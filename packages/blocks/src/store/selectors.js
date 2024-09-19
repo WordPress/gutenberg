@@ -8,6 +8,7 @@ import removeAccents from 'remove-accents';
  */
 import { createSelector } from '@wordpress/data';
 import { RichTextData } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -845,3 +846,12 @@ export const hasContentRoleAttribute = createSelector(
 		state.blockTypes[ blockTypeName ]?.attributes,
 	]
 );
+
+export const __experimentalHasContentRoleAttribute = ( ...args ) => {
+	deprecated( '__experimentalHasContentRoleAttribute', {
+		since: '6.7',
+		version: '6.8',
+		alternative: 'hasContentRoleAttribute',
+	} );
+	return hasContentRoleAttribute( ...args );
+};
