@@ -24,7 +24,7 @@ const Media = ( {
 	size = [ 'large', 'medium', 'thumbnail' ],
 	...props
 }: {
-	id: string;
+	id: number;
 	size?: Array< 'large' | 'medium' | 'full' | 'thumbnail' >;
 } & Record< string, any > ) => {
 	const { record: media } = useEntityRecord< Attachment >(
@@ -32,6 +32,7 @@ const Media = ( {
 		'media',
 		id
 	);
+
 	const currentSize =
 		size.find( ( s ) => !! media?.media_details?.sizes[ s ] ) ?? '';
 
@@ -88,11 +89,7 @@ export const FeaturedImageView = ( {
 				{ item.featured_media && (
 					<Media
 						className="fields-controls__featured-image-image"
-						id={
-							item.featured_media
-								? item.featured_media.toString()
-								: ''
-						}
+						id={ item.featured_media }
 						size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
 					/>
 				) }
