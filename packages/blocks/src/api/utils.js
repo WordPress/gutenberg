@@ -332,7 +332,7 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
  *
  * @return {string[]} The attribute names that have the provided role.
  */
-export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+export function getBlockAttributesNamesByRole( name, role ) {
 	const attributes = getBlockType( name )?.attributes;
 	if ( ! attributes ) {
 		return [];
