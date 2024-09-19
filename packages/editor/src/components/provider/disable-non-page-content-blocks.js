@@ -3,52 +3,32 @@
  */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect, useMemo } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const POST_CONTENT_BLOCK_TYPES = [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-];
+import usePostContentBlocks from './use-post-content-blocks';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyBlockTypes = useMemo(
-		() => [
-			...applyFilters(
-				'editor.postContentBlockTypes',
-				POST_CONTENT_BLOCK_TYPES
-			),
-			'core/template-part',
-		],
-		[]
-	);
-
-	// Note that there are two separate subscriptions because the result for each
-	// returns a new array.
-	const contentOnlyIds = useSelect(
-		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName( contentOnlyBlockTypes );
-		},
-		[ contentOnlyBlockTypes ]
-	);
-	const disabledIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( 'core/template-part' ).flatMap( ( clientId ) =>
-			getBlockOrder( clientId )
-		);
+	const contentOnlyIds = usePostContentBlocks();
+	const templateParts = useSelect( ( select ) => {
+		const { getBlocksByName } = select( blockEditorStore );
+		return getBlocksByName( 'core/template-part' );
 	}, [] );
+	const disabledIds = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( blockEditorStore );
+			return templateParts.flatMap( ( clientId ) =>
+				getBlockOrder( clientId )
+			);
+		},
+		[ templateParts ]
+	);
 
 	const registry = useRegistry();
 
@@ -59,6 +39,9 @@ export default function DisableNonPageContentBlocks() {
 		registry.batch( () => {
 			setBlockEditingMode( '', 'disabled' );
 			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of templateParts ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 			for ( const clientId of disabledIds ) {
@@ -72,12 +55,15 @@ export default function DisableNonPageContentBlocks() {
 				for ( const clientId of contentOnlyIds ) {
 					unsetBlockEditingMode( clientId );
 				}
+				for ( const clientId of templateParts ) {
+					unsetBlockEditingMode( clientId );
+				}
 				for ( const clientId of disabledIds ) {
 					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
-	}, [ contentOnlyIds, disabledIds, registry ] );
+	}, [ templateParts, contentOnlyIds, disabledIds, registry ] );
 
 	return null;
 }

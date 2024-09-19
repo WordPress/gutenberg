@@ -45,7 +45,7 @@ function ToolSelector( props, ref ) {
 					__next40pxDefaultSize={ false }
 					{ ...props }
 					ref={ ref }
-					icon={ mode === 'navigation' ? selectIcon : editIcon }
+					icon={ mode === 'navigation' ? editIcon : selectIcon }
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ onToggle }
@@ -56,7 +56,11 @@ function ToolSelector( props, ref ) {
 			popoverProps={ { placement: 'bottom-start' } }
 			renderContent={ () => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+					<NavigableMenu
+						className="block-editor-tool-selector__menu"
+						role="menu"
+						aria-label={ __( 'Tools' ) }
+					>
 						<MenuItemsChoice
 							value={
 								mode === 'navigation' ? 'navigation' : 'edit'
@@ -67,19 +71,23 @@ function ToolSelector( props, ref ) {
 									value: 'edit',
 									label: (
 										<>
-											<Icon icon={ editIcon } />
-											{ __( 'Edit' ) }
+											{ selectIcon }
+											{ __( 'Design' ) }
 										</>
+									),
+									info: __(
+										'Full control over layout and styling.'
 									),
 								},
 								{
 									value: 'navigation',
 									label: (
 										<>
-											{ selectIcon }
-											{ __( 'Select' ) }
+											<Icon icon={ editIcon } />
+											{ __( 'Edit' ) }
 										</>
 									),
+									info: __( 'Focus on content.' ),
 								},
 							] }
 						/>
