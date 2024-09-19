@@ -3,11 +3,21 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { trash, rotateLeft, rotateRight, layout, page } from '@wordpress/icons';
-import { useCommandLoader } from '@wordpress/commands';
+import {
+	trash,
+	rotateLeft,
+	rotateRight,
+	layout,
+	page,
+	plus,
+} from '@wordpress/icons';
+import { useCommandLoader, store as commandsStore } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -158,7 +168,70 @@ function useManipulateDocumentCommands() {
 	};
 }
 
+function useAddNewPageCommand() {
+	const history = useHistory();
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const createPageEntity = async ( { close } ) => {
+		try {
+			const _page = await saveEntityRecord(
+				'postType',
+				'page',
+				{
+					status: 'draft',
+				},
+				{
+					throwOnError: true,
+				}
+			);
+			if ( _page?.id ) {
+				history.push( {
+					postId: _page.id,
+					postType: 'page',
+					canvas: 'edit',
+				} );
+			}
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the item.' );
+
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		} finally {
+			close();
+		}
+	};
+
+	const commands = useMemo( () => {
+		return [
+			{
+				name: 'core/edit-site/add-new-page',
+				label: __( 'Add new page' ),
+				icon: plus,
+				callback: createPageEntity,
+			},
+		];
+	}, [ createPageEntity ] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
+}
+
 export function useEditModeCommands() {
+	const { unregisterCommand } = useDispatch( commandsStore );
+	unregisterCommand( 'core/add-new-page' );
+
+	useCommandLoader( {
+		name: 'core/edit-site/add-new-page',
+		hook: useAddNewPageCommand,
+	} );
+
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,
