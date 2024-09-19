@@ -390,20 +390,10 @@ export const modifyContentLockBlock =
  * @param {number} zoom the new zoom level
  * @return {Object} Action object.
  */
-export function setZoomLevel( zoom = 50 ) {
-	let zoomValue;
-
-	if ( zoom === true ) {
-		zoomValue = 50;
-	} else if ( zoom === false ) {
-		zoomValue = 100; // Considered as a reset
-	} else {
-		zoomValue = zoom;
-	}
-
+export function setZoomLevel( zoom = 100 ) {
 	return {
 		type: 'SET_ZOOM_LEVEL',
-		zoom: zoomValue,
+		zoom,
 	};
 }
 
@@ -411,7 +401,7 @@ export function setZoomLevel( zoom = 50 ) {
  * Resets the Zoom state.
  * @return {Object} Action object.
  */
-export function resetZoomOut() {
+export function resetZoomLevel() {
 	return {
 		type: 'RESET_ZOOM_LEVEL',
 	};

@@ -85,7 +85,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock, __unstableSetEditorMode, resetZoomOut } = unlock(
+	const { removeBlock, __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -146,7 +146,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 							setIsInserterOpened( false );
 						}
 						__unstableSetEditorMode( 'edit' );
-						resetZoomOut();
+						resetZoomLevel();
 						__unstableContentRef.current?.focus();
 					} }
 				/>

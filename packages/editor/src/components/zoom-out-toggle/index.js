@@ -18,12 +18,16 @@ const ZoomOutToggle = () => {
 		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
 	} ) );
 
-	const { setZoomLevel, __unstableSetEditorMode } = unlock(
+	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	const handleZoomOut = () => {
-		setZoomLevel( isZoomOut ? false : true );
+		if ( isZoomOut ) {
+			resetZoomLevel();
+		} else {
+			setZoomLevel( 50 );
+		}
 		__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 	};
 

@@ -17,7 +17,7 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useZoomOutModeExit( { editorMode } ) {
 	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
-	const { __unstableSetEditorMode, resetZoomOut } = unlock(
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
@@ -42,7 +42,7 @@ export function useZoomOutModeExit( { editorMode } ) {
 						__experimentalSetIsInserterOpened( false );
 					}
 					__unstableSetEditorMode( 'edit' );
-					resetZoomOut();
+					resetZoomLevel();
 				}
 			}
 
