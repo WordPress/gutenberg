@@ -266,7 +266,7 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.title_ `string`: A title for the document, defaulting to the document or template title currently being edited.
--   _props.icon_ `import("@wordpress/components").IconType`: An icon for the document, defaulting to an icon for document or template currently being edited.
+-   _props.icon_ `IconType`: An icon for the document, no default. (A default icon indicating the document post type is no longer used.)
 
 _Returns_
 
@@ -1470,6 +1470,10 @@ Undocumented declaration.
 ### PostTrash
 
 Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Parameters_
+
+-   _An_ `?{onActionPerformed: Object}`: object containing the onActionPerformed function.
 
 _Returns_
 

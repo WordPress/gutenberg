@@ -275,6 +275,23 @@ export function isDropTargetValid(
 }
 
 /**
+ * Checks if the given element is an insertion point.
+ *
+ * @param {EventTarget|null} targetToCheck - The element to check.
+ * @param {Document}         ownerDocument - The owner document of the element.
+ * @return {boolean} True if the element is a insertion point, false otherwise.
+ */
+function isInsertionPoint( targetToCheck, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+
+	return !! (
+		defaultView &&
+		targetToCheck instanceof defaultView.HTMLElement &&
+		targetToCheck.dataset.isInsertionPoint
+	);
+}
+
+/**
  * @typedef  {Object} WPBlockDropZoneConfig
  * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
  * @property {string}       rootClientId    The root client id for the block list.
@@ -422,6 +439,10 @@ export default function useBlockDropZone( {
 				const [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 
+				if ( isZoomOutMode() && operation !== 'insert' ) {
+					return;
+				}
+
 				if ( operation === 'group' ) {
 					const targetBlock = blocks[ targetIndex ];
 					const areAllImages = [
@@ -521,7 +542,18 @@ export default function useBlockDropZone( {
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget.ownerDocument );
 		},
-		onDragLeave() {
+		onDragLeave( event ) {
+			const { ownerDocument } = event.currentTarget;
+
+			// If the drag event is leaving the drop zone and entering an insertion point,
+			// do not hide the insertion point as it is conceptually within the dropzone.
+			if (
+				isInsertionPoint( event.relatedTarget, ownerDocument ) ||
+				isInsertionPoint( event.target, ownerDocument )
+			) {
+				return;
+			}
+
 			throttled.cancel();
 			hideInsertionPoint();
 		},

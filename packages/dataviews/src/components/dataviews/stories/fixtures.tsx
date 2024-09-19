@@ -547,7 +547,15 @@ export const themeData: Theme[] = [
 export const themeFields: Field< Theme >[] = [
 	{ id: 'slug', label: 'Slug' },
 	{ id: 'name', label: 'Name' },
-	{ id: 'description', label: 'Description' },
+	{
+		id: 'description',
+		label: 'Description',
+		render: ( { item } ) => (
+			<span className="theme-field-description">
+				{ item.description }
+			</span>
+		),
+	},
 	{ id: 'requires', label: 'Requires at least' },
 	{ id: 'tested', label: 'Tested up to' },
 	{

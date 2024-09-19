@@ -194,19 +194,15 @@ function ReusableBlockEdit( {
 		hasPatternOverridesSource,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlocks,
-				getSettings,
-				getBlockEditingMode: _getBlockEditingMode,
-			} = select( blockEditorStore );
+			const { getBlocks, getSettings, getBlockEditingMode } =
+				select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: getBlocks( patternClientId ),
-				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
-				editingMode: _getBlockEditingMode( patternClientId ),
+				editingMode: getBlockEditingMode( patternClientId ),
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
 				),

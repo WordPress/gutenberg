@@ -531,6 +531,7 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
+							__next40pxDefaultSize
 							values={ paddingValues }
 							onChange={ setPaddingValues }
 							label={ __( 'Padding' ) }
@@ -571,6 +572,7 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
+							__next40pxDefaultSize
 							values={ marginValues }
 							onChange={ setMarginValues }
 							inputProps={ inputProps }
@@ -617,6 +619,7 @@ export default function DimensionsPanel( {
 					{ ! showSpacingPresetsControl &&
 						( isAxialGap ? (
 							<BoxControl
+								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
 								min={ 0 }
 								onChange={ setGapValues }

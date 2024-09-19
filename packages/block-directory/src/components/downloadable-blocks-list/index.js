@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { Composite } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 
@@ -11,9 +11,7 @@ import { useDispatch } from '@wordpress/data';
  */
 import DownloadableBlockListItem from '../downloadable-block-list-item';
 import { store as blockDirectoryStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
-const { CompositeV2: Composite } = unlock( componentsPrivateApis );
 const noop = () => {};
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {

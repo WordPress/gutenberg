@@ -84,8 +84,7 @@ const CommentsForm = ( { postId, postType } ) => {
 		if ( 'closed' === commentStatus ) {
 			const actions = [
 				<Button
-					// TODO: Switch to `true` (40px size) if possible
-					__next40pxDefaultSize={ false }
+					__next40pxDefaultSize
 					key="enableComments"
 					onClick={ () => setCommentStatus( 'open' ) }
 					variant="primary"

@@ -47,7 +47,7 @@ test.describe( 'Site editor command palette', () => {
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'heading', { level: 1 } )
-		).toHaveText( 'Index' );
+		).toContainText( 'Index' );
 	} );
 
 	test( 'Open the command palette and navigate to Customize CSS', async ( {

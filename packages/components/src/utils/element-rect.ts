@@ -2,134 +2,37 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
 import { useEvent } from './hooks/use-event';
 
 /**
- * `useTrackElementRectUpdates` options.
- */
-export type UseTrackElementRectUpdatesOptions = {
-	/**
-	 * Whether to trigger the callback when an element's ResizeObserver is
-	 * first set up, including when the target element changes.
-	 *
-	 * @default true
-	 */
-	fireOnElementInit?: boolean;
-};
-
-/**
- * Tracks an element's "rect" (size and position) and fires `onRect` for all
- * of its discrete values. The element can be changed dynamically and **it
- * must not be stored in a ref**. Instead, it should be stored in a React
- * state or equivalent.
- *
- * By default, `onRect` is called initially for the target element (including
- * when the target element changes), not only on size or position updates.
- * This allows consumers of the hook to always be in sync with all rect values
- * of the target element throughout its lifetime. This behavior can be
- * disabled by setting the `fireOnElementInit` option to `false`.
- *
- * Under the hood, it sets up a `ResizeObserver` that tracks the element. The
- * target element can be changed dynamically, and the observer will be
- * updated accordingly.
- *
- * @example
- *
- * ```tsx
- * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
- *
- * useTrackElementRectUpdates( targetElement, ( element ) => {
- *   console.log( 'Element resized:', element );
- * } );
- *
- * <div ref={ setTargetElement } />;
- * ```
- */
-export function useTrackElementRectUpdates(
-	/**
-	 * The target element to observe. It can be changed dynamically.
-	 */
-	targetElement: HTMLElement | undefined | null,
-	/**
-	 * Callback to fire when the element is resized. It will also be
-	 * called when the observer is set up, unless `fireOnElementInit` is
-	 * set to `false`.
-	 */
-	onRect: (
-		/**
-		 * The element being tracked at the time of this update.
-		 */
-		element: HTMLElement,
-		/**
-		 * The list of
-		 * [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
-		 * objects passed to the `ResizeObserver.observe` callback. This list
-		 * won't be available when the observer is set up, and only on updates.
-		 */
-		resizeObserverEntries?: ResizeObserverEntry[]
-	) => void,
-	{ fireOnElementInit = true }: UseTrackElementRectUpdatesOptions = {}
-) {
-	const onRectEvent = useEvent( onRect );
-
-	const observedElementRef = useRef< HTMLElement | null >();
-	const resizeObserverRef = useRef< ResizeObserver >();
-
-	// TODO: could this be a layout effect?
-	useEffect( () => {
-		if ( targetElement === observedElementRef.current ) {
-			return;
-		}
-
-		observedElementRef.current = targetElement;
-
-		// Set up a ResizeObserver.
-		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( ( entries ) => {
-				if ( observedElementRef.current ) {
-					onRectEvent( observedElementRef.current, entries );
-				}
-			} );
-		}
-		const { current: resizeObserver } = resizeObserverRef;
-
-		// Observe new element.
-		if ( targetElement ) {
-			if ( fireOnElementInit ) {
-				// TODO: investigate if this can be removed,
-				// see: https://stackoverflow.com/a/60026394
-				onRectEvent( targetElement );
-			}
-			resizeObserver.observe( targetElement );
-		}
-
-		return () => {
-			// Unobserve previous element.
-			if ( observedElementRef.current ) {
-				resizeObserver.unobserve( observedElementRef.current );
-			}
-		};
-	}, [ fireOnElementInit, onRectEvent, targetElement ] );
-}
-
-/**
  * The position and dimensions of an element, relative to its offset parent.
  */
 export type ElementOffsetRect = {
-	/**
-	 * The distance from the left edge of the offset parent to the left edge of
-	 * the element.
-	 */
-	left: number;
 	/**
 	 * The distance from the top edge of the offset parent to the top edge of
 	 * the element.
 	 */
 	top: number;
+	/**
+	 * The distance from the right edge of the offset parent to the right edge
+	 * of the element.
+	 */
+	right: number;
+	/**
+	 * The distance from the bottom edge of the offset parent to the bottom edge
+	 * of the element.
+	 */
+	bottom: number;
+	/**
+	 * The distance from the left edge of the offset parent to the left edge of
+	 * the element.
+	 */
+	left: number;
 	/**
 	 * The width of the element.
 	 */
@@ -144,51 +47,111 @@ export type ElementOffsetRect = {
  * An `ElementOffsetRect` object with all values set to zero.
  */
 export const NULL_ELEMENT_OFFSET_RECT = {
-	left: 0,
 	top: 0,
+	right: 0,
+	bottom: 0,
+	left: 0,
 	width: 0,
 	height: 0,
 } satisfies ElementOffsetRect;
 
 /**
  * Returns the position and dimensions of an element, relative to its offset
- * parent. This is useful in contexts where `getBoundingClientRect` is not
- * suitable, such as when the element is transformed.
+ * parent, with subpixel precision. Values reflect the real measures before any
+ * potential scaling distortions along the X and Y axes.
  *
- * **Note:** the `left` and `right` values are adjusted due to a limitation
- * in the way the browser calculates the offset position of the element,
- * which can cause unwanted scrollbars to appear. This adjustment makes the
- * values potentially inaccurate within a range of 1 pixel.
+ * Useful in contexts where plain `getBoundingClientRect` calls or `ResizeObserver`
+ * entries are not suitable, such as when the element is transformed, and when
+ * `element.offset<Top|Left|Width|Height>` methods are not precise enough.
+ *
+ * **Note:** in some contexts, like when the scale is 0, this method will fail
+ * because it's impossible to calculate a scaling ratio. When that happens, it
+ * will return `undefined`.
  */
 export function getElementOffsetRect(
 	element: HTMLElement
-): ElementOffsetRect {
+): ElementOffsetRect | undefined {
+	// Position and dimension values computed with `getBoundingClientRect` have
+	// subpixel precision, but are affected by distortions since they represent
+	// the "real" measures, or in other words, the actual final values as rendered
+	// by the browser.
+	const rect = element.getBoundingClientRect();
+	if ( rect.width === 0 || rect.height === 0 ) {
+		return;
+	}
+	const offsetParentRect =
+		element.offsetParent?.getBoundingClientRect() ??
+		NULL_ELEMENT_OFFSET_RECT;
+
+	// Computed widths and heights have subpixel precision, and are not affected
+	// by distortions.
+	const computedWidth = parseFloat( getComputedStyle( element ).width );
+	const computedHeight = parseFloat( getComputedStyle( element ).height );
+
+	// We can obtain the current scale factor for the element by comparing "computed"
+	// dimensions with the "real" ones.
+	const scaleX = computedWidth / rect.width;
+	const scaleY = computedHeight / rect.height;
+
 	return {
-		// The adjustments mentioned in the documentation above are necessary
-		// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
-		// which can result in a position mismatch that causes unwanted overflow.
-		// For context, see: https://github.com/WordPress/gutenberg/pull/61979
-		left: Math.max( element.offsetLeft - 1, 0 ),
-		top: Math.max( element.offsetTop - 1, 0 ),
-		// This is a workaround to obtain these values with a sub-pixel precision,
-		// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
-		width: parseFloat( getComputedStyle( element ).width ),
-		height: parseFloat( getComputedStyle( element ).height ),
+		// To obtain the adjusted values for the position:
+		// 1. Compute the element's position relative to the offset parent.
+		// 2. Correct for the scale factor.
+		top: ( rect.top - offsetParentRect?.top ) * scaleY,
+		right: ( offsetParentRect?.right - rect.right ) * scaleX,
+		bottom: ( offsetParentRect?.bottom - rect.bottom ) * scaleY,
+		left: ( rect.left - offsetParentRect?.left ) * scaleX,
+		// Computed dimensions don't need any adjustments.
+		width: computedWidth,
+		height: computedHeight,
 	};
 }
+
+const POLL_RATE = 100;
 
 /**
  * Tracks the position and dimensions of an element, relative to its offset
  * parent. The element can be changed dynamically.
+ *
+ * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
+ * documentation for more details). When that happens, this hook will attempt
+ * to measure again after a frame, and if that fails, it will poll every 100
+ * milliseconds until it succeeds.
  */
 export function useTrackElementOffsetRect(
 	targetElement: HTMLElement | undefined | null
 ) {
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
+	const intervalRef = useRef< ReturnType< typeof setInterval > >();
 
-	useTrackElementRectUpdates( targetElement, ( element ) =>
-		setIndicatorPosition( getElementOffsetRect( element ) )
+	const measure = useEvent( () => {
+		if ( targetElement ) {
+			const elementOffsetRect = getElementOffsetRect( targetElement );
+			if ( elementOffsetRect ) {
+				setIndicatorPosition( elementOffsetRect );
+				clearInterval( intervalRef.current );
+				return true;
+			}
+		} else {
+			clearInterval( intervalRef.current );
+		}
+		return false;
+	} );
+
+	const setElement = useResizeObserver( () => {
+		if ( ! measure() ) {
+			requestAnimationFrame( () => {
+				if ( ! measure() ) {
+					intervalRef.current = setInterval( measure, POLL_RATE );
+				}
+			} );
+		}
+	} );
+
+	useLayoutEffect(
+		() => setElement( targetElement ),
+		[ setElement, targetElement ]
 	);
 
 	return indicatorPosition;

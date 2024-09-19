@@ -110,7 +110,7 @@ export default function PreferencesModalTabs( { sections } ) {
 									return (
 										<NavigatorButton
 											key={ tab.name }
-											path={ tab.name }
+											path={ `/${ tab.name }` }
 											as={ Item }
 											isAction
 										>
@@ -142,7 +142,7 @@ export default function PreferencesModalTabs( { sections } ) {
 						return (
 							<NavigatorScreen
 								key={ `${ section.name }-menu` }
-								path={ section.name }
+								path={ `/${ section.name }` }
 							>
 								<Card isBorderless size="large">
 									<CardHeader

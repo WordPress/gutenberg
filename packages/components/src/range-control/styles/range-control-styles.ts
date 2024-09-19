@@ -239,6 +239,7 @@ export const Thumb = styled.span< ThumbProps >`
 	position: absolute;
 	user-select: none;
 	width: 100%;
+	box-shadow: ${ CONFIG.elevationXSmall };
 
 	${ thumbColor };
 	${ thumbFocus };

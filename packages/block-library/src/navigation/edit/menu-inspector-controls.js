@@ -94,7 +94,9 @@ const MainContent = ( {
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
-		return <DeletedNavigationWarning onCreateNew={ onCreateNew } />;
+		return (
+			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
+		);
 	}
 
 	if ( isLoading ) {

@@ -11,26 +11,14 @@ import removeAccents from 'remove-accents';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import {
-	VisuallyHidden,
-	Icon,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { VisuallyHidden, Icon, Composite } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import type { Filter, NormalizedFilter, View } from '../../types';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	CompositeHoverV2: CompositeHover,
-	CompositeTypeaheadV2: CompositeTypeahead,
-} = unlock( componentsPrivateApis );
 
 interface SearchWidgetProps {
 	view: View;
@@ -126,8 +114,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 			) }
 			onFocusVisible={ () => {
 				// `onFocusVisible` needs the `Composite` component to be focusable,
-				// which is implicitly achieved via the `virtualFocus: true` option
-				// in the `useCompositeStore` hook.
+				// which is implicitly achieved via the `virtualFocus` prop.
 				if ( ! activeCompositeId && filter.elements.length ) {
 					setActiveCompositeId(
 						generateFilterElementCompositeItemId(
@@ -137,13 +124,13 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 					);
 				}
 			} }
-			render={ <CompositeTypeahead /> }
+			render={ <Composite.Typeahead /> }
 		>
 			{ filter.elements.map( ( element ) => (
-				<CompositeHover
+				<Composite.Hover
 					key={ element.value }
 					render={
-						<CompositeItem
+						<Composite.Item
 							id={ generateFilterElementCompositeItemId(
 								baseId,
 								element.value
@@ -213,7 +200,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 							) }
 					</span>
 					<span>{ element.label }</span>
-				</CompositeHover>
+				</Composite.Hover>
 			) ) }
 		</Composite>
 	);
