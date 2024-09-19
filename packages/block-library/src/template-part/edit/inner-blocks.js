@@ -100,6 +100,12 @@ function EditableTemplatePartInnerBlocks( {
 	tagName: TagName,
 	blockProps,
 } ) {
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_template_part',
@@ -114,7 +120,20 @@ function EditableTemplatePartInnerBlocks( {
 		layout: useLayout( layout ),
 	} );
 
-	return <TagName { ...innerBlocksProps } />;
+	const blockEditingMode = useBlockEditingMode();
+
+	const customProps =
+		blockEditingMode === 'contentOnly' && onNavigateToEntityRecord
+			? {
+					onDoubleClick: () =>
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'wp_template_part',
+						} ),
+			  }
+			: {};
+
+	return <TagName { ...innerBlocksProps } { ...customProps } />;
 }
 
 export default function TemplatePartInnerBlocks( {

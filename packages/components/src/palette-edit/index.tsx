@@ -275,9 +275,9 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	addColorRef,
 }: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef< typeof elements >();
+	const elementsReferenceRef = useRef< typeof elements >();
 	useEffect( () => {
-		elementsReference.current = elements;
+		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
 	const debounceOnChange = useDebounce( onChange, 100 );

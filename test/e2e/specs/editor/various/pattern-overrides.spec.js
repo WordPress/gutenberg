@@ -150,7 +150,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'Block: Paragraph',
 			} );
 			// Ensure the first pattern is selected.
-			await patternBlocks.first().selectText();
+			await editor.selectBlocks( patternBlocks.first() );
 			await expect( paragraphs.first() ).not.toHaveAttribute(
 				'inert',
 				'true'
@@ -168,7 +168,7 @@ test.describe( 'Pattern Overrides', () => {
 			await page.keyboard.type( 'I would word it this way' );
 
 			// Ensure the second pattern is selected.
-			await patternBlocks.last().selectText();
+			await editor.selectBlocks( patternBlocks.last() );
 			await patternBlocks
 				.last()
 				.getByRole( 'document', {
@@ -1131,7 +1131,7 @@ test.describe( 'Pattern Overrides', () => {
 			/\/wp-content\/uploads\//
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockToolbarButton( 'Alt' );
+		await editor.clickBlockToolbarButton( 'Alternative text' );
 		await page
 			.getByRole( 'textbox', { name: 'alternative text' } )
 			.fill( 'Test Image' );

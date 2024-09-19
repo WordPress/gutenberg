@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { NEW_TAB_REL } from './constants';
+import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
 
 /**
  * Evaluates a CSS aspect-ratio property value as a number.
@@ -80,4 +80,16 @@ export function getImageSizeAttributes( image, size ) {
 	}
 
 	return {};
+}
+
+/**
+ * Checks if the file has a valid file type.
+ *
+ * @param {File} file - The file to check.
+ * @return {boolean} - Returns true if the file has a valid file type, otherwise false.
+ */
+export function isValidFileType( file ) {
+	return ALLOWED_MEDIA_TYPES.some(
+		( mediaType ) => file.type.indexOf( mediaType ) === 0
+	);
 }

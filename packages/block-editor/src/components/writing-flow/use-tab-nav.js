@@ -36,12 +36,12 @@ export default function useTabNav() {
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
-	const noCapture = useRef();
+	const noCaptureRef = useRef();
 
 	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
-		if ( noCapture.current ) {
-			noCapture.current = null;
+		if ( noCaptureRef.current ) {
+			noCaptureRef.current = null;
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
@@ -165,7 +165,7 @@ export default function useTabNav() {
 			// Disable focus capturing on the focus capture element, so it
 			// doesn't refocus this block and so it allows default behaviour
 			// (moving focus to the next tabbable element).
-			noCapture.current = true;
+			noCaptureRef.current = true;
 
 			// Focusing the focus capture element, which is located above and
 			// below the editor, should not scroll the page all the way up or

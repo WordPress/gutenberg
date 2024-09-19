@@ -19,11 +19,7 @@ import { forwardRef } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import type { NormalizedFilter, View } from '../../types';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2 } = unlock( componentsPrivateApis );
 
 interface AddFilterProps {
 	filters: NormalizedFilter[];
@@ -43,10 +39,10 @@ export function AddFilterDropdownMenu( {
 } ) {
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
-		<DropdownMenu trigger={ trigger }>
+		<DropdownMenuV2 trigger={ trigger }>
 			{ inactiveFilters.map( ( filter ) => {
 				return (
-					<DropdownMenuItem
+					<DropdownMenuV2.Item
 						key={ filter.field }
 						onClick={ () => {
 							setOpenedFilter( filter.field );
@@ -64,13 +60,13 @@ export function AddFilterDropdownMenu( {
 							} );
 						} }
 					>
-						<DropdownMenuItemLabel>
+						<DropdownMenuV2.ItemLabel>
 							{ filter.name }
-						</DropdownMenuItemLabel>
-					</DropdownMenuItem>
+						</DropdownMenuV2.ItemLabel>
+					</DropdownMenuV2.Item>
 				);
 			} ) }
-		</DropdownMenu>
+		</DropdownMenuV2>
 	);
 }
 

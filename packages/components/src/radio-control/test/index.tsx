@@ -56,6 +56,47 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	describe( 'semantics and labelling', () => {
+		it( 'should group all radios under a fieldset with an accessible label (legend)', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Component { ...defaultProps } onChange={ onChangeSpy } />
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: defaultProps.label } )
+			).toBeVisible();
+		} );
+
+		it( 'should group all radios under a fieldset with an accessible label even when the label is visually hidden', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Component
+					{ ...defaultProps }
+					hideLabelFromVision
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: defaultProps.label } )
+			).toBeVisible();
+		} );
+
+		it( 'should describe the radio group with the help text', () => {
+			const onChangeSpy = jest.fn();
+			render(
+				<Component
+					{ ...defaultProps }
+					help="Test help text"
+					onChange={ onChangeSpy }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'group', { name: defaultProps.label } )
+			).toHaveAccessibleDescription( 'Test help text' );
+		} );
+
 		it( 'should render radio inputs with accessible labels', () => {
 			const onChangeSpy = jest.fn();
 			render(
@@ -101,46 +142,7 @@ describe.each( [
 			).toHaveAccessibleName( defaultProps.options[ 1 ].label );
 		} );
 
-		it( 'should use the group help text to describe individual options', () => {
-			const onChangeSpy = jest.fn();
-			render(
-				<Component
-					{ ...defaultProps }
-					onChange={ onChangeSpy }
-					selected={ defaultProps.options[ 1 ].value }
-					help="Select your favorite animal."
-				/>
-			);
-
-			for ( const option of defaultProps.options ) {
-				expect(
-					screen.getByRole( 'radio', { name: option.label } )
-				).toHaveAccessibleDescription( 'Select your favorite animal.' );
-			}
-		} );
-
 		it( 'should use the option description text to describe individual options', () => {
-			const onChangeSpy = jest.fn();
-			render(
-				<Component
-					{ ...defaultPropsWithDescriptions }
-					onChange={ onChangeSpy }
-					selected={ defaultProps.options[ 1 ].value }
-				/>
-			);
-
-			let index = 1;
-			for ( const option of defaultProps.options ) {
-				expect(
-					screen.getByRole( 'radio', { name: option.label } )
-				).toHaveAccessibleDescription(
-					`This is the option number ${ index }.`
-				);
-				index += 1;
-			}
-		} );
-
-		it( 'should use both the option description text and the group help text to describe individual options', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Component
@@ -151,12 +153,13 @@ describe.each( [
 				/>
 			);
 
+			// Group help text should not be used to describe individual options.
 			let index = 1;
 			for ( const option of defaultProps.options ) {
 				expect(
 					screen.getByRole( 'radio', { name: option.label } )
 				).toHaveAccessibleDescription(
-					`This is the option number ${ index }. Select your favorite animal`
+					`This is the option number ${ index }.`
 				);
 				index += 1;
 			}

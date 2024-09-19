@@ -44,6 +44,8 @@ function DropdownHeader( {
 				<Spacer />
 				{ onClose && (
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						className="dataforms-layouts-panel__dropdown-header-action"
 						label={ __( 'Close' ) }
 						icon={ closeSmall }

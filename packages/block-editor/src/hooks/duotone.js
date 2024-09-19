@@ -251,10 +251,6 @@ function useDuotoneStyles( {
 	const selectors = duotoneSelector.split( ',' );
 
 	const selectorsScoped = selectors.map( ( selectorPart ) => {
-		// Extra .editor-styles-wrapper specificity is needed in the editor
-		// since we're not using inline styles to apply the filter. We need to
-		// override duotone applied by global styles and theme.json.
-
 		// Assuming the selector part is a subclass selector (not a tag name)
 		// so we can prepend the filter id class. If we want to support elements
 		// such as `img` or namespaces, we'll need to add a case for that here.

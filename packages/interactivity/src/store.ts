@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { proxifyState, proxifyStore } from './proxies';
+import { proxifyState, proxifyStore, deepMerge } from './proxies';
 /**
  * External dependencies
  */
 import { getNamespace } from './namespaces';
-import { deepMerge, isPlainObject } from './utils';
+import { isPlainObject } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();

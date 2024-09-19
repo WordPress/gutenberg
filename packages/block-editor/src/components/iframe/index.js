@@ -122,7 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const prevContainerWidth = useRef();
+	const prevContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -243,7 +243,7 @@ function Iframe( {
 
 	useEffect( () => {
 		if ( ! isZoomedOut ) {
-			prevContainerWidth.current = containerWidth;
+			prevContainerWidthRef.current = containerWidth;
 		}
 	}, [ containerWidth, isZoomedOut ] );
 
@@ -310,7 +310,7 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
 				? Math.min( containerWidth, maxWidth ) /
-						prevContainerWidth.current
+						prevContainerWidthRef.current
 				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
@@ -331,7 +331,7 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidth.current }px`
+			`${ prevContainerWidthRef.current }px`
 		);
 
 		return () => {
@@ -456,7 +456,7 @@ function Iframe( {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,
 					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ prevContainerWidth.current }px`,
+						isZoomedOut && `${ prevContainerWidthRef.current }px`,
 				} }
 			>
 				{ iframe }

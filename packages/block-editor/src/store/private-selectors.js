@@ -20,6 +20,7 @@ import {
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getGrammar,
 } from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
@@ -27,6 +28,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	sectionRootClientIdKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -112,6 +114,7 @@ export const getEnabledClientIdsTree = createSelector(
 		state.blockEditingModes,
 		state.settings.templateLock,
 		state.blockListSettings,
+		state.editorMode,
 	]
 );
 
@@ -291,19 +294,18 @@ export const getInserterMediaCategories = createSelector(
 export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, rootClientId = null ) => {
-			const { getAllPatterns, __experimentalGetParsedPattern } = unlock(
-				select( STORE_NAME )
-			);
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-			return patterns.some( ( { name, inserter = true } ) => {
+			return patterns.some( ( pattern ) => {
+				const { inserter = true } = pattern;
 				if ( ! inserter ) {
 					return false;
 				}
-				const { blocks } = __experimentalGetParsedPattern( name );
+				const grammar = getGrammar( pattern );
 				return (
-					checkAllowListRecursive( blocks, allowedBlockTypes ) &&
-					blocks.every( ( { name: blockName } ) =>
+					checkAllowListRecursive( grammar, allowedBlockTypes ) &&
+					grammar.every( ( { name: blockName } ) =>
 						canInsertBlockType( state, blockName, rootClientId )
 					)
 				);
@@ -421,9 +423,11 @@ const EMPTY_ARRAY = [];
 export const getReusableBlocks = createRegistrySelector(
 	( select ) => ( state ) => {
 		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		return reusableBlocksSelect
-			? reusableBlocksSelect( select )
-			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+		return (
+			( reusableBlocksSelect
+				? reusableBlocksSelect( select )
+				: state.settings.__experimentalReusableBlocks ) ?? EMPTY_ARRAY
+		);
 	}
 );
 
@@ -512,10 +516,6 @@ export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
 
-export function getInserterSearchInputRef( state ) {
-	return state.inserterSearchInputRef;
-}
-
 /**
  * Returns the style attributes of multiple blocks.
  *
@@ -546,4 +546,17 @@ export const getBlockStyles = createSelector(
  */
 export function isZoomOutMode( state ) {
 	return state.editorMode === 'zoom-out';
+}
+
+/**
+ * Retrieves the client ID of the block which contains the blocks
+ * acting as "sections" in the editor. This is typically the "main content"
+ * of the template/post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string|undefined} The section root client ID or undefined if not set.
+ */
+export function getSectionRootClientId( state ) {
+	return state.settings?.[ sectionRootClientIdKey ];
 }

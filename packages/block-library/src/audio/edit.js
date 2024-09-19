@@ -155,6 +155,7 @@ function AudioEdit( {
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
+						onReset={ () => onSelectAudio( undefined ) }
 					/>
 				</BlockControls>
 			) }

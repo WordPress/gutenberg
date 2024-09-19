@@ -58,7 +58,6 @@ export default function EditorInterface( {
 	customSavePanel,
 	forceDisableBlockTools,
 	title,
-	icon,
 	iframeProps,
 } ) {
 	const {
@@ -99,7 +98,6 @@ export default function EditorInterface( {
 				select( blockEditorStore ).__unstableGetEditorMode(),
 		};
 	}, [] );
-	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
@@ -122,11 +120,10 @@ export default function EditorInterface( {
 	return (
 		<InterfaceSkeleton
 			enableRegionNavigation={ enableRegionNavigation }
-			isDistractionFree={ isDistractionFree && isWideViewport }
+			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
-				'is-distraction-free':
-					isDistractionFree && isWideViewport && ! isPreviewMode,
+				'is-distraction-free': isDistractionFree && ! isPreviewMode,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -142,7 +139,7 @@ export default function EditorInterface( {
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
-						icon={ icon }
+						isEditorIframed={ ! disableIframe }
 					/>
 				)
 			}

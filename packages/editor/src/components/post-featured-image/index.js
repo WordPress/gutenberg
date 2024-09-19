@@ -160,6 +160,7 @@ function PostFeaturedImage( {
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
+									__next40pxDefaultSize
 									ref={ toggleRef }
 									className={
 										! featuredImageId
@@ -200,6 +201,7 @@ function PostFeaturedImage( {
 								{ !! featuredImageId && (
 									<HStack className="editor-post-featured-image__actions">
 										<Button
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ open }
 											aria-haspopup="dialog"
@@ -207,6 +209,7 @@ function PostFeaturedImage( {
 											{ __( 'Replace' ) }
 										</Button>
 										<Button
+											__next40pxDefaultSize
 											className="editor-post-featured-image__action"
 											onClick={ () => {
 												onRemoveImage();

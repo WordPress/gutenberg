@@ -142,6 +142,13 @@ A handler for `blur` events on the trigger button.
 
 -   Required: No
 
+#### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`
+
 ## Related components
 
 -   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.

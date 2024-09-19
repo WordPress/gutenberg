@@ -22,6 +22,8 @@ export default function InstallButton( { attributes, block, clientId } ) {
 
 	return (
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			onClick={ () =>
 				installBlockType( block ).then( ( success ) => {
 					if ( success ) {

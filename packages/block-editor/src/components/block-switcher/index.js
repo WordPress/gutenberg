@@ -181,8 +181,24 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
+const BlockIndicator = ( { icon, showTitle, blockTitle } ) => (
+	<>
+		<BlockIcon
+			className="block-editor-block-switcher__toggle"
+			icon={ icon }
+			showColors
+		/>
+		{ showTitle && blockTitle && (
+			<span className="block-editor-block-switcher__toggle-text">
+				{ blockTitle }
+			</span>
+		) }
+	</>
+);
+
 export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
+		hasContentOnlyLocking,
 		canRemove,
 		hasBlockStyles,
 		icon,
@@ -191,8 +207,12 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		isTemplate,
 	} = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks } =
-				select( blockEditorStore );
+			const {
+				getTemplateLock,
+				getBlocksByClientId,
+				getBlockAttributes,
+				canRemoveBlocks,
+			} = select( blockEditorStore );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
@@ -204,6 +224,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 			const blockType = getBlockType( firstBlockName );
 
 			let _icon;
+			let _hasTemplateLock;
 			if ( _isSingleBlockSelected ) {
 				const match = getActiveBlockVariation(
 					firstBlockName,
@@ -211,9 +232,14 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 				);
 				// Take into account active block variations.
 				_icon = match?.icon || blockType.icon;
+				_hasTemplateLock =
+					getTemplateLock( clientIds[ 0 ] ) === 'contentOnly';
 			} else {
 				const isSelectionOfSameType =
 					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
+				_hasTemplateLock = clientIds.some(
+					( id ) => getTemplateLock( id ) === 'contentOnly'
+				);
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
 				_icon = isSelectionOfSameType ? blockType.icon : copy;
@@ -229,6 +255,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					_isSingleBlockSelected && isReusableBlock( _blocks[ 0 ] ),
 				isTemplate:
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
+				hasContentOnlyLocking: _hasTemplateLock,
 			};
 		},
 		[ clientIds ]
@@ -237,6 +264,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
 	} );
+
 	if ( invalidBlocks ) {
 		return null;
 	}
@@ -246,7 +274,11 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		? blockTitle
 		: __( 'Multiple blocks selected' );
 
-	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
+	const hideDropdown =
+		disabled ||
+		( ! hasBlockStyles && ! canRemove ) ||
+		hasContentOnlyLocking;
+
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
@@ -255,14 +287,11 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 					className="block-editor-block-switcher__no-switcher-icon"
 					title={ blockSwitcherLabel }
 					icon={
-						<>
-							<BlockIcon icon={ icon } showColors />
-							{ ( isReusable || isTemplate ) && (
-								<span className="block-editor-block-switcher__toggle-text">
-									{ blockTitle }
-								</span>
-							) }
-						</>
+						<BlockIndicator
+							icon={ icon }
+							showTitle={ isReusable || isTemplate }
+							blockTitle={ blockTitle }
+						/>
 					}
 				/>
 			</ToolbarGroup>
@@ -292,18 +321,11 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 							className: 'block-editor-block-switcher__popover',
 						} }
 						icon={
-							<>
-								<BlockIcon
-									icon={ icon }
-									className="block-editor-block-switcher__toggle"
-									showColors
-								/>
-								{ ( isReusable || isTemplate ) && (
-									<span className="block-editor-block-switcher__toggle-text">
-										{ blockTitle }
-									</span>
-								) }
-							</>
+							<BlockIndicator
+								icon={ icon }
+								showTitle={ isReusable || isTemplate }
+								blockTitle={ blockTitle }
+							/>
 						}
 						toggleProps={ {
 							description: blockSwitcherDescription,

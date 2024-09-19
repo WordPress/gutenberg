@@ -137,7 +137,9 @@ export const saveDirtyEntities =
 			{ kind: 'postType', name: 'wp_navigation' },
 		];
 		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry.select( coreStore ).getUnstableBase()?.home;
+		const homeUrl = registry
+			.select( coreStore )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
 		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {

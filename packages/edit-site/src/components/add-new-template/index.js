@@ -107,6 +107,8 @@ function TemplateListItem( {
 } ) {
 	return (
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			className={ className }
 			onClick={ onClick }
 			label={ description }
@@ -164,14 +166,10 @@ function NewTemplateModal( { onClose } ) {
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
+	const homeUrl = useSelect( ( select ) => {
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
 	}, [] );
 
 	const TEMPLATE_SHORT_DESCRIPTIONS = {

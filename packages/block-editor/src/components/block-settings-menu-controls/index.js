@@ -21,7 +21,7 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
-
+import { ModifyContentLockMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
@@ -108,6 +108,12 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 									{ __( 'Move to' ) }
 								</MenuItem>
 							) }
+						{ selectedClientIds.length === 1 && (
+							<ModifyContentLockMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ fillProps?.count === 1 && ! isContentOnly && (
 							<BlockModeToggle
 								clientId={ fillProps?.firstBlockClientId }

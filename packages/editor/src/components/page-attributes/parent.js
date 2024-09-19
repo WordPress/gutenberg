@@ -222,10 +222,11 @@ function PostParentToggle( { isOpen, onClick } ) {
 }
 
 export function ParentRow() {
-	const homeUrl = useSelect(
-		( select ) => select( coreStore ).getUnstableBase()?.home,
-		[]
-	);
+	const homeUrl = useSelect( ( select ) => {
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -274,16 +275,20 @@ export function ParentRow() {
 								}
 							) }
 							<p>
-								{ __(
-									'They also show up as sub-items in the default navigation menu. '
+								{ createInterpolateElement(
+									__(
+										'They also show up as sub-items in the default navigation menu. <a>Learn more.</a>'
+									),
+									{
+										a: (
+											<ExternalLink
+												href={ __(
+													'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
+												) }
+											/>
+										),
+									}
 								) }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
-									) }
-								>
-									{ __( 'Learn more' ) }
-								</ExternalLink>
 							</p>
 						</div>
 						<PageAttributesParent />

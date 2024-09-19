@@ -322,6 +322,24 @@ _Returns_
 
 -   `boolean`: Whether or not it looks like an email.
 
+### isPhoneNumber
+
+Determines whether the given string looks like a phone number.
+
+_Usage_
+
+```js
+const isPhoneNumber = isPhoneNumber( '+1 (555) 123-4567' ); // true
+```
+
+_Parameters_
+
+-   _phoneNumber_ `string`: The string to scrutinize.
+
+_Returns_
+
+-   `boolean`: Whether or not it looks like a phone number.
+
 ### isURL
 
 Determines whether the given string looks like a URL.

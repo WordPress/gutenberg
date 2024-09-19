@@ -36,15 +36,12 @@ const SiteHub = memo(
 		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
 
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
 			return {
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
-				homeUrl: getUnstableBase()?.home,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )
@@ -65,6 +62,8 @@ const SiteHub = memo(
 						) }
 					>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							ref={ ref }
 							href={ dashboardLink }
 							label={ __( 'Go to the Dashboard' ) }
@@ -81,6 +80,8 @@ const SiteHub = memo(
 					<HStack>
 						<div className="edit-site-site-hub__title">
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
@@ -100,6 +101,8 @@ const SiteHub = memo(
 							className="edit-site-site-hub__actions"
 						>
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
 								onClick={ () => openCommandCenter() }
@@ -122,13 +125,10 @@ export const SiteHubMobile = memo(
 		const { navigate } = useContext( SidebarNavigationContext );
 
 		const { homeUrl, siteTitle } = useSelect( ( select ) => {
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
 			return {
-				homeUrl: getUnstableBase()?.home,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )
@@ -149,6 +149,8 @@ export const SiteHubMobile = memo(
 						) }
 					>
 						<Button
+							// TODO: Switch to `true` (40px size) if possible
+							__next40pxDefaultSize={ false }
 							ref={ ref }
 							label={ __( 'Go to Site Editor' ) }
 							className="edit-site-layout__view-mode-toggle"
@@ -168,6 +170,8 @@ export const SiteHubMobile = memo(
 					<HStack>
 						<div className="edit-site-site-hub__title">
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
@@ -182,6 +186,8 @@ export const SiteHubMobile = memo(
 							className="edit-site-site-hub__actions"
 						>
 							<Button
+								// TODO: Switch to `true` (40px size) if possible
+								__next40pxDefaultSize={ false }
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
 								onClick={ () => openCommandCenter() }

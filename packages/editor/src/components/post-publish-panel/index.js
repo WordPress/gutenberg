@@ -78,6 +78,7 @@ export class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ isPostPublish ? (
 						<Button
+							size="compact"
 							onClick={ onClose }
 							icon={ closeSmall }
 							label={ __( 'Close panel' ) }

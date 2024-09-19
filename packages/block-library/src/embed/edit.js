@@ -14,7 +14,6 @@ import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-import { Caption } from '../utils/caption';
 
 /**
  * External dependencies
@@ -226,7 +225,7 @@ const EmbedEdit = ( props ) => {
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
-					onChange={ ( event ) => setURL( event.target.value ) }
+					onChange={ ( value ) => setURL( value ) }
 					fallback={ () => fallback( url, onReplace ) }
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
@@ -277,14 +276,8 @@ const EmbedEdit = ( props ) => {
 					icon={ icon }
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
-				/>
-				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Embed caption text' ) }
-					showToolbarButton={ isSelected }
 				/>
 			</View>
 		</>

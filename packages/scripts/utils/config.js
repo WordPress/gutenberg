@@ -351,22 +351,23 @@ function getWebpackEntryPoints( buildType ) {
 /**
  * Returns the list of PHP file paths found in `block.json` files for the given props.
  *
- * @param {string[]} props The props to search for in the `block.json` files.
+ * @param {string}   context The path to search for `block.json` files.
+ * @param {string[]} props   The props to search for in the `block.json` files.
  * @return {string[]} The list of PHP file paths.
  */
-function getPhpFilePaths( props ) {
+function getPhpFilePaths( context, props ) {
 	// Continue only if the source directory exists.
-	if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
+	if ( ! hasProjectFile( context ) ) {
 		return [];
 	}
 
 	// Checks whether any block metadata files can be detected in the defined source directory.
 	const blockMetadataFiles = glob( '**/block.json', {
 		absolute: true,
-		cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+		cwd: fromProjectRoot( context ),
 	} );
 
-	const srcDirectory = fromProjectRoot( getWordPressSrcDirectory() + sep );
+	const srcDirectory = fromProjectRoot( context + sep );
 
 	return blockMetadataFiles.flatMap( ( blockMetadataFile ) => {
 		const blockJson = JSON.parse( readFileSync( blockMetadataFile ) );
@@ -396,7 +397,7 @@ function getPhpFilePaths( props ) {
 						) }" listed in "${ blockMetadataFile.replace(
 							fromProjectRoot( sep ),
 							''
-						) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
+						) }". File is located outside of the "${ context }" directory.`
 					)
 				);
 				continue;

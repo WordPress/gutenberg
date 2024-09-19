@@ -11,7 +11,7 @@ import {
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
-import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { previous, chevronLeft, chevronRight, next } from '@wordpress/icons';
 
 export default function Pagination( {
@@ -50,7 +50,7 @@ export default function Pagination( {
 					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'First page' ) }
-					icon={ previous }
+					icon={ isRTL() ? next : previous }
 					size="compact"
 				/>
 				<Button
@@ -59,7 +59,7 @@ export default function Pagination( {
 					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'Previous page' ) }
-					icon={ chevronLeft }
+					icon={ isRTL() ? chevronRight : chevronLeft }
 					size="compact"
 				/>
 			</HStack>
@@ -78,7 +78,7 @@ export default function Pagination( {
 					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Next page' ) }
-					icon={ chevronRight }
+					icon={ isRTL() ? chevronLeft : chevronRight }
 					size="compact"
 				/>
 				<Button
@@ -87,7 +87,7 @@ export default function Pagination( {
 					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Last page' ) }
-					icon={ next }
+					icon={ isRTL() ? previous : next }
 					size="compact"
 				/>
 			</HStack>

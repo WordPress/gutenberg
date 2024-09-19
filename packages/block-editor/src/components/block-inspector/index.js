@@ -32,6 +32,14 @@ import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
 
+function BlockStylesPanel( { clientId } ) {
+	return (
+		<PanelBody title={ __( 'Styles' ) }>
+			<BlockStyles clientId={ clientId } />
+		</PanelBody>
+	);
+}
+
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
 		( select ) => {
@@ -48,6 +56,15 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 		},
 		[ topLevelLockedBlock ]
 	);
+	const hasBlockStyles = useSelect(
+		( select ) => {
+			const { getBlockName } = select( blockEditorStore );
+			const { getBlockStyles } = select( blocksStore );
+			return !! getBlockStyles( getBlockName( topLevelLockedBlock ) )
+				?.length;
+		},
+		[ topLevelLockedBlock ]
+	);
 	const blockInformation = useBlockDisplayInformation( topLevelLockedBlock );
 	return (
 		<div className="block-editor-block-inspector">
@@ -55,8 +72,10 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 				{ ...blockInformation }
 				className={ blockInformation.isSynced && 'is-synced' }
 			/>
-			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
 			<BlockInfo.Slot />
+			{ hasBlockStyles && (
+				<BlockStylesPanel clientId={ topLevelLockedBlock } />
+			) }
 			{ contentClientIds.length > 0 && (
 				<PanelBody title={ __( 'Content' ) }>
 					<BlockQuickNavigation clientIds={ contentClientIds } />
@@ -81,7 +100,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getContentLockingParent,
 			getTemplateLock,
 		} = unlock( select( blockEditorStore ) );
-
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
 			_selectedBlockClientId && getBlockName( _selectedBlockClientId );
@@ -276,11 +294,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			{ ! showTabs && (
 				<>
 					{ hasBlockStyles && (
-						<div>
-							<PanelBody title={ __( 'Styles' ) }>
-								<BlockStyles clientId={ clientId } />
-							</PanelBody>
-						</div>
+						<BlockStylesPanel clientId={ clientId } />
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot group="list" />
@@ -307,6 +321,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					/>
 					<InspectorControls.Slot group="styles" />
 					<PositionControls />
+					<InspectorControls.Slot group="bindings" />
 					<div>
 						<AdvancedControls />
 					</div>

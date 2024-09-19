@@ -124,7 +124,7 @@ export default function Edit( { attributes, setAttributes } ) {
 						<legend className="blocks-base-control__label">
 							{ __( 'Background color', 'block-development-examples' ) }
 						</legend>
-						<ColorPalette // Element Tag for Gutenberg standard colour selector
+						<ColorPalette // Element Tag for Gutenberg standard color selector
 							onChange={ onChangeBGColor } // onChange event callback
 						/>
 					</fieldset>

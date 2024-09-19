@@ -1,6 +1,12 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## Unreleased
+## Internal
+
+- Added `addPolyfillComments` option. When used, it will automatically add magic comments to mark files that need `wp-polyfill`.
+
+## 8.7.0 (2024-09-05)
+
+## 8.6.0 (2024-08-21)
 
 ## 8.5.0 (2024-08-07)
 
