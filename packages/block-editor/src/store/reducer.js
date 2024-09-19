@@ -2095,9 +2095,9 @@ export function hoveredBlockClientId( state = false, action ) {
  */
 export function zoomLevel( state = 100, action ) {
 	switch ( action.type ) {
-		case 'SET_ZOOM_OUT':
+		case 'SET_ZOOM_LEVEL':
 			return action.zoom;
-		case 'RESET_ZOOM':
+		case 'RESET_ZOOM_LEVEL':
 			return 100;
 	}
 

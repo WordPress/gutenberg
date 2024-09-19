@@ -402,7 +402,7 @@ export function setZoomOut( zoom = 50 ) {
 	}
 
 	return {
-		type: 'SET_ZOOM_OUT',
+		type: 'SET_ZOOM_LEVEL',
 		zoom: zoomValue,
 	};
 }
@@ -413,6 +413,6 @@ export function setZoomOut( zoom = 50 ) {
  */
 export function resetZoomOut() {
 	return {
-		type: 'RESET_ZOOM',
+		type: 'RESET_ZOOM_LEVEL',
 	};
 }
