@@ -480,7 +480,10 @@ export const getContentLockingParent = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
+		while (
+			! result &&
+			( current = state.blocks.parents.get( current ) )
+		) {
 			if ( getTemplateLock( state, current ) === 'contentOnly' ) {
 				result = current;
 			}
@@ -506,7 +509,10 @@ export const getParentSectionBlock = createSelector(
 	( state, clientId ) => {
 		let current = clientId;
 		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
+		while (
+			! result &&
+			( current = state.blocks.parents.get( current ) )
+		) {
 			if ( isSectionBlock( state, current ) ) {
 				result = current;
 			}
