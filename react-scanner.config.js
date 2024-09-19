@@ -21,4 +21,9 @@ module.exports = {
 	],
 	// Filter out any non-component React elements
 	importedFrom: /.*/,
+	getComponentName: ( { imported, local } ) => {
+		return ( imported || local )
+			.replace( '__experimental', '' )
+			.replace( '__unstable', '' );
+	},
 };
