@@ -199,11 +199,7 @@ export default function StartPageOptions() {
 		__unstableSetEditorMode,
 	] );
 
-	if (
-		shouldEnableModal &&
-		! isClosed &&
-		! window.__experimentalEnableZoomOutExperiment
-	) {
+	if ( shouldEnableModal && ! isClosed ) {
 		return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
 	}
 
