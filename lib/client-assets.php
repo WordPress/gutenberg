@@ -619,8 +619,9 @@ function gutenberg_default_script_modules() {
 	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
 
 	foreach ( $assets as $file_name => $script_module_data ) {
-		$package_name     = dirname( $file_name );
-		$package_sub_name = basename( $file_name, '.min.js' );
+		$package_name = dirname( $file_name );
+		// Account for both `[filename].min.js` and `[filename].js`
+		$package_sub_name = basename( basename( $file_name, '.js' ), '.min' );
 
 		switch ( $package_name ) {
 			/*
