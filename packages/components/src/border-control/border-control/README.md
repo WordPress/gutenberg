@@ -1,10 +1,6 @@
 # BorderControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-<br />
-This component provides control over a border's color, style, and width.
+An input control for a border's color, style, and width.
 
 ## Development guidelines
 
