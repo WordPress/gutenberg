@@ -20,34 +20,30 @@ export function useZoomOut( zoomOut = true ) {
 	const { isZoomOut } = unlock( useSelect( blockEditorStore ) );
 
 	const originalIsZoomOutRef = useRef( null );
-	const currentZoomOutState = isZoomOut();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
 		if ( ! originalIsZoomOutRef.current ) {
-			originalIsZoomOutRef.current = currentZoomOutState;
+			originalIsZoomOutRef.current = isZoomOut();
 		}
 
 		return () => {
-			// We need to use  isZoomOut() here and not `currentZoomOutState`, as currentZoomOutState may not update on unmount
 			if ( isZoomOut() && isZoomOut() !== originalIsZoomOutRef.current ) {
 				setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
 			}
 		};
-	}, [ currentZoomOutState, isZoomOut, setZoomLevel ] );
+	}, [ isZoomOut, setZoomLevel ] );
 
 	// The effect opens the zoom-out view if we want it open and the canvas is not currently zoomed-out.
 	useEffect( () => {
-		if ( zoomOut && currentZoomOutState === false ) {
+		if ( zoomOut && isZoomOut() === false ) {
 			setZoomLevel( 50 );
 		} else if (
 			! zoomOut &&
 			isZoomOut() &&
-			originalIsZoomOutRef.current !== currentZoomOutState
+			originalIsZoomOutRef.current !== isZoomOut()
 		) {
 			setZoomLevel( originalIsZoomOutRef.current ? 50 : 100 );
 		}
-		// currentZoomOutState is deliberately excluded from the dependencies so that the effect does not run when mode changes.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ isZoomOut, setZoomLevel, zoomOut ] );
 }
