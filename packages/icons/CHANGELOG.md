@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add new `bell` and `bell-unread` icons.
+-   Add new `directionSE` icon.
 
 ## 10.7.0 (2024-09-05)
 
