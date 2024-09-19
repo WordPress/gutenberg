@@ -55,7 +55,7 @@ export const TabList = forwardRef<
 	const activeId = useStoreState( context?.store, 'activeId' );
 	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
 
-	if ( ! context || ! context.store ) {
+	if ( ! context?.store ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}

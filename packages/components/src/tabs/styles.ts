@@ -125,7 +125,7 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		height: auto;
+		height: ${ space( 12 ) };
 		background: transparent;
 		border: none;
 		box-shadow: none;
