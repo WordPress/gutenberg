@@ -3,7 +3,6 @@
  */
 import {
 	useCallback,
-	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useRef,
@@ -102,7 +101,7 @@ export function useToolsPanel(
 	// the resetAll task. Without this, the flag is cleared after the first
 	// control updates and forces a rerender with subsequent controls then
 	// believing they need to reset, unfortunately using stale data.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( wasResetting ) {
 			isResettingRef.current = false;
 		}
@@ -115,76 +114,66 @@ export function useToolsPanel(
 		ResetAllFilter[]
 	>( [] );
 
-	const registerPanelItem = useCallback(
-		( item: ToolsPanelItem ) => {
-			// Add item to panel items.
-			setPanelItems( ( items ) => {
-				const newItems = [ ...items ];
-				// If an item with this label has already been registered, remove it
-				// first. This can happen when an item is moved between the default
-				// and optional groups.
-				const existingIndex = newItems.findIndex(
-					( oldItem ) => oldItem.label === item.label
-				);
-				if ( existingIndex !== -1 ) {
-					newItems.splice( existingIndex, 1 );
-				}
-				return [ ...newItems, item ];
-			} );
+	const registerPanelItem = useCallback( ( item: ToolsPanelItem ) => {
+		// Add item to panel items.
+		setPanelItems( ( items ) => {
+			const newItems = [ ...items ];
+			// If an item with this label has already been registered, remove it
+			// first. This can happen when an item is moved between the default
+			// and optional groups.
+			const existingIndex = newItems.findIndex(
+				( oldItem ) => oldItem.label === item.label
+			);
+			if ( existingIndex !== -1 ) {
+				newItems.splice( existingIndex, 1 );
+			}
+			return [ ...newItems, item ];
+		} );
 
-			// Track the initial order of item registration. This is used for
-			// maintaining menu item order later.
-			setMenuItemOrder( ( items ) => {
-				if ( items.includes( item.label ) ) {
-					return items;
-				}
+		// Track the initial order of item registration. This is used for
+		// maintaining menu item order later.
+		setMenuItemOrder( ( items ) => {
+			if ( items.includes( item.label ) ) {
+				return items;
+			}
 
-				return [ ...items, item.label ];
-			} );
-		},
-		[ setPanelItems, setMenuItemOrder ]
-	);
+			return [ ...items, item.label ];
+		} );
+	}, [] );
 
 	// Panels need to deregister on unmount to avoid orphans in menu state.
 	// This is an issue when panel items are being injected via SlotFills.
-	const deregisterPanelItem = useCallback(
-		( label: string ) => {
-			// When switching selections between components injecting matching
-			// controls, e.g. both panels have a "padding" control, the
-			// deregistration of the first panel doesn't occur until after the
-			// registration of the next.
-			setPanelItems( ( items ) => {
-				const newItems = [ ...items ];
-				const index = newItems.findIndex(
-					( item ) => item.label === label
-				);
-				if ( index !== -1 ) {
-					newItems.splice( index, 1 );
-				}
-				return newItems;
-			} );
-		},
-		[ setPanelItems ]
-	);
+	const deregisterPanelItem = useCallback( ( label: string ) => {
+		// When switching selections between components injecting matching
+		// controls, e.g. both panels have a "padding" control, the
+		// deregistration of the first panel doesn't occur until after the
+		// registration of the next.
+		setPanelItems( ( items ) => {
+			const newItems = [ ...items ];
+			const index = newItems.findIndex(
+				( item ) => item.label === label
+			);
+			if ( index !== -1 ) {
+				newItems.splice( index, 1 );
+			}
+			return newItems;
+		} );
+	}, [] );
 
 	const registerResetAllFilter = useCallback(
 		( newFilter: ResetAllFilter ) => {
-			setResetAllFilters( ( filters ) => {
-				return [ ...filters, newFilter ];
-			} );
+			setResetAllFilters( ( filters ) => [ ...filters, newFilter ] );
 		},
-		[ setResetAllFilters ]
+		[]
 	);
 
 	const deregisterResetAllFilter = useCallback(
 		( filterToRemove: ResetAllFilter ) => {
-			setResetAllFilters( ( filters ) => {
-				return filters.filter(
-					( filter ) => filter !== filterToRemove
-				);
-			} );
+			setResetAllFilters( ( filters ) =>
+				filters.filter( ( filter ) => filter !== filterToRemove )
+			);
 		},
-		[ setResetAllFilters ]
+		[]
 	);
 
 	// Manage and share display state of menu items representing child controls.
@@ -225,7 +214,7 @@ export function useToolsPanel(
 				return newState;
 			} );
 		},
-		[ setMenuItems ]
+		[]
 	);
 
 	// Whether all optional menu items are hidden or not must be tracked
@@ -235,7 +224,7 @@ export function useToolsPanel(
 	const [ areAllOptionalControlsHidden, setAreAllOptionalControlsHidden ] =
 		useState( false );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if (
 			isMenuItemTypeEmpty( menuItems?.default ) &&
 			! isMenuItemTypeEmpty( menuItems?.optional )
@@ -245,7 +234,7 @@ export function useToolsPanel(
 			).some( ( [ , isSelected ] ) => isSelected );
 			setAreAllOptionalControlsHidden( allControlsHidden );
 		}
-	}, [ menuItems, setAreAllOptionalControlsHidden ] );
+	}, [ menuItems ] );
 
 	const cx = useCx();
 	const classes = useMemo( () => {
@@ -297,7 +286,7 @@ export function useToolsPanel(
 
 			setMenuItems( newMenuItems );
 		},
-		[ menuItems, panelItems, setMenuItems ]
+		[ menuItems, panelItems ]
 	);
 
 	// Resets display of children and executes resetAll callback if available.
@@ -314,7 +303,7 @@ export function useToolsPanel(
 			shouldReset: true,
 		} );
 		setMenuItems( resetMenuItems );
-	}, [ panelItems, resetAllFilters, resetAll, setMenuItems, menuItemOrder ] );
+	}, [ panelItems, resetAllFilters, resetAll, menuItemOrder ] );
 
 	// Assist ItemGroup styling when there are potentially hidden placeholder
 	// items by identifying first & last items that are toggled on for display.
