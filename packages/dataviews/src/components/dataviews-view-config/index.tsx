@@ -526,16 +526,13 @@ function DataviewsViewConfigDropdown( {
 		_DataViewsViewConfig,
 		'dataviews-view-config-dropdown'
 	);
-	const popoverProps = useMemo(
-		() => ( {
-			...DATAVIEWS_CONFIG_POPOVER_PROPS,
-			id: popoverId,
-		} ),
-		[ popoverId ]
-	);
+
 	return (
 		<Dropdown
-			popoverProps={ popoverProps }
+			popoverProps={ {
+				...DATAVIEWS_CONFIG_POPOVER_PROPS,
+				id: popoverId,
+			} }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				return (
 					<Button
