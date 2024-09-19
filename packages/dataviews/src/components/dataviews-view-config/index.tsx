@@ -57,6 +57,8 @@ interface ViewTypeMenuProps {
 	defaultLayouts?: SupportedLayouts;
 }
 
+const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
+
 function ViewTypeMenu( {
 	defaultLayouts = { list: {}, grid: {}, table: {} },
 }: ViewTypeMenuProps ) {
@@ -571,8 +573,6 @@ function DataviewsViewConfigDropdown( {
 		/>
 	);
 }
-
-const DATAVIEWS_CONFIG_POPOVER_PROPS = { placement: 'bottom-end', offset: 9 };
 
 function _DataViewsViewConfig( {
 	density,
