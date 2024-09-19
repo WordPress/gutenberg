@@ -8,8 +8,8 @@ import clsx from 'clsx';
  */
 import { dragHandle } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { forwardRef, useEffect, useContext } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -38,6 +38,9 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { unlock } from '../../lock-unlock';
+import { getBindingsValues } from '../../hooks/use-bindings-attributes';
+import BlockContext from '../block-context';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -51,6 +54,12 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
  * @return {Component} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId }, ref ) {
+	const blockContext = useContext( BlockContext );
+	const registry = useRegistry();
+	const sources = useSelect( ( select ) =>
+		unlock( select( blocksStore ) ).getAllBlockBindingsSources()
+	);
+
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -62,7 +71,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canMoveBlock,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
 			const index = getBlockIndex( clientId );
@@ -72,13 +81,28 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 
+			const blockBindings = attributes?.metadata?.bindings;
+			const boundAttributes = getBindingsValues(
+				blockBindings,
+				name,
+				sources,
+				registry,
+				blockContext,
+				clientId
+			);
+
+			const newAttributes = {
+				...attributes,
+				...boundAttributes,
+			};
+
 			return {
 				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
 				icon: match?.icon || blockType.icon,
 				label: getAccessibleBlockLabel(
 					blockType,
-					attributes,
+					newAttributes,
 					index + 1,
 					orientation
 				),
@@ -87,7 +111,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getPreviousBlockClientId,
 			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, rootClientId, sources, registry, blockContext ]
 	);
 	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
