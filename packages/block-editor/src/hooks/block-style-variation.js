@@ -327,7 +327,7 @@ function useBlockProps( { name, className, clientId } ) {
 			getBlockStyles,
 			clientId
 		);
-		const hasBlockGapSupport = true;
+		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
 		const disableRootPadding = true;

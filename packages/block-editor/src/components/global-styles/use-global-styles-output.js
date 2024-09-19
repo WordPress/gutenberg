@@ -468,7 +468,6 @@ export function getStylesDeclarations(
  * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
  * @param {boolean} props.hasFallbackGapSupport Whether or not the theme allows fallback gap styles.
  * @param {?string} props.fallbackGapValue      An optional fallback gap value if no real gap value is available.
- * @param {?string} props.variationSelector     An optional CSS class selector for a block style variation to append to layout selector.
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
@@ -478,7 +477,6 @@ export function getLayoutStyles( {
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
 	fallbackGapValue,
-	variationSelector = '',
 } ) {
 	let ruleset = '';
 	let gapValue = hasBlockGapSupport
@@ -542,7 +540,7 @@ export function getLayoutStyles( {
 										? `:root :where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `:root :where(${ selector }-${ className }${ variationSelector })${
+										: `:root :where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -1082,22 +1080,6 @@ export const toStyles = (
 										';'
 									) };}`;
 								}
-
-								// Only process layout styles if variation contains block gap value.
-								if ( styleVariations.spacing?.blockGap ) {
-									const variationLayoutStyles =
-										getLayoutStyles( {
-											style: styleVariations,
-											selector,
-											variationSelector:
-												styleVariationSelector,
-											hasBlockGapSupport,
-											hasFallbackGapSupport,
-											fallbackGapValue: false,
-										} );
-									ruleset += variationLayoutStyles;
-								}
-
 								if ( styleVariations?.css ) {
 									ruleset += processCSSNesting(
 										styleVariations.css,
