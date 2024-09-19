@@ -259,7 +259,7 @@
 		"style-loader": "3.2.1",
 		"terser": "5.32.0",
 		"terser-webpack-plugin": "5.3.9",
-		"typescript": "5.5.3",
+		"typescript": "5.6.2",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
 		"webpack": "5.88.2",
