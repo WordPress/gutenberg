@@ -35,7 +35,7 @@ function useAddNewPageCommand() {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const createPageEntity = async () => {
+	const createPageEntity = async ( { close } ) => {
 		try {
 			const page = await saveEntityRecord(
 				'postType',
@@ -63,6 +63,8 @@ function useAddNewPageCommand() {
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );
+		} finally {
+			close();
 		}
 	};
 
