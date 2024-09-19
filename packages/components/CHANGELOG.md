@@ -12,11 +12,13 @@
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
+-   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
 -   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
+-   `BoxControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
 
 ### Enhancements
 
