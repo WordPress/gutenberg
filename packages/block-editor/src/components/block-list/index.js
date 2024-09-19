@@ -203,7 +203,7 @@ function Items( {
 				isZoomOut: __unstableGetEditorMode() === 'zoom-out',
 				shouldRenderAppender:
 					! isSectionBlock( rootClientId ) &&
-					! getBlockEditingMode( rootClientId ) !== 'disabled' &&
+					getBlockEditingMode( rootClientId ) !== 'disabled' &&
 					! getTemplateLock( rootClientId ) &&
 					hasAppender &&
 					__unstableGetEditorMode() !== 'zoom-out' &&

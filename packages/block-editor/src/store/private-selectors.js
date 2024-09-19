@@ -490,8 +490,7 @@ export const getContentLockingParent = createSelector(
 	( state ) => [
 		state.blocks.parents,
 		state.blockListSettings,
-		state.editorMode,
-		getSectionRootClientId( state ),
+		state.settings.templateLock,
 	]
 );
 
@@ -516,8 +515,11 @@ export const getParentSectionBlock = createSelector(
 	},
 	( state ) => [
 		state.blocks.parents,
+		state.blocks.order,
 		state.blockListSettings,
 		state.editorMode,
+		state.settings.templateLock,
+		state.blocks.byClientId,
 		getSectionRootClientId( state ),
 	]
 );
