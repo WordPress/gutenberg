@@ -4,6 +4,7 @@
 import {
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -193,17 +194,16 @@ export function useToolsPanel(
 	} );
 
 	// Setup menuItems state as panel items register themselves.
-	useEffect( () => {
-		setMenuItems( ( prevState ) => {
-			const items = generateMenuItems( {
+	useLayoutEffect( () => {
+		setMenuItems( ( currentMenuItems ) =>
+			generateMenuItems( {
 				panelItems,
 				shouldReset: false,
-				currentMenuItems: prevState,
+				currentMenuItems,
 				menuItemOrder,
-			} );
-			return items;
-		} );
-	}, [ panelItems, setMenuItems, menuItemOrder ] );
+			} )
+		);
+	}, [ panelItems, menuItemOrder ] );
 
 	// Updates the status of the panel’s menu items. For default items the
 	// value represents whether it differs from the default and for optional
