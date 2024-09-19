@@ -7,12 +7,22 @@ import { plus } from '@wordpress/icons';
 import { getPath } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 function useAddNewPageCommand() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
+	const history = useHistory();
 	const { userCanCreatePages } = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
 		return {
@@ -23,25 +33,43 @@ function useAddNewPageCommand() {
 		};
 	}, [] );
 	const { saveEntityRecord } = useDispatch( coreStore );
-	/**
-	 * Creates a Post entity.
-	 *
-	 * @param {Object} options parameters for the post being created. These mirror those used on 3rd param of saveEntityRecord.
-	 * @return {Object} the post type object that was created.
-	 */
-	const createPageEntity = useCallback(
-		( options ) => {
-			if ( ! userCanCreatePages ) {
-				return Promise.reject( {
-					message: __(
-						'You do not have permission to create Pages.'
-					),
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const createPageEntity = async () => {
+		try {
+			const page = await saveEntityRecord(
+				'postType',
+				'page',
+				{
+					status: 'draft',
+				},
+				{
+					throwOnError: true,
+				}
+			);
+			if ( page?.id ) {
+				history.push( {
+					postId: page.id,
+					postType: 'page',
+					canvas: 'edit',
 				} );
 			}
-			return saveEntityRecord( 'postType', 'page', options );
-		},
-		[ saveEntityRecord, userCanCreatePages ]
-	);
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the item.' );
+
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	};
+
+	const redirectToPostEditor = () =>
+		( document.location.href = 'post-new.php?post_type=page' );
+
+	const addNewPage = ! isSiteEditor ? redirectToPostEditor : createPageEntity;
 
 	const commands = useMemo( () => {
 		if ( ! userCanCreatePages ) {
@@ -52,19 +80,10 @@ function useAddNewPageCommand() {
 				name: 'core/add-new-page',
 				label: __( 'Add new page' ),
 				icon: plus,
-				callback: async () => {
-					if ( isSiteEditor ) {
-						const page = await createPageEntity( {
-							status: 'draft',
-						} );
-						document.location.href = `/wp-admin/site-editor.php?postId=${ page.id }&postType=page&canvas=edit`;
-						return;
-					}
-					document.location.href = 'post-new.php?post_type=page';
-				},
+				callback: addNewPage,
 			},
 		];
-	}, [ createPageEntity, isSiteEditor, userCanCreatePages ] );
+	}, [ addNewPage, userCanCreatePages ] );
 
 	return {
 		isLoading: false,
