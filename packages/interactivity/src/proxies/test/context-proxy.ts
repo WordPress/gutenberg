@@ -6,7 +6,7 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxifyContext, proxifyState } from '../';
+import { proxifyContext, proxifyState, deepMerge } from '../';
 
 describe( 'Interactivity API', () => {
 	describe( 'context proxy', () => {
@@ -300,6 +300,37 @@ describe( 'Interactivity API', () => {
 
 				// Add a deeply nested object to the context
 				context.a = { b: { c: { d: 'test value' } } };
+
+				// The effect should be called again
+				expect( spy ).toHaveBeenCalledTimes( 2 );
+				expect( deepValue ).toBe( 'test value' );
+
+				// Reading the value directly should also work
+				expect( context.a.b.c.d ).toBe( 'test value' );
+			} );
+
+			it( 'should handle deeply nested properties that are initially undefined and merged with deepMerge', () => {
+				const fallback: any = proxifyContext(
+					proxifyState( 'test', {} ),
+					{}
+				);
+				const context: any = proxifyContext(
+					proxifyState( 'test', {} ),
+					fallback
+				);
+
+				let deepValue: any;
+				const spy = jest.fn( () => {
+					deepValue = context.a?.b?.c?.d;
+				} );
+				effect( spy );
+
+				// Initial call, the deep value is undefined
+				expect( spy ).toHaveBeenCalledTimes( 1 );
+				expect( deepValue ).toBeUndefined();
+
+				// Use deepMerge to add a deeply nested object to the context
+				deepMerge( context, { a: { b: { c: { d: 'test value' } } } } );
 
 				// The effect should be called again
 				expect( spy ).toHaveBeenCalledTimes( 2 );
