@@ -209,7 +209,7 @@ function useAddNewPageCommand() {
 	const commands = useMemo( () => {
 		return [
 			{
-				name: 'core/edit-site/add-new-page',
+				name: 'core/add-new-page',
 				label: __( 'Add new page' ),
 				icon: plus,
 				callback: createPageEntity,
@@ -228,7 +228,7 @@ export function useEditModeCommands() {
 	unregisterCommand( 'core/add-new-page' );
 
 	useCommandLoader( {
-		name: 'core/edit-site/add-new-page',
+		name: 'core/add-new-page',
 		hook: useAddNewPageCommand,
 	} );
 
