@@ -588,7 +588,7 @@ class LinkControl {
 
 	getSearchInput() {
 		return this.page.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Search or type URL',
 		} );
 	}
 
