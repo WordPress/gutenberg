@@ -16,15 +16,15 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
+import { addQueryArgs } from '@wordpress/url';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
-import { getItemTitle, isTemplateOrTemplatePart } from '../utils';
-import type { CoreDataError, Template, TemplatePart } from '../../types';
-import { addQueryArgs } from '@wordpress/url';
-import apiFetch from '@wordpress/api-fetch';
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../constants';
+import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../constants';
+import type { CoreDataError, Template, TemplatePart } from '../types';
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
@@ -176,8 +176,8 @@ const revertTemplate = async (
 	}
 };
 
-const resetTemplateAction: Action< Template | TemplatePart > = {
-	id: 'reset-template',
+const resetPostAction: Action< Template | TemplatePart > = {
+	id: 'reset-post',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		return (
@@ -293,4 +293,4 @@ const resetTemplateAction: Action< Template | TemplatePart > = {
 	},
 };
 
-export default resetTemplateAction;
+export default resetPostAction;

@@ -22,11 +22,7 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### deletePatternAction
-
-Undocumented declaration.
-
-### deleteTemplateAction
+### deletePost
 
 Undocumented declaration.
 
@@ -74,7 +70,7 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-### resetTemplateAction
+### resetPost
 
 Undocumented declaration.
 

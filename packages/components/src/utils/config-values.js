@@ -68,7 +68,6 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',
-	cardBorderRadius: '2px',
 	cardPaddingXSmall: `${ space( 2 ) }`,
 	cardPaddingSmall: `${ space( 4 ) }`,
 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,

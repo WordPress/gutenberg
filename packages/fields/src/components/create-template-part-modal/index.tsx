@@ -28,6 +28,7 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+// @ts-ignore
 import { store as blockEditorStore } from '@wordpress/block-editor';
 // @ts-ignore
 import { serialize } from '@wordpress/blocks';
