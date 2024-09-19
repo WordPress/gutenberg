@@ -12,8 +12,7 @@ import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
 import { getSectionRootClientId } from './private-selectors';
 
-export const withRootClientIdOptionKey = Symbol( 'withRootClientId' );
-
+export const noFilter = Symbol( 'noFilter' );
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
 

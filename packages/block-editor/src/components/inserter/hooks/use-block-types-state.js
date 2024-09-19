@@ -14,7 +14,8 @@ import { useCallback, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-import { withRootClientIdOptionKey } from '../../../store/utils';
+import { noFilter } from '../../../store/utils';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * Retrieves the block types inserter state.
@@ -26,7 +27,7 @@ import { withRootClientIdOptionKey } from '../../../store/utils';
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 	const options = useMemo(
-		() => ( { [ withRootClientIdOptionKey ]: ! isQuick } ),
+		() => ( { [ noFilter ]: ! isQuick } ),
 		[ isQuick ]
 	);
 	const [ items ] = useSelect(
@@ -38,6 +39,9 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 		],
 		[ rootClientId, options ]
 	);
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
 
 	const [ categories, collections ] = useSelect( ( select ) => {
 		const { getCategories, getCollections } = select( blocksStore );
@@ -46,35 +50,35 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 
 	const onSelectItem = useCallback(
 		(
-			{
-				name,
-				initialAttributes,
-				innerBlocks,
-				syncStatus,
-				content,
-				rootClientId: _rootClientId,
-			},
+			{ name, initialAttributes, innerBlocks, syncStatus, content },
 			shouldFocusBlock
 		) => {
-			const insertedBlock =
-				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-					  } )
-					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks )
-					  );
-
-			onInsert(
-				insertedBlock,
-				undefined,
-				shouldFocusBlock,
-				_rootClientId
+			const destinationClientId = getClosestAllowedInsertionPoint(
+				name,
+				rootClientId
 			);
+			if ( destinationClientId !== null ) {
+				const insertedBlock =
+					syncStatus === 'unsynced'
+						? parse( content, {
+								__unstableSkipMigrationLogs: true,
+						  } )
+						: createBlock(
+								name,
+								initialAttributes,
+								createBlocksFromInnerBlocksTemplate(
+									innerBlocks
+								)
+						  );
+				onInsert(
+					insertedBlock,
+					undefined,
+					shouldFocusBlock,
+					destinationClientId
+				);
+			}
 		},
-		[ onInsert ]
+		[ onInsert, getClosestAllowedInsertionPoint, rootClientId ]
 	);
 
 	return [ items, categories, collections, onSelectItem ];

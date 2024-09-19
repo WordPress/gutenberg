@@ -21,7 +21,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	withRootClientIdOptionKey,
+	noFilter,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -2056,56 +2056,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				)
 				.map( buildBlockTypeInserterItem );
 
-			if ( options[ withRootClientIdOptionKey ] ) {
-				blockTypeInserterItems = blockTypeInserterItems.reduce(
-					( accumulator, item ) => {
-						item.rootClientId = rootClientId ?? '';
-
-						while (
-							! canInsertBlockTypeUnmemoized(
-								state,
-								item.name,
-								item.rootClientId
-							)
-						) {
-							if ( ! item.rootClientId ) {
-								let sectionRootClientId;
-								try {
-									sectionRootClientId =
-										getSectionRootClientId( state );
-								} catch ( e ) {}
-								if (
-									sectionRootClientId &&
-									canInsertBlockTypeUnmemoized(
-										state,
-										item.name,
-										sectionRootClientId
-									)
-								) {
-									item.rootClientId = sectionRootClientId;
-								} else {
-									delete item.rootClientId;
-								}
-								break;
-							} else {
-								const parentClientId = getBlockRootClientId(
-									state,
-									item.rootClientId
-								);
-								item.rootClientId = parentClientId;
-							}
-						}
-
-						// We could also add non insertable items and gray them out.
-						if ( item.hasOwnProperty( 'rootClientId' ) ) {
-							accumulator.push( item );
-						}
-
-						return accumulator;
-					},
-					[]
-				);
-			} else {
+			if ( ! options[ noFilter ] ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
 					( blockType ) =>
 						canIncludeBlockTypeInInserter(
