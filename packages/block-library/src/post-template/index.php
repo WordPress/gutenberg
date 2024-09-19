@@ -67,7 +67,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 			// If in a single post of any post type, default to the 'post' post type.
 			if ( is_singular() ) {
-				query_posts( array( 'post_type' => 'post' ) );
+				$query->set( 'post_type', 'post' );
 			}
 		} else {
 			$query = $wp_query;
