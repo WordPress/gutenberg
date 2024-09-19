@@ -2065,6 +2065,17 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							rootClientId
 						)
 				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems.map(
+					( blockType ) => ( {
+						...blockType,
+						isAllowedInCurrentRoot: canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						),
+					} )
+				);
 			}
 
 			const items = blockTypeInserterItems.reduce(
