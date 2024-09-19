@@ -239,55 +239,5 @@ function gutenberg_a11y_script_module_html() {
 		. '<div id="a11y-speak-polite" class="a11y-speak-region" aria-live="polite" aria-relevant="additions text" aria-atomic="true"></div>'
 		. '</div>';
 }
-
-/**
- * Registers Gutenberg Script Modules.
- *
- * @since 19.3
- */
-function gutenberg_register_script_modules() {
-	/*
-	 * Expects multidimensional array like:
-	 *
-	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
-	 *     'interactivity-router/index.min.js' => …
-	 */
-	$assets = include gutenberg_dir_path() . '/build-module/assets.production.php';
-
-	foreach ( $assets as $file_name => $script_module_data ) {
-		$package_name     = dirname( $file_name );
-		$package_sub_name = basename( $file_name, '.min.js' );
-
-		switch ( $package_name ) {
-			/*
-			 * Interactivity exposes two entrypoints, `/index` and `/debug`.
-			 * They're the production and development versions of the package.
-			 */
-			case 'interactivity':
-				if ( SCRIPT_DEBUG ) {
-					if ( 'index' === $package_sub_name ) {
-						continue 2;
-					}
-				} else {
-					if ( 'debug' === $package_sub_name ) {
-						continue 2;
-					}
-				}
-				$script_module_id = '@wordpress/interactivity';
-				break;
-
-			default:
-				$script_module_id = 'index' === $package_sub_name ?
-					"@wordpress/{$package_name}" :
-					"@wordpress/{$package_name}/{$package_sub_name}";
-		}
-
-		$path = gutenberg_url( "build-module/{$file_name}" );
-		wp_deregister_script_module( $script_module_id );
-		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
-	}
-}
-add_action( 'after_setup_theme', 'gutenberg_register_script_modules', 20 );
 add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
 add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
