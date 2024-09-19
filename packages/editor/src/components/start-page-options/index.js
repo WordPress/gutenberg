@@ -180,24 +180,15 @@ export default function StartPageOptions() {
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 
 	const showInserterOnNewPage =
-		shouldEnableStartPage &&
-		! isClosed &&
-		hasStarterPatterns &&
-		window.__experimentalEnableZoomOutExperiment;
+		shouldEnableStartPage && ! isClosed && hasStarterPatterns;
 
-	useEffect( () => {
-		if ( showInserterOnNewPage ) {
-			setIsInserterOpened( {
-				tab: 'patterns',
-				category: 'core/content',
-			} );
-			__unstableSetEditorMode( 'zoom-out' );
-		}
-	}, [
-		showInserterOnNewPage,
-		setIsInserterOpened,
-		__unstableSetEditorMode,
-	] );
+	if ( showInserterOnNewPage ) {
+		setIsInserterOpened( {
+			tab: 'patterns',
+			category: 'core/content',
+		} );
+		__unstableSetEditorMode( 'zoom-out' );
+	}
 
 	if ( shouldEnableModal && ! isClosed ) {
 		return <StartPageOptionsModal onClose={ () => setIsClosed( true ) } />;
