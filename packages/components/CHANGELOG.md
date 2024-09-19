@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+## 28.8.0 (2024-09-19)
+
 ### Bug Fixes
 
+-   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
+-   `BoxControl`: Unify input filed width whether linked or not ([#65348](https://github.com/WordPress/gutenberg/pull/65348)).
 
 ### Deprecations
 
@@ -14,11 +18,21 @@
 ### New Features
 
 -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+-   `ComboboxControl`: add support for `placeholder` attribute ([#65254](https://github.com/WordPress/gutenberg/pull/65254)).
 
 ### Enhancements
 
 -   `Navigator`: warn if a screen's `path` doesn't follow a URL-like scheme ([#65231](https://github.com/WordPress/gutenberg/pull/65231)).
 -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+-   `CustomSelectControl V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `DropdownMenu V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `FormToggle`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Popover`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `RangeControl`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `ResizeableBox`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Snackbar`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+-   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
 -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
 
 ### Bug Fixes
