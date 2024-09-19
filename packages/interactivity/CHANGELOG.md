@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.8.0 (2024-09-19)
+
 ### Enhancements
 
 -   Refactor internal context proxies implementation ([#64713](https://github.com/WordPress/gutenberg/pull/64713)).
