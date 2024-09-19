@@ -390,7 +390,7 @@ export const modifyContentLockBlock =
  * @param {number} zoom the new zoom level
  * @return {Object} Action object.
  */
-export function setZoomOut( zoom = 50 ) {
+export function setZoomLevel( zoom = 50 ) {
 	let zoomValue;
 
 	if ( zoom === true ) {
