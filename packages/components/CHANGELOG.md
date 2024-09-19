@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.8.0 (2024-09-19)
+
 ### Bug Fixes
 
 -   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).

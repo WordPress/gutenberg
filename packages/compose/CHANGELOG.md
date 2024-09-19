@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.8.0 (2024-09-19)
+
 ### New Features
 
 -   `useEvent`: a new utility that creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks ([#64943](https://github.com/WordPress/gutenberg/pull/64943)).
