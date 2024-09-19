@@ -125,14 +125,31 @@ export const FeaturedImageView = ( {
 		);
 	}
 
+	if ( view === 'panel' ) {
+		return (
+			<HStack className="fields-controls__featured-image-container">
+				<img
+					className="fields-controls__featured-image-image"
+					src={ url }
+					width={ 16 }
+					height={ 16 }
+					alt=""
+				/>
+				<span>{ title }</span>
+			</HStack>
+		);
+	}
+
 	return (
 		<HStack className="fields-controls__featured-image-container">
 			<img
 				className="fields-controls__featured-image-image"
 				src={ url }
 				alt=""
+				width={ 32 }
+				height={ 32 }
 			/>
-			{ view === 'panel' ? <span>{ title }</span> : null }
+			<span>{ title }</span>
 		</HStack>
 	);
 };

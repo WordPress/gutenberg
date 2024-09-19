@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalGrid as Grid,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { Button, __experimentalGrid as Grid } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 // @ts-ignore
@@ -70,28 +66,26 @@ export const FeaturedImageEdit = ( {
 								<Grid
 									rowGap={ 0 }
 									columnGap={ 8 }
-									templateColumns="24px 1fr 0.5fr"
+									templateColumns="24px 1fr 24px"
 								>
 									{ url && (
 										<>
 											<img
 												className="fields-controls__featured-image-image"
 												alt=""
+												width={ 24 }
+												height={ 24 }
 												src={ url }
 											/>
-											<Text
-												as="span"
-												truncate
-												numberOfLines={ 0 }
-											>
+											<span className="fields-controls__featured-image-title">
 												{ title }
-											</Text>
+											</span>
 										</>
 									) }
 									{ ! url && (
 										<>
 											<span className="fields-controls__featured-image-placeholder" />
-											<span>
+											<span className="fields-controls__featured-image-title">
 												{ __( 'Choose an image…' ) }
 											</span>
 										</>

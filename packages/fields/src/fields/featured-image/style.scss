@@ -10,9 +10,15 @@
 		linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
 }
 
+.fields-controls__featured-image-title {
+	width: 100%;
+	color: $gray-900;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
 .fields-controls__featured-image-image {
-	width: 16px;
-	height: 16px;
 	border-radius: $radius-small;
 	align-self: center;
 }
@@ -28,12 +34,6 @@
 }
 
 fieldset.fields-controls__featured-image {
-	.fields-controls__featured-image-image {
-		width: 24px;
-		height: 24px;
-		border-radius: $radius-small;
-	}
-
 	.fields-controls__featured-image-container {
 		border: $border-width solid $gray-300;
 		border-radius: $radius-small;
