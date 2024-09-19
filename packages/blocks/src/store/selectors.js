@@ -839,7 +839,20 @@ export const hasContentRoleAttribute = createSelector(
 		}
 
 		return Object.entries( blockType.attributes ).some(
-			( [ , { role } ] ) => role === 'content'
+			( [ , { role, __experimentalRole } ] ) => {
+				if ( role === 'content' ) {
+					return true;
+				}
+				if ( __experimentalRole === 'content' ) {
+					deprecated( '__experimentalRole attribute', {
+						since: '6.7',
+						version: '6.8',
+						alternative: 'role attribute',
+					} );
+					return true;
+				}
+				return false;
+			}
 		);
 	},
 	( state, blockTypeName ) => [
