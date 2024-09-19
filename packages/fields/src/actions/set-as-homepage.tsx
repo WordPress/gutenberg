@@ -34,6 +34,15 @@ const renamePost: Action< PostWithPermissions > = {
 			return false;
 		}
 
+		// A front-page tempalte overrides homepage settings, so don't show the action if it's present.
+		const homepageTemplateSlug =
+			select( coreStore ).__experimentalGetTemplateForLink( '/' )?.slug;
+
+		if ( 'front-page' === homepageTemplateSlug ) {
+			return false;
+		}
+
+		// Don't show the action if the page is already set as the homepage.
 		const pageOnFront = select(
 			coreStore
 			// @ts-ignore

@@ -122,6 +122,9 @@ export const registerPostTypeActions =
 				? duplicatePattern
 				: undefined,
 			postTypeConfig.supports?.title ? renamePost : undefined,
+			canManageOptions && postTypeConfig.slug === 'page'
+				? setAsHomepage
+				: undefined,
 			postTypeConfig?.supports?.[ 'page-attributes' ]
 				? reorderPage
 				: undefined,
