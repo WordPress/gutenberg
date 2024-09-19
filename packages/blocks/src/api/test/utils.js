@@ -318,15 +318,15 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 				},
 				content: {
 					type: 'boolean',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 				level: {
 					type: 'number',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 				color: {
 					type: 'string',
-					__experimentalRole: 'other',
+					role: 'other',
 				},
 			},
 			save: noop,

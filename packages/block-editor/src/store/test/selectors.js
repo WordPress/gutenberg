@@ -4475,13 +4475,11 @@ describe( 'getBlockEditingMode', () => {
 		},
 	};
 
-	const __experimentalHasContentRoleAttribute = jest.fn( ( name ) => {
-		// consider paragraphs as content blocks.
-		return name === 'core/p';
-	} );
+	const hasContentRoleAttribute = jest.fn( () => false );
+
 	getBlockEditingMode.registry = {
 		select: jest.fn( () => ( {
-			__experimentalHasContentRoleAttribute,
+			hasContentRoleAttribute,
 		} ) ),
 	};
 
@@ -4586,7 +4584,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( false );
+		hasContentRoleAttribute.mockReturnValueOnce( false );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'disabled' );
@@ -4602,7 +4600,7 @@ describe( 'getBlockEditingMode', () => {
 				},
 			},
 		};
-		__experimentalHasContentRoleAttribute.mockReturnValueOnce( true );
+		hasContentRoleAttribute.mockReturnValueOnce( true );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );

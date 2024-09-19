@@ -238,7 +238,7 @@ export function getCommentAttributes( blockType, attributes ) {
 			}
 
 			// Ignore all local attributes
-			if ( attributeSchema.__experimentalRole === 'local' ) {
+			if ( attributeSchema.role === 'local' ) {
 				return accumulator;
 			}
 

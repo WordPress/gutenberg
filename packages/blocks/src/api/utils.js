@@ -342,8 +342,7 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 		return attributesNames;
 	}
 	return attributesNames.filter(
-		( attributeName ) =>
-			attributes[ attributeName ]?.__experimentalRole === role
+		( attributeName ) => attributes[ attributeName ]?.role === role
 	);
 }
 

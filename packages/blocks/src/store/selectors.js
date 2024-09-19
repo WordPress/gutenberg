@@ -823,11 +823,14 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 };
 
 /**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ * Determines if any of the block type's attributes have
+ * the content role attribute.
+ *
+ * @param {Object} state         Data state.
+ * @param {string} blockTypeName Block type name.
+ * @return {boolean} Whether block type has content role attribute.
  */
-export const __experimentalHasContentRoleAttribute = createSelector(
+export const hasContentRoleAttribute = createSelector(
 	( state, blockTypeName ) => {
 		const blockType = getBlockType( state, blockTypeName );
 		if ( ! blockType ) {
@@ -835,7 +838,7 @@ export const __experimentalHasContentRoleAttribute = createSelector(
 		}
 
 		return Object.entries( blockType.attributes ).some(
-			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
+			( [ , { role } ] ) => role === 'content'
 		);
 	},
 	( state, blockTypeName ) => [
