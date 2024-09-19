@@ -109,7 +109,9 @@ export function PageAttributesParent() {
 				{
 					value: treeNode.id,
 					label:
-						'— '.repeat( level ) + decodeEntities( treeNode.name ),
+						'— '.repeat( level ) +
+						decodeEntities( treeNode.name ) +
+						( fieldValue ? ` (ID: ${ treeNode.id })` : '' ),
 					rawName: treeNode.name,
 				},
 				...getOptionsFromTree( treeNode.children || [], level + 1 ),
@@ -148,7 +150,9 @@ export function PageAttributesParent() {
 		if ( parentPostTitle && ! optsHasParent ) {
 			opts.unshift( {
 				value: parentPostId,
-				label: parentPostTitle,
+				label:
+					parentPostTitle +
+					( fieldValue ? ` (ID: ${ parentPostId })` : '' ),
 			} );
 		}
 		return opts;
