@@ -168,7 +168,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 										indexOfSet,
 										indexOfControl,
 									].join() }
-									onClick={ ( event ) => {
+									onClick={ (
+										event: React.MouseEvent< HTMLButtonElement >
+									) => {
 										event.stopPropagation();
 										props.onClose();
 										if ( control.onClick ) {
