@@ -10,6 +10,8 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	CheckboxControl,
+	TextControl,
 } from '@wordpress/components';
 import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
@@ -22,7 +24,7 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const PAGE_POST_TYPE = 'page';
 
-const renamePost: Action< PostWithPermissions > = {
+const setAsHomepage: Action< PostWithPermissions > = {
 	id: 'set-as-homepage',
 	label: __( 'Set as homepage' ),
 	isEligible( post ) {
@@ -35,10 +37,10 @@ const renamePost: Action< PostWithPermissions > = {
 		}
 
 		// A front-page tempalte overrides homepage settings, so don't show the action if it's present.
-		const homepageTemplateSlug =
-			select( coreStore ).__experimentalGetTemplateForLink( '/' )?.slug;
+		const homepageTemplate =
+			select( coreStore ).__experimentalGetTemplateForLink( '/' );
 
-		if ( 'front-page' === homepageTemplateSlug ) {
+		if ( homepageTemplate && 'front-page' === homepageTemplate.slug ) {
 			return false;
 		}
 
@@ -56,8 +58,10 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const [ title ] = useState( () => getItemTitle( item ) );
-		const { currentHomePage, pageForPosts, pageOnFront, showOnFront } =
+		const pageTitle = getItemTitle( item );
+		const [ createPageForPosts, setCreatePageForPosts ] = useState( false );
+		const [ postsPageTitle, setPostsPageTitle ] = useState( '' );
+		const { currentHomePage, pageForPosts, showOnFront } =
 			// @ts-ignore
 			useSelect( ( _select ) => {
 				// @ts-ignore
@@ -79,32 +83,51 @@ const renamePost: Action< PostWithPermissions > = {
 					currentHomePage: _currentHomePage,
 					// @ts-ignore
 					pageForPosts: siteSettings?.page_for_posts,
-					pageOnFront: _pageOnFront,
 					// @ts-ignore
-					showOnFront: siteSettings?.showOnFront,
+					showOnFront: siteSettings?.show_on_front,
 				};
 			} );
-		const { editEntityRecord, saveEditedEntityRecord } =
+		const currentHomePageTitle = getItemTitle( currentHomePage );
+
+		const { editEntityRecord, saveEditedEntityRecord, saveEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 
-		async function onSetAsHomepage( event: React.FormEvent ) {
+		async function onSetPageAsHomepage( event: React.FormEvent ) {
 			event.preventDefault();
+
 			let publishItem = false;
+			let newPage;
+
 			try {
+				// Create a new page for posts, if that action was selected.
+				if ( createPageForPosts ) {
+					newPage = await saveEntityRecord( 'postType', 'page', {
+						title: postsPageTitle,
+						status: 'publish',
+					} );
+				}
+
+				// Publish the page to become the homepage, if needed.
 				if ( 'publish' !== item.status ) {
 					await editEntityRecord( 'postType', item.type, item.id, {
 						status: 'publish',
 					} );
 					publishItem = true;
 				}
+
+				// Save new home page settings.
 				// @ts-ignore
 				await editEntityRecord( 'root', 'site', undefined, {
+					page_for_posts: newPage?.id,
 					page_on_front: item.id,
+					show_on_front: 'page',
 				} );
+
 				closeModal?.();
-				// Persist edited entities.
+
+				// Persist changes.
 				if ( publishItem ) {
 					await saveEditedEntityRecord(
 						'postType',
@@ -115,13 +138,18 @@ const renamePost: Action< PostWithPermissions > = {
 						}
 					);
 				}
+
 				// @ts-ignore
 				await saveEditedEntityRecord( 'root', 'site', undefined, {
+					page_for_posts: newPage?.id,
 					page_on_front: item.id,
+					show_on_front: 'page',
 				} );
-				createSuccessNotice( __( 'This page set as homepage' ), {
+
+				createSuccessNotice( __( 'Page set as homepage' ), {
 					type: 'snackbar',
 				} );
+
 				onActionPerformed?.( items );
 			} catch ( error ) {
 				const typedError = error as CoreDataError;
@@ -166,18 +194,61 @@ const renamePost: Action< PostWithPermissions > = {
 				createErrorNotice( errorMessage, { type: 'snackbar' } );
 			}
 		}
-		const currentHomePageTitle = getItemTitle( currentHomePage );
 
-		let modalDescription;
+		let modalBody;
 		let submitAction;
 
-		if ( item.id === pageForPosts ) {
-			modalDescription = sprintf(
-				// translators: %s: title of the current home page.
-				__(
-					'Set the homepage to display the latest posts? This will replace the current home page: "%s"'
-				),
-				currentHomePageTitle
+		if ( 'posts' === showOnFront ) {
+			modalBody = (
+				<>
+					<Text>
+						{ sprintf(
+							// translators: %s: title of the page to be set as the homepage.
+							__(
+								'Set "%s" as the site homepage? This will replace the current homepage which is set to display the latest posts.'
+							),
+							pageTitle
+						) }
+					</Text>
+					{ ! pageForPosts && (
+						<>
+							<CheckboxControl
+								__nextHasNoMarginBottom
+								label={ __(
+									'Create a page to display latest posts'
+								) }
+								checked={ createPageForPosts }
+								onChange={ ( value ) =>
+									setCreatePageForPosts( value )
+								}
+							/>
+							{ createPageForPosts && (
+								<TextControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Posts page title' ) }
+									value={ postsPageTitle }
+									onChange={ ( value ) =>
+										setPostsPageTitle( value )
+									}
+								/>
+							) }
+						</>
+					) }
+				</>
+			);
+			submitAction = onSetPageAsHomepage;
+		} else if ( item.id === pageForPosts ) {
+			modalBody = (
+				<Text>
+					{ sprintf(
+						// translators: %s: title of the current home page.
+						__(
+							'Set the homepage to display the latest posts? This will replace the current home page: "%s"'
+						),
+						currentHomePageTitle
+					) }{ ' ' }
+				</Text>
 			);
 			submitAction = onSetLatestPostsHomepage;
 		} else {
@@ -192,18 +263,22 @@ const renamePost: Action< PostWithPermissions > = {
 							'Set "%1$s" as the site homepage? This will replace the current homepage: "%2$s"'
 					  );
 
-			modalDescription = sprintf(
-				modalTranslatedString,
-				title,
-				currentHomePageTitle
+			modalBody = (
+				<Text>
+					{ sprintf(
+						modalTranslatedString,
+						pageTitle,
+						currentHomePageTitle
+					) }{ ' ' }
+				</Text>
 			);
-			submitAction = onSetAsHomepage;
+			submitAction = onSetPageAsHomepage;
 		}
 
 		return (
 			<form onSubmit={ submitAction }>
 				<VStack spacing="5">
-					<Text>{ modalDescription }</Text>
+					{ modalBody }
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -219,7 +294,10 @@ const renamePost: Action< PostWithPermissions > = {
 							variant="primary"
 							type="submit"
 						>
-							{ __( 'Confirm' ) }
+							{
+								// translators: Button to confirm setting the specified page as the homepage.
+								__( 'Set homepage' )
+							}
 						</Button>
 					</HStack>
 				</VStack>
@@ -228,4 +306,4 @@ const renamePost: Action< PostWithPermissions > = {
 	},
 };
 
-export default renamePost;
+export default setAsHomepage;
