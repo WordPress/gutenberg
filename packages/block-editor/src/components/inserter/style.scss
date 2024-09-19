@@ -228,11 +228,6 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	margin-bottom: $grid-unit-10;
-	// Push the listitem wrapping the "explore" button to the bottom of the panel.
-	// TODO: is this outdated? The selected element doesn't seem to exist.
-	div[role="listitem"]:last-child {
-		margin-top: auto;
-	}
 
 	.block-editor-inserter__category-tab {
 
