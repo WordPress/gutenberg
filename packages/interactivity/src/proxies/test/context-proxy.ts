@@ -279,7 +279,14 @@ describe( 'Interactivity API', () => {
 			} );
 
 			it( 'should handle deeply nested properties that are initially undefined', () => {
-				const context: any = proxifyContext( {}, {} );
+				const fallback: any = proxifyContext(
+					proxifyState( 'test', {} ),
+					{}
+				);
+				const context: any = proxifyContext(
+					proxifyState( 'test', {} ),
+					fallback
+				);
 
 				let deepValue: any;
 				const spy = jest.fn( () => {
