@@ -13,7 +13,7 @@ export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 		name: 'design',
 		title: __( 'Design' ),
 		blocks: [ 'core/navigation', 'core/avatar', 'core/post-time-to-read' ],
-		exclude: [ 'core/home-link' ],
+		exclude: [ 'core/home-link', 'core/navigation-link' ],
 	},
 	{
 		name: 'posts',
@@ -57,7 +57,11 @@ export const STYLE_BOOK_CATEGORIES = [
 	{
 		name: 'text',
 		title: __( 'Text' ),
-		blocks: [ 'core/post-content', 'core/home-link' ],
+		blocks: [
+			'core/post-content',
+			'core/home-link',
+			'core/navigation-link',
+		],
 	},
 	{
 		name: 'colors',
