@@ -80,14 +80,14 @@ export const FeaturedImageView = ( {
 		}
 		return (
 			<button
-				className="edit-site-post-list__featured-image-button"
+				className="fields-controls__featured-image-button"
 				type="button"
 				onClick={ onClick }
 				aria-label={ getItemTitle( item ) || __( '(no title)' ) }
 			>
 				{ item.featured_media && (
 					<Media
-						className="edit-site-post-list__featured-image"
+						className="fields-controls__featured-image-image"
 						id={
 							item.featured_media
 								? item.featured_media.toString()
@@ -107,9 +107,9 @@ export const FeaturedImageView = ( {
 		}
 
 		return (
-			<div className="edit-site-post-featured-image-container">
+			<div className="fields-controls__featured-image-container">
 				<img
-					className="edit-site-post-featured-image"
+					className="fields-controls__featured-image-image"
 					src={ url }
 					alt=""
 				/>
@@ -119,8 +119,8 @@ export const FeaturedImageView = ( {
 
 	if ( ! url ) {
 		return (
-			<HStack className="edit-site-post-featured-image-container">
-				<span className="edit-site-post-featured-image-placeholder" />
+			<HStack className="fields-controls__featured-image-container">
+				<span className="fields-controls__featured-image-placeholder" />
 				{ view === 'panel' ? (
 					<span>{ __( 'Choose an image…' ) }</span>
 				) : null }
@@ -129,8 +129,12 @@ export const FeaturedImageView = ( {
 	}
 
 	return (
-		<HStack className="edit-site-post-featured-image-container">
-			<img className="edit-site-post-featured-image" src={ url } alt="" />
+		<HStack className="fields-controls__featured-image-container">
+			<img
+				className="fields-controls__featured-image-image"
+				src={ url }
+				alt=""
+			/>
 			{ view === 'panel' ? <span>{ title }</span> : null }
 		</HStack>
 	);

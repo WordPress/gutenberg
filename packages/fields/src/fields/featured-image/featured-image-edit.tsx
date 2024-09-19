@@ -49,8 +49,8 @@ export const FeaturedImageEdit = ( {
 	const ref = useRef( null );
 
 	return (
-		<fieldset className="edit-site-dataviews-controls__featured-image">
-			<div className="edit-side-dataviews-controls__featured-image-container">
+		<fieldset className="fields-controls__featured-image">
+			<div className="fields-controls__featured-image-container">
 				<MediaUpload
 					onSelect={ ( selectedMedia: { id: number } ) => {
 						onChangeControl( selectedMedia.id );
@@ -75,7 +75,7 @@ export const FeaturedImageEdit = ( {
 									{ url && (
 										<>
 											<img
-												className="edit-site-post-featured-image"
+												className="fields-controls__featured-image-image"
 												alt=""
 												src={ url }
 											/>
@@ -90,7 +90,7 @@ export const FeaturedImageEdit = ( {
 									) }
 									{ ! url && (
 										<>
-											<span className="edit-site-post-featured-image-placeholder" />
+											<span className="fields-controls__featured-image-placeholder" />
 											<span>
 												{ __( 'Choose an image…' ) }
 											</span>
@@ -100,7 +100,7 @@ export const FeaturedImageEdit = ( {
 										<>
 											<Button
 												size="small"
-												className="edit-site-dataviews-controls__featured-image-remove-button"
+												className="fields-controls__featured-image-remove-button"
 												icon={ lineSolid }
 												onClick={ (
 													event: React.MouseEvent< HTMLButtonElement >
