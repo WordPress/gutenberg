@@ -11,8 +11,8 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
-	Button,
-	ButtonGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	PanelBody,
 	privateApis as componentsPrivateApis,
@@ -313,23 +313,28 @@ export default {
 	},
 };
 
-function LayoutTypeSwitcher( { type, onChange } ) {
+function LayoutTypeSwitcher( { key, onChange } ) {
 	return (
-		<ButtonGroup>
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Layout Type Select' ) }
+			__nextHasNoMarginBottom
+			hideLabelFromVision
+			isAdaptiveWidth
+		>
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
-					<Button
-						// TODO: Switch to `true` (40px size) if possible
-						__next40pxDefaultSize={ false }
-						key={ name }
-						isPressed={ type === name }
+					<ToggleGroupControlOption
+						value={ name }
+						label={ name }
 						onClick={ () => onChange( name ) }
 					>
 						{ label }
-					</Button>
+					</ToggleGroupControlOption>
 				);
 			} ) }
-		</ButtonGroup>
+		</ToggleGroupControl>
 	);
 }
 
