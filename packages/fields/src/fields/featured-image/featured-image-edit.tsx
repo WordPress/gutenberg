@@ -84,7 +84,13 @@ export const FeaturedImageEdit = ( {
 									) }
 									{ ! url && (
 										<>
-											<span className="fields-controls__featured-image-placeholder" />
+											<span
+												className="fields-controls__featured-image-placeholder"
+												style={ {
+													width: '24px',
+													height: '24px',
+												} }
+											/>
 											<span className="fields-controls__featured-image-title">
 												{ __( 'Choose an image…' ) }
 											</span>

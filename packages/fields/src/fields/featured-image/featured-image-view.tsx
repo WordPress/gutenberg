@@ -47,6 +47,101 @@ const Media = ( {
 	return <img { ...props } src={ mediaUrl } alt={ media.alt_text } />;
 };
 
+const getComponentToDisplay = ( {
+	item,
+	url,
+	title,
+	onClick,
+}: {
+	item: BasePost;
+	title: string | undefined;
+	url: string | undefined;
+	onClick: () => void;
+} ) => ( {
+	grid: {
+		NoUrl: <></>,
+		WithUrl: (
+			<>
+				<button
+					className="fields-controls__featured-image-button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ getItemTitle( item ) ?? __( '(no title)' ) }
+				>
+					{ item.featured_media && (
+						<Media
+							className="fields-controls__featured-image-image"
+							id={ item.featured_media }
+							size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
+						/>
+					) }
+					{ ! item.featured_media && <></> }
+				</button>
+			</>
+		),
+	},
+	list: {
+		NoUrl: <></>,
+		WithUrl: (
+			<div className="fields-controls__featured-image-container">
+				<img
+					className="fields-controls__featured-image-image"
+					src={ url }
+					alt=""
+				/>
+			</div>
+		),
+	},
+	panel: {
+		NoUrl: (
+			<HStack className="fields-controls__featured-image-container">
+				<span
+					style={ {
+						width: '16px',
+						height: '16px',
+					} }
+					className="fields-controls__featured-image-placeholder"
+				/>
+				<span>{ __( 'Choose an image…' ) }</span>
+			</HStack>
+		),
+		WithUrl: (
+			<HStack className="fields-controls__featured-image-container">
+				<img
+					className="fields-controls__featured-image-image"
+					src={ url }
+					width={ 16 }
+					height={ 16 }
+					alt=""
+				/>
+				<span>{ title }</span>
+			</HStack>
+		),
+	},
+	table: {
+		NoUrl: (
+			<span
+				style={ {
+					width: '32px',
+					height: '32px',
+				} }
+				className="fields-controls__featured-image-placeholder"
+			/>
+		),
+		WithUrl: (
+			<HStack className="fields-controls__featured-image-container">
+				<img
+					className="fields-controls__featured-image-image"
+					src={ url }
+					alt=""
+					width={ 32 }
+					height={ 32 }
+				/>
+			</HStack>
+		),
+	},
+} );
+
 export const FeaturedImageView = ( {
 	item,
 	view,
@@ -75,81 +170,13 @@ export const FeaturedImageView = ( {
 		history.push( params );
 	}, [ history, item.id, item.type ] );
 
-	if ( view === 'grid' ) {
-		if ( ! url ) {
-			return null;
-		}
-		return (
-			<button
-				className="fields-controls__featured-image-button"
-				type="button"
-				onClick={ onClick }
-				aria-label={ getItemTitle( item ) || __( '(no title)' ) }
-			>
-				{ item.featured_media && (
-					<Media
-						className="fields-controls__featured-image-image"
-						id={ item.featured_media }
-						size={ [ 'large', 'full', 'medium', 'thumbnail' ] }
-					/>
-				) }
-				{ ! item.featured_media && <></> }
-			</button>
-		);
+	const component = getComponentToDisplay( { item, title, url, onClick } )[
+		view
+	];
+
+	if ( url ) {
+		return component.WithUrl;
 	}
 
-	if ( view === 'list' ) {
-		if ( ! url ) {
-			return <></>;
-		}
-
-		return (
-			<div className="fields-controls__featured-image-container">
-				<img
-					className="fields-controls__featured-image-image"
-					src={ url }
-					alt=""
-				/>
-			</div>
-		);
-	}
-
-	if ( ! url ) {
-		return (
-			<HStack className="fields-controls__featured-image-container">
-				<span className="fields-controls__featured-image-placeholder" />
-				{ view === 'panel' ? (
-					<span>{ __( 'Choose an image…' ) }</span>
-				) : null }
-			</HStack>
-		);
-	}
-
-	if ( view === 'panel' ) {
-		return (
-			<HStack className="fields-controls__featured-image-container">
-				<img
-					className="fields-controls__featured-image-image"
-					src={ url }
-					width={ 16 }
-					height={ 16 }
-					alt=""
-				/>
-				<span>{ title }</span>
-			</HStack>
-		);
-	}
-
-	return (
-		<HStack className="fields-controls__featured-image-container">
-			<img
-				className="fields-controls__featured-image-image"
-				src={ url }
-				alt=""
-				width={ 32 }
-				height={ 32 }
-			/>
-			<span>{ title }</span>
-		</HStack>
-	);
+	return component.NoUrl;
 };
