@@ -179,10 +179,6 @@ export function RichTextWrapper(
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				registry,
-				context: blockContext,
-			} );
 
 			const _disableBoundBlock =
 				! blockBindingsSource?.canUserEditValue?.( {
@@ -200,6 +196,14 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
+			const fieldsList = blockBindingsSource?.getFieldsList?.( {
+				registry,
+				context: blockContext,
+			} );
+			const bindingKey =
+				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
+				blockBindingsSource?.label;
+
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey
 				: sprintf(
