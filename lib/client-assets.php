@@ -645,10 +645,6 @@ function gutenberg_default_script_modules() {
 				break;
 		}
 
-		if ( SCRIPT_DEBUG ) {
-			// Replave ".min.js" with ".js" in devlopment.
-			$file_name = substr( $file_name, 0, -7 ) . '.js';
-		}
 		$path = gutenberg_url( "build-module/{$file_name}" );
 		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
 	}
