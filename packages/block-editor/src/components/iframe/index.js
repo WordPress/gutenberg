@@ -225,6 +225,9 @@ function Iframe( {
 					if ( iframeDocument && iframeDocument.defaultView ) {
 						const { documentElement, defaultView } = iframeDocument;
 						documentElement.classList.remove( 'is-zoomed-out' );
+						documentElement.style.removeProperty(
+							'--wp-block-editor-iframe-zoom-out-scale'
+						);
 						defaultView.frameElement.style.removeProperty(
 							'--wp-block-editor-iframe-zoom-out-scale'
 						);
@@ -285,6 +288,10 @@ function Iframe( {
 		const { documentElement, defaultView } = iframeDocument;
 
 		documentElement.classList.add( 'is-zoomed-out' );
+		documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			nextScale
+		);
 		defaultView.frameElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			Math.min( nextScale, 1 )
