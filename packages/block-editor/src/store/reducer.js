@@ -2085,6 +2085,25 @@ export function hoveredBlockClientId( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer setting zoom out state.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function zoomLevel( state = 100, action ) {
+	switch ( action.type ) {
+		case 'SET_ZOOM_LEVEL':
+			return action.zoom;
+		case 'RESET_ZOOM_LEVEL':
+			return 100;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2118,6 +2137,7 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	hoveredBlockClientId,
+	zoomLevel,
 } );
 
 function withAutomaticChangeReset( reducer ) {

@@ -20,6 +20,7 @@ import BlockDraggable from '../block-draggable';
 import BlockMover from '../block-mover';
 import Shuffle from '../block-toolbar/shuffle';
 import NavigableToolbar from '../navigable-toolbar';
+import { unlock } from '../../lock-unlock';
 
 export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 	const selected = useSelect(
@@ -84,8 +85,9 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		setIsInserterOpened,
 	} = selected;
 
-	const { removeBlock, __unstableSetEditorMode } =
-		useDispatch( blockEditorStore );
+	const { removeBlock, __unstableSetEditorMode, resetZoomLevel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const classNames = clsx( 'zoom-out-toolbar', {
 		'is-block-moving-mode': !! blockMovingMode,
@@ -144,6 +146,7 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 							setIsInserterOpened( false );
 						}
 						__unstableSetEditorMode( 'edit' );
+						resetZoomLevel();
 						__unstableContentRef.current?.focus();
 					} }
 				/>
