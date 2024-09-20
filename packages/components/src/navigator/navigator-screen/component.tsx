@@ -72,7 +72,7 @@ function UnconnectedNavigatorScreen(
 	}, [ screenId, path, addScreen, removeScreen ] );
 
 	// Animation.
-	const { animationStyles, shouldRenderScreen, onAnimationEnd } =
+	const { animationStyles, shouldRenderScreen, screenProps } =
 		useScreenAnimatePresence( {
 			isMatch,
 			isBack,
@@ -146,7 +146,7 @@ function UnconnectedNavigatorScreen(
 		<View
 			ref={ mergedWrapperRef }
 			className={ classes }
-			onAnimationEnd={ onAnimationEnd }
+			{ ...screenProps }
 			{ ...otherProps }
 		>
 			{ children }

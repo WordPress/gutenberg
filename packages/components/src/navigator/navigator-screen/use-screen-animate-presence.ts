@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useLayoutEffect,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { useState, useLayoutEffect, useCallback } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 
@@ -99,15 +94,6 @@ export function useScreenAnimatePresence( {
 	} else if ( animationStatus === 'ANIMATING_OUT' ) {
 		animationType = 'out';
 	}
-	const animationStyles = useMemo(
-		() =>
-			styles.navigatorScreenAnimation( {
-				skipAnimation,
-				animationDirection,
-				animationType,
-			} ),
-		[ skipAnimation, animationDirection, animationType ]
-	);
 
 	const onScreenAnimationEnd = useCallback(
 		( e: React.AnimationEvent< HTMLElement > ) => {
@@ -139,13 +125,18 @@ export function useScreenAnimatePresence( {
 	);
 
 	return {
-		animationStyles,
+		animationStyles: styles.navigatorScreenAnimation,
 		// Render the screen's contents in the DOM not only when the screen is
 		// selected, but also while it is animating out.
 		shouldRenderScreen:
 			isMatch ||
 			animationStatus === 'IN' ||
 			animationStatus === 'ANIMATING_OUT',
-		onAnimationEnd: onScreenAnimationEnd,
+		screenProps: {
+			onAnimationEnd: onScreenAnimationEnd,
+			'data-animation-direction': animationDirection,
+			'data-animation-type': animationType,
+			'data-skip-animation': skipAnimation || undefined,
+		},
 	} as const;
 }

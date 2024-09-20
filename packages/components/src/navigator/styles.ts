@@ -55,12 +55,6 @@ export const slideToRight = keyframes( {
 	},
 } );
 
-type NavigatorScreenAnimationProps = {
-	skipAnimation: boolean;
-	animationDirection: 'end' | 'start';
-	animationType: 'in' | 'out' | undefined;
-};
-
 const FADE = {
 	DURATION: 70,
 	EASING: 'linear',
@@ -111,19 +105,26 @@ const ANIMATION = {
 				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToRight }
 		`,
 	},
-};
-export const navigatorScreenAnimation = ( {
-	animationDirection,
-	skipAnimation,
-	animationType,
-}: NavigatorScreenAnimationProps ) => css`
-	z-index: ${ animationType === 'out' ? 0 : 1 };
-	animation: ${ skipAnimation || ! animationType
-		? 'none'
-		: ANIMATION[ animationDirection ][ animationType ] };
+} as const;
+export const navigatorScreenAnimation = css`
+	z-index: 1;
 
-	@media ( prefers-reduced-motion ) {
-		animation: none;
+	&[data-animation-type='out'] {
+		z-index: 0;
+	}
+
+	@media not ( prefers-reduced-motion ) {
+		&:not( [data-skip-animation] ) {
+			${ ( [ 'start', 'end' ] as const ).map( ( direction ) =>
+				( [ 'in', 'out' ] as const ).map(
+					( type ) => css`
+						&[data-animation-direction='${ direction }'][data-animation-type='${ type }'] {
+							animation: ${ ANIMATION[ direction ][ type ] };
+						}
+					`
+				)
+			) }
+		}
 	}
 `;
 
