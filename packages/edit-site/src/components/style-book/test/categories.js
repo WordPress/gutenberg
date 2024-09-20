@@ -93,7 +93,6 @@ describe( 'utils', () => {
 				{
 					name: 'funky',
 					title: 'Funky',
-					icon: 'funky',
 				},
 			] );
 		} );
