@@ -423,11 +423,7 @@ export function RichTextWrapper(
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				aria-label={
-					props[ 'data-custom-placeholder' ]
-						? placeholder
-						: bindingsPlaceholder ||
-						  props[ 'aria-label' ] ||
-						  placeholder
+					bindingsPlaceholder || props[ 'aria-label' ] || placeholder
 				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [

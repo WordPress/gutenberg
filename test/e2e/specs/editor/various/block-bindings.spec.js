@@ -1299,7 +1299,7 @@ test.describe( 'Block bindings', () => {
 
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					// Aria-label is changed for empty paragraphs.
-					name: 'My custom placeholder',
+					name: 'Add empty_field',
 				} );
 
 				await expect( paragraphBlock ).toBeEmpty();
