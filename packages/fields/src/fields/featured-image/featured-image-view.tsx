@@ -120,13 +120,7 @@ const getComponentToDisplay = ( {
 	},
 	table: {
 		NoUrl: (
-			<span
-				style={ {
-					width: '32px',
-					height: '32px',
-				} }
-				className="fields-controls__featured-image-placeholder"
-			/>
+			<span className="fields-controls__featured-image-placeholder__table" />
 		),
 		WithUrl: (
 			<HStack className="fields-controls__featured-image-container">
