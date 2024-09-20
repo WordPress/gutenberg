@@ -30,7 +30,7 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { STYLE_BOOK_CATEGORIES, STYLE_BOOK_IFRAME_STYLES } from './constants';
+import { STYLE_BOOK_IFRAME_STYLES } from './constants';
 import {
 	getExamplesByCategory, getTopLevelStyleBookCategories,
 } from './categories';
@@ -247,7 +247,7 @@ const StyleBookBody = ( {
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
 		const categoryDefinition = category
-			? STYLE_BOOK_CATEGORIES.find(
+			? getTopLevelStyleBookCategories().find(
 					( _category ) => _category.slug === category
 			  )
 			: null;
