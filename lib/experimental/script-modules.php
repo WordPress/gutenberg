@@ -239,26 +239,5 @@ function gutenberg_a11y_script_module_html() {
 		. '<div id="a11y-speak-polite" class="a11y-speak-region" aria-live="polite" aria-relevant="additions text" aria-atomic="true"></div>'
 		. '</div>';
 }
-
-/**
- * Registers Gutenberg Script Modules.
- *
- * @since 19.3
- */
-function gutenberg_register_script_modules() {
-	// When in production, use the plugin's version as the default asset version;
-	// else (for development or test) default to use the current time.
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-
-	wp_deregister_script_module( '@wordpress/a11y' );
-	wp_register_script_module(
-		'@wordpress/a11y',
-		gutenberg_url( 'build-module/a11y/index.min.js' ),
-		array(),
-		$default_version
-	);
-
-	add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
-	add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
-}
-add_action( 'init', 'gutenberg_register_script_modules' );
+add_action( 'wp_footer', 'gutenberg_a11y_script_module_html' );
+add_action( 'admin_footer', 'gutenberg_a11y_script_module_html' );
