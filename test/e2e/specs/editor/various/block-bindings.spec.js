@@ -1299,7 +1299,7 @@ test.describe( 'Block bindings', () => {
 
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					// Aria-label is changed for empty paragraphs.
-					name: 'Add empty_field',
+					name: 'Empty empty_field; start writing to edit its value',
 				} );
 
 				await expect( paragraphBlock ).toBeEmpty();
@@ -1331,7 +1331,7 @@ test.describe( 'Block bindings', () => {
 
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					// Aria-label is changed for empty paragraphs.
-					name: 'Add empty_field',
+					name: 'Empty empty_field; start writing to edit its value',
 				} );
 
 				await expect( paragraphBlock ).toBeEmpty();

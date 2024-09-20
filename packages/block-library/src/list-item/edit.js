@@ -96,7 +96,6 @@ export default function ListItemEdit( {
 					value={ content }
 					aria-label={ __( 'List text' ) }
 					placeholder={ placeholder || __( 'List' ) }
-					data-custom-placeholder={ placeholder ? true : undefined }
 					onMerge={ onMerge }
 				/>
 				{ innerBlocksProps.children }
