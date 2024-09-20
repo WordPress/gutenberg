@@ -353,6 +353,7 @@ export function getBlockAttributesNamesByRole( name, role ) {
 				since: '6.7',
 				version: '6.8',
 				alternative: 'role attribute',
+				hint: `Check the block.json of the ${ name } block.`,
 			} );
 			return true;
 		}
