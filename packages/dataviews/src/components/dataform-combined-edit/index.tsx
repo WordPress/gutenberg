@@ -42,14 +42,11 @@ function DataFormCombinedEdit< Item >( {
 	const children = visibleChildren.map( ( child, index ) => {
 		return (
 			<div className="dataforms-combined-edit__field" key={ child.id }>
-				{ index !== 0 && hideLabelFromVision && (
-					<Header title={ child.label } />
-				) }
 				<child.Edit
 					data={ data }
 					field={ child }
 					onChange={ onChange }
-					hideLabelFromVision={ hideLabelFromVision }
+					hideLabelFromVision={ hideLabelFromVision && index === 0 }
 				/>
 			</div>
 		);
