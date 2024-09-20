@@ -100,19 +100,6 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 	return {
 		title: categoryDefinition.title,
 		name: categoryDefinition.name,
-		examples: examples.filter( ( example ) => {
-			return (
-				! blocksToExclude.includes( example.name ) &&
-				( example.category === categoryDefinition.name ||
-					blocksToInclude.includes( example.name ) )
-			);
-		} ),
+		examples: categoryExamples,
 	};
 }
-
-/*
-
-
-
-
- */

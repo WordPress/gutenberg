@@ -149,6 +149,7 @@ function StyleBook( {
 					</div>
 				) : (
 					<StyleBookBody
+						category={ tabs[ 0 ].name }
 						examples={ examples }
 						isSelected={ isSelected }
 						onClick={ onClick }
