@@ -11,6 +11,7 @@ import {
 	FlexItem,
 	Dropdown,
 	Composite,
+	Tooltip,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
@@ -79,32 +80,31 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<Composite.Item
-			role="option"
-			aria-label={ label }
-			aria-selected={ isActive }
-			className={ clsx( 'block-editor-global-styles__shadow__item', {
-				'is-active': isActive,
-			} ) }
-			render={
-				<button
-					__next40pxDefaultSize
-					className={ clsx(
-						'block-editor-global-styles__shadow-indicator',
-						{
-							unset: type === 'unset',
-						}
-					) }
-					onClick={ onSelect }
-					label={ label }
-					style={ { boxShadow: shadow } }
-					title={ label }
-					aria-label={ label }
-				>
-					{ isActive && <Icon icon={ check } /> }
-				</button>
-			}
-		/>
+		<Tooltip text={ label }>
+			<Composite.Item
+				role="option"
+				aria-label={ label }
+				aria-selected={ isActive }
+				className={ clsx( 'block-editor-global-styles__shadow__item', {
+					'is-active': isActive,
+				} ) }
+				render={
+					<button
+						className={ clsx(
+							'block-editor-global-styles__shadow-indicator',
+							{
+								unset: type === 'unset',
+							}
+						) }
+						onClick={ onSelect }
+						style={ { boxShadow: shadow } }
+						aria-label={ label }
+					>
+						{ isActive && <Icon icon={ check } /> }
+					</button>
+				}
+			/>
+		</Tooltip>
 	);
 }
 
