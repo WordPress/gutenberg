@@ -3006,9 +3006,8 @@ export const getBlockEditingMode = createRegistrySelector(
 				// The rest of the blocks depend on whether they are content blocks or not.
 				// This "flattens" the sections tree.
 				const name = getBlockName( state, clientId );
-				const isContent = unlock(
-					select( blocksStore )
-				).hasContentRoleAttribute( name );
+				const isContent =
+					select( blocksStore ).hasContentRoleAttribute( name );
 				return isContent ? 'contentOnly' : 'disabled';
 			}
 
