@@ -129,6 +129,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		},
 		__experimentalRenderItem,
 		expandOnFocus = true,
+		placeholder,
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -340,6 +341,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								className="components-combobox-control__input"
 								instanceId={ instanceId }
 								ref={ inputContainer }
+								placeholder={ placeholder }
 								value={ isExpanded ? inputValue : currentLabel }
 								onFocus={ onFocus }
 								onBlur={ onBlur }

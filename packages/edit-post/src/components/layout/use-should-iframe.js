@@ -6,11 +6,6 @@ import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
-
 const isGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN ? true : false;
 
 export function useShouldIframe() {
@@ -18,7 +13,6 @@ export function useShouldIframe() {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 		isEditingTemplate,
-		hasMetaBoxes,
 		isZoomOutMode,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getCurrentPostType } = select( editorStore );
@@ -31,14 +25,13 @@ export function useShouldIframe() {
 				return type.apiVersion >= 3;
 			} ),
 			isEditingTemplate: getCurrentPostType() === 'wp_template',
-			hasMetaBoxes: select( editPostStore ).hasMetaBoxes(),
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
 	return (
-		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
-			! hasMetaBoxes ) ||
+		hasV3BlocksOnly ||
+		( isGutenbergPlugin && isBlockBasedTheme ) ||
 		isEditingTemplate ||
 		isZoomOutMode
 	);

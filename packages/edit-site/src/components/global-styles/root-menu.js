@@ -3,6 +3,7 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import {
+	background,
 	typography,
 	color,
 	layout,
@@ -23,11 +24,17 @@ const {
 	useHasColorPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
+	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
 function RootMenu() {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
+	/*
+	 * Use the raw settings to determine if the background panel should be displayed,
+	 * as the background panel is not dependent on the block element settings.
+	 */
+	const hasBackgroundPanel = useHasBackgroundPanel( rawSettings );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasShadowPanel = true; // useHasShadowPanel( settings );
@@ -53,6 +60,15 @@ function RootMenu() {
 						aria-label={ __( 'Colors styles' ) }
 					>
 						{ __( 'Colors' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasBackgroundPanel && (
+					<NavigationButtonAsItem
+						icon={ background }
+						path="/background"
+						aria-label={ __( 'Background styles' ) }
+					>
+						{ __( 'Background' ) }
 					</NavigationButtonAsItem>
 				) }
 				{ hasShadowPanel && (
