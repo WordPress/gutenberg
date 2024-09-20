@@ -295,10 +295,10 @@ Used to filter an individual transform result from block transformation. All of 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
 The callback function for this filter accepts 4 parameters:
-- `blockAttributes` (`Object`): The attributes of the block node given its type.
-- `blockType` (`Object`): A block-type definition object.
-- `innerHTML` (`string`): Inner HTML content of the block.
-- `attributes` (`object`): Known attributes of the block.
+- `blockAttributes` (`Object`): All block attributes.
+- `blockType` (`Object`): The block type.
+- `innerHTML` (`string`): Raw block content.
+- `attributes` (`object`): Known block attributes (from delimiters).
 
 In the example below, we use the `blocks.getBlockAttributes` filter to lock the position of all paragraph blocks on a page.
 
