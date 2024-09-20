@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { dragHandle, trash, edit } from '@wordpress/icons';
@@ -26,12 +21,16 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 		( select ) => {
 			const {
 				getBlock,
-				hasBlockMovingClientId,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
 				canMoveBlock,
+				getSettings,
 			} = select( blockEditorStore );
+
+			const { __experimentalSetIsInserterOpened: setIsInserterOpened } =
+				getSettings();
+
 			const { getBlockType } = select( blocksStore );
 			const { name } = getBlock( clientId );
 			const blockType = getBlockType( name );
@@ -57,38 +56,34 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 			}
 
 			return {
-				blockMovingMode: hasBlockMovingClientId(),
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
 				canRemove: canRemoveBlock( clientId ),
 				canMove: canMoveBlock( clientId ),
+				setIsInserterOpened,
 			};
 		},
 		[ clientId ]
 	);
 
 	const {
-		blockMovingMode,
 		isBlockTemplatePart,
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
 		canRemove,
 		canMove,
+		setIsInserterOpened,
 	} = selected;
 
 	const { removeBlock, __unstableSetEditorMode } =
 		useDispatch( blockEditorStore );
 
-	const classNames = clsx( 'zoom-out-toolbar', {
-		'is-block-moving-mode': !! blockMovingMode,
-	} );
-
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
 
 	return (
 		<NavigableToolbar
-			className={ classNames }
+			className="zoom-out-toolbar"
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
@@ -132,6 +127,10 @@ export default function ZoomOutToolbar( { clientId, __unstableContentRef } ) {
 					icon={ edit }
 					label={ __( 'Edit' ) }
 					onClick={ () => {
+						// Setting may be undefined.
+						if ( typeof setIsInserterOpened === 'function' ) {
+							setIsInserterOpened( false );
+						}
 						__unstableSetEditorMode( 'edit' );
 						__unstableContentRef.current?.focus();
 					} }

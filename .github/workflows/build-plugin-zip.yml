@@ -3,7 +3,10 @@ name: Build Gutenberg Plugin Zip
 on:
     pull_request:
     push:
-        branches: [trunk]
+        branches:
+            - trunk
+            - 'release/**'
+            - 'wp/**'
     workflow_dispatch:
         inputs:
             version:

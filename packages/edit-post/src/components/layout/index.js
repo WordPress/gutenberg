@@ -24,7 +24,13 @@ import {
 } from '@wordpress/block-editor';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -36,8 +42,17 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { SlotFillProvider } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	ResizableBox,
+	SlotFillProvider,
+	Tooltip,
+	VisuallyHidden,
+} from '@wordpress/components';
+import {
+	useMediaQuery,
+	useRefEffect,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -149,6 +164,226 @@ function useEditorStyles() {
 		hasThemeStyleSupport,
 		postType,
 	] );
+}
+
+/**
+ * @param {Object}  props
+ * @param {boolean} props.isLegacy True when the editor canvas is not in an iframe.
+ */
+function MetaBoxesMain( { isLegacy } ) {
+	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		const { isMetaBoxLocationVisible } = select( editPostStore );
+		return [
+			get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+			isMetaBoxLocationVisible( 'normal' ) ||
+				isMetaBoxLocationVisible( 'advanced' ) ||
+				isMetaBoxLocationVisible( 'side' ),
+		];
+	}, [] );
+	const { set: setPreference } = useDispatch( preferencesStore );
+	const resizableBoxRef = useRef();
+	const isShort = useMediaQuery( '(max-height: 549px)' );
+
+	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
+	// Keeps the resizable area’s size constraints updated taking into account
+	// editor notices. The constraints are also used to derive the value for the
+	// aria-valuenow attribute on the seperator.
+	const effectSizeConstraints = useRefEffect( ( node ) => {
+		const container = node.closest(
+			'.interface-interface-skeleton__content'
+		);
+		const noticeLists = container.querySelectorAll(
+			':scope > .components-notice-list'
+		);
+		const resizeHandle = container.querySelector(
+			'.edit-post-meta-boxes-main__resize-handle'
+		);
+		const actualize = () => {
+			const fullHeight = container.offsetHeight;
+			let nextMax = fullHeight;
+			for ( const element of noticeLists ) {
+				nextMax -= element.offsetHeight;
+			}
+			const nextMin = resizeHandle.offsetHeight;
+			setHeightConstraints( { min: nextMin, max: nextMax } );
+		};
+		const observer = new window.ResizeObserver( actualize );
+		observer.observe( container );
+		for ( const element of noticeLists ) {
+			observer.observe( element );
+		}
+		return () => observer.disconnect();
+	}, [] );
+
+	const separatorRef = useRef();
+	const separatorHelpId = useId();
+
+	const [ isUntouched, setIsUntouched ] = useState( true );
+
+	if ( ! hasAnyVisible ) {
+		return;
+	}
+
+	const className = 'edit-post-meta-boxes-main';
+	const contents = (
+		<div
+			className={ clsx(
+				// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
+				'edit-post-layout__metaboxes',
+				! isLegacy && 'edit-post-meta-boxes-main__liner'
+			) }
+		>
+			<MetaBoxes location="normal" />
+			<MetaBoxes location="advanced" />
+		</div>
+	);
+
+	if ( isLegacy ) {
+		return contents;
+	}
+
+	const isAutoHeight = openHeight === undefined;
+	let usedMax = '50%'; // Approximation before max has a value.
+	if ( max !== undefined ) {
+		// Halves the available max height until a user height is set.
+		usedMax = isAutoHeight && isUntouched ? max / 2 : max;
+	}
+
+	const getAriaValueNow = ( height ) =>
+		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
+	const usedAriaValueNow =
+		max === undefined || isAutoHeight ? 50 : getAriaValueNow( openHeight );
+
+	if ( isShort ) {
+		return (
+			<details
+				className={ className }
+				open={ isOpen }
+				onToggle={ ( { target } ) => {
+					setPreference(
+						'core/edit-post',
+						'metaBoxesMainIsOpen',
+						target.open
+					);
+				} }
+			>
+				<summary>{ __( 'Meta Boxes' ) }</summary>
+				{ contents }
+			</details>
+		);
+	}
+
+	// TODO: Support more/all keyboard interactions from the window splitter pattern:
+	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
+	const onSeparatorKeyDown = ( event ) => {
+		const delta = { ArrowUp: 20, ArrowDown: -20 }[ event.key ];
+		if ( delta ) {
+			const { resizable } = resizableBoxRef.current;
+			const fromHeight = isAutoHeight
+				? resizable.offsetHeight
+				: openHeight;
+			const nextHeight = Math.min(
+				max,
+				Math.max( min, delta + fromHeight )
+			);
+			resizableBoxRef.current.updateSize( {
+				height: nextHeight,
+				// Oddly, if left unspecified a subsequent drag gesture applies a fixed
+				// width and the pane fails to shrink/grow with parent width changes from
+				// sidebars opening/closing or window resizes.
+				width: 'auto',
+			} );
+			setPreference(
+				'core/edit-post',
+				'metaBoxesMainOpenHeight',
+				nextHeight
+			);
+		}
+	};
+
+	return (
+		<ResizableBox
+			className={ className }
+			defaultSize={ { height: openHeight } }
+			ref={ resizableBoxRef }
+			enable={ {
+				top: true,
+				right: false,
+				bottom: false,
+				left: false,
+				topLeft: false,
+				topRight: false,
+				bottomRight: false,
+				bottomLeft: false,
+			} }
+			minHeight={ min }
+			maxHeight={ usedMax }
+			bounds="parent"
+			boundsByDirection
+			// Avoids hiccups while dragging over objects like iframes and ensures that
+			// the event to end the drag is captured by the target (resize handle)
+			// whether or not it’s under the pointer.
+			onPointerDown={ ( { pointerId, target } ) => {
+				target.setPointerCapture( pointerId );
+			} }
+			onResizeStart={ ( event, direction, elementRef ) => {
+				if ( isAutoHeight ) {
+					const heightNow = elementRef.offsetHeight;
+					// Sets the starting height to avoid visual jumps in height and
+					// aria-valuenow being `NaN` for the first (few) resize events.
+					resizableBoxRef.current.updateSize( { height: heightNow } );
+					// Causes `maxHeight` to update to full `max` value instead of half.
+					setIsUntouched( false );
+				}
+			} }
+			onResize={ () => {
+				const { height } = resizableBoxRef.current.state;
+				const separator = separatorRef.current;
+				separator.ariaValueNow = getAriaValueNow( height );
+			} }
+			onResizeStop={ () => {
+				const nextHeight = resizableBoxRef.current.state.height;
+				setPreference(
+					'core/edit-post',
+					'metaBoxesMainOpenHeight',
+					nextHeight
+				);
+			} }
+			handleClasses={ {
+				top: 'edit-post-meta-boxes-main__resize-handle',
+			} }
+			handleComponent={ {
+				top: (
+					<>
+						<Tooltip text={ __( 'Drag to resize' ) }>
+							{ /* Disable reason: aria-valuenow is supported by separator role. */ }
+							{ /* eslint-disable-next-line jsx-a11y/role-supports-aria-props */ }
+							<button
+								ref={ separatorRef }
+								aria-label={ __( 'Drag to resize' ) }
+								aria-describedby={ separatorHelpId }
+								onKeyDown={ onSeparatorKeyDown }
+								// Disable reason: buttons are allowed to be separator role.
+								// eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
+								role="separator"
+								aria-valuenow={ usedAriaValueNow }
+							/>
+						</Tooltip>
+						<VisuallyHidden id={ separatorHelpId }>
+							{ __(
+								'Use up and down arrow keys to resize the metabox panel.'
+							) }
+						</VisuallyHidden>
+					</>
+				),
+			} }
+		>
+			<meta ref={ effectSizeConstraints } />
+			{ contents }
+		</ResizableBox>
+	);
 }
 
 function Layout( {
@@ -355,10 +590,7 @@ function Layout( {
 					extraContent={
 						! isDistractionFree &&
 						showMetaBoxes && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
+							<MetaBoxesMain isLegacy={ ! shouldIframe } />
 						)
 					}
 				>

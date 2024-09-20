@@ -13,6 +13,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -85,19 +86,21 @@ export default {
 					layout={ layout }
 					onChange={ onChange }
 				/>
-				{ showColumnsControl && (
-					<GridLayoutColumnsAndRowsControl
-						layout={ layout }
-						onChange={ onChange }
-						allowSizingOnChildren={ allowSizingOnChildren }
-					/>
-				) }
-				{ showMinWidthControl && (
-					<GridLayoutMinimumWidthControl
-						layout={ layout }
-						onChange={ onChange }
-					/>
-				) }
+				<VStack spacing={ 4 }>
+					{ showColumnsControl && (
+						<GridLayoutColumnsAndRowsControl
+							layout={ layout }
+							onChange={ onChange }
+							allowSizingOnChildren={ allowSizingOnChildren }
+						/>
+					) }
+					{ showMinWidthControl && (
+						<GridLayoutMinimumWidthControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					) }
+				</VStack>
 			</>
 		);
 	},
