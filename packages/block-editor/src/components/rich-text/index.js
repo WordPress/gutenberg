@@ -362,9 +362,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
-		placeholder: props[ 'data-custom-placeholder' ]
-			? placeholder
-			: bindingsPlaceholder || placeholder,
+		placeholder: bindingsPlaceholder || placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
