@@ -10,6 +10,7 @@ import {
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -239,6 +240,15 @@ export function getCommentAttributes( blockType, attributes ) {
 
 			// Ignore all local attributes
 			if ( attributeSchema.role === 'local' ) {
+				return accumulator;
+			}
+
+			if ( attributeSchema.__experimentalRole === 'local' ) {
+				deprecated( '__experimentalRole attribute', {
+					since: '6.7',
+					version: '6.8',
+					alternative: 'role attribute',
+				} );
 				return accumulator;
 			}
 
