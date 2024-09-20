@@ -395,34 +395,36 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 .block-editor-block-list__zoom-out-separator {
-	/* same color as the iframe's background */
-	background: $gray-300;
-	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
-	margin-left: -1px;
-	margin-right: -1px;
-	transition: background-color 0.3s ease;
+	color: $black;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: $default-font-size;
 	font-family: $default-font;
-	color: $black;
 	font-weight: normal;
+	.has-global-padding > & {
+		margin: 0;
+	}
 
 	.is-zoomed-out & {
 		// Scale the font size based on the zoom level.
-		font-size: calc(#{$default-font-size} * ( 2 - var(--wp-block-editor-iframe-zoom-out-scale)  ));
-	}
+		font-size: calc(#{$default-font-size} / var(--wp-block-editor-iframe-zoom-out-scale));
 
-	&.is-dragged-over {
-		background: $gray-400;
-	}
-}
+		& > * {
+			position: relative; // Puts the label in front of the ::before pseudo element.
+		}
 
-// In Post Editor allow the separator to occupy the full width by ignoring (cancelling out) the global padding.
-.has-global-padding > .block-editor-block-list__zoom-out-separator,
-.block-editor-block-list__layout.is-root-container.has-global-padding > .block-editor-block-list__zoom-out-separator {
-	max-width: none;
-	// Additional -1px is required to avoid sub pixel rounding errors allowing background to show.
-	margin: 0 calc(-1 * var(--wp--style--root--padding-right) - 1px) 0 calc(-1 * var(--wp--style--root--padding-left) - 1px) !important;
+		&::before {
+			background: $gray-300; // same color as the iframe's background.
+			content: "";
+			transition: opacity 0.2s linear;
+			position: absolute;
+			inset: auto 0; // Horizontal edges to the full canvas width regardless of global padding.
+			height: inherit;
+		}
+
+		&.is-dragged-over::before {
+			opacity: 0.25;
+		}
+	}
 }
