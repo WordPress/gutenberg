@@ -122,10 +122,6 @@ export const Tab = styled( Ariakit.Tab )`
 			outline: none;
 		}
 
-		&[data-active-item] {
-			font-weight: 500;
-		}
-
 		// Focus.
 		&::before {
 			content: '';
@@ -159,6 +155,12 @@ export const Tab = styled( Ariakit.Tab )`
 		min-height: ${ space(
 			10
 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+
+		&[data-active-item] {
+			font-weight: 500;
+			color: ${ COLORS.theme.accent };
+			fill: currentColor;
+		}
 	}
 `;
 
