@@ -14,6 +14,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { getValueFromObjectPath, matchesAttributes } from './utils';
+import { hasContentRoleAttribute } from './private-selectors';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -823,48 +824,12 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 	} );
 };
 
-/**
- * Determines if any of the block type's attributes have
- * the content role attribute.
- *
- * @param {Object} state         Data state.
- * @param {string} blockTypeName Block type name.
- * @return {boolean} Whether block type has content role attribute.
- */
-export const hasContentRoleAttribute = createSelector(
-	( state, blockTypeName ) => {
-		const blockType = getBlockType( state, blockTypeName );
-		if ( ! blockType ) {
-			return false;
-		}
-
-		return Object.entries( blockType.attributes ).some(
-			( [ , { role, __experimentalRole } ] ) => {
-				if ( role === 'content' ) {
-					return true;
-				}
-				if ( __experimentalRole === 'content' ) {
-					deprecated( '__experimentalRole attribute', {
-						since: '6.7',
-						version: '6.8',
-						alternative: 'role attribute',
-					} );
-					return true;
-				}
-				return false;
-			}
-		);
-	},
-	( state, blockTypeName ) => [
-		state.blockTypes[ blockTypeName ]?.attributes,
-	]
-);
-
 export const __experimentalHasContentRoleAttribute = ( ...args ) => {
 	deprecated( '__experimentalHasContentRoleAttribute', {
 		since: '6.7',
 		version: '6.8',
 		alternative: 'hasContentRoleAttribute',
+		hint: 'This is a private selector.',
 	} );
 	return hasContentRoleAttribute( ...args );
 };

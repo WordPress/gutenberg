@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -209,3 +210,40 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+/**
+ * Determines if any of the block type's attributes have
+ * the content role attribute.
+ *
+ * @param {Object} state         Data state.
+ * @param {string} blockTypeName Block type name.
+ * @return {boolean} Whether block type has content role attribute.
+ */
+export const hasContentRoleAttribute = createSelector(
+	( state, blockTypeName ) => {
+		const blockType = getBlockType( state, blockTypeName );
+		if ( ! blockType ) {
+			return false;
+		}
+
+		return Object.entries( blockType.attributes ).some(
+			( [ , { role, __experimentalRole } ] ) => {
+				if ( role === 'content' ) {
+					return true;
+				}
+				if ( __experimentalRole === 'content' ) {
+					deprecated( '__experimentalRole attribute', {
+						since: '6.7',
+						version: '6.8',
+						alternative: 'role attribute',
+					} );
+					return true;
+				}
+				return false;
+			}
+		);
+	},
+	( state, blockTypeName ) => [
+		state.blockTypes[ blockTypeName ]?.attributes,
+	]
+);

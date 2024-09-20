@@ -660,19 +660,6 @@ _Returns_
 
 -   `boolean`: True if a block contains at least one child blocks with inserter support and false otherwise.
 
-### hasContentRoleAttribute
-
-Determines if any of the block type's attributes have the content role attribute.
-
-_Parameters_
-
--   _state_ `Object`: Data state.
--   _blockTypeName_ `string`: Block type name.
-
-_Returns_
-
--   `boolean`: Whether block type has content role attribute.
-
 ### isMatchingSearchTerm
 
 Returns true if the block type by the given name or object value matches a search term, or false otherwise.
