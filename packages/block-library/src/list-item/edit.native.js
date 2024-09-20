@@ -155,6 +155,9 @@ export default function ListItemEdit( {
 						}
 						value={ content }
 						placeholder={ placeholder || __( 'List' ) }
+						data-custom-placeholder={
+							placeholder ? true : undefined
+						}
 						placeholderTextColor={
 							defaultPlaceholderTextColorWithOpacity
 						}

@@ -271,6 +271,7 @@ function ButtonEdit( props ) {
 					ref={ mergedRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
+					data-custom-placeholder={ placeholder ? true : undefined }
 					value={ text }
 					onChange={ ( value ) =>
 						setAttributes( {
