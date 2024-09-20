@@ -626,11 +626,11 @@ function gutenberg_default_script_modules() {
 		 *   - interactivity/debug.min.js  => @wordpress/interactivity/debug
 		 *   - block-library/query/view.js => @wordpress/block-library/query/view
 		 */
-		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?(?:\.min)?\.js$~iD', '', $file_name, 1 );
+		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.min\.js$~D', '', $file_name, 1 );
 		switch ( $script_module_id ) {
 			/*
-			 * Interactivity exposes two entrypoints, `/index` and `/debug`.
-			 * `/debug` should replalce `/index` in devlopment.
+			 * Interactivity exposes two entrypoints, "/index" and "/debug".
+			 * "/debug" should replalce "/index" in devlopment.
 			 */
 			case '@wordpress/interactivity/debug':
 				if ( ! SCRIPT_DEBUG ) {
@@ -645,6 +645,10 @@ function gutenberg_default_script_modules() {
 				break;
 		}
 
+		if ( SCRIPT_DEBUG ) {
+			// Replave ".min.js" with ".js" in devlopment.
+			$file_name = substr( $file_name, 0, -7 ) . '.js';
+		}
 		$path = gutenberg_url( "build-module/{$file_name}" );
 		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
 	}
