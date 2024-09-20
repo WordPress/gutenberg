@@ -147,7 +147,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
-					return getBlocksByName( 'core/post-content' )?.[ 0 ];
+					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? ''
 				}
 
 				// Allow default algorithm to determine the section root block.
