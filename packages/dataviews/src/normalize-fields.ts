@@ -93,7 +93,7 @@ export function normalizeCombinedFields< Item >(
 					.map( ( fieldId ) =>
 						fields.find( ( { id } ) => id === fieldId )
 					)
-					.filter( ( field ): field is Field< any > => !! field )
+					.filter( ( field ): field is Field< Item > => !! field )
 			),
 		};
 	} );

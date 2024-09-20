@@ -143,7 +143,7 @@ export default function FormPanel< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				getVisibleFields(
+				getVisibleFields< Item >(
 					fields,
 					form.fields,
 					form.layout?.combinedFields

@@ -20,7 +20,7 @@ export default function FormRegular< Item >( {
 	const visibleFields = useMemo(
 		() =>
 			normalizeFields(
-				getVisibleFields(
+				getVisibleFields< Item >(
 					fields,
 					form.fields,
 					form.layout?.combinedFields
