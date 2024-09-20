@@ -58,7 +58,6 @@ export function useScreenAnimatePresence( {
 	skipAnimation: boolean;
 	isBack?: boolean;
 	onAnimationEnd?: React.AnimationEventHandler< Element >;
-	screenEl?: HTMLElement | null;
 } ) {
 	const isRTL = isRTLFn();
 	const prefersReducedMotion = useReducedMotion();
@@ -67,8 +66,8 @@ export function useScreenAnimatePresence( {
 		useState< AnimationStatus >( 'INITIAL' );
 
 	// Start enter and exit animations when the screen is selected or deselected.
-	// The animation status is set to `*_END` immediately if the animation should
-	// be skipped.
+	// The animation status is set to `IN` or `OUT` immediately if the animation
+	// should be skipped.
 	const becameSelected =
 		animationStatus !== 'ANIMATING_IN' &&
 		animationStatus !== 'IN' &&

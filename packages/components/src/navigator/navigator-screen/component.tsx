@@ -40,11 +40,7 @@ function UnconnectedNavigatorScreen(
 		);
 	}
 
-	// Generate a unique ID for the screen.
 	const screenId = useId();
-
-	const wrapperRef = useRef< HTMLDivElement >( null );
-	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	const {
 		children,
@@ -59,6 +55,7 @@ function UnconnectedNavigatorScreen(
 	const { isInitial, isBack, focusTargetSelector, skipFocus } = location;
 
 	const isMatch = match === screenId;
+	const wrapperRef = useRef< HTMLDivElement >( null );
 	const skipAnimationAndFocusRestoration = !! isInitial && ! isBack;
 
 	// Register / unregister screen with the navigator context.
@@ -141,6 +138,8 @@ function UnconnectedNavigatorScreen(
 		focusTargetSelector,
 		skipFocus,
 	] );
+
+	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
 	return shouldRenderScreen ? (
 		<View
