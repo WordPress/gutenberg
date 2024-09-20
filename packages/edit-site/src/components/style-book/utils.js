@@ -62,9 +62,9 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 
 	if ( categoryDefinition?.subcategories?.length ) {
 		return categoryDefinition.subcategories.reduce(
-			( acc, subcategory ) => {
+			( acc, subcategoryDefinition ) => {
 				const subcategoryExamples = getCategoryExamples(
-					subcategory,
+					subcategoryDefinition,
 					examples
 				);
 				if ( subcategoryExamples ) {
@@ -85,6 +85,17 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 
 	const blocksToInclude = categoryDefinition?.blocks || [];
 	const blocksToExclude = categoryDefinition?.exclude || [];
+	const categoryExamples = examples.filter( ( example ) => {
+		return (
+			! blocksToExclude.includes( example.name ) &&
+			( example.category === categoryDefinition.name ||
+				blocksToInclude.includes( example.name ) )
+		);
+	} );
+
+	if ( ! categoryExamples.length ) {
+		return;
+	}
 
 	return {
 		title: categoryDefinition.title,

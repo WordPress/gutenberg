@@ -277,8 +277,10 @@ const Examples = memo(
 							className="edit-site-style-book__subcategory"
 							key={ `subcategory-${ subcategory.name }` }
 						>
-							<Composite.GroupLabel className="edit-site-style-book__subcategory-label">
-								{ subcategory.title }
+							<Composite.GroupLabel>
+								<h2 className="edit-site-style-book__subcategory-title">
+									{ subcategory.title }
+								</h2>
 							</Composite.GroupLabel>
 							<Subcategory
 								examples={ subcategory.examples }
