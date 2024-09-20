@@ -16,9 +16,8 @@ function useEditorFontsResolver() {
 	const { currentTheme = {}, fontFamilies = [] } = useSelect( ( select ) => {
 		return {
 			currentTheme:
-				// Disable Reason: Using 'core' as string to avoid circular dependency importing from @wordpress/core-data.
-				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				select( 'core' )?.getCurrentTheme(),
+				select( editorStore ).getSettings()?.__experimentalFeatures
+					?.currentTheme,
 			fontFamilies:
 				select( editorStore ).getSettings()?.__experimentalFeatures
 					?.typography?.fontFamilies,
