@@ -11,6 +11,8 @@ module.exports = ( environment = '', file ) => {
 			name: `WP_BUILD_${ environment.toUpperCase() }`,
 		},
 	};
+	// Add `/* wp:polyfill */` magic comment where needed.
+	callerOpts.caller.addPolyfillComments = true;
 	switch ( environment ) {
 		case 'main':
 			// To be merged as a presetEnv option.

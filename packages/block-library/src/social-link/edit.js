@@ -22,6 +22,7 @@ import {
 	PanelBody,
 	PanelRow,
 	TextControl,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
@@ -78,15 +79,18 @@ const SocialLinkURLPopover = ( {
 							}
 							removeBlock( clientId );
 						} }
+						suffix={
+							<InputControlSuffixWrapper variant="control">
+								<Button
+									icon={ keyboardReturn }
+									label={ __( 'Apply' ) }
+									type="submit"
+									size="small"
+								/>
+							</InputControlSuffixWrapper>
+						}
 					/>
 				</div>
-				<Button
-					// TODO: Switch to `true` (40px size) if possible.
-					__next40pxDefaultSize={ false }
-					icon={ keyboardReturn }
-					label={ __( 'Apply' ) }
-					type="submit"
-				/>
 			</form>
 		</URLPopover>
 	);

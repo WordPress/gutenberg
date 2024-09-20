@@ -9,7 +9,6 @@
 		"gutenberg",
 		"dataviews"
 	],
-	"private": true,
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields/README.md",
 	"repository": {
 		"type": "git",

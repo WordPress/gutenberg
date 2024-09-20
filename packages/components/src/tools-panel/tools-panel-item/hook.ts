@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useCallback, useLayoutEffect, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -101,7 +96,7 @@ export function useToolsPanelItem(
 		deregisterPanelItem,
 	] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( hasMatchingPanel ) {
 			registerResetAllFilter( resetAllFilterCallback );
 		}
@@ -127,7 +122,7 @@ export function useToolsPanelItem(
 	const isValueSet = hasValue();
 	// Notify the panel when an item's value has changed except for optional
 	// items without value because the item should not cause itself to hide.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! isShownByDefault && ! isValueSet ) {
 			return;
 		}
@@ -143,7 +138,7 @@ export function useToolsPanelItem(
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		// We check whether this item is currently registered as items rendered
 		// via fills can persist through the parent panel being remounted.
 		// See: https://github.com/WordPress/gutenberg/pull/45673

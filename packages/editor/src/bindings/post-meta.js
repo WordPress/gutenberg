@@ -9,26 +9,26 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
-function getMetadata( registry, context ) {
+function getMetadata( registry, context, registeredFields ) {
 	let metaFields = {};
-	const { type } = registry.select( editorStore ).getCurrentPost();
+	const type = registry.select( editorStore ).getCurrentPostType();
 	const { getEditedEntityRecord } = registry.select( coreDataStore );
-	const { getRegisteredPostMeta } = unlock(
-		registry.select( coreDataStore )
-	);
 
-	if ( type === 'wp_template' ) {
-		const fields = getRegisteredPostMeta( context?.postType );
-		// Populate the `metaFields` object with the default values.
-		Object.entries( fields || {} ).forEach( ( [ key, props ] ) => {
-			metaFields[ key ] = props.default;
-		} );
-	} else {
+	if ( context?.postType && context?.postId ) {
 		metaFields = getEditedEntityRecord(
 			'postType',
 			context?.postType,
 			context?.postId
 		).meta;
+	} else if ( type === 'wp_template' ) {
+		// Populate the `metaFields` object with the default values.
+		Object.entries( registeredFields || {} ).forEach(
+			( [ key, props ] ) => {
+				if ( props.default ) {
+					metaFields[ key ] = props.default;
+				}
+			}
+		);
 	}
 
 	return metaFields;
@@ -37,13 +37,20 @@ function getMetadata( registry, context ) {
 export default {
 	name: 'core/post-meta',
 	getValues( { registry, context, bindings } ) {
-		const metaFields = getMetadata( registry, context );
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
+		const registeredFields = getRegisteredPostMeta( context?.postType );
+		const metaFields = getMetadata( registry, context, registeredFields );
 
 		const newValues = {};
 		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
-			// Use the key if the value is not set.
+			// Use the value, the field label, or the field key.
+			const metaKey = source.args.key;
 			newValues[ attributeName ] =
-				metaFields?.[ source.args.key ] ?? source.args.key;
+				metaFields?.[ metaKey ] ??
+				registeredFields?.[ metaKey ]?.title ??
+				metaKey;
 		}
 		return newValues;
 	},
@@ -103,18 +110,31 @@ export default {
 		return true;
 	},
 	getFieldsList( { registry, context } ) {
-		const metaFields = getMetadata( registry, context );
+		const { getRegisteredPostMeta } = unlock(
+			registry.select( coreDataStore )
+		);
+		const registeredFields = getRegisteredPostMeta( context?.postType );
+		const metaFields = getMetadata( registry, context, registeredFields );
 
 		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
 		}
 
-		// Remove footnotes or private keys from the list of fields.
-		// TODO: Remove this once we retrieve the fields from 'types' endpoint in post or page editor.
 		return Object.fromEntries(
-			Object.entries( metaFields ).filter(
-				( [ key ] ) => key !== 'footnotes' && key.charAt( 0 ) !== '_'
-			)
+			Object.entries( metaFields )
+				// Remove footnotes or private keys from the list of fields.
+				.filter(
+					( [ key ] ) =>
+						key !== 'footnotes' && key.charAt( 0 ) !== '_'
+				)
+				// Return object with label and value.
+				.map( ( [ key, value ] ) => [
+					key,
+					{
+						label: registeredFields?.[ key ]?.title || key,
+						value,
+					},
+				] )
 		);
 	},
 };

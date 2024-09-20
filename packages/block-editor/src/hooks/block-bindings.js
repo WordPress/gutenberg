@@ -61,7 +61,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								{ registeredSources[ name ].label }
 							</DropdownMenuV2.GroupLabel>
 						) }
-						{ Object.entries( fields ).map( ( [ key, value ] ) => (
+						{ Object.entries( fields ).map( ( [ key, args ] ) => (
 							<DropdownMenuV2.RadioItem
 								key={ key }
 								onChange={ () =>
@@ -77,10 +77,10 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								checked={ key === currentKey }
 							>
 								<DropdownMenuV2.ItemLabel>
-									{ key }
+									{ args?.label }
 								</DropdownMenuV2.ItemLabel>
 								<DropdownMenuV2.ItemHelpText>
-									{ value }
+									{ args?.value }
 								</DropdownMenuV2.ItemHelpText>
 							</DropdownMenuV2.RadioItem>
 						) ) }
@@ -94,7 +94,7 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	);
 }
 
-function BlockBindingsAttribute( { attribute, binding } ) {
+function BlockBindingsAttribute( { attribute, binding, fieldsList } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
@@ -110,14 +110,16 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 				>
 					{ isSourceInvalid
 						? __( 'Invalid source' )
-						: args?.key || sourceProps?.label || sourceName }
+						: fieldsList?.[ sourceName ]?.[ args?.key ]?.label ||
+						  sourceProps?.label ||
+						  sourceName }
 				</Text>
 			) }
 		</VStack>
 	);
 }
 
-function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
+function ReadOnlyBlockBindingsPanelItems( { bindings, fieldsList } ) {
 	return (
 		<>
 			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
@@ -125,6 +127,7 @@ function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
 					<BlockBindingsAttribute
 						attribute={ attribute }
 						binding={ binding }
+						fieldsList={ fieldsList }
 					/>
 				</Item>
 			) ) }
@@ -164,6 +167,7 @@ function EditableBlockBindingsPanelItems( {
 									<BlockBindingsAttribute
 										attribute={ attribute }
 										binding={ binding }
+										fieldsList={ fieldsList }
 									/>
 								</Item>
 							}
@@ -214,7 +218,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 							context,
 						} );
 						// Only add source if the list is not empty.
-						if ( sourceList ) {
+						if ( Object.keys( sourceList || {} ).length ) {
 							_fieldsList[ sourceName ] = { ...sourceList };
 						}
 					}
@@ -236,12 +240,6 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
-	// Remove empty sources from the list of fields.
-	Object.entries( fieldsList ).forEach( ( [ key, value ] ) => {
-		if ( ! Object.keys( value ).length ) {
-			delete fieldsList[ key ];
-		}
-	} );
 	// Filter bindings to only show bindable attributes and remove pattern overrides.
 	const { bindings } = metadata || {};
 	const filteredBindings = { ...bindings };
@@ -276,6 +274,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 					{ readOnly ? (
 						<ReadOnlyBlockBindingsPanelItems
 							bindings={ filteredBindings }
+							fieldsList={ fieldsList }
 						/>
 					) : (
 						<EditableBlockBindingsPanelItems
