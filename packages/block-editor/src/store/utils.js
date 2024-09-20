@@ -117,5 +117,6 @@ export function getInsertBlockTypeDependants( state, rootClientId ) {
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.blockEditingModes,
+		state.editorMode,
 	];
 }

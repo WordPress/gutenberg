@@ -26,6 +26,7 @@ import { ActionItem } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import PostPreviewButton from '../post-preview-button';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
@@ -44,6 +45,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			};
 		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
+	const handleDevicePreviewChange = ( newDeviceType ) => {
+		setDeviceType( newDeviceType );
+		__unstableSetEditorMode( 'edit' );
+	};
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) {
@@ -113,7 +120,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItemsChoice
 							choices={ choices }
 							value={ deviceType }
-							onSelect={ setDeviceType }
+							onSelect={ handleDevicePreviewChange }
 						/>
 					</MenuGroup>
 					{ isTemplate && (

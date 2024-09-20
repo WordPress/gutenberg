@@ -162,9 +162,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					let values = {};
 					if ( ! source.getValues ) {
 						Object.keys( bindings ).forEach( ( attr ) => {
-							// Default to the `key` or the source label when `getValues` doesn't exist
-							values[ attr ] =
-								bindings[ attr ].args?.key || source.label;
+							// Default to the the source label when `getValues` doesn't exist.
+							values[ attr ] = source.label;
 						} );
 					} else {
 						values = source.getValues( {

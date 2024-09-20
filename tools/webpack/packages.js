@@ -146,7 +146,7 @@ module.exports = {
 	},
 	plugins: [
 		...plugins,
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
+		new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 		new CopyWebpackPlugin( {
 			patterns: gutenbergPackages
 				.map( ( packageName ) => ( {

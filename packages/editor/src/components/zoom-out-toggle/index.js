@@ -8,16 +8,27 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { square as zoomOutIcon } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
 const ZoomOutToggle = () => {
-	const { isZoomOutMode } = useSelect( ( select ) => ( {
-		isZoomOutMode:
-			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+	const { isZoomOut } = useSelect( ( select ) => ( {
+		isZoomOut: unlock( select( blockEditorStore ) ).isZoomOut(),
 	} ) );
 
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	const { resetZoomLevel, setZoomLevel, __unstableSetEditorMode } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const handleZoomOut = () => {
-		__unstableSetEditorMode( isZoomOutMode ? 'edit' : 'zoom-out' );
+		if ( isZoomOut ) {
+			resetZoomLevel();
+		} else {
+			setZoomLevel( 50 );
+		}
+		__unstableSetEditorMode( isZoomOut ? 'edit' : 'zoom-out' );
 	};
 
 	return (
@@ -25,7 +36,7 @@ const ZoomOutToggle = () => {
 			onClick={ handleZoomOut }
 			icon={ zoomOutIcon }
 			label={ __( 'Toggle Zoom Out' ) }
-			isPressed={ isZoomOutMode }
+			isPressed={ isZoomOut }
 			size="compact"
 		/>
 	);

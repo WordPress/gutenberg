@@ -93,7 +93,7 @@ interface DirectivesProps {
 }
 
 // Main context.
-const context = createContext< any >( {} );
+const context = createContext< any >( { client: {}, server: {} } );
 
 // WordPress Directives.
 const directiveCallbacks: Record< string, DirectiveCallback > = {};
@@ -253,7 +253,9 @@ const Directives = ( {
 	// element ref, state and props.
 	const scope = useRef< Scope >( {} as Scope ).current;
 	scope.evaluate = useCallback( getEvaluate( { scope } ), [] );
-	scope.context = useContext( context );
+	const { client, server } = useContext( context );
+	scope.context = client;
+	scope.serverContext = server;
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
 	/* eslint-enable react-hooks/rules-of-hooks */

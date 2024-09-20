@@ -1698,6 +1698,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/fields",
+		"slug": "packages-fields",
+		"markdown_source": "../packages/fields/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "../packages/format-library/README.md",

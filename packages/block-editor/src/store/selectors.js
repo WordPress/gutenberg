@@ -38,6 +38,8 @@ import {
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
 	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
 } from './private-selectors';
 
 /**
@@ -1582,6 +1584,11 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+	if ( _isSectionBlock ) {
+		return false;
+	}
+
 	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
@@ -1730,6 +1737,11 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
+		return false;
+	}
+
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	if ( isBlockWithinSection ) {
 		return false;
 	}
 
@@ -2674,12 +2686,17 @@ export function __unstableGetEditorMode( state ) {
 /**
  * Returns whether block moving mode is enabled.
  *
- * @param {Object} state Editor state.
- *
- * @return {string} Client Id of moving block.
+ * @deprecated
  */
-export function hasBlockMovingClientId( state ) {
-	return state.hasBlockMovingClientId;
+export function hasBlockMovingClientId() {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).hasBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
+		}
+	);
+	return false;
 }
 
 /**
@@ -2862,11 +2879,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		'__experimentalDisableBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+	const shouldEnableIfUnselected = blockSupportDisable
+		? false
+		: areInnerBlocksControlled( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&
@@ -2884,6 +2899,14 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 		parent = state.blocks.parents.get( parent );
 	}
 	return false;
+}
+
+function isWithinBlock( state, clientId, parentClientId ) {
+	let parent = state.blocks.parents.get( clientId );
+	while ( !! parent && parent !== parentClientId ) {
+		parent = state.blocks.parents.get( parent );
+	}
+	return parent === parentClientId;
 }
 
 /**
@@ -2926,6 +2949,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( clientId === null ) {
 				clientId = '';
 			}
+
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
@@ -2943,20 +2967,66 @@ export const getBlockEditingMode = createRegistrySelector(
 					state,
 					sectionRootClientId
 				);
-				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return 'disabled';
+
+				// Sections are always contentOnly.
+				if ( sectionsClientIds?.includes( clientId ) ) {
+					return 'contentOnly';
 				}
+
+				return 'disabled';
 			}
 
+			if ( editorMode === 'navigation' ) {
+				const sectionRootClientId = getSectionRootClientId( state );
+
+				// The root section is "default mode"
+				if ( clientId === sectionRootClientId ) {
+					return 'default';
+				}
+
+				// Sections should always be contentOnly in navigation mode.
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( sectionsClientIds.includes( clientId ) ) {
+					return 'contentOnly';
+				}
+
+				// Blocks outside sections should be disabled.
+				const isWithinSectionRoot = isWithinBlock(
+					state,
+					clientId,
+					sectionRootClientId
+				);
+				if ( ! isWithinSectionRoot ) {
+					return 'disabled';
+				}
+
+				// The rest of the blocks depend on whether they are content blocks or not.
+				// This "flattens" the sections tree.
+				const name = getBlockName( state, clientId );
+				const isContent =
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					);
+				return isContent ? 'contentOnly' : 'disabled';
+			}
+
+			// In normal mode, consider that an explicitely set editing mode takes over.
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
 			}
+
+			// In normal mode, top level is default mode.
 			if ( ! clientId ) {
 				return 'default';
 			}
+
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
+			// If the parent of the block is contentOnly locked, check whether it's a content block.
 			if ( templateLock === 'contentOnly' ) {
 				const name = getBlockName( state, clientId );
 				const isContent =
@@ -2965,6 +3035,7 @@ export const getBlockEditingMode = createRegistrySelector(
 					);
 				return isContent ? 'contentOnly' : 'disabled';
 			}
+			// Otherwise, check if there's an ancestor that is contentOnly
 			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}
