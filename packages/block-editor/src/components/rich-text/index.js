@@ -423,8 +423,8 @@ export function RichTextWrapper(
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-readonly={ shouldDisableEditing }
+				aria-label={ elementPlaceholder }
 				{ ...props }
-				aria-label={ elementPlaceholder || props[ 'aria-label' ] }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
 					// Rich text ref must be first because its focus listener
