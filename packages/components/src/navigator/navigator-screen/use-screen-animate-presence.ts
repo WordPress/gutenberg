@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useState, useLayoutEffect, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+} from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
 
@@ -22,6 +27,10 @@ type AnimationStatus =
 	| 'IN'
 	| 'ANIMATING_OUT'
 	| 'OUT';
+
+// Allow an extra 20% of the total animation duration to account for potential
+// event loop delays.
+const ANIMATION_TIMEOUT_MARGIN = 1.2;
 
 const isEnterAnimation = (
 	animationDirection: 'end' | 'start',
@@ -85,13 +94,15 @@ export function useScreenAnimatePresence( {
 		prefersReducedMotion,
 	] );
 
-	// Styles
+	// Animation attributes (derived state).
 	const animationDirection =
 		( isRTL && isBack ) || ( ! isRTL && ! isBack ) ? 'end' : 'start';
+	const isAnimatingIn = animationStatus === 'ANIMATING_IN';
+	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
 	let animationType: 'in' | 'out' | undefined;
-	if ( animationStatus === 'ANIMATING_IN' ) {
+	if ( isAnimatingIn ) {
 		animationType = 'in';
-	} else if ( animationStatus === 'ANIMATING_OUT' ) {
+	} else if ( isAnimatingOut ) {
 		animationType = 'out';
 	}
 
@@ -123,6 +134,31 @@ export function useScreenAnimatePresence( {
 		},
 		[ onAnimationEnd, animationStatus, animationDirection ]
 	);
+
+	// Fallback timeout to ensure that the logic is applied even if the
+	// `animationend` event is not triggered.
+	useEffect( () => {
+		let animationTimeout: number | undefined;
+
+		if ( isAnimatingOut ) {
+			animationTimeout = window.setTimeout( () => {
+				setAnimationStatus( 'OUT' );
+				animationTimeout = undefined;
+			}, styles.TOTAL_ANIMATION_DURATION.OUT * ANIMATION_TIMEOUT_MARGIN );
+		} else if ( isAnimatingIn ) {
+			animationTimeout = window.setTimeout( () => {
+				setAnimationStatus( 'IN' );
+				animationTimeout = undefined;
+			}, styles.TOTAL_ANIMATION_DURATION.IN * ANIMATION_TIMEOUT_MARGIN );
+		}
+
+		return () => {
+			if ( animationTimeout ) {
+				window.clearTimeout( animationTimeout );
+				animationTimeout = undefined;
+			}
+		};
+	}, [ isAnimatingOut, isAnimatingIn ] );
 
 	return {
 		animationStyles: styles.navigatorScreenAnimation,
