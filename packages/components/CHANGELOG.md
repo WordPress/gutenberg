@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ToolsPanel`: avoid paining intermediate unfinished states ([#65494](https://github.com/WordPress/gutenberg/pull/65494)).
+
 ## 28.8.0 (2024-09-19)
 
 ### Bug Fixes
