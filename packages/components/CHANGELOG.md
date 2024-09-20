@@ -11,6 +11,7 @@
 
 -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
 -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+-   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
 
 ## 28.8.0 (2024-09-19)
 
@@ -95,7 +96,6 @@
     -   Contains internal visual changes from this PR:
         -   `AnglePickerControl`
         -   `ColorPicker`
--   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
 -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
     -   `AnglePickerControl`
     -   `ColorPicker` (on the inputs)
