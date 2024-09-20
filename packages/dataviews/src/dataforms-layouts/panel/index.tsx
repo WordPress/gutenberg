@@ -146,10 +146,10 @@ export default function FormPanel< Item >( {
 				getVisibleFields< Item >(
 					fields,
 					form.fields,
-					form.layout?.combinedFields
+					form.combinedFields
 				)
 			),
-		[ fields, form.fields, form.layout?.combinedFields ]
+		[ fields, form.fields, form.combinedFields ]
 	);
 
 	return (

@@ -135,17 +135,15 @@ export const CombinedFields = ( { type }: { type: 'panel' | 'regular' } ) => {
 
 	const form = {
 		fields: [ 'title', 'status_and_visibility', 'order', 'author' ],
-		layout: {
-			combinedFields: [
-				{
-					id: 'status_and_visibility',
-					label: 'Status & Visibility',
-					children: [ 'status', 'password' ],
-					direction: 'vertical',
-					render: ( { item } ) => item.status,
-				},
-			] as CombinedFormField< any >[],
-		},
+		combinedFields: [
+			{
+				id: 'status_and_visibility',
+				label: 'Status & Visibility',
+				children: [ 'status', 'password' ],
+				direction: 'vertical',
+				render: ( { item } ) => item.status,
+			},
+		] as CombinedFormField< any >[],
 	};
 
 	return (

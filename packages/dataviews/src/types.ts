@@ -538,12 +538,10 @@ export type NormalizedCombinedFormField< Item > = CombinedFormField< Item > & {
 export type Form< Item > = {
 	type?: 'regular' | 'panel';
 	fields?: string[];
-	layout?: {
-		/**
-		 * The fields to combine.
-		 */
-		combinedFields?: CombinedFormField< Item >[];
-	};
+	/**
+	 * The fields to combine.
+	 */
+	combinedFields?: CombinedFormField< Item >[];
 };
 
 export interface DataFormProps< Item > {
