@@ -32,7 +32,7 @@ export function useInBetweenInserter() {
 		getBlockName,
 		getBlockAttributes,
 	} = useSelect( blockEditorStore );
-	const { showInsertionPoint, hideInsertionPoint } =
+	const { showInsertionPoint, hideInsertionPoint, selectBlock } =
 		useDispatch( blockEditorStore );
 
 	return useRefEffect(
@@ -175,15 +175,23 @@ export function useInBetweenInserter() {
 					return;
 				}
 
+				if ( event.type === 'click' ) {
+					hideInsertionPoint();
+					selectBlock( clientId, -1 );
+					return;
+				}
+
 				showInsertionPoint( rootClientId, index, {
 					__unstableWithInserter: true,
 				} );
 			}
 
 			node.addEventListener( 'mousemove', onMouseMove );
+			node.addEventListener( 'click', onMouseMove );
 
 			return () => {
 				node.removeEventListener( 'mousemove', onMouseMove );
+				node.removeEventListener( 'click', onMouseMove );
 			};
 		},
 		[

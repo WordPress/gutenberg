@@ -6,8 +6,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, createContext, useContext } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { createContext, useContext } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 
@@ -27,9 +27,7 @@ function InbetweenInsertionPointPopover( {
 	operation = 'insert',
 	nearestSide = 'right',
 } ) {
-	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
-	const ref = useRef();
 	const {
 		orientation,
 		previousClientId,
@@ -81,35 +79,8 @@ function InbetweenInsertionPointPopover( {
 			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
-	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
-
-	function onClick( event ) {
-		if (
-			event.target === ref.current &&
-			nextClientId &&
-			getBlockEditingMode( nextClientId ) !== 'disabled'
-		) {
-			selectBlock( nextClientId, -1 );
-		}
-	}
-
-	function maybeHideInserterPoint( event ) {
-		// Only hide the inserter if it's triggered on the wrapper,
-		// and the inserter is not open.
-		if ( event.target === ref.current && ! openRef.current ) {
-			hideInsertionPoint();
-		}
-	}
-
-	function onFocus( event ) {
-		// Only handle click on the wrapper specifically, and not an event
-		// bubbled from the inserter itself.
-		if ( event.target !== ref.current ) {
-			openRef.current = true;
-		}
-	}
 
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
@@ -179,14 +150,7 @@ function InbetweenInsertionPointPopover( {
 				whileHover="hover"
 				whileTap="pressed"
 				exit="start"
-				ref={ ref }
-				tabIndex={ -1 }
-				onClick={ onClick }
-				onFocus={ onFocus }
-				className={ clsx( className, {
-					'is-with-inserter': isInserterShown,
-				} ) }
-				onHoverEnd={ maybeHideInserterPoint }
+				className={ className }
 			>
 				<motion.div
 					variants={ lineVariants }
