@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { getValueFromObjectPath, matchesAttributes } from './utils';
-import { hasContentRoleAttribute } from './private-selectors';
+import { hasContentRoleAttribute as privateHasContentRoleAttribute } from './private-selectors';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -831,5 +831,5 @@ export const __experimentalHasContentRoleAttribute = ( ...args ) => {
 		alternative: 'hasContentRoleAttribute',
 		hint: 'This is a private selector.',
 	} );
-	return hasContentRoleAttribute( ...args );
+	return privateHasContentRoleAttribute( ...args );
 };
