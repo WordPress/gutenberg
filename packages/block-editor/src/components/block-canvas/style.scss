@@ -17,7 +17,6 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$inset: var(--wp-block-editor-iframe-zoom-out-inset);
 	inset-block: $inset 0;
-	filter: drop-shadow(0 0 $grid-unit-05 rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	transform: scale(#{$scale});
 	flex-basis: calc((100% - #{$inset} * 2) / #{$scale});
 	height: calc((100% - #{$inset} * 2) / #{$scale});
