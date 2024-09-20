@@ -4,7 +4,7 @@ DataViews is a component that provides an API to render datasets using different
 
 DataViews is data agnostic, it can work with data coming from a static (JSON file) or dynamic source (HTTP Request) — it just requires the data to be an array of objects that have an unique identifier. Consumers are responsible to query the data source appropiately based on the DataViews props:
 
-![DataViews flow](dataviews-flow.png "DataViews flow")
+![DataViews flow](https://developer.wordpress.org/files/2024/09/368600071-20aa078f-7c3d-406d-8dd0-8b764addd22a.png "DataViews flow")
 
 ## Installation
 
