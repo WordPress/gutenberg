@@ -15,6 +15,7 @@ import { select, dispatch } from '@wordpress/data';
  */
 import * as selectors from '../selectors';
 import { store } from '../';
+import { sectionRootClientIdKey } from '../private-keys';
 
 const {
 	getBlockName,
@@ -4382,12 +4383,28 @@ describe( 'getBlockEditingMode', () => {
 		settings: {},
 		blocks: {
 			byClientId: new Map( [
-				[ '6cf70164-9097-4460-bcbf-200560546988', {} ], // Header
-				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ], // Group
-				[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', {} ], // |  Post Title
-				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ], // |  Post Content
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', {} ], // | |  Paragraph
-				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', {} ], // | |  Paragraph
+				[
+					'6cf70164-9097-4460-bcbf-200560546988',
+					{ name: 'core/template-part' },
+				], // Header
+				[
+					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+					{ name: 'core/group' },
+				], // Group
+				[
+					'b26fc763-417d-4f01-b81c-2ec61e14a972',
+					{ name: 'core/post-title' },
+				], // |  Post Title
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+					{ name: 'core/group' },
+				], // |  Group
+				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', { name: 'core/p' } ], // | |  Paragraph
+				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', { name: 'core/p' } ], // | |  Paragraph
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
+					{ name: 'core/group' },
+				], // | | Group
 			] ),
 			order: new Map( [
 				[
@@ -4411,10 +4428,12 @@ describe( 'getBlockEditingMode', () => {
 					[
 						'b3247f75-fd94-4fef-97f9-5bfd162cc416',
 						'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+						'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
 					],
 				],
 				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', [] ],
 				[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', [] ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fed515b958s', [] ],
 			] ),
 			parents: new Map( [
 				[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
@@ -4435,6 +4454,10 @@ describe( 'getBlockEditingMode', () => {
 					'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 				],
+				[
+					'9b9c5c3f-2e46-4f02-9e14-9fed515b958s',
+					'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+				],
 			] ),
 		},
 		blockListSettings: {
@@ -4444,7 +4467,18 @@ describe( 'getBlockEditingMode', () => {
 		blockEditingModes: new Map( [] ),
 	};
 
-	const __experimentalHasContentRoleAttribute = jest.fn( () => false );
+	const navigationModeStateWithRootSection = {
+		...baseState,
+		editorMode: 'navigation',
+		settings: {
+			[ sectionRootClientIdKey ]: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', // The group is the "main" container
+		},
+	};
+
+	const __experimentalHasContentRoleAttribute = jest.fn( ( name ) => {
+		// consider paragraphs as content blocks.
+		return name === 'core/p';
+	} );
 	getBlockEditingMode.registry = {
 		select: jest.fn( () => ( {
 			__experimentalHasContentRoleAttribute,
@@ -4572,5 +4606,62 @@ describe( 'getBlockEditingMode', () => {
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );
+	} );
+
+	it( 'in navigation mode, the root section container is default', () => {
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337'
+			)
+		).toBe( 'default' );
+	} );
+
+	it( 'in navigation mode, anything outside the section container is disabled', () => {
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'6cf70164-9097-4460-bcbf-200560546988'
+			)
+		).toBe( 'disabled' );
+	} );
+
+	it( 'in navigation mode, sections are contentOnly', () => {
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'b26fc763-417d-4f01-b81c-2ec61e14a972'
+			)
+		).toBe( 'contentOnly' );
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
+			)
+		).toBe( 'contentOnly' );
+	} );
+
+	it( 'in navigation mode, blocks with content attributes within sections are contentOnly', () => {
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'b3247f75-fd94-4fef-97f9-5bfd162cc416'
+			)
+		).toBe( 'contentOnly' );
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c'
+			)
+		).toBe( 'contentOnly' );
+	} );
+
+	it( 'in navigation mode, blocks without content attributes within sections are disabled', () => {
+		expect(
+			getBlockEditingMode(
+				navigationModeStateWithRootSection,
+				'9b9c5c3f-2e46-4f02-9e14-9fed515b958s'
+			)
+		).toBe( 'disabled' );
 	} );
 } );
