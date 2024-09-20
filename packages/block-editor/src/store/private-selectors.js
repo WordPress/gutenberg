@@ -616,3 +616,23 @@ export function isZoomOutMode( state ) {
 export function getSectionRootClientId( state ) {
 	return state.settings?.[ sectionRootClientIdKey ];
 }
+
+/**
+ * Returns the zoom out state.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} The zoom out state.
+ */
+export function getZoomLevel( state ) {
+	return state.zoomLevel;
+}
+
+/**
+ * Returns whether the editor is considered zoomed out.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the editor is zoomed.
+ */
+export function isZoomOut( state ) {
+	return getZoomLevel( state ) < 100;
+}

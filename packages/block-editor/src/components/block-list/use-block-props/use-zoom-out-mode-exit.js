@@ -16,14 +16,17 @@ import { unlock } from '../../../lock-unlock';
  * @param {string} clientId Block client ID.
  */
 export function useZoomOutModeExit( { editorMode } ) {
-	const { getSettings } = useSelect( blockEditorStore );
-	const { __unstableSetEditorMode } = unlock(
+	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
+	const { __unstableSetEditorMode, resetZoomLevel } = unlock(
 		useDispatch( blockEditorStore )
 	);
 
 	return useRefEffect(
 		( node ) => {
-			if ( editorMode !== 'zoom-out' ) {
+			// In "compose" mode.
+			const composeMode = editorMode === 'zoom-out' && isZoomOut();
+
+			if ( ! composeMode ) {
 				return;
 			}
 
@@ -39,6 +42,7 @@ export function useZoomOutModeExit( { editorMode } ) {
 						__experimentalSetIsInserterOpened( false );
 					}
 					__unstableSetEditorMode( 'edit' );
+					resetZoomLevel();
 				}
 			}
 
