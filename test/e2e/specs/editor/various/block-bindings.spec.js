@@ -66,7 +66,7 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
-			test( 'should show the key of the custom field in server sources with key', async ( {
+			test( 'should always show the source label in server-only sources', async ( {
 				editor,
 			} ) => {
 				await editor.insertBlock( {
@@ -78,30 +78,6 @@ test.describe( 'Block bindings', () => {
 								content: {
 									source: 'core/server-source',
 									args: { key: 'text_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await expect( paragraphBlock ).toHaveText(
-					'text_custom_field'
-				);
-			} );
-
-			test( 'should show the source label in server sources without key', async ( {
-				editor,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: {
-						content: 'paragraph default content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'core/server-source',
 								},
 							},
 						},
