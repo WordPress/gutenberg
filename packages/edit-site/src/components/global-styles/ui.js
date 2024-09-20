@@ -280,10 +280,9 @@ function GlobalStylesEditorCanvasContainerLink() {
 				 * Exclude revisions panel from this behavior,
 				 * as it should close when the editorCanvasContainerView doesn't correspond.
 				 */
-				if ( path !== '/' && ! isRevisionsOpen ) {
-					return;
+				if ( path !== '/' && isRevisionsOpen ) {
+					goTo( '/' );
 				}
-				goTo( '/' );
 				break;
 		}
 	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
