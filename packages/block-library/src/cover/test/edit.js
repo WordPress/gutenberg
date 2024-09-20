@@ -101,7 +101,7 @@ describe( 'Cover block', () => {
 				} )
 			);
 
-			const title = screen.getByLabelText( 'Empty block;', {
+			const title = screen.getByLabelText( 'Write title…', {
 				exact: false,
 			} );
 			await userEvent.click( title );
