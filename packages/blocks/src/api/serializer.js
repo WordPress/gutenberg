@@ -248,6 +248,7 @@ export function getCommentAttributes( blockType, attributes ) {
 					since: '6.7',
 					version: '6.8',
 					alternative: 'role attribute',
+					hint: `Check the block.json of the ${ blockType?.name } block.`,
 				} );
 				return accumulator;
 			}
