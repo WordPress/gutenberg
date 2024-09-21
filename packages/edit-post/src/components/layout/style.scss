@@ -32,7 +32,7 @@
 		&:focus-visible::after {
 			content: "";
 			position: absolute;
-			inset: 2px 3px 2px 2px;
+			inset: var(--wp-admin-border-width-focus);
 			@include button-style__focus();
 		}
 	}
@@ -57,8 +57,8 @@
 				content: "";
 				background-color: $gray-300;
 				position: absolute;
-				inset: 50% auto auto 50%;
-				transform: translate(-50%, -50%);
+				inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+				transform: translateX(-50%);
 				width: inherit;
 				height: $grid-unit-05;
 				border-radius: $radius-small;
