@@ -24,7 +24,7 @@ export function cleanForSlug( string ) {
 		return '';
 	}
 	return (
-		removeAccents( string )
+		removeAccents( string.replace( /&amp;/g, '' ).replace( /&lt;/g, '' ) )
 			// Convert each group of whitespace, periods, and forward slashes to a hyphen.
 			.replace( /[\s\./]+/g, '-' )
 			// Remove anything that's not a letter, number, underscore or hyphen.
