@@ -208,6 +208,8 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontSize', 'style' ],
+	isMatch: ( { style, fontSize } ) =>
+		!! ( style?.typography?.fontSize || fontSize ),
 	hasSupport( name ) {
 		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},
