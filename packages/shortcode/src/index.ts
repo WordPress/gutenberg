@@ -11,6 +11,18 @@ import memize from 'memize';
  * @property {Object} named   Object with named attributes.
  * @property {Array}  numeric Array with numeric attributes.
  */
+type WPShortcodeAttrs = {
+	/**
+	 * Object with named attributes.
+	 */
+	named: Record< string, string >;
+	/**
+	 * Array with numeric attributes.
+	 */
+	numeric: string[];
+};
+
+type ShortcodeType = 'single' | 'self-closing' | 'closed';
 
 /**
  * Shortcode object.
@@ -23,6 +35,24 @@ import memize from 'memize';
  * @property {string}           type    Shortcode type: `self-closing`,
  *                                      `closed`, or `single`.
  */
+type WPShortcodeOptions = {
+	/**
+	 * Shortcode tag.
+	 */
+	tag: string;
+	/**
+	 * Shortcode attributes.
+	 */
+	attrs: string | WPShortcodeAttrs | WPShortcodeAttrs[ 'named' ];
+	/**
+	 * Shortcode content.
+	 */
+	content: string;
+	/**
+	 * Shortcode type.
+	 */
+	type: ShortcodeType;
+};
 
 /**
  * @typedef {Object} WPShortcodeMatch
@@ -31,6 +61,20 @@ import memize from 'memize';
  * @property {string}      content   Matched content.
  * @property {WPShortcode} shortcode Shortcode instance of the match.
  */
+type WPShortcodeMatch = {
+	/**
+	 * Index the shortcode is found at.
+	 */
+	index: number;
+	/**
+	 * Matched content.
+	 */
+	content: string;
+	/**
+	 * Shortcode instance of the match.
+	 */
+	shortcode: WPShortcode;
+};
 
 /**
  * Find the next matching shortcode.
@@ -41,7 +85,11 @@ import memize from 'memize';
  *
  * @return {WPShortcodeMatch | undefined} Matched information.
  */
-export function next( tag, text, index = 0 ) {
+export function next(
+	tag: string,
+	text: string,
+	index = 0
+): WPShortcodeMatch | undefined {
 	const re = regexp( tag );
 
 	re.lastIndex = index;
@@ -88,24 +136,28 @@ export function next( tag, text, index = 0 ) {
  *
  * @return {string} Text with shortcodes replaced.
  */
-export function replace( tag, text, callback ) {
-	return text.replace(
-		regexp( tag ),
-		function ( match, left, $3, attrs, slash, content, closing, right ) {
-			// If both extra brackets exist, the shortcode has been properly
-			// escaped.
-			if ( left === '[' && right === ']' ) {
-				return match;
-			}
-
-			// Create the match object and pass it through the callback.
-			const result = callback( fromMatch( arguments ) );
-
-			// Make sure to return any of the extra brackets if they weren't used to
-			// escape the shortcode.
-			return result || result === '' ? left + result + right : match;
+export function replace(
+	tag: string,
+	text: string,
+	callback: ( shortcode: WPShortcode ) => any
+): string {
+	return text.replace( regexp( tag ), function ( ...args ) {
+		const [ match, left, , , , , , right ] = args;
+		// If both extra brackets exist, the shortcode has been properly
+		// escaped.
+		if ( left === '[' && right === ']' ) {
+			return match;
 		}
-	);
+
+		// Create the match object and pass it through the callback.
+		const result = callback(
+			fromMatch( args as unknown as RegExpExecArray )
+		);
+
+		// Make sure to return any of the extra brackets if they weren't used to
+		// escape the shortcode.
+		return result || result === '' ? left + result + right : match;
+	} );
 }
 
 /**
@@ -121,7 +173,7 @@ export function replace( tag, text, callback ) {
  *
  * @return {string} String representation of the shortcode.
  */
-export function string( options ) {
+export function string( options: WPShortcodeOptions ): string {
 	return new shortcode( options ).string();
 }
 
@@ -145,7 +197,7 @@ export function string( options ) {
  *
  * @return {RegExp} Shortcode RegExp.
  */
-export function regexp( tag ) {
+export function regexp( tag: string ): RegExp {
 	return new RegExp(
 		'\\[(\\[?)(' +
 			tag +
@@ -171,9 +223,9 @@ export function regexp( tag ) {
  *
  * @return {WPShortcodeAttrs} Parsed shortcode attributes.
  */
-export const attrs = memize( ( text ) => {
-	const named = {};
-	const numeric = [];
+export const attrs = memize( ( text: string ): WPShortcodeAttrs => {
+	const named: Record< string, string > = {};
+	const numeric: string[] = [];
 
 	// This regular expression is reused from `shortcode_parse_atts()` in
 	// `wp-includes/shortcodes.php`.
@@ -195,7 +247,7 @@ export const attrs = memize( ( text ) => {
 	// Map zero-width spaces to actual spaces.
 	text = text.replace( /[\u00a0\u200b]/g, ' ' );
 
-	let match;
+	let match: RegExpExecArray | null;
 
 	// Match and normalize attributes.
 	while ( ( match = pattern.exec( text ) ) ) {
@@ -228,8 +280,8 @@ export const attrs = memize( ( text ) => {
  *
  * @return {WPShortcode} Shortcode instance.
  */
-export function fromMatch( match ) {
-	let type;
+export function fromMatch( match: RegExpExecArray ): WPShortcode {
+	let type: ShortcodeType;
 
 	if ( match[ 4 ] ) {
 		type = 'self-closing';
@@ -247,6 +299,19 @@ export function fromMatch( match ) {
 	} );
 }
 
+function isWPShortcodeAttrsObject(
+	attributes: WPShortcodeAttrs | WPShortcodeAttrs[ 'named' ]
+): attributes is WPShortcodeAttrs {
+	const attributeTypes = [ 'named', 'numeric' ];
+	return (
+		Object.keys( attributes ).length === attributeTypes.length &&
+		attributeTypes.every(
+			( attributeType, key ) =>
+				attributeType === Object.keys( attributes )[ key ]
+		)
+	);
+}
+
 /**
  * Creates a shortcode instance.
  *
@@ -259,10 +324,17 @@ export function fromMatch( match ) {
  *
  * @return {WPShortcode} Shortcode instance.
  */
-const shortcode = Object.assign(
-	function ( options ) {
+class shortcode {
+	tag?: string;
+	attrs: WPShortcodeAttrs;
+	type?: ShortcodeType;
+	content?: string;
+
+	constructor( options: WPShortcodeOptions ) {
 		const { tag, attrs: attributes, type, content } = options || {};
-		Object.assign( this, { tag, type, content } );
+		this.tag = tag;
+		this.type = type;
+		this.content = content;
 
 		// Ensure we have a correctly formatted `attrs` object.
 		this.attrs = {
@@ -274,16 +346,11 @@ const shortcode = Object.assign(
 			return;
 		}
 
-		const attributeTypes = [ 'named', 'numeric' ];
-
 		// Parse a string of attributes.
 		if ( typeof attributes === 'string' ) {
 			this.attrs = attrs( attributes );
 			// Identify a correctly formatted `attrs` object.
-		} else if (
-			attributes.length === attributeTypes.length &&
-			attributeTypes.every( ( t, key ) => t === attributes[ key ] )
-		) {
+		} else if ( isWPShortcodeAttrsObject( attributes ) ) {
 			this.attrs = attributes;
 			// Handle a flat object of attributes.
 		} else {
@@ -291,18 +358,13 @@ const shortcode = Object.assign(
 				this.set( key, value );
 			} );
 		}
-	},
-	{
-		next,
-		replace,
-		string,
-		regexp,
-		attrs,
-		fromMatch,
 	}
-);
 
-Object.assign( shortcode.prototype, {
+	next = next;
+	replace = replace;
+	regexp = regexp;
+	fromMatch = fromMatch;
+
 	/**
 	 * Get a shortcode attribute.
 	 *
@@ -313,11 +375,12 @@ Object.assign( shortcode.prototype, {
 	 *
 	 * @return {string} Attribute value.
 	 */
-	get( attr ) {
-		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
-			attr
-		];
-	},
+	get( attr: number | string ): string {
+		if ( typeof attr === 'number' ) {
+			return this.attrs.numeric[ attr ];
+		}
+		return this.attrs.named[ attr ];
+	}
 
 	/**
 	 * Set a shortcode attribute.
@@ -330,18 +393,21 @@ Object.assign( shortcode.prototype, {
 	 *
 	 * @return {WPShortcode} Shortcode instance.
 	 */
-	set( attr, value ) {
-		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
-			value;
+	set( attr: number | string, value: string ): WPShortcode {
+		if ( typeof attr === 'number' ) {
+			this.attrs.numeric[ attr ] = value;
+		} else {
+			this.attrs.named[ attr ] = value;
+		}
 		return this;
-	},
+	}
 
 	/**
 	 * Transform the shortcode into a string.
 	 *
 	 * @return {string} String representation of the shortcode.
 	 */
-	string() {
+	string(): string {
 		let text = '[' + this.tag;
 
 		this.attrs.numeric.forEach( ( value ) => {
@@ -373,7 +439,9 @@ Object.assign( shortcode.prototype, {
 
 		// Add the closing tag.
 		return text + '[/' + this.tag + ']';
-	},
-} );
+	}
+}
+
+type WPShortcode = shortcode;
 
 export default shortcode;
