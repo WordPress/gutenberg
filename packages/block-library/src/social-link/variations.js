@@ -341,16 +341,22 @@ const variations = [
 ];
 
 /**
- * Add `isActive` function to all `social link` variations, if not defined.
- * `isActive` function is used to find a variation match from a created
- *  Block by providing its attributes.
+ * Add `isActive` and `example` properties to all Social Link variations, if not defined.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) {
-		return;
+	if ( ! variation.isActive ) {
+		variation.isActive = ( blockAttributes, variationAttributes ) =>
+			blockAttributes.service === variationAttributes.service;
 	}
-	variation.isActive = ( blockAttributes, variationAttributes ) =>
-		blockAttributes.service === variationAttributes.service;
+
+	if ( ! variation.example ) {
+		variation.example = {
+			attributes: {
+				service: variation.name,
+				url: '#',
+			},
+		};
+	}
 } );
 
 export default variations;
