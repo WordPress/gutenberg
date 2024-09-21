@@ -31,6 +31,7 @@
 	cite,
 	footer {
 		position: relative;
+		display: block;
 	}
 	.has-text-color a {
 		color: inherit;
@@ -68,8 +69,4 @@
 			font-style: normal;
 		}
 	}
-}
-
-.wp-block-pullquote cite {
-	color: inherit;
 }
