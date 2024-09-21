@@ -16,10 +16,18 @@ import { AUTHORS_QUERY, BASE_QUERY } from './constants';
 export function useAuthorsQuery( search ) {
 	const { authorId, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { getUser, getUsers } = select( coreStore );
+			const { getUser, getUsers, canUser } = select( coreStore );
 			const { getEditedPostAttribute } = select( editorStore );
 			const _authorId = getEditedPostAttribute( 'author' );
 			const query = { ...AUTHORS_QUERY };
+
+			const isCurrentUserAdmin = Boolean( canUser( 'create', 'users' ) );
+
+			// Get the authors with edit context if the current user is admin.
+			if ( isCurrentUserAdmin ) {
+				query.context = 'edit';
+				query._fields = query._fields + ',username';
+			}
 
 			if ( search ) {
 				query.search = search;
@@ -38,7 +46,8 @@ export function useAuthorsQuery( search ) {
 		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
 			return {
 				value: author.id,
-				label: decodeEntities( author.name ),
+				label: `${ decodeEntities( author.name ) }
+				${ decodeEntities( `(${ author.username })` ?? '' ) }`,
 			};
 		} );
 
