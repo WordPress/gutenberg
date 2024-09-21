@@ -43,7 +43,7 @@ export function html( selector, multilineTag ) {
 			return value;
 		}
 
-		return match.innerHTML;
+		return match.innerText;
 	};
 }
 
