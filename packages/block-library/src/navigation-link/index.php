@@ -324,10 +324,6 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 			),
 		),
 		'post_format' => array(
-			// The item_link and item_link_description for post formats is the
-			// same as for tags, so need to be overridden.
-			'title'       => __( 'Post Format Link' ),
-			'description' => __( 'A link to a post format' ),
 			'attributes'  => array(
 				'type' => 'post_format',
 				'kind' => $kind,
