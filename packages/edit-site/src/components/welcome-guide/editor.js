@@ -3,7 +3,7 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -57,8 +57,10 @@ export default function WelcomeGuideEditor() {
 							</p>
 							<p className="edit-site-welcome-guide__text">
 								{ createInterpolateElement(
-									__(
-										'Click <StylesIconImage /> to start designing your blocks, and choose your typography, layout, and colors.'
+									sprintf(
+										// translators: %s - icon for Styles.
+										__( 'Click %s to start designing your blocks, and choose your typography, layout, and colors.' ),
+										'<StylesIconImage />'
 									),
 									{
 										StylesIconImage: (
