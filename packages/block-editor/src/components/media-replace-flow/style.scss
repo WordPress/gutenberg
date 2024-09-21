@@ -38,6 +38,8 @@
 		.block-editor-link-control__search-item-info {
 			max-width: 200px;
 			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 
 		.block-editor-link-control__tools {
