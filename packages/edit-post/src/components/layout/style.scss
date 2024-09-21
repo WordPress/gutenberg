@@ -37,10 +37,6 @@
 		}
 	}
 
-	.is-toggle-only:not(.is-open) > & {
-		overflow: hidden;
-	}
-
 	.is-resizable > & {
 		cursor: row-resize;
 		height: $grid-unit-30;
