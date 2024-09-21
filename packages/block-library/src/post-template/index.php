@@ -123,6 +123,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$block_content = ( new WP_Block( $block_instance ) )->render( array( 'dynamic' => false ) );
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
+		$block_content = apply_filters( 'post_template_block_content', $block_content, $query, $block->context['queryId'] );
+
 		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 
