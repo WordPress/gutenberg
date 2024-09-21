@@ -8,7 +8,7 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -43,14 +43,43 @@ export const TabList = forwardRef<
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate( selectedId, ( { previousValue } ) => {
 		if ( previousValue ) {
-			selectedElement?.scrollIntoView( {
-				behavior: 'instant',
-				block: 'nearest',
-				inline: 'nearest',
-			} );
 			setAnimationEnabled( true );
 		}
 	} );
+
+	// Make sure active tab is scrolled into view.
+	useEffect( () => {
+		if ( ! parent || ! indicatorPosition ) {
+			return;
+		}
+
+		const SCROLL_MARGIN = 24;
+
+		function scrollTo( left: number ) {
+			if ( parent ) {
+				const originalOverflowX = parent.style.overflowX;
+				parent.style.overflowX = 'hidden';
+				parent.scroll( { left } );
+				parent.style.overflowX = originalOverflowX;
+			}
+		}
+
+		const { scrollLeft: parentScroll } = parent;
+		const parentWidth = parent.getBoundingClientRect().width;
+		const { left: childLeft, width: childWidth } = indicatorPosition;
+
+		const parentRightEdge = parentScroll + parentWidth;
+		const childRightEdge = childLeft + childWidth;
+		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
+		if ( rightOverflow > 0 ) {
+			return scrollTo( parentScroll + rightOverflow );
+		}
+
+		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
+		if ( leftOverflow > 0 ) {
+			return scrollTo( parentScroll - leftOverflow );
+		}
+	}, [ indicatorPosition, parent ] );
 
 	const activeId = useStoreState( context?.store, 'activeId' );
 	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );

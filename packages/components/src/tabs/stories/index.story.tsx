@@ -122,7 +122,7 @@ export function SizeAndOverflowPlayground() {
 					? 'Remove width: 100% from TabList'
 					: 'Set width: 100% in TabList' }
 			</Button>
-			<Tabs>
+			<Tabs defaultTabId="tab4">
 				<div
 					style={ {
 						width: '20rem',
