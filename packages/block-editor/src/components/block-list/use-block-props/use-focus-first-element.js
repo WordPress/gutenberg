@@ -87,7 +87,13 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			}
 		}
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition, clientId ] );
+	}, [
+		initialPosition,
+		clientId,
+		isBlockSelected,
+		isMultiSelecting,
+		__unstableGetEditorMode,
+	] );
 
 	return ref;
 }

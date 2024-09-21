@@ -118,7 +118,7 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 				stopDraggingBlocks();
 			}
 		};
-	}, [] );
+	}, [ isDragging.value, stopDraggingBlocks ] );
 
 	const setDraggedBlockIconByClientId = ( clientId ) => {
 		const blockName = select( blockEditorStore ).getBlockName( clientId );
