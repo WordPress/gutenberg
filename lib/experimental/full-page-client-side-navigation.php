@@ -86,14 +86,17 @@ add_filter( 'gutenberg_template_output_buffer', '_gutenberg_add_client_side_navi
  */
 function _gutenberg_buffer_template_output( string $passthrough ): string {
 	ob_start(
-		static function ( string $output ): string {
-			/**
-			 * Filters the template output buffer prior to sending to the client.
-			 *
-			 * @param string $output Output buffer.
-			 * @return string Filtered output buffer.
-			 */
-			return (string) apply_filters( 'gutenberg_template_output_buffer', $output );
+		static function ( string $output, ?int $phase ): string {
+			if ( $phase & PHP_OUTPUT_HANDLER_FINAL ) {
+				/**
+				 * Filters the template output buffer prior to sending to the client.
+				 *
+				 * @param string $output Output buffer.
+				 * @return string Filtered output buffer.
+				 */
+				$output = (string) apply_filters( 'gutenberg_template_output_buffer', $output );
+			}
+			return $output;
 		}
 	);
 	return $passthrough;
