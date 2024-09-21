@@ -51,13 +51,17 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$suffix = '<span class="wp-block-post-terms__suffix">' . $attributes['suffix'] . '</span>' . $suffix;
 	}
 
-	return get_the_term_list(
+	$term_list = get_the_term_list(
 		$block->context['postId'],
 		$attributes['term'],
 		wp_kses_post( $prefix ),
 		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
 		wp_kses_post( $suffix )
 	);
+	if ( false === $term_list || is_wp_error( $term_list ) ) {
+		return '';
+	}
+	return $term_list;
 }
 
 /**
