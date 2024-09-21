@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Warning } from '@wordpress/block-editor';
 import { Icon, homeButton } from '@wordpress/icons';
 
 /**
@@ -216,7 +217,18 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
+			{ ! isReady ? (
+				<>
+					{ ! editedPostType && (
+						<Warning className="editor-error-boundary">
+							{ __(
+								'The template you are currently using is not compatible with the Site Editor.'
+							) }
+						</Warning>
+					) }
+					<CanvasLoader id={ loadingProgressId } />
+				</>
+			) : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
 				<Editor
