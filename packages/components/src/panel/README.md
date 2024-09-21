@@ -50,6 +50,8 @@ Panels should be expanded by default if the content is important or essential. P
 
 The `Panel` creates a container with a header that can take collapsible `PanelBody` components to easily create a user friendly interface for affecting state and attributes.
 
+A `PanelRow` is only necessary when you want to wrap multiple components in a row. With only one component, there is no difference in wrapping it in a `PanelRow` or not.
+
 ### Usage
 
 ```jsx
