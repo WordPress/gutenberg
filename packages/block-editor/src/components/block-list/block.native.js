@@ -471,6 +471,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		__unstableMarkLastChangeAsPersistent,
 		moveBlocksToPosition,
 		removeBlock,
+		selectBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -512,6 +513,28 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				canInsertBlockType,
 			} = registry.select( blockEditorStore );
 
+			function switchToDefaultOrRemove() {
+				const block = getBlock( clientId ) || {};
+				const defaultBlockName = getDefaultBlockName();
+				if ( getBlockName( clientId ) !== defaultBlockName ) {
+					const replacement = switchToBlockType(
+						block,
+						defaultBlockName
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( clientId, replacement );
+					}
+				} else if ( isUnmodifiedDefaultBlock( block ) ) {
+					const nextBlockClientId = getNextBlockClientId( clientId );
+					if ( nextBlockClientId ) {
+						registry.batch( () => {
+							removeBlock( clientId );
+							selectBlock( nextBlockClientId );
+						} );
+					}
+				}
+			}
+
 			/**
 			 * Moves the block with clientId up one level. If the block type
 			 * cannot be inserted at the new location, it will be attempted to
@@ -551,7 +574,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 								getDefaultBlockName()
 							);
 
-							if ( replacement && replacement.length ) {
+							if (
+								replacement &&
+								replacement.length &&
+								replacement.every( ( block ) =>
+									canInsertBlockType(
+										block.name,
+										targetRootClientId
+									)
+								)
+							) {
 								insertBlocks(
 									replacement,
 									getBlockIndex( _clientId ),
@@ -559,6 +591,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 									changeSelection
 								);
 								removeBlock( firstClientId, false );
+							} else {
+								switchToDefaultOrRemove();
 							}
 						}
 
@@ -669,16 +703,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
-				} else if (
-					getBlockName( clientId ) !== getDefaultBlockName()
-				) {
-					const replacement = switchToBlockType(
-						getBlock( clientId ),
-						getDefaultBlockName()
-					);
-					if ( replacement && replacement.length ) {
-						replaceBlocks( clientId, replacement );
-					}
+				} else {
+					switchToDefaultOrRemove();
 				}
 			}
 		},
