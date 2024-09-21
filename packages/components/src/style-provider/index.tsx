@@ -40,7 +40,7 @@ export function StyleProvider( props: StyleProviderProps ) {
 		return null;
 	}
 
-	const cache = memoizedCreateCacheWithContainer( document.head );
+	const cache = memoizedCreateCacheWithContainer( document.head ?? document );
 
 	return <CacheProvider value={ cache }>{ children }</CacheProvider>;
 }
