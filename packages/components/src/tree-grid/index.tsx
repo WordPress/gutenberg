@@ -3,7 +3,16 @@
  */
 import { focus } from '@wordpress/dom';
 import { forwardRef, useCallback } from '@wordpress/element';
-import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	HOME,
+	END,
+	PAGEUP,
+	PAGEDOWN,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -40,6 +49,7 @@ function UnforwardedTreeGrid(
 		onExpandRow = () => {},
 		onCollapseRow = () => {},
 		onFocusRow = () => {},
+		pageSize = 10,
 		applicationAriaLabel,
 		...props
 	}: WordPressComponentProps< TreeGridProps, 'table', false >,
@@ -56,9 +66,18 @@ function UnforwardedTreeGrid(
 
 			if (
 				hasModifierKeyPressed ||
-				! ( [ UP, DOWN, LEFT, RIGHT, HOME, END ] as number[] ).includes(
-					keyCode
-				)
+				! (
+					[
+						UP,
+						DOWN,
+						LEFT,
+						RIGHT,
+						HOME,
+						END,
+						PAGEUP,
+						PAGEDOWN,
+					] as number[]
+				 ).includes( keyCode )
 			) {
 				return;
 			}
@@ -241,7 +260,11 @@ function UnforwardedTreeGrid(
 				// Prevent key use for anything else. This ensures Voiceover
 				// doesn't try to handle key navigation.
 				event.preventDefault();
-			} else if ( ( [ HOME, END ] as number[] ).includes( keyCode ) ) {
+			} else if (
+				( [ HOME, END, PAGEUP, PAGEDOWN ] as number[] ).includes(
+					keyCode
+				)
+			) {
 				// Calculate the rowIndex of the next row.
 				const rows = Array.from(
 					treeGridElement.querySelectorAll< HTMLElement >(
@@ -249,16 +272,27 @@ function UnforwardedTreeGrid(
 					)
 				);
 				const currentRowIndex = rows.indexOf( activeRow );
-				let nextRowIndex;
+				let nextRowIndex = 0;
 
 				if ( keyCode === HOME ) {
 					nextRowIndex = 0;
-				} else {
+				} else if ( keyCode === END ) {
 					nextRowIndex = rows.length - 1;
+				} else if ( keyCode === PAGEUP ) {
+					nextRowIndex = Math.max( 0, currentRowIndex - pageSize );
+				} else if ( keyCode === PAGEDOWN ) {
+					nextRowIndex = Math.min(
+						currentRowIndex + pageSize,
+						rows.length - 1
+					);
 				}
 
 				// Focus is either at the top or bottom edge of the grid. Do nothing.
-				if ( nextRowIndex === currentRowIndex ) {
+				if (
+					nextRowIndex === currentRowIndex &&
+					( currentRowIndex === 0 ||
+						currentRowIndex === rows.length - 1 )
+				) {
 					// Prevent key use for anything else. For example, Voiceover
 					// will start navigating horizontally when reaching the vertical
 					// bounds of a table.
@@ -296,7 +330,7 @@ function UnforwardedTreeGrid(
 				event.preventDefault();
 			}
 		},
-		[ onExpandRow, onCollapseRow, onFocusRow ]
+		[ onExpandRow, onCollapseRow, onFocusRow, pageSize ]
 	);
 
 	/* Disable reason: A treegrid is implemented using a table element. */
