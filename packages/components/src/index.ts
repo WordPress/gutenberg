@@ -40,7 +40,9 @@ export {
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {
+	/** @deprecated Import `BoxControl` instead. */
 	default as __experimentalBoxControl,
+	default as BoxControl,
 	applyValueToSides as __experimentalApplyValueToSides,
 } from './box-control';
 export { default as Button } from './button';

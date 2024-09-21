@@ -12,6 +12,7 @@ export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
 const storeConfigs = new Map();
+const serverStates = new Map();
 
 /**
  * Get the defined config for the store with the passed namespace.
@@ -21,6 +22,39 @@ const storeConfigs = new Map();
  */
 export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
+
+/**
+ * Get the part of the state defined and updated from the server.
+ *
+ * The object returned is read-only, and includes the state defined in PHP with
+ * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
+ * updated to reflect the changes in its properites, without affecting the state
+ * returned by `store()`. Directives can subscribe to those changes to update
+ * the state if needed.
+ *
+ * @example
+ * ```js
+ *  const { state } = store('myStore', {
+ *    callbacks: {
+ *      updateServerState() {
+ *        const serverState = getServerState();
+ *        // Override some property with the new value that came from the server.
+ *        state.overridableProp = serverState.overridableProp;
+ *      },
+ *    },
+ *  });
+ * ```
+ *
+ * @param namespace Store's namespace from which to retrieve the server state.
+ * @return The server state for the given namespace.
+ */
+export const getServerState = ( namespace?: string ) => {
+	const ns = namespace || getNamespace();
+	if ( ! serverStates.has( ns ) ) {
+		serverStates.set( ns, proxifyState( ns, {}, { readOnly: true } ) );
+	}
+	return serverStates.get( ns );
+};
 
 interface StoreOptions {
 	/**
@@ -187,6 +221,7 @@ export const populateServerData = ( data?: {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			const st = store< any >( namespace, {}, { lock: universalUnlock } );
 			deepMerge( st.state, state, false );
+			deepMerge( getServerState( namespace ), state );
 		} );
 	}
 	if ( isPlainObject( data?.config ) ) {

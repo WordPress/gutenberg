@@ -55,6 +55,21 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-dynamic-depe
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-external-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array(array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => 'e1033c1bd62e8cb8d4c9', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`cyclic-external-deps\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array(array('id' => '@wordpress/blob', 'import' => 'dynamic')), 'version' => '4f59b7847b70a07b2710', 'type' => 'module');
 "
@@ -235,6 +250,13 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`overrides\` should 
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '9725ab782f6b09598d3d', 'type' => 'module');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'a1906cfc819b623c86f8', 'type' => 'module');
 "
@@ -400,6 +422,24 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-depe
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-dynamic-dependency-graph\` should produce expected output: External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-external-deps\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-interactivity'), 'version' => '455f3cab924853d41b8b');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`cyclic-external-deps\` should produce expected output: External modules should match snapshot 1`] = `
 [
   {
     "externalType": "window",
@@ -618,6 +658,13 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`overrides\` should 
   },
 ]
 `;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array('dependencies' => array('wp-polyfill'), 'version' => '464c785b5c938d4fde3f');
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment\` should produce expected output: External modules should match snapshot 1`] = `[]`;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
 "<?php return array('dependencies' => array('wp-blob'), 'version' => 'd3cda564b538b44d38ef');

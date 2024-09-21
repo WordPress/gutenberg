@@ -1,15 +1,12 @@
+$resize-handle-height: $grid-unit-30;
+
 .edit-post-meta-boxes-main {
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	background-color: $white;
 	clear: both; // This is seemingly only needed in case the canvas is not iframe’d.
 
 	&:not(details) {
-		padding-top: 23px;
-		max-height: 100%;
-
-		&:not(.has-user-size) {
-			max-height: 50% !important;
-		}
+		padding-top: $resize-handle-height;
 	}
 
 	// The component renders as a details element in short viewports.
@@ -31,24 +28,34 @@
 			z-index: 1;
 		}
 	}
+}
 
-	& .components-resizable-box__handle-top {
-		top: 0;
-		box-shadow: 0 $border-width $gray-300;
-	}
-	& .components-resizable-box__side-handle::before {
-		border-radius: 0;
-		top: 0;
-		height: $border-width;
-	}
-	& .components-resizable-box__handle::after {
+.edit-post-meta-boxes-main__resize-handle {
+	display: flex;
+	// The position is absolute by default inline style of ResizableBox.
+	inset: 0 0 auto 0;
+	height: $resize-handle-height;
+	box-shadow: 0 $border-width $gray-300;
+
+	& > button {
+		appearance: none;
+		cursor: inherit;
+		margin: auto;
+		padding: 0;
+		border: none;
+		outline: none;
 		background-color: $gray-300;
-		box-shadow: none;
-		border-radius: 4px;
+		width: $grid-unit-80;
 		height: $grid-unit-05;
-		top: calc(50% - #{$grid-unit-05} / 2);
-		width: 100px;
-		right: calc(50% - 50px);
+		border-radius: $radius-small;
+		transition: width 0.3s ease-out;
+		@include reduce-motion("transition");
+	}
+
+	&:hover > button,
+	> button:focus {
+		background-color: var(--wp-admin-theme-color);
+		width: $grid-unit-80 + $grid-unit-20;
 	}
 }
 
