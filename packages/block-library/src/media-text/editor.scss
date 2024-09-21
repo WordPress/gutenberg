@@ -42,3 +42,15 @@
 .wp-block-media-text--placeholder-image {
 	min-height: 205px;
 }
+
+@media screen and (min-width: 600px) {
+	.wp-block-media-text {
+		.components-placeholder__fieldset {
+			.components-form-file-upload,
+			.components-button.is-secondary,
+			.block-editor-media-placeholder__url-input-container {
+				width: min-content;
+			}
+		}
+	}
+}
