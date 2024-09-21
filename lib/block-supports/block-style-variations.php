@@ -94,6 +94,10 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
  * @return array The parsed block with block style variation classname added.
  */
 function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
+	if ( is_admin() ) {
+		return $parsed_block;
+	}
+
 	$classes    = $parsed_block['attrs']['className'] ?? null;
 	$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
 
@@ -163,9 +167,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	);
 
 	// Turn off filter that excludes block nodes. They are needed here for the variation's inner block types.
-	if ( ! is_admin() ) {
-		remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
-	}
+	remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 
 	// Temporarily prevent variation instance from being sanitized while processing theme.json.
 	$styles_registry = WP_Block_Styles_Registry::get_instance();
@@ -186,9 +188,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	$styles_registry->unregister( $parsed_block['blockName'], $variation_instance );
 
 	// Restore filter that excludes block nodes.
-	if ( ! is_admin() ) {
-		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
-	}
+	add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 
 	if ( empty( $variation_styles ) ) {
 		return $parsed_block;
@@ -221,7 +221,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  * @return string                Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
-	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
+	if ( is_admin() || ! $block_content || empty( $block['attrs']['className'] ) ) {
 		return $block_content;
 	}
 
