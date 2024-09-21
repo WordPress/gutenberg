@@ -23,6 +23,8 @@ import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
 import { useTrackOverflow } from './use-track-overflow';
 
+const SCROLL_MARGIN = 24;
+
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
@@ -49,14 +51,16 @@ export const TabList = forwardRef<
 
 	// Make sure active tab is scrolled into view.
 	useEffect( () => {
-		if ( ! parent || ! indicatorPosition ) {
+		if (
+			! parent ||
+			! indicatorPosition ||
+			( ! overflow.first && ! overflow.last )
+		) {
 			return;
 		}
 
-		const SCROLL_MARGIN = 24;
-
 		function scrollTo( left: number ) {
-			if ( parent ) {
+			if ( parent?.scroll ) {
 				const originalOverflowX = parent.style.overflowX;
 				parent.style.overflowX = 'hidden';
 				parent.scroll( { left } );
@@ -79,7 +83,7 @@ export const TabList = forwardRef<
 		if ( leftOverflow > 0 ) {
 			return scrollTo( parentScroll - leftOverflow );
 		}
-	}, [ indicatorPosition, parent ] );
+	}, [ indicatorPosition, overflow.first, overflow.last, parent ] );
 
 	const activeId = useStoreState( context?.store, 'activeId' );
 	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
