@@ -55,3 +55,8 @@ p.has-text-align-right[style*="writing-mode:vertical-rl"],
 p.has-text-align-left[style*="writing-mode:vertical-lr"] {
 	rotate: 180deg;
 }
+
+p {
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+}
