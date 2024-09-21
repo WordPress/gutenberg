@@ -1,7 +1,7 @@
 [
 	{
 		"name": "core/cover",
-		"isValid": true,
+		"isValid": false,
 		"attributes": {
 			"url": "https://w.wiki/59So",
 			"useFeaturedImage": false,
@@ -10,6 +10,7 @@
 			"hasParallax": true,
 			"isRepeated": false,
 			"dimRatio": 50,
+			"overlayColor": "black",
 			"backgroundType": "image",
 			"isDark": false,
 			"tagName": "div",
