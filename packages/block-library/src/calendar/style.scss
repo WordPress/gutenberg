@@ -37,9 +37,26 @@
 			color: inherit;
 		}
 	}
+
+	&.has-background {
+		table#wp-calendar th {
+			background: inherit;
+		}
+	}
 }
 
 // Keep the hard-coded header background color for backward compatibility.
 :where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
+}
+
+// Update editor color.
+.wp-block-calendar.has-link-color table#wp-calendar th,
+.wp-block-calendar.has-link-color table#wp-calendar {
+	color: inherit;
+	border-color: inherit;
+}
+
+.wp-block-calendar.has-link-color table#wp-calendar td {
+	border-color: inherit;
 }
