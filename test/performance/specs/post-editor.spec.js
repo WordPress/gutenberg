@@ -310,7 +310,7 @@ test.describe( 'Post Editor Performance', () => {
 
 		test( 'Set up the test page', async ( { admin, perfUtils } ) => {
 			await admin.createNewPost();
-			await perfUtils.load1000Paragraphs();
+			await perfUtils.loadBlocksForLargePost();
 			draftId = await perfUtils.saveDraft();
 		} );
 
