@@ -9,6 +9,9 @@ $blocks-block__margin: 0.5em;
 	text-align: center;
 	word-break: break-word; // overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
 	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+	align-content: center;
 
 	&.aligncenter {
 		text-align: center;
