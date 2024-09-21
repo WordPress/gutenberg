@@ -58,6 +58,15 @@
 		opacity: 0.5;
 	}
 
+	/**
+	 * To support key board navigation, focus styles are added to the cover block.
+	 */
+	&:focus,
+	&:focus-visible,
+	&:focus-within {
+		outline: -webkit-focus-ring-color auto 1px;
+	}
+
 	// The following styles are needed to support legacy blocks added prior to the update
 	// that moved opacity to a nested span.
 	// https://github.com/WordPress/gutenberg/pull/35065

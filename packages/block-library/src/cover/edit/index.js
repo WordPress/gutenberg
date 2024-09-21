@@ -508,6 +508,7 @@ function CoverEdit( {
 				{ showOverlay && (
 					<span
 						aria-hidden="true"
+						tabIndex={ 0 }
 						className={ clsx(
 							'wp-block-cover__background',
 							dimRatioToClass( dimRatio ),
