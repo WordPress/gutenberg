@@ -23,10 +23,10 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * 	return React.createElement(
  * 		PluginSidebarMoreMenuItem,
  * 		{
- * 			target: 'my-sidebar',
+ * 			target: 'my-panel',
  * 			icon: moreIcon,
  * 		},
- * 		__( 'My sidebar title' )
+ * 		__( 'My panel title' )
  * 	)
  * }
  * ```
@@ -40,10 +40,10 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  *
  * const MySidebarMoreMenuItem = () => (
  * 	<PluginSidebarMoreMenuItem
- * 		target="my-sidebar"
+ * 		target="my-panel"
  * 		icon={ more }
  * 	>
- * 		{ __( 'My sidebar title' ) }
+ * 		{ __( 'My panel title' ) }
  * 	</PluginSidebarMoreMenuItem>
  * );
  * ```

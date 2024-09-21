@@ -92,7 +92,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/toggle-sidebar',
 			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
+			description: __( 'Show or hide the Settings panel.' ),
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: ',',

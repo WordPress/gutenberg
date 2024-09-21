@@ -224,7 +224,7 @@ function useEditorCommandLoader() {
 
 	commands.push( {
 		name: 'core/open-settings-sidebar',
-		label: __( 'Toggle settings sidebar' ),
+		label: __( 'Toggle settings panel' ),
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			const activeSidebar = getActiveComplementaryArea( 'core' );

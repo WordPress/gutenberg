@@ -109,7 +109,7 @@
 <!-- /wp:gallery -->
 
 <!-- wp:paragraph -->
-<p><?php _e( 'You can change the amount of columns in your galleries by dragging a slider in the block inspector in the sidebar.', 'gutenberg' ); ?></p>
+<p><?php _e( 'You can change the amount of columns in your galleries by dragging a slider in the block settings panel.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading {"level":2} -->
