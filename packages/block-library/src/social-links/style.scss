@@ -1,3 +1,10 @@
+.wp-block-group .wp-block-social-links {
+	&.alignleft,
+	&.alignright {
+		float: none;
+	}
+}
+
 .wp-block-social-links {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
@@ -159,3 +166,4 @@
 		}
 	}
 }
+
