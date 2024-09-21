@@ -30,6 +30,7 @@ import {
 	safeDecodeURI,
 } from '../';
 import wptData from './fixtures/wpt-data';
+import bug24895Data from './fixtures/bug-24895-data';
 
 describe( 'isURL', () => {
 	it.each( wptData.map( ( { input, failure } ) => [ input, !! failure ] ) )(
@@ -38,6 +39,12 @@ describe( 'isURL', () => {
 			expect( isURL( input ) ).toBe( ! isFailure );
 		}
 	);
+
+	it.each(
+		bug24895Data.map( ( { input, failure } ) => [ input, !! failure ] )
+	)( '%s', ( input, isFailure ) => {
+		expect( isURL( input ) ).toBe( ! isFailure );
+	} );
 } );
 
 describe( 'isEmail', () => {
