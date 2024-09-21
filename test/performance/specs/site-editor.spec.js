@@ -359,17 +359,14 @@ test.describe( 'Site Editor Performance', () => {
 								.getByTitle( 'Editor canvas' )
 						);
 
-						// Wait until the first block is rendered AND all
-						// patterns are replaced.
-						await Promise.all( [
-							canvas.locator( '.wp-block' ).first().waitFor(),
-							page.waitForFunction(
-								() =>
-									document.querySelectorAll(
-										'[data-type="core/pattern"]'
-									).length === 0
-							),
-						] );
+						// We need to wait for some essential content that all
+						// index patterns have in common. A portfolio index
+						// template does not have a title or content, but all
+						// patterns do have links to the posts.
+						await canvas
+							.locator( '[data-type="core/post-template"] a' )
+							.first()
+							.waitFor();
 					} )
 				);
 
