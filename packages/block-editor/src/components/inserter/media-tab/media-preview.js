@@ -126,13 +126,14 @@ export function MediaPreview( { media, onClick, category } ) {
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
+	const { imageDefaultSize } = getSettings();
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
 		[ media, category.mediaType ]
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const { getSettings } = useSelect( blockEditorStore );
 
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
@@ -174,14 +175,38 @@ export function MediaPreview( { media, onClick, category } ) {
 							if ( isBlobURL( img.url ) ) {
 								return;
 							}
-							onClick( {
-								...clonedBlock,
-								attributes: {
-									...clonedBlock.attributes,
-									id: img.id,
-									url: img.url,
-								},
-							} );
+
+							if (
+								clonedBlock.name === 'core/image' &&
+								img.media_type === 'image'
+							) {
+								const sizeSlug =
+									img.sizes?.[ imageDefaultSize ] ||
+									img.media_details?.sizes?.[
+										imageDefaultSize
+									]
+										? imageDefaultSize
+										: 'full';
+								onClick( {
+									...clonedBlock,
+									attributes: {
+										...clonedBlock.attributes,
+										id: img.id,
+										url: img.url,
+										sizeSlug,
+									},
+								} );
+							} else {
+								onClick( {
+									...clonedBlock,
+									attributes: {
+										...clonedBlock.attributes,
+										id: img.id,
+										url: img.url,
+									},
+								} );
+							}
+
 							createSuccessNotice(
 								__( 'Image uploaded and inserted.' ),
 								{ type: 'snackbar' }
@@ -206,6 +231,7 @@ export function MediaPreview( { media, onClick, category } ) {
 			onClick,
 			createSuccessNotice,
 			createErrorNotice,
+			imageDefaultSize,
 		]
 	);
 
