@@ -14,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -171,7 +171,12 @@ function ResizableFrame( {
 		event.preventDefault();
 
 		const step = 20 * ( event.shiftKey ? 5 : 1 );
-		const delta = step * ( event.key === 'ArrowLeft' ? 1 : -1 );
+		const delta =
+			step *
+			( ( ! isRTL() && event.key === 'ArrowLeft' ) ||
+			( isRTL() && event.key === 'ArrowRight' )
+				? 1
+				: -1 );
 		const newWidth = Math.min(
 			Math.max(
 				FRAME_MIN_WIDTH,
@@ -200,15 +205,17 @@ function ResizableFrame( {
 	const resizeHandleVariants = {
 		hidden: {
 			opacity: 0,
-			left: 0,
+			...( isRTL() ? { right: 0 } : { left: 0 } ),
 		},
 		visible: {
 			opacity: 1,
-			left: -14, // Account for the handle's width.
+			// Account for the handle's width.
+			...( isRTL() ? { right: -14 } : { left: -14 } ),
 		},
 		active: {
 			opacity: 1,
-			left: -14, // Account for the handle's width.
+			// Account for the handle's width.
+			...( isRTL() ? { right: -14 } : { left: -14 } ),
 			scaleY: 1.3,
 		},
 	};
