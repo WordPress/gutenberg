@@ -8,7 +8,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { search } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ export default function ZoomDropdown() {
 			popoverProps={ POPOVER_PROPS }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarButton
-					icon={ search }
+					icon={ plus }
 					label={ __( 'Zoom' ) }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }
