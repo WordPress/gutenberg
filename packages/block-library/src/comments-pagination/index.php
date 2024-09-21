@@ -28,8 +28,10 @@ function render_block_core_comments_pagination( $attributes, $content ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf(
-		'<div %1$s>%2$s</div>',
+		'<nav %1$s aria-label="%2$s"><span class="screen-reader-text">%3$s</span>%4$s</nav>',
 		$wrapper_attributes,
+		__( 'Comments' ),
+		__( 'Comments navigation' ),
 		$content
 	);
 }
