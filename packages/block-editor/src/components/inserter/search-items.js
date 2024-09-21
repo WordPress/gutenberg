@@ -5,7 +5,9 @@ import removeAccents from 'remove-accents';
 import { noCase } from 'change-case';
 
 // Default search helpers.
-const defaultGetName = ( item ) => item.name || '';
+// For the block name, prioritize returning the id,
+// which is similar to the name, but includes the variation.
+const defaultGetName = ( item ) => item.id || item.name || '';
 const defaultGetTitle = ( item ) => item.title;
 const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
