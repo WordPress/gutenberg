@@ -104,10 +104,11 @@ export function SizeAndOverflowPlayground() {
 							</li>
 							<li>
 								<strong>
-									Without <code>width: auto</code>
+									Without <code>width: 100%</code>
 								</strong>{ ' ' }
-								set on the TabList (tabs take up space
-								proportional to their content).
+								(defaults to <code>auto</code>) set on the
+								TabList (tabs take up space proportional to
+								their content).
 							</li>
 						</ul>
 					</li>
