@@ -33,6 +33,10 @@
 	iframe {
 		max-width: 100%;
 	}
+
+	&.alignright {
+		margin-inline-start: auto;
+	}
 }
 
 .wp-block-embed__wrapper {
