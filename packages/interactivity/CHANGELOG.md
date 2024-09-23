@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.8.0 (2024-09-19)
+
 ### Enhancements
 
 -   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).

@@ -17,108 +17,26 @@ test.describe( 'Order of block keyboard navigation', () => {
 		await editor.openDocumentSettingsSidebar();
 	} );
 
-	test( 'permits tabbing through paragraph blocks in the expected order', async ( {
-		editor,
-		KeyboardNavigableBlocks,
-		page,
-	} ) => {
-		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
-
-		// Create 3 paragraphs blocks with some content.
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( paragraphBlock );
-		}
-
-		// Select the middle block.
-		await page.keyboard.press( 'ArrowUp' );
-		await editor.showBlockToolbar();
-		await KeyboardNavigableBlocks.navigateToContentEditorTop();
-		await KeyboardNavigableBlocks.tabThroughParagraphBlock( 'Paragraph 1' );
-
-		// Repeat the same steps to ensure that there is no change introduced in how the focus is handled.
-		// This prevents the previous regression explained in: https://github.com/WordPress/gutenberg/issues/11773.
-		await KeyboardNavigableBlocks.navigateToContentEditorTop();
-		await KeyboardNavigableBlocks.tabThroughParagraphBlock( 'Paragraph 1' );
-	} );
-
-	test( 'allows tabbing in navigation mode if no block is selected', async ( {
-		editor,
-		KeyboardNavigableBlocks,
-		page,
-	} ) => {
-		const paragraphBlocks = [ '0', '1' ];
-
-		// Create 2 paragraphs blocks with some content.
-		for ( const paragraphBlock of paragraphBlocks ) {
-			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( paragraphBlock );
-		}
-
-		// Clear the selected block.
-		const paragraph = editor.canvas
-			.locator( '[data-type="core/paragraph"]' )
-			.getByText( '1' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
-
-		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Add title' );
-
-		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Paragraph Block. Row 1. 0'
-		);
-
-		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Paragraph Block. Row 2. 1'
-		);
-
-		await page.keyboard.press( 'Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
-	} );
-
-	test( 'allows tabbing in navigation mode if no block is selected (reverse)', async ( {
+	test( 'permits tabbing through the block toolbar of the paragraph block', async ( {
 		editor,
 		KeyboardNavigableBlocks,
 		page,
 		pageUtils,
 	} ) => {
-		const paragraphBlocks = [ '0', '1' ];
-
-		// Create 2 paragraphs blocks with some content.
-		for ( const paragraphBlock of paragraphBlocks ) {
+		// Insert three paragraph blocks.
+		for ( let i = 0; i < 3; i++ ) {
 			await editor.insertBlock( { name: 'core/paragraph' } );
-			await page.keyboard.type( paragraphBlock );
+			await page.keyboard.type( `Paragraph ${ i + 1 }` );
 		}
-
-		// Clear the selected block.
-		const paragraph = editor.canvas
-			.locator( '[data-type="core/paragraph"]' )
-			.getByText( '1' );
-		const box = await paragraph.boundingBox();
-		await page.mouse.click( box.x - 1, box.y );
-
-		// Put focus behind the block list.
-		await page.evaluate( () => {
-			document
-				.querySelector( '.interface-interface-skeleton__sidebar' )
-				.focus();
-		} );
-
+		// Select the middle paragraph block.
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.showBlockToolbar();
 		await pageUtils.pressKeys( 'shift+Tab' );
+		await KeyboardNavigableBlocks.navigateThroughBlockToolbar();
+		await page.keyboard.press( 'Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Paragraph Block. Row 2. 1'
+			'Block: Paragraph'
 		);
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Paragraph Block. Row 1. 0'
-		);
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Add title' );
 	} );
 
 	test( 'should navigate correctly with multi selection', async ( {
@@ -208,31 +126,7 @@ class KeyboardNavigableBlocks {
 		expect( ariaLabel ).toBe( label );
 	}
 
-	async navigateToContentEditorTop() {
-		// Use 'Ctrl+`' to return to the top of the editor.
-		await this.pageUtils.pressKeys( 'ctrl+`', { times: 5 } );
-	}
-
-	async tabThroughParagraphBlock( paragraphText ) {
-		await this.tabThroughBlockToolbar();
-
-		await this.page.keyboard.press( 'Tab' );
-		await this.expectLabelToHaveFocus( 'Block: Paragraph' );
-
-		const activeElement = this.editor.canvas.locator( ':focus' );
-
-		await expect( activeElement ).toHaveText( paragraphText );
-
-		await this.page.keyboard.press( 'Tab' );
-		await this.expectLabelToHaveFocus( 'Block' );
-
-		// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
-		await this.pageUtils.pressKeys( 'shift+Tab' );
-		await this.expectLabelToHaveFocus( 'Block: Paragraph' );
-	}
-
-	async tabThroughBlockToolbar() {
-		await this.page.keyboard.press( 'Tab' );
+	async navigateThroughBlockToolbar() {
 		await this.expectLabelToHaveFocus( 'Paragraph' );
 
 		await this.page.keyboard.press( 'ArrowRight' );

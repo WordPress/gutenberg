@@ -4,7 +4,7 @@
 	}
 }
 
-@mixin animation__fade-in($speed: 0.08s, $delay: 0s) {
+@mixin animation__fade-in($speed: 0.08s, $delay: 0s, $easing: linear) {
 	@include keyframes(__wp-base-styles-fade-in) {
 		from {
 			opacity: 0;
@@ -15,12 +15,12 @@
 	}
 
 
-	animation: __wp-base-styles-fade-in $speed linear $delay;
+	animation: __wp-base-styles-fade-in $speed $easing $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 }
 
-@mixin animation__fade-out($speed: 0.08s, $delay: 0s) {
+@mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
 	@include keyframes(__wp-base-styles-fade-out) {
 		from {
 			opacity: 1;
@@ -31,7 +31,7 @@
 	}
 
 
-	animation: __wp-base-styles-fade-out $speed linear $delay;
+	animation: __wp-base-styles-fade-out $speed $easing $delay;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
 }
