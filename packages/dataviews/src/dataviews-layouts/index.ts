@@ -75,6 +75,17 @@ function getCombinedFieldIds( view: View ): string[] {
 	return combinedFields;
 }
 
+function getMediaFieldIds( view: View ): string[] {
+	const mediaFields: string[] = [];
+	if ( view.type === LAYOUT_GRID && view.layout?.mediaField ) {
+		mediaFields.push( view.layout.mediaField );
+	}
+	if ( view.type === LAYOUT_LIST && view.layout?.mediaField ) {
+		mediaFields.push( view.layout.mediaField );
+	}
+	return mediaFields;
+}
+
 export function getVisibleFieldIds(
 	view: View,
 	fields: Field< any >[]
@@ -97,13 +108,6 @@ export function getVisibleFieldIds(
 				.filter( ( { id } ) => ! fieldsToExclude.includes( id ) )
 				.map( ( { id } ) => id )
 		);
-	}
-	if (
-		( view.type === LAYOUT_GRID || view.type === LAYOUT_LIST ) &&
-		view.layout?.mediaField &&
-		! visibleFields.includes( view.layout?.mediaField )
-	) {
-		visibleFields.push( view.layout?.mediaField );
 	}
 
 	return visibleFields;
