@@ -3,26 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 
-/**
- * @typedef {Object} StyleBookCategory
- *
- * @property {string} slug  Unique category slug.
- * @property {string} title Category label, for display in user interface.
- */
 export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 	{
-		name: 'site-identity',
+		slug: 'site-identity',
 		title: __( 'Site Identity' ),
 		blocks: [ 'core/site-logo', 'core/site-title', 'core/site-tagline' ],
 	},
 	{
-		name: 'design',
+		slug: 'design',
 		title: __( 'Design' ),
 		blocks: [ 'core/navigation', 'core/avatar', 'core/post-time-to-read' ],
 		exclude: [ 'core/home-link', 'core/navigation-link' ],
 	},
 	{
-		name: 'posts',
+		slug: 'posts',
 		title: __( 'Posts' ),
 		blocks: [
 			'core/post-title',
@@ -40,7 +34,7 @@ export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 		],
 	},
 	{
-		name: 'comments',
+		slug: 'comments',
 		title: __( 'Comments' ),
 		blocks: [
 			'core/comments-title',
@@ -61,7 +55,7 @@ export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 
 export const STYLE_BOOK_CATEGORIES = [
 	{
-		name: 'text',
+		slug: 'text',
 		title: __( 'Text' ),
 		blocks: [
 			'core/post-content',
@@ -70,27 +64,27 @@ export const STYLE_BOOK_CATEGORIES = [
 		],
 	},
 	{
-		name: 'colors',
+		slug: 'colors',
 		title: __( 'Colors' ),
 		blocks: [ 'custom/colors' ],
 	},
 	{
-		name: 'theme',
+		slug: 'theme',
 		title: __( 'Theme' ),
 		subcategories: STYLE_BOOK_THEME_SUBCATEGORIES,
 	},
 	{
-		name: 'media',
+		slug: 'media',
 		title: __( 'Media' ),
 		blocks: [ 'core/post-featured-image' ],
 	},
 	{
-		name: 'widgets',
+		slug: 'widgets',
 		title: __( 'Widgets' ),
 		blocks: [],
 	},
 	{
-		name: 'embed',
+		slug: 'embed',
 		title: __( 'Embeds' ),
 		include: [],
 	},

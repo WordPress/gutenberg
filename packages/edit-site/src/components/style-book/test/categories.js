@@ -62,21 +62,21 @@ describe( 'utils', () => {
 	describe( 'getCategoryExamples', () => {
 		it( 'returns theme subcategories examples', () => {
 			const themeCategory = STYLE_BOOK_CATEGORIES.find(
-				( category ) => category.name === 'theme'
+				( category ) => category.slug === 'theme'
 			);
 			const themeCategoryExamples = getCategoryExamples(
 				themeCategory,
 				exampleThemeBlocks
 			);
 
-			expect( themeCategoryExamples.name ).toEqual( 'theme' );
+			expect( themeCategoryExamples.slug ).toEqual( 'theme' );
 
 			const siteIdentity = themeCategoryExamples.subcategories.find(
-				( subcategory ) => subcategory.name === 'site-identity'
+				( subcategory ) => subcategory.slug === 'site-identity'
 			);
 			expect( siteIdentity ).toEqual( {
 				title: 'Site Identity',
-				name: 'site-identity',
+				slug: 'site-identity',
 				examples: [
 					{
 						name: 'core/site-logo',
@@ -97,11 +97,11 @@ describe( 'utils', () => {
 			} );
 
 			const design = themeCategoryExamples.subcategories.find(
-				( subcategory ) => subcategory.name === 'design'
+				( subcategory ) => subcategory.slug === 'design'
 			);
 			expect( design ).toEqual( {
 				title: 'Design',
-				name: 'design',
+				slug: 'design',
 				examples: [
 					{
 						name: 'core/group',
@@ -112,12 +112,12 @@ describe( 'utils', () => {
 			} );
 
 			const posts = themeCategoryExamples.subcategories.find(
-				( subcategory ) => subcategory.name === 'posts'
+				( subcategory ) => subcategory.slug === 'posts'
 			);
 
 			expect( posts ).toEqual( {
 				title: 'Posts',
-				name: 'posts',
+				slug: 'posts',
 				examples: [
 					{
 						name: 'core/post-terms',

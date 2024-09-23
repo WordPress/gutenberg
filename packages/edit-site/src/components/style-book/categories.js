@@ -3,10 +3,10 @@
  *
  * @typedef {Object} StyleBookCategory
  *
- * @property {string} name     Object with named attributes.
- * @property {string} title    Object with named attributes.
- * @property {Array?} blocks   Object with named attributes.
- * @property {Array?} excludes Array with numeric attributes.
+ * @property {string} slug     Category identifier.
+ * @property {string} title    Category title/label.
+ * @property {Array?} blocks   Array of block names to include in the category. Used when blocks are not included in the category by default.
+ * @property {Array?} excludes Array of blocks to exclude from the category. Used when blocks are included in the category by default.
  */
 
 /**
@@ -25,10 +25,10 @@
  *
  * @typedef {Object} CategoryExamples
  *
- * @property {string}                   name       Name of the category.
- * @property {string}                   title      Title of the category for the UI.
- * @property {Array<blockExamples>?}    examples   Object with named attributes.
- * @property {Array<CategoryExamples>?} categories Array with numeric attributes.
+ * @property {string}                   slug          Category identifier.
+ * @property {string}                   title         Category title/label.
+ * @property {Array<blockExamples>?}    examples      Array of block examples.
+ * @property {Array<CategoryExamples>?} subcategories Array of subcategory examples.
  */
 
 /**
@@ -38,7 +38,7 @@
  * @return {CategoryExamples|undefined} An object containing the category examples.
  */
 export function getCategoryExamples( categoryDefinition, examples ) {
-	if ( ! categoryDefinition?.name || ! examples?.length ) {
+	if ( ! categoryDefinition?.slug || ! examples?.length ) {
 		return;
 	}
 
@@ -59,7 +59,7 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 			},
 			{
 				title: categoryDefinition.title,
-				name: categoryDefinition.name,
+				slug: categoryDefinition.slug,
 				subcategories: [],
 			}
 		);
@@ -70,7 +70,7 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 	const categoryExamples = examples.filter( ( example ) => {
 		return (
 			! blocksToExclude.includes( example.name ) &&
-			( example.category === categoryDefinition.name ||
+			( example.category === categoryDefinition.slug ||
 				blocksToInclude.includes( example.name ) )
 		);
 	} );
@@ -81,7 +81,7 @@ export function getCategoryExamples( categoryDefinition, examples ) {
 
 	return {
 		title: categoryDefinition.title,
-		name: categoryDefinition.name,
+		slug: categoryDefinition.slug,
 		examples: categoryExamples,
 	};
 }
