@@ -394,6 +394,10 @@ describe( 'private selectors', () => {
 					parents: new Map( [
 						[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
 					] ),
+					order: new Map( [
+						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
+					] ),
 				},
 				blockEditingModes: new Map(),
 			};
@@ -423,6 +427,21 @@ describe( 'private selectors', () => {
 							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
+					] ),
+
+					order: new Map( [
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							[
+								'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+								'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							],
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
+						],
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
@@ -460,6 +479,21 @@ describe( 'private selectors', () => {
 							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
+					] ),
+					order: new Map( [
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f' ],
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c' ],
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
+						],
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
