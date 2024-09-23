@@ -389,5 +389,29 @@ describe( 'Interactivity API', () => {
 			expect( spy ).toHaveBeenCalledTimes( 2 );
 			expect( spy ).toHaveLastReturnedWith( [ 'a', 'b', 'c' ] );
 		} );
+
+		it( 'should handle deeply nested properties that are initially undefined and merged with deepMerge', () => {
+			const target: any = proxifyState( 'test', {} );
+
+			let deepValue: any;
+			const spy = jest.fn( () => {
+				deepValue = target.a?.b?.c?.d;
+			} );
+			effect( spy );
+
+			// Initial call, the deep value is undefined
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( deepValue ).toBeUndefined();
+
+			// Use deepMerge to add a deeply nested object to the target
+			deepMerge( target, { a: { b: { c: { d: 'test value' } } } } );
+
+			// The effect should be called again
+			expect( spy ).toHaveBeenCalledTimes( 2 );
+			expect( deepValue ).toBe( 'test value' );
+
+			// Reading the value directly should also work
+			expect( target.a.b.c.d ).toBe( 'test value' );
+		} );
 	} );
 } );
