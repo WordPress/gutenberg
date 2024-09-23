@@ -1,8 +1,16 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## Internal
+## Unreleased
 
-- Added `addPolyfillComments` option. When used, it will automatically add magic comments to mark files that need `wp-polyfill`.
+### Bug Fixes
+
+-   Fix a bug in 8.8.1 due to missing files in the published package ([#65481](https://github.com/WordPress/gutenberg/pull/65481)).
+
+## 8.8.0 (2024-09-19)
+
+### Internal
+
+-   Added `addPolyfillComments` option. When used, it will automatically add magic comments to mark files that need `wp-polyfill` ([#65292](https://github.com/WordPress/gutenberg/pull/65292)).
 
 ## 8.7.0 (2024-09-05)
 

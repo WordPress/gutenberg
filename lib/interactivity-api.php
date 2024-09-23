@@ -6,37 +6,6 @@
  */
 
 /**
- * Deregisters the Core Interactivity API Modules and replace them
- * with the ones from the Gutenberg plugin.
- */
-function gutenberg_reregister_interactivity_script_modules() {
-	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
-	wp_deregister_script_module( '@wordpress/interactivity' );
-	wp_deregister_script_module( '@wordpress/interactivity-router' );
-
-	wp_register_script_module(
-		'@wordpress/interactivity',
-		gutenberg_url( '/build-module/' . ( SCRIPT_DEBUG ? 'interactivity/debug.min.js' : 'interactivity/index.min.js' ) ),
-		array(),
-		$default_version
-	);
-
-	wp_register_script_module(
-		'@wordpress/interactivity-router',
-		gutenberg_url( '/build-module/interactivity-router/index.min.js' ),
-		array(
-			array(
-				'id'     => '@wordpress/a11y',
-				'import' => 'dynamic',
-			),
-			'@wordpress/interactivity',
-		),
-		$default_version
-	);
-}
-add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
-
-/**
  * Adds script data to the interactivity-router script module.
  *
  * This filter is registered conditionally anticipating a WordPress Core change to add the script module data.

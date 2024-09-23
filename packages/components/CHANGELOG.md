@@ -9,11 +9,13 @@
 -   `Tabs`: restore vertical indicator ([#65385](https://github.com/WordPress/gutenberg/pull/65385)).
 -   `Tabs`: indicator positioning under RTL direction ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
 -   `Popover`: Update `toolbar` variant radius to match block toolbar ([#65263](https://github.com/WordPress/gutenberg/pull/65263)).
+-   `MenuItemsChoice`: Allow menu items height to adapt to its content ([#65204](https://github.com/WordPress/gutenberg/pull/65204)).
 -   `BoxControl`: Unify input filed width whether linked or not ([#65348](https://github.com/WordPress/gutenberg/pull/65348)).
 
 ### Deprecations
 
 -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
+-   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### New Features
 
@@ -34,6 +36,7 @@
 -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
 -   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
 -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
+-   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
 
 ### Bug Fixes
 

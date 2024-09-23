@@ -58,7 +58,7 @@ test.describe( 'Post publish panel', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should move focus to the publish button in the panel', async ( {
+	test( 'should move focus to the cancel button in the panel', async ( {
 		editor,
 		page,
 	} ) => {
@@ -74,7 +74,7 @@ test.describe( 'Post publish panel', () => {
 			page
 				.getByRole( 'region', { name: 'Editor publish' } )
 				.locator( ':focus' )
-		).toHaveText( 'Publish' );
+		).toHaveText( 'Cancel' );
 	} );
 
 	test( 'should focus on the post list after publishing', async ( {

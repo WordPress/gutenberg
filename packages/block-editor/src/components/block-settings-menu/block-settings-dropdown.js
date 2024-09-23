@@ -58,7 +58,6 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = clientIds[ 0 ];
 	const {
 		firstParentClientId,
-		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
 		selectedBlockClientIds,
@@ -67,7 +66,6 @@ export function BlockSettingsDropdown( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
@@ -86,7 +84,6 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
 					( getActiveBlockVariation(
@@ -195,7 +192,6 @@ export function BlockSettingsDropdown( {
 				canCopyStyles,
 				canDuplicate,
 				canInsertBlock,
-				canMove,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
@@ -203,7 +199,6 @@ export function BlockSettingsDropdown( {
 				onRemove,
 				onCopy,
 				onPasteStyles,
-				onMoveTo,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
@@ -294,9 +289,6 @@ export function BlockSettingsDropdown( {
 							<BlockSettingsMenuControls.Slot
 								fillProps={ {
 									onClose,
-									canMove,
-									onMoveTo,
-									onlyBlock,
 									count,
 									firstBlockClientId,
 								} }
