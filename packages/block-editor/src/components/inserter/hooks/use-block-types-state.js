@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import {
+	getBlockType,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 	parse,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -42,6 +45,7 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 	const { getClosestAllowedInsertionPoint } = unlock(
 		useSelect( blockEditorStore )
 	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ categories, collections ] = useSelect( ( select ) => {
 		const { getCategories, getCollections } = select( blocksStore );
@@ -57,26 +61,38 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 				name,
 				rootClientId
 			);
-			if ( destinationClientId !== null ) {
-				const insertedBlock =
-					syncStatus === 'unsynced'
-						? parse( content, {
-								__unstableSkipMigrationLogs: true,
-						  } )
-						: createBlock(
-								name,
-								initialAttributes,
-								createBlocksFromInnerBlocksTemplate(
-									innerBlocks
-								)
-						  );
-				onInsert(
-					insertedBlock,
-					undefined,
-					shouldFocusBlock,
-					destinationClientId
+			if ( destinationClientId === null ) {
+				const title = getBlockType( name )?.title ?? name;
+				createErrorNotice(
+					sprintf(
+						/* translators: %s: block pattern title. */
+						__( 'Block "%s" can\'t be inserted.' ),
+						title
+					),
+					{
+						type: 'snackbar',
+						id: 'inserter-notice',
+					}
 				);
+				return;
 			}
+
+			const insertedBlock =
+				syncStatus === 'unsynced'
+					? parse( content, {
+							__unstableSkipMigrationLogs: true,
+					  } )
+					: createBlock(
+							name,
+							initialAttributes,
+							createBlocksFromInnerBlocksTemplate( innerBlocks )
+					  );
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				destinationClientId
+			);
 		},
 		[ onInsert, getClosestAllowedInsertionPoint, rootClientId ]
 	);
