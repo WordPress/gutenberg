@@ -51,11 +51,7 @@ export const TabList = forwardRef<
 
 	// Make sure active tab is scrolled into view.
 	useEffect( () => {
-		if (
-			! parent ||
-			! indicatorPosition ||
-			( ! overflow.first && ! overflow.last )
-		) {
+		if ( ! parent || ! indicatorPosition ) {
 			return;
 		}
 
@@ -83,7 +79,7 @@ export const TabList = forwardRef<
 		if ( leftOverflow > 0 ) {
 			return scrollTo( parentScroll - leftOverflow );
 		}
-	}, [ indicatorPosition, overflow.first, overflow.last, parent ] );
+	}, [ indicatorPosition, parent ] );
 
 	const activeId = useStoreState( context?.store, 'activeId' );
 	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
