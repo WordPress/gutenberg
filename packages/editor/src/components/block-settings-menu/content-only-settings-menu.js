@@ -15,65 +15,38 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import usePostContentBlocks from '../provider/use-post-content-blocks';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const postContentBlocks = usePostContentBlocks();
 	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				getSettings,
 				getBlockAttributes,
-			} = select( blockEditorStore );
+			} = unlock( select( blockEditorStore ) );
 			const patternParent = getBlockParentsByBlockName(
 				clientId,
 				'core/block',
 				true
 			)[ 0 ];
 
-			let record;
-			if ( patternParent ) {
-				record = select( coreStore ).getEntityRecord(
-					'postType',
-					'wp_block',
-					getBlockAttributes( patternParent ).ref
-				);
-			} else {
-				const { getCurrentTemplateId } = select( editorStore );
-				const templateId = getCurrentTemplateId();
-				const { getBlockParents } = unlock(
-					select( blockEditorStore )
-				);
-				if (
-					! getBlockParents( clientId ).some( ( parent ) =>
-						postContentBlocks.includes( parent )
-					)
-				) {
-					record = select( coreStore ).getEntityRecord(
-						'postType',
-						'wp_template',
-						templateId
-					);
-				}
-			}
-			if ( ! record ) {
-				return {};
-			}
 			const _canEditTemplates = select( coreStore ).canUser( 'create', {
 				kind: 'postType',
 				name: 'wp_template',
 			} );
 			return {
 				canEditTemplates: _canEditTemplates,
-				entity: record,
+				entity: select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_block',
+					getBlockAttributes( patternParent ).ref
+				),
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 			};
 		},
-		[ clientId, postContentBlocks ]
+		[ clientId ]
 	);
 
 	if ( ! entity ) {
@@ -82,21 +55,6 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				clientId={ clientId }
 				onClose={ onClose }
 			/>
-		);
-	}
-
-	const isPattern = entity.type === 'wp_block';
-	let helpText = isPattern
-		? __(
-				'Edit the pattern to move, delete, or make further changes to this block.'
-		  )
-		: __(
-				'Edit the template to move, delete, or make further changes to this block.'
-		  );
-
-	if ( ! canEditTemplates ) {
-		helpText = __(
-			'Only users with permissions to edit the template can move or delete this block'
 		);
 	}
 
@@ -112,16 +70,18 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					} }
 					disabled={ ! canEditTemplates }
 				>
-					{ isPattern ? __( 'Edit pattern' ) : __( 'Edit template' ) }
+					{ __( 'Edit pattern' ) }
 				</MenuItem>
+				<Text
+					variant="muted"
+					as="p"
+					className="editor-content-only-settings-menu__description"
+				>
+					{ __(
+						'Edit the pattern to move, delete, or make further changes to this block.'
+					) }
+				</Text>
 			</BlockSettingsMenuFirstItem>
-			<Text
-				variant="muted"
-				as="p"
-				className="editor-content-only-settings-menu__description"
-			>
-				{ helpText }
-			</Text>
 		</>
 	);
 }
