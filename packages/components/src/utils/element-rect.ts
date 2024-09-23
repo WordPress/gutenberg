@@ -3,11 +3,7 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useRef, useState } from '@wordpress/element';
-import { useResizeObserver } from '@wordpress/compose';
-/**
- * Internal dependencies
- */
-import { useEvent } from './hooks/use-event';
+import { useEvent, useResizeObserver } from '@wordpress/compose';
 
 /**
  * The position and dimensions of an element, relative to its offset parent.

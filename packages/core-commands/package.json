@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.7.0",
+	"version": "1.8.0",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -37,6 +37,7 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/router": "file:../router",
 		"@wordpress/url": "file:../url"

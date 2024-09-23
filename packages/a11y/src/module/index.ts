@@ -1,25 +1,11 @@
 /**
  * Internal dependencies
  */
-import { makeSetupFunction } from '../shared/index';
 export { speak } from '../shared/index';
 
-// Without an i18n Script Module, "Notifications" (the only localized text used in this module)
-// will be translated on the server and provided as script-module data.
-let notificationsText = 'Notifications';
-try {
-	const textContent = document.getElementById(
-		'wp-script-module-data-@wordpress/a11y'
-	)?.textContent;
-	if ( textContent ) {
-		const parsed = JSON.parse( textContent );
-		notificationsText = parsed?.i18n?.Notifications ?? notificationsText;
-	}
-} catch {}
-
 /**
- * Create the live regions.
+ * This no-op function is exported to provide compatibility with the `wp-a11y` Script.
+ *
+ * Filters should inject the relevant HTML on page load instead of requiring setup.
  */
-export const setup = makeSetupFunction( notificationsText );
-
-setup();
+export const setup = () => {};

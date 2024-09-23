@@ -43,6 +43,7 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion = true,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
+			suffix,
 		},
 		ref
 	) => {
@@ -147,6 +148,7 @@ const LinkControlSearchInput = forwardRef(
 						}
 					} }
 					ref={ ref }
+					suffix={ suffix }
 				/>
 				{ children }
 			</div>
