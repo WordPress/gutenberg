@@ -18,6 +18,10 @@
 }
 
 .edit-site-style-book__tabs {
+	[role="tab"] {
+		white-space: nowrap;
+	}
+
 	[role="tablist"] {
 		background: $white;
 		color: $gray-900;
