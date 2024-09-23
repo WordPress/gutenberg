@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -27,16 +28,21 @@ import { store as editorStore } from '../../store';
  *                                                                  editor iframe canvas.
  */
 export default function EditTemplateBlocksNotification( { contentRef } ) {
-	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
-		const { getEditorSettings, getCurrentTemplateId } =
-			select( editorStore );
+	const { onNavigateToEntityRecord, templateId, editorMode } = useSelect(
+		( select ) => {
+			const { getEditorSettings, getCurrentTemplateId } =
+				select( editorStore );
+			const { __unstableGetEditorMode } = select( blockEditorStore );
 
-		return {
-			onNavigateToEntityRecord:
-				getEditorSettings().onNavigateToEntityRecord,
-			templateId: getCurrentTemplateId(),
-		};
-	}, [] );
+			return {
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
+				templateId: getCurrentTemplateId(),
+				editorMode: 'zoom-out' === __unstableGetEditorMode(),
+			};
+		},
+		[]
+	);
 
 	const canEditTemplate = useSelect(
 		( select ) =>
@@ -49,9 +55,16 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
 	useEffect( () => {
 		const handleDblClick = ( event ) => {
 			if ( ! canEditTemplate ) {
+				return;
+			}
+
+			if ( editorMode ) {
+				__unstableSetEditorMode( editorMode ? 'edit' : 'zoom-out' );
 				return;
 			}
 
@@ -69,7 +82,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		return () => {
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ contentRef, canEditTemplate ] );
+	}, [ contentRef, canEditTemplate, editorMode ] );
 
 	if ( ! canEditTemplate ) {
 		return null;
