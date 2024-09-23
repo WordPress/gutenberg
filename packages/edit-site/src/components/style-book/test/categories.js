@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getCategoryExamples } from '../utils';
+import { getCategoryExamples } from '../categories';
 import { STYLE_BOOK_CATEGORIES } from '../constants';
 
 // Fixtures

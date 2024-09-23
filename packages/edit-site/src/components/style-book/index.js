@@ -31,7 +31,8 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 import { STYLE_BOOK_CATEGORIES, STYLE_BOOK_IFRAME_STYLES } from './constants';
-import { getCategoryExamples, getExamples } from './utils';
+import { getCategoryExamples } from './categories';
+import { getExamples } from './examples';
 
 const {
 	ExperimentalBlockEditorProvider,

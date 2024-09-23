@@ -3,6 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * @typedef {Object} StyleBookCategory
+ *
+ * @property {string} slug  Unique category slug.
+ * @property {string} title Category label, for display in user interface.
+ */
 export const STYLE_BOOK_THEME_SUBCATEGORIES = [
 	{
 		name: 'site-identity',

@@ -9,7 +9,22 @@ import {
 	createBlock,
 } from '@wordpress/blocks';
 
-// Get all examples from every registered block.
+/**
+ * blockExamples object.
+ *
+ * @typedef {Object} blockExamples
+ *
+ * @property {string} name     Block name, e.g., "core/paragraph".
+ * @property {string} title    Block title/label.
+ * @property {string} category Block category.
+ * @property {Object} blocks   Block object.
+ */
+
+/**
+ * Returns a list of examples for registered block types.
+ *
+ * @return {Array<blockExamples>} An array of block examples.
+ */
 export function getExamples() {
 	const nonHeadingBlockExamples = getBlockTypes()
 		.filter( ( blockType ) => {
@@ -52,54 +67,4 @@ export function getExamples() {
 	};
 
 	return [ headingsExample, ...nonHeadingBlockExamples ];
-}
-
-// Get examples for a given category.
-export function getCategoryExamples( categoryDefinition, examples ) {
-	if ( ! categoryDefinition?.name || ! examples?.length ) {
-		return;
-	}
-
-	if ( categoryDefinition?.subcategories?.length ) {
-		return categoryDefinition.subcategories.reduce(
-			( acc, subcategoryDefinition ) => {
-				const subcategoryExamples = getCategoryExamples(
-					subcategoryDefinition,
-					examples
-				);
-				if ( subcategoryExamples ) {
-					acc.subcategories = [
-						...acc.subcategories,
-						subcategoryExamples,
-					];
-				}
-				return acc;
-			},
-			{
-				title: categoryDefinition.title,
-				name: categoryDefinition.name,
-				subcategories: [],
-			}
-		);
-	}
-
-	const blocksToInclude = categoryDefinition?.blocks || [];
-	const blocksToExclude = categoryDefinition?.exclude || [];
-	const categoryExamples = examples.filter( ( example ) => {
-		return (
-			! blocksToExclude.includes( example.name ) &&
-			( example.category === categoryDefinition.name ||
-				blocksToInclude.includes( example.name ) )
-		);
-	} );
-
-	if ( ! categoryExamples.length ) {
-		return;
-	}
-
-	return {
-		title: categoryDefinition.title,
-		name: categoryDefinition.name,
-		examples: categoryExamples,
-	};
 }
