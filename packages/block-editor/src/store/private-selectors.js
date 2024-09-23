@@ -639,11 +639,14 @@ export function isZoomOut( state ) {
 	return getZoomLevel( state ) < 100;
 }
 
-/*
+/**
+ * Finds the closest block where the block is allowed to be inserted.
  *
  * @param {Object} state    Editor state.
  * @param {string} name     Block name.
  * @param {string} clientId Default insertion point.
+ *
+ * @return {string} clientID of the closest container when the block name can be inserted.
  */
 export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 	// If we're trying to insert at the root level and it's not allowed
