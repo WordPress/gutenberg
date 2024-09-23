@@ -49,7 +49,7 @@ export default function TableOfContentsEdit( {
 	clientId,
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId, headings );
+	useObserveHeadings( clientId );
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
