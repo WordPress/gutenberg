@@ -18,7 +18,7 @@ import { __, _x } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
+	const { entity, onNavigateToEntityRecord } = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
@@ -30,18 +30,14 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				'core/block',
 				true
 			)[ 0 ];
-
-			const _canEditTemplates = select( coreStore ).canUser( 'create', {
-				kind: 'postType',
-				name: 'wp_template',
-			} );
 			return {
-				canEditTemplates: _canEditTemplates,
-				entity: select( coreStore ).getEntityRecord(
-					'postType',
-					'wp_block',
-					getBlockAttributes( patternParent ).ref
-				),
+				entity:
+					patternParent &&
+					select( coreStore ).getEntityRecord(
+						'postType',
+						'wp_block',
+						getBlockAttributes( patternParent ).ref
+					),
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 			};
@@ -68,20 +64,19 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 							postType: entity.type,
 						} );
 					} }
-					disabled={ ! canEditTemplates }
 				>
 					{ __( 'Edit pattern' ) }
 				</MenuItem>
-				<Text
-					variant="muted"
-					as="p"
-					className="editor-content-only-settings-menu__description"
-				>
-					{ __(
-						'Edit the pattern to move, delete, or make further changes to this block.'
-					) }
-				</Text>
 			</BlockSettingsMenuFirstItem>
+			<Text
+				variant="muted"
+				as="p"
+				className="editor-content-only-settings-menu__description"
+			>
+				{ __(
+					'Edit the pattern to move, delete, or make further changes to this block.'
+				) }
+			</Text>
 		</>
 	);
 }
