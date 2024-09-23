@@ -1,18 +1,30 @@
-{{#isDefaultVariant}}
+{{#isTypescriptVariant}}
 /**
  * WordPress dependencies
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-const { state } = store( '{{namespace}}', {
+type ServerState = {
 	state: {
-		get themeText() {
+		isDark: boolean;
+		darkText: string;
+		lightText: string;
+	};
+};
+
+type Context = {
+	isOpen: boolean;
+};
+
+const storeDef = {
+	state: {
+		get themeText(): string {
 			return state.isDark ? state.darkText : state.lightText;
 		}
 	},
 	actions: {
 		toggleOpen() {
-			const context = getContext();
+			const context = getContext< Context >();
 			context.isOpen = ! context.isOpen;
 		},
 		toggleTheme() {
@@ -21,10 +33,14 @@ const { state } = store( '{{namespace}}', {
 	},
 	callbacks: {
 		logIsOpen: () => {
-			const { isOpen } = getContext();
+			const { isOpen } = getContext< Context >();
 			// Log the value of `isOpen` each time it changes.
 			console.log( `Is open: ${ isOpen }` );
 		},
 	},
-} );
-{{/isDefaultVariant}}
+};
+
+type Store = ServerState & typeof storeDef;
+
+const { state } = store< Store >( '{{namespace}}', storeDef );
+{{/isTypescriptVariant}}
