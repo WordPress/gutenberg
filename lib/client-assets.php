@@ -487,7 +487,9 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  * This hook also exists, and should be backported to Core in future versions.
  * However, it is envisaged that Gutenberg will continue to use the Style Engine's `gutenberg_*` functions and `_Gutenberg` classes to aid continuous development.
  *
- * See: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ * @since 6.1
+ *
+ * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
@@ -495,8 +497,6 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
  *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
  *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
  * }
- *
- * @since 6.1
  *
  * @return void
  */
@@ -601,6 +601,56 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
+/**
+ * Registers or re-registers Gutenberg Script Modules.
+ *
+ * Script modules that are registered by Core will be re-registered by Gutenberg.
+ *
+ * @since 19.3.0
+ */
+function gutenberg_default_script_modules() {
+	/*
+	 * Expects multidimensional array like:
+	 *
+	 *     'interactivity/index.min.js' => array('dependencies' => array(…), 'version' => '…'),
+	 *     'interactivity/debug.min.js' => array('dependencies' => array(…), 'version' => '…'),
+	 *     'interactivity-router/index.min.js' => …
+	 */
+	$assets = include gutenberg_dir_path() . '/build-module/assets.php';
+
+	foreach ( $assets as $file_name => $script_module_data ) {
+		/*
+		 * Build the WordPress Script Module ID from the file name.
+		 * Prepend `@wordpress/` and remove extensions and `/index` if present:
+		 *   - interactivity/index.min.js  => @wordpress/interactivity
+		 *   - interactivity/debug.min.js  => @wordpress/interactivity/debug
+		 *   - block-library/query/view.js => @wordpress/block-library/query/view
+		 */
+		$script_module_id = '@wordpress/' . preg_replace( '~(?:/index)?\.min\.js$~D', '', $file_name, 1 );
+		switch ( $script_module_id ) {
+			/*
+			 * Interactivity exposes two entrypoints, "/index" and "/debug".
+			 * "/debug" should replalce "/index" in devlopment.
+			 */
+			case '@wordpress/interactivity/debug':
+				if ( ! SCRIPT_DEBUG ) {
+					continue 2;
+				}
+				$script_module_id = '@wordpress/interactivity';
+				break;
+			case '@wordpress/interactivity':
+				if ( SCRIPT_DEBUG ) {
+					continue 2;
+				}
+				break;
+		}
+
+		$path = gutenberg_url( "build-module/{$file_name}" );
+		wp_register_script_module( $script_module_id, $path, $script_module_data['dependencies'], $script_module_data['version'] );
+	}
+}
+remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
+add_action( 'wp_default_scripts', 'gutenberg_default_script_modules' );
 
 /*
  * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.

@@ -8,11 +8,10 @@ import clsx from 'clsx';
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { textHorizontal, textVertical } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
-import SegmentedTextControl from '../segmented-text-control';
+import {
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+} from '@wordpress/components';
 
 const WRITING_MODES = [
 	{
@@ -39,14 +38,27 @@ const WRITING_MODES = [
  */
 export default function WritingModeControl( { className, value, onChange } ) {
 	return (
-		<SegmentedTextControl
+		<ToggleGroupControl
+			isDeselectable
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label={ __( 'Orientation' ) }
-			options={ WRITING_MODES }
 			className={ clsx( 'block-editor-writing-mode-control', className ) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
 			} }
-		/>
+		>
+			{ WRITING_MODES.map( ( option ) => {
+				return (
+					<ToggleGroupControlOptionIcon
+						key={ option.value }
+						value={ option.value }
+						icon={ option.icon }
+						label={ option.label }
+					/>
+				);
+			} ) }
+		</ToggleGroupControl>
 	);
 }

@@ -230,6 +230,7 @@ function UploadFonts() {
 						onChange={ onFilesUpload }
 						render={ ( { openFileDialog } ) => (
 							<Button
+								__next40pxDefaultSize
 								className="font-library-modal__upload-area"
 								onClick={ openFileDialog }
 							>

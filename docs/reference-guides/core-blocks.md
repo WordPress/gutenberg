@@ -72,14 +72,14 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 -	**Supports:** align, color (background, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight)
 -	**Attributes:** month, year
 
-## Categories List
+## Terms List
 
-Display a list of all categories. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
+Display a list of all terms of a given taxonomy. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
 
 -	**Name:** core/categories
 -	**Category:** widgets
 -	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts
+-	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
 
@@ -426,7 +426,7 @@ An individual item within a list. ([Source](https://github.com/WordPress/gutenbe
 -	**Category:** text
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
--	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -493,7 +493,7 @@ Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenbe
 -	**Name:** core/navigation-submenu
 -	**Category:** design
 -	**Parent:** core/navigation
--	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
+-	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelItem, kind, label, opensInNewTab, rel, title, type, url
 
 ## Page Break
@@ -783,7 +783,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 -	**Name:** core/quote
 -	**Category:** text
--	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** citation, textAlign, value
 
 ## Read More

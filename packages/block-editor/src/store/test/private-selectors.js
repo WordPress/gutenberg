@@ -9,6 +9,7 @@ import {
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
+	getBlockStyles,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 
@@ -393,6 +394,10 @@ describe( 'private selectors', () => {
 					parents: new Map( [
 						[ '6cf70164-9097-4460-bcbf-200560546988', '' ],
 					] ),
+					order: new Map( [
+						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
+						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
+					] ),
 				},
 				blockEditingModes: new Map(),
 			};
@@ -422,6 +427,21 @@ describe( 'private selectors', () => {
 							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
+					] ),
+
+					order: new Map( [
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							[
+								'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+								'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							],
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
+						],
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
@@ -459,6 +479,21 @@ describe( 'private selectors', () => {
 							'4c2b7140-fffd-44b4-b2a7-820c670a6514',
 							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 						],
+					] ),
+					order: new Map( [
+						[
+							'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
+							[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f' ],
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c' ],
+						],
+						[
+							'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
+							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
+						],
+						[ '', [ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337' ] ],
 					] ),
 				},
 				blockEditingModes: new Map( [
@@ -507,6 +542,94 @@ describe( 'private selectors', () => {
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
 			);
+		} );
+	} );
+
+	describe( 'getBlockStyles', () => {
+		it( 'should return an empty object when no client IDs are provided', () => {
+			const state = {
+				blocks: {
+					attributes: new Map(),
+				},
+			};
+			const result = getBlockStyles( state, [] );
+			expect( result ).toEqual( {} );
+		} );
+
+		it( 'should return styles for a single block', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { style: { color: 'red' } } ],
+					] ),
+				},
+			};
+			const result = getBlockStyles( state, [ 'block-1' ] );
+			expect( result ).toEqual( {
+				'block-1': { color: 'red' },
+			} );
+		} );
+
+		it( 'should return styles for multiple blocks', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { style: { color: 'red' } } ],
+						[ 'block-2', { style: { fontSize: '16px' } } ],
+						[ 'block-3', { style: { margin: '10px' } } ],
+					] ),
+				},
+			};
+			const result = getBlockStyles( state, [
+				'block-1',
+				'block-2',
+				'block-3',
+			] );
+			expect( result ).toEqual( {
+				'block-1': { color: 'red' },
+				'block-2': { fontSize: '16px' },
+				'block-3': { margin: '10px' },
+			} );
+		} );
+
+		it( 'should return undefined for blocks without styles', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { style: { color: 'red' } } ],
+						[ 'block-2', {} ],
+						[ 'block-3', { style: { margin: '10px' } } ],
+					] ),
+				},
+			};
+			const result = getBlockStyles( state, [
+				'block-1',
+				'block-2',
+				'block-3',
+			] );
+			expect( result ).toEqual( {
+				'block-1': { color: 'red' },
+				'block-2': undefined,
+				'block-3': { margin: '10px' },
+			} );
+		} );
+
+		it( 'should return undefined for non-existent blocks', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { style: { color: 'red' } } ],
+					] ),
+				},
+			};
+			const result = getBlockStyles( state, [
+				'block-1',
+				'non-existent-block',
+			] );
+			expect( result ).toEqual( {
+				'block-1': { color: 'red' },
+				'non-existent-block': undefined,
+			} );
 		} );
 	} );
 } );

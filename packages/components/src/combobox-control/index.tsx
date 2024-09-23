@@ -129,6 +129,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		},
 		__experimentalRenderItem,
 		expandOnFocus = true,
+		placeholder,
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -320,6 +321,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				__associatedWPComponentName="ComboboxControl"
 				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
@@ -339,6 +341,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								className="components-combobox-control__input"
 								instanceId={ instanceId }
 								ref={ inputContainer }
+								placeholder={ placeholder }
 								value={ isExpanded ? inputValue : currentLabel }
 								onFocus={ onFocus }
 								onBlur={ onBlur }

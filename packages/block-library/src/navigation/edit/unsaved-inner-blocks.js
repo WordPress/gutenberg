@@ -20,13 +20,13 @@ export default function UnsavedInnerBlocks( {
 	createNavigationMenu,
 	hasSelection,
 } ) {
-	const originalBlocks = useRef();
+	const originalBlocksRef = useRef();
 
 	useEffect( () => {
 		// Initially store the uncontrolled inner blocks for
 		// dirty state comparison.
-		if ( ! originalBlocks?.current ) {
-			originalBlocks.current = blocks;
+		if ( ! originalBlocksRef?.current ) {
+			originalBlocksRef.current = blocks;
 		}
 	}, [ blocks ] );
 
@@ -38,7 +38,7 @@ export default function UnsavedInnerBlocks( {
 	// entity records. As a result we need to perform a deep equality check skipping
 	// the page list's inner blocks.
 	const innerBlocksAreDirty = areBlocksDirty(
-		originalBlocks?.current,
+		originalBlocksRef?.current,
 		blocks
 	);
 

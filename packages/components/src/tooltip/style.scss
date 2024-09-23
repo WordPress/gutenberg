@@ -1,13 +1,14 @@
 .components-tooltip {
 	background: $black;
 	font-family: $default-font;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;
 	color: $gray-100;
 	text-align: center;
 	line-height: 1.4;
 	font-size: 12px;
 	padding: $grid-unit-05 $grid-unit-10;
 	z-index: z-index(".components-tooltip");
+	box-shadow: $elevation-small;
 }
 
 .components-tooltip__shortcut {

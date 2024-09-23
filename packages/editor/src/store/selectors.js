@@ -1276,9 +1276,15 @@ export function getRenderingMode( state ) {
  *
  * @return {string} Device type.
  */
-export function getDeviceType( state ) {
-	return state.deviceType;
-}
+export const getDeviceType = createRegistrySelector(
+	( select ) => ( state ) => {
+		const editorMode = select( blockEditorStore ).__unstableGetEditorMode();
+		if ( editorMode === 'zoom-out' ) {
+			return 'Desktop';
+		}
+		return state.deviceType;
+	}
+);
 
 /**
  * Returns true if the list view is opened.

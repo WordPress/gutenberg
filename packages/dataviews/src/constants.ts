@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { arrowDown, arrowUp } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,6 +58,10 @@ export const sortValues = { asc: 'ascending', desc: 'descending' } as const;
 export const sortLabels = {
 	asc: __( 'Sort ascending' ),
 	desc: __( 'Sort descending' ),
+};
+export const sortIcons = {
+	asc: arrowUp,
+	desc: arrowDown,
 };
 
 // View layouts.

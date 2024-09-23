@@ -78,6 +78,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 		>
 			<VStack spacing="5">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -87,6 +88,8 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 				/>
 				<HStack justify="right">
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="tertiary"
 						onClick={ () => {
 							setIsAdding( false );
@@ -96,6 +99,8 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 					</Button>
 
 					<Button
+						// TODO: Switch to `true` (40px size) if possible
+						__next40pxDefaultSize={ false }
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSaving }

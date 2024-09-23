@@ -34,8 +34,8 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
-import Shuffle from './shuffle';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Renders the block toolbar.
@@ -65,6 +65,8 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		hasParentPattern,
+		hasContentOnlyLocking,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -72,19 +74,21 @@ export function PrivateBlockToolbar( {
 			getBlockParents,
 			getSelectedBlockClientIds,
 			isBlockValid,
-			getBlockRootClientId,
 			getBlockEditingMode,
 			getBlockAttributes,
-		} = select( blockEditorStore );
+			getBlockParentsByBlockName,
+			getTemplateLock,
+			getParentSectionBlock,
+		} = unlock( select( blockEditorStore ) );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
-		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
 		const parents = getBlockParents( selectedBlockClientId );
-		const firstParentClientId = parents[ parents.length - 1 ];
-		const parentBlockName = getBlockName( firstParentClientId );
+		const parentSection = getParentSectionBlock( selectedBlockClientId );
+		const parentClientId = parentSection ?? parents[ parents.length - 1 ];
+		const parentBlockName = getBlockName( parentClientId );
 		const parentBlockType = getBlockType( parentBlockName );
-		const _isDefaultEditingMode =
-			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const editingMode = getBlockEditingMode( selectedBlockClientId );
+		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
@@ -96,25 +100,36 @@ export function PrivateBlockToolbar( {
 			( clientId ) =>
 				!! getBlockAttributes( clientId )?.metadata?.bindings
 		);
+
+		const _hasParentPattern = selectedBlockClientIds.every(
+			( clientId ) =>
+				getBlockParentsByBlockName( clientId, 'core/block', true )
+					.length > 0
+		);
+
+		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
+		const _hasTemplateLock = selectedBlockClientIds.some(
+			( id ) => getTemplateLock( id ) === 'contentOnly'
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
-			rootClientId: blockRootClientId,
-			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
+			toolbarKey: `${ selectedBlockClientId }${ parentClientId }`,
 			showParentSelector:
 				parentBlockType &&
-				getBlockEditingMode( firstParentClientId ) === 'default' &&
+				getBlockEditingMode( parentClientId ) !== 'disabled' &&
 				hasBlockSupport(
 					parentBlockType,
 					'__experimentalParentSelector',
 					true
 				) &&
-				selectedBlockClientIds.length === 1 &&
-				_isDefaultEditingMode,
+				selectedBlockClientIds.length === 1,
 			isUsingBindings: _isUsingBindings,
+			hasParentPattern: _hasParentPattern,
+			hasContentOnlyLocking: _hasTemplateLock,
 		};
 	}, [] );
 
@@ -164,41 +179,32 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! isMultiToolbar &&
-					isLargeViewport &&
-					isDefaultEditingMode && <BlockParentSelector /> }
+				{ ! isMultiToolbar && isLargeViewport && (
+					<BlockParentSelector />
+				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					( isDefaultEditingMode || isSynced ) && (
+					! hasParentPattern && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher
-									clientIds={ blockClientIds }
-									disabled={ ! isDefaultEditingMode }
-									isUsingBindings={ isUsingBindings }
-								/>
-								{ isDefaultEditingMode && (
-									<>
-										{ ! isMultiToolbar && (
-											<BlockLockToolbar
-												clientId={ blockClientId }
-											/>
-										) }
-										<BlockMover
-											clientIds={ blockClientIds }
-											hideDragHandle={ hideDragHandle }
-										/>
-									</>
+								<BlockSwitcher clientIds={ blockClientIds } />
+								{ ! isMultiToolbar && isDefaultEditingMode && (
+									<BlockLockToolbar
+										clientId={ blockClientId }
+									/>
 								) }
+								<BlockMover
+									clientIds={ blockClientIds }
+									hideDragHandle={ hideDragHandle }
+								/>
 							</ToolbarGroup>
 						</div>
 					) }
-				<Shuffle clientId={ blockClientId } />
-				{ shouldShowVisualToolbar && isMultiToolbar && (
-					<BlockGroupToolbar />
-				) }
+				{ ! hasContentOnlyLocking &&
+					shouldShowVisualToolbar &&
+					isMultiToolbar && <BlockGroupToolbar /> }
 				{ shouldShowVisualToolbar && (
 					<>
 						<BlockControls.Slot
@@ -226,9 +232,7 @@ export function PrivateBlockToolbar( {
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				{ isDefaultEditingMode && (
-					<BlockSettingsMenu clientIds={ blockClientIds } />
-				) }
+				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
 	);

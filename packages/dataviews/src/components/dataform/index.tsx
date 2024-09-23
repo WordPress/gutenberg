@@ -1,55 +1,17 @@
 /**
- * External dependencies
- */
-import type { Dispatch, SetStateAction } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
-import { normalizeFields } from '../../normalize-fields';
-import type { Field, Form } from '../../types';
-
-type DataFormProps< Item > = {
-	data: Item;
-	fields: Field< Item >[];
-	form: Form;
-	onChange: Dispatch< SetStateAction< Item > >;
-};
+import type { DataFormProps } from '../../types';
+import { getFormLayout } from '../../dataforms-layouts';
 
 export default function DataForm< Item >( {
-	data,
-	fields,
 	form,
-	onChange,
+	...props
 }: DataFormProps< Item > ) {
-	const visibleFields = useMemo(
-		() =>
-			normalizeFields(
-				fields.filter(
-					( { id } ) => !! form.visibleFields?.includes( id )
-				)
-			),
-		[ fields, form.visibleFields ]
-	);
+	const layout = getFormLayout( form.type ?? 'regular' );
+	if ( ! layout ) {
+		return null;
+	}
 
-	return (
-		<VStack spacing={ 4 }>
-			{ visibleFields.map( ( field ) => {
-				return (
-					<field.Edit
-						key={ field.id }
-						data={ data }
-						field={ field }
-						onChange={ onChange }
-					/>
-				);
-			} ) }
-		</VStack>
-	);
+	return <layout.component form={ form } { ...props } />;
 }

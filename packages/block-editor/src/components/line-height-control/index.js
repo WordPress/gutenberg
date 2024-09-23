@@ -16,6 +16,8 @@ import {
 } from './utils';
 
 const LineHeightControl = ( {
+	/** Start opting into the larger default height that will become the default size in a future version. */
+	__next40pxDefaultSize = false,
 	value: lineHeight,
 	onChange,
 	__unstableInputWidth = '60px',
@@ -91,6 +93,7 @@ const LineHeightControl = ( {
 		<div className="block-editor-line-height-control">
 			<NumberControl
 				{ ...otherProps }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }
 				onChange={ handleOnChange }

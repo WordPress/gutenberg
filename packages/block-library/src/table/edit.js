@@ -95,7 +95,7 @@ function TableEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
-	isSelected,
+	isSelected: isSingleSelected,
 } ) {
 	const { hasFixedLayout, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
@@ -340,10 +340,10 @@ function TableEdit( {
 	}
 
 	useEffect( () => {
-		if ( ! isSelected ) {
+		if ( ! isSingleSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSelected ] );
+	}, [ isSingleSelected ] );
 
 	useEffect( () => {
 		if ( hasTableCreated ) {
@@ -565,9 +565,10 @@ function TableEdit( {
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Table caption text' ) }
+					showToolbarButton={ isSingleSelected }
 				/>
 			) }
 		</figure>

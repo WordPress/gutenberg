@@ -1,6 +1,6 @@
-export { NavigatorProvider } from './navigator-provider';
-export { NavigatorScreen } from './navigator-screen';
-export { NavigatorButton } from './navigator-button';
-export { NavigatorBackButton } from './navigator-back-button';
-export { NavigatorToParentButton } from './navigator-to-parent-button';
-export { default as useNavigator } from './use-navigator';
+export { NavigatorProvider } from './navigator-provider/component';
+export { NavigatorScreen } from './navigator-screen/component';
+export { NavigatorButton } from './navigator-button/component';
+export { NavigatorBackButton } from './navigator-back-button/component';
+export { NavigatorToParentButton } from './navigator-to-parent-button/component';
+export { useNavigator } from './use-navigator';

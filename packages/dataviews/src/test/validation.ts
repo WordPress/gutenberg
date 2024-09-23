@@ -17,7 +17,7 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'valid_order' ] };
+		const form = { fields: [ 'valid_order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );
@@ -30,7 +30,7 @@ describe( 'validation', () => {
 				id: 'order',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );
@@ -43,7 +43,7 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -56,7 +56,7 @@ describe( 'validation', () => {
 				type: 'integer',
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -73,7 +73,7 @@ describe( 'validation', () => {
 				],
 			},
 		];
-		const form = { visibleFields: [ 'author' ] };
+		const form = { fields: [ 'author' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -90,7 +90,7 @@ describe( 'validation', () => {
 				],
 			},
 		];
-		const form = { visibleFields: [ 'author' ] };
+		const form = { fields: [ 'author' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -106,7 +106,7 @@ describe( 'validation', () => {
 				],
 			},
 		];
-		const form = { visibleFields: [ 'author' ] };
+		const form = { fields: [ 'author' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
@@ -124,7 +124,7 @@ describe( 'validation', () => {
 				isValid: () => true, // Overrides the validation provided for integer types.
 			},
 		];
-		const form = { visibleFields: [ 'order' ] };
+		const form = { fields: [ 'order' ] };
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( true );
 	} );

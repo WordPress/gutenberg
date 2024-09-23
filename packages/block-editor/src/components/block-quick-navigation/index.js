@@ -59,6 +59,8 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 
 	return (
 		<Button
+			// TODO: Switch to `true` (40px size) if possible
+			__next40pxDefaultSize={ false }
 			isPressed={ isSelected }
 			onClick={ async () => {
 				await selectBlock( clientId );

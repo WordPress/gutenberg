@@ -37,6 +37,8 @@ function Inserter( { setIsOpened } ) {
 					{ __( 'Add a block' ) }
 				</h2>
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					className="customize-widgets-layout__inserter-panel-header-close-button"
 					icon={ closeSmall }
 					onClick={ () => setIsOpened( false ) }

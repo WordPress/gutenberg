@@ -52,8 +52,17 @@
 
 	> :last-child,
 	> :last-child .components-toolbar-group,
-	> :last-child .components-toolbar {
+	> :last-child .components-toolbar,
+	// If the last toolbar group is empty,
+	// we need to remove the double border from the penultimate one.
+	&:has(> :last-child:empty) > :nth-last-child(2),
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
+	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
 		border-right: none;
+	}
+
+	.components-toolbar-group:empty {
+		display: none;
 	}
 }
 
@@ -70,8 +79,11 @@
 	// Raise the specificity.
 	&.components-accessible-toolbar {
 		border: none;
-		border-bottom: $border-width solid $gray-200;
 		border-radius: 0;
+	}
+
+	&.is-unstyled {
+		box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 	}
 
 	.block-editor-block-toolbar {

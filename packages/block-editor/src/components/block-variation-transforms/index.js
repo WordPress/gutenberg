@@ -35,6 +35,8 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
@@ -138,19 +140,30 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations } = useSelect(
+	const { activeBlockVariation, variations, isContentOnly } = useSelect(
 		( select ) => {
-			const { getActiveBlockVariation, getBlockVariations } =
-				select( blocksStore );
-			const { getBlockName, getBlockAttributes } =
+			const {
+				getActiveBlockVariation,
+				getBlockVariations,
+				__experimentalHasContentRoleAttribute,
+			} = select( blocksStore );
+			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
+
 			const name = blockClientId && getBlockName( blockClientId );
+
+			const isContentBlock =
+				__experimentalHasContentRoleAttribute( name );
+
 			return {
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId )
 				),
 				variations: name && getBlockVariations( name, 'transform' ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
 			};
 		},
 		[ blockClientId ]
@@ -179,8 +192,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	// Skip rendering if there are no variations
-	if ( ! variations?.length ) {
+	if ( ! variations?.length || isContentOnly ) {
 		return null;
 	}
 

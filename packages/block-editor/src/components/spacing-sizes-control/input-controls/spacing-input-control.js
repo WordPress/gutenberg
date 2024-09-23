@@ -188,10 +188,12 @@ export default function SpacingInputControl( {
 		name: size.name,
 	} ) );
 
-	const marks = spacingSizes.map( ( _newValue, index ) => ( {
-		value: index,
-		label: undefined,
-	} ) );
+	const marks = spacingSizes
+		.slice( 1, spacingSizes.length - 1 )
+		.map( ( _newValue, index ) => ( {
+			value: index + 1,
+			label: undefined,
+		} ) );
 
 	const sideLabel =
 		ALL_SIDES.includes( side ) && showSideInLabel ? LABELS[ side ] : '';
@@ -247,6 +249,7 @@ export default function SpacingInputControl( {
 						} }
 					/>
 					<RangeControl
+						__next40pxDefaultSize
 						onMouseOver={ onMouseOver }
 						onMouseOut={ onMouseOut }
 						onFocus={ onMouseOver }
@@ -268,6 +271,7 @@ export default function SpacingInputControl( {
 			) }
 			{ showRangeControl && ! showCustomValueControl && (
 				<RangeControl
+					__next40pxDefaultSize
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					className="spacing-sizes-control__range-control"

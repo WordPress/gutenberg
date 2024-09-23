@@ -99,7 +99,7 @@ export const colorIndicatorWrapper = (
 	const { style } = border || {};
 
 	return css`
-		border-radius: 9999px;
+		border-radius: ${ CONFIG.radiusFull };
 		border: 2px solid transparent;
 		${ style ? colorIndicatorBorder( border ) : undefined }
 		width: ${ size === '__unstable-large' ? '24px' : '22px' };

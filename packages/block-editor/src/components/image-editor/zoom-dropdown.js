@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, RangeControl, Dropdown } from '@wordpress/components';
+import {
+	ToolbarButton,
+	RangeControl,
+	Dropdown,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 
@@ -27,14 +32,17 @@ export default function ZoomDropdown() {
 				/>
 			) }
 			renderContent={ () => (
-				<RangeControl
-					__nextHasNoMarginBottom
-					label={ __( 'Zoom' ) }
-					min={ MIN_ZOOM }
-					max={ MAX_ZOOM }
-					value={ Math.round( zoom ) }
-					onChange={ setZoom }
-				/>
+				<DropdownContentWrapper paddingSize="medium">
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Zoom' ) }
+						min={ MIN_ZOOM }
+						max={ MAX_ZOOM }
+						value={ Math.round( zoom ) }
+						onChange={ setZoom }
+					/>
+				</DropdownContentWrapper>
 			) }
 		/>
 	);

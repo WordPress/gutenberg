@@ -10,7 +10,7 @@ export function isItemValid< Item >(
 	form: Form
 ): boolean {
 	const _fields = normalizeFields(
-		fields.filter( ( { id } ) => !! form.visibleFields?.includes( id ) )
+		fields.filter( ( { id } ) => !! form.fields?.includes( id ) )
 	);
 	return _fields.every( ( field ) => {
 		return field.isValid( item, { elements: field.elements } );

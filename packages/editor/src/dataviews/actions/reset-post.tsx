@@ -32,7 +32,8 @@ const resetPost: Action< Post > = {
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === TEMPLATE_ORIGINS.custom &&
-			item?.has_theme_file
+			( Boolean( item.type === 'wp_template' && item?.plugin ) ||
+				item?.has_theme_file )
 		);
 	},
 	icon: backup,
@@ -113,6 +114,7 @@ const resetPost: Action< Post > = {
 				</Text>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
@@ -121,6 +123,7 @@ const resetPost: Action< Post > = {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );

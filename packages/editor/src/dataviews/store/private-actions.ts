@@ -8,15 +8,24 @@ import { doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import deletePost from '../actions/delete-post';
-import exportPattern from '../actions/export-pattern';
+import duplicateTemplatePart from '../actions/duplicate-template-part';
 import resetPost from '../actions/reset-post';
 import trashPost from '../actions/trash-post';
-import permanentlyDeletePost from '../actions/permanently-delete-post';
+import renamePost from '../actions/rename-post';
 import restorePost from '../actions/restore-post';
 import type { PostType } from '../types';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	viewPost,
+	viewPostRevisions,
+	duplicatePost,
+	duplicatePattern,
+	reorderPage,
+	exportPattern,
+	permanentlyDeletePost,
+} from '@wordpress/fields';
+import deletePost from '../actions/delete-post';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -72,7 +81,41 @@ export const registerPostTypeActions =
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
 
+		const canCreate = await registry
+			.resolveSelect( coreStore )
+			.canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
+		const currentTheme = await registry
+			.resolveSelect( coreStore )
+			.getCurrentTheme();
+
 		const actions = [
+			postTypeConfig.viewable ? viewPost : undefined,
+			!! postTypeConfig?.supports?.revisions
+				? viewPostRevisions
+				: undefined,
+			// @ts-ignore
+			globalThis.IS_GUTENBERG_PLUGIN
+				? ! [ 'wp_template', 'wp_block', 'wp_template_part' ].includes(
+						postTypeConfig.slug
+				  ) &&
+				  canCreate &&
+				  duplicatePost
+				: undefined,
+			postTypeConfig.slug === 'wp_template_part' &&
+			canCreate &&
+			currentTheme?.is_block_theme
+				? duplicateTemplatePart
+				: undefined,
+			canCreate && postTypeConfig.slug === 'wp_block'
+				? duplicatePattern
+				: undefined,
+			postTypeConfig.supports?.title ? renamePost : undefined,
+			postTypeConfig?.supports?.[ 'page-attributes' ]
+				? reorderPage
+				: undefined,
 			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
 			resetPost,
 			restorePost,
@@ -83,7 +126,7 @@ export const registerPostTypeActions =
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
-				if ( action === undefined ) {
+				if ( ! action ) {
 					return;
 				}
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(

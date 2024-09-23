@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 10.8.0 (2024-09-19)
+
+### New Features
+
+-   Add new `bell` and `bell-unread` icons.
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
 ### New Features
 
 -   Add new `send` icon.

@@ -49,6 +49,9 @@ const Template: StoryFn< typeof FocalPointPicker > = ( {
 };
 
 export const Default = Template.bind( {} );
+Default.args = {
+	__nextHasNoMarginBottom: true,
+};
 
 export const Image = Template.bind( {} );
 Image.args = {

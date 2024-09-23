@@ -44,8 +44,6 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 };
 
-export { imageFillStyles } from './media-container.js';
-
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );

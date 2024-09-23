@@ -149,13 +149,6 @@ test.describe( 'Patterns', () => {
 
 		await expect( patterns.item ).toHaveCount( 3 );
 
-		await patterns.content
-			.getByRole( 'button', {
-				name: 'Toggle filter display',
-				exact: true,
-			} )
-			.click();
-
 		const searchBox = patterns.content.getByRole( 'searchbox', {
 			name: 'Search',
 		} );

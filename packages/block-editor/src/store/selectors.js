@@ -7,7 +7,6 @@ import {
 	getBlockVariations,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
-	parse,
 	switchToBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -27,6 +26,8 @@ import {
 	checkAllowList,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
+	getParsedPattern,
+	getGrammar,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -36,6 +37,9 @@ import {
 	getContentLockingParent,
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
+	getSectionRootClientId,
+	isSectionBlock,
+	getParentSectionBlock,
 } from './private-selectors';
 
 /**
@@ -1580,6 +1584,11 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	const _isSectionBlock = !! isSectionBlock( state, rootClientId );
+	if ( _isSectionBlock ) {
+		return false;
+	}
+
 	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
@@ -1731,6 +1740,11 @@ export function canRemoveBlock( state, clientId ) {
 		return false;
 	}
 
+	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	if ( isBlockWithinSection ) {
+		return false;
+	}
+
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
@@ -1752,7 +1766,7 @@ export function canRemoveBlocks( state, clientIds ) {
  * @param {Object} state    Editor state.
  * @param {string} clientId The block client Id.
  *
- * @return {boolean | undefined} Whether the given block is allowed to be moved.
+ * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
@@ -2057,9 +2071,8 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							if ( ! item.rootClientId ) {
 								let sectionRootClientId;
 								try {
-									sectionRootClientId = unlock(
-										getSettings( state )
-									).sectionRootClientId;
+									sectionRootClientId =
+										getSectionRootClientId( state );
 								} catch ( e ) {}
 								if (
 									sectionRootClientId &&
@@ -2349,40 +2362,12 @@ export function __experimentalGetDirectInsertBlock(
 }
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
-	( select ) =>
-		createSelector(
-			( state, patternName ) => {
-				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
-					patternName
-				);
-				if ( ! pattern ) {
-					return null;
-				}
-				const blocks = parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} );
-				if ( blocks.length === 1 ) {
-					blocks[ 0 ].attributes = {
-						...blocks[ 0 ].attributes,
-						metadata: {
-							...( blocks[ 0 ].attributes.metadata || {} ),
-							categories: pattern.categories,
-							patternName: pattern.name,
-							name:
-								blocks[ 0 ].attributes.metadata?.name ||
-								pattern.title,
-						},
-					};
-				}
-				return {
-					...pattern,
-					blocks,
-				};
-			},
-			( state, patternName ) => [
-				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
-			]
-		)
+	( select ) => ( state, patternName ) => {
+		const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+			patternName
+		);
+		return pattern ? getParsedPattern( pattern ) : null;
+	}
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
@@ -2401,23 +2386,30 @@ const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
 export const __experimentalGetAllowedPatterns = createRegistrySelector(
 	( select ) => {
 		return createSelector( ( state, rootClientId = null ) => {
-			const {
-				getAllPatterns,
-				__experimentalGetParsedPattern: getParsedPattern,
-			} = unlock( select( STORE_NAME ) );
+			const { getAllPatterns } = unlock( select( STORE_NAME ) );
 			const patterns = getAllPatterns();
 			const { allowedBlockTypes } = getSettings( state );
-
 			const parsedPatterns = patterns
 				.filter( ( { inserter = true } ) => !! inserter )
-				.map( ( { name } ) => getParsedPattern( name ) );
+				.map( ( pattern ) => {
+					return {
+						...pattern,
+						get blocks() {
+							return getParsedPattern( pattern ).blocks;
+						},
+					};
+				} );
+
 			const availableParsedPatterns = parsedPatterns.filter(
-				( { blocks } ) =>
-					checkAllowListRecursive( blocks, allowedBlockTypes )
+				( pattern ) =>
+					checkAllowListRecursive(
+						getGrammar( pattern ),
+						allowedBlockTypes
+					)
 			);
 			const patternsAllowed = availableParsedPatterns.filter(
-				( { blocks } ) =>
-					blocks.every( ( { name } ) =>
+				( pattern ) =>
+					getGrammar( pattern ).every( ( { blockName: name } ) =>
 						canInsertBlockType( state, name, rootClientId )
 					)
 			);
@@ -2694,12 +2686,17 @@ export function __unstableGetEditorMode( state ) {
 /**
  * Returns whether block moving mode is enabled.
  *
- * @param {Object} state Editor state.
- *
- * @return {string} Client Id of moving block.
+ * @deprecated
  */
-export function hasBlockMovingClientId( state ) {
-	return state.hasBlockMovingClientId;
+export function hasBlockMovingClientId() {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).hasBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
+		}
+	);
+	return false;
 }
 
 /**
@@ -2858,7 +2855,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.
 	if ( editorMode === 'zoom-out' ) {
-		const { sectionRootClientId } = unlock( getSettings( state ) );
+		const sectionRootClientId = getSectionRootClientId( state );
 		if ( sectionRootClientId ) {
 			const sectionClientIds = getBlockOrder(
 				state,
@@ -2882,11 +2879,9 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 		'__experimentalDisableBlockOverlay',
 		false
 	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+	const shouldEnableIfUnselected = blockSupportDisable
+		? false
+		: areInnerBlocksControlled( state, clientId );
 
 	return (
 		shouldEnableIfUnselected &&
@@ -2904,6 +2899,14 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 		parent = state.blocks.parents.get( parent );
 	}
 	return false;
+}
+
+function isWithinBlock( state, clientId, parentClientId ) {
+	let parent = state.blocks.parents.get( clientId );
+	while ( !! parent && parent !== parentClientId ) {
+		parent = state.blocks.parents.get( parent );
+	}
+	return parent === parentClientId;
 }
 
 /**
@@ -2946,12 +2949,14 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( clientId === null ) {
 				clientId = '';
 			}
+
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
-				const { sectionRootClientId } = unlock( getSettings( state ) );
+				const sectionRootClientId = getSectionRootClientId( state );
+
 				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 					return sectionRootClientId ? 'disabled' : 'contentOnly';
 				}
@@ -2962,20 +2967,66 @@ export const getBlockEditingMode = createRegistrySelector(
 					state,
 					sectionRootClientId
 				);
-				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return 'disabled';
+
+				// Sections are always contentOnly.
+				if ( sectionsClientIds?.includes( clientId ) ) {
+					return 'contentOnly';
 				}
+
+				return 'disabled';
 			}
 
+			if ( editorMode === 'navigation' ) {
+				const sectionRootClientId = getSectionRootClientId( state );
+
+				// The root section is "default mode"
+				if ( clientId === sectionRootClientId ) {
+					return 'default';
+				}
+
+				// Sections should always be contentOnly in navigation mode.
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( sectionsClientIds.includes( clientId ) ) {
+					return 'contentOnly';
+				}
+
+				// Blocks outside sections should be disabled.
+				const isWithinSectionRoot = isWithinBlock(
+					state,
+					clientId,
+					sectionRootClientId
+				);
+				if ( ! isWithinSectionRoot ) {
+					return 'disabled';
+				}
+
+				// The rest of the blocks depend on whether they are content blocks or not.
+				// This "flattens" the sections tree.
+				const name = getBlockName( state, clientId );
+				const isContent =
+					select( blocksStore ).__experimentalHasContentRoleAttribute(
+						name
+					);
+				return isContent ? 'contentOnly' : 'disabled';
+			}
+
+			// In normal mode, consider that an explicitely set editing mode takes over.
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
 			}
+
+			// In normal mode, top level is default mode.
 			if ( ! clientId ) {
 				return 'default';
 			}
+
 			const rootClientId = getBlockRootClientId( state, clientId );
 			const templateLock = getTemplateLock( state, rootClientId );
+			// If the parent of the block is contentOnly locked, check whether it's a content block.
 			if ( templateLock === 'contentOnly' ) {
 				const name = getBlockName( state, clientId );
 				const isContent =
@@ -2984,6 +3035,7 @@ export const getBlockEditingMode = createRegistrySelector(
 					);
 				return isContent ? 'contentOnly' : 'disabled';
 			}
+			// Otherwise, check if there's an ancestor that is contentOnly
 			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}

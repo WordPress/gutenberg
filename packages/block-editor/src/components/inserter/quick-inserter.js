@@ -138,6 +138,7 @@ export default function QuickInserter( {
 
 			{ setInserterIsOpened && (
 				<Button
+					__next40pxDefaultSize
 					className="block-editor-inserter__quick-inserter-expand"
 					onClick={ onBrowseAll }
 					aria-label={ __(

@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BaseControl from '../../base-control';
+import { VisuallyHidden } from '../../visually-hidden';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimeInputValue, TimePickerProps } from '../types';
@@ -61,6 +62,7 @@ export function TimePicker( {
 	currentTime,
 	onChange,
 	dateOrder: dateOrderProp,
+	hideLabelFromVision = false,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -77,10 +79,28 @@ export function TimePicker( {
 		);
 	}, [ currentTime ] );
 
+	const monthOptions = [
+		{ value: '01', label: __( 'January' ) },
+		{ value: '02', label: __( 'February' ) },
+		{ value: '03', label: __( 'March' ) },
+		{ value: '04', label: __( 'April' ) },
+		{ value: '05', label: __( 'May' ) },
+		{ value: '06', label: __( 'June' ) },
+		{ value: '07', label: __( 'July' ) },
+		{ value: '08', label: __( 'August' ) },
+		{ value: '09', label: __( 'September' ) },
+		{ value: '10', label: __( 'October' ) },
+		{ value: '11', label: __( 'November' ) },
+		{ value: '12', label: __( 'December' ) },
+	] as const;
+
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
 			day: format( date, 'dd' ),
-			month: format( date, 'MM' ),
+			month: format(
+				date,
+				'MM'
+			) as ( typeof monthOptions )[ number ][ 'value' ],
 			year: format( date, 'yyyy' ),
 			minutes: format( date, 'mm' ),
 			hours: format( date, 'HH' ),
@@ -146,20 +166,7 @@ export function TimePicker( {
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				value={ month }
-				options={ [
-					{ value: '01', label: __( 'January' ) },
-					{ value: '02', label: __( 'February' ) },
-					{ value: '03', label: __( 'March' ) },
-					{ value: '04', label: __( 'April' ) },
-					{ value: '05', label: __( 'May' ) },
-					{ value: '06', label: __( 'June' ) },
-					{ value: '07', label: __( 'July' ) },
-					{ value: '08', label: __( 'August' ) },
-					{ value: '09', label: __( 'September' ) },
-					{ value: '10', label: __( 'October' ) },
-					{ value: '11', label: __( 'November' ) },
-					{ value: '12', label: __( 'December' ) },
-				] }
+				options={ monthOptions }
 				onChange={ ( value ) => {
 					const newDate = setMonth( date, Number( value ) - 1 );
 					setDate( newDate );
@@ -214,12 +221,18 @@ export function TimePicker( {
 			className="components-datetime__time" // Unused, for backwards compatibility.
 		>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Time' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Time' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Time' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
@@ -236,12 +249,18 @@ export function TimePicker( {
 				</HStack>
 			</Fieldset>
 			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Date' ) }
-				</BaseControl.VisualLabel>
+				{ hideLabelFromVision ? (
+					<VisuallyHidden as="legend">
+						{ __( 'Date' ) }
+					</VisuallyHidden>
+				) : (
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Date' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
