@@ -303,6 +303,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			const pane = metaBoxesMainRef.current;
 			const fromHeight = isAutoHeight ? pane.offsetHeight : openHeight;
 			actualizeHeight( delta + fromHeight, true );
+			event.preventDefault();
 		}
 	};
 	const className = 'edit-post-meta-boxes-main';
