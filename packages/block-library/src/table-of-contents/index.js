@@ -19,6 +19,28 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	example: {
+		attributes: {
+			headings: [
+				{
+					content: 'Heading',
+					level: 2,
+				},
+				{
+					content: 'Subheading',
+					level: 3,
+				},
+				{
+					content: 'Heading',
+					level: 2,
+				},
+				{
+					content: 'Subheading',
+					level: 3,
+				},
+			],
+		},
+	},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

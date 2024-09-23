@@ -6,7 +6,8 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * WordPress dependencies
  */
-import { useRegistry } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -144,13 +145,24 @@ function observeCallback( select, dispatch, clientId ) {
 	}
 }
 
-export function useObserveHeadings( clientId ) {
+export function useObserveHeadings( clientId, headings ) {
 	const registry = useRegistry();
+	const blockType = useSelect(
+		( select ) =>
+			select( blocksStore ).getBlockType( 'core/table-of-contents' ),
+		[]
+	);
+	const isExample =
+		JSON.stringify( blockType.example.attributes.headings ) ===
+		JSON.stringify( headings );
+
 	useEffect( () => {
-		// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
-		// See: https://github.com/WordPress/gutenberg/pull/45513
-		return registry.subscribe( () =>
-			observeCallback( registry.select, registry.dispatch, clientId )
-		);
-	}, [ registry, clientId ] );
+		if ( ! isExample ) {
+			// Todo: Limit subscription to block editor store when data no longer depends on `getPermalink`.
+			// See: https://github.com/WordPress/gutenberg/pull/45513
+			return registry.subscribe( () =>
+				observeCallback( registry.select, registry.dispatch, clientId )
+			);
+		}
+	}, [ registry, clientId, isExample ] );
 }
