@@ -59,7 +59,9 @@ export const TabList = forwardRef<
 		}
 
 		function scrollTo( left: number ) {
-			parent?.scroll( { left } );
+			if ( parent?.scroll ) {
+				parent.scroll( { left } );
+			}
 		}
 
 		const { scrollLeft: parentScroll } = parent;
