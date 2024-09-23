@@ -8,7 +8,7 @@ import { useStoreState } from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -53,18 +53,13 @@ export const TabList = forwardRef<
 	} );
 
 	// Make sure active tab is scrolled into view.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! parent || ! activeTabPosition ) {
 			return;
 		}
 
 		function scrollTo( left: number ) {
-			if ( parent?.scroll ) {
-				const originalOverflowX = parent.style.overflowX;
-				parent.style.overflowX = 'hidden';
-				parent.scroll( { left } );
-				parent.style.overflowX = originalOverflowX;
-			}
+			parent?.scroll( { left } );
 		}
 
 		const { scrollLeft: parentScroll } = parent;
