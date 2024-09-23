@@ -34,6 +34,9 @@ export const TabList = forwardRef<
 	const selectedId = useStoreState( context?.store, 'selectedId' );
 	const selectedElement = context?.store.item( selectedId )?.element;
 	const indicatorPosition = useTrackElementOffsetRect( selectedElement );
+	const activeId = useStoreState( context?.store, 'activeId' );
+	const activeElement = context?.store.item( activeId )?.element;
+	const activeTabPosition = useTrackElementOffsetRect( activeElement );
 	const items = useStoreState( context?.store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement | null >();
 	const overflow = useTrackOverflow( parent, {
@@ -51,7 +54,7 @@ export const TabList = forwardRef<
 
 	// Make sure active tab is scrolled into view.
 	useEffect( () => {
-		if ( ! parent || ! indicatorPosition ) {
+		if ( ! parent || ! activeTabPosition ) {
 			return;
 		}
 
@@ -66,7 +69,7 @@ export const TabList = forwardRef<
 
 		const { scrollLeft: parentScroll } = parent;
 		const parentWidth = parent.getBoundingClientRect().width;
-		const { left: childLeft, width: childWidth } = indicatorPosition;
+		const { left: childLeft, width: childWidth } = activeTabPosition;
 
 		const parentRightEdge = parentScroll + parentWidth;
 		const childRightEdge = childLeft + childWidth;
@@ -79,9 +82,8 @@ export const TabList = forwardRef<
 		if ( leftOverflow > 0 ) {
 			return scrollTo( parentScroll - leftOverflow );
 		}
-	}, [ indicatorPosition, parent ] );
+	}, [ activeTabPosition, parent ] );
 
-	const activeId = useStoreState( context?.store, 'activeId' );
 	const selectOnMove = useStoreState( context?.store, 'selectOnMove' );
 
 	if ( ! context?.store ) {
