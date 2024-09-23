@@ -62,7 +62,7 @@ export const TabListWrapper = styled.div`
 	&:not( [aria-orientation='vertical'] ) {
 		--fade-width: 4rem;
 		--fade-gradient-base: transparent 0%, black var( --fade-width );
-		--fade-gradient-composed: var( --fade-gradient-base ), black 50%,
+		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
 			transparent 50%;
 		&.is-overflowing-first {
 			mask-image: linear-gradient(
