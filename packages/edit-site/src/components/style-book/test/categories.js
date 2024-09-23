@@ -91,8 +91,9 @@ describe( 'utils', () => {
 			expect( getTopLevelStyleBookCategories() ).toEqual( [
 				...STYLE_BOOK_CATEGORIES,
 				{
-					name: 'funky',
+					slug: 'funky',
 					title: 'Funky',
+					icon: 'funky',
 				},
 			] );
 		} );
