@@ -14,7 +14,7 @@ import { useCallback, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
-import { noFilter } from '../../../store/utils';
+import { isFiltered } from '../../../store/utils';
 import { unlock } from '../../../lock-unlock';
 
 /**
@@ -27,7 +27,7 @@ import { unlock } from '../../../lock-unlock';
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 	const options = useMemo(
-		() => ( { [ noFilter ]: ! isQuick } ),
+		() => ( { [ isFiltered ]: isQuick } ),
 		[ isQuick ]
 	);
 	const [ items ] = useSelect(

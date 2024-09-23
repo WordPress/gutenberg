@@ -21,7 +21,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	noFilter,
+	isFiltered,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -80,7 +80,9 @@ const EMPTY_ARRAY = [];
  */
 const EMPTY_SET = new Set();
 
-const EMPTY_OBJECT = {};
+const EMPTY_OBJECT = {
+	[ isFiltered ]: true,
+};
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -2056,7 +2058,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				)
 				.map( buildBlockTypeInserterItem );
 
-			if ( ! options[ noFilter ] ) {
+			if ( options[ isFiltered ] === false ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
 					( blockType ) =>
 						canIncludeBlockTypeInInserter(
