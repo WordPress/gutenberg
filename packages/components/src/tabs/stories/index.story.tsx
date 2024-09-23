@@ -70,7 +70,7 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 
 export const Default = Template.bind( {} );
 
-export function SizeAndOverflowPlayground() {
+export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
 	const [ fullWidth, setFullWidth ] = useState( false );
 	return (
 		<div>
@@ -123,7 +123,7 @@ export function SizeAndOverflowPlayground() {
 					? 'Remove width: 100% from TabList'
 					: 'Set width: 100% in TabList' }
 			</Button>
-			<Tabs defaultTabId="tab4">
+			<Tabs { ...props }>
 				<div
 					style={ {
 						width: '20rem',
@@ -171,7 +171,10 @@ export function SizeAndOverflowPlayground() {
 			</Tabs>
 		</div>
 	);
-}
+};
+SizeAndOverflowPlayground.args = {
+	defaultTabId: 'tab4',
+};
 
 const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
