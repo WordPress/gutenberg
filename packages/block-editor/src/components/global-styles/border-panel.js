@@ -249,7 +249,7 @@ export default function BorderPanel( {
 				<ToolsPanelItem
 					hasValue={ () => isDefinedBorder( value?.border ) }
 					label={ __( 'Border' ) }
-					onDeselect={ () => resetBorder() }
+					onDeselect={ resetBorder }
 					isShownByDefault={ showBorderByDefault }
 					panelId={ panelId }
 				>

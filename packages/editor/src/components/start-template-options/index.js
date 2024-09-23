@@ -144,9 +144,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 					slug={ slug }
 					isCustom={ isCustom }
 					postType={ postType }
-					onChoosePattern={ () => {
-						onClose();
-					} }
+					onChoosePattern={ onClose }
 				/>
 			</div>
 			<Flex

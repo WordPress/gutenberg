@@ -303,9 +303,7 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 											return (
 												<MenuItem
 													icon={ upload }
-													onClick={ () => {
-														openFileDialog();
-													} }
+													onClick={ openFileDialog }
 												>
 													{ __( 'Upload' ) }
 												</MenuItem>

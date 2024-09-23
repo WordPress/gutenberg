@@ -679,9 +679,7 @@ export default function LogoEdit( {
 								label={ __( 'Choose logo' ) }
 								showTooltip
 								tooltipPosition="middle right"
-								onClick={ () => {
-									open();
-								} }
+								onClick={ open }
 							/>
 						);
 					} }

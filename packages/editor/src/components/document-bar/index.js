@@ -152,7 +152,7 @@ export default function DocumentBar( props ) {
 			) : (
 				<Button
 					className="editor-document-bar__command"
-					onClick={ () => openCommandCenter() }
+					onClick={ openCommandCenter }
 					size="compact"
 				>
 					<motion.div

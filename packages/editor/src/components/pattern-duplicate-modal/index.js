@@ -43,7 +43,7 @@ export default function PatternDuplicateModal() {
 	return (
 		<DuplicatePatternModal
 			onClose={ closeModal }
-			onSuccess={ () => closeModal() }
+			onSuccess={ closeModal }
 			pattern={ record }
 		/>
 	);

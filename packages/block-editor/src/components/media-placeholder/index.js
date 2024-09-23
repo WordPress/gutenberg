@@ -439,9 +439,7 @@ export function MediaPlaceholder( {
 					// TODO: Switch to `true` (40px size) if possible
 					__next40pxDefaultSize={ false }
 					variant="secondary"
-					onClick={ () => {
-						open();
-					} }
+					onClick={ open }
 				>
 					{ __( 'Media Library' ) }
 				</Button>

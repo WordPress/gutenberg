@@ -67,9 +67,7 @@ const InserterDraggableBlocks = ( {
 					serialize( parsedBlocks )
 				);
 			} }
-			onDragEnd={ () => {
-				stopDragging();
-			} }
+			onDragEnd={ stopDragging }
 			__experimentalDragComponent={
 				<BlockDraggableChip
 					count={ blocks.length }

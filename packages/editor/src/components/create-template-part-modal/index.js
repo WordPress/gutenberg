@@ -186,9 +186,7 @@ export function CreateTemplatePartModalContents( {
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
-						onClick={ () => {
-							closeModal();
-						} }
+						onClick={ closeModal }
 					>
 						{ __( 'Cancel' ) }
 					</Button>

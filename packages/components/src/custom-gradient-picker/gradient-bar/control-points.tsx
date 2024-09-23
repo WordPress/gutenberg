@@ -344,9 +344,7 @@ function InsertPoint( {
 		<GradientColorPickerDropdown
 			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
 			className="components-custom-gradient-picker__inserter"
-			onClose={ () => {
-				onCloseInserter();
-			} }
+			onClose={ onCloseInserter }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }

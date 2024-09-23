@@ -32,7 +32,7 @@ function TabbedSidebar(
 						className="block-editor-tabbed-sidebar__close-button"
 						icon={ closeSmall }
 						label={ closeButtonLabel }
-						onClick={ () => onClose() }
+						onClick={ onClose }
 						size="small"
 					/>
 

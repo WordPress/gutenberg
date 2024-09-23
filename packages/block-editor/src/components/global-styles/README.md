@@ -14,7 +14,7 @@ import { useGlobalStylesReset } from '@wordpress/block-editor';
 function MyComponent() {
 	const [ canReset, reset ] = useGlobalStylesReset();
 
-	return canReset ? <Button onClick={ () => reset() }>Reset</Button> : null;
+	return canReset ? <Button onClick={ reset }>Reset</Button> : null;
 }
 ```
 

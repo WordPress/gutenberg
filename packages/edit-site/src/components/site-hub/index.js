@@ -105,7 +105,7 @@ const SiteHub = memo(
 								__next40pxDefaultSize={ false }
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
-								onClick={ () => openCommandCenter() }
+								onClick={ openCommandCenter }
 								label={ __( 'Open command palette' ) }
 								shortcut={ displayShortcut.primary( 'k' ) }
 							/>
@@ -190,7 +190,7 @@ export const SiteHubMobile = memo(
 								__next40pxDefaultSize={ false }
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
-								onClick={ () => openCommandCenter() }
+								onClick={ openCommandCenter }
 								label={ __( 'Open command palette' ) }
 								shortcut={ displayShortcut.primary( 'k' ) }
 							/>

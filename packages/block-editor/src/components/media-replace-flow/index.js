@@ -184,9 +184,7 @@ const MediaReplaceFlow = ( {
 									return (
 										<MenuItem
 											icon={ upload }
-											onClick={ () => {
-												openFileDialog();
-											} }
+											onClick={ openFileDialog }
 										>
 											{ __( 'Upload' ) }
 										</MenuItem>

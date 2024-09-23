@@ -72,7 +72,7 @@ function ImportForm( { instanceId, onUpload } ) {
 			ref={ formRef }
 		>
 			{ error && (
-				<Notice status="error" onRemove={ () => onDismissError() }>
+				<Notice status="error" onRemove={ onDismissError }>
 					{ error }
 				</Notice>
 			) }

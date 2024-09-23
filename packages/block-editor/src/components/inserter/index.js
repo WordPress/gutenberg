@@ -179,9 +179,7 @@ class Inserter extends Component {
 
 		return (
 			<InserterMenu
-				onSelect={ () => {
-					onClose();
-				} }
+				onSelect={ onClose }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }

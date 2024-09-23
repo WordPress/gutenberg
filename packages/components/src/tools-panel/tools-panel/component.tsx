@@ -72,7 +72,7 @@ const UnconnectedToolsPanel = (
  *       <ToolsPanelItem
  *         hasValue={ () => !! height }
  *         label={ __( 'Height' ) }
- *         onDeselect={ () => setHeight() }
+ *         onDeselect={ setHeight }
  *       >
  *         <UnitControl
  *           label={ __( 'Height' ) }
@@ -83,7 +83,7 @@ const UnconnectedToolsPanel = (
  *       <ToolsPanelItem
  *         hasValue={ () => !! width }
  *         label={ __( 'Width' ) }
- *         onDeselect={ () => setWidth() }
+ *         onDeselect={ setWidth }
  *       >
  *         <UnitControl
  *           label={ __( 'Width' ) }

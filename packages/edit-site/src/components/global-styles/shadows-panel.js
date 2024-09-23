@@ -109,9 +109,7 @@ function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 							size="small"
 							icon={ plus }
 							label={ __( 'Add shadow' ) }
-							onClick={ () => {
-								handleAddShadow();
-							} }
+							onClick={ handleAddShadow }
 						/>
 					</FlexItem>
 				) }

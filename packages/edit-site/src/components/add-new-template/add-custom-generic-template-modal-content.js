@@ -61,9 +61,7 @@ function AddCustomGenericTemplateModalContent( { onClose, createTemplate } ) {
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
-						onClick={ () => {
-							onClose();
-						} }
+						onClick={ onClose }
 					>
 						{ __( 'Cancel' ) }
 					</Button>

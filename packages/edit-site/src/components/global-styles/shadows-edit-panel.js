@@ -310,9 +310,7 @@ function ShadowEditor( { shadow, onChange } ) {
 							size="small"
 							icon={ plus }
 							label={ __( 'Add shadow' ) }
-							onClick={ () => {
-								onAddShadowPart();
-							} }
+							onClick={ onAddShadowPart }
 						/>
 					</FlexItem>
 				</HStack>

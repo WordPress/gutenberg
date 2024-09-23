@@ -44,7 +44,7 @@ function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
 						className="block-editor-inserter__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close block inserter' ) }
-						onClick={ () => onClose() }
+						onClick={ onClose }
 						size="small"
 					/>
 

@@ -82,7 +82,7 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 						onAppend();
 					}
 				} }
-				onClick={ () => onAppend() }
+				onClick={ onAppend }
 				onFocus={ () => {
 					if ( showPrompt ) {
 						onAppend();
