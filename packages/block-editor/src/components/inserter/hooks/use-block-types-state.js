@@ -27,7 +27,7 @@ import { unlock } from '../../../lock-unlock';
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 	const options = useMemo(
-		() => ( { [ isFiltered ]: isQuick } ),
+		() => ( { [ isFiltered ]: !! isQuick } ),
 		[ isQuick ]
 	);
 	const [ items ] = useSelect(

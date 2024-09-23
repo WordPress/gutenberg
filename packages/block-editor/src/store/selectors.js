@@ -80,7 +80,7 @@ const EMPTY_ARRAY = [];
  */
 const EMPTY_SET = new Set();
 
-const EMPTY_OBJECT = {
+const DEFAULT_INSERTER_OPTIONS = {
 	[ isFiltered ]: true,
 };
 
@@ -2010,7 +2010,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
+		( state, rootClientId = null, options = DEFAULT_INSERTER_OPTIONS ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2058,7 +2058,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				)
 				.map( buildBlockTypeInserterItem );
 
-			if ( options[ isFiltered ] === false ) {
+			if ( options[ isFiltered ] !== false ) {
 				blockTypeInserterItems = blockTypeInserterItems.filter(
 					( blockType ) =>
 						canIncludeBlockTypeInInserter(
