@@ -8,6 +8,12 @@
 
 		&:has(.components-menu-group) {
 			padding: 0;
+
+			.components-dropdown-menu__menu > .components-menu-item__button,
+			> .components-menu-item__button {
+				margin: $grid-unit-10;
+				width: auto;
+			}
 		}
 	}
 
