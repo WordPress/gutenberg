@@ -6,6 +6,7 @@
 
 ### Enhancements
 
+-   Improve TypeScript support for generators ([#64577](https://github.com/WordPress/gutenberg/pull/64577)).
 -   Refactor internal context proxies implementation ([#64713](https://github.com/WordPress/gutenberg/pull/64713)).
 
 ### Bug Fixes
