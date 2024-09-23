@@ -105,7 +105,19 @@ export function ZoomOutSeparator( {
 					onDragOver={ () => setIsDraggedOver( true ) }
 					onDragLeave={ () => setIsDraggedOver( false ) }
 				>
-					{ __( 'Drag and drop a pattern.' ) }
+					<motion.div
+						initial={ { opacity: 0 } }
+						animate={ { opacity: 1 } }
+						exit={ { opacity: 0 } }
+						transition={ {
+							type: 'tween',
+							duration: 0.1,
+						} }
+					>
+						{ isDraggedOver
+							? __( 'Drop pattern.' )
+							: __( 'Insert a pattern here.' ) }
+					</motion.div>
 				</motion.div>
 			) }
 		</AnimatePresence>
