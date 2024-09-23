@@ -49,10 +49,9 @@ function UnconnectedToggleGroupControl(
 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
 
 	const [ activeElement, setActiveElement ] = useState< HTMLElement >();
-	if ( activeElement && ! value ) {
-		setActiveElement( undefined );
-	}
-	const indicatorPosition = useTrackElementOffsetRect( activeElement );
+	const indicatorPosition = useTrackElementOffsetRect(
+		value ? activeElement : undefined
+	);
 
 	const [ animationEnabled, setAnimationEnabled ] = useState( false );
 	useOnValueUpdate( indicatorPosition.element, ( { previousValue } ) => {
